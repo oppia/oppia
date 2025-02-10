@@ -38,8 +38,9 @@ if MYPY: # pragma: no cover
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
     """Test the story fetchers module."""
 
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
+    NODE_ID_2: Final = '%s2' % story_domain.NODE_ID_PREFIX
+    EXP_ID_1: Final = 'exp_1'
     USER_ID: Final = 'user'
 
     def setUp(self) -> None:
@@ -61,6 +62,14 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': self.NODE_ID_1,
                 'title': 'Title 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': self.EXP_ID_1
             })
         ]
         story_services.update_story(
@@ -279,7 +288,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(pending_nodes[0].description, '')
         self.assertEqual(pending_nodes[0].title, 'Title 1')
         self.assertEqual(pending_nodes[0].id, self.NODE_ID_1)
-        self.assertEqual(pending_nodes[0].exploration_id, None)
+        self.assertEqual(pending_nodes[0].exploration_id, self.EXP_ID_1)
 
     def test_get_completed_nodes_in_story(self) -> None:
         story = story_fetchers.get_story_by_id(self.story_id)
@@ -337,7 +346,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': exp_id_1
             })

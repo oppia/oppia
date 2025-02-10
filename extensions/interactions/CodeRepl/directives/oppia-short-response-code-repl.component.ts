@@ -20,15 +20,15 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { Answer } from './oppia-response-code-repl.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {Answer} from './oppia-response-code-repl.component';
 
 @Component({
   selector: 'oppia-short-response-code-repl',
   templateUrl: './code-repl-short-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseCodeRepl implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -36,14 +36,17 @@ export class ShortResponseCodeRepl implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input('answer') answerWithValue!: string;
   escapedAnswer!: Answer;
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
-      this.answerWithValue) as Answer;
+      this.answerWithValue
+    ) as Answer;
   }
 }
 angular.module('oppia').directive(
-  'oppiaShortResponseCodeRepl', downgradeComponent({
-    component: ShortResponseCodeRepl
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseCodeRepl',
+  downgradeComponent({
+    component: ShortResponseCodeRepl,
+  }) as angular.IDirectiveFactory
+);

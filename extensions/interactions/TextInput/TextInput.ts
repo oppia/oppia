@@ -16,16 +16,17 @@
  * @fileoverview Requires for TextInput interaction.
  */
 
-require('interactions/TextInput/text-input-prediction.service.ts');
-
 require('interactions/TextInput/directives/text-input-rules.service.ts');
 require('interactions/TextInput/directives/text-input-validation.service.ts');
 require(
   'interactions/TextInput/directives/' +
-  'oppia-interactive-text-input.component.ts');
+    'oppia-interactive-text-input.component.ts'
+);
 require(
   'interactions/TextInput/directives/' +
-  'oppia-response-text-input.component.ts');
+    'oppia-response-text-input.component.ts'
+);
 require(
   'interactions/TextInput/directives/' +
-  'oppia-short-response-text-input.component.ts');
+    'oppia-short-response-text-input.component.ts'
+);

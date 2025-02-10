@@ -16,16 +16,16 @@
  * @fileoverview Module for the feedback-updates page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { FeedbackUpdatesPageComponent } from './feedback-updates-page.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { FeedbackUpdatesPageRootComponent } from './feedback-updates-page-root.component';
-import { CommonModule } from '@angular/common';
-import { FeedbackUpdatesPageRoutingModule } from './feedback-updates-page-routing.module';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {FeedbackUpdatesPageComponent} from './feedback-updates-page.component';
+import {ReactiveFormsModule} from '@angular/forms';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.component';
+import {CommonModule} from '@angular/common';
+import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.module';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -37,15 +37,15 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     ReactiveFormsModule,
     SharedComponentsModule,
     FeedbackUpdatesPageRoutingModule,
-    Error404PageModule
+    Error404PageModule,
   ],
   declarations: [
     FeedbackUpdatesPageComponent,
-    FeedbackUpdatesPageRootComponent
+    FeedbackUpdatesPageRootComponent,
   ],
   entryComponents: [
     FeedbackUpdatesPageComponent,
-    FeedbackUpdatesPageRootComponent
-  ]
+    FeedbackUpdatesPageRootComponent,
+  ],
 })
 export class FeedbackUpdatesPageModule {}

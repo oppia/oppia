@@ -16,13 +16,23 @@
  * @fileoverview Unit tests for Unassign Skill Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent, TopicAssignmentsSummary } from './unassign-skill-from-topics-modal.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  AssignedSkillBackendDict,
+  AssignedSkill,
+} from 'domain/skill/assigned-skill.model';
+import {
+  TopicsAndSkillsDashboardBackendApiService,
+  TopicIdToDiagnosticTestSkillIdsResponse,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {
+  TopicNameToTopicAssignments,
+  UnassignSkillFromTopicsModalComponent,
+  TopicAssignmentsSummary,
+} from './unassign-skill-from-topics-modal.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 describe('Skill unassignment modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
@@ -33,62 +43,59 @@ describe('Skill unassignment modal', () => {
     topic_id: 'test_id_1',
     topic_name: 'Addition',
     topic_version: 1,
-    subtopic_id: 2
+    subtopic_id: 2,
   };
   let skillBackendDictForFractions: AssignedSkillBackendDict = {
     topic_id: 'test_id_2',
     topic_name: 'Fractions',
     topic_version: 1,
-    subtopic_id: 2
+    subtopic_id: 2,
   };
   const testSkills: AssignedSkill[] = [
     AssignedSkill.createFromBackendDict(skillBackendDictForAddition),
-    AssignedSkill.createFromBackendDict(skillBackendDictForFractions)
+    AssignedSkill.createFromBackendDict(skillBackendDictForFractions),
   ];
 
-  const testTopicIdToDiagnosticTestSkillIds:
-  TopicIdToDiagnosticTestSkillIdsResponse = {
-    topicIdToDiagnosticTestSkillIds: {
-      test_id_1: [],
-      test_id_2: ['skill_id']
-    }
-  };
+  const testTopicIdToDiagnosticTestSkillIds: TopicIdToDiagnosticTestSkillIdsResponse =
+    {
+      topicIdToDiagnosticTestSkillIds: {
+        test_id_1: [],
+        test_id_2: ['skill_id'],
+      },
+    };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
       return {
         then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
-        }
+        },
       };
     }
 
     fetchTopicIdToDiagnosticTestSkillIdsAsync(topicIds: string[]) {
       return {
-        then: (callback: (
-          resp: TopicIdToDiagnosticTestSkillIdsResponse) => void) => {
+        then: (
+          callback: (resp: TopicIdToDiagnosticTestSkillIdsResponse) => void
+        ) => {
           callback(testTopicIdToDiagnosticTestSkillIds);
-        }
+        },
       };
     }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MatProgressSpinnerModule
-      ],
-      declarations: [
-        UnassignSkillFromTopicsModalComponent
-      ],
+      imports: [MatProgressSpinnerModule],
+      declarations: [UnassignSkillFromTopicsModalComponent],
       providers: [
         NgbActiveModal,
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
-          useClass: MockTopicsAndSkillsDashboardBackendApiService
+          useClass: MockTopicsAndSkillsDashboardBackendApiService,
         },
-        UrlInterpolationService
-      ]
+        UrlInterpolationService,
+      ],
     }).compileComponents();
   }));
 
@@ -118,17 +125,19 @@ describe('Skill unassignment modal', () => {
         subtopicId: 0,
         topicVersion: 0,
         topicId: '',
-      }
+      },
     };
     componentInstance.close();
     expect(ngbActiveModal.close).toHaveBeenCalledWith(
-      componentInstance.selectedTopics);
+      componentInstance.selectedTopics
+    );
   });
 
   it('should select topic to unassign', () => {
     componentInstance.selectedTopicToUnassign('abc');
-    expect(componentInstance.selectedTopicNames.indexOf('abc'))
-      .toBeGreaterThan(-1);
+    expect(componentInstance.selectedTopicNames.indexOf('abc')).toBeGreaterThan(
+      -1
+    );
     componentInstance.selectedTopicToUnassign('abc');
     expect(componentInstance.selectedTopicNames.indexOf('abc')).toEqual(-1);
   });
@@ -140,23 +149,25 @@ describe('Skill unassignment modal', () => {
     assignments[skillBackendDictForAddition.topic_name] = {
       subtopicId: skillBackendDictForAddition.subtopic_id,
       topicVersion: skillBackendDictForAddition.topic_version,
-      topicId: skillBackendDictForAddition.topic_id
+      topicId: skillBackendDictForAddition.topic_id,
     };
     expect(componentInstance.eligibleTopicNameToTopicAssignments).toEqual(
-      assignments);
+      assignments
+    );
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
 
   it('should get topic editor url', () => {
-    spyOn(urlInterpolationService, 'interpolateUrl').and
-      .returnValue('test_url');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'test_url'
+    );
     let topicsAssignment: TopicAssignmentsSummary = {
       subtopicId: 1,
       topicVersion: 1,
-      topicId: 'topicID'
+      topicId: 'topicID',
     };
-    expect(
-      componentInstance.getTopicEditorUrl(topicsAssignment)).toEqual(
-      'test_url');
+    expect(componentInstance.getTopicEditorUrl(topicsAssignment)).toEqual(
+      'test_url'
+    );
   });
 });

@@ -16,24 +16,24 @@
  * @fileoverview Unit tests for the DeleteWorkedExampleComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteWorkedExampleComponent } from './delete-worked-example-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteWorkedExampleComponent} from './delete-worked-example-modal.component';
 
-describe('Delete Worked Example Modal Component', function() {
+describe('Delete Worked Example Modal Component', function () {
   let component: DeleteWorkedExampleComponent;
   let fixture: ComponentFixture<DeleteWorkedExampleComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteWorkedExampleComponent
+      declarations: [DeleteWorkedExampleComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

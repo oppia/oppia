@@ -16,17 +16,16 @@
  * @fileoverview Component for fraction editor.
  */
 
-
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Fraction } from 'domain/objects/fraction.model';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { FractionAnswer } from 'interactions/answer-defs';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Fraction} from 'domain/objects/fraction.model';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {FractionAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'fraction-editor',
   templateUrl: './fraction-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class FractionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -40,8 +39,7 @@ export class FractionEditorComponent implements OnInit {
   eventBus: EventBusGroup;
   @Output() validityChange = new EventEmitter();
 
-  constructor(
-    private eventBusService: EventBusService) {
+  constructor(private eventBusService: EventBusService) {
     this.eventBus = new EventBusGroup(this.eventBusService);
   }
 
@@ -66,10 +64,10 @@ export class FractionEditorComponent implements OnInit {
       }
       this.errorMessageI18nKey = '';
       this.currentFractionValueIsValid = true;
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
@@ -82,6 +80,8 @@ export class FractionEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'fractionEditor', downgradeComponent({
-    component: FractionEditorComponent
-  }) as angular.IDirectiveFactory);
+  'fractionEditor',
+  downgradeComponent({
+    component: FractionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

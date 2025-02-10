@@ -17,18 +17,18 @@
  * in the translation tab is currently active.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-
-import { ContributionOpportunitiesService } from
+import {AppConstants} from 'app.constants';
+import {
+  ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities.service';
-import { LoggerService } from 'services/contextual/logger.service';
-
+} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslationTopicService {
   // This property is initialized using async methods
@@ -39,24 +39,29 @@ export class TranslationTopicService {
 
   constructor(
     private ContributionOpportunitiesService: ContributionOpportunitiesService,
-    private loggerService: LoggerService) {}
+    private loggerService: LoggerService
+  ) {}
 
   getActiveTopicName(): string {
     return this.activeTopicName;
   }
 
   setActiveTopicName(newActiveTopicName: string): void {
-    this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync()
-      .then((data) => {
-        if (newActiveTopicName !== 'All' &&
-            data.indexOf(newActiveTopicName) < 0) {
+    this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync().then(
+      data => {
+        if (
+          newActiveTopicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL &&
+          data.indexOf(newActiveTopicName) < 0
+        ) {
           this.loggerService.error(
-            'Invalid active topic name: ' + newActiveTopicName);
+            `Invalid active topic name: ${newActiveTopicName}`
+          );
           return;
         }
         this.activeTopicName = newActiveTopicName;
         this._activeTopicChangedEventEmitter.emit();
-      });
+      }
+    );
   }
 
   get onActiveTopicChanged(): EventEmitter<void> {
@@ -64,6 +69,9 @@ export class TranslationTopicService {
   }
 }
 
-angular.module('oppia').service(
-  'TranslationTopicService',
-  downgradeInjectable(TranslationTopicService));
+angular
+  .module('oppia')
+  .service(
+    'TranslationTopicService',
+    downgradeInjectable(TranslationTopicService)
+  );

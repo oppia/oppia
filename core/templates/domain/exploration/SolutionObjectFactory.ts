@@ -17,44 +17,43 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ConvertToPlainTextPipe } from
-  'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { ExplorationHtmlFormatterService } from
-  'services/exploration-html-formatter.service';
-import { Fraction } from 'domain/objects/fraction.model';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {Fraction} from 'domain/objects/fraction.model';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
   NumberWithUnitsAnswer,
-  PencilCodeEditorAnswer
+  PencilCodeEditorAnswer,
 } from 'interactions/answer-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
-import { InteractionCustomizationArgs, DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
+import {
+  InteractionCustomizationArgs,
+  DragAndDropSortInputCustomizationArgs,
+} from 'interactions/customization-args-defs';
 
 export interface ExplanationBackendDict {
   // A null 'content_id' indicates that the 'Solution' has been created
   // but not saved. Before the 'Solution' object is saved into a State,
   // the 'content_id' should be set to a string.
-  'content_id': string | null;
-  'html': string;
+  content_id: string | null;
+  html: string;
 }
 
 export interface SolutionBackendDict {
-  'answer_is_exclusive': boolean;
-  'correct_answer': InteractionAnswer;
-  'explanation': ExplanationBackendDict;
+  answer_is_exclusive: boolean;
+  correct_answer: InteractionAnswer;
+  explanation: ExplanationBackendDict;
 }
 
 export interface ShortAnswerResponse {
@@ -68,9 +67,11 @@ export class Solution extends BaseTranslatableObject {
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
-      ehfs: ExplorationHtmlFormatterService,
-      answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
-      explanation: SubtitledHtml) {
+    ehfs: ExplorationHtmlFormatterService,
+    answerIsExclusive: boolean,
+    correctAnswer: InteractionAnswer,
+    explanation: SubtitledHtml
+  ) {
     super();
 
     this.ehfs = ehfs;
@@ -87,36 +88,41 @@ export class Solution extends BaseTranslatableObject {
     return {
       answer_is_exclusive: this.answerIsExclusive,
       correct_answer: this.correctAnswer,
-      explanation: this.explanation.toBackendDict()
+      explanation: this.explanation.toBackendDict(),
     };
   }
 
   getSummary(
-      interactionId: string, customizationArgs: InteractionCustomizationArgs
+    interactionId: string,
+    customizationArgs: InteractionCustomizationArgs
   ): string {
     const solutionType = this.answerIsExclusive ? 'The only' : 'One';
     let correctAnswer = null;
     if (interactionId === 'GraphInput') {
       correctAnswer = '[Graph]';
-    } else if (interactionId === 'CodeRepl' ||
-      interactionId === 'PencilCodeEditor') {
+    } else if (
+      interactionId === 'CodeRepl' ||
+      interactionId === 'PencilCodeEditor'
+    ) {
       correctAnswer = (this.correctAnswer as PencilCodeEditorAnswer).code;
     } else if (interactionId === 'MusicNotesInput') {
       correctAnswer = '[Music Notes]';
     } else if (interactionId === 'FractionInput') {
       correctAnswer = Fraction.fromDict(
-        this.correctAnswer as FractionAnswer).toString();
+        this.correctAnswer as FractionAnswer
+      ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = (new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory())).fromDict(
-          this.correctAnswer as NumberWithUnitsAnswer).toString();
+      correctAnswer = new NumberWithUnitsObjectFactory(new UnitsObjectFactory())
+        .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
+        .toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
       const subtitledHtmlChoices = (
-        customizationArgs as DragAndDropSortInputCustomizationArgs)
-        .choices.value;
+        customizationArgs as DragAndDropSortInputCustomizationArgs
+      ).choices.value;
       const subtitledHtmlChoicesContentIds = subtitledHtmlChoices.map(
-        choice => choice.contentId);
+        choice => choice.contentId
+      );
       for (const arr of this.correctAnswer as DragAndDropAnswer) {
         const transformedArray = [];
         for (const elem of arr) {
@@ -128,15 +134,21 @@ export class Solution extends BaseTranslatableObject {
       correctAnswer = JSON.stringify(correctAnswer);
       correctAnswer = correctAnswer.replace(/"/g, '');
     } else {
-      correctAnswer = (
-        (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
-          this.correctAnswer));
+      correctAnswer = new HtmlEscaperService(
+        new LoggerService()
+      ).objToEscapedJson(this.correctAnswer);
     }
-    const explanation = (
-      (new ConvertToPlainTextPipe()).transform(this.explanation.html));
+    const explanation = new ConvertToPlainTextPipe().transform(
+      this.explanation.html
+    );
     return (
-      solutionType + ' solution is "' + correctAnswer +
-      '". ' + explanation + '.');
+      solutionType +
+      ' solution is "' +
+      correctAnswer +
+      '". ' +
+      explanation +
+      '.'
+    );
   }
 
   setCorrectAnswer(correctAnswer: InteractionAnswer): void {
@@ -147,17 +159,19 @@ export class Solution extends BaseTranslatableObject {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(interaction: Interaction):
-    ShortAnswerResponse {
+  getOppiaShortAnswerResponseHtml(
+    interaction: Interaction
+  ): ShortAnswerResponse {
     if (interaction.id === null) {
       throw new Error('Interaction id is possibly null.');
     }
     return {
-      prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+      prefix: this.answerIsExclusive ? 'The only' : 'One',
       answer: this.ehfs.getShortAnswerHtml(
-        this.correctAnswer, interaction.id,
+        this.correctAnswer,
+        interaction.id,
         interaction.customizationArgs
-      )
+      ),
     };
   }
 
@@ -167,34 +181,35 @@ export class Solution extends BaseTranslatableObject {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SolutionObjectFactory {
-  constructor(
-    private ehfs: ExplorationHtmlFormatterService) {}
+  constructor(private ehfs: ExplorationHtmlFormatterService) {}
 
   createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
     return new Solution(
       this.ehfs,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
-      SubtitledHtml.createFromBackendDict(
-        solutionBackendDict.explanation));
+      SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)
+    );
   }
 
   createNew(
-      answerIsExclusive: boolean, correctAnswer: InteractionAnswer,
-      explanationHtml: string, explanationId: string): Solution {
+    answerIsExclusive: boolean,
+    correctAnswer: InteractionAnswer,
+    explanationHtml: string,
+    explanationId: string
+  ): Solution {
     return new Solution(
       this.ehfs,
       answerIsExclusive,
       correctAnswer,
-      SubtitledHtml.createDefault(
-        explanationHtml, explanationId));
+      SubtitledHtml.createDefault(explanationHtml, explanationId)
+    );
   }
 }
 
-
-angular.module('oppia').factory(
-  'SolutionObjectFactory',
-  downgradeInjectable(SolutionObjectFactory));
+angular
+  .module('oppia')
+  .factory('SolutionObjectFactory', downgradeInjectable(SolutionObjectFactory));

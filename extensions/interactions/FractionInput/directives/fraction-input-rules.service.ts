@@ -16,78 +16,86 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { Fraction } from 'domain/objects/fraction.model';
-import { FractionAnswer } from 'interactions/answer-defs';
-import { UtilsService } from 'services/utils.service';
+import {Fraction} from 'domain/objects/fraction.model';
+import {FractionAnswer} from 'interactions/answer-defs';
+import {UtilsService} from 'services/utils.service';
 import {
   FractionEquivalentRuleInputs,
-  FractionIntegerPartRuleInputs
+  FractionIntegerPartRuleInputs,
 } from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FractionInputRulesService {
-  constructor(
-    private utilsService: UtilsService) {}
+  constructor(private utilsService: UtilsService) {}
 
   toFloat(fractionDict: FractionAnswer): number {
     return Fraction.fromDict(fractionDict).toFloat();
   }
 
   IsEquivalentTo(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
     return this.toFloat(answer) === this.toFloat(inputs.f);
   }
 
   IsEquivalentToAndInSimplestForm(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
-    var simplestForm =
-      Fraction.fromDict(inputs.f).convertToSimplestForm();
-    return this.toFloat(answer) === this.toFloat(inputs.f) &&
-      this.utilsService.isEquivalent(answer, simplestForm);
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
+    var simplestForm = Fraction.fromDict(inputs.f).convertToSimplestForm();
+    return (
+      this.toFloat(answer) === this.toFloat(inputs.f) &&
+      this.utilsService.isEquivalent(answer, simplestForm)
+    );
   }
 
   IsExactlyEqualTo(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
     // Only returns true if both answers are structurally equal.
     return this.utilsService.isEquivalent(answer, inputs.f);
   }
 
   IsLessThan(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
     return this.toFloat(answer) < this.toFloat(inputs.f);
   }
 
   IsGreaterThan(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
     return this.toFloat(answer) > this.toFloat(inputs.f);
   }
 
   HasIntegerPartEqualTo(
-      answer: FractionAnswer,
-      inputs: FractionIntegerPartRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionIntegerPartRuleInputs
+  ): boolean {
     var answerFraction = Fraction.fromDict(answer);
     return answerFraction.getIntegerPart() === inputs.x;
   }
 
   HasNumeratorEqualTo(
-      answer: FractionAnswer,
-      inputs: FractionIntegerPartRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionIntegerPartRuleInputs
+  ): boolean {
     return answer.numerator === inputs.x;
   }
 
   HasDenominatorEqualTo(
-      answer: FractionAnswer,
-      inputs: FractionIntegerPartRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionIntegerPartRuleInputs
+  ): boolean {
     return answer.denominator === inputs.x;
   }
 
@@ -96,13 +104,19 @@ export class FractionInputRulesService {
   }
 
   HasFractionalPartExactlyEqualTo(
-      answer: FractionAnswer,
-      inputs: FractionEquivalentRuleInputs): boolean {
+    answer: FractionAnswer,
+    inputs: FractionEquivalentRuleInputs
+  ): boolean {
     return (
       answer.numerator === inputs.f.numerator &&
-      answer.denominator === inputs.f.denominator);
+      answer.denominator === inputs.f.denominator
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'FractionInputRulesService', downgradeInjectable(FractionInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'FractionInputRulesService',
+    downgradeInjectable(FractionInputRulesService)
+  );

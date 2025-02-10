@@ -1,19 +1,22 @@
 <div [ngClass]="{'oppia-save-exploration-wide-modal':showDiff}">
   <div class="modal-header">
     <h3>
-      <span *ngIf="isExplorationPrivate">Save Draft</span>
-      <span *ngIf="!isExplorationPrivate">Publish Changes</span>
+      <span *ngIf="isExplorationPrivate" tabindex="0">Save Draft</span>
+      <span *ngIf="!isExplorationPrivate" tabindex="0">Publish Changes</span>
     </h3>
   </div>
   <div class="modal-body oppia-long-text">
     <p class="e2e-test-exploration-save-modal">
-      <span *ngIf="isExplorationPrivate">(Optional)</span>
-      Please enter a brief description of what you have changed:
-      <textarea rows="3" cols="50" [maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="oppia-commit-message-input e2e-test-commit-message-input" autofocus></textarea>
+      <span *ngIf="isExplorationPrivate" tabindex="0">(Optional)</span>
+      <span tabindex="0">Please enter a brief description of what you have changed:</span>
+      <textarea rows="3" cols="50" [maxlength]="MAX_COMMIT_MESSAGE_LENGTH" [(ngModel)]="commitMessage" class="oppia-commit-message-input e2e-test-commit-message-input"></textarea>
     </p>
     <button class="btn btn-secondary" (click)="onClickToggleDiffButton()">
-      <span *ngIf="!showDiff">Show Changes</span>
+      <span *ngIf="!showDiff">Show Lesson Changes</span>
       <span *ngIf="showDiff">Hide Changes</span>
+    </button>
+    <button *ngIf="modifyTranslationsFeatureFlagIsEnabled" class="btn btn-secondary oppia-show-translation-changes" (click)="showStateDiffModalForTranslations()">
+      <span>Show Translation Changes</span>
     </button>
     <oppia-version-diff-visualization *ngIf="showDiff"
                                       [diffData]="diffData"
@@ -33,5 +36,9 @@
 <style>
   .modal-body .oppia-commit-message-input {
     resize: vertical;
+  }
+
+  .modal-body .oppia-show-translation-changes {
+    margin-left: 10px;
   }
 </style>

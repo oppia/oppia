@@ -19,7 +19,7 @@
 
 var action = require('./action');
 
-var ExplorationEditorStatsTab = function() {
+var ExplorationEditorStatsTab = function () {
   /**
    * Interactive elements
    */
@@ -31,44 +31,47 @@ var ExplorationEditorStatsTab = function() {
   /**
    * Workflows
    */
-  var _getNumPassersby = async function() {
+  var _getNumPassersby = async function () {
     var numPasserByText = await action.getText(
-      'Number Passer By', numPassersby);
+      'Number Passer By',
+      numPassersby
+    );
     return numPasserByText;
   };
 
-  var _getIssueText = async function(issueIndex) {
+  var _getIssueText = async function (issueIndex) {
     var issueElement = _getIssueElement(issueIndex);
-    var issueElementText = await action.getText(
-      'Issue Element', issueElement);
+    var issueElementText = await action.getText('Issue Element', issueElement);
     return issueElementText;
   };
 
-  var _getIssueTitle = async function() {
+  var _getIssueTitle = async function () {
     var issueTitleText = await action.getText(
-      'Issue Title Element', issueTitle);
+      'Issue Title Element',
+      issueTitle
+    );
     return issueTitleText;
   };
 
-  var _getIssueElement = function(issueIndex) {
+  var _getIssueElement = function (issueIndex) {
     return $(`${issueElementStr}${issueIndex.toString()}`);
   };
 
-  this.expectNumPassersbyToBe = async function(numPassersby) {
+  this.expectNumPassersbyToBe = async function (numPassersby) {
     expect(await _getNumPassersby()).toMatch(numPassersby);
   };
 
-  this.clickIssue = async function(issueIndex, expectedIssueText) {
+  this.clickIssue = async function (issueIndex, expectedIssueText) {
     expect(await _getIssueText(issueIndex)).toMatch(expectedIssueText);
     var issueElement = _getIssueElement(issueIndex);
     await action.click('Issue Element', issueElement);
   };
 
-  this.expectIssueTitleToBe = async function(issueTitle) {
+  this.expectIssueTitleToBe = async function (issueTitle) {
     expect(await _getIssueTitle()).toMatch(issueTitle);
   };
 
-  this.markResolved = async function() {
+  this.markResolved = async function () {
     await action.click('Resolve Button', resolveBtn);
   };
 };

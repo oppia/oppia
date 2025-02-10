@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for angular code mirror wrapper.
  */
 
-import { NgZone, SimpleChanges } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import CodeMirror from 'node_modules/@types/codemirror';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
+import {NgZone, SimpleChanges} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import CodeMirror from '@types/codemirror';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CodemirrorMergeviewComponent} from './codemirror-mergeview.component';
 
 describe('Oppia CodeMirror Component', () => {
   let component: CodemirrorMergeviewComponent;
@@ -29,7 +29,7 @@ describe('Oppia CodeMirror Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [CodemirrorMergeviewComponent]
+      declarations: [CodemirrorMergeviewComponent],
     }).compileComponents();
   }));
 
@@ -57,7 +57,7 @@ describe('Oppia CodeMirror Component', () => {
       mergeViewCalled = true;
     };
     const mockCodeMirror: typeof CodeMirror = {
-      MergeView: mockMergeView
+      MergeView: mockMergeView,
     } as typeof CodeMirror;
     window.CodeMirror = mockCodeMirror;
     component.ngAfterViewInit();
@@ -73,14 +73,14 @@ describe('Oppia CodeMirror Component', () => {
         MergeView: () => {
           return {
             editor: () => {
-              return { setValue: editSetValueSpy };
+              return {setValue: editSetValueSpy};
             },
             rightOriginal: () => {
-              return { setValue: rightOrgSetValueSpy };
-            }
+              return {setValue: rightOrgSetValueSpy};
+            },
           };
-        }
-      }
+        },
+      },
     } as unknown as Window);
     component.ngAfterViewInit();
     let changes: SimpleChanges = {
@@ -88,8 +88,8 @@ describe('Oppia CodeMirror Component', () => {
         currentValue: undefined,
         previousValue: 'B',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.leftValue = undefined;
     expect(() => component.ngOnChanges(changes)).toThrowError(
@@ -100,8 +100,8 @@ describe('Oppia CodeMirror Component', () => {
         currentValue: undefined,
         previousValue: 'B',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.rightValue = undefined;
     expect(() => component.ngOnChanges(changes)).toThrowError(
@@ -117,14 +117,14 @@ describe('Oppia CodeMirror Component', () => {
         MergeView: () => {
           return {
             editor: () => {
-              return { setValue: editSetValueSpy };
+              return {setValue: editSetValueSpy};
             },
             rightOriginal: () => {
-              return { setValue: rightOrgSetValueSpy };
-            }
+              return {setValue: rightOrgSetValueSpy};
+            },
           };
-        }
-      }
+        },
+      },
     } as unknown as Window);
     component.ngAfterViewInit();
     const changes: SimpleChanges = {
@@ -132,14 +132,14 @@ describe('Oppia CodeMirror Component', () => {
         currentValue: 'A',
         previousValue: 'B',
         firstChange: false,
-        isFirstChange: () => false
+        isFirstChange: () => false,
       },
       rightValue: {
         currentValue: 'D',
         previousValue: 'C',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.leftValue = 'A';
     component.rightValue = 'D';

@@ -15,25 +15,25 @@
 /**
  * @fileoverview A data service that stores the current interaction solution.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
+import {AlertsService} from 'services/alerts.service';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {StatePropertyService} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class StateSolutionService
-    // The state property is null until a solution is specified or removed.
-    extends StatePropertyService<Solution | null> {
+// The state property is null until a solution is specified or removed.
+export class StateSolutionService extends StatePropertyService<Solution | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveSolution';
   }
 }
 
-angular.module('oppia').factory(
-  'StateSolutionService', downgradeInjectable(StateSolutionService));
+angular
+  .module('oppia')
+  .factory('StateSolutionService', downgradeInjectable(StateSolutionService));

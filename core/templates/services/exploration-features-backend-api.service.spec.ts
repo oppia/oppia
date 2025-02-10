@@ -16,32 +16,33 @@
  * @fileoverview Tests for ExplorationFeaturesBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ExplorationFeaturesBackendApiService } from
-  'services/exploration-features-backend-api.service';
+import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 
 describe('exploration features backend api service', () => {
-  let explorationFeaturesBackendApiService:
-    ExplorationFeaturesBackendApiService;
+  let explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var ERROR_STATUS_CODE = 500;
 
   var sampleDataResults = {
     explorationIsCurated: true,
-    alwaysAskLearnersForAnswerDetails: false
+    alwaysAskLearnersForAnswerDetails: false,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ExplorationFeaturesBackendApiService]
+      providers: [ExplorationFeaturesBackendApiService],
     });
     explorationFeaturesBackendApiService = TestBed.get(
-      ExplorationFeaturesBackendApiService);
+      ExplorationFeaturesBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -49,43 +50,42 @@ describe('exploration features backend api service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch data from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch data from the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync('0')
-        .then(successHandler, failHandler);
+    explorationFeaturesBackendApiService
+      .fetchExplorationFeaturesAsync('0')
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/explorehandler/features/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    var req = httpTestingController.expectOne('/explorehandler/features/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use rejection handler if data backend request failed',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use rejection handler if data backend request failed', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync('0')
-        .then(successHandler, failHandler);
+    explorationFeaturesBackendApiService
+      .fetchExplorationFeaturesAsync('0')
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/explorehandler/features/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Error loading data.', {
-        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-      });
+    var req = httpTestingController.expectOne('/explorehandler/features/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error loading data.', {
+      status: ERROR_STATUS_CODE,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

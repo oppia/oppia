@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for license explanation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslateModule } from 'tests/unit-test-utils';
-import { LicenseExplanationModalComponent } from './license-explanation-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslateModule} from 'tests/unit-test-utils';
+import {LicenseExplanationModalComponent} from './license-explanation-modal.component';
 
 describe('License Explanation Modal Component', () => {
   let fixture: ComponentFixture<LicenseExplanationModalComponent>;
@@ -27,16 +27,9 @@ describe('License Explanation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MockTranslateModule,
-        NgbModalModule
-      ],
-      declarations: [
-        LicenseExplanationModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      imports: [MockTranslateModule, NgbModalModule],
+      declarations: [LicenseExplanationModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

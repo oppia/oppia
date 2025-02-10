@@ -16,25 +16,19 @@
  * @fileoverview Routing module for view learner group page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { ViewLearnerGroupPageRootComponent } from
-  './view-learner-group-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {ViewLearnerGroupPageRootComponent} from './view-learner-group-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: ViewLearnerGroupPageRootComponent
-  }
+    component: ViewLearnerGroupPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class ViewLearnerGroupPageRoutingModule {}

@@ -20,7 +20,7 @@ import {
   QuestionReviewerStats,
   QuestionSubmitterStats,
   TranslationReviewerStats,
-  TranslationSubmitterStats
+  TranslationSubmitterStats,
 } from './contributor-dashboard-admin-summary.model';
 
 describe('Translation Submitter Stats Model', () => {
@@ -39,24 +39,26 @@ describe('Translation Submitter Stats Model', () => {
       rejected_translations_count: 2,
       rejected_translation_word_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      last_contributed_in_days: 2
+      last_contributed_in_days: 2,
     };
 
-    let statsSummary = TranslationSubmitterStats
-      .createFromBackendDict(backendDict);
+    let statsSummary =
+      TranslationSubmitterStats.createFromBackendDict(backendDict);
 
     expect(statsSummary.languageCode).toEqual('en');
     expect(statsSummary.contributorName).toEqual('user1');
-    expect(
-      statsSummary.topicsWithTranslationSubmissions)
-      .toEqual(['topic1', 'topic2']);
+    expect(statsSummary.topicsWithTranslationSubmissions).toEqual([
+      'topic1',
+      'topic2',
+    ]);
     expect(statsSummary.recentPerformance).toEqual(2);
     expect(statsSummary.overallAccuracy).toEqual(1.0);
     expect(statsSummary.submittedTranslationsCount).toEqual(2);
     expect(statsSummary.submittedTranslationWordCount).toEqual(2);
     expect(statsSummary.acceptedTranslationsCount).toEqual(2);
-    expect(
-      statsSummary.acceptedTranslationsWithoutReviewerEditsCount).toEqual(2);
+    expect(statsSummary.acceptedTranslationsWithoutReviewerEditsCount).toEqual(
+      2
+    );
     expect(statsSummary.acceptedTranslationWordCount).toEqual(2);
     expect(statsSummary.rejectedTranslationsCount).toEqual(2);
     expect(statsSummary.firstContributionDate).toEqual('firstcontributiondate');
@@ -76,21 +78,21 @@ describe('Translation Reviewer Stats Model', () => {
       accepted_translation_word_count: 2,
       rejected_translations_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      last_contributed_in_days: 2
+      last_contributed_in_days: 2,
     };
 
-    let statsSummary = TranslationReviewerStats
-      .createFromBackendDict(backendDict);
+    let statsSummary =
+      TranslationReviewerStats.createFromBackendDict(backendDict);
 
     expect(statsSummary.languageCode).toEqual('en');
     expect(statsSummary.contributorName).toEqual('user1');
-    expect(
-      statsSummary.topicsWithTranslationReviews)
-      .toEqual(['topic1', 'topic2']);
+    expect(statsSummary.topicsWithTranslationReviews).toEqual([
+      'topic1',
+      'topic2',
+    ]);
     expect(statsSummary.reviewedTranslationsCount).toEqual(2);
     expect(statsSummary.acceptedTranslationsCount).toEqual(2);
-    expect(
-      statsSummary.acceptedTranslationsWithReviewerEditsCount).toEqual(2);
+    expect(statsSummary.acceptedTranslationsWithReviewerEditsCount).toEqual(2);
     expect(statsSummary.acceptedTranslationWordCount).toEqual(2);
     expect(statsSummary.rejectedTranslationsCount).toEqual(2);
     expect(statsSummary.firstContributionDate).toEqual('firstcontributiondate');
@@ -110,21 +112,21 @@ describe('Question Submitter Stats Model', () => {
       accepted_questions_without_reviewer_edits_count: 2,
       rejected_questions_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      last_contributed_in_days: 2
+      last_contributed_in_days: 2,
     };
 
-    let statsSummary = QuestionSubmitterStats
-      .createFromBackendDict(backendDict);
+    let statsSummary =
+      QuestionSubmitterStats.createFromBackendDict(backendDict);
 
     expect(statsSummary.contributorName).toEqual('user1');
-    expect(
-      statsSummary.topicsWithQuestionSubmissions)
-      .toEqual(['topic1', 'topic2']);
+    expect(statsSummary.topicsWithQuestionSubmissions).toEqual([
+      'topic1',
+      'topic2',
+    ]);
     expect(statsSummary.recentPerformance).toEqual(2);
     expect(statsSummary.overallAccuracy).toEqual(1.0);
     expect(statsSummary.submittedQuestionsCount).toEqual(2);
-    expect(
-      statsSummary.acceptedQuestionsWithoutReviewerEditsCount).toEqual(2);
+    expect(statsSummary.acceptedQuestionsWithoutReviewerEditsCount).toEqual(2);
     expect(statsSummary.rejectedQuestionsCount).toEqual(2);
     expect(statsSummary.firstContributionDate).toEqual('firstcontributiondate');
     expect(statsSummary.lastContributedInDays).toEqual(2);
@@ -141,20 +143,19 @@ describe('Question Reviewer Stats Model', () => {
       accepted_questions_with_reviewer_edits_count: 2,
       rejected_questions_count: 2,
       first_contribution_date: 'firstcontributiondate',
-      last_contributed_in_days: 2
+      last_contributed_in_days: 2,
     };
 
-    let statsSummary = QuestionReviewerStats
-      .createFromBackendDict(backendDict);
+    let statsSummary = QuestionReviewerStats.createFromBackendDict(backendDict);
 
     expect(statsSummary.contributorName).toEqual('user1');
-    expect(
-      statsSummary.topicsWithQuestionReviews)
-      .toEqual(['topic1', 'topic2']);
+    expect(statsSummary.topicsWithQuestionReviews).toEqual([
+      'topic1',
+      'topic2',
+    ]);
     expect(statsSummary.reviewedQuestionsCount).toEqual(2);
     expect(statsSummary.acceptedQuestionsCount).toEqual(2);
-    expect(
-      statsSummary.acceptedQuestionsWithReviewerEditsCount).toEqual(2);
+    expect(statsSummary.acceptedQuestionsWithReviewerEditsCount).toEqual(2);
     expect(statsSummary.rejectedQuestionsCount).toEqual(2);
     expect(statsSummary.firstContributionDate).toEqual('firstcontributiondate');
     expect(statsSummary.lastContributedInDays).toEqual(2);

@@ -18,18 +18,14 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
+  imports: [CommonModule],
   providers: [],
   declarations: [],
   entryComponents: [],
   exports: [],
 })
-
-export class ExtensionsModule { }
+export class ExtensionsModule {}

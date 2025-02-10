@@ -20,13 +20,13 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-set-input',
-  templateUrl: './set-input-short-response.component.html'
+  templateUrl: './set-input-short-response.component.html',
 })
 export class ShortResponseSetInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -35,19 +35,22 @@ export class ShortResponseSetInputComponent implements OnInit {
   @Input() answer!: string;
   displayedAnswer!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string[];
-    this.displayedAnswer = (
-      _answer.length > 0 ? _answer.join(', ') :
-      'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+      this.answer
+    ) as string[];
+    this.displayedAnswer =
+      _answer.length > 0
+        ? _answer.join(', ')
+        : 'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER';
   }
 }
 
 angular.module('oppia').directive(
   'oppiaShortResponseSetInput',
   downgradeComponent({
-    component: ShortResponseSetInputComponent
-  }));
+    component: ShortResponseSetInputComponent,
+  })
+);

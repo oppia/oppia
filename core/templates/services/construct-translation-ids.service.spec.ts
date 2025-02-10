@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for ConstructTranslationIdsService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ConstructTranslationIdsService } from
-  'services/construct-translation-ids.service';
+import {TestBed} from '@angular/core/testing';
+import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
 
 describe('Construct Translation Ids Service', () => {
   let ctis: ConstructTranslationIdsService;
@@ -28,22 +27,25 @@ describe('Construct Translation Ids Service', () => {
   });
 
   it('should get library id', () => {
-    expect(ctis.getLibraryId('categories', 'Algorithms'))
-      .toBe('I18N_LIBRARY_CATEGORIES_ALGORITHMS');
+    expect(ctis.getLibraryId('categories', 'Algorithms')).toBe(
+      'I18N_LIBRARY_CATEGORIES_ALGORITHMS'
+    );
 
     expect(ctis.getLibraryId('', '')).toBe('I18N_LIBRARY__');
   });
 
   it('should get classroom title id', () => {
-    expect(ctis.getClassroomTitleId('math'))
-      .toBe('I18N_CLASSROOM_MATH_TITLE');
+    expect(ctis.getClassroomTitleId('math')).toBe('I18N_CLASSROOM_MATH_NAME');
 
-    expect(ctis.getClassroomTitleId('')).toBe('I18N_CLASSROOM__TITLE');
+    expect(ctis.getClassroomTitleId('science')).toBe(
+      'I18N_CLASSROOM_SCIENCE_NAME'
+    );
   });
 
   it('should get syllabus type title id', () => {
-    expect(ctis.getSyllabusTypeTitleId('skill'))
-      .toBe('I18N_SYLLABUS_SKILL_TITLE');
+    expect(ctis.getSyllabusTypeTitleId('skill')).toBe(
+      'I18N_SYLLABUS_SKILL_TITLE'
+    );
 
     expect(ctis.getSyllabusTypeTitleId('')).toBe('I18N_SYLLABUS__TITLE');
   });

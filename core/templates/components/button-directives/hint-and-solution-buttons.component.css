@@ -42,7 +42,7 @@ oppia-hint-and-solution-buttons .hint-box {
   display: flex;
   font-size: 17px;
   height: 40px;
-  min-width: 395px;
+  min-width: 345px;
   padding: 20px 10px 20px 10px;
   position: relative;
   text-align: center;
@@ -115,13 +115,9 @@ oppia-hint-and-solution-buttons .hint-box::before {
   oppia-hint-and-solution-buttons .hint-box-add-ons .close {
     bottom: 10px;
     font-size: 22px;
-    left: 295px;
+    left: 310px;
     margin: 0 10px;
     position: fixed;
-  }
-
-  oppia-hint-and-solution-buttons .hint-box-add-ons {
-    left: -18px;
   }
 
   oppia-hint-and-solution-buttons .hint-box-add-ons::before {
@@ -133,14 +129,14 @@ oppia-hint-and-solution-buttons .hint-box::before {
   }
 
   oppia-hint-and-solution-buttons .hint-box {
-    font-size: 14px;
-    text-align: left;
-    width: 325px;
+    bottom: 80px;
+    font-size: 15px;
+    left: 5px;
   }
 
   oppia-hint-and-solution-buttons .hint-container {
-    position: absolute;
-    right: 0;
+    right: 16px;
+    width: 100%;
   }
 
   .oppia-hint-and-solution-buttons ul {
@@ -201,4 +197,15 @@ oppia-hint-and-solution-buttons .hint-box::before {
 .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
   color: #f5da57;
   font-size: 23px;
+}
+
+@media screen and (max-width: 546px) {
+  oppia-hint-and-solution-buttons .hint-box {
+    bottom: 110px;
+    font-size: 15px;
+    left: 5px;
+  }
+  .oppia-hint-and-solution-buttons .footer-hints-label {
+    display: none;
+  }
 }

@@ -15,13 +15,13 @@
 /**
  * @fileoverview Service to check if user is on a mobile device.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 // See: https://stackoverflow.com/a/11381730
 export class DeviceInfoService {
@@ -30,12 +30,13 @@ export class DeviceInfoService {
   isMobileDevice(): boolean {
     return Boolean(
       navigator.userAgent.match(/Android/i) ||
-      navigator.userAgent.match(/webOS/i) ||
-      navigator.userAgent.match(/iPhone/i) ||
-      navigator.userAgent.match(/iPad/i) ||
-      navigator.userAgent.match(/iPod/i) ||
-      navigator.userAgent.match(/BlackBerry/i) ||
-      navigator.userAgent.match(/Windows Phone/i));
+        navigator.userAgent.match(/webOS/i) ||
+        navigator.userAgent.match(/iPhone/i) ||
+        navigator.userAgent.match(/iPad/i) ||
+        navigator.userAgent.match(/iPod/i) ||
+        navigator.userAgent.match(/BlackBerry/i) ||
+        navigator.userAgent.match(/Windows Phone/i)
+    );
   }
 
   isMobileUserAgent(): boolean {
@@ -47,6 +48,6 @@ export class DeviceInfoService {
   }
 }
 
-angular.module('oppia').factory(
-  'DeviceInfoService',
-  downgradeInjectable(DeviceInfoService));
+angular
+  .module('oppia')
+  .factory('DeviceInfoService', downgradeInjectable(DeviceInfoService));

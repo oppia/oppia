@@ -16,91 +16,35 @@
  * @fileoverview Module for the practice session page.
  */
 
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {PracticeSessionPageComponent} from './practice-session-page.component';
+import {PracticeSessionAccessGuard} from './practice-session-page-auth.guard';
+import {PracticeSessionPageRootComponent} from './practice-session-page-root.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
+    CommonModule,
     InteractionExtensionsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: PracticeSessionPageComponent,
+        canActivate: [PracticeSessionAccessGuard],
+      },
+    ]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    PracticeSessionPageComponent
+    PracticeSessionPageRootComponent,
+    PracticeSessionPageComponent,
   ],
-  entryComponents: [
-    PracticeSessionPageComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+  entryComponents: [PracticeSessionPageComponent],
 })
-class PracticeSessionPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { PracticeSessionPageComponent } from './practice-session-page.component';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(PracticeSessionPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class PracticeSessionPageModule {}

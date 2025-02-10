@@ -17,13 +17,12 @@
  * editor.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-continue-button',
-  templateUrl: './continue-button.component.html'
+  templateUrl: './continue-button.component.html',
 })
 export class ContinueButtonComponent {
   @Input() isLearnAgainButton: boolean = false;
@@ -31,16 +30,11 @@ export class ContinueButtonComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() focusLabel!: string;
-  @Output() clickContinueButton: EventEmitter<void> = (
-    new EventEmitter());
+  @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
 
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService) {}
+  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-
-angular.module('oppia').directive('oppiaContinueButton',
-  downgradeComponent({ component: ContinueButtonComponent }));

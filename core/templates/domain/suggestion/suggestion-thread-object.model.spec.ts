@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { FeedbackThreadBackendDict } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { SuggestionBackendDict } from './suggestion.model';
+import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {FeedbackThreadBackendDict} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {SuggestionBackendDict} from './suggestion.model';
 
 describe('SuggestionThreadObjectFactory', () => {
   let suggestionThreadBackendDict: FeedbackThreadBackendDict;
@@ -45,23 +45,24 @@ describe('SuggestionThreadObjectFactory', () => {
       target_id: 'exp1',
       status: 'accepted',
       author_name: 'author',
-      change: {
+      change_cmd: {
         skill_id: 'skill_id',
         state_name: 'state_1',
-        new_value: { html: 'new suggestion content' },
-        old_value: { html: 'old suggestion content' }
+        new_value: {html: 'new suggestion content'},
+        old_value: {html: 'old suggestion content'},
+        content_id: 'content_id',
       },
-      last_updated_msecs: 1000
+      last_updated_msecs: 1000,
     };
   });
 
   it('should create a new suggestion thread from a backend dict.', () => {
-    suggestionBackendDict.suggestion_type =
-      'edit_exploration_state_content';
+    suggestionBackendDict.suggestion_type = 'edit_exploration_state_content';
 
-    let suggestionThread =
-    SuggestionThread.createFromBackendDicts(
-      suggestionThreadBackendDict, suggestionBackendDict);
+    let suggestionThread = SuggestionThread.createFromBackendDicts(
+      suggestionThreadBackendDict,
+      suggestionBackendDict
+    );
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -70,16 +71,19 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
-    expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
-      .toEqual('author');
-    expect(suggestionThread.lastNonemptyMessageSummary.text)
-      .toEqual('tenth message');
+    expect(suggestionThread.lastNonemptyMessageSummary.authorUsername).toEqual(
+      'author'
+    );
+    expect(suggestionThread.lastNonemptyMessageSummary.text).toEqual(
+      'tenth message'
+    );
 
     let suggestion = suggestionThread.getSuggestion();
     expect(suggestion).not.toBeNull();
     expect(suggestion?.suggestionId).toEqual('exploration.exp1.thread1');
-    expect(suggestion?.suggestionType)
-      .toEqual('edit_exploration_state_content');
+    expect(suggestion?.suggestionType).toEqual(
+      'edit_exploration_state_content'
+    );
     expect(suggestion?.targetType).toEqual('exploration');
     expect(suggestion?.targetId).toEqual('exp1');
     expect(suggestion?.status).toEqual('accepted');
@@ -95,14 +99,16 @@ describe('SuggestionThreadObjectFactory', () => {
     expect(suggestionThread.isSuggestionHandled()).toBeFalse();
     expect(suggestionThread.getSuggestionStatus()).toEqual('review');
     expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
-    expect(suggestionThread.getReplacementHtmlFromSuggestion())
-      .toEqual('new suggestion content');
+    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
+      'new suggestion content'
+    );
   });
 
   it('should create a new suggestion thread.', () => {
-    let suggestionThread =
-    SuggestionThread.createFromBackendDicts(
-      suggestionThreadBackendDict, suggestionBackendDict);
+    let suggestionThread = SuggestionThread.createFromBackendDicts(
+      suggestionThreadBackendDict,
+      suggestionBackendDict
+    );
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -116,9 +122,10 @@ describe('SuggestionThreadObjectFactory', () => {
 
   describe('.setMessages', () => {
     it('should handle message getter and setter.', () => {
-      let suggestionThread =
-      SuggestionThread.createFromBackendDicts(
-        suggestionThreadBackendDict, suggestionBackendDict);
+      let suggestionThread = SuggestionThread.createFromBackendDicts(
+        suggestionThreadBackendDict,
+        suggestionBackendDict
+      );
 
       expect(suggestionThread.getMessages()).toEqual([]);
 
@@ -142,17 +149,19 @@ describe('SuggestionThreadObjectFactory', () => {
           message_id: 0,
           updated_status: 'status',
           updated_subject: 'subject',
-        })
+        }),
       ];
 
       suggestionThread.setMessages(messages);
 
       expect(suggestionThread.messages).toEqual(messages);
       expect(suggestionThread.messageCount).toEqual(messages.length);
-      expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
-        .toEqual('author2');
-      expect(suggestionThread.lastNonemptyMessageSummary.text)
-        .toEqual('message2');
+      expect(
+        suggestionThread.lastNonemptyMessageSummary.authorUsername
+      ).toEqual('author2');
+      expect(suggestionThread.lastNonemptyMessageSummary.text).toEqual(
+        'message2'
+      );
     });
   });
 });

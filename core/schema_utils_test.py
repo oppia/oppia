@@ -21,9 +21,7 @@ from __future__ import annotations
 import inspect
 import re
 
-from core import feconf
 from core import schema_utils
-from core.domain import email_manager
 from core.tests import test_utils
 
 from typing import Any, Dict, List, Tuple
@@ -920,10 +918,6 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     def test_is_search_query_string(self) -> None:
         """Checks whether a given string is contained within parenthesis and
         double quotes.
-
-        Returns:
-            bool. A boolean value representing whether a given string is
-            contained within parenthesis and double quotes.
         """
         is_search_query_string = (
             schema_utils.get_validator('is_search_query_string'))
@@ -934,12 +928,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_search_query_string('missing-outer-parens'))
 
     def test_is_valid_username_string(self) -> None:
-        """Checks whether given username string is valid.
-
-        Returns:
-            bool. A boolean value representing whether given username is
-            valid or not.
-        """
+        """Checks whether given username string is valid."""
         is_valid_username_string = (
             schema_utils.get_validator('is_valid_username_string'))
 
@@ -958,10 +947,6 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
     def test_has_expected_subtitled_content_length(self) -> None:
         """Checks whether the given subtitled content does not exceed the
         given length.
-
-        Returns:
-            bool. A boolean value representing whether the content matches
-            the given max length.
         """
         has_expected_subtitled_content_length = (
             schema_utils.get_validator('has_expected_subtitled_content_length'))
@@ -976,12 +961,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertTrue(has_expected_subtitled_content_length(obj, 20))
 
     def test_has_unique_subtitled_contents(self) -> None:
-        """Checks whether the subtitled html content has unique value or not.
-
-        Returns:
-            bool. A boolean value representing whether the content has unique
-            value.
-        """
+        """Checks whether the subtitled html content has unique value or not."""
         has_unique_subtitled_contents = (
             schema_utils.get_validator('has_unique_subtitled_contents')
         )
@@ -1151,7 +1131,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         obj_1 = 'a     a'
         normalize_obj_1 = schema_utils.normalize_against_schema(obj_1, schema_1)
-        self.assertEqual(u'a a', normalize_obj_1)
+        self.assertEqual('a a', normalize_obj_1)
 
         schema_2 = {
             'type': schema_utils.SCHEMA_TYPE_HTML,
@@ -1161,7 +1141,15 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         }
         obj_2 = 'http://www.oppia.org/splash/<script>'
         normalize_obj_2 = schema_utils.normalize_against_schema(obj_2, schema_2)
-        self.assertEqual(u'http://www.oppia.org/splash/', normalize_obj_2)
+        self.assertEqual('http://www.oppia.org/splash/', normalize_obj_2)
+
+    def test_normalize_against_schema_for_bytes_unicode_works_fine(
+        self) -> None:
+        schema = {'type': schema_utils.SCHEMA_TYPE_UNICODE}
+        obj = bytes('random string', 'utf-8')
+        normalized_obj = schema_utils.normalize_against_schema(obj, schema)
+
+        self.assertEqual('random string', normalized_obj)
 
     def test_list_schema(self) -> None:
         schema = {
@@ -1366,41 +1354,6 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             }, 'Missing arg_b in argument.')
         ]
 
-        self.check_normalization(
-            schema, mappings, invalid_values_with_error_messages)
-
-    def test_notification_user_ids_list_validator(self) -> None:
-        schema = email_manager.NOTIFICATION_USER_IDS_LIST_SCHEMA
-        valid_user_id_list = [
-            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in range(0, 5)
-        ]
-        big_user_id_list = [
-            'uid_%s' % (chr(97 + i) * feconf.USER_ID_RANDOM_PART_LENGTH)
-            for i in range(0, 7)
-        ]
-        mappings = [
-            (
-                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)],
-                ['uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)]
-            ),
-            (valid_user_id_list, valid_user_id_list)]
-        invalid_values_with_error_messages = [
-            (
-                ['uid_%s' % ('a' * 28)],
-                re.escape(
-                    'Validation failed: is_valid_user_id ({}) for '
-                    'object uid_%s' % ('a' * 28)
-                )
-            ),
-            (
-                big_user_id_list,
-                re.escape(
-                    'Validation failed: has_length_at_most '
-                    '({\'max_value\': 5}) for object ['
-                ) + '.*' + re.escape(']')
-            )
-        ]
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)
 

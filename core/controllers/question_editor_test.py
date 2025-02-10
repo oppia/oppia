@@ -759,11 +759,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             payload,
             csrf_token=csrf_token, expected_status_int=400)
         max_len_object = 'a' * 376
-        self.assertEqual(
-            response_json['error'],
+        self.assertIn(
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
-            % max_len_object
+            % max_len_object,
+            response_json['error'],
         )
 
     def test_put_with_admin_email_allows_question_editing(self) -> None:

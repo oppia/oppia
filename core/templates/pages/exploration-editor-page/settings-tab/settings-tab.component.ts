@@ -16,59 +16,65 @@
  * @fileoverview Component for the exploration settings tab.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { DeleteExplorationModalComponent } from './templates/delete-exploration-modal.component';
-import { RemoveRoleConfirmationModalComponent } from './templates/remove-role-confirmation-modal.component';
-import { ModeratorUnpublishExplorationModalComponent } from './templates/moderator-unpublish-exploration-modal.component';
-import { ReassignRoleConfirmationModalComponent } from './templates/reassign-role-confirmation-modal.component';
-import { TransferExplorationOwnershipModalComponent } from './templates/transfer-exploration-ownership-modal.component';
-import { PreviewSummaryTileModalComponent } from './templates/preview-summary-tile-modal.component';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { UserService } from 'services/user.service';
-import { ChangeListService } from '../services/change-list.service';
-import { ExplorationAutomaticTextToSpeechService } from '../services/exploration-automatic-text-to-speech.service';
-import { ExplorationCategoryService } from '../services/exploration-category.service';
-import { ExplorationCorrectnessFeedbackService } from '../services/exploration-correctness-feedback.service';
-import { ExplorationDataService } from '../services/exploration-data.service';
-import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
-import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
-import { ExplorationLanguageCodeService } from '../services/exploration-language-code.service';
-import { ExplorationObjectiveService } from '../services/exploration-objective.service';
-import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
-import { ExplorationParamSpecsService } from '../services/exploration-param-specs.service';
-import { ExplorationRightsService } from '../services/exploration-rights.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { ExplorationTagsService } from '../services/exploration-tags.service';
-import { ExplorationTitleService } from '../services/exploration-title.service';
-import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { RouterService } from '../services/router.service';
-import { SettingTabBackendApiService, SettingTabResponse } from '../services/setting-tab-backend-api.service';
-import { UserEmailPreferencesService } from '../services/user-email-preferences.service';
-import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
-import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
-import { AppConstants } from 'app.constants';
-import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { MetadataDiffData, VersionHistoryService } from '../services/version-history.service';
-import { MetadataVersionHistoryResponse, VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
-import { MetadataVersionHistoryModalComponent } from '../modal-templates/metadata-version-history-modal.component';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {DeleteExplorationModalComponent} from './templates/delete-exploration-modal.component';
+import {RemoveRoleConfirmationModalComponent} from './templates/remove-role-confirmation-modal.component';
+import {ModeratorUnpublishExplorationModalComponent} from './templates/moderator-unpublish-exploration-modal.component';
+import {ReassignRoleConfirmationModalComponent} from './templates/reassign-role-confirmation-modal.component';
+import {TransferExplorationOwnershipModalComponent} from './templates/transfer-exploration-ownership-modal.component';
+import {PreviewSummaryTileModalComponent} from './templates/preview-summary-tile-modal.component';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {UserService} from 'services/user.service';
+import {ChangeListService} from '../services/change-list.service';
+import {ExplorationAutomaticTextToSpeechService} from '../services/exploration-automatic-text-to-speech.service';
+import {ExplorationCategoryService} from '../services/exploration-category.service';
+import {ExplorationDataService} from '../services/exploration-data.service';
+import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
+import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
+import {ExplorationLanguageCodeService} from '../services/exploration-language-code.service';
+import {ExplorationObjectiveService} from '../services/exploration-objective.service';
+import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
+import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
+import {ExplorationRightsService} from '../services/exploration-rights.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {ExplorationTagsService} from '../services/exploration-tags.service';
+import {ExplorationTitleService} from '../services/exploration-title.service';
+import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {RouterService} from '../services/router.service';
+import {
+  SettingTabBackendApiService,
+  SettingTabResponse,
+} from '../services/setting-tab-backend-api.service';
+import {UserEmailPreferencesService} from '../services/user-email-preferences.service';
+import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
+import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
+import {AppConstants} from 'app.constants';
+import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {
+  MetadataDiffData,
+  VersionHistoryService,
+} from '../services/version-history.service';
+import {
+  MetadataVersionHistoryResponse,
+  VersionHistoryBackendApiService,
+} from '../services/version-history-backend-api.service';
+import {MetadataVersionHistoryModalComponent} from '../modal-templates/metadata-version-history-modal.component';
 
 @Component({
   selector: 'oppia-settings-tab',
-  templateUrl: './settings-tab.component.html'
+  templateUrl: './settings-tab.component.html',
 })
-export class SettingsTabComponent
-  implements OnInit, OnDestroy {
+export class SettingsTabComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -80,7 +86,7 @@ export class SettingsTabComponent
   errorMessage!: string;
   isRolesFormOpen!: boolean;
   newMemberUsername!: string;
-  newMemberRole!: { name: string; value: string};
+  newMemberRole!: {name: string; value: string};
   isVoiceoverFormOpen!: boolean;
   newVoiceArtistUsername!: string;
   hasPageLoaded!: boolean;
@@ -107,21 +113,26 @@ export class SettingsTabComponent
   directiveSubscriptions = new Subscription();
   explorationIsLinkedToStory: boolean = false;
   isSuperAdmin: boolean = false;
-  ROLES = [{
-    name: 'Manager (can edit permissions)',
-    value: 'owner'
-  }, {
-    name: 'Collaborator (can make changes)',
-    value: 'editor'
-  }, {
-    name: 'Playtester (can give feedback)',
-    value: 'viewer'
-  }];
+  tagIsInvalid: boolean = false;
+  ROLES = [
+    {
+      name: 'Manager (can edit permissions)',
+      value: 'owner',
+    },
+    {
+      name: 'Collaborator (can make changes)',
+      value: 'editor',
+    },
+    {
+      name: 'Playtester (can give feedback)',
+      value: 'viewer',
+    },
+  ];
 
   CATEGORY_LIST_FOR_SELECT2!: {
     id: string;
     text: string;
-  } [];
+  }[];
 
   addOnBlur: boolean = true;
 
@@ -132,16 +143,11 @@ export class SettingsTabComponent
     private changeListService: ChangeListService,
     private contextService: ContextService,
     public editabilityService: EditabilityService,
-    private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService,
-    private explorationAutomaticTextToSpeechService:
-      ExplorationAutomaticTextToSpeechService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
     private explorationCategoryService: ExplorationCategoryService,
-    private explorationCorrectnessFeedbackService:
-      ExplorationCorrectnessFeedbackService,
     private explorationDataService: ExplorationDataService,
-    private explorationEditsAllowedBackendApiService:
-      ExplorationEditsAllowedBackendApiService,
+    private explorationEditsAllowedBackendApiService: ExplorationEditsAllowedBackendApiService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
@@ -158,13 +164,12 @@ export class SettingsTabComponent
     private routerService: RouterService,
     private settingTabBackendApiService: SettingTabBackendApiService,
     private userEmailPreferencesService: UserEmailPreferencesService,
-    private userExplorationPermissionsService:
-      UserExplorationPermissionsService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private versionHistoryService: VersionHistoryService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {}
 
   filteredChoices: {
@@ -181,15 +186,23 @@ export class SettingsTabComponent
 
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
+    let tagRegex = new RegExp(AppConstants.TAG_REGEX);
 
     // Add our explorationTags.
     if (value) {
-      if (!(this.explorationTagsService.displayed) ||
-        (this.explorationTagsService.displayed as []).length < 10) {
+      if (
+        !this.explorationTagsService.displayed ||
+        (this.explorationTagsService.displayed as []).length < 10
+      ) {
         if (
-          (this.explorationTagsService.displayed as string[]).includes(value)) {
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
+          !value.match(tagRegex)
+        ) {
           // Clear the input value.
           event.input.value = '';
+          this.tagIsInvalid = true;
           return;
         }
 
@@ -199,6 +212,7 @@ export class SettingsTabComponent
 
     // Clear the input value.
     event.input.value = '';
+    this.tagIsInvalid = false;
 
     this.explorationTagsService.displayed = this.explorationTags;
 
@@ -218,7 +232,10 @@ export class SettingsTabComponent
   }
 
   updateCategoryListWithUserData(): void {
-    if (this.newCategory) {
+    if (
+      this.newCategory &&
+      this.explorationCategoryService.displayed === this.newCategory.id
+    ) {
       this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
       this.explorationCategoryService.displayed = this.newCategory.id;
     }
@@ -229,11 +246,12 @@ export class SettingsTabComponent
   filterChoices(searchTerm: string): void {
     this.newCategory = {
       id: searchTerm,
-      text: searchTerm
+      text: searchTerm,
     };
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2.filter(
-      value => value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+      value => value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    );
 
     this.filteredChoices.push(this.newCategory);
 
@@ -249,38 +267,40 @@ export class SettingsTabComponent
     // /settings) results in a console error.
 
     this.hasPageLoaded = false;
-    this.explorationDataService.getDataAsync(() => {}).then(() => {
-      if (this.explorationStatesService.isInitialized()) {
-        var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
-          (categoryItem) => {
-            return (
-              categoryItem.id ===
-                  this.explorationCategoryService.savedMemento);
+    this.explorationDataService
+      .getDataAsync(() => {})
+      .then(() => {
+        if (this.explorationStatesService.isInitialized()) {
+          var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+            categoryItem => {
+              return (
+                categoryItem.id === this.explorationCategoryService.savedMemento
+              );
+            }
+          );
+          // If the current category is not in the dropdown, add it
+          // as the first option.
+          if (
+            !categoryIsInSelect2 &&
+            this.explorationCategoryService.savedMemento
+          ) {
+            this.CATEGORY_LIST_FOR_SELECT2.unshift({
+              id: this.explorationCategoryService.savedMemento as string,
+              text: this.explorationCategoryService.savedMemento as string,
+            });
           }
-        );
-        // If the current category is not in the dropdown, add it
-        // as the first option.
-        if (!categoryIsInSelect2 &&
-            this.explorationCategoryService.savedMemento) {
-          this.CATEGORY_LIST_FOR_SELECT2.unshift({
-            id: this.explorationCategoryService.savedMemento as string,
-            text: this.explorationCategoryService.savedMemento as string
-          });
-        }
 
-        this.stateNames = this.explorationStatesService.getStateNames();
-        this.explorationIsLinkedToStory = (
-          this.contextService.isExplorationLinkedToStory());
-      }
-      this.hasPageLoaded = true;
-    });
+          this.stateNames = this.explorationStatesService.getStateNames();
+          this.explorationIsLinkedToStory =
+            this.contextService.isExplorationLinkedToStory();
+        }
+        this.hasPageLoaded = true;
+      });
   }
 
   getLastEditedVersionNumber(): number {
-    const lastEditedVersionNumber = this
-      .versionHistoryService
-      .getBackwardMetadataDiffData()
-      .oldVersionNumber;
+    const lastEditedVersionNumber =
+      this.versionHistoryService.getBackwardMetadataDiffData().oldVersionNumber;
     if (lastEditedVersionNumber === null) {
       // A null value for lastEditedVersionNumber marks the end of the version
       // history for the exploration metadata. This is impossible here because
@@ -293,12 +313,8 @@ export class SettingsTabComponent
   }
 
   getLastEditedCommitterUsername(): string {
-    return (
-      this
-        .versionHistoryService
-        .getBackwardMetadataDiffData()
-        .committerUsername
-    );
+    return this.versionHistoryService.getBackwardMetadataDiffData()
+      .committerUsername;
   }
 
   canShowExploreVersionHistoryButton(): boolean {
@@ -307,52 +323,59 @@ export class SettingsTabComponent
 
   onClickExploreVersionHistoryButton(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
-      MetadataVersionHistoryModalComponent, {
+      MetadataVersionHistoryModalComponent,
+      {
         backdrop: true,
         windowClass: 'metadata-diff-modal',
-        size: 'xl'
-      });
+        size: 'xl',
+      }
+    );
 
-    const metadataDiffData: MetadataDiffData = this
-      .versionHistoryService
-      .getBackwardMetadataDiffData();
+    const metadataDiffData: MetadataDiffData =
+      this.versionHistoryService.getBackwardMetadataDiffData();
 
     modalRef.componentInstance.newMetadata = metadataDiffData.newMetadata;
     modalRef.componentInstance.oldMetadata = metadataDiffData.oldMetadata;
-    modalRef.componentInstance.committerUsername = (
-      metadataDiffData.committerUsername);
+    modalRef.componentInstance.committerUsername =
+      metadataDiffData.committerUsername;
     modalRef.componentInstance.oldVersion = metadataDiffData.oldVersionNumber;
 
-    modalRef.result.then(() => {
-      this.versionHistoryService
-        .setCurrentPositionInMetadataVersionHistoryList(0);
-    }, () => {
-      this.versionHistoryService
-        .setCurrentPositionInMetadataVersionHistoryList(0);
-    });
+    modalRef.result.then(
+      () => {
+        this.versionHistoryService.setCurrentPositionInMetadataVersionHistoryList(
+          0
+        );
+      },
+      () => {
+        this.versionHistoryService.setCurrentPositionInMetadataVersionHistoryList(
+          0
+        );
+      }
+    );
   }
 
   async updateMetadataVersionHistory(): Promise<void> {
     this.versionHistoryService.resetMetadataVersionHistory();
     this.validationErrorIsShown = false;
 
-    const explorationData = (
-      await this.explorationDataService.getDataAsync(() => {}));
+    const explorationData = await this.explorationDataService.getDataAsync(
+      () => {}
+    );
 
-    const explorationMetadata = this
-      .explorationMetadataObjectFactory
-      .createFromBackendDict(explorationData.exploration_metadata);
+    const explorationMetadata =
+      this.explorationMetadataObjectFactory.createFromBackendDict(
+        explorationData.exploration_metadata
+      );
 
     this.versionHistoryService.insertMetadataVersionHistoryData(
       this.versionHistoryService.getLatestVersionOfExploration(),
-      explorationMetadata, '');
+      explorationMetadata,
+      ''
+    );
 
-    if (
-      this.versionHistoryService.getLatestVersionOfExploration() !== null
-    ) {
-      const metadataVersionHistory = await this
-        .versionHistoryBackendApiService
-        .fetchMetadataVersionHistoryAsync(
+    if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
+      const metadataVersionHistory =
+        await this.versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync(
           this.contextService.getExplorationId(),
           this.versionHistoryService.getLatestVersionOfExploration() as number
         );
@@ -375,12 +398,11 @@ export class SettingsTabComponent
     this.explorationTitleService.saveDisplayedValue();
     if (!this.isTitlePresent()) {
       this.rolesSaveButtonEnabled = false;
-      this.errorMessage = (
-        'Please provide a title before inviting.');
+      this.errorMessage = 'Please provide a title before inviting.';
       return;
     } else {
       this.rolesSaveButtonEnabled = true;
-      this.errorMessage = ('');
+      this.errorMessage = '';
       return;
     }
   }
@@ -404,7 +426,8 @@ export class SettingsTabComponent
 
     if (!this.explorationStatesService.getState(newInitStateName as string)) {
       this.alertsService.addWarning(
-        'Invalid initial state name: ' + newInitStateName);
+        'Invalid initial state name: ' + newInitStateName
+      );
       this.explorationInitStateNameService.restoreFromMemento();
       return;
     }
@@ -425,7 +448,7 @@ export class SettingsTabComponent
 
   areParametersUsed(): boolean {
     if (this.hasPageLoaded) {
-      return (this.explorationDataService.data.param_changes.length > 0);
+      return this.explorationDataService.data.param_changes.length > 0;
     }
     return false;
   }
@@ -435,45 +458,41 @@ export class SettingsTabComponent
   }
 
   isAutomaticTextToSpeechEnabled(): boolean {
-    return this.explorationAutomaticTextToSpeechService
-      .isAutomaticTextToSpeechEnabled();
+    return this.explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled();
   }
 
   toggleAutomaticTextToSpeech(): void {
-    return this.explorationAutomaticTextToSpeechService
-      .toggleAutomaticTextToSpeech();
-  }
-
-  isCorrectnessFeedbackEnabled(): boolean {
-    return (this.explorationCorrectnessFeedbackService.isEnabled() as boolean);
-  }
-
-  toggleCorrectnessFeedback(): void {
-    this.explorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+    return this.explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech();
   }
 
   isExplorationEditable(): boolean {
     return (
-      this.explorationDataService.data &&
-      this.explorationDataService.data.edits_allowed) || false;
+      (this.explorationDataService.data &&
+        this.explorationDataService.data.edits_allowed) ||
+      false
+    );
   }
 
   enableEdits(): void {
     this.explorationEditsAllowedBackendApiService.setEditsAllowed(
-      true, this.explorationDataService.explorationId,
+      true,
+      this.explorationDataService.explorationId,
       () => {
         this.editabilityService.lockExploration(false);
         this.explorationDataService.data.edits_allowed = true;
-      });
+      }
+    );
   }
 
   disableEdits(): void {
     this.explorationEditsAllowedBackendApiService.setEditsAllowed(
-      false, this.explorationDataService.explorationId,
+      false,
+      this.explorationDataService.explorationId,
       () => {
         this.editabilityService.lockExploration(true);
         this.explorationDataService.data.edits_allowed = false;
-      });
+      }
+    );
   }
 
   // Methods for rights management.
@@ -500,17 +519,19 @@ export class SettingsTabComponent
   }
 
   editRole(newMemberUsername: string, newMemberRole: string): void {
-    if (!this.explorationRightsService.checkUserAlreadyHasRoles(
-      newMemberUsername)) {
+    if (
+      !this.explorationRightsService.checkUserAlreadyHasRoles(newMemberUsername)
+    ) {
       this.explorationRightsService.saveRoleChanges(
-        newMemberUsername, newMemberRole);
+        newMemberUsername,
+        newMemberRole
+      );
 
       this.closeRolesForm();
       return;
     }
 
-    let oldRole = this.explorationRightsService.getOldRole(
-      newMemberUsername);
+    let oldRole = this.explorationRightsService.getOldRole(newMemberUsername);
 
     this.reassignRole(newMemberUsername, newMemberRole, oldRole);
   }
@@ -540,28 +561,30 @@ export class SettingsTabComponent
   removeRole(memberUsername: string, memberRole: string): void {
     this.alertsService.clearWarnings();
 
-    const modalRef = this.ngbModal
-      .open(RemoveRoleConfirmationModalComponent, {
-        backdrop: true,
-      });
+    const modalRef = this.ngbModal.open(RemoveRoleConfirmationModalComponent, {
+      backdrop: true,
+    });
 
     modalRef.componentInstance.username = memberUsername;
     modalRef.componentInstance.role = memberRole;
 
-    modalRef.result.then(() => {
-      this.explorationRightsService.removeRoleAsync(
-        memberUsername);
-      this.closeRolesForm();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    modalRef.result.then(
+      () => {
+        this.explorationRightsService.removeRoleAsync(memberUsername);
+        this.closeRolesForm();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   editVoiceArtist(newVoiceArtistUsername: string): void {
     this.explorationRightsService.assignVoiceArtistRoleAsync(
-      newVoiceArtistUsername);
+      newVoiceArtistUsername
+    );
     this.closeVoiceoverForm();
     return;
   }
@@ -569,32 +592,38 @@ export class SettingsTabComponent
   removeVoiceArtist(voiceArtistUsername: string): void {
     this.alertsService.clearWarnings();
 
-    const modalRef = this.ngbModal
-      .open(RemoveRoleConfirmationModalComponent, {
-        backdrop: true,
-      });
+    const modalRef = this.ngbModal.open(RemoveRoleConfirmationModalComponent, {
+      backdrop: true,
+    });
     modalRef.componentInstance.username = voiceArtistUsername;
     modalRef.componentInstance.role = 'voice artist';
-    modalRef.result.then(() => {
-      this.explorationRightsService.removeVoiceArtistRoleAsync(
-        voiceArtistUsername);
-      this.closeVoiceoverForm();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    modalRef.result.then(
+      () => {
+        this.explorationRightsService.removeVoiceArtistRoleAsync(
+          voiceArtistUsername
+        );
+        this.closeVoiceoverForm();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   toggleViewabilityIfPrivate(): void {
     this.explorationRightsService.setViewability(
-      !this.explorationRightsService.viewableIfPrivate());
+      !this.explorationRightsService.viewableIfPrivate()
+    );
   }
 
   // Methods for muting notifications.
   muteFeedbackNotifications(): void {
     this.userEmailPreferencesService.setFeedbackNotificationPreferences(
-      true, () => {});
+      true,
+      () => {}
+    );
   }
 
   muteSuggestionNotifications(): void {
@@ -613,45 +642,63 @@ export class SettingsTabComponent
 
   unmuteSuggestionNotifications(): void {
     this.userEmailPreferencesService.setSuggestionNotificationPreferences(
-      false, () => {});
+      false,
+      () => {}
+    );
   }
 
   // Methods relating to control buttons.
   previewSummaryTile(): void {
     this.alertsService.clearWarnings();
-    this.ngbModal.open(PreviewSummaryTileModalComponent, {
-      backdrop: true,
-    }).result.then(() => {}, () => {
-      this.alertsService.clearWarnings();
-    });
+    this.ngbModal
+      .open(PreviewSummaryTileModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {},
+        () => {
+          this.alertsService.clearWarnings();
+        }
+      );
   }
 
   showTransferExplorationOwnershipModal(): void {
     this.alertsService.clearWarnings();
-    this.ngbModal.open(TransferExplorationOwnershipModalComponent, {
-      backdrop: true,
-    }).result.then(() => {
-      this.explorationRightsService.makeCommunityOwned();
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    this.ngbModal
+      .open(TransferExplorationOwnershipModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.explorationRightsService.makeCommunityOwned();
+        },
+        () => {
+          this.alertsService.clearWarnings();
+        }
+      );
   }
 
   deleteExploration(): void {
     this.alertsService.clearWarnings();
 
-    this.ngbModal.open(DeleteExplorationModalComponent, {
-      backdrop: true,
-    }).result.then(() => {
-      this.editableExplorationBackendApiService.deleteExplorationAsync(
-        this.explorationId).then(() => {
-        this.windowRef.nativeWindow.location = (
-          // TODO(#13015): Remove use of unknown as a type.
-          this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location);
-      });
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    this.ngbModal
+      .open(DeleteExplorationModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.editableExplorationBackendApiService
+            .deleteExplorationAsync(this.explorationId)
+            .then(() => {
+              this.windowRef.nativeWindow.location =
+                // TODO(#13015): Remove use of unknown as a type.
+                this.CREATOR_DASHBOARD_PAGE_URL as unknown as Location;
+            });
+        },
+        () => {
+          this.alertsService.clearWarnings();
+        }
+      );
   }
 
   unpublishExplorationAsModerator(): void {
@@ -660,32 +707,39 @@ export class SettingsTabComponent
     var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
     this.settingTabBackendApiService
-      .getData(moderatorEmailDraftUrl).then(
-        (response: SettingTabResponse) => {
-          // If the draft email body is empty, email functionality will not
-          // be exposed to the mdoerator.
-          const draftEmailBody = response.draft_email_body;
+      .getData(moderatorEmailDraftUrl)
+      .then((response: SettingTabResponse) => {
+        // If the draft email body is empty, email functionality will not
+        // be exposed to the mdoerator.
+        const draftEmailBody = response.draft_email_body;
 
-          const modalRef = this.ngbModal
-            .open(ModeratorUnpublishExplorationModalComponent, {
-              backdrop: true,
-            });
+        const modalRef = this.ngbModal.open(
+          ModeratorUnpublishExplorationModalComponent,
+          {
+            backdrop: true,
+          }
+        );
 
-          modalRef.componentInstance.draftEmailBody = draftEmailBody;
+        modalRef.componentInstance.draftEmailBody = draftEmailBody;
 
-          modalRef.result.then((emailBody) => {
-            this.explorationRightsService.saveModeratorChangeToBackendAsync(
-              emailBody).then(() => {
-              this.userExplorationPermissionsService.fetchPermissionsAsync()
-                .then((permissions) => {
-                  this.canUnpublish = permissions.canUnpublish;
-                  this.canReleaseOwnership = permissions.canReleaseOwnership;
-                });
-            });
-          }, () => {
+        modalRef.result.then(
+          emailBody => {
+            this.explorationRightsService
+              .saveModeratorChangeToBackendAsync(emailBody)
+              .then(() => {
+                this.userExplorationPermissionsService
+                  .fetchPermissionsAsync()
+                  .then(permissions => {
+                    this.canUnpublish = permissions.canUnpublish;
+                    this.canReleaseOwnership = permissions.canReleaseOwnership;
+                  });
+              });
+          },
+          () => {
             this.alertsService.clearWarnings();
-          });
-        });
+          }
+        );
+      });
   }
 
   isExplorationLockedForEditing(): boolean {
@@ -708,14 +762,18 @@ export class SettingsTabComponent
 
     if (this.newMemberUsername === this.loggedInUser) {
       this.rolesSaveButtonEnabled = false;
-      this.errorMessage = (
-        'Users are not allowed to assign other roles to themselves.');
+      this.errorMessage =
+        'Users are not allowed to assign other roles to themselves.';
       return;
     }
-    if (this.explorationRightsService.checkUserAlreadyHasRoles(
-      this.newMemberUsername)) {
+    if (
+      this.explorationRightsService.checkUserAlreadyHasRoles(
+        this.newMemberUsername
+      )
+    ) {
       var oldRole = this.explorationRightsService.getOldRole(
-        this.newMemberUsername);
+        this.newMemberUsername
+      );
       if (oldRole === this.newMemberRole.value) {
         this.rolesSaveButtonEnabled = false;
         this.errorMessage = `User is already ${oldRole}.`;
@@ -726,82 +784,80 @@ export class SettingsTabComponent
 
   getExplorePageUrl(): string {
     return (
-      this.windowRef.nativeWindow.location.protocol + '//' +
+      this.windowRef.nativeWindow.location.protocol +
+      '//' +
       this.windowRef.nativeWindow.location.host +
-      this.EXPLORE_PAGE_PREFIX + this.explorationId);
+      this.EXPLORE_PAGE_PREFIX +
+      this.explorationId
+    );
   }
 
-  reassignRole(
-      username: string,
-      newRole: string,
-      oldRole: string
-  ): void {
+  reassignRole(username: string, newRole: string, oldRole: string): void {
     this.alertsService.clearWarnings();
-    const modalRef: NgbModalRef = this.ngbModal
-      .open(ReassignRoleConfirmationModalComponent, {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      ReassignRoleConfirmationModalComponent,
+      {
         backdrop: true,
-      });
+      }
+    );
     modalRef.componentInstance.username = username;
     modalRef.componentInstance.newRole = newRole;
     modalRef.componentInstance.oldRole = oldRole;
 
-    modalRef.result.then(() => {
-      this.explorationRightsService.saveRoleChanges(
-        username, newRole);
-      this.closeRolesForm();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    modalRef.result.then(
+      () => {
+        this.explorationRightsService.saveRoleChanges(username, newRole);
+        this.closeRolesForm();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.explorationTagsService.onExplorationPropertyChanged
-        .subscribe(
-          () => {
-            this.explorationTags = (
-              this.explorationTagsService.displayed as string[]);
-            this.updateMetadataVersionHistory();
-          }
-        )
+      this.explorationTagsService.onExplorationPropertyChanged.subscribe(() => {
+        this.explorationTags = this.explorationTagsService
+          .displayed as string[];
+        this.updateMetadataVersionHistory();
+      })
     );
 
     this.directiveSubscriptions.add(
-      this.routerService.onRefreshSettingsTab.subscribe(
+      this.routerService.onRefreshSettingsTab.subscribe(() => {
+        // TODO(#15473): Remove this delay after this has been
+        // migrated to Angular 2+.
+        setTimeout(() => {
+          this.refreshSettingsTab();
+        }, 500);
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.userExplorationPermissionsService.onUserExplorationPermissionsFetched.subscribe(
         () => {
-          // TODO(#15473): Remove this delay after this has been
-          // migrated to Angular 2+.
-          setTimeout(()=>{
-            this.refreshSettingsTab();
-          }, 500);
+          this.userExplorationPermissionsService
+            .getPermissionsAsync()
+            .then(permissions => {
+              this.canUnpublish = permissions.canUnpublish;
+              this.canReleaseOwnership = permissions.canReleaseOwnership;
+            });
         }
       )
     );
 
-    this.directiveSubscriptions.add(
-      this.userExplorationPermissionsService.onUserExplorationPermissionsFetched
-        .subscribe(
-          () => {
-            this.userExplorationPermissionsService.getPermissionsAsync()
-              .then((permissions) => {
-                this.canUnpublish = permissions.canUnpublish;
-                this.canReleaseOwnership = permissions.canReleaseOwnership;
-              });
-          }
-        )
-    );
-
-    this.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
-      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+    this.EXPLORATION_TITLE_INPUT_FOCUS_LABEL =
+      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL;
 
     this.CATEGORY_LIST_FOR_SELECT2 = [];
 
     for (var i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
       this.CATEGORY_LIST_FOR_SELECT2.push({
         id: AppConstants.ALL_CATEGORIES[i],
-        text: AppConstants.ALL_CATEGORIES[i]
+        text: AppConstants.ALL_CATEGORIES[i],
       });
     }
     this.isRolesFormOpen = false;
@@ -809,15 +865,15 @@ export class SettingsTabComponent
     this.rolesSaveButtonEnabled = false;
     this.errorMessage = '';
     this.basicSettingIsShown = !this.windowDimensionsService.isWindowNarrow();
-    this.advancedFeaturesIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.advancedFeaturesIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
     this.rolesCardIsShown = !this.windowDimensionsService.isWindowNarrow();
-    this.permissionsCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.permissionsCardIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
     this.feedbackCardIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.controlsCardIsShown = !this.windowDimensionsService.isWindowNarrow();
-    this.voiceArtistsCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.voiceArtistsCardIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
 
     this.TAG_REGEX = AppConstants.TAG_REGEX;
     this.canDelete = false;
@@ -828,13 +884,14 @@ export class SettingsTabComponent
     this.explorationId = this.explorationDataService.explorationId;
     this.loggedInUser = null;
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.loggedInUser = userInfo.getUsername();
       this.isSuperAdmin = userInfo.isSuperAdmin();
     });
 
-    this.userExplorationPermissionsService.getPermissionsAsync()
-      .then((permissions) => {
+    this.userExplorationPermissionsService
+      .getPermissionsAsync()
+      .then(permissions => {
         this.canDelete = permissions.canDelete;
         this.canModifyRoles = permissions.canModifyRoles;
         this.canReleaseOwnership = permissions.canReleaseOwnership;
@@ -845,7 +902,7 @@ export class SettingsTabComponent
     this.formStyle = JSON.stringify({
       display: 'table-cell',
       width: '16.66666667%',
-      'vertical-align': 'top'
+      'vertical-align': 'top',
     });
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
@@ -855,8 +912,3 @@ export class SettingsTabComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaSettingsTab',
-  downgradeComponent({
-    component: SettingsTabComponent
-  }) as angular.IDirectiveFactory);

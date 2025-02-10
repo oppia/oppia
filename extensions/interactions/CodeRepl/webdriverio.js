@@ -18,54 +18,62 @@
  */
 
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 
-var customizeInteraction = async function(interactionEditor, placeHolderText) {
+var customizeInteraction = async function (interactionEditor, placeHolderText) {
   await browser.execute(
     "var editor = $('schema-based-editor .CodeMirror')[0].CodeMirror;" +
-    "editor.setValue('" + placeHolderText + "');");
+      "editor.setValue('" +
+      placeHolderText +
+      "');"
+  );
 };
 
-var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
-  expect(
-    await elem.$('.CodeMirror').isExisting()
-  ).toBe(true);
+var expectInteractionDetailsToMatch = async function (elem, placeHolderText) {
+  expect(await elem.$('.CodeMirror').isExisting()).toBe(true);
   // The \n must be included in the check because the editor inserts a newline.
   // For testing purposes it is required that the order of
   // the quotes is single-quotes within double-quotes.
   var testValue = await browser.execute(
-    'var elem = $(\'.e2e-test-preview-tab .CodeMirror\')[0]' +
-    '.CodeMirror;return elem.getValue()');
+    "var elem = $('.e2e-test-preview-tab .CodeMirror')[0]" +
+      '.CodeMirror;return elem.getValue()'
+  );
   expect(testValue).toEqual(placeHolderText + '\n');
 };
 
-var submitAnswer = async function(conversationInput, answerCode) {
+var submitAnswer = async function (conversationInput, answerCode) {
   if (answerCode) {
     await browser.execute(
       "var elem = $('.e2e-test-preview-tab .CodeMirror')[0]" +
-      ".CodeMirror;elem.setValue('" + answerCode + "');");
+        ".CodeMirror;elem.setValue('" +
+        answerCode +
+        "');"
+    );
   }
   await browser.execute('window.scrollTo(0,500);');
-  var submitAnswerButton = $(
-    '.e2e-test-submit-answer-button');
+  var submitAnswerButton = $('.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
-    submitAnswerButton, 'Submit Answer button is not clickable');
+    submitAnswerButton,
+    'Submit Answer button is not clickable'
+  );
   await action.click('Submit Answer Button', submitAnswerButton);
 };
 
 var answerObjectType = 'CodeString';
 
-var testSuite = [{
-  interactionArguments: ['# You can enter the Code below'],
-  ruleArguments: ['CodeEquals', 'print("Hello World")'],
-  expectedInteractionDetails: ['# You can enter the Code below'],
-  // For testing purposes it is required that the order of
-  // the quotes is double-quotes within single-quotes.
-  wrongAnswers: ['print("Hello")'],
-  correctAnswers: ['print("Hello World")']
-}];
+var testSuite = [
+  {
+    interactionArguments: ['# You can enter the Code below'],
+    ruleArguments: ['CodeEquals', 'print("Hello World")'],
+    expectedInteractionDetails: ['# You can enter the Code below'],
+    // For testing purposes it is required that the order of
+    // the quotes is double-quotes within single-quotes.
+    wrongAnswers: ['print("Hello")'],
+    correctAnswers: ['print("Hello World")'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

@@ -16,11 +16,10 @@
  * @fileoverview Unit tests for refresher exploration confirmation modal service
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RefresherExplorationConfirmationModalService }
-  from './refresher-exploration-confirmation-modal.service';
+import {EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
 
 describe('Refresher exploration confirmation modal service', () => {
   let recms: RefresherExplorationConfirmationModalService;
@@ -33,16 +32,17 @@ describe('Refresher exploration confirmation modal service', () => {
 
   it('should display redirect confirmation modal', () => {
     const redirectConfirmationCallback = jasmine.createSpy(
-      'redirectConfirmationCallback', () => {}
+      'redirectConfirmationCallback',
+      () => {}
     );
     const mockComponentInstance = {
       confirmRedirectEventEmitter: new EventEmitter(),
-      refresherExplorationId: ''
+      refresherExplorationId: '',
     };
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: mockComponentInstance,
-        result: Promise.resolve()
+        result: Promise.resolve(),
       } as NgbModalRef;
     });
 

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
-import { waitForAsync, TestBed } from '@angular/core/testing';
-import { FilepathEditorComponent } from './filepath-editor.component';
+import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
+import {waitForAsync, TestBed} from '@angular/core/testing';
+import {FilepathEditorComponent} from './filepath-editor.component';
 
 /**
  * @fileoverview Unit tests for the File path editor.
@@ -23,15 +23,15 @@ import { FilepathEditorComponent } from './filepath-editor.component';
 describe('File path editor', () => {
   let component: FilepathEditorComponent;
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [FilepathEditorComponent],
-        schemas: [NO_ERRORS_SCHEMA]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [FilepathEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
   }));
   beforeEach(() => {
     component = TestBed.createComponent(
-      FilepathEditorComponent).componentInstance;
+      FilepathEditorComponent
+    ).componentInstance;
   });
 
   it('should show svg editor when filepath represents an svg', () => {
@@ -62,8 +62,7 @@ describe('File path editor', () => {
     component.value = '';
     component.ngOnInit();
 
-    expect(component.validityChange.emit).toHaveBeenCalledWith(
-      { empty: false });
+    expect(component.validityChange.emit).toHaveBeenCalledWith({empty: false});
   });
 
   it('should detect change in value', () => {
@@ -77,10 +76,9 @@ describe('File path editor', () => {
   it('should detect change in validity', () => {
     spyOn(component.validityChange, 'emit');
 
-    component.validityHasChanged({ empty: false });
+    component.validityHasChanged({empty: false});
 
-    expect(component.validityChange.emit).toHaveBeenCalledWith(
-      { empty: false });
+    expect(component.validityChange.emit).toHaveBeenCalledWith({empty: false});
   });
 
   it('should reset the editor when discard button is clicked', () => {
@@ -91,8 +89,7 @@ describe('File path editor', () => {
     expect(component.imageEditorIsShown).toBeFalse();
     expect(component.svgEditorIsShown).toBeFalse();
     expect(component.value).toEqual('');
-    expect(component.validityChange.emit).toHaveBeenCalledWith(
-      { empty: false });
+    expect(component.validityChange.emit).toHaveBeenCalledWith({empty: false});
   });
 
   it('should display image editor when upload button is clicked', () => {
@@ -122,8 +119,8 @@ describe('File path editor', () => {
         currentValue: '/path/to/svg-image.svg',
         previousValue: undefined,
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
 
     component.ngOnChanges(changes);

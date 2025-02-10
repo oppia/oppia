@@ -1,0 +1,52 @@
+name: Type checks
+permissions: read-all
+on:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+    branches:
+      - develop
+      - release-*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  backend_type_checks:
+    name: Backend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run Mypy type checks
+        run: python -m scripts.run_mypy_checks
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Python type checks failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  frontend_type_checks:
+    name: Frontend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run typescript tests
+        run: python -m scripts.run_typescript_checks
+      - name: Run typescript tests in strict mode
+        run: python -m scripts.run_typescript_checks --strict_checks
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A typescript test failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

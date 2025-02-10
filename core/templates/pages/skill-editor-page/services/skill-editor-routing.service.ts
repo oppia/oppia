@@ -16,12 +16,11 @@
  * @fileoverview Service that handles routing for the skill editor page.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {Injectable} from '@angular/core';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillEditorRoutingService {
   MAIN_TAB = 'main';
@@ -30,9 +29,7 @@ export class SkillEditorRoutingService {
   activeTab = this.MAIN_TAB;
   questionIsBeingCreated: boolean = false;
 
-  constructor(
-    private windowRef: WindowRef,
-  ) {
+  constructor(private windowRef: WindowRef) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._changeTab(currentHash.substring(1, currentHash.length));
   }
@@ -88,6 +85,3 @@ export class SkillEditorRoutingService {
     return this.questionIsBeingCreated;
   }
 }
-
-angular.module('oppia').factory('SkillEditorRoutingService',
-  downgradeInjectable(SkillEditorRoutingService));

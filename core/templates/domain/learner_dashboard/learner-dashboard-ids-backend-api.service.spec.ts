@@ -16,18 +16,17 @@
  * @fileoverview Unit tests for LearnerDashboardIdsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { LearnerDashboardIdsBackendApiService } from
-  'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { LearnerDashboardActivityIds } from
-  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import {LearnerDashboardIdsBackendApiService} from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 describe('Learner Dashboard Backend API Service', () => {
-  var learnerDashboardIdsBackendApiService:
-    LearnerDashboardIdsBackendApiService;
+  var learnerDashboardIdsBackendApiService: LearnerDashboardIdsBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleDataResults = {
@@ -44,12 +43,12 @@ describe('Learner Dashboard Backend API Service', () => {
       all_topic_ids: [],
       untracked_topic_ids: [],
       collection_playlist_ids: [],
-      incomplete_collection_ids: []
+      incomplete_collection_ids: [],
     },
     user_email: 'test@example.com',
     is_curriculum_admin: false,
     is_super_admin: false,
-    is_moderator: false
+    is_moderator: false,
   };
 
   var LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data';
@@ -58,10 +57,11 @@ describe('Learner Dashboard Backend API Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LearnerDashboardIdsBackendApiService]
+      providers: [LearnerDashboardIdsBackendApiService],
     });
     learnerDashboardIdsBackendApiService = TestBed.get(
-      LearnerDashboardIdsBackendApiService);
+      LearnerDashboardIdsBackendApiService
+    );
 
     httpTestingController = TestBed.get(HttpTestingController);
   });
@@ -70,49 +70,57 @@ describe('Learner Dashboard Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner dashboard IDs data from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch learner dashboard IDs data from the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIdsAsync()
-        .then(successHandler, failHandler);
+    learnerDashboardIdsBackendApiService
+      .fetchLearnerDashboardIdsAsync()
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        LearnerDashboardActivityIds.createFromBackendDict(
-          sampleDataResults.learner_dashboard_activity_ids));
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerDashboardActivityIds.createFromBackendDict(
+        sampleDataResults.learner_dashboard_activity_ids
+      )
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it(
     'should use rejection handler if learner dashboard IDs' +
-    ' data backend request failed',
+      ' data backend request failed',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      learnerDashboardIdsBackendApiService.fetchLearnerDashboardIdsAsync()
+      learnerDashboardIdsBackendApiService
+        .fetchLearnerDashboardIdsAsync()
         .then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(LEARNER_DASHBOARD_IDS_DATA_URL);
       expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Error loading dashboard IDs data.'
-      }, {
-        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-      });
+      req.flush(
+        {
+          error: 'Error loading dashboard IDs data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
 
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
-        'Error loading dashboard IDs data.');
-    }));
+        'Error loading dashboard IDs data.'
+      );
+    })
+  );
 });

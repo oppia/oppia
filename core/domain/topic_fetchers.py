@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 from core.domain import caching_services
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_domain
@@ -174,8 +174,8 @@ def get_topic_from_model(
         topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
         topic_model.page_title_fragment_for_web,
-        topic_model.skill_ids_for_diagnostic_test, topic_model.created_on,
-        topic_model.last_updated)
+        topic_model.skill_ids_for_diagnostic_test,
+        topic_model.created_on, topic_model.last_updated)
 
 
 @overload
@@ -536,6 +536,7 @@ def get_topic_summary_from_model(
         topic_summary_model.thumbnail_filename,
         topic_summary_model.thumbnail_bg_color,
         topic_summary_model.url_fragment,
+        topic_summary_model.published_story_exploration_mapping,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -691,7 +692,8 @@ class CannonicalStoryDict(TypedDict):
     thumbnail_filename: Optional[str]
     url_fragment: str
     topic_url_fragment: str
-    classroom_url_fragment: str
+    classroom_url_fragment: Optional[str]
+    classroom_name: Optional[str]
     story_is_published: bool
     completed_node_titles: List[str]
     all_node_dicts: List[story_domain.StoryNodeDict]
@@ -738,8 +740,12 @@ def get_canonical_story_dicts(
         )
         story_summary_dict['topic_url_fragment'] = topic.url_fragment
         story_summary_dict['classroom_url_fragment'] = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
+        story_summary_dict['classroom_name'] = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic.id)
+        )
         story_summary_dict['story_is_published'] = True
         story_summary_dict['completed_node_titles'] = completed_node_titles
         story_summary_dict['all_node_dicts'] = [

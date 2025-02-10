@@ -16,15 +16,20 @@
  * @fileoverview Unit Tests for CuratedExplorationValidationService
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
-import { ExplorationSummaryBackendDict, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import {CuratedExplorationValidationService} from 'domain/exploration/curated-exploration-validation.service';
+import {
+  ExplorationSummaryBackendDict,
+  ExplorationSummaryDict,
+} from 'domain/summary/exploration-summary-backend-api.service';
 
 describe('Curated exploration validation service', () => {
-  let curatedExplorationValidationService:
-  CuratedExplorationValidationService;
+  let curatedExplorationValidationService: CuratedExplorationValidationService;
   let httpTestingController: HttpTestingController;
   let validExpResultsWithCustomCategory: ExplorationSummaryBackendDict;
   let validExpResultsWithDefaultCategory: ExplorationSummaryBackendDict;
@@ -33,10 +38,11 @@ describe('Curated exploration validation service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
-    curatedExplorationValidationService =
-      TestBed.inject(CuratedExplorationValidationService);
+    curatedExplorationValidationService = TestBed.inject(
+      CuratedExplorationValidationService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -47,79 +53,86 @@ describe('Curated exploration validation service', () => {
 
   beforeEach(() => {
     validExpResultsWithCustomCategory = {
-      summaries: [{
-        id: '0',
-        num_views: 0,
-        human_readable_contributors_summary: {},
-        created_on_msec: 1581965806278.269,
-        ratings: {
-          5: 0,
-          4: 0,
-          1: 0,
-          3: 0,
-          2: 0
-        },
-        last_updated_msec: 1581965806278.183,
-        language_code: 'en',
-        category: 'Test',
-        objective: 'Dummy exploration for testing all interactions',
-        activity_type: 'exploration',
-        status: 'public',
-        thumbnail_bg_color: '#a33f40',
-        tags: [],
-        thumbnail_icon_url: '/subjects/Lightbulb.svg',
-        community_owned: true,
-        title: 'Test of all interactions',
-        num_total_threads: 0,
-        num_open_threads: 0
-      } as ExplorationSummaryDict]
+      summaries: [
+        {
+          id: '0',
+          num_views: 0,
+          human_readable_contributors_summary: {},
+          created_on_msec: 1581965806278.269,
+          ratings: {
+            5: 0,
+            4: 0,
+            1: 0,
+            3: 0,
+            2: 0,
+          },
+          last_updated_msec: 1581965806278.183,
+          language_code: 'en',
+          category: 'Test',
+          objective: 'Dummy exploration for testing all interactions',
+          activity_type: 'exploration',
+          status: 'public',
+          thumbnail_bg_color: '#a33f40',
+          tags: [],
+          thumbnail_icon_url: '/subjects/Lightbulb.svg',
+          community_owned: true,
+          title: 'Test of all interactions',
+          num_total_threads: 0,
+          num_open_threads: 0,
+        } as ExplorationSummaryDict,
+      ],
     };
     validExpResultsWithDefaultCategory = {
-      summaries: [{
-        id: '1',
-        num_views: 0,
-        human_readable_contributors_summary: {},
-        created_on_msec: 1581965806278.269,
-        ratings: {
-          5: 0,
-          4: 0,
-          1: 0,
-          3: 0,
-          2: 0
-        },
-        last_updated_msec: 1581965806278.183,
-        language_code: 'en',
-        category: 'Algebra',
-        objective: 'Dummy exploration for testing all interactions',
-        activity_type: 'exploration',
-        status: 'public',
-        thumbnail_bg_color: '#a33f40',
-        tags: [],
-        thumbnail_icon_url: '/subjects/Lightbulb.svg',
-        community_owned: true,
-        title: 'Test of all interactions',
-        num_total_threads: 0,
-        num_open_threads: 0
-      } as ExplorationSummaryDict]
+      summaries: [
+        {
+          id: '1',
+          num_views: 0,
+          human_readable_contributors_summary: {},
+          created_on_msec: 1581965806278.269,
+          ratings: {
+            5: 0,
+            4: 0,
+            1: 0,
+            3: 0,
+            2: 0,
+          },
+          last_updated_msec: 1581965806278.183,
+          language_code: 'en',
+          category: 'Algebra',
+          objective: 'Dummy exploration for testing all interactions',
+          activity_type: 'exploration',
+          status: 'public',
+          thumbnail_bg_color: '#a33f40',
+          tags: [],
+          thumbnail_icon_url: '/subjects/Lightbulb.svg',
+          community_owned: true,
+          title: 'Test of all interactions',
+          num_total_threads: 0,
+          num_open_threads: 0,
+        } as ExplorationSummaryDict,
+      ],
     };
   });
 
-  afterEach(function() {
+  afterEach(function () {
     httpTestingController.verify();
   });
 
-  it('should correctly validate the invalid exploration ids', fakeAsync(()=> {
+  it('should correctly validate the invalid exploration ids', fakeAsync(() => {
     // The service should respond false when the summaries array
     // is empty.
     const explorationIds = ['0'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-      '&' + 'include_private_explorations=false';
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=false';
 
-    curatedExplorationValidationService.isExpPublishedAsync('0')
+    curatedExplorationValidationService
+      .isExpPublishedAsync('0')
       .then(successHandler, failHandler);
-    let req = httpTestingController
-      .expectOne(requestUrl);
+    let req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush({summaries: []});
     flushMicrotasks();
@@ -129,10 +142,10 @@ describe('Curated exploration validation service', () => {
 
     // The service should respond false when the summaries array
     // contains null.
-    curatedExplorationValidationService.isExpPublishedAsync('0')
+    curatedExplorationValidationService
+      .isExpPublishedAsync('0')
       .then(successHandler, failHandler);
-    req = httpTestingController
-      .expectOne(requestUrl);
+    req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush({summaries: [null]});
     flushMicrotasks();
@@ -142,32 +155,31 @@ describe('Curated exploration validation service', () => {
 
     // The service should respond false when the summaries array
     // contains more than one element.
-    curatedExplorationValidationService.isExpPublishedAsync('0')
+    curatedExplorationValidationService
+      .isExpPublishedAsync('0')
       .then(successHandler, failHandler);
-    req = httpTestingController
-      .expectOne(requestUrl);
+    req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
-    req.flush({summaries: [
-      'exp1',
-      'exp2'
-    ]});
+    req.flush({summaries: ['exp1', 'exp2']});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(false);
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
-  it('should correctly validate the valid exploration id', fakeAsync(()=> {
+  it('should correctly validate the valid exploration id', fakeAsync(() => {
     const explorationIds = ['0'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-      '&' + 'include_private_explorations=false';
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=false';
 
-    curatedExplorationValidationService.isExpPublishedAsync('0')
+    curatedExplorationValidationService
+      .isExpPublishedAsync('0')
       .then(successHandler, failHandler);
-    const req = httpTestingController
-      .expectOne(requestUrl);
+    const req = httpTestingController.expectOne(requestUrl);
     expect(req.request.method).toEqual('GET');
     req.flush(validExpResultsWithCustomCategory);
     flushMicrotasks();
@@ -176,177 +188,175 @@ describe('Curated exploration validation service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should determine correctness feedback state when it is ' +
-    'enabled for the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
+  it(
+    'should determine if the exploration category is ' +
+      'default for the exploration',
+    fakeAsync(() => {
+      const explorationIds = ['0'];
+      const requestUrl =
+        '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' +
+        encodeURI(JSON.stringify(explorationIds)) +
+        '&' +
+        'include_private_explorations=false';
 
-    curatedExplorationValidationService.isCorrectnessFeedbackEnabled(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({correctness_feedback_enabled: true});
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .isDefaultCategoryAsync(explorationIds[0])
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(validExpResultsWithDefaultCategory);
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(true);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith(true);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should determine correctness feedback state when it is ' +
-    'disabled for the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
+  it(
+    'should determine if the exploration category is ' +
+      'not default for the exploration',
+    fakeAsync(() => {
+      const explorationIds = ['0'];
+      const requestUrl =
+        '/explorationsummarieshandler/data?' +
+        'stringified_exp_ids=' +
+        encodeURI(JSON.stringify(explorationIds)) +
+        '&' +
+        'include_private_explorations=false';
 
-    curatedExplorationValidationService.isCorrectnessFeedbackEnabled(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({correctness_feedback_enabled: false});
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .isDefaultCategoryAsync(explorationIds[0])
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(validExpResultsWithCustomCategory);
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(false);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should determine if the exploration category is ' +
-    'default for the exploration', fakeAsync(() => {
-    const explorationIds = ['0'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+  it(
+    'should get states with restricted interactions when they are not ' +
+      'present in the exploration',
+    fakeAsync(() => {
+      const explorationId = '0';
+      const requestUrl = '/explorehandler/init/' + explorationId;
+      const expDict = {
+        states: {
+          Intro: {interaction: {id: 'Continue'}},
+          GoodState: {interaction: {id: 'MultipleChoiceInput'}},
+        },
+      };
 
-    curatedExplorationValidationService.isDefaultCategoryAsync(
-      explorationIds[0]).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(validExpResultsWithDefaultCategory);
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .getStatesWithRestrictedInteractions(explorationId)
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({exploration: expDict});
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(true);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith([]);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should determine if the exploration category is ' +
-    'not default for the exploration', fakeAsync(() => {
-    const explorationIds = ['0'];
-    const requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+  it(
+    'should get states with restricted interactions when they are present ' +
+      'in the exploration',
+    fakeAsync(() => {
+      const explorationId = '0';
+      const requestUrl = '/explorehandler/init/' + explorationId;
+      const expDict = {
+        states: {
+          Intro: {interaction: {id: 'Continue'}},
+          BadState: {interaction: {id: 'AnInvalidType'}},
+        },
+      };
 
-    curatedExplorationValidationService.isDefaultCategoryAsync(
-      explorationIds[0]).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(validExpResultsWithCustomCategory);
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .getStatesWithRestrictedInteractions(explorationId)
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({exploration: expDict});
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(false);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith(['BadState']);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should get states with restricted interactions when they are not ' +
-    'present in the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
-    const expDict = {
-      states: {
-        Intro: {interaction: {id: 'Continue'}},
-        GoodState: {interaction: {id: 'MultipleChoiceInput'}}
-      }
-    };
+  it(
+    'should get states with invalid multiple choices when they are not ' +
+      'present in the exploration',
+    fakeAsync(() => {
+      const explorationId = '0';
+      const requestUrl = '/explorehandler/init/' + explorationId;
+      const expDict = {
+        states: {
+          Intro: {interaction: {id: 'Continue'}},
+          GoodState: {
+            interaction: {
+              id: 'MultipleChoiceInput',
+              customization_args: {
+                choices: {
+                  value: ['1', '2', '3', '4'],
+                },
+              },
+            },
+          },
+        },
+      };
 
-    curatedExplorationValidationService.getStatesWithRestrictedInteractions(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({exploration: expDict});
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .getStatesWithInvalidMultipleChoices(explorationId)
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({exploration: expDict});
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith([]);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith([]);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should get states with restricted interactions when they are present ' +
-    'in the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
-    const expDict = {
-      states: {
-        Intro: {interaction: {id: 'Continue'}},
-        BadState: {interaction: {id: 'AnInvalidType'}}
-      }
-    };
+  it(
+    'should get states with invalid multiple choices when they are present ' +
+      'in the exploration',
+    fakeAsync(() => {
+      const explorationId = '0';
+      const requestUrl = '/explorehandler/init/' + explorationId;
+      const expDict = {
+        states: {
+          Intro: {interaction: {id: 'Continue'}},
+          BadState: {
+            interaction: {
+              id: 'MultipleChoiceInput',
+              customization_args: {
+                choices: {
+                  value: ['1', '2', '3'],
+                },
+              },
+            },
+          },
+        },
+      };
 
-    curatedExplorationValidationService.getStatesWithRestrictedInteractions(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({exploration: expDict});
-    flushMicrotasks();
+      curatedExplorationValidationService
+        .getStatesWithInvalidMultipleChoices(explorationId)
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush({exploration: expDict});
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(['BadState']);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should get states with invalid multiple choices when they are not ' +
-    'present in the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
-    const expDict = {
-      states: {
-        Intro: {interaction: {id: 'Continue'}},
-        GoodState: {
-          interaction: {
-            id: 'MultipleChoiceInput',
-            customization_args: {
-              choices: {
-                value: ['1', '2', '3', '4']
-              }
-            }
-          }
-        }
-      }
-    };
-
-    curatedExplorationValidationService.getStatesWithInvalidMultipleChoices(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({exploration: expDict});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith([]);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should get states with invalid multiple choices when they are present ' +
-    'in the exploration', fakeAsync(() => {
-    const explorationId = '0';
-    const requestUrl = '/explorehandler/init/' + explorationId;
-    const expDict = {
-      states: {
-        Intro: {interaction: {id: 'Continue'}},
-        BadState: {
-          interaction: {
-            id: 'MultipleChoiceInput',
-            customization_args: {
-              choices: {
-                value: ['1', '2', '3']
-              }
-            }
-          }
-        }
-      }
-    };
-
-    curatedExplorationValidationService.getStatesWithInvalidMultipleChoices(
-      explorationId).then(successHandler, failHandler);
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush({exploration: expDict});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(['BadState']);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalledWith(['BadState']);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

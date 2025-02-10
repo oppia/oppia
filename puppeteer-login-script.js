@@ -18,8 +18,8 @@
  * @param {puppeteer.Browser} browser
  * @param {{url: string, options: LHCI.CollectCommand.Options}} context
  */
-const LOGIN_URL = 'http://127.0.0.1:8181/login';
-const CREATOR_DASHBOARD_URL = 'http://127.0.0.1:8181/creator-dashboard';
+const LOGIN_URL = 'http://localhost:8181/login';
+const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
 const networkIdle = 'networkidle0';
 
 var emailInput = '.e2e-test-sign-in-email-input';
@@ -29,14 +29,13 @@ var agreeToTermsCheckBox = '.e2e-test-agree-to-terms-checkbox';
 var registerUser = '.e2e-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
-var usernameInputFieldForRolesEditing = (
-  '.e2e-test-username-for-role-editor');
+var usernameInputFieldForRolesEditing = '.e2e-test-username-for-role-editor';
 var editUserRoleButton = '.e2e-test-role-edit-button';
 var roleEditorContainer = '.e2e-test-roles-editor-card-container';
 var addNewRoleButton = '.e2e-test-add-new-role-button';
 var roleSelect = '.e2e-test-new-role-selector';
 
-module.exports = async(browser, context) => {
+module.exports = async (browser, context) => {
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout(0);
   // Sign into Oppia.
@@ -56,7 +55,7 @@ module.exports = async(browser, context) => {
 };
 
 // Needed to relogin after lighthouse_setup.js.
-const login = async function(context, page) {
+const login = async function (context, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(LOGIN_URL, {waitUntil: networkIdle});
@@ -84,11 +83,12 @@ const login = async function(context, page) {
   }
 };
 
-const setRole = async function(page, role) {
+const setRole = async function (page, role) {
   try {
     // eslint-disable-next-line dot-notation
-    await page.goto(
-      'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
+    await page.goto('http://localhost:8181/admin#/roles', {
+      waitUntil: networkIdle,
+    });
     await page.waitForSelector(usernameInputFieldForRolesEditing);
     await page.type(usernameInputFieldForRolesEditing, 'username1');
     await page.waitForSelector(editUserRoleButton);
@@ -103,21 +103,21 @@ const setRole = async function(page, role) {
     await page.click(selector);
     await page.waitForTimeout(2000);
     // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
+    await page.goto(CREATOR_DASHBOARD_URL, {waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
   }
 };
 
-const createCollections = async function(context, page) {
+const createCollections = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
     await setRole(page, 'COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin');
+    await page.goto('http://localhost:8181/admin');
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
     await page.click('#reload-collection-button-id');
@@ -129,17 +129,16 @@ const createCollections = async function(context, page) {
   }
 };
 
-const createExplorations = async function(context, page) {
+const createExplorations = async function (context, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Exploration...');
     // Load in Exploration
     // eslint-disable-next-line dot-notation
-    await page.goto('http://127.0.0.1:8181/admin', { waitUntil: 'networkidle0' });
+    await page.goto('http://localhost:8181/admin', {waitUntil: 'networkidle0'});
     await page.waitForTimeout(2000);
     await page.evaluate('window.confirm = () => true');
-    await page.click(
-      '.e2e-test-reload-exploration-button');
+    await page.click('.e2e-test-reload-exploration-button');
     // eslint-disable-next-line no-console
     console.log('Exploration Created');
   } catch (e) {

@@ -17,7 +17,7 @@
  * that are used in topics dashboard.
  */
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 export class NewlyCreatedTopic {
   name: string;
@@ -31,10 +31,10 @@ export class NewlyCreatedTopic {
    * @param {String} pageTitleFragment - page title fragment of the topic.
    */
   constructor(
-      name: string,
-      description: string,
-      urlFragment: string,
-      pageTitleFragment: string
+    name: string,
+    description: string,
+    urlFragment: string,
+    pageTitleFragment: string
   ) {
     this.name = name;
     this.description = description;
@@ -47,19 +47,22 @@ export class NewlyCreatedTopic {
    */
   isValid(): boolean {
     let validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX
+    );
     let urlFragmentCharLimit = AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
-    let titleFragMaxLimit = (
-      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
-    let titleFragMinLimit = (
-      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
+    let titleFragMaxLimit =
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+    let titleFragMinLimit =
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
     return Boolean(
-      this.name && this.description && this.urlFragment &&
-      validUrlFragmentRegex.test(this.urlFragment) &&
-      this.urlFragment.length <= urlFragmentCharLimit &&
-      this.pageTitleFragment &&
-      this.pageTitleFragment.length >= titleFragMinLimit &&
-      this.pageTitleFragment.length <= titleFragMaxLimit
+      this.name &&
+        this.description &&
+        this.urlFragment &&
+        validUrlFragmentRegex.test(this.urlFragment) &&
+        this.urlFragment.length <= urlFragmentCharLimit &&
+        this.pageTitleFragment &&
+        this.pageTitleFragment.length >= titleFragMinLimit &&
+        this.pageTitleFragment.length <= titleFragMaxLimit
     );
   }
 

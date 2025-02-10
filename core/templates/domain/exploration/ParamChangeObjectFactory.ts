@@ -19,8 +19,8 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface CustomizationArgs {
   [generatorId: string]: ParamChangeCustomizationArgs;
@@ -29,23 +29,23 @@ interface CustomizationArgs {
 var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
   Copier: {
     parse_with_jinja: true,
-    value: '5'
+    value: '5',
   },
   RandomSelector: {
-    list_of_values: ['sample value']
-  }
+    list_of_values: ['sample value'],
+  },
 };
 
 interface ParamChangeCustomizationArgs {
-  'parse_with_jinja'?: boolean;
-  'value'?: string;
-  'list_of_values'?: string[];
+  parse_with_jinja?: boolean;
+  value?: string;
+  list_of_values?: string[];
 }
 
 export interface ParamChangeBackendDict {
-  'customization_args': ParamChangeCustomizationArgs;
-  'generator_id': string;
-  'name': string;
+  customization_args: ParamChangeCustomizationArgs;
+  generator_id: string;
+  name: string;
 }
 
 export class ParamChange {
@@ -54,8 +54,10 @@ export class ParamChange {
   name: string;
 
   constructor(
-      customizationArgs: ParamChangeCustomizationArgs, generatorId: string,
-      name: string) {
+    customizationArgs: ParamChangeCustomizationArgs,
+    generatorId: string,
+    name: string
+  ) {
     this.customizationArgs = customizationArgs;
     this.generatorId = generatorId;
     this.name = name;
@@ -65,40 +67,54 @@ export class ParamChange {
     return {
       customization_args: this.customizationArgs,
       generator_id: this.generatorId,
-      name: this.name
+      name: this.name,
     };
   }
 
   resetCustomizationArgs(): void {
     this.customizationArgs = cloneDeep(
-      DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
+      DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]
+    );
   }
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParamChangeObjectFactory {
   createFromBackendDict(
-      paramChangeBackendDict: ParamChangeBackendDict): ParamChange {
+    paramChangeBackendDict: ParamChangeBackendDict
+  ): ParamChange {
     return new ParamChange(
       paramChangeBackendDict.customization_args,
       paramChangeBackendDict.generator_id,
-      paramChangeBackendDict.name);
+      paramChangeBackendDict.name
+    );
   }
 
   createEmpty(paramName: string): ParamChange {
-    return new ParamChange({
-      parse_with_jinja: true,
-      value: ''
-    }, 'Copier', paramName);
+    return new ParamChange(
+      {
+        parse_with_jinja: true,
+        value: '',
+      },
+      'Copier',
+      paramName
+    );
   }
 
   createDefault(paramName: string): ParamChange {
     return new ParamChange(
-      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier), 'Copier', paramName);
+      cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier),
+      'Copier',
+      paramName
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'ParamChangeObjectFactory', downgradeInjectable(ParamChangeObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ParamChangeObjectFactory',
+    downgradeInjectable(ParamChangeObjectFactory)
+  );

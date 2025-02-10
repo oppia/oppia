@@ -17,21 +17,21 @@
  * warning messages if the validation fails.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { AppConstants } from 'app.constants';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
+import {AlertsService} from 'services/alerts.service';
+import {AppConstants} from 'app.constants';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ValidatorsService {
   constructor(
     private alerts: AlertsService,
-    private whitespacefilter: NormalizeWhitespacePipe) {}
+    private whitespacefilter: NormalizeWhitespacePipe
+  ) {}
 
   /**
    * Checks whether an entity name is valid, and displays a warning message
@@ -42,7 +42,10 @@ export class ValidatorsService {
    * @return {boolean} True if the entity name is valid, false otherwise.
    */
   isValidEntityName(
-      input: string, showWarnings: boolean, allowEmpty: boolean): boolean {
+    input: string,
+    showWarnings: boolean,
+    allowEmpty: boolean
+  ): boolean {
     input = this.whitespacefilter.transform(input);
     if (!input && !allowEmpty) {
       if (showWarnings) {
@@ -51,13 +54,12 @@ export class ValidatorsService {
       return false;
     }
 
-    for (
-      var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
+    for (var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
       if (input.indexOf(AppConstants.INVALID_NAME_CHARS[i]) !== -1) {
         if (showWarnings) {
           this.alerts.addWarning(
             'Invalid input. Please use a non-empty description ' +
-            'consisting of alphanumeric characters, spaces and/or hyphens.'
+              'consisting of alphanumeric characters, spaces and/or hyphens.'
           );
         }
         return false;
@@ -74,7 +76,8 @@ export class ValidatorsService {
     if (input.length > 40) {
       if (showWarnings) {
         this.alerts.addWarning(
-          'Exploration titles should be at most 40 characters long.');
+          'Exploration titles should be at most 40 characters long.'
+        );
       }
       return false;
     }
@@ -92,7 +95,8 @@ export class ValidatorsService {
     if (input.length > 50) {
       if (showWarnings) {
         this.alerts.addWarning(
-          'Card names should be at most 50 characters long.');
+          'Card names should be at most 50 characters long.'
+        );
       }
       return false;
     }
@@ -103,7 +107,7 @@ export class ValidatorsService {
   isNonempty(input: string, showWarnings: boolean): boolean {
     if (!input) {
       if (showWarnings) {
-        // TODO(sll): Allow this warning to be more specific in terms of
+        // TODO(#20336): Allow this warning to be more specific in terms of
         // what needs to be entered.
         this.alerts.addWarning('Please enter a non-empty value.');
       }
@@ -131,12 +135,15 @@ export class ValidatorsService {
     if (input.length > AppConstants.MAX_REVIEW_MESSAGE_LENGTH && showWarnings) {
       this.alerts.addWarning(
         'Review message should be at most ' +
-        AppConstants.MAX_REVIEW_MESSAGE_LENGTH + ' characters long.');
+          AppConstants.MAX_REVIEW_MESSAGE_LENGTH +
+          ' characters long.'
+      );
       return false;
     }
     return true;
   }
 }
 
-angular.module('oppia').factory(
-  'ValidatorsService', downgradeInjectable(ValidatorsService));
+angular
+  .module('oppia')
+  .factory('ValidatorsService', downgradeInjectable(ValidatorsService));

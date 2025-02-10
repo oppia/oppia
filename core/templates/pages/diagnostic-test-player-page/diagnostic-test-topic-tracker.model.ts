@@ -21,11 +21,9 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-
 export interface TopicIdToRelatedTopicIds {
   [topicId: string]: string[];
 }
-
 
 export class DiagnosticTestTopicTrackerModel {
   // The list of pending topic IDs from which the next topic can be selected
@@ -59,7 +57,8 @@ export class DiagnosticTestTopicTrackerModel {
 
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
     this._pendingTopicIdsToTest = Object.keys(
-      this._topicIdToPrerequisiteTopicIds).sort();
+      this._topicIdToPrerequisiteTopicIds
+    ).sort();
 
     this.generateTopicIdToAncestorTopicIds();
     this.generateTopicIdToSuccessorTopicIds();
@@ -102,7 +101,8 @@ export class DiagnosticTestTopicTrackerModel {
     for (let topicId in this._topicIdToPrerequisiteTopicIds) {
       let ancestorTopicIds: string[] = [];
       let unprocessedAncestorTopicIds: string[] = cloneDeep(
-        this._topicIdToPrerequisiteTopicIds[topicId]);
+        this._topicIdToPrerequisiteTopicIds[topicId]
+      );
 
       let visitedTopicIdsForCurrentTopic: string[] = [];
       let lastTopicId: string;
@@ -119,8 +119,9 @@ export class DiagnosticTestTopicTrackerModel {
 
         unprocessedAncestorTopicIds = unprocessedAncestorTopicIds.concat(
           this._topicIdToPrerequisiteTopicIds[lastTopicId].filter(
-            (topic) => visitedTopicIdsForCurrentTopic.indexOf(topic) === -1
-          ));
+            topic => visitedTopicIdsForCurrentTopic.indexOf(topic) === -1
+          )
+        );
         visitedTopicIdsForCurrentTopic.push(lastTopicId);
       }
       this._topicIdToAncestorTopicIds[topicId] = ancestorTopicIds.sort();
@@ -128,7 +129,7 @@ export class DiagnosticTestTopicTrackerModel {
   }
 
   _generateTopicIdToChildTopicId(
-      topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToRelatedTopicIds
   ): TopicIdToRelatedTopicIds {
     // The method generates a dict with topic ID as the key and its immediate
     // successor topic IDs as value. The successor's list is generated using
@@ -156,13 +157,14 @@ export class DiagnosticTestTopicTrackerModel {
     // the prerequisite dependency graph.
     // Example: A -> B -> C, here the topic ID to successor topic IDs dict will
     // look like: {A: [B, C], B: [C], C: []}.
-    let topicIdToChildTopicId: TopicIdToRelatedTopicIds = (
-      this._generateTopicIdToChildTopicId(this._topicIdToPrerequisiteTopicIds));
+    let topicIdToChildTopicId: TopicIdToRelatedTopicIds =
+      this._generateTopicIdToChildTopicId(this._topicIdToPrerequisiteTopicIds);
 
     for (let topicId in topicIdToChildTopicId) {
       let successorTopicIds: string[] = [];
       let unprocessedSuccessorTopicIds: string[] = cloneDeep(
-        topicIdToChildTopicId[topicId]);
+        topicIdToChildTopicId[topicId]
+      );
 
       let visitedTopicIdsForCurrentTopic: string[] = [];
       let lastTopicId: string;
@@ -179,8 +181,9 @@ export class DiagnosticTestTopicTrackerModel {
 
         unprocessedSuccessorTopicIds = unprocessedSuccessorTopicIds.concat(
           topicIdToChildTopicId[lastTopicId].filter(
-            (topicId) => visitedTopicIdsForCurrentTopic.indexOf(topicId) === -1
-          ));
+            topicId => visitedTopicIdsForCurrentTopic.indexOf(topicId) === -1
+          )
+        );
         visitedTopicIdsForCurrentTopic.push(lastTopicId);
       }
       this._topicIdToSuccessorTopicIds[topicId] = successorTopicIds.sort();
@@ -200,7 +203,9 @@ export class DiagnosticTestTopicTrackerModel {
       // removed from the eligible topic IDs after testing, is the minimum of
       // the counts of its ancestors and successors.
       topicIdToLengthOfRelatedTopicIds[topicId] = Math.min(
-        ancestorTopicIds.length, successorTopicIds.length);
+        ancestorTopicIds.length,
+        successorTopicIds.length
+      );
     }
 
     // Among all the eligible topics, the topic with the maximum value for
@@ -209,10 +214,12 @@ export class DiagnosticTestTopicTrackerModel {
     // recommendations.
     return Object.keys(topicIdToLengthOfRelatedTopicIds).reduce(
       (item1, item2) => {
-        return (
-          topicIdToLengthOfRelatedTopicIds[item1] >=
-          topicIdToLengthOfRelatedTopicIds[item2] ? item1 : item2);
-      });
+        return topicIdToLengthOfRelatedTopicIds[item1] >=
+          topicIdToLengthOfRelatedTopicIds[item2]
+          ? item1
+          : item2;
+      }
+    );
   }
 
   recordTopicPassed(passedTopicId: string): void {
@@ -230,7 +237,7 @@ export class DiagnosticTestTopicTrackerModel {
     topicIdsToRemove.push(passedTopicId);
 
     this._pendingTopicIdsToTest = this._pendingTopicIdsToTest.filter(
-      (topicId) => (topicIdsToRemove.indexOf(topicId) === -1)
+      topicId => topicIdsToRemove.indexOf(topicId) === -1
     );
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
@@ -252,7 +259,7 @@ export class DiagnosticTestTopicTrackerModel {
     topicIdsToRemove.push(failedTopicId);
 
     this._pendingTopicIdsToTest = this._pendingTopicIdsToTest.filter(
-      (topicId) => (topicIdsToRemove.indexOf(topicId) === -1)
+      topicId => topicIdsToRemove.indexOf(topicId) === -1
     );
     this.removeTopicIdsFromTopicIdToAncestorsDict(topicIdsToRemove);
     this.removeTopicIdsFromTopicIdToSuccessorsDict(topicIdsToRemove);
@@ -266,7 +273,7 @@ export class DiagnosticTestTopicTrackerModel {
     }
     for (let topicId in this._topicIdToAncestorTopicIds) {
       let ancestors = this._topicIdToAncestorTopicIds[topicId];
-      this._topicIdToAncestorTopicIds[topicId] = ancestors.filter((topic) => {
+      this._topicIdToAncestorTopicIds[topicId] = ancestors.filter(topic => {
         return topicIdsToRemove.indexOf(topic) === -1;
       });
     }
@@ -280,7 +287,7 @@ export class DiagnosticTestTopicTrackerModel {
     }
     for (let topicId in this._topicIdToSuccessorTopicIds) {
       let successors = this._topicIdToSuccessorTopicIds[topicId];
-      this._topicIdToSuccessorTopicIds[topicId] = successors.filter((topic) => {
+      this._topicIdToSuccessorTopicIds[topicId] = successors.filter(topic => {
         return topicIdsToRemove.indexOf(topic) === -1;
       });
     }

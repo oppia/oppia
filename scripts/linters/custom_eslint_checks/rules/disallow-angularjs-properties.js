@@ -23,44 +23,43 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
-        'Lint check to disallow $parent and $broadcast properties of angularJs'
-      ),
+      description:
+        'Lint check to disallow $parent and $broadcast properties of angularJs',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowBrodcast: (
+      disallowBrodcast:
         'Please do not use $broadcast/$on for propagating' +
-        ' events. Use @Input/@Output instead'),
-      disallowParent: (
+        ' events. Use @Input/@Output instead',
+      disallowParent:
         'Please do not access parent properties using $parent.' +
-        ' Use the scope object for this purpose.')
+        ' Use the scope object for this purpose.',
     },
   },
 
-  create: function(context) {
-    var checkAndReportAngularJsProperties = function(node) {
+  create: function (context) {
+    var checkAndReportAngularJsProperties = function (node) {
       if (node.property.name === '$parent') {
         context.report({
           node: node,
-          messageId: 'disallowParent'
+          messageId: 'disallowParent',
         });
       }
       if (node.property.name === '$broadcast') {
         context.report({
           node: node,
-          messageId: 'disallowBrodcast'
+          messageId: 'disallowBrodcast',
         });
       }
     };
 
     return {
-      MemberExpression: function(node) {
+      MemberExpression: function (node) {
         checkAndReportAngularJsProperties(node);
-      }
+      },
     };
-  }
+  },
 };

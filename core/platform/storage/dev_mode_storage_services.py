@@ -98,11 +98,14 @@ def copy(
             assets folder.
 
     Raises:
-        Exception. Source asset does not exist.
+        ValueError. Source asset does not exist at the given path.
     """
     src_blob = CLIENT.get_blob(source_assets_path)
     if src_blob is None:
-        raise Exception('Source asset does not exist.')
+        raise ValueError(
+            'Source asset does not exist at %s.' % source_assets_path,
+            source_assets_path
+        )
     CLIENT.copy_blob(src_blob, dest_assets_path)
 
 

@@ -16,10 +16,16 @@
  * @fileoverview Unit tests for BlogAdminBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { BlogAdminPageData, BlogAdminBackendApiService } from './blog-admin-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {
+  BlogAdminPageData,
+  BlogAdminBackendApiService,
+} from './blog-admin-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('Blog Admin backend api service', () => {
   let babas: BlogAdminBackendApiService;
@@ -29,36 +35,27 @@ describe('Blog Admin backend api service', () => {
   let failHandler: jasmine.Spy<jasmine.Func>;
   let blogAdminBackendResponse = {
     role_to_actions: {
-      blog_post_editor: ['action for editor']
+      blog_post_editor: ['action for editor'],
     },
-    config_properties: {
-      list_of_default_tags_for_blog_post: {
-        description: 'List of tags',
-        value: ['Learners', 'News'],
-        schema: {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          validators: [{
-            id: 'is_uniquified',
-          }],
-        }
-      }
+    platform_parameters: {
+      max_number_of_tags_assigned_to_blog_post: {
+        description: 'Max number of tags.',
+        value: 10,
+        schema: {type: 'number'},
+      },
     },
     updatable_roles: {
-      blog_post_editor: 'blog_post_editor'
-    }
+      blog_post_editor: 'blog_post_editor',
+    },
   };
   let blogAdminDataObject: BlogAdminPageData;
-  let configPropertyValues = {
-    list_of_default_tags_for_blog_post: ['News', 'Learners'],
-    max_number_of_tags_assigned_to_blog_post: 5
+  let platformParameterValues = {
+    max_number_of_tags_assigned_to_blog_post: 5,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     babas = TestBed.inject(BlogAdminBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -68,10 +65,10 @@ describe('Blog Admin backend api service', () => {
     blogAdminDataObject = {
       updatableRoles: blogAdminBackendResponse.updatable_roles,
       roleToActions: blogAdminBackendResponse.role_to_actions,
-      configProperties: blogAdminBackendResponse.config_properties,
+      platformParameters: blogAdminBackendResponse.platform_parameters,
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -81,7 +78,7 @@ describe('Blog Admin backend api service', () => {
   });
 
   it('should fetch the data.', fakeAsync(() => {
-    babas.getDataAsync().then((blogAdminData) => {
+    babas.getDataAsync().then(blogAdminData => {
       expect(blogAdminData).toEqual(blogAdminDataObject);
     });
 
@@ -92,229 +89,195 @@ describe('Blog Admin backend api service', () => {
     flushMicrotasks();
   }));
 
+  it('should use the rejection handler if the backend request failed.', fakeAsync(() => {
+    babas.getDataAsync().then(successHandler, failHandler);
 
-  it('should use the rejection handler if the backend request failed.',
+    var req = httpTestingController.expectOne('/blogadminhandler');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
+
+  it(
+    'should update the role of the user given the name' +
+      'when calling updateUserRoleAsync',
     fakeAsync(() => {
-      babas.getDataAsync().then(successHandler, failHandler);
+      let newRole = 'BLOG_EDITOR';
+      let username = 'validUser';
+      let payload = {
+        role: newRole,
+        username: username,
+      };
+      babas
+        .updateUserRoleAsync(newRole, username)
+        .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        '/blogadminhandler');
-      expect(req.request.method).toEqual('GET');
+      let req = httpTestingController.expectOne('/blogadminrolehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+      req.flush({status: 200, statusText: 'Success.'});
       flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     })
   );
 
-  it('should update the role of the user given the name' +
-  'when calling updateUserRoleAsync', fakeAsync(() => {
-    let newRole = 'BLOG_EDITOR';
-    let username = 'validUser';
-    let payload = {
-      role: newRole,
-      username: username,
-    };
-    babas.updateUserRoleAsync(newRole, username)
-      .then(successHandler, failHandler);
+  it(
+    'should fail to update the role of user when user does' +
+      'not exists when calling updateUserRoleAsync',
+    fakeAsync(() => {
+      let newRole = 'BLOG_EDITOR';
+      let username = 'InvalidUser';
+      let payload = {
+        role: newRole,
+        username: username,
+      };
+      babas
+        .updateUserRoleAsync(newRole, username)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/blogadminrolehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
+      let req = httpTestingController.expectOne('/blogadminrolehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
+      req.flush(
+        {error: 'User with given username does not exist'},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'User with given username does not exist'
+      );
+    })
+  );
 
-  it('should fail to update the role of user when user does' +
-    'not exists when calling updateUserRoleAsync', fakeAsync(() => {
-    let newRole = 'BLOG_EDITOR';
-    let username = 'InvalidUser';
-    let payload = {
-      role: newRole,
-      username: username,
-    };
-    babas.updateUserRoleAsync(newRole, username)
-      .then(successHandler, failHandler);
+  it(
+    'should remove blog editor rights given the username' +
+      'when calling removeBlogEditorAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      let payload = {
+        username: username,
+      };
+      babas.removeBlogEditorAsync(username).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/blogadminrolehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
+      let req = httpTestingController.expectOne('/blogadminrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
 
-    req.flush(
-      { error: 'User with given username does not exist'},
-      { status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'User with given username does not exist');
-  }
-  ));
+  it(
+    'should remove blog editor rights when user does' +
+      'not exists when calling removeBlogEditorAsync',
+    fakeAsync(() => {
+      let username = 'InvalidUser';
+      let payload = {
+        username: username,
+      };
+      babas.removeBlogEditorAsync(username).then(successHandler, failHandler);
 
-  it('should remove blog editor rights given the username' +
-  'when calling removeBlogEditorAsync', fakeAsync(() => {
-    let username = 'validUser';
-    let payload = {
-      username: username,
-    };
-    babas.removeBlogEditorAsync(username,).then(
-      successHandler, failHandler);
+      let req = httpTestingController.expectOne('/blogadminrolehandler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
 
-    let req = httpTestingController.expectOne(
-      '/blogadminrolehandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
+      req.flush(
+        {
+          error: 'User with given username does not exist.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 
-  it('should remove blog editor rights when user does' +
-  'not exists when calling removeBlogEditorAsync', fakeAsync(() => {
-    let username = 'InvalidUser';
-    let payload = {
-      username: username,
-    };
-    babas.removeBlogEditorAsync(username).then(
-      successHandler, failHandler);
+  it(
+    'should save the new config properties given the new' +
+      'platform parameter when calling' +
+      'savePlatformParametersAsync',
+    fakeAsync(() => {
+      let action = 'save_platform_parameters';
+      let payload = {
+        action: action,
+        new_platform_parameter_values: platformParameterValues,
+      };
 
-    let req = httpTestingController.expectOne('/blogadminrolehandler');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+      babas
+        .savePlatformParametersAsync(platformParameterValues)
+        .then(successHandler, failHandler);
 
-    req.flush({
-      error: 'User with given username does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+      let req = httpTestingController.expectOne('/blogadminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }
-  ));
+      req.flush(200);
+      flushMicrotasks();
 
-  it('should revert specified config property to default' +
-    'value given the config property ID when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'max_number_of_tags_assigned_to_blog_post';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-    babas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
+  it(
+    'should fail to save the new config properties when given new' +
+      'platform parameter is invalid when calling' +
+      'savePlatformParametersAsync',
+    fakeAsync(() => {
+      let action = 'save_platform_parameters';
+      let payload = {
+        action: action,
+        new_platform_parameter_values: platformParameterValues,
+      };
+      babas
+        .savePlatformParametersAsync(platformParameterValues)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
+      let req = httpTestingController.expectOne('/blogadminhandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-    req.flush(200);
-    flushMicrotasks();
+      req.flush(
+        {
+          error: 'Platform parameter does not exist.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to revert specified config property to default' +
-    'value when given config property ID is invalid when calling' +
-    'revertConfigPropertyAsync', fakeAsync(() => {
-    let action = 'revert_config_property';
-    let configPropertyId = 'InvalidId';
-    let payload = {
-      action: action,
-      config_property_id: configPropertyId
-    };
-
-    babas.revertConfigPropertyAsync(
-      configPropertyId).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'Config property does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
-  }
-  ));
-
-
-  it('should save the new config properties given the new' +
-    'config property when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
-    let payload = {
-      action: action,
-      new_config_property_values: configPropertyValues
-    };
-
-    babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to save the new config properties when given new' +
-    'config property is invalid when calling' +
-    'saveConfigPropertiesAsync', fakeAsync(() => {
-    let action = 'save_config_properties';
-    let payload = {
-      action: action,
-      new_config_property_values: configPropertyValues
-    };
-    babas.saveConfigPropertiesAsync(
-      configPropertyValues).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/blogadminhandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush({
-      error: 'Config property does not exist.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Config property does not exist.');
-  }
-  ));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Platform parameter does not exist.'
+      );
+    })
+  );
 });

@@ -16,13 +16,34 @@
  * @fileoverview Unit tests for schema-based editor component for custom values
  */
 
-import { Component, EventEmitter, NO_ERRORS_SCHEMA, forwardRef } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { SchemaBasedCustomEditorComponent } from './schema-based-custom-editor.component';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import {
+  Component,
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  forwardRef,
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SchemaBasedCustomEditorComponent} from './schema-based-custom-editor.component';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
 
 // Trying to use the actual Object editor component in the tests would require
 // a lot of mocking to be done (given the size of the component and how many
@@ -35,9 +56,9 @@ import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => MockObjectEditorComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class MockObjectEditorComponent implements ControlValueAccessor {
   writeValue(value: string | number | null): void {}
@@ -52,19 +73,22 @@ describe('Schema Based Custom Editor Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, HttpClientTestingModule,
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })],
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
       declarations: [
         SchemaBasedCustomEditorComponent,
-        MockObjectEditorComponent
+        MockObjectEditorComponent,
       ],
       schemas: [NO_ERRORS_SCHEMA],
-      providers: [TranslateService]
+      providers: [TranslateService],
     }).compileComponents();
   }));
 
@@ -74,7 +98,7 @@ describe('Schema Based Custom Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: SchemaDefaultValue) {
+    let mockFunction = function (value: SchemaDefaultValue) {
       return value;
     };
 
@@ -125,33 +149,30 @@ describe('Schema Based Custom Editor Component', () => {
     expect(component.localValue).toBe('true');
   });
 
-  it(
-    'should register validator and call it when the form validation changes',
-    fakeAsync(() => {
-      component.schema = { obj_type: 'UnicodeString', type: 'custom' };
-      fixture.detectChanges();
-      const onValidatorChangeSpy = jasmine.createSpy('validator onchange spy');
+  it('should register validator and call it when the form validation changes', fakeAsync(() => {
+    component.schema = {obj_type: 'UnicodeString', type: 'custom'};
+    fixture.detectChanges();
+    const onValidatorChangeSpy = jasmine.createSpy('validator onchange spy');
 
-      // The statusChanges property in the form used in the component is an
-      // observable which is triggered by changes to the form state in the
-      // template. Since we are not doing template-based testing, we need to
-      // mock the statusChanges property of the form.
-      let mockFormStatusChangeEmitter = new EventEmitter();
-      spyOnProperty(
-        component.hybridForm, 'statusChanges'
-      ).and.returnValue(
-        mockFormStatusChangeEmitter);
-      component.registerOnValidatorChange(onValidatorChangeSpy);
-      component.ngAfterViewInit();
+    // The statusChanges property in the form used in the component is an
+    // observable which is triggered by changes to the form state in the
+    // template. Since we are not doing template-based testing, we need to
+    // mock the statusChanges property of the form.
+    let mockFormStatusChangeEmitter = new EventEmitter();
+    spyOnProperty(component.hybridForm, 'statusChanges').and.returnValue(
+      mockFormStatusChangeEmitter
+    );
+    component.registerOnValidatorChange(onValidatorChangeSpy);
+    component.ngAfterViewInit();
 
-      expect(onValidatorChangeSpy).not.toHaveBeenCalled();
+    expect(onValidatorChangeSpy).not.toHaveBeenCalled();
 
-      component.validate(new FormControl());
-      mockFormStatusChangeEmitter.emit();
-      // The subscription to statusChanges is asynchronous, so we need to
-      // tick() to trigger the callback.
-      tick();
+    component.validate(new FormControl());
+    mockFormStatusChangeEmitter.emit();
+    // The subscription to statusChanges is asynchronous, so we need to
+    // tick() to trigger the callback.
+    tick();
 
-      expect(onValidatorChangeSpy).toHaveBeenCalled();
-    }));
+    expect(onValidatorChangeSpy).toHaveBeenCalled();
+  }));
 });

@@ -1,24 +1,40 @@
-<div class="list-group">
-  <div class="form-group">
-    <div class="selected-topics-list" *ngIf="topicsSelected.length !== 0"><b>Topics selected:</b> {{ topicsSelected.join(", ") }}</div>
+<div class="form-group">
+  <div class="fixed-search-bar">
     <span><input type="text" placeholder="Search topics" [(ngModel)]="topicFilterText"><i class="fas fa-search topic-search-icon"></i></span>
-    <br>
   </div>
-  <a class="list-group-item e2e-test-topics-list-item"
-     *ngFor="let topicSummary of searchInTopics(topicFilterText)"
-     (click)="selectOrDeselectTopic(topicSummary.id)"
-     [ngClass]="{'list-group-item-success': topicSummary.isSelected}">
-    <label class="list-group-item-heading e2e-test-topic-name-in-topic-select-modal">{{topicSummary.name}}</label>
-    <p class="list-group-item-text">Uncategorized Skill Count: {{topicSummary.uncategorizedSkillCount}}</p>
-    <p class="list-group-item-text">Status: {{topicSummary.isPublished ? 'Published' : 'Not Published'}}</p>
-  </a>
 </div>
+
+<div class="list-group">
+  <div class="selected-topics-list" *ngIf="topicsSelected.length !== 0"><b>Topics selected:</b> {{ topicsSelected.join(", ") }}</div>
+  <div class="scrollable-content">
+    <a class="list-group-item e2e-test-topics-list-item"
+       *ngFor="let topicSummary of searchInTopics(topicFilterText)"
+       (click)="selectOrDeselectTopic(topicSummary.id)"
+       [ngClass]="{'list-group-item-success': topicSummary.isSelected}">
+      <label class="list-group-item-heading e2e-test-topic-name-in-topic-select-modal">{{topicSummary.name}}</label>
+      <p class="list-group-item-text">Uncategorized Skill Count: {{topicSummary.uncategorizedSkillCount}}</p>
+      <p class="list-group-item-text">Status: {{topicSummary.isPublished ? 'Published' : 'Not Published'}}</p>
+    </a>
+  </div>
+</div>
+
 <style>
+  .fixed-search-bar {
+    padding: 10px;
+    position: sticky;
+  }
+
+  .scrollable-content {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
   .selected-topics-list {
     border-radius: 3px;
     margin-bottom: 15px;
     padding: 5px 0;
   }
+
   .topic-search-icon {
     padding-left: 5px;
   }

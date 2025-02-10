@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the Ck editor copy content service.
  */
 
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 /**
  * Returns a HTMLElement containing the element to copy.
@@ -27,14 +27,15 @@ import { LoggerService } from 'services/contextual/logger.service';
  */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
-  container.innerHTML = (
-    `<angular-html-bind>${html.trim()}</angular-html-bind>`);
+  container.innerHTML = `<angular-html-bind>${html.trim()}</angular-html-bind>`;
   // Return element inside <angular-html-bind />
-  if (container.content.firstChild === null ||
-    container.content.firstChild.firstChild === null) {
+  if (
+    container.content.firstChild === null ||
+    container.content.firstChild.firstChild === null
+  ) {
     throw new Error('First Child is null');
   }
-  return (container.content.firstChild.firstChild) as HTMLElement;
+  return container.content.firstChild.firstChild as HTMLElement;
 };
 
 describe('Ck editor copy content service', () => {
@@ -43,9 +44,9 @@ describe('Ck editor copy content service', () => {
 
   let service: CkEditorCopyContentService;
   let ckEditorStub: CKEDITOR.editor;
-  let insertHtmlSpy: jasmine.Spy<(
-    html: string, mode?: string,
-    range?: CKEDITOR.dom.range) => void>;
+  let insertHtmlSpy: jasmine.Spy<
+    (html: string, mode?: string, range?: CKEDITOR.dom.range) => void
+  >;
   let execCommandSpy: jasmine.Spy<(commandName: string) => boolean>;
 
   beforeEach(() => {
@@ -86,27 +87,30 @@ describe('Ck editor copy content service', () => {
     expect(execCommandSpy).not.toHaveBeenCalled();
   });
 
-  it('should copy and paste the top level plain html element when clicking a ' +
-    'descendant', () => {
-    expect(service.copyModeActive).toBe(false);
-    service.toggleCopyMode();
-    expect(service.copyModeActive).toBe(true);
+  it(
+    'should copy and paste the top level plain html element when clicking a ' +
+      'descendant',
+    () => {
+      expect(service.copyModeActive).toBe(false);
+      service.toggleCopyMode();
+      expect(service.copyModeActive).toBe(true);
 
-    // eslint-disable-next-line  @typescript-eslint/quotes
-    let listHtml = `<ul><li>Parent bullet<ul><li>Child bullet<ul>\
+      // eslint-disable-next-line  @typescript-eslint/quotes
+      let listHtml = `<ul><li>Parent bullet<ul><li>Child bullet<ul>\
 <li>Grandchild bullet</li></ul></li></ul></li></ul>`;
-    const listElement = generateContent(listHtml);
+      const listElement = generateContent(listHtml);
 
-    let liElements = listElement.querySelectorAll('li');
-    let innerMostLiElement = liElements[liElements.length - 1];
-    expect(innerMostLiElement.innerText).toEqual('Grandchild bullet');
+      let liElements = listElement.querySelectorAll('li');
+      let innerMostLiElement = liElements[liElements.length - 1];
+      expect(innerMostLiElement.innerText).toEqual('Grandchild bullet');
 
-    service.bindPasteHandler(ckEditorStub);
-    service.broadcastCopy(innerMostLiElement);
+      service.bindPasteHandler(ckEditorStub);
+      service.broadcastCopy(innerMostLiElement);
 
-    expect(insertHtmlSpy).toHaveBeenCalledWith(listHtml);
-    expect(execCommandSpy).not.toHaveBeenCalled();
-  });
+      expect(insertHtmlSpy).toHaveBeenCalledWith(listHtml);
+      expect(execCommandSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it('should copy and paste widgets', () => {
     expect(service.copyModeActive).toBe(false);
@@ -114,37 +118,36 @@ describe('Ck editor copy content service', () => {
     expect(service.copyModeActive).toBe(true);
     const imageWidgetElement = generateContent(
       '<oppia-noninteractive-image ng-reflect-alt-with-value="&amp;" alt-with' +
-      '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
-      ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
-      'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>');
+        '-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;Banana&amp' +
+        ';quot;" filepath-with-value="&amp;quot;img_20200630_114637_c2ek92uvb8_' +
+        'height_326_width_490.png&amp;quot;"></oppia-noninteractive-image>'
+    );
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
 
     expect(insertHtmlSpy).not.toHaveBeenCalled();
-    expect(execCommandSpy).toHaveBeenCalledWith(
-      'oppiaimage',
-      {
-        startupData: {
-          alt: '',
-          caption: 'Banana',
-          filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png',
-          isCopied: true
-        }
-      }
-    );
+    expect(execCommandSpy).toHaveBeenCalledWith('oppiaimage', {
+      startupData: {
+        alt: '',
+        caption: 'Banana',
+        filepath: 'img_20200630_114637_c2ek92uvb8_height_326_width_490.png',
+        isCopied: true,
+      },
+    });
   });
 
-  it('should not copy and paste non-whitelisted widgets', () => {
+  it('should not copy and paste non-allowed widgets', () => {
     expect(service.copyModeActive).toBe(false);
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
     const imageWidgetElement = generateContent(
       '<oppia-noninteractive-fake alt-with-value="&amp;quot;&amp;quot;" capt' +
-      'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
-      'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
-      '"></oppia-noninteractive-fake>');
+        'ion-with-value="&amp;quot;Banana&amp;quot;" filepath-with-value="&amp;' +
+        'quot;img_20200630_114637_c2ek92uvb8_height_326_width_490.png&amp;quot;' +
+        '"></oppia-noninteractive-fake>'
+    );
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(imageWidgetElement);
@@ -158,34 +161,34 @@ describe('Ck editor copy content service', () => {
     service.toggleCopyMode();
     expect(service.copyModeActive).toBe(true);
 
-
     const mathWidgetElement = generateContent(
       '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_' +
-      'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
-      'ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti' +
-      've-math></p>');
-    if (mathWidgetElement.firstChild === null ||
-        mathWidgetElement.firstChild.firstChild === null) {
+        'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
+        'ame&amp;quot;:&amp;quot;&amp;quot;}"><span></span></oppia-noninteracti' +
+        've-math></p>'
+    );
+    if (
+      mathWidgetElement.firstChild === null ||
+      mathWidgetElement.firstChild.firstChild === null
+    ) {
       throw new Error('First Child is null');
     }
-    const nestedMathWidgetElement = (
-      mathWidgetElement.firstChild.firstChild) as HTMLElement;
+    const nestedMathWidgetElement = mathWidgetElement.firstChild
+      .firstChild as HTMLElement;
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(nestedMathWidgetElement);
 
     expect(insertHtmlSpy).not.toHaveBeenCalled();
-    expect(execCommandSpy).toHaveBeenCalledWith(
-      'oppiamath',
-      {
-        startupData: {
-          math_content: {
-            raw_latex: '\\frac{x}{y}', svg_filename: ''
-          },
-          isCopied: true
-        }
-      }
-    );
+    expect(execCommandSpy).toHaveBeenCalledWith('oppiamath', {
+      startupData: {
+        math_content: {
+          raw_latex: '\\frac{x}{y}',
+          svg_filename: '',
+        },
+        isCopied: true,
+      },
+    });
   });
 
   it('should copy and paste widgets when clicking a widget ancestor', () => {
@@ -195,24 +198,23 @@ describe('Ck editor copy content service', () => {
 
     const mathWidgetElement = generateContent(
       '<p><oppia-noninteractive-math math_content-with-value="{&amp;quot;raw_' +
-      'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
-      'ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>');
+        'latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filen' +
+        'ame&amp;quot;:&amp;quot;&amp;quot;}"></oppia-noninteractive-math></p>'
+    );
 
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(mathWidgetElement);
 
     expect(insertHtmlSpy).not.toHaveBeenCalled();
-    expect(execCommandSpy).toHaveBeenCalledWith(
-      'oppiamath',
-      {
-        startupData: {
-          math_content: {
-            raw_latex: '\\frac{x}{y}', svg_filename: ''
-          },
-          isCopied: true
-        }
-      }
-    );
+    expect(execCommandSpy).toHaveBeenCalledWith('oppiamath', {
+      startupData: {
+        math_content: {
+          raw_latex: '\\frac{x}{y}',
+          svg_filename: '',
+        },
+        isCopied: true,
+      },
+    });
   });
 
   it('should not copy and paste after editor is destroyed', () => {
@@ -222,7 +224,7 @@ describe('Ck editor copy content service', () => {
 
     const pElement = generateContent('<p>Hello</p>');
 
-    ckEditorStub = { ...ckEditorStub, status: 'destroyed' } as CKEDITOR.editor;
+    ckEditorStub = {...ckEditorStub, status: 'destroyed'} as CKEDITOR.editor;
     service.bindPasteHandler(ckEditorStub);
     service.broadcastCopy(pElement);
     expect(insertHtmlSpy).not.toHaveBeenCalled();

@@ -21,7 +21,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -38,26 +38,6 @@ SCHEMA_FOR_STORY_ID = {
         'value': constants.STORY_ID_LENGTH
     }]
 }
-
-
-class StoryEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single story."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'story_id': {
-            'schema': SCHEMA_FOR_STORY_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_edit_story
-    def get(self, unused_story_id: str) -> None:
-        """Renders the story editor page.
-
-        Args:
-            unused_story_id: str. The unused story ID.
-        """
-        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandlerNormalizedPayloadDict(TypedDict):
@@ -155,7 +135,7 @@ class EditableStoryDataHandler(
         skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
         classroom_url_fragment = (
-            classroom_services.get_classroom_url_fragment_for_topic_id(
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
 
         for story_reference in topic.canonical_story_references:

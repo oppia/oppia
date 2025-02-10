@@ -16,16 +16,16 @@
  * @fileoverview Component for the NumberWithUnits response.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-response-number-with-units',
   templateUrl: './number-with-units-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseNumberWithUnitsComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -40,16 +40,19 @@ export class ResponseNumberWithUnitsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const answer: NumberWithUnitsAnswer = (
+    const answer: NumberWithUnitsAnswer =
       this.htmlEscaperService.escapedJsonToObj(
         this.answer
-      ) as NumberWithUnitsAnswer);
-    this.responses = this.numberWithUnitsObjectFactory.fromDict(
-      answer).toString();
+      ) as NumberWithUnitsAnswer;
+    this.responses = this.numberWithUnitsObjectFactory
+      .fromDict(answer)
+      .toString();
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseNumberWithUnits', downgradeComponent({
-    component: ResponseNumberWithUnitsComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaResponseNumberWithUnits',
+  downgradeComponent({
+    component: ResponseNumberWithUnitsComponent,
+  }) as angular.IDirectiveFactory
+);

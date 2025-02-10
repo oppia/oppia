@@ -29,18 +29,18 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      noToThrow: 'Please use “toThrowError”  instead of “toThrow”.'
+      noToThrow: 'Please use “toThrowError”  instead of “toThrow”.',
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     return {
-      'MemberExpression[property.name=toThrow]': function(node) {
+      'MemberExpression[property.name=toThrow]': function (node) {
         context.report({
           node: node.property,
-          messageId: 'noToThrow'
+          messageId: 'noToThrow',
         });
-      }
+      },
     };
-  }
+  },
 };

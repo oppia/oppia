@@ -16,28 +16,27 @@
  * @fileoverview Module for the donate page.
  */
 
-import { NgModule } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { DonatePageComponent } from './donate-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { DonatePageRootComponent } from './donate-page-root.component';
-import { CommonModule } from '@angular/common';
-import { DonatePageRoutingModule } from './donate-page-routing.module';
+import {NgModule} from '@angular/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {DonatePageComponent} from './donate-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {DonatePageRootComponent} from './donate-page-root.component';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    DonatePageRoutingModule,
-    NgbModule
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DonatePageRootComponent,
+      },
+    ]),
+    NgbModule,
   ],
-  declarations: [
-    DonatePageComponent,
-    DonatePageRootComponent,
-  ],
-  entryComponents: [
-    DonatePageComponent,
-    DonatePageRootComponent,
-  ]
+  declarations: [DonatePageComponent, DonatePageRootComponent],
+  entryComponents: [DonatePageComponent, DonatePageRootComponent],
 })
 export class DonatePageModule {}

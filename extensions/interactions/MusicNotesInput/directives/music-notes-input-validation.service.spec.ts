@@ -16,24 +16,36 @@
  * @fileoverview Unit tests for music notes input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+
+import {AppConstants} from 'app.constants';
+import {Rule} from 'domain/exploration/rule.model';
+import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import cloneDeep from 'lodash/cloneDeep';
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
+  let customizationArgs: MusicNotesInputCustomizationArgs;
 
   let currentState: string;
-  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
+  let answerGroups: AnswerGroup[],
+    goodAnswerGroups: AnswerGroup[],
+    goodDefaultOutcome: Outcome;
   let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MusicNotesInputValidationService]
+      providers: [MusicNotesInputValidationService],
     });
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
@@ -47,26 +59,71 @@ describe('MusicNotesInputValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], '')];
   });
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {
+      currentState,
+      {
         sequenceToGuess: {
-          value: []
+          value: [],
         },
         initialSequence: {
-          value: []
-        }
-      }, goodAnswerGroups, goodDefaultOutcome);
+          value: [],
+        },
+      },
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
+    var answerGroup = agof.createNew(
+      [
+        Rule.createNew(
+          'HasLengthInclusivelyBetween',
+          {
+            a: 5,
+            b: 0,
+          },
+          {
+            a: 'NonnegativeInt',
+            b: 'NonnegativeInt',
+          }
+        ),
+      ],
+      goodDefaultOutcome,
+      [],
+      null
+    );
+
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 1 is invalid. 5 is more than 0',
+      },
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 2 is invalid. 5 is more than 0',
+      },
+    ]);
   });
 });

@@ -18,38 +18,37 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { InteractiveTextInputComponent } from './directives/oppia-interactive-text-input.component';
-import { ResponseTextInputComponent } from './directives/oppia-response-text-input.component';
-import { ShortResponseTextInputComponent } from './directives/oppia-short-response-text-input.component';
-import { TranslateModule } from '@ngx-translate/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {InteractiveTextInputComponent} from './directives/oppia-interactive-text-input.component';
+import {ResponseTextInputComponent} from './directives/oppia-response-text-input.component';
+import {ShortResponseTextInputComponent} from './directives/oppia-short-response-text-input.component';
+import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule,
-    FormsModule
+    FormsModule,
   ],
   declarations: [
     InteractiveTextInputComponent,
     ResponseTextInputComponent,
-    ShortResponseTextInputComponent
+    ShortResponseTextInputComponent,
   ],
   entryComponents: [
     InteractiveTextInputComponent,
     ResponseTextInputComponent,
-    ShortResponseTextInputComponent
+    ShortResponseTextInputComponent,
   ],
   exports: [
     InteractiveTextInputComponent,
     ResponseTextInputComponent,
-    ShortResponseTextInputComponent
+    ShortResponseTextInputComponent,
   ],
 })
-
-export class TextInputInteractionModule { }
+export class TextInputInteractionModule {}

@@ -16,17 +16,26 @@
  * @fileoverview Unit tests for the logout page.
  */
 
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  flushMicrotasks,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 
-import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
-import { AlertsService } from 'services/alerts.service';
-import { AuthService } from 'services/auth.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
+import {LogoutPageComponent} from 'pages/logout-page/logout-page.component';
+import {AlertsService} from 'services/alerts.service';
+import {AuthService} from 'services/auth.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
 
 class MockWindowRef {
   constructor(
-    public location: string | null = null, public searchParams: string = '') {}
+    public location: string | null = null,
+    public searchParams: string = ''
+  ) {}
 
   get nativeWindow() {
     const that = this;
@@ -38,7 +47,7 @@ class MockWindowRef {
         assign: (url: string) => {
           that.location = url;
         },
-      }
+      },
     };
   }
 }
@@ -61,7 +70,7 @@ class PendingPromise<T = void> {
   }
 }
 
-describe('Logout Page', function() {
+describe('Logout Page', function () {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let authService: jasmine.SpyObj<AuthService>;
   let loaderService: jasmine.SpyObj<LoaderService>;
@@ -92,10 +101,10 @@ describe('Logout Page', function() {
     TestBed.configureTestingModule({
       declarations: [LogoutPageComponent],
       providers: [
-        { provide: AlertsService, useValue: alertsService },
-        { provide: AuthService, useValue: authService },
-        { provide: LoaderService, useValue: loaderService },
-        { provide: WindowRef, useValue: windowRef }
+        {provide: AlertsService, useValue: alertsService},
+        {provide: AuthService, useValue: authService},
+        {provide: LoaderService, useValue: loaderService},
+        {provide: WindowRef, useValue: windowRef},
       ],
     }).compileComponents();
 

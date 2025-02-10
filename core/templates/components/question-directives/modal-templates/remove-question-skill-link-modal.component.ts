@@ -16,14 +16,14 @@
  * @fileoverview Component for Remove Question Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AssignedSkill} from 'domain/skill/assigned-skill.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 
 export interface TopicNameToTopicId {
   [key: string]: string;
@@ -31,10 +31,9 @@ export interface TopicNameToTopicId {
 
 @Component({
   selector: 'oppia-remove-question-skill-link-modal',
-  templateUrl: './remove-question-skill-link-modal.component.html'
+  templateUrl: './remove-question-skill-link-modal.component.html',
 })
-export class RemoveQuestionSkillLinkModalComponent
-  extends ConfirmOrCancelModal {
+export class RemoveQuestionSkillLinkModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -48,8 +47,7 @@ export class RemoveQuestionSkillLinkModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private skillBackendApiService: SkillBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {
@@ -57,7 +55,9 @@ export class RemoveQuestionSkillLinkModalComponent
   }
 
   getTopicNameToTopicId(
-      topicAssignments: AssignedSkill[], topicNames: string[]): void {
+    topicAssignments: AssignedSkill[],
+    topicNames: string[]
+  ): void {
     this.topicNameToTopicId = {};
 
     for (let topic of topicAssignments) {
@@ -76,11 +76,13 @@ export class RemoveQuestionSkillLinkModalComponent
       return;
     }
     this.skillBackendApiService
-      .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
-        this.skillId).then((topicNames) => {
-        if ((topicNames.length > 0) && (
+      .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(this.skillId)
+      .then(topicNames => {
+        if (
+          topicNames.length > 0 &&
           this.numberOfQuestions <=
-            AppConstants.MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
+            AppConstants.MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
+        ) {
           this.getTopicNameToTopicId(topicAssignments, topicNames);
           this.questionRemovalIsAllowed = false;
         }
@@ -89,9 +91,8 @@ export class RemoveQuestionSkillLinkModalComponent
 
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
-      .fetchTopicAssignmentsForSkillAsync(
-        this.skillId
-      ).then((response: AssignedSkill[]) => {
+      .fetchTopicAssignmentsForSkillAsync(this.skillId)
+      .then((response: AssignedSkill[]) => {
         this.isQuestionRemovalAllowed(response);
         this.topicsAssignmentsAreFetched = true;
       });
@@ -100,9 +101,11 @@ export class RemoveQuestionSkillLinkModalComponent
   getTopicEditorUrl(topicId: string): string {
     const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
-      TOPIC_EDITOR_URL_TEMPLATE, {
-        topic_id: topicId
-      });
+      TOPIC_EDITOR_URL_TEMPLATE,
+      {
+        topic_id: topicId,
+      }
+    );
   }
 
   ngOnInit(): void {

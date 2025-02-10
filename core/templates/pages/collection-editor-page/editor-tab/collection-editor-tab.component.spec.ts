@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for collection editor tab component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { CollectionNode } from 'domain/collection/collection-node.model';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-import { Collection } from 'domain/collection/collection.model';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionLinearizerService } from '../services/collection-linearizer.service';
-import { CollectionEditorTabComponent } from './collection-editor-tab.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
+import {Collection} from 'domain/collection/collection.model';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionLinearizerService} from '../services/collection-linearizer.service';
+import {CollectionEditorTabComponent} from './collection-editor-tab.component';
 
 describe('Collection editor tab component', () => {
   let componentInstance: CollectionEditorTabComponent;
@@ -34,22 +34,24 @@ describe('Collection editor tab component', () => {
   let collectionLinearizerService: CollectionLinearizerService;
 
   let mockCollection = new Collection(
-    '', '', '', '', [], new CollectionPlaythrough(null, []), '', 0, 1, []);
-
+    '',
+    '',
+    '',
+    '',
+    [],
+    new CollectionPlaythrough(null, []),
+    '',
+    0,
+    1,
+    []
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CollectionEditorTabComponent
-      ],
-      providers: [
-        CollectionEditorStateService,
-        CollectionLinearizerService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule],
+      declarations: [CollectionEditorTabComponent],
+      providers: [CollectionEditorStateService, CollectionLinearizerService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,7 +65,8 @@ describe('Collection editor tab component', () => {
 
   it('should initialize', () => {
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      mockCollection);
+      mockCollection
+    );
 
     componentInstance.ngOnInit();
 
@@ -74,19 +77,24 @@ describe('Collection editor tab component', () => {
     componentInstance.collection = mockCollection;
     let collectionNode = new CollectionNode({
       exploration_id: 'id',
-      exploration_summary: null
+      exploration_summary: null,
     });
 
-    spyOn(collectionLinearizerService, 'getCollectionNodesInPlayableOrder')
-      .and.returnValue([collectionNode]);
+    spyOn(
+      collectionLinearizerService,
+      'getCollectionNodesInPlayableOrder'
+    ).and.returnValue([collectionNode]);
 
-    expect(componentInstance.getLinearlySortedNodes()).toEqual(
-      [collectionNode]);
+    expect(componentInstance.getLinearlySortedNodes()).toEqual([
+      collectionNode,
+    ]);
   });
 
   it('should tell if collection is loaded', () => {
-    spyOn(collectionEditorStateService, 'hasLoadedCollection')
-      .and.returnValues(true, false);
+    spyOn(collectionEditorStateService, 'hasLoadedCollection').and.returnValues(
+      true,
+      false
+    );
     expect(componentInstance.hasLoadedCollection()).toBeTrue();
     expect(componentInstance.hasLoadedCollection()).toBeFalse();
   });

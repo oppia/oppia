@@ -19,14 +19,14 @@
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 @Component({
   selector: 'parameter-name-editor',
-  templateUrl: './parameter-name-editor.component.html'
+  templateUrl: './parameter-name-editor.component.html',
 })
 export class ParameterNameEditorComponent implements OnInit {
   @Output() valueChanged = new EventEmitter();
@@ -36,20 +36,20 @@ export class ParameterNameEditorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: string | null;
   availableParamNames!: string[];
-  SCHEMA!: { type: 'unicode'; choices: string[] };
+  SCHEMA!: {type: 'unicode'; choices: string[]};
   constructor(
     private explorationParamSpecsService: ExplorationParamSpecsService
-  ) { }
+  ) {}
 
   private _validate() {
-    this.validityChange.emit({error: (
-      this.availableParamNames.length === 0) ? false : true});
+    this.validityChange.emit({
+      error: this.availableParamNames.length === 0 ? false : true,
+    });
   }
 
   ngOnInit(): void {
-    this.availableParamNames = (
-      (this.explorationParamSpecsService.savedMemento)
-        .getParamNames());
+    this.availableParamNames =
+      this.explorationParamSpecsService.savedMemento.getParamNames();
 
     if (this.availableParamNames.length === 0) {
       this.value = null;
@@ -59,11 +59,11 @@ export class ParameterNameEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
     this.SCHEMA = {
       type: 'unicode',
-      choices: this.availableParamNames
+      choices: this.availableParamNames,
     };
   }
 
-  getSchema(): { type: 'unicode'; choices: string[] } {
+  getSchema(): {type: 'unicode'; choices: string[]} {
     return this.SCHEMA;
   }
 
@@ -74,6 +74,9 @@ export class ParameterNameEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('parameterNameEditor', downgradeComponent({
-  component: ParameterNameEditorComponent
-}));
+angular.module('oppia').directive(
+  'parameterNameEditor',
+  downgradeComponent({
+    component: ParameterNameEditorComponent,
+  })
+);

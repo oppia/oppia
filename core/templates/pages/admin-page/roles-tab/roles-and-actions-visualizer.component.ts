@@ -16,15 +16,14 @@
  * @fileoverview Component for displaying roles and actions.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit} from '@angular/core';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-roles-and-actions-visualizer',
-  templateUrl: './roles-and-actions-visualizer.component.html'
+  templateUrl: './roles-and-actions-visualizer.component.html',
 })
 export class RolesAndActionsVisualizerComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -46,7 +45,8 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private adminBackendApiService: AdminBackendApiService) {}
+    private adminBackendApiService: AdminBackendApiService
+  ) {}
 
   setActiveRole(role: string): void {
     this.activeRole = role;
@@ -55,39 +55,42 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
 
   showAssignedUsers(): void {
     this.loadingAssignedUsernames = true;
-    this.adminBackendApiService.fetchUsersAssignedToRoleAsync(
-      this.activeRole).then((response) => {
-      this.assignUsersToActiveRole = response.usernames;
-      this.loadingAssignedUsernames = false;
-    });
+    this.adminBackendApiService
+      .fetchUsersAssignedToRoleAsync(this.activeRole)
+      .then(response => {
+        this.assignUsersToActiveRole = response.usernames;
+        this.loadingAssignedUsernames = false;
+      });
   }
 
   ngOnInit(): void {
     this.loadingAssignedUsernames = false;
     this.avatarPictureUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/user_blue_72px.png');
+      '/avatar/user_blue_72px.png'
+    );
     this.activeTab = this.TAB_ACTIONS;
 
     let getSortedReadableTexts = (texts: string[]): string[] => {
       let readableTexts: string[] = [];
       texts.forEach(text => {
         readableTexts.push(
-          text.toLowerCase().split('_').join(' ').replace(
-            /^\w/, (c) => c.toUpperCase()));
+          text
+            .toLowerCase()
+            .split('_')
+            .join(' ')
+            .replace(/^\w/, c => c.toUpperCase())
+        );
       });
       return readableTexts.sort();
     };
 
     for (let role in this.roleToActions) {
       this.roleToReadableActions[role] = getSortedReadableTexts(
-        this.roleToActions[role]);
+        this.roleToActions[role]
+      );
     }
 
     this.roles = Object.keys(this.roleToActions).sort();
     this.activeRole = this.roles[3];
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRolesAndActionsVisualizer', downgradeComponent(
-    { component: RolesAndActionsVisualizerComponent }));

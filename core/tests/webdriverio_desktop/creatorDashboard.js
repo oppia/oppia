@@ -21,15 +21,12 @@ var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var forms = require('../webdriverio_utils/forms.js');
 
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
-var SubscriptionDashboardPage =
-  require('../webdriverio_utils/SubscriptionDashboardPage.js');
+var SubscriptionDashboardPage = require('../webdriverio_utils/SubscriptionDashboardPage.js');
 
-describe('Creator dashboard functionality', function() {
+describe('Creator dashboard functionality', function () {
   var EXPLORATION_TITLE_1 = 'Exploration 1';
   var EXPLORATION_TITLE_2 = 'Exploration 2';
   var EXPLORATION_TITLE_3 = 'Exploration 3';
@@ -45,7 +42,7 @@ describe('Creator dashboard functionality', function() {
   var libraryPage = null;
   var subscriptionDashboardPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -53,11 +50,13 @@ describe('Creator dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display correct stats on dashboard', async function() {
+  it('should display correct stats on dashboard', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser(
-      'user1@creatorDashboard.com', 'creatorDashboardOwner');
+      'user1@creatorDashboard.com',
+      'creatorDashboardOwner'
+    );
     await users.createUser('user2@creatorDashboard.com', 'learner2');
     await users.createUser('user3@creatorDashboard.com', 'learner3');
     await users.createUser('user4@creatorDashboard.com', 'learner4');
@@ -82,7 +81,8 @@ describe('Creator dashboard functionality', function() {
 
     await users.login('user2@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creatorDashboardOwner');
+      'creatorDashboardOwner'
+    );
     await subscriptionDashboardPage.clickSubscribeButton();
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_1);
@@ -108,7 +108,8 @@ describe('Creator dashboard functionality', function() {
 
     await users.login('user4@creatorDashboard.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creatorDashboardOwner');
+      'creatorDashboardOwner'
+    );
     await subscriptionDashboardPage.clickSubscribeButton();
     await libraryPage.get();
     await libraryPage.findExploration(EXPLORATION_TITLE_2);
@@ -126,7 +127,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should work fine in grid view', async function() {
+  it('should work fine in grid view', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser('user5@creatorDashboard.com', 'creatorDashboard');
@@ -156,11 +157,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.playExploration(EXPLORATION_TITLE_3);
     await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_3);
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 1'));
+      await forms.toRichText('card 1')
+    );
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 2'));
+      await forms.toRichText('card 2')
+    );
     await explorationPlayerPage.rateExploration(3);
     await users.logout();
 
@@ -170,11 +173,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.playExploration(EXPLORATION_TITLE_4);
     await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_4);
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 1'));
+      await forms.toRichText('card 1')
+    );
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 2'));
+      await forms.toRichText('card 2')
+    );
     await explorationPlayerPage.rateExploration(5);
     await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
@@ -191,8 +196,8 @@ describe('Creator dashboard functionality', function() {
     expect(await ratings[0].getText()).toEqual('5.0');
     expect(await ratings[1].getText()).toEqual('3.0');
 
-    var feedbackCount = await (
-      creatorDashboardPage.getExpSummaryTileOpenFeedbackCount());
+    var feedbackCount =
+      await creatorDashboardPage.getExpSummaryTileOpenFeedbackCount();
     expect(feedbackCount.length).toEqual(2);
     expect(await feedbackCount[0].getText()).toEqual('1');
     expect(await feedbackCount[1].getText()).toEqual('0');
@@ -205,7 +210,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  it('should work fine in list view', async function() {
+  it('should work fine in list view', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser('user8@creatorDashboard.com', 'newCreatorDashboard');
@@ -235,11 +240,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.playExploration(EXPLORATION_TITLE_5);
     await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_5);
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 1'));
+      await forms.toRichText('card 1')
+    );
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 2'));
+      await forms.toRichText('card 2')
+    );
     await explorationPlayerPage.rateExploration(3);
     await users.logout();
 
@@ -249,11 +256,13 @@ describe('Creator dashboard functionality', function() {
     await libraryPage.playExploration(EXPLORATION_TITLE_6);
     await explorationPlayerPage.expectExplorationNameToBe(EXPLORATION_TITLE_6);
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 1'));
+      await forms.toRichText('card 1')
+    );
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 2'));
+      await forms.toRichText('card 2')
+    );
     await explorationPlayerPage.rateExploration(5);
     await explorationPlayerPage.submitFeedback(feedback);
     await users.logout();
@@ -273,8 +282,8 @@ describe('Creator dashboard functionality', function() {
     expect(await ratings[0].getText()).toEqual('5.0');
     expect(await ratings[1].getText()).toEqual('3.0');
 
-    var feedbackCount = await (
-      creatorDashboardPage.getExpSummaryRowOpenFeedbackCount());
+    var feedbackCount =
+      await creatorDashboardPage.getExpSummaryRowOpenFeedbackCount();
     expect(feedbackCount.length).toEqual(2);
     expect(await feedbackCount[0].getText()).toEqual('1');
     expect(await feedbackCount[1].getText()).toEqual('0');
@@ -287,7 +296,7 @@ describe('Creator dashboard functionality', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

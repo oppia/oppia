@@ -19,12 +19,13 @@
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
 //   'content': a function that gives rich text editing instructions.
-var customizeComponent = async function(modal, tabArray) {
+var customizeComponent = async function (modal, tabArray) {
   var listEditor = await forms.ListEditor(modal);
 
   await listEditor.setLength(tabArray.length);
@@ -38,9 +39,8 @@ var customizeComponent = async function(modal, tabArray) {
   }
 };
 
-var expectComponentDetailsToMatch = async function(elem, tabArray) {
-  var titleElems = elem.$$(
-    '.e2e-test-non-interactive-tabs-headers');
+var expectComponentDetailsToMatch = async function (elem, tabArray) {
+  var titleElems = elem.$$('.e2e-test-non-interactive-tabs-headers');
   expect(await titleElems.length).toEqual(tabArray.length);
 
   for (var i = 0; i < tabArray.length; i++) {
@@ -49,8 +49,7 @@ var expectComponentDetailsToMatch = async function(elem, tabArray) {
       elem.$('.e2e-test-non-interactive-tabs-headers'),
       'Non-interactive-tabs-headers is taking too long to appear'
     );
-    expect(await (await titleElems[i].getText())).toMatch(
-      tabArray[i].title);
+    expect(await await titleElems[i].getText()).toMatch(tabArray[i].title);
     await (await titleElems[i]).click();
 
     const tabContentEl = elem.$(`.e2e-test-tab-content-${i}`);
@@ -59,8 +58,7 @@ var expectComponentDetailsToMatch = async function(elem, tabArray) {
       tabContentEl,
       '.e2e-test-tab-content-' + i + 'is taking too long to appear'
     );
-    await forms.expectRichText(tabContentEl).toMatch(
-      tabArray[i].content);
+    await forms.expectRichText(tabContentEl).toMatch(tabArray[i].content);
   }
 };
 

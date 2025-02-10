@@ -16,28 +16,27 @@
  * @fileoverview Component for the navbar breadcrumb of the story editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Story } from 'domain/story/story.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-import { StoryEditorStateService } from '../services/story-editor-state.service';
+import {Component} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {Story} from 'domain/story/story.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
+import {StoryEditorStateService} from '../services/story-editor-state.service';
 
- @Component({
-   selector: 'oppia-story-editor-navbar-breadcrumb',
-   templateUrl: './story-editor-navbar-breadcrumb.component.html'
- })
+@Component({
+  selector: 'oppia-story-editor-navbar-breadcrumb',
+  templateUrl: './story-editor-navbar-breadcrumb.component.html',
+})
 export class StoryEditorNavbarBreadcrumbComponent {
   constructor(
-     private undoRedoService: UndoRedoService,
-     private ngbModal: NgbModal,
-     private storyEditorStateService: StoryEditorStateService,
-     private windowRef: WindowRef,
-     private urlInterpolationService: UrlInterpolationService
+    private undoRedoService: UndoRedoService,
+    private ngbModal: NgbModal,
+    private storyEditorStateService: StoryEditorStateService,
+    private windowRef: WindowRef,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -50,24 +49,27 @@ export class StoryEditorNavbarBreadcrumbComponent {
 
   returnToTopicEditorPage(): void {
     if (this.undoRedoService.getChangeCount() > 0) {
-      const modalRef = this.ngbModal.open(
-        SavePendingChangesModalComponent,
-        {backdrop: true}
-      );
-
-      modalRef.componentInstance.body = (
-        'Please save all pending changes before returning to the topic.');
-
-      modalRef.result.then(() => {}, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
+        backdrop: true,
       });
+
+      modalRef.componentInstance.body =
+        'Please save all pending changes before returning to the topic.';
+
+      modalRef.result.then(
+        () => {},
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
     } else {
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
-          this.TOPIC_EDITOR_URL_TEMPLATE, {
-            topicId: this.story.getCorrespondingTopicId()
+          this.TOPIC_EDITOR_URL_TEMPLATE,
+          {
+            topicId: this.story.getCorrespondingTopicId(),
           }
         ),
         '_self'
@@ -77,12 +79,10 @@ export class StoryEditorNavbarBreadcrumbComponent {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.storyEditorStateService.onStoryInitialized.subscribe(
-        () => {
-          this.topicName = this.storyEditorStateService.getTopicName();
-          this.story = this.storyEditorStateService.getStory();
-        }
-      )
+      this.storyEditorStateService.onStoryInitialized.subscribe(() => {
+        this.topicName = this.storyEditorStateService.getTopicName();
+        this.story = this.storyEditorStateService.getStory();
+      })
     );
   }
 
@@ -90,6 +90,3 @@ export class StoryEditorNavbarBreadcrumbComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaStoryEditorNavbarBreadcrumb',
-  downgradeComponent({component: StoryEditorNavbarBreadcrumbComponent}));

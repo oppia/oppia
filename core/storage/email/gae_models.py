@@ -71,8 +71,8 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_DELETE_EXPLORATION,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
             feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
-            feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
-            feconf.EMAIL_INTENT_REMOVE_REVIEWER,
+            feconf.EMAIL_INTENT_ONBOARD_CD_USER,
+            feconf.EMAIL_INTENT_REMOVE_CD_USER,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
             feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
@@ -81,7 +81,7 @@ class SentEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_TEST,
             (
                 feconf
-                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS)
+                .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
@@ -357,7 +357,7 @@ class BulkEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
             feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT,
-            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE
+            feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)

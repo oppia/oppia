@@ -19,19 +19,19 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface TypeDefinitionObject {
-  'validate': (arg0: Object) => boolean;
+  validate: (arg0: Object) => boolean;
 
   // The default value is typed as Object because it's type could be anything.
   // It depends on the arguments passed to the constructor.
-  'default_value': Object;
+  default_value: Object;
 }
 
 interface RegistryType {
-    [key: string]: ParamType;
+  [key: string]: ParamType;
 }
 
 export class ParamType {
@@ -56,7 +56,8 @@ export class ParamType {
   constructor(typeDefinitionObject: TypeDefinitionObject) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
-        'The default value is invalid according to validation function');
+        'The default value is invalid according to validation function'
+      );
     }
 
     /** @member {String} */
@@ -79,7 +80,7 @@ export class ParamType {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParamTypeObjectFactory {
   constructor() {
@@ -103,10 +104,10 @@ export class ParamTypeObjectFactory {
   registry: RegistryType = {
     UnicodeString: new ParamType({
       validate: (value: Object) => {
-        return (typeof value === 'string' || value instanceof String);
+        return typeof value === 'string' || value instanceof String;
       },
-      default_value: ''
-    })
+      default_value: '',
+    }),
   };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
@@ -127,5 +128,9 @@ export class ParamTypeObjectFactory {
   }
 }
 
-angular.module('oppia').factory(
-  'ParamTypeObjectFactory', downgradeInjectable(ParamTypeObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ParamTypeObjectFactory',
+    downgradeInjectable(ParamTypeObjectFactory)
+  );

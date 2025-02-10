@@ -16,19 +16,20 @@
  * @fileoverview Component for topic-viewer subtopics list.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit} from '@angular/core';
 
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 import './subtopics-list.component.css';
-
 
 @Component({
   selector: 'subtopics-list',
   templateUrl: './subtopics-list.component.html',
-  styleUrls: ['./subtopics-list.component.css']
+  styleUrls: ['./subtopics-list.component.css'],
 })
 export class SubtopicsListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -41,13 +42,14 @@ export class SubtopicsListComponent implements OnInit {
   @Input() topicName!: string;
   topicNameTranslationKey!: string;
 
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
+  constructor(private i18nLanguageCodeService: I18nLanguageCodeService) {}
 
   ngOnInit(): void {
-    this.topicNameTranslationKey = this.i18nLanguageCodeService
-      .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
+    this.topicNameTranslationKey =
+      this.i18nLanguageCodeService.getTopicTranslationKey(
+        this.topicId,
+        TranslationKeyType.TITLE
+      );
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
@@ -58,7 +60,3 @@ export class SubtopicsListComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'subtopicsList', downgradeComponent(
-    {component: SubtopicsListComponent}));

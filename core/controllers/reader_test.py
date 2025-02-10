@@ -27,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
+from core.domain import platform_parameter_list
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -95,40 +96,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             self.EXP_ID, self.editor_id, title=self.UNICODE_TEST_STRING,
             category=self.UNICODE_TEST_STRING)
 
-    def test_unpublished_explorations_are_invisible_to_logged_out_users(
-        self
-    ) -> None:
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expected_status_int=404)
-
-    def test_unpublished_explorations_are_invisible_to_unconnected_users(
-        self
-    ) -> None:
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expected_status_int=404)
-        self.logout()
-
-    def test_unpublished_explorations_are_invisible_to_other_editors(
-        self
-    ) -> None:
-        other_editor_email = 'another@example.com'
-        self.signup(other_editor_email, 'othereditorusername')
-
-        other_exploration = exp_domain.Exploration.create_default_exploration(
-            'eid2')
-        exp_services.save_new_exploration(
-            other_editor_email, other_exploration)
-
-        self.login(other_editor_email)
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
-            expected_status_int=404)
-        self.logout()
-
     def test_unpublished_explorations_are_visible_to_their_editors(
         self
     ) -> None:
@@ -162,37 +129,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
-
-    def test_exploration_page_with_iframed_redirects(self) -> None:
-        self.login(self.EDITOR_EMAIL)
-
-        exp_version = self.exploration.version
-        response = self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID), params={
-                'parent': True,
-                'iframed': True,
-                'v': exp_version
-            }, expected_status_int=302
-        )
-        self.assertTrue(
-            response.headers['Location'].endswith(
-                '/embed/exploration/%s?v=%s' % (self.EXP_ID, exp_version)))
-
-        self.logout()
-
-    def test_exploration_page_raises_error_with_invalid_exploration_version(
-        self
-    ) -> None:
-        self.login(self.EDITOR_EMAIL)
-
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID), params={
-                'v': 10,
-                'parent': True
-            }, expected_status_int=404
-        )
-
-        self.logout()
 
 
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
@@ -230,8 +166,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
+    """Test the handler for retrieving exploration pre-tests.
     """
 
     def setUp(self) -> None:
@@ -260,6 +195,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
@@ -282,7 +224,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
+            'old_value': 'exp_1',
             'new_value': exp_id,
             'node_id': 'node_1'
         })]
@@ -343,6 +285,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
@@ -362,7 +311,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
+            'old_value': 'exp_1',
             'new_value': exp_id,
             'node_id': 'node_1'
         })]
@@ -529,6 +478,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url, expected_status_int=400)
         self.assertEqual(
             json_response['error'],
+            'At \'http://localhost/question_player_handler?question_count=1'
+            '&skill_ids=invalid_skill_id&fetch_by_difficulty=true\' '
+            'these errors are happening:\n'
             'Schema validation for \'skill_ids\' failed: Invalid skill id'
         )
 
@@ -733,10 +685,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
 
     # TODO(bhenning): Add tests for ensuring system explorations are properly
     # sampled when there are many matched for a given exploration ID.
-
-    # TODO(bhenning): Verify whether recommended author-specified explorations
-    # are also played within the context of collections, and whether that's
-    # desirable.
 
     def _set_recommendations(
         self, exp_id: str, recommended_ids: List[str]
@@ -1190,6 +1138,10 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
 
     EXP_ID: Final = '0'
     REPORT_TEXT: Final = 'AD'
+    EMAIL_FOOTER = (
+        'You can change your email preferences via the '
+        '<a href="http://localhost:8181/preferences">Preferences</a> page.'
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -1214,11 +1166,16 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             title='Welcome to Oppia!',
             category='This is just a spam category',
             objective='Test a spam exploration.')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+        ]
+    )
     def test_that_emails_are_sent(self) -> None:
         """Check that emails are sent to moderaters when a logged-in
         user reports.
@@ -1265,14 +1222,13 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        with self.can_send_emails_ctx:
-            self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_tasks()
 
-            messages = self._get_sent_email_messages(
-                self.MODERATOR_EMAIL)
-            self.assertEqual(len(messages), 1)
-            self.assertEqual(messages[0].html, expected_email_html_body)
-            self.assertEqual(messages[0].body, expected_email_text_body)
+        messages = self._get_sent_email_messages(
+            self.MODERATOR_EMAIL)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_html_body)
+        self.assertEqual(messages[0].body, expected_email_text_body)
 
     def test_non_logged_in_users_cannot_report(self) -> None:
         """Check that non-logged in users cannot report."""
@@ -1338,8 +1294,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             self.EXP_ID_2_0, self.owner_id, title='Sillat Suomi',
-            category='Architecture', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Architecture', language_code='en')
 
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
@@ -1375,21 +1330,17 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_2_0,
+                'node_id': 'node_1'
             })
         ]
         story_services.update_story(
             self.owner_id, self.STORY_ID, changelist, 'Added node.')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
-            'new_value': self.EXP_ID_2_0,
-            'node_id': 'node_1'
-        })]
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, change_list, 'Updated Node 1.')
 
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
@@ -1508,7 +1459,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Missing key in handler args: version.')
+            response['error'],
+            'At \'http://localhost/explorehandler/exploration_complete_event/'
+            'exp_2\' these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
 
     def test_exp_incomplete_event_handler(self) -> None:
         """Test handler for leaving an exploration incomplete."""
@@ -1611,7 +1566,12 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
-        error_msg = 'Missing key in handler args: version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/'
+            'exploration_maybe_leave_event/exp_0\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_remove_exp_from_incomplete_list_handler(self) -> None:
@@ -2091,10 +2051,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: num_starts not in aggregated stats dict.'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2113,10 +2075,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: Expected num_starts to be an int, received invalid'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2132,11 +2096,13 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                     'exp_version': self.exp_version}, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: total_hit_count not in '
             'state stats mapping of Home in aggregated stats dict.'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2159,10 +2125,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         )
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: Expected total_hit_count to be an int, received invalid'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2238,7 +2206,10 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
         self.assertEqual(
-            response['error'], 'Missing key in handler args: version.'
+            response['error'],
+            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
         )
 
     def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
@@ -2273,7 +2244,9 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
-            'Schema validation for \'answer\' failed: ' +
+            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
+            'these errors are happening:\n'
+            'Schema validation for \'answer\' failed: '
             'Type of 1.1 is not present in options'
         )
 
@@ -2347,6 +2320,8 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/explorehandler/state_hit_event/6\' '
+            'these errors are happening:\n'
             'Missing key in handler args: exploration_version.'
         )
 
@@ -2379,7 +2354,9 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Missing key in handler args: new_state_name.'
+            'At \'http://localhost/explorehandler/state_hit_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: new_state_name.',
         )
 
         self.logout()
@@ -2449,7 +2426,11 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: exp_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/state_complete_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: exp_version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2665,7 +2646,11 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/exploration_start_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2734,7 +2719,11 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: exploration_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/'
+            'exploration_actual_start_event/6\' these errors are happening:\n'
+            'Missing key in handler args: exploration_version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2803,95 +2792,12 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
                 'time_spent_in_state_secs': 2.0
             }, expected_status_int=400
         )
-        error_msg = 'Missing key in handler args: exploration_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/solution_hit_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: exploration_version.'
+        )
         self.assertEqual(response['error'], error_msg)
-
-        self.logout()
-
-
-class ExplorationEmbedPageTests(test_utils.GenericTestBase):
-
-    COL_ID: Final = 'col_id'
-    EXP_ID: Final = 'exp_id'
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_exploration_embed_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        self.save_new_valid_collection(self.COL_ID, self.owner_id)
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        response = self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
-            params={
-                'v': exploration.version,
-                'collection_id': self.COL_ID
-            }
-        )
-        self.assertIn(b'<oppia-root></oppia-root>', response.body)
-
-        self.logout()
-
-    def test_handler_raises_error_with_invalid_exploration_id(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        self.save_new_valid_collection(self.COL_ID, self.owner_id)
-
-        self.get_html_response(
-            '%s/invalid_exp_id' % (feconf.EXPLORATION_URL_EMBED_PREFIX),
-            params={
-                'collection_id': self.COL_ID
-            }, expected_status_int=400
-        )
-
-        self.logout()
-
-    def test_handler_raises_error_with_invalid_collection_id(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
-            params={
-                'v': exploration.version,
-                'collection_id': 'invalid_collection_id'
-            }, expected_status_int=400
-        )
-
-        self.logout()
-
-    def test_handler_raises_error_with_no_collection(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
-            params={
-                'v': exploration.version,
-                'collection_id': 'aZ9_______12'
-            }, expected_status_int=404
-        )
-
-        self.logout()
-
-    def test_handler_raises_error_with_invalid_version(self) -> None:
-        self.login(self.OWNER_EMAIL)
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-        self.save_new_valid_collection(self.COL_ID, self.owner_id)
-
-        self.get_html_response(
-            '%s/%s' % (feconf.EXPLORATION_URL_EMBED_PREFIX, self.EXP_ID),
-            params={
-                'v': '10',
-                'collection_id': self.COL_ID
-            }, expected_status_int=404
-        )
 
         self.logout()
 

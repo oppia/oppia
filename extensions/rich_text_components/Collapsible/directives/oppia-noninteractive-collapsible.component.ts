@@ -34,14 +34,20 @@
  * value.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-noninteractive-collapsible',
   templateUrl: './collapsible.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class NoninteractiveCollapsible implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -58,9 +64,11 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
       return;
     }
     this.heading = this.htmlEscaperService.escapedJsonToObj(
-      this.headingWithValue) as string;
+      this.headingWithValue
+    ) as string;
     this.content = this.htmlEscaperService.escapedJsonToObj(
-      this.contentWithValue) as string;
+      this.contentWithValue
+    ) as string;
   }
 
   ngOnInit(): void {
@@ -75,6 +83,8 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
 }
 
 angular.module('oppia').directive(
-  'oppiaNoninteractiveCollapsible', downgradeComponent({
-    component: NoninteractiveCollapsible
-  }) as angular.IDirectiveFactory);
+  'oppiaNoninteractiveCollapsible',
+  downgradeComponent({
+    component: NoninteractiveCollapsible,
+  }) as angular.IDirectiveFactory
+);

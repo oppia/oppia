@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
+import {LearnerDashboardSuggestionModalComponent} from './learner-dashboard-suggestion-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,7 +32,6 @@ class MockActiveModal {
     return;
   }
 }
-
 
 describe('Learner Dashboard Suggestion Modal Component', () => {
   let description = 'This is a description string';
@@ -52,10 +50,11 @@ describe('Learner Dashboard Suggestion Modal Component', () => {
       ],
       providers: [
         {
-          provide: NgbActiveModal, useClass: MockActiveModal
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

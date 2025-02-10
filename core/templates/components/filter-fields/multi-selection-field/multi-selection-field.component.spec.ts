@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the multi selection field component.
  */
 
-import { ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'modules/material.module';
-import { MultiSelectionFieldComponent } from './multi-selection-field.component';
+import {ElementRef} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from 'modules/material.module';
+import {MultiSelectionFieldComponent} from './multi-selection-field.component';
 
 describe('Multi Selection Field Component', () => {
   let componentInstance: MultiSelectionFieldComponent;
@@ -33,11 +33,9 @@ describe('Multi Selection Field Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
       ],
-      declarations: [
-        MultiSelectionFieldComponent
-      ]
+      declarations: [MultiSelectionFieldComponent],
     }).compileComponents();
   }));
 
@@ -58,8 +56,8 @@ describe('Multi Selection Field Component', () => {
       valueChanges: {
         subscribe: (callb: (value: string) => void) => {
           callb(input);
-        }
-      }
+        },
+      },
     } as FormControl;
     componentInstance.ngOnInit();
     input = 'selection 1';
@@ -67,12 +65,13 @@ describe('Multi Selection Field Component', () => {
       valueChanges: {
         subscribe(callb: (val: string) => void) {
           callb(input);
-        }
-      }
+        },
+      },
     } as FormControl;
     componentInstance.ngOnInit();
     expect(componentInstance.readOnlySelections).toEqual(
-      componentInstance.selections);
+      componentInstance.selections
+    );
   });
 
   it('should validate input', () => {
@@ -91,8 +90,8 @@ describe('Multi Selection Field Component', () => {
     componentInstance.readOnlySelections = [];
     componentInstance.newSelectionInput = {
       nativeElement: {
-        value: ''
-      }
+        value: '',
+      },
     } as ElementRef;
     componentInstance.add({value: 'math'});
     componentInstance.add({value: ''});
@@ -110,13 +109,11 @@ describe('Multi Selection Field Component', () => {
     spyOn(componentInstance, 'add');
     spyOn(componentInstance, 'remove');
     componentInstance.selections = ['selection 1'];
-    componentInstance.selected(
-      { option: { value: 'selection 1' }});
+    componentInstance.selected({option: {value: 'selection 1'}});
     expect(componentInstance.remove).toHaveBeenCalled();
     expect(componentInstance.add).not.toHaveBeenCalled();
     componentInstance.selections = [];
-    componentInstance.selected(
-      { option: { value: 'selection 1' }});
+    componentInstance.selected({option: {value: 'selection 1'}});
     expect(componentInstance.add).toHaveBeenCalled();
   });
 

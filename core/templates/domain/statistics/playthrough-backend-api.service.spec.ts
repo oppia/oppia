@@ -16,27 +16,30 @@
  * @fileoverview Unit tests for PlaythroughBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { PlaythroughBackendApiService } from
-  'domain/statistics/playthrough-backend-api.service';
-import { PlaythroughObjectFactory, PlaythroughBackendDict } from
-  'domain/statistics/PlaythroughObjectFactory';
+import {PlaythroughBackendApiService} from 'domain/statistics/playthrough-backend-api.service';
+import {PlaythroughIssueType} from 'domain/statistics/playthrough-issue.model';
+import {
+  Playthrough,
+  PlaythroughBackendDict,
+} from 'domain/statistics/playthrough.model';
+import {LearnerActionType} from 'domain/statistics/learner-action.model';
 
 describe('Playthrough backend api service', () => {
   let pbas: PlaythroughBackendApiService;
-  let pof: PlaythroughObjectFactory;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     pbas = TestBed.get(PlaythroughBackendApiService);
-    pof = TestBed.get(PlaythroughObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -52,48 +55,51 @@ describe('Playthrough backend api service', () => {
     let playthroughDict: PlaythroughBackendDict = {
       exp_id: 'expId1',
       exp_version: 1,
-      issue_type: 'MultipleIncorrectSubmissions',
+      issue_type: PlaythroughIssueType.MultipleIncorrectSubmissions,
       issue_customization_args: {
         state_name: {
-          value: 'stateName'
+          value: 'stateName',
         },
         num_times_answered_incorrectly: {
-          value: 14
-        }
-      },
-      actions: [{
-        action_type: 'AnswerSubmit',
-        action_customization_args: {
-          state_name: {
-            value: ''
-          },
-          dest_state_name: {
-            value: ''
-          },
-          interaction_id: {
-            value: ''
-          },
-          submitted_answer: {
-            value: ''
-          },
-          feedback: {
-            value: ''
-          },
-          time_spent_state_in_msecs: {
-            value: 0
-          },
+          value: 14,
         },
-        schema_version: 1
-      }]
+      },
+      actions: [
+        {
+          action_type: LearnerActionType.AnswerSubmit,
+          action_customization_args: {
+            state_name: {
+              value: '',
+            },
+            dest_state_name: {
+              value: '',
+            },
+            interaction_id: {
+              value: '',
+            },
+            submitted_answer: {
+              value: '',
+            },
+            feedback: {
+              value: '',
+            },
+            time_spent_state_in_msecs: {
+              value: 0,
+            },
+          },
+          schema_version: 1,
+        },
+      ],
     };
-    let playthorughObject = pof.createFromBackendDict(playthroughDict);
+    let playthorughObject = Playthrough.createFromBackendDict(playthroughDict);
 
     let onSuccess = jasmine.createSpy('onSuccess');
     let onFailure = jasmine.createSpy('onFailure');
     pbas.storePlaythroughAsync(playthorughObject, 1).then(onSuccess, onFailure);
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/store_playthrough/expId1');
+      '/explorehandler/store_playthrough/expId1'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush(backendResposne);
 

@@ -16,22 +16,22 @@
  * @fileoverview Component for the copy message tooltip.
  */
 
-import { Component, Input } from '@angular/core';
-import { Clipboard } from '@angular/cdk/clipboard';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {Component, Input} from '@angular/core';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-copy-url',
-  templateUrl: './copy-url.component.html'
+  templateUrl: './copy-url.component.html',
 })
-
 export class ComponentOverviewComponent {
   @Input() urlToCopy!: string;
   showTooltip: boolean = false;
 
   constructor(
     private clipboard: Clipboard,
-    private i18nLanguageCodeService: I18nLanguageCodeService) {}
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {}
 
   copyUrlButton(): void {
     this.clipboard.copy(this.urlToCopy);

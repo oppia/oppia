@@ -18,18 +18,14 @@
 
 from __future__ import annotations
 
-import getpass
 import os
 import tempfile
 
 from core import utils
 from core.tests import test_utils
-from scripts import common
 from scripts.release_scripts import update_configs
 
 from typing import Final
-
-import github  # isort:skip pylint: disable=wrong-import-position
 
 INVALID_FECONF_CONFIG_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
@@ -44,60 +40,9 @@ MOCK_LOCAL_FECONF_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'release_sources',
     'feconf.txt')
 
-MOCK_REQUESTER = github.Requester.Requester(
-    login_or_token=None,
-    password=None,
-    jwt=None,
-    app_auth=None,
-    base_url='https://github.com',
-    timeout=0,
-    user_agent='user',
-    per_page=0,
-    verify=False,
-    retry=None,
-    pool_size=None,
-)
-
 
 class UpdateConfigsTests(test_utils.GenericTestBase):
     """Test the methods for updating configs."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.mock_repo = github.Repository.Repository(
-            requester=MOCK_REQUESTER,
-            headers={},
-            attributes={},
-            completed=False
-        )
-        def mock_get_organization(
-            unused_self: str, unused_name: str
-        ) -> github.Organization.Organization:
-            return github.Organization.Organization(
-                requester=MOCK_REQUESTER,
-                headers={},
-                attributes={},
-                completed=False
-            )
-        def mock_get_repo(
-            unused_self: str, unused_org: github.Organization.Organization
-        ) -> github.Repository.Repository:
-            return self.mock_repo
-        def mock_open_tab(unused_url: str) -> None:
-            pass
-        def mock_getpass(prompt: str) -> str:  # pylint: disable=unused-argument
-            return 'test-token'
-        def mock_url_open(unused_url: str) -> None:
-            pass
-
-        self.get_org_swap = self.swap(
-            github.Github, 'get_organization', mock_get_organization)
-        self.get_repo_swap = self.swap(
-            github.Organization.Organization, 'get_repo', mock_get_repo)
-        self.open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
 
     def test_feconf_verification_with_correct_config(self) -> None:
         mailgun_api_key = ('key-%s' % ('').join(['1'] * 32))
@@ -370,16 +315,19 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
+            '  "GTM_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
         expected_analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -402,6 +350,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
+            '  "GTM_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
@@ -411,6 +360,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         # Testing invalid GA_ANALYTICS_ID key.
         constants_text = (
             '  "GA_analytics_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -424,9 +374,27 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 temp_constants_path
             )
 
+        # Testing invalid GTM_ANALYTICS_ID key.
+        constants_text = (
+            '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_blablabla_ID": "123"\n'
+            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
+        )
+        with utils.open_file(temp_constants_path, 'w') as f:
+            f.write(constants_text)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No GTM_ANALYTICS_ID key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path,
+                temp_constants_path
+            )
+
         # Testing invalid SITE_NAME_FOR_ANALYTICS key.
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_name_for_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -443,6 +411,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         # Testing invalid CAN_SEND_ANALYTICS_EVENTS key.
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "can_SEND_analytics_EVENTS": true\n'
         )

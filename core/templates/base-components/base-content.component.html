@@ -51,7 +51,7 @@
                 <oppia-top-navigation-bar [headerText]="getHeaderText()"
                                           [subheaderText]="getSubheaderText()">
                 </oppia-top-navigation-bar>
-                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
+                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
                   <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
@@ -61,6 +61,8 @@
             </nav>
 
             <div class="oppia-top-of-page-padding"></div>
+            <language-banner>
+            </language-banner>
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
               <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options-base"
                  (click)="toggleMobileNavOptions()"

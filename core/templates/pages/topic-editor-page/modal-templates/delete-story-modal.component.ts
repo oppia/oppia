@@ -15,19 +15,17 @@
 /**
  * @fileoverview Component for delete story modal.
  */
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-story-modal',
-  templateUrl: './delete-story-modal.component.html'
+  templateUrl: './delete-story-modal.component.html',
 })
 export class DeleteStoryModalComponent extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

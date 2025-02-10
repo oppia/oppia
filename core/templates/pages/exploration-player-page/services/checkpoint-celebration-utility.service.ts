@@ -17,12 +17,12 @@
  * checkpoint celebration feature.
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import {Injectable, EventEmitter} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
-import { ComputeGraphService } from 'services/compute-graph.service';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 
 enum CheckpointMessageTypes {
   FIRST = 'FIRST',
@@ -30,11 +30,11 @@ enum CheckpointMessageTypes {
   MIDWAY = 'MIDWAY',
   TWO_REMAINING = 'TWO_REMAINING',
   ONE_REMAINING = 'ONE_REMAINING',
-  GENERIC = 'GENERIC'
+  GENERIC = 'GENERIC',
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CheckpointCelebrationUtilityService {
   private isOnCheckpointedState: boolean = false;
@@ -46,14 +46,18 @@ export class CheckpointCelebrationUtilityService {
   ) {}
 
   getStateListForCheckpointMessages(
-      statesbackendDict: StateObjectsBackendDict, initStateName: string
+    statesbackendDict: StateObjectsBackendDict,
+    initStateName: string
   ): string[] {
-    const states = this.statesObjectFactory.createFromBackendDict(
-      statesbackendDict);
+    const states =
+      this.statesObjectFactory.createFromBackendDict(statesbackendDict);
     const bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
-      initStateName, states, initStateName);
+      initStateName,
+      states,
+      initStateName
+    );
     let stateListForCheckpointMessages: string[] = [];
-    bfsStateList.forEach((state) => {
+    bfsStateList.forEach(state => {
       if (statesbackendDict[state].card_is_checkpoint) {
         stateListForCheckpointMessages.push(state);
       }
@@ -62,9 +66,9 @@ export class CheckpointCelebrationUtilityService {
   }
 
   getRandomI18nKey(
-      i18nKeyPrefix: string,
-      availableKeyCount: number,
-      messageKind: string | null,
+    i18nKeyPrefix: string,
+    availableKeyCount: number,
+    messageKind: string | null
   ): string {
     // 'randomValue' is being set to lie between 1 and availableKeyCount, the
     // total number of i18n keys available to choose from.
@@ -84,15 +88,22 @@ export class CheckpointCelebrationUtilityService {
   // The function returns a random key from the 3 available ones for the
   // correct type, using the 'getRandomI18nKey' method.
   getCheckpointMessageI18nKey(
-      completedCheckpointCount: number, totalCheckpointCount: number
+    completedCheckpointCount: number,
+    totalCheckpointCount: number
   ): string {
     const messageI18nKeyPrefix = 'I18N_CONGRATULATORY_CHECKPOINT_MESSAGE';
     if (completedCheckpointCount === 1) {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.FIRST);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.FIRST
+      );
     } else if (completedCheckpointCount === 2) {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.SECOND);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.SECOND
+      );
       // The condition below evaluates to true when the learner has just
       // completed the middle checkpoint and returns the midway message's
       // i18n key.
@@ -100,24 +111,39 @@ export class CheckpointCelebrationUtilityService {
       Math.ceil(totalCheckpointCount / 2) === completedCheckpointCount
     ) {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.MIDWAY);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.MIDWAY
+      );
     } else if (totalCheckpointCount - completedCheckpointCount === 2) {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.TWO_REMAINING);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.TWO_REMAINING
+      );
     } else if (totalCheckpointCount - completedCheckpointCount === 1) {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.ONE_REMAINING);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.ONE_REMAINING
+      );
     } else {
       return this.getRandomI18nKey(
-        messageI18nKeyPrefix, 3, CheckpointMessageTypes.GENERIC);
+        messageI18nKeyPrefix,
+        3,
+        CheckpointMessageTypes.GENERIC
+      );
     }
   }
 
   getCheckpointMessage(
-      completedCheckpointCount: number, totalCheckpointCount: number
+    completedCheckpointCount: number,
+    totalCheckpointCount: number
   ): string {
     const messageI18nKey = this.getCheckpointMessageI18nKey(
-      completedCheckpointCount, totalCheckpointCount);
+      completedCheckpointCount,
+      totalCheckpointCount
+    );
     return this.translateService.instant(messageI18nKey);
   }
 

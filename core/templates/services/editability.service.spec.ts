@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
-import { EditabilityService } from 'services/editability.service';
+import {EditabilityService} from 'services/editability.service';
 
 describe('EditabilityService', () => {
   let editabilityService: EditabilityService;
@@ -45,24 +45,21 @@ describe('EditabilityService', () => {
     expect(editabilityService.isEditable()).toBe(true);
   });
 
-  it('should allow to translate an exploration after the tutorial ends',
-    () => {
-      editabilityService.onEndTutorial();
-      editabilityService.markTranslatable();
-      expect(editabilityService.isTranslatable()).toBe(true);
-    });
+  it('should allow to translate an exploration after the tutorial ends', () => {
+    editabilityService.onEndTutorial();
+    editabilityService.markTranslatable();
+    expect(editabilityService.isTranslatable()).toBe(true);
+  });
 
-  it('should allow to edit an exploration outside the tutorial mode',
-    () => {
-      editabilityService.markEditable();
-      expect(editabilityService.isEditableOutsideTutorialMode()).toBe(true);
-    });
+  it('should allow to edit an exploration outside the tutorial mode', () => {
+    editabilityService.markEditable();
+    expect(editabilityService.isEditableOutsideTutorialMode()).toBe(true);
+  });
 
-  it('should not allow to edit an exploration during tutorial mode',
-    () => {
-      editabilityService.onStartTutorial();
-      expect(editabilityService.isEditable()).toBe(false);
-    });
+  it('should not allow to edit an exploration during tutorial mode', () => {
+    editabilityService.onStartTutorial();
+    expect(editabilityService.isEditable()).toBe(false);
+  });
 
   it('should not allow to edit an uneditable exploration', () => {
     editabilityService.markNotEditable();

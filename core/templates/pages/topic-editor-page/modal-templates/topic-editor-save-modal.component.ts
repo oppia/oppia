@@ -16,17 +16,19 @@
  * @fileoverview Component for topic editor save modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-topic-editor-save-modal',
-  templateUrl: './topic-editor-save-modal.component.html'
+  templateUrl: './topic-editor-save-modal.component.html',
 })
-export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
-  implements OnInit {
+export class TopicEditorSaveModalComponent
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -35,9 +37,7 @@ export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   commitMessage: string = '';
   isTopicPublished: boolean = false;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

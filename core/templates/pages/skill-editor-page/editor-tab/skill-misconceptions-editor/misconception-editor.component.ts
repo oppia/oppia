@@ -16,30 +16,36 @@
  * @fileoverview Component for the misconception editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import {AppConstants} from 'app.constants';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
 
 interface MisconceptionFormSchema {
   type: 'html';
-  'ui_config': object;
+  ui_config: object;
 }
 
 interface Container {
-  'misconceptionName': string;
-  'misconceptionNotes': string;
-  'misconceptionFeedback': string;
-  'misconceptionMustBeAddressed': boolean;
+  misconceptionName: string;
+  misconceptionNotes: string;
+  misconceptionFeedback: string;
+  misconceptionMustBeAddressed: boolean;
 }
 
 @Component({
   selector: 'oppia-misconception-editor',
-  templateUrl: './misconception-editor.component.html'
+  templateUrl: './misconception-editor.component.html',
 })
 export class MisconceptionEditorComponent implements OnInit {
   @Output() onMisconceptionChange = new EventEmitter<void>();
@@ -60,26 +66,26 @@ export class MisconceptionEditorComponent implements OnInit {
   feedbackEditorIsOpen: boolean = false;
   NOTES_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
-    ui_config: {}
+    ui_config: {},
   };
 
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
-      hide_complex_extensions: 'true'
-    }
+      hide_complex_extensions: 'true',
+    },
   };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private skillEditorStateService: SkillEditorStateService,
-    private skillUpdateService: SkillUpdateService,
+    private skillUpdateService: SkillUpdateService
   ) {}
 
   ngOnInit(): void {
     this.skill = this.skillEditorStateService.getSkill();
-    this.MAX_CHARS_IN_MISCONCEPTION_NAME = (
-      AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME);
+    this.MAX_CHARS_IN_MISCONCEPTION_NAME =
+      AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME;
     this.nameEditorIsOpen = false;
     this.notesEditorIsOpen = false;
     this.feedbackEditorIsOpen = false;
@@ -88,61 +94,57 @@ export class MisconceptionEditorComponent implements OnInit {
       misconceptionName: this.misconception.getName(),
       misconceptionNotes: this.misconception.getNotes(),
       misconceptionFeedback: this.misconception.getFeedback(),
-      misconceptionMustBeAddressed: this.misconception.isMandatory()
+      misconceptionMustBeAddressed: this.misconception.isMandatory(),
     };
   }
 
   openNameEditor(): void {
     if (this.isEditable) {
-      this.nameMemento = cloneDeep(
-        this.container.misconceptionName);
+      this.nameMemento = cloneDeep(this.container.misconceptionName);
       this.nameEditorIsOpen = true;
     }
   }
 
   openNotesEditor(): void {
     if (this.isEditable) {
-      this.notesMemento = cloneDeep(
-        this.container.misconceptionNotes);
+      this.notesMemento = cloneDeep(this.container.misconceptionNotes);
       this.notesEditorIsOpen = true;
     }
   }
 
   openFeedbackEditor(): void {
     if (this.isEditable) {
-      this.feedbackMemento = cloneDeep(
-        this.container.misconceptionFeedback);
+      this.feedbackMemento = cloneDeep(this.container.misconceptionFeedback);
       this.feedbackEditorIsOpen = true;
     }
   }
 
   saveName(): void {
     this.nameEditorIsOpen = false;
-    let nameHasChanged = (
-      this.nameMemento !==
-      this.container.misconceptionName);
+    let nameHasChanged = this.nameMemento !== this.container.misconceptionName;
 
     if (nameHasChanged) {
       this.skillUpdateService.updateMisconceptionName(
         this.skill,
         this.misconception.getId(),
         this.nameMemento,
-        this.container.misconceptionName);
+        this.container.misconceptionName
+      );
     }
   }
 
   saveNotes(): void {
     this.notesEditorIsOpen = false;
-    let notesHasChanged = (
-      this.notesMemento !==
-      this.container.misconceptionNotes);
+    let notesHasChanged =
+      this.notesMemento !== this.container.misconceptionNotes;
 
     if (notesHasChanged) {
       this.skillUpdateService.updateMisconceptionNotes(
         this.skill,
         this.misconception.getId(),
         this.notesMemento,
-        this.container.misconceptionNotes);
+        this.container.misconceptionNotes
+      );
     }
   }
 
@@ -151,22 +153,23 @@ export class MisconceptionEditorComponent implements OnInit {
       this.skill,
       this.misconception.getId(),
       !this.container.misconceptionMustBeAddressed,
-      this.container.misconceptionMustBeAddressed);
+      this.container.misconceptionMustBeAddressed
+    );
     this.onMisconceptionChange.emit();
   }
 
   saveFeedback(): void {
     this.feedbackEditorIsOpen = false;
-    var feedbackHasChanged = (
-      this.feedbackMemento !==
-      this.container.misconceptionFeedback);
+    var feedbackHasChanged =
+      this.feedbackMemento !== this.container.misconceptionFeedback;
 
     if (feedbackHasChanged) {
       this.skillUpdateService.updateMisconceptionFeedback(
         this.skill,
         this.misconception.getId(),
         this.feedbackMemento,
-        this.container.misconceptionFeedback);
+        this.container.misconceptionFeedback
+      );
     }
   }
 
@@ -185,6 +188,3 @@ export class MisconceptionEditorComponent implements OnInit {
     this.feedbackEditorIsOpen = false;
   }
 }
-
-angular.module('oppia').directive('oppiaMisconceptionEditor',
-  downgradeComponent({component: MisconceptionEditorComponent}));

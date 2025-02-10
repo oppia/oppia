@@ -4,7 +4,8 @@
     "sourceType": "module"
   },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "prettier"
   ],
   "plugins": [
     "angular",
@@ -74,7 +75,6 @@
         "additionalPlayerFeatures.js",
         "adminTabFeatures.js",
         "classroomPage.js",
-        "classroomPageFileUploadFeatures.js",
         "collections.js",
         "contributorDashboard.js",
         "coreEditorAndPlayerFeatures.js",
@@ -124,7 +124,7 @@
       }
     },
     {
-      // We exclude spec files to the no-testonly check
+      // We exclude spec files from the no-testonly check
       "files": ["*spec.js", "*spec.ts"],
       "rules": {
         "oppia/no-testonly": "off"
@@ -155,7 +155,6 @@
     }
   ],
   "rules": {
-    "oppia/break-after-parens": "error",
     "oppia/constant-declaration": "error",
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
@@ -169,7 +168,6 @@
     "oppia/sorted-dependencies": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
-    "oppia/match-line-break": "error",
     "oppia/no-test-blockers": "error",
     "oppia/no-inject": "error",
     "oppia/no-bypass-security-phrase": "error",
@@ -193,10 +191,6 @@
     "array-bracket-spacing": [
       "error",
       "never"
-    ],
-    "brace-style":[
-      "error",
-      "1tbs"
     ],
     "camelcase": [
       "error",
@@ -234,34 +228,7 @@
       "error",
       "expression"
     ],
-    "indent": [
-      "error",
-      2,
-      {
-        "ArrayExpression": 1,
-        "flatTernaryExpressions": true,
-        "FunctionExpression": {
-          "body": 1,
-          "parameters": 2
-        },
-        "MemberExpression": 1,
-        "SwitchCase": 1,
-        "ignoredNodes": [
-          "ConditionalExpression",
-          // TODO(#14575): Remove once we have linting for class declaration.
-          "ClassDeclaration"
-        ]
-      }
-    ],
     "key-spacing": "error",
-    "max-len": [
-      "error",
-      {
-        "code": 80,
-        "ignoreUrls": true,
-        "ignorePattern": "^import \\{"
-      }
-    ],
     "no-compare-neg": "off",
     "no-console": [
       "error",
@@ -319,23 +286,12 @@
     "one-var": [
       "off"
     ],
-    "operator-linebreak": [
-      "error",
-      "after"
-    ],
     "padded-blocks": [
       "error",
       "never"
     ],
     "quotes": [
       "off"
-    ],
-    "quote-props": [
-      "error",
-      "as-needed",
-      {
-        "keywords": true
-      }
     ],
     // The following must be off so that we can enable
     // "@typescript-eslint/semi", which checks semicolons in TS files.
@@ -430,14 +386,6 @@
     ],
     "@typescript-eslint/member-delimiter-style": ["error"],
     "@typescript-eslint/method-signature-style": ["error"],
-    "@typescript-eslint/space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "never",
-        "asyncArrow": "never",
-        "named": "never"
-      }
-    ],
     "@typescript-eslint/keyword-spacing": [
       "error",
       {
@@ -450,13 +398,6 @@
       {
         "before": false,
         "after": true
-      }
-    ],
-    "@typescript-eslint/lines-between-class-members": [
-      "error",
-      "always",
-      {
-        "exceptAfterSingleLine": true
       }
     ],
     "@typescript-eslint/quotes": [

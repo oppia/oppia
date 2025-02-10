@@ -16,118 +16,133 @@
  * @fileoverview Tests for SuggestionModalForLearnerDashboardService.
  */
 
-import { async, TestBed } from '@angular/core/testing';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {async, TestBed} from '@angular/core/testing';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
-import { SuggestionModalForLearnerDashboardService } from './suggestion-modal-for-learner-dashboard.service';
+import {SuggestionModalForLearnerDashboardService} from './suggestion-modal-for-learner-dashboard.service';
 
 class MockNgbModalRef {
   componentInstance = {
     newContent: null,
     oldContent: null,
-    description: null
+    description: null,
   };
 }
 
 describe('Suggestion Modal Service For Learners Dashboard', () => {
-  let suggestionModalForLearnerDashboardService:
-    SuggestionModalForLearnerDashboardService;
+  let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService;
   let csrfService: CsrfTokenService;
   let ngbModal: NgbModal;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
   }));
 
   beforeEach(() => {
-    suggestionModalForLearnerDashboardService =
-      TestBed.inject(SuggestionModalForLearnerDashboardService);
+    suggestionModalForLearnerDashboardService = TestBed.inject(
+      SuggestionModalForLearnerDashboardService
+    );
     ngbModal = TestBed.inject(NgbModal);
     csrfService = TestBed.inject(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
-      return new Promise((resolve) => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
+      return new Promise(resolve => {
         resolve('sample-csrf-token');
       });
     });
   });
 
-  it('should open an ngbModal for suggestions requested' +
-    ' when calling showSuggestionModal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
-    });
+  it(
+    'should open an ngbModal for suggestions requested' +
+      ' when calling showSuggestionModal',
+    () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        if (opt?.beforeDismiss !== undefined) {
+          setTimeout(opt.beforeDismiss);
+        }
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      });
 
-    let suggestionType = 'edit_exploration_state_content';
-    let extraParams = {
-      newContent: 'new',
-      oldContent: 'old',
-      description: 'description'
-    };
+      let suggestionType = 'edit_exploration_state_content';
+      let extraParams = {
+        newContent: 'new',
+        oldContent: 'old',
+        description: 'description',
+      };
 
-    suggestionModalForLearnerDashboardService.showSuggestionModal(
-      suggestionType, extraParams);
+      suggestionModalForLearnerDashboardService.showSuggestionModal(
+        suggestionType,
+        extraParams
+      );
 
-    expect(modalSpy).toHaveBeenCalled();
-  });
+      expect(modalSpy).toHaveBeenCalled();
+    }
+  );
 
-  it('should not open an ngbModal for suggestions requested' +
-    ' when calling showSuggestionModal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
-    });
+  it(
+    'should not open an ngbModal for suggestions requested' +
+      ' when calling showSuggestionModal',
+    () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        if (opt?.beforeDismiss !== undefined) {
+          setTimeout(opt.beforeDismiss);
+        }
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      });
 
-    let suggestionType = 'invalidType';
-    let extraParams = {
-      newContent: 'new',
-      oldContent: 'old',
-      description: 'description'
-    };
+      let suggestionType = 'invalidType';
+      let extraParams = {
+        newContent: 'new',
+        oldContent: 'old',
+        description: 'description',
+      };
 
-    suggestionModalForLearnerDashboardService.showSuggestionModal(
-      suggestionType, extraParams);
+      suggestionModalForLearnerDashboardService.showSuggestionModal(
+        suggestionType,
+        extraParams
+      );
 
-    expect(modalSpy).not.toHaveBeenCalled();
-  });
+      expect(modalSpy).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should do nothing when cancel button is clicked' +
-    ' when calling showSuggestionModal', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      if (opt?.beforeDismiss !== undefined) {
-        setTimeout(opt.beforeDismiss);
-      }
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.reject('cancel')
-        }) as NgbModalRef;
-    });
+  it(
+    'should do nothing when cancel button is clicked' +
+      ' when calling showSuggestionModal',
+    () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        if (opt?.beforeDismiss !== undefined) {
+          setTimeout(opt.beforeDismiss);
+        }
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject('cancel'),
+        } as NgbModalRef;
+      });
 
-    let suggestionType = 'edit_exploration_state_content';
-    let extraParams = {
-      newContent: 'new',
-      oldContent: 'old',
-      description: 'description'
-    };
+      let suggestionType = 'edit_exploration_state_content';
+      let extraParams = {
+        newContent: 'new',
+        oldContent: 'old',
+        description: 'description',
+      };
 
-    suggestionModalForLearnerDashboardService.showSuggestionModal(
-      suggestionType, extraParams);
+      suggestionModalForLearnerDashboardService.showSuggestionModal(
+        suggestionType,
+        extraParams
+      );
 
-    expect(modalSpy).toHaveBeenCalled();
-  });
+      expect(modalSpy).toHaveBeenCalled();
+    }
+  );
 });

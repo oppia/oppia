@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for libraryFooter.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LibraryFooterComponent } from './library-footer.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LibraryFooterComponent} from './library-footer.component';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
-      pathname: '/search/find'
-    }
+      pathname: '/search/find',
+    },
   };
 }
 
@@ -35,16 +35,14 @@ describe('Library footer component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LibraryFooterComponent
-      ],
+      declarations: [LibraryFooterComponent],
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
-        }
+          useClass: MockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

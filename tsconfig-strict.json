@@ -25,9 +25,6 @@
       "app.constants": [
         "core/templates/app.constants"
       ],
-      "classifiers/*": [
-        "extensions/classifiers/*"
-      ],
       "components/*": [
         "core/templates/components/*"
       ],
@@ -84,6 +81,11 @@
       "./node_modules/@types"
     ]
   },
+  "exclude": [
+    "extensions/objects/**/*.spec.ts",
+    "core/templates/**/*.spec.ts",
+    "extensions/interactions/**/*.spec.ts"
+  ],
   "include": [
     "core",
     "extensions",

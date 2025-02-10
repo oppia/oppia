@@ -16,19 +16,21 @@
  * @fileoverview Component for question player concept card modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-question-player-concept-card-modal',
-  templateUrl: './question-player-concept-card-modal.component.html'
+  templateUrl: './question-player-concept-card-modal.component.html',
 })
 export class QuestionPlayerConceptCardModalComponent
-   extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() skillIds: string[] = [];
   @Input() skills: string[] = [];
 
@@ -36,9 +38,9 @@ export class QuestionPlayerConceptCardModalComponent
   modalHeader: string = '';
 
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private windowRef: WindowRef,
-      private urlService: UrlService,
+    private ngbActiveModal: NgbActiveModal,
+    private windowRef: WindowRef,
+    private urlService: UrlService
   ) {
     super(ngbActiveModal);
   }
@@ -58,16 +60,20 @@ export class QuestionPlayerConceptCardModalComponent
   }
 
   retryTest(): void {
-    const selectedSubtopics = (
-      this.urlService.getUrlParams().selected_subtopic_ids);
+    const selectedSubtopics =
+      this.urlService.getUrlParams().selected_subtopic_ids;
 
     this.windowRef.nativeWindow.location.replace(
-      this.urlService.getPathname() + '?selected_subtopic_ids=' +
-      selectedSubtopics);
+      this.urlService.getPathname() +
+        '?selected_subtopic_ids=' +
+        selectedSubtopics
+    );
   }
 }
 
-angular.module('oppia').directive('oppiaQuestionPlayerConceptCardModal',
+angular.module('oppia').directive(
+  'oppiaQuestionPlayerConceptCardModal',
   downgradeComponent({
-    component: QuestionPlayerConceptCardModalComponent
-  }) as angular.IDirectiveFactory);
+    component: QuestionPlayerConceptCardModalComponent,
+  }) as angular.IDirectiveFactory
+);

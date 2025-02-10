@@ -16,26 +16,29 @@
  * @fileoverview Unit tests for the Missing Translations Handler.
  */
 
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
-import { MissingTranslationCustomHandler } from './missing-translation-custom-handler';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
+import {MissingTranslationCustomHandler} from './missing-translation-custom-handler';
 
 describe('Missing Translations Custom Handler', () => {
   let mth = new MissingTranslationCustomHandler();
 
-  it('should return correct translation for existing default translations',
-    () => {
-      expect(mth.handle({
+  it('should return correct translation for existing default translations', () => {
+    expect(
+      mth.handle({
         key: 'I18N_SIGNUP_PAGE_SUBTITLE',
         translateService: {} as TranslateService,
-      })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
-    });
+      })
+    ).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
+  });
 
-  it('should return key if correct value is not available in app constants',
-    () => {
-      let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
-      expect(mth.handle({
-        key, translateService: {} as TranslateService
-      })).toEqual(key);
-    });
+  it('should return key if correct value is not available in app constants', () => {
+    let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
+    expect(
+      mth.handle({
+        key,
+        translateService: {} as TranslateService,
+      })
+    ).toEqual(key);
+  });
 });

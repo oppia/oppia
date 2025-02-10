@@ -16,63 +16,54 @@
  * @fileoverview Module for the classroom-admin page.
  */
 
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ClassroomAdminNavbarComponent } from './navbar/classroom-admin-navbar.component';
-import { ClassroomAdminPageComponent } from './classroom-admin-page.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
-import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
-import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
-import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
-import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
-
-
-declare var angular: ng.IAngularStatic;
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ClassroomAdminNavbarComponent} from './navbar/classroom-admin-navbar.component';
+import {ClassroomAdminPageComponent} from './classroom-admin-page.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
+import {DeleteClassroomConfirmModalComponent} from './modals/delete-classroom-confirm-modal.component';
+import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-modal.component';
+import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
+import {TopicsDependencyGraphModalComponent} from './modals/topic-dependency-graph-viz-modal.component';
+import {CommonModule} from '@angular/common';
+import {ClassroomAdminPageRootComponent} from './classroom-admin-page-root.component';
+import {ClassroomAdminAuthGuard} from './classroom-admin-auth.guard';
+import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-order-modal.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     FormsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     MatCardModule,
+    CommonModule,
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ClassroomAdminPageRootComponent,
+        canActivate: [ClassroomAdminAuthGuard],
+      },
+    ]),
   ],
   declarations: [
     ClassroomAdminNavbarComponent,
     ClassroomAdminPageComponent,
+    ClassroomAdminPageRootComponent,
     ClassroomEditorConfirmModalComponent,
     DeleteClassroomConfirmModalComponent,
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
+    UpdateClassroomsOrderModalComponent,
   ],
   entryComponents: [
     ClassroomAdminNavbarComponent,
@@ -82,39 +73,7 @@ declare var angular: ng.IAngularStatic;
     CreateNewClassroomModalComponent,
     DeleteTopicFromClassroomModalComponent,
     TopicsDependencyGraphModalComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+    UpdateClassroomsOrderModalComponent,
   ],
 })
-class ClassroomAdminPageModule implements DoBootstrap {
-  ngDoBootstrap() {}
-}
-
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ClassroomAdminPageModule);
-}));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}));
+export class ClassroomAdminPageModule {}

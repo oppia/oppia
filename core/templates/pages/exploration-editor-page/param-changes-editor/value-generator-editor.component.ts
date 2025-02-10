@@ -25,15 +25,14 @@ import {
   OnChanges,
   SimpleChange,
   ViewChild,
-  ViewContainerRef
+  ViewContainerRef,
 } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CopierComponent } from 'value_generators/templates/copier.component';
-import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
+import {CopierComponent} from 'value_generators/templates/copier.component';
+import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
 
 @Component({
   selector: 'oppia-value-generator-editor',
-  templateUrl: './value-generator-editor.component.html'
+  templateUrl: './value-generator-editor.component.html',
 })
 export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
   @Input() generatorId: string;
@@ -45,29 +44,33 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
   };
 
   @ViewChild('interactionContainer', {
-    read: ViewContainerRef}) viewContainerRef!: ViewContainerRef;
+    read: ViewContainerRef,
+  })
+  viewContainerRef!: ViewContainerRef;
 
   TAG_TO_INTERACTION_MAPPING = {
     copier: CopierComponent,
-    'random-selector': RandomSelectorComponent
+    'random-selector': RandomSelectorComponent,
   };
 
   constructor(
-     private componentFactoryResolver: ComponentFactoryResolver,
-     private changeDetectorRef: ChangeDetectorRef
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {
-    let componentName = this.generatorId.replace(
-      /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    let componentName = this.generatorId
+      .replace(/([a-z])([A-Z])/g, '$1-$2')
+      .toLowerCase();
 
-    const componentFactory = this.componentFactoryResolver
-      .resolveComponentFactory<CopierComponent | RandomSelectorComponent>(
-        this.TAG_TO_INTERACTION_MAPPING[componentName]);
+    const componentFactory =
+      this.componentFactoryResolver.resolveComponentFactory<
+        CopierComponent | RandomSelectorComponent
+      >(this.TAG_TO_INTERACTION_MAPPING[componentName]);
 
     const componentRef = this.viewContainerRef.createComponent<
-     CopierComponent | RandomSelectorComponent>(
-       componentFactory);
+      CopierComponent | RandomSelectorComponent
+    >(componentFactory);
 
     componentRef.instance.customizationArgs = this.customizationArgs;
     componentRef.instance.generatorId = this.generatorId;
@@ -78,17 +81,13 @@ export class ValueGeneratorEditorComponent implements OnChanges, AfterViewInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  ngOnChanges(changes: { generatorId: SimpleChange }): void {
-    if ((changes.generatorId.currentValue !==
-        changes.generatorId.previousValue) &&
-        this.viewContainerRef) {
+  ngOnChanges(changes: {generatorId: SimpleChange}): void {
+    if (
+      changes.generatorId.currentValue !== changes.generatorId.previousValue &&
+      this.viewContainerRef
+    ) {
       this.viewContainerRef.clear();
       this.ngAfterViewInit();
     }
   }
 }
-
-angular.module('oppia').directive('oppiaValueGeneratorEditor',
-   downgradeComponent({
-     component: ValueGeneratorEditorComponent
-   }) as angular.IDirectiveFactory);

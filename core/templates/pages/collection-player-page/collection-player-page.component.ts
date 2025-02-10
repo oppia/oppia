@@ -16,27 +16,25 @@
  * @fileoverview Component for the learner's view of a collection.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { UserService } from 'services/user.service';
-import { CollectionNode } from 'domain/collection/collection-node.model';
-import { AppConstants } from 'app.constants';
-import { Collection } from 'domain/collection/collection.model';
-import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {UserService} from 'services/user.service';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {AppConstants} from 'app.constants';
+import {Collection} from 'domain/collection/collection.model';
+import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 import './collection-player-page.component.css';
-
 
 export interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -46,32 +44,32 @@ export interface IconParametersArray {
 }
 
 export interface CollectionSummary {
-  'is_admin': boolean;
-  'summaries': string[];
-  'user_email': string;
-  'is_topic_manager': boolean;
-  'username': boolean;
+  is_admin: boolean;
+  summaries: string[];
+  user_email: string;
+  is_topic_manager: boolean;
+  username: boolean;
 }
 
 export interface CollectionHandler {
-  'can_edit': boolean;
-  'collection': Collection;
-  'is_admin': boolean;
-  'is_logged_in': boolean;
-  'is_moderator': boolean;
-  'is_super_admin': boolean;
-  'is_topic_manager': boolean;
-  'meta_description': string;
-  'meta_name': string;
-  'session_id': string;
-  'user_email': string;
-  'username': string;
+  can_edit: boolean;
+  collection: Collection;
+  is_admin: boolean;
+  is_logged_in: boolean;
+  is_moderator: boolean;
+  is_super_admin: boolean;
+  is_topic_manager: boolean;
+  meta_description: string;
+  meta_name: string;
+  session_id: string;
+  user_email: string;
+  username: string;
 }
 
 @Component({
   selector: 'oppia-collection-player-page',
   templateUrl: './collection-player-page.component.html',
-  styleUrls: ['./collection-player-page.component.css']
+  styleUrls: ['./collection-player-page.component.css'],
 })
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -93,7 +91,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
   nextExplorationId!: string;
-  whitelistedCollectionIdsForGuestProgress;
+  allowedCollectionIdsForGuestProgress;
   collectionSummary;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
@@ -105,12 +103,10 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private loaderService: LoaderService,
     private urlService: UrlService,
-    private readOnlyCollectionBackendApiService:
-      ReadOnlyCollectionBackendApiService,
+    private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
     private pageTitleService: PageTitleService,
     private userService: UserService,
-    private collectionPlayerBackendApiService:
-      CollectionPlayerBackendApiService,
+    private collectionPlayerBackendApiService: CollectionPlayerBackendApiService,
     private translateService: TranslateService
   ) {}
 
@@ -118,42 +114,52 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
+  }
+
   togglePreviewCard(): void {
     this.explorationCardIsShown = !this.explorationCardIsShown;
   }
 
   getCollectionNodeForExplorationId(explorationId: string): CollectionNode {
-    let collectionNode = (
-      this.collection.getCollectionNodeByExplorationId(explorationId));
+    let collectionNode =
+      this.collection.getCollectionNodeByExplorationId(explorationId);
     if (!collectionNode) {
       this.alertsService.addWarning(
-        'There was an error loading the collection.');
+        'There was an error loading the collection.'
+      );
     }
     return collectionNode;
   }
 
   getNextRecommendedCollectionNodes(): CollectionNode {
     return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getNextExplorationId());
+      this.collectionPlaythrough.getNextExplorationId()
+    );
   }
 
   getCompletedExplorationNodes(): CollectionNode {
     return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getCompletedExplorationIds());
+      this.collectionPlaythrough.getCompletedExplorationIds()
+    );
   }
 
   getNonRecommendedCollectionNodeCount(): number {
-    return this.collection.getCollectionNodeCount() - (
-      this.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
-      this.collectionPlaythrough.getCompletedExplorationNodeCount()
+    return (
+      this.collection.getCollectionNodeCount() -
+      (this.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
+        this.collectionPlaythrough.getCompletedExplorationNodeCount())
     );
   }
 
   updateExplorationPreview(explorationId: string): void {
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
-    this.summaryToPreview = this.getCollectionNodeForExplorationId(
-      explorationId).getExplorationSummaryObject();
+    this.summaryToPreview =
+      this.getCollectionNodeForExplorationId(
+        explorationId
+      ).getExplorationSummaryObject();
   }
 
   // Calculates the SVG parameters required to draw the curved path.
@@ -176,7 +182,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       // points for the bezier curve (path).
       this.y = 500;
       for (let i = 1; i < Math.floor(collectionNodeCount / 2); i++) {
-        let x = (i % 2) ? 30 : 470;
+        let x = i % 2 ? 30 : 470;
         sParameterExtension += x + ' ' + this.y + ', ';
         this.y += 20;
         sParameterExtension += 250 + ' ' + this.y + ', ';
@@ -205,14 +211,13 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     let collectionNodes = this.collection.getCollectionNodes();
     let iconParametersArray = [];
     iconParametersArray.push({
-      thumbnailIconUrl:
-        collectionNodes[0].getExplorationSummaryObject(
-        ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+      thumbnailIconUrl: collectionNodes[0]
+        .getExplorationSummaryObject()
+        .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
       left: '225px',
       top: '35px',
       thumbnailBgColor:
-        collectionNodes[0].getExplorationSummaryObject(
-        ).thumbnail_bg_color
+        collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color,
     });
 
     // Here x and y represent the co-ordinates for the icons in the
@@ -235,24 +240,20 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         y += this.ICON_Y_INCREMENT_PX;
       }
       iconParametersArray.push({
-        thumbnailIconUrl:
-          collectionNodes[i].getExplorationSummaryObject(
-          ).thumbnail_icon_url.replace(
-            'subjects', 'inverted_subjects'),
+        thumbnailIconUrl: collectionNodes[i]
+          .getExplorationSummaryObject()
+          .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
         left: x + 'px',
         top: y + 'px',
         thumbnailBgColor:
-          collectionNodes[i].getExplorationSummaryObject(
-          ).thumbnail_bg_color
+          collectionNodes[i].getExplorationSummaryObject().thumbnail_bg_color,
       });
     }
     return iconParametersArray;
   }
 
   getExplorationUrl(explorationId: string): string {
-    return (
-      '/explore/' + explorationId + '?collection_id=' +
-      this.collectionId);
+    return '/explore/' + explorationId + '?collection_id=' + this.collectionId;
   }
 
   getExplorationTitlePosition(index: number): string {
@@ -282,8 +283,8 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   isCompletedExploration(explorationId: string): boolean {
     if (this.collectionPlaythrough) {
-      let completedExplorationIds = (
-        this.collectionPlaythrough.getCompletedExplorationIds());
+      let completedExplorationIds =
+        this.collectionPlaythrough.getCompletedExplorationIds();
       return completedExplorationIds.indexOf(explorationId) > -1;
     }
     return false;
@@ -291,22 +292,19 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   async fetchSummaryAsync(collectionId: string): Promise<void> {
     let summary = null;
-    this.collectionPlayerBackendApiService.fetchCollectionSummariesAsync(
-      collectionId
-    ).then((collectionSummary) => {
-      summary = collectionSummary;
-      if (summary) {
-        this.collectionSummary = summary.summaries[0];
-      }
-    });
+    this.collectionPlayerBackendApiService
+      .fetchCollectionSummariesAsync(collectionId)
+      .then(collectionSummary => {
+        summary = collectionSummary;
+        if (summary) {
+          this.collectionSummary = summary.summaries[0];
+        }
+      });
   }
 
   updateCollection(collection: Collection): void {
     this.collection = collection;
-    if (
-      this.collection !== null &&
-      this.collection.getCollectionNodeCount()
-    ) {
+    if (this.collection !== null && this.collection.getCollectionNodeCount()) {
       this.generatePathParameters();
     }
   }
@@ -321,9 +319,11 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_COLLECTION_PLAYER_PAGE_TITLE', {
-        collectionTitle: this.collection.getTitle()
-      });
+      'I18N_COLLECTION_PLAYER_PAGE_TITLE',
+      {
+        collectionTitle: this.collection.getTitle(),
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -346,52 +346,48 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
-    this.whitelistedCollectionIdsForGuestProgress = (
-      AppConstants.WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
+    this.allowedCollectionIdsForGuestProgress =
+      AppConstants.ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS;
 
     this.fetchSummaryAsync(this.collectionId);
 
     // Load the collection the learner wants to view.
-    this.readOnlyCollectionBackendApiService.loadCollectionAsync(
-      this.collectionId).then(
-      (collection) => {
-        this.updateCollection(collection);
-        // The onLangChange event is initially fired before the collection is
-        // loaded. Hence the first setpageTitle() call needs to made
-        // manually, and the onLangChange subscription is added after
-        // the collection is loaded.
-        this.setPageTitle();
-        this.subscribeToOnLangChange();
+    this.readOnlyCollectionBackendApiService
+      .loadCollectionAsync(this.collectionId)
+      .then(
+        collection => {
+          this.updateCollection(collection);
+          // The onLangChange event is initially fired before the collection is
+          // loaded. Hence the first setpageTitle() call needs to made
+          // manually, and the onLangChange subscription is added after
+          // the collection is loaded.
+          this.setPageTitle();
+          this.subscribeToOnLangChange();
 
-        // Load the user's current progress in the collection. If the
-        // user is a guest, then either the defaults from the server
-        // will be used or the user's local progress, if any has been
-        // made and the collection is whitelisted.
-        this.userService.getUserInfoAsync().then((userInfo) => {
-          this.loaderService.hideLoadingScreen();
-          this.isLoggedIn = userInfo.isLoggedIn();
-          this.collectionPlaythrough = collection.getPlaythrough();
-          this.nextExplorationId =
-            this.collectionPlaythrough.getNextExplorationId();
-        });
-      },
-      () => {
-        // TODO(bhenning): Handle not being able to load the collection.
-        // NOTE TO DEVELOPERS: Check the backend console for an
-        // indication as to why this error occurred; sometimes the
-        // errors are noisy, so they are not shown to the user.
-        this.alertsService.addWarning(
-          'There was an error loading the collection.');
-      }
-    );
+          // Load the user's current progress in the collection. If the
+          // user is a guest, then either the defaults from the server
+          // will be used or the user's local progress, if any has been
+          // made and the collection is whitelisted.
+          this.userService.getUserInfoAsync().then(userInfo => {
+            this.loaderService.hideLoadingScreen();
+            this.isLoggedIn = userInfo.isLoggedIn();
+            this.collectionPlaythrough = collection.getPlaythrough();
+            this.nextExplorationId =
+              this.collectionPlaythrough.getNextExplorationId();
+          });
+        },
+        () => {
+          // NOTE TO DEVELOPERS: Check the backend console for an
+          // indication as to why this error occurred; sometimes the
+          // errors are noisy, so they are not shown to the user.
+          this.alertsService.addWarning(
+            'There was an error loading the collection.'
+          );
+        }
+      );
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaCollectionPlayerPage',
-  downgradeComponent({
-    component: CollectionPlayerPageComponent
-  }) as angular.IDirectiveFactory);

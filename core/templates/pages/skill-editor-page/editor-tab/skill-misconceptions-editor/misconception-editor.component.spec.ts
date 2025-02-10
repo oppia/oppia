@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for MisconceptionEditorComponent
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ConceptCard } from 'domain/skill/concept-card.model';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { MisconceptionEditorComponent } from './misconception-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {MisconceptionEditorComponent} from './misconception-editor.component';
 
 describe('Misconception Editor Component', () => {
   let component: MisconceptionEditorComponent;
@@ -36,15 +36,13 @@ describe('Misconception Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        MisconceptionEditorComponent
-      ],
+      declarations: [MisconceptionEditorComponent],
       providers: [
         ChangeDetectorRef,
         SkillEditorStateService,
-        SkillUpdateService
+        SkillUpdateService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,8 +53,18 @@ describe('Misconception Editor Component', () => {
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     sampleSkill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1',
+      'description',
+      [],
+      [],
+      {} as ConceptCard,
+      'en',
+      1,
+      0,
+      'id1',
+      false,
+      []
+    );
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
 
     component.isEditable = true;
@@ -79,7 +87,7 @@ describe('Misconception Editor Component', () => {
 
       isMandatory(): boolean {
         return false;
-      }
+      },
     } as Misconception;
     component.ngOnInit();
   });
@@ -117,7 +125,9 @@ describe('Misconception Editor Component', () => {
 
   it('should save name when clicking on save button', () => {
     let updateNameSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionName').and.returnValue();
+      skillUpdateService,
+      'updateMisconceptionName'
+    ).and.returnValue();
     component.openNameEditor();
     // Setting new name.
     component.container.misconceptionName = 'newName';
@@ -129,7 +139,9 @@ describe('Misconception Editor Component', () => {
 
   it('should save notes when clicking on save button', () => {
     let updateNotesSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionNotes').and.returnValue();
+      skillUpdateService,
+      'updateMisconceptionNotes'
+    ).and.returnValue();
     component.openNotesEditor();
     // Setting new notes content.
     component.container.misconceptionNotes = 'newNotes';
@@ -141,7 +153,9 @@ describe('Misconception Editor Component', () => {
 
   it('should save feedback when clicking on save button', () => {
     let updateFeedbackSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionFeedback').and.returnValue();
+      skillUpdateService,
+      'updateMisconceptionFeedback'
+    ).and.returnValue();
     component.openFeedbackEditor();
     // Setting new feedback content.
     component.container.misconceptionFeedback = 'newFeedback';
@@ -149,7 +163,11 @@ describe('Misconception Editor Component', () => {
     component.saveFeedback();
 
     expect(updateFeedbackSpy).toHaveBeenCalledWith(
-      sampleSkill, 1, 'feedback', 'newFeedback');
+      sampleSkill,
+      1,
+      'feedback',
+      'newFeedback'
+    );
   });
 
   it('should close name editor when clicking on cancel button', () => {
@@ -188,16 +206,16 @@ describe('Misconception Editor Component', () => {
     expect(component.feedbackEditorIsOpen).toBe(false);
   });
 
-  it('should address the misconception\'s updates', () => {
+  it("should address the misconception's updates", () => {
     let updatesSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionMustBeAddressed')
-      .and.returnValue();
+      skillUpdateService,
+      'updateMisconceptionMustBeAddressed'
+    ).and.returnValue();
     spyOn(component.onMisconceptionChange, 'emit').and.callThrough();
 
     component.updateMustBeAddressed();
 
-    expect(updatesSpy).toHaveBeenCalledWith(
-      sampleSkill, 1, true, false);
+    expect(updatesSpy).toHaveBeenCalledWith(sampleSkill, 1, true, false);
     expect(component.onMisconceptionChange.emit).toHaveBeenCalled();
   });
 });

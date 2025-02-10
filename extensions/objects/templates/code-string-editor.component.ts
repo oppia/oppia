@@ -20,15 +20,15 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 @Component({
   selector: 'code-string-editor',
   templateUrl: './code-string-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CodeStringEditorComponent implements OnInit {
   @Input() alwaysEditable: boolean = false;
@@ -70,6 +70,8 @@ export class CodeStringEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'codeStringEditor', downgradeComponent({
-    component: CodeStringEditorComponent
-  }) as angular.IDirectiveFactory);
+  'codeStringEditor',
+  downgradeComponent({
+    component: CodeStringEditorComponent,
+  }) as angular.IDirectiveFactory
+);

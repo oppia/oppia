@@ -1,0 +1,1 @@
+core/templates/pages/admin-page/admin-page.module.ts

@@ -27,8 +27,7 @@ from core.jobs.batch_jobs import topic_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = True
 if MYPY:
@@ -64,7 +63,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -85,7 +85,8 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()
@@ -321,7 +322,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         first_topic_summary_model.update_timestamps()
         first_topic_summary_model.put()
@@ -342,7 +344,8 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={}
         )
         second_topic_summary_model.update_timestamps()
         second_topic_summary_model.put()

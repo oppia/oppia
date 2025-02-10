@@ -16,31 +16,42 @@
  * @fileoverview Component for the topics and skills dashboard.
  */
 
-import { Component, HostListener } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { CategorizedSkills, TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicsAndSkillsDashboardFilter } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+import {Component, HostListener} from '@angular/core';
+import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {
+  CategorizedSkills,
+  TopicsAndSkillsDashboardBackendApiService,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {TopicsAndSkillsDashboardFilter} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 import debounce from 'lodash/debounce';
-import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ETopicPublishedOptions, TopicsAndSkillsDashboardPageConstants } from './topics-and-skills-dashboard-page.constants';
-import { TopicsAndSkillsDashboardPageService } from './topics-and-skills-dashboard-page.service';
+import {CreateNewSkillModalService} from 'pages/topic-editor-page/services/create-new-skill-modal.service';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {
+  ETopicPublishedOptions,
+  ETopicStatusOptions,
+  TopicsAndSkillsDashboardPageConstants,
+} from './topics-and-skills-dashboard-page.constants';
+import {TopicsAndSkillsDashboardPageService} from './topics-and-skills-dashboard-page.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
-type TopicPublishedOptionsKeys = (
-  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
-type TopicSortOptionsKeys = (
-  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
-type SkillStatusOptionsKeys = (
-  keyof typeof TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS);
+type TopicPublishedOptionsKeys =
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS;
+type TopicStatusOptionsKeys =
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS;
+type TopicSortOptionsKeys =
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS;
+type TopicSortingOptionsKeys =
+  keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS;
+type SkillStatusOptionsKeys =
+  keyof typeof TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS;
 
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page',
-  templateUrl: './topics-and-skills-dashboard-page.component.html'
+  templateUrl: './topics-and-skills-dashboard-page.component.html',
 })
 export class TopicsAndSkillsDashboardPageComponent {
   directiveSubscriptions: Subscription = new Subscription();
@@ -81,22 +92,23 @@ export class TopicsAndSkillsDashboardPageComponent {
   skillPageNumber: number = 0;
   lastSkillPage: number = 0;
   itemsPerPageChoice: number[] = [10, 15, 20];
-  classrooms: string[] = [];
+  classrooms: string[] = [
+    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS,
+  ];
   sortOptions: string[] = [];
-  statusOptions: ETopicPublishedOptions[] = [];
+  statusOptions: (ETopicPublishedOptions | ETopicStatusOptions)[] = [];
   displayedTopicSummaries: CreatorTopicSummary[] = [];
   displayedSkillSummaries: SkillSummary[] = [];
   skillStatusOptions: string[] = [];
-
+  windowWidth: number = window.innerWidth;
   constructor(
     private focusManagerService: FocusManagerService,
     private createNewSkillModalService: CreateNewSkillModalService,
     private topicCreationService: TopicCreationService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
-    private topicsAndSkillsDashboardPageService:
-    TopicsAndSkillsDashboardPageService,
-    private windowDimensionsService: WindowDimensionsService
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardPageService: TopicsAndSkillsDashboardPageService,
+    private windowDimensionsService: WindowDimensionsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -107,25 +119,55 @@ export class TopicsAndSkillsDashboardPageComponent {
     for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS) {
       this.sortOptions.push(
         TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS[
-          key as TopicSortOptionsKeys]);
+          key as TopicSortOptionsKeys
+        ]
+      );
     }
 
-    for (let key in TopicsAndSkillsDashboardPageConstants
-      .TOPIC_PUBLISHED_OPTIONS) {
+    if (
+      this.platformFeatureService.status.SerialChapterLaunchCurriculumAdminView
+        .isEnabled
+    ) {
+      this.sortOptions = [];
+      for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS) {
+        this.sortOptions.push(
+          TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS[
+            key as TopicSortingOptionsKeys
+          ]
+        );
+      }
+    }
+
+    for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS) {
       this.statusOptions.push(
         TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS[
-          key as TopicPublishedOptionsKeys]);
+          key as TopicPublishedOptionsKeys
+        ]
+      );
+    }
+
+    if (
+      this.platformFeatureService.status.SerialChapterLaunchCurriculumAdminView
+        .isEnabled
+    ) {
+      this.statusOptions = [];
+      for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS) {
+        this.statusOptions.push(
+          TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS[
+            key as TopicStatusOptionsKeys
+          ]
+        );
+      }
     }
 
     this.fetchSkillsDebounced = debounce(this.fetchSkills, 300);
 
     this.directiveSubscriptions.add(
-      this.topicsAndSkillsDashboardBackendApiService.
-        onTopicsAndSkillsDashboardReinitialized.subscribe(
-          (stayInSameTab: boolean) => {
-            this._initDashboard(stayInSameTab);
-          }
-        )
+      this.topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.subscribe(
+        (stayInSameTab: boolean) => {
+          this._initDashboard(stayInSameTab);
+        }
+      )
     );
     this._initDashboard(false);
   }
@@ -154,8 +196,8 @@ export class TopicsAndSkillsDashboardPageComponent {
     let totalSkillsPresent: number = this.skillSummaries.length;
     // Here +1 is used since we are checking the next page and
     // another +1 because page numbers start from 0.
-    let numberOfSkillsRequired: number = (
-      (this.skillPageNumber + 2) * this.itemsPerPage);
+    let numberOfSkillsRequired: number =
+      (this.skillPageNumber + 2) * this.itemsPerPage;
 
     return totalSkillsPresent >= numberOfSkillsRequired;
   }
@@ -180,11 +222,12 @@ export class TopicsAndSkillsDashboardPageComponent {
     this.skillStatusOptions = [];
     this.moreSkillsPresent = true;
     this.firstTimeFetchingSkills = true;
-    for (let key in TopicsAndSkillsDashboardPageConstants
-      .SKILL_STATUS_OPTIONS) {
+    for (let key in TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS) {
       this.skillStatusOptions.push(
         TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS[
-          key as SkillStatusOptionsKeys]);
+          key as SkillStatusOptionsKeys
+        ]
+      );
     }
     this.applyFilters();
   }
@@ -205,16 +248,17 @@ export class TopicsAndSkillsDashboardPageComponent {
       this.topicPageNumber = pageNumber;
       this.pageNumber = this.topicPageNumber;
       this.currentCount = this.topicSummaries.length;
-      this.displayedTopicSummaries =
-              this.topicSummaries.slice(
-                pageNumber * this.itemsPerPage,
-                (pageNumber + 1) * this.itemsPerPage);
+      this.displayedTopicSummaries = this.topicSummaries.slice(
+        pageNumber * this.itemsPerPage,
+        (pageNumber + 1) * this.itemsPerPage
+      );
     } else if (this.activeTab === this.TAB_NAME_SKILLS) {
       this.skillPageNumber = pageNumber;
       this.pageNumber = this.skillPageNumber;
       this.displayedSkillSummaries = this.skillSummaries.slice(
         pageNumber * this.itemsPerPage,
-        (pageNumber + 1) * this.itemsPerPage);
+        (pageNumber + 1) * this.itemsPerPage
+      );
     }
   }
 
@@ -222,21 +266,26 @@ export class TopicsAndSkillsDashboardPageComponent {
     if (this.moreSkillsPresent) {
       this.topicsAndSkillsDashboardBackendApiService
         .fetchSkillsDashboardDataAsync(
-          this.filterObject, this.itemsPerPage, this.nextCursor).then(
-          (response) => {
-            this.moreSkillsPresent = response.more;
-            this.nextCursor = response.nextCursor;
-            this.skillSummaries.push(...response.skillSummaries);
-            this.currentCount = this.skillSummaries.length;
-            if (this.firstTimeFetchingSkills) {
-              this.goToPageNumber(0);
-              this.firstTimeFetchingSkills = false;
-            } else {
-              this.goToPageNumber(this.pageNumber + 1);
-            }
-          });
-    } else if (this.skillSummaries.length >
-            ((this.skillPageNumber + 1) * this.itemsPerPage)) {
+          this.filterObject,
+          this.itemsPerPage,
+          this.nextCursor
+        )
+        .then(response => {
+          this.moreSkillsPresent = response.more;
+          this.nextCursor = response.nextCursor;
+          this.skillSummaries.push(...response.skillSummaries);
+          this.currentCount = this.skillSummaries.length;
+          if (this.firstTimeFetchingSkills) {
+            this.goToPageNumber(0);
+            this.firstTimeFetchingSkills = false;
+          } else {
+            this.goToPageNumber(this.pageNumber + 1);
+          }
+        });
+    } else if (
+      this.skillSummaries.length >
+      (this.skillPageNumber + 1) * this.itemsPerPage
+    ) {
       this.goToPageNumber(this.pageNumber + 1);
     }
   }
@@ -258,12 +307,13 @@ export class TopicsAndSkillsDashboardPageComponent {
    * page to left or right by 1.
    */
   changePageByOne(direction: string): void {
-    this.lastPage = parseInt(
-      String(this.currentCount / this.itemsPerPage));
+    this.lastPage = parseInt(String(this.currentCount / this.itemsPerPage));
     if (direction === this.MOVE_TO_PREV_PAGE && this.pageNumber >= 1) {
       this.goToPageNumber(this.pageNumber - 1);
-    } else if (direction === this.MOVE_TO_NEXT_PAGE &&
-            this.pageNumber < this.lastPage - 1) {
+    } else if (
+      direction === this.MOVE_TO_NEXT_PAGE &&
+      this.pageNumber < this.lastPage - 1
+    ) {
       this.goToPageNumber(this.pageNumber + 1);
     }
   }
@@ -277,12 +327,16 @@ export class TopicsAndSkillsDashboardPageComponent {
       this.fetchSkills();
       return;
     }
-    this.topicSummaries = (
+    this.topicSummaries =
       this.topicsAndSkillsDashboardPageService.getFilteredTopics(
-        this.totalTopicSummaries, this.filterObject));
+        this.totalTopicSummaries,
+        this.filterObject
+      );
 
-    this.displayedTopicSummaries =
-            this.topicSummaries.slice(0, this.itemsPerPage);
+    this.displayedTopicSummaries = this.topicSummaries.slice(
+      0,
+      this.itemsPerPage
+    );
     this.currentCount = this.topicSummaries.length;
     this.goToPageNumber(0);
   }
@@ -301,14 +355,17 @@ export class TopicsAndSkillsDashboardPageComponent {
 
   @HostListener('window:resize')
   filterBoxOnResize(): void {
-    this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    if (window.innerWidth !== this.windowWidth) {
+      this.windowWidth = window.innerWidth;
+      this.filterBoxIsShown = !this.windowDimensionsService.isWindowNarrow();
+    }
   }
 
   getUpperLimitValueForPagination(): number {
-    return (
-      Math.min((
-        (this.pageNumber * this.itemsPerPage) +
-          this.itemsPerPage), this.currentCount));
+    return Math.min(
+      this.pageNumber * this.itemsPerPage + this.itemsPerPage,
+      this.currentCount
+    );
   }
 
   getTotalCountValueForSkills(): number | string {
@@ -327,17 +384,19 @@ export class TopicsAndSkillsDashboardPageComponent {
    * Calls the TopicsAndSkillsDashboardBackendApiService and fetches
    * the topics and skills dashboard data.
    * @param {Boolean} stayInSameTab - To stay in the same tab or not.
-  */
+   */
   _initDashboard(stayInSameTab: boolean): void {
-    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-      .then((response) => {
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then(response => {
         this.totalTopicSummaries = response.topicSummaries;
         this.topicSummaries = this.totalTopicSummaries;
         this.totalEntityCountToDisplay = this.topicSummaries.length;
         this.currentCount = this.totalEntityCountToDisplay;
         this.applyFilters();
-        this.editableTopicSummaries = this.topicSummaries
-          .filter((summary) => summary.canEditTopic === true);
+        this.editableTopicSummaries = this.topicSummaries.filter(
+          summary => summary.canEditTopic === true
+        );
         this.focusManagerService.setFocus('createTopicBtn');
         this.totalSkillCount = response.totalSkillCount;
         this.skillsCategorizedByTopics = response.categorizedSkillsDict;
@@ -353,16 +412,16 @@ export class TopicsAndSkillsDashboardPageComponent {
         this.userCanDeleteSkill = response.canDeleteSkill;
         this.userCanDeleteTopic = response.canDeleteTopic;
 
-        if (this.topicSummaries.length === 0 &&
-            this.untriagedSkillSummaries.length !== 0) {
+        if (
+          this.topicSummaries.length === 0 &&
+          this.untriagedSkillSummaries.length !== 0
+        ) {
           this.activeTab = this.TAB_NAME_SKILLS;
           this.initSkillDashboard();
           this.focusManagerService.setFocus('createSkillBtn');
         }
-        this.classrooms = response.allClassroomNames;
+
+        this.classrooms.push(...response.allClassroomNames);
       });
   }
 }
-
-angular.module('oppia').directive('oppiaTopicsAndSkillsDashboardPage',
-  downgradeComponent({ component: TopicsAndSkillsDashboardPageComponent }));

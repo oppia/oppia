@@ -1,0 +1,20 @@
+name: Check Workflow Status
+description: 'Checks the status of the workflow using the status of its jobs.'
+
+inputs:
+  jobs:
+    description: 'The jobs to check the status of, should be in JSON.'
+    required: true
+
+outputs:
+  WORKFLOW_STATUS:
+    description: 'The status of the workflow. Can be "success" or "failure".'
+    value: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check workflow status
+      id: check_workflow_status
+      run: python -m scripts.check_github_workflow_status --jobs '${{ inputs.jobs }}'
+      shell: bash

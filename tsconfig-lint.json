@@ -67,9 +67,6 @@
       "services/*": [
         "core/templates/services/*"
       ],
-      "classifiers/*": [
-        "extensions/classifiers/*"
-      ],
       "interactions/*": [
         "extensions/interactions/*"
       ],
@@ -117,9 +114,16 @@
   "include": [
     "core",
     "extensions",
-    "typings"
+    "typings",
+    "core/tests/puppeteer-acceptance-tests",
+    "core/tests/test-dependencies"
   ],
   "exclude": [
-    "core/tests"
+    "core/tests/build_sources",
+    "core/tests/data",
+    "core/tests/release_sources",
+    "core/tests/services_sources",
+    "core/tests/puppeteer-acceptance-tests/build",
+    "core/tests/test-dependencies/*.js"
   ]
 }

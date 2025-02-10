@@ -1,36 +1,37 @@
 # NOTE TO DEVELOPERS: If you make changes to this file, please run
 #
-#    python -m scripts.install_third_party
+#    python -m scripts.install_third_party_libs
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.38.0
+apache-beam[gcp]==2.43.0
 beautifulsoup4==4.10.0
 bleach==4.1.0
-certifi==2022.12.7
+certifi==2023.7.22
 deepdiff==5.8.1
 defusedxml==0.7.1
 elasticsearch==7.17.0
 firebase-admin==5.2.0
 future==0.18.3
-googledatastore==7.0.2
-google-cloud-storage==2.1.0
-google-auth==1.35.0
-google-cloud-dataflow-client==0.3.1
-google-cloud-logging==3.0.0
+google-cloud-storage==2.18.2
+google-auth==2.35.0
+google-cloud-bigquery==3.26.0
+google-cloud-dataflow-client==0.8.13
+google-cloud-logging==3.11.3
 google-cloud-ndb==1.11.1
-google-cloud-secret-manager==2.12.4
-google-cloud-tasks==2.7.2
-google-cloud-translate==3.6.1
+google-cloud-secret-manager==2.21.0
+google-cloud-tasks==2.17.0
+google-cloud-translate==3.17.0
 gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
 mutagen==1.45.1
-Pillow==9.5.0
+packaging==24.0
+Pillow==10.1.0
 pylatexenc==2.10
-pytest==6.2.5
+pytest==7.4.4
 PyYAML==6.0
 redis==3.5.3
-requests==2.26.0
+requests==2.31.0
 requests-mock==1.9.3
 requests-toolbelt==0.9.1
 result==0.6.0
@@ -39,6 +40,6 @@ simplejson==3.17.5
 six==1.16.0
 soupsieve==2.3.1
 typing-extensions==4.5.0
-urllib3==1.26.7
+urllib3==1.26.18
 webapp2==3.0.0b1
 webencodings==0.5.1

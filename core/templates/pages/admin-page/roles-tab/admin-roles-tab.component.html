@@ -137,6 +137,9 @@
                     <button *ngIf="role === 'TOPIC_MANAGER'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTopicManagerRoleEditor()">
                       <mat-icon matListIcon>edit</mat-icon>
                     </button>
+                    <button *ngIf="role === 'TRANSLATION_COORDINATOR'" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="openTranslationCoordinatorRoleEditor()" class="e2e-test-edit-language-button">
+                      <mat-icon matListIcon>edit</mat-icon>
+                    </button>
                     <div class="e2e-test-{{HUMAN_READABLE_ROLES[role].split(' ').join('-')}}-remove-button-container">
                       <button *ngIf="VIEWABLE_ROLES.includes(role)"
                               mat-button matSuffix mat-icon-button

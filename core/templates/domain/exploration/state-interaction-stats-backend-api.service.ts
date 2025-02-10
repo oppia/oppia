@@ -16,56 +16,68 @@
  * @fileoverview Backend api service for state interaction stats.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   VisualizationInfoBackendDict,
   VisualizationInfo,
 } from 'domain/exploration/visualization-info.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface StateInteractionStatsBackendDict {
-  'visualizations_info': VisualizationInfoBackendDict[];
+  visualizations_info: VisualizationInfoBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateInteractionStatsBackendApiService {
-  STATE_INTERACTION_STATS_URL_TEMPLATE: string = (
-    '/createhandler/state_interaction_stats/<exploration_id>/<state_name>');
+  STATE_INTERACTION_STATS_URL_TEMPLATE: string =
+    '/createhandler/state_interaction_stats/<exploration_id>/<state_name>';
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async getStatsAsync(
-      explorationId: string,
-      name: string
+    explorationId: string,
+    name: string
   ): Promise<VisualizationInfo[]> {
     return new Promise((resolve, reject) => {
-      this.http.get<StateInteractionStatsBackendDict>(
-        this.urlInterpolationService.interpolateUrl(
-          this.STATE_INTERACTION_STATS_URL_TEMPLATE, {
-            exploration_id: explorationId,
-            state_name: name
-          })).toPromise().then(backendDict => {
-        let visualizationInfoObjects = backendDict.visualizations_info.map((
-            visInfoDict) => {
-          return VisualizationInfo.createFromBackendDict(
-            visInfoDict);
-        });
-        resolve(visualizationInfoObjects);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<StateInteractionStatsBackendDict>(
+          this.urlInterpolationService.interpolateUrl(
+            this.STATE_INTERACTION_STATS_URL_TEMPLATE,
+            {
+              exploration_id: explorationId,
+              state_name: name,
+            }
+          )
+        )
+        .toPromise()
+        .then(
+          backendDict => {
+            let visualizationInfoObjects = backendDict.visualizations_info.map(
+              visInfoDict => {
+                return VisualizationInfo.createFromBackendDict(visInfoDict);
+              }
+            );
+            resolve(visualizationInfoObjects);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'StateInteractionStatsBackendApiService',
-  downgradeInjectable(StateInteractionStatsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'StateInteractionStatsBackendApiService',
+    downgradeInjectable(StateInteractionStatsBackendApiService)
+  );

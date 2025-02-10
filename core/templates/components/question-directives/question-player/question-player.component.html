@@ -99,7 +99,6 @@
               (click)="performAction(actionButton)">
           <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
                role="button"
-               [attr.aria-label]="getActionButtonLabel(actionButton.type)"
                tabindex="0"
                *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)">
             <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>

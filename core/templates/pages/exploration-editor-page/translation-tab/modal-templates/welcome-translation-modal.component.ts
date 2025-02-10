@@ -16,31 +16,33 @@
  * @fileoverview Component for the welcome translation modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-welcome-translation-modal',
-  templateUrl: './welcome-translation-modal.component.html'
+  templateUrl: './welcome-translation-modal.component.html',
 })
-
 export class WelcomeTranslationModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   translationWelcomeImgUrl!: string;
+  @ViewChild('welcome') welcomeHeading!: ElementRef;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
     private contextService: ContextService,
-    private siteAnalyticsService: SiteAnalyticsService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {
     super(ngbActiveModal);
   }
@@ -48,8 +50,12 @@ export class WelcomeTranslationModalComponent
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
-      this.explorationId);
-    this.translationWelcomeImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/editor_welcome.svg');
+      this.explorationId
+    );
+    this.translationWelcomeImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/editor_welcome.svg'
+      );
+    this.welcomeHeading?.nativeElement.focus();
   }
 }

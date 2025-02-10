@@ -16,16 +16,16 @@
  * @fileoverview Component for thumbnail display.
  */
 
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {SafeResourceUrl} from '@angular/platform-browser';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'oppia-thumbnail-display',
   templateUrl: './thumbnail-display.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -37,8 +37,6 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   @Input() background!: string;
   // This property will be null when the SVG uploaded is not valid.
   imageSourceInView: SafeResourceUrl | null = null;
-  height = '180px';
-  width = '320px';
 
   constructor(private svgSanitizerService: SvgSanitizerService) {}
 
@@ -55,26 +53,26 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') === 0) {
       const safeResourceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        this.imgSrc);
+        this.imgSrc
+      );
       if (safeResourceUrl !== null) {
         this.imageSourceInView = safeResourceUrl;
       }
     } else {
       this.imageSourceInView = this.imgSrc;
     }
-    this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
   }
 
   ngOnChanges(): void {
     if (this.imgSrc !== undefined) {
       this.updateSvgInViewIfSafe();
-      this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
-      this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
     }
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaThumbnailDisplay', downgradeComponent(
-    {component: ThumbnailDisplayComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaThumbnailDisplay',
+    downgradeComponent({component: ThumbnailDisplayComponent})
+  );

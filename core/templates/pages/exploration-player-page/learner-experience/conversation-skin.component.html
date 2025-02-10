@@ -1,6 +1,6 @@
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards e2e-test-conversation-skin-cards-container"
-       [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
+       [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards,'animate-to-one-card': isAnimatingToOneCard,'conversation-skin-cards-container-embedded': isIframed}">
 
     <div class="conversation-skin-tutor-card-container"
          [ngClass]="{'conversation-skin-animate-tutor-card-on-narrow':
@@ -65,7 +65,7 @@
         </div>
         <div>
           <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-            <button mat-button class="md-raised oppia-button-raised">
+            <button mat-button class="md-raised oppia-button-raised e2e-test-next-lesson-button">
               <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
             </button>
           </a>
@@ -100,7 +100,7 @@
 <div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
   <div id="toast-container" class="toast-top-center toast-container">
     <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
-      <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
+      <div aria-live="polite" role="alertdialog" class="toast-message e2e-test-lesson-completion-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
         {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
       </div>
     </div>

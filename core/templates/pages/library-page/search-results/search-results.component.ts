@@ -16,19 +16,19 @@
  * @fileoverview Component for showing search results.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
-import { SearchService } from 'services/search.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {SearchService} from 'services/search.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-search-results',
-  templateUrl: './search-results.component.html'
+  templateUrl: './search-results.component.html',
 })
 export class SearchResultsComponent {
   directiveSubscriptions = new Subscription();
@@ -44,8 +44,8 @@ export class SearchResultsComponent {
     private userService: UserService
   ) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticAssetUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
   onRedirectToLogin(destinationUrl: string): boolean {
@@ -59,7 +59,7 @@ export class SearchResultsComponent {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
-    userInfoPromise.then((userInfo) => {
+    userInfoPromise.then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
 
@@ -67,14 +67,15 @@ export class SearchResultsComponent {
     // the server.
     this.directiveSubscriptions.add(
       this.searchService.onInitialSearchResultsLoaded.subscribe(
-        (activityList) => {
+        activityList => {
           this.someResultsExist = activityList.length > 0;
-          userInfoPromise.then((userInfo) => {
+          userInfoPromise.then(userInfo => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             this.loaderService.hideLoadingScreen();
             this.siteAnalyticsService.registerSearchResultsViewedEvent();
           });
-        })
+        }
+      )
     );
   }
 
@@ -83,7 +84,9 @@ export class SearchResultsComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaSearchResults',
+angular.module('oppia').directive(
+  'oppiaSearchResults',
   downgradeComponent({
-    component: SearchResultsComponent
-  }) as angular.IDirectiveFactory);
+    component: SearchResultsComponent,
+  }) as angular.IDirectiveFactory
+);

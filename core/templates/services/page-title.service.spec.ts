@@ -16,9 +16,9 @@
  * @fileoverview Unit test for the page title service.
  */
 
-import { PageTitleService } from 'services/page-title.service';
-import { TestBed } from '@angular/core/testing';
-import { Title, Meta } from '@angular/platform-browser';
+import {PageTitleService} from 'services/page-title.service';
+import {TestBed} from '@angular/core/testing';
+import {Title, Meta} from '@angular/platform-browser';
 
 describe('Page title service', () => {
   let pts: PageTitleService;
@@ -27,7 +27,7 @@ describe('Page title service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [PageTitleService, Title, Meta]
+      providers: [PageTitleService, Title, Meta],
     });
     titleService = TestBed.inject(Title);
     metaTagService = TestBed.inject(Meta);
@@ -73,15 +73,15 @@ describe('Page title service', () => {
     expect(updateTagSpy).toHaveBeenCalledTimes(3);
     expect(updateTagSpy).toHaveBeenCalledWith({
       name: 'description',
-      content: 'description_text'
+      content: 'description_text',
     });
     expect(updateTagSpy).toHaveBeenCalledWith({
       itemprop: 'description',
-      content: 'description_text'
+      content: 'description_text',
     });
     expect(updateTagSpy).toHaveBeenCalledWith({
       property: 'og:description',
-      content: 'description_text'
+      content: 'description_text',
     });
   });
 

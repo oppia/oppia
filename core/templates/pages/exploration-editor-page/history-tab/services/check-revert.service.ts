@@ -16,15 +16,16 @@
  * @fileoverview Service for passing exploration revert details.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CheckRevertService {
   detailsEventEmitter: EventEmitter<string> = new EventEmitter<string>();
 }
 
-angular.module('oppia').factory(
-  'CheckRevertService', downgradeInjectable(CheckRevertService));
+angular
+  .module('oppia')
+  .factory('CheckRevertService', downgradeInjectable(CheckRevertService));

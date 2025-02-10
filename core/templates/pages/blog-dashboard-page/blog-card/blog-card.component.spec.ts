@@ -16,17 +16,20 @@
  * @fileoverview Unit tests for Blog Card component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
-import { BlogCardComponent } from './blog-card.component';
-import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserService } from 'services/user.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {MockTranslatePipe, MockCapitalizePipe} from 'tests/unit-test-utils';
+import {BlogCardComponent} from './blog-card.component';
+import {
+  BlogPostSummaryBackendDict,
+  BlogPostSummary,
+} from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UserService} from 'services/user.service';
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogCardComponent;
@@ -40,7 +43,7 @@ describe('Blog Dashboard Tile Component', () => {
       location: {
         href: '',
         hash: '/',
-        reload: () => { }
+        reload: () => {},
       },
     };
   }
@@ -48,26 +51,21 @@ describe('Blog Dashboard Tile Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        BlogCardComponent,
-        MockTranslatePipe,
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [BlogCardComponent, MockTranslatePipe],
       providers: [
         {
           provide: CapitalizePipe,
-          useClass: MockCapitalizePipe
+          useClass: MockCapitalizePipe,
         },
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         UrlInterpolationService,
         ContextService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -90,33 +88,32 @@ describe('Blog Dashboard Tile Component', () => {
       last_updated: '11/21/2014',
       published_on: '11/21/2014',
     };
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
   });
 
-  it('should get formatted date string from the timestamp in milliseconds',
-    () => {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let DATE = '11/21/2014';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('November 21, 2014');
+  it('should get formatted date string from the timestamp in milliseconds', () => {
+    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+    let DATE = '11/21/2014';
+    expect(component.getDateStringInWords(DATE)).toBe('November 21, 2014');
 
-      DATE = '01/16/2027';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('January 16, 2027');
+    DATE = '01/16/2027';
+    expect(component.getDateStringInWords(DATE)).toBe('January 16, 2027');
 
-      DATE = '02/02/2018';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('February 2, 2018');
-    });
+    DATE = '02/02/2018';
+    expect(component.getDateStringInWords(DATE)).toBe('February 2, 2018');
+  });
 
   it('should initialize', () => {
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
     spyOn(contextService, 'isInBlogPostEditorPage').and.returnValue(true);
 
     component.ngOnInit();
@@ -124,8 +121,8 @@ describe('Blog Dashboard Tile Component', () => {
     expect(component.authorProfilePicPngUrl).toEqual('default-image-url-png');
     expect(component.authorProfilePicWebpUrl).toEqual('default-image-url-webp');
     expect(component.thumbnailUrl).toBe(
-      '/assetsdevhandler/blog_post/sampleId/assets/' +
-      'thumbnail/image.png');
+      '/assetsdevhandler/blog_post/sampleId/assets/' + 'thumbnail/image.png'
+    );
     expect(component.publishedDateString).toBe('November 21, 2014');
     expect(component.blogCardPreviewModeIsActive).toBeTrue();
   });
@@ -143,7 +140,8 @@ describe('Blog Dashboard Tile Component', () => {
       last_updated: '11/21/2014',
     };
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      invalidBlogPostSummary);
+      invalidBlogPostSummary
+    );
 
     expect(() => {
       component.ngOnInit();
@@ -154,7 +152,8 @@ describe('Blog Dashboard Tile Component', () => {
     spyOn(contextService, 'isInBlogPostEditorPage').and.returnValue(true);
     sampleBlogPostSummary.thumbnail_filename = null;
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
 
     expect(component.thumbnailUrl).toBe('');
 
@@ -165,14 +164,17 @@ describe('Blog Dashboard Tile Component', () => {
 
   it('should navigate to the blog post page', () => {
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
     spyOn(contextService, 'isInBlogPostEditorPage').and.returnValue(false);
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/blog/sample-blog-post-url');
+      '/blog/sample-blog-post-url'
+    );
 
     component.navigateToBlogPostPage();
 
     expect(mockWindowRef.nativeWindow.location.href).toEqual(
-      '/blog/sample-blog-post-url');
+      '/blog/sample-blog-post-url'
+    );
   });
 });

@@ -1,9 +1,9 @@
 <div class="modal-header e2e-test-metadata-modal-header">
-  <h3>Add Some Details</h3>
+  <h3 tabindex="0">Add Some Details</h3>
 </div>
 
 <div class="modal-body oppia-long-text" *ngIf="isValueHasbeenUpdated">
-  <p>
+  <p tabindex="0">
     Just a few more things before you publish:
   </p>
   <oppia-exploration-title-editor *ngIf="requireTitleToBeSpecified"
@@ -65,7 +65,8 @@
                [matChipInputAddOnBlur]="addOnBlur"
                (matChipInputTokenEnd)="add($event)">
       </mat-chip-list>
-      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-exploration-tags-error-message">Can only contain 10 tags max</mat-hint>
+      <mat-hint *ngIf="tagIsInvalid" class="oppia-exploration-tags-error-message" align="start">Use only lowercase letters, spaces, and no duplicate tags</mat-hint>
+      <mat-hint *ngIf="explorationTags.length >= 10" class="oppia-exploration-tags-error-message" align="end">Can only contain 10 tags max</mat-hint>
     </mat-form-field>
   </p>
 </div>

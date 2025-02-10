@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the Post Publish Modal.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  template: ''
+  template: '',
 })
-
-class ChangesInHumanReadableFormComponentStub {
-}
+class ChangesInHumanReadableFormComponentStub {}
 
 class MockActiveModal {
   close(): void {
@@ -44,7 +40,7 @@ class MockActiveModal {
   }
 }
 
-describe('Post Publish Modal Controller', function() {
+describe('Post Publish Modal Controller', function () {
   let component: PostPublishModalComponent;
   let fixture: ComponentFixture<PostPublishModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -57,8 +53,8 @@ describe('Post Publish Modal Controller', function() {
     nativeWindow = {
       location: {
         protocol: 'https:',
-        host: 'www.oppia.org'
-      }
+        host: 'www.oppia.org',
+      },
     };
   }
 
@@ -66,20 +62,21 @@ describe('Post Publish Modal Controller', function() {
     TestBed.configureTestingModule({
       declarations: [
         PostPublishModalComponent,
-        ChangesInHumanReadableFormComponentStub
+        ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
         ContextService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
-        UrlInterpolationService, {
+        UrlInterpolationService,
+        {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -91,8 +88,10 @@ describe('Post Publish Modal Controller', function() {
     contextService = TestBed.inject(ContextService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue(address);
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue(address);
     fixture.detectChanges();
   });
 
@@ -100,7 +99,9 @@ describe('Post Publish Modal Controller', function() {
     expect(component.congratsImgUrl).toBe(address);
     expect(component.explorationId).toBe(explorationId);
     expect(component.explorationLinkCopied).toBe(false);
-    expect(component.explorationLink).toBe('https://www.oppia.org/explore/exp1');
+    expect(component.explorationLink).toBe(
+      'https://www.oppia.org/explore/exp1'
+    );
   });
 
   it('should close the modal', () => {

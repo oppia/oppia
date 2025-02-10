@@ -16,43 +16,41 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { CodeReplCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {CodeReplCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CodeReplValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: CodeReplCustomizationArgs): Warning[] {
+    customizationArgs: CodeReplCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
-      customizationArgs, [
-        'language',
-        'placeholder',
-        'preCode',
-        'postCode']);
+      customizationArgs,
+      ['language', 'placeholder', 'preCode', 'postCode']
+    );
 
     var language = customizationArgs.language.value;
     if (!(typeof language === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Programming language name must be a string.'
+        message: 'Programming language name must be a string.',
       });
     }
 
@@ -60,7 +58,7 @@ export class CodeReplValidationService {
     if (!(typeof placeholder === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.'
+        message: 'Placeholder text must be a string.',
       });
     }
 
@@ -68,7 +66,7 @@ export class CodeReplValidationService {
     if (!(typeof preCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The pre-code text must be a string.'
+        message: 'The pre-code text must be a string.',
       });
     }
 
@@ -76,20 +74,31 @@ export class CodeReplValidationService {
     if (!(typeof postCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The post-code text must be a string.'
+        message: 'The post-code text must be a string.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: CodeReplCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
+    stateName: string,
+    customizationArgs: CodeReplCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome | null
+  ): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'CodeReplValidationService', downgradeInjectable(CodeReplValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'CodeReplValidationService',
+    downgradeInjectable(CodeReplValidationService)
+  );

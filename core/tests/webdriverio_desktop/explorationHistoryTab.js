@@ -22,13 +22,10 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 
-var ExplorationEditorPage =
-  require('../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
-
-describe('Exploration history', function() {
+describe('Exploration history', function () {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
@@ -42,7 +39,7 @@ describe('Exploration history', function() {
   var COLOR_UNCHANGED = 'rgb(245,245,220)';
   var COLOR_RENAMED_UNCHANGED = 'rgb(255,215,0)';
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -50,7 +47,7 @@ describe('Exploration history', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should correctly display the dates of the commits', async function() {
+  it('should correctly display the dates of the commits', async function () {
     await users.createUser('userTestDate@historyTab.com', 'testDateUsername');
     await users.login('userTestDate@historyTab.com');
 
@@ -66,7 +63,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history of the states', async function() {
+  it('should display the history of the states', async function () {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);
@@ -74,17 +71,27 @@ describe('Exploration history', function() {
     // Check renaming state, editing text, editing interactions and adding
     // state.
     await explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(await forms.toRichText(
-      'enter 6 to continue'), true);
+    explorationEditorMainTab.setContent(
+      await forms.toRichText('enter 6 to continue'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'second', true, 'Equals', 6);
+      'NumericInput',
+      null,
+      'second',
+      true,
+      'Equals',
+      6
+    );
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'), true);
+      await forms.toRichText('this is card 2'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
@@ -95,325 +102,333 @@ describe('Exploration history', function() {
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
         text: 'content:',
-        highlighted: false
+        highlighted: false,
       },
       2: {
-        text: '  html: \'\'',
-        highlighted: true
+        text: "  html: ''",
+        highlighted: true,
       },
       3: {
         text: '  content_id: content_0',
-        highlighted: false
+        highlighted: false,
       },
       4: {
         text: 'classifier_model_id: null',
-        highlighted: false
+        highlighted: false,
       },
       5: {
         text: 'linked_skill_id: null',
-        highlighted: false
+        highlighted: false,
       },
       6: {
         text: 'interaction:',
-        highlighted: false
+        highlighted: false,
       },
       7: {
         text: '  answer_groups: []',
-        highlighted: true
+        highlighted: true,
       },
       8: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: true
+        highlighted: true,
       },
       9: {
         text: '  customization_args: {}',
-        highlighted: true
+        highlighted: true,
       },
       10: {
         text: '  default_outcome:',
-        highlighted: true
+        highlighted: true,
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
       11: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
-        highlighted: true
+        highlighted: true,
       },
       12: {
         text: '    dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: false,
       },
       13: {
         text: '    feedback:',
-        highlighted: false
+        highlighted: false,
       },
       14: {
-        text: '      html: \'\'',
-        highlighted: false
+        text: "      html: ''",
+        highlighted: false,
       },
       15: {
         text: '      content_id: default_outcome_1',
-        highlighted: false
+        highlighted: false,
       },
       16: {
         text: '    labelled_as_correct: false',
-        highlighted: false
+        highlighted: false,
       },
       17: {
         text: '    param_changes: []',
-        highlighted: false
+        highlighted: false,
       },
       18: {
         text: '    refresher_exploration_id: null',
-        highlighted: false
+        highlighted: false,
       },
       19: {
         text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
+        highlighted: false,
       },
       20: {
         text: '  hints: []',
-        highlighted: false
+        highlighted: false,
       },
       21: {
         text: '  id: null',
-        highlighted: true
+        highlighted: true,
       },
       22: {
         text: '  solution: null',
-        highlighted: false
+        highlighted: false,
       },
       23: {
         text: 'param_changes: []',
-        highlighted: false
+        highlighted: false,
       },
       24: {
         text: 'recorded_voiceovers:',
-        highlighted: false
+        highlighted: false,
       },
       25: {
         text: '  voiceovers_mapping:',
-        highlighted: false
+        highlighted: false,
       },
       26: {
         text: '    content_0: {}',
-        highlighted: false
+        highlighted: false,
       },
       27: {
         text: '    default_outcome_1: {}',
-        highlighted: true
+        highlighted: true,
       },
       28: {
         text: 'solicit_answer_details: false',
-        highlighted: false
+        highlighted: false,
       },
       29: {
         text: 'card_is_checkpoint: true',
-        highlighted: false
+        highlighted: false,
       },
       30: {
+        text: 'inapplicable_skill_misconception_ids: []',
+        highlighted: false,
+      },
+      31: {
         text: '',
-        highlighted: false
-      }
+        highlighted: false,
+      },
     };
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
         text: 'content:',
-        highlighted: false
+        highlighted: false,
       },
       2: {
         text: '  html: <p>enter 6 to continue</p>',
-        highlighted: true
+        highlighted: true,
       },
       3: {
         text: '  content_id: content_0',
-        highlighted: false
+        highlighted: false,
       },
       4: {
         text: 'classifier_model_id: null',
-        highlighted: false
+        highlighted: false,
       },
       5: {
         text: 'linked_skill_id: null',
-        highlighted: false
+        highlighted: false,
       },
       6: {
         text: 'interaction:',
-        highlighted: false
+        highlighted: false,
       },
       7: {
         text: '  answer_groups:',
-        highlighted: true
+        highlighted: true,
       },
       8: {
         text: '    - rule_specs:',
-        highlighted: true
+        highlighted: true,
       },
       9: {
         text: '        - rule_type: Equals',
-        highlighted: true
+        highlighted: true,
       },
       10: {
         text: '          inputs:',
-        highlighted: true
+        highlighted: true,
       },
       11: {
         text: '            x: 6',
-        highlighted: true
+        highlighted: true,
       },
       12: {
         text: '      outcome:',
-        highlighted: true
+        highlighted: true,
       },
       13: {
         text: '        dest: second',
-        highlighted: true
+        highlighted: true,
       },
       14: {
         text: '        dest_if_really_stuck: null',
-        highlighted: true
+        highlighted: true,
       },
       15: {
         text: '        feedback:',
-        highlighted: true
+        highlighted: true,
       },
       16: {
-        text: '          html: \'\'',
-        highlighted: true
+        text: "          html: ''",
+        highlighted: true,
       },
       17: {
         text: '          content_id: feedback_2',
-        highlighted: true
+        highlighted: true,
       },
       18: {
         text: '        labelled_as_correct: false',
-        highlighted: true
+        highlighted: true,
       },
       19: {
         text: '        param_changes: []',
-        highlighted: true
+        highlighted: true,
       },
       20: {
         text: '        refresher_exploration_id: null',
-        highlighted: true
+        highlighted: true,
       },
       21: {
         text: '        missing_prerequisite_skill_id: null',
-        highlighted: true
+        highlighted: true,
       },
       22: {
         text: '      training_data: []',
-        highlighted: true
+        highlighted: true,
       },
       23: {
         text: '      tagged_skill_misconception_id: null',
-        highlighted: true
+        highlighted: true,
       },
       24: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: true
+        highlighted: true,
       },
       25: {
         text: '  customization_args:',
-        highlighted: true
+        highlighted: true,
       },
       26: {
         text: '    requireNonnegativeInput:',
-        highlighted: true
+        highlighted: true,
       },
       27: {
         text: '      value: false',
-        highlighted: true
+        highlighted: true,
       },
       28: {
         text: '  default_outcome:',
-        highlighted: true
+        highlighted: true,
       },
       29: {
         text: '    dest: first',
-        highlighted: true
+        highlighted: true,
       },
       30: {
         text: '    dest_if_really_stuck: null',
-        highlighted: false
+        highlighted: false,
       },
       31: {
         text: '    feedback:',
-        highlighted: false
+        highlighted: false,
       },
       32: {
-        text: '      html: \'\'',
-        highlighted: false
+        text: "      html: ''",
+        highlighted: false,
       },
       33: {
         text: '      content_id: default_outcome_1',
-        highlighted: false
+        highlighted: false,
       },
       34: {
         text: '    labelled_as_correct: false',
-        highlighted: false
+        highlighted: false,
       },
       35: {
         text: '    param_changes: []',
-        highlighted: false
+        highlighted: false,
       },
       36: {
         text: '    refresher_exploration_id: null',
-        highlighted: false
+        highlighted: false,
       },
       37: {
         text: '    missing_prerequisite_skill_id: null',
-        highlighted: false
+        highlighted: false,
       },
       38: {
         text: '  hints: []',
-        highlighted: false
+        highlighted: false,
       },
       39: {
         text: '  id: NumericInput',
-        highlighted: true
+        highlighted: true,
       },
       40: {
         text: '  solution: null',
-        highlighted: false
+        highlighted: false,
       },
       41: {
         text: 'param_changes: []',
-        highlighted: false
+        highlighted: false,
       },
       42: {
         text: 'recorded_voiceovers:',
-        highlighted: false
+        highlighted: false,
       },
       43: {
         text: '  voiceovers_mapping:',
-        highlighted: false
+        highlighted: false,
       },
       44: {
         text: '    content_0: {}',
-        highlighted: false
+        highlighted: false,
       },
       45: {
         text: '    default_outcome_1: {}',
-        highlighted: true
+        highlighted: true,
       },
       46: {
         text: '    feedback_2: {}',
-        highlighted: true
+        highlighted: true,
       },
       47: {
         text: 'solicit_answer_details: false',
-        highlighted: false
+        highlighted: false,
       },
       48: {
         text: 'card_is_checkpoint: true',
-        highlighted: false
+        highlighted: false,
       },
       49: {
+        text: 'inapplicable_skill_misconception_ids: []',
+        highlighted: false,
+      },
+      50: {
         text: '',
-        highlighted: false
-      }
+        highlighted: false,
+      },
     };
 
     var STATE_2_STRING =
@@ -434,7 +449,7 @@ describe('Exploration history', function() {
       '    dest: final card\n' +
       '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
-      '      html: \'\'\n' +
+      "      html: ''\n" +
       '      content_id: default_outcome_4\n' +
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
@@ -451,18 +466,23 @@ describe('Exploration history', function() {
       '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
+      'inapplicable_skill_misconception_ids: []\n' +
       '';
 
-    var expectedHistoryStates = [{
-      label: 'first (was: Introd...',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_ADDED
-    }, {
-      label: 'final card',
-      color: COLOR_ADDED
-    }];
+    var expectedHistoryStates = [
+      {
+        label: 'first (was: Introd...',
+        color: COLOR_CHANGED,
+      },
+      {
+        label: 'second',
+        color: COLOR_ADDED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_ADDED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions('1', '2');
@@ -470,7 +490,9 @@ describe('Exploration history', function() {
     await historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
     await historyGraph.openStateHistory('first (was: Introd...');
     await historyGraph.expectTextWithHighlightingToMatch(
-      VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
+      VERSION_1_STATE_1_CONTENTS,
+      VERSION_2_STATE_1_CONTENTS
+    );
     await historyGraph.closeStateHistory();
 
     await historyGraph.openStateHistory('second');
@@ -492,16 +514,20 @@ describe('Exploration history', function() {
     await responseEditor.setDestination('final card', false, null);
     await explorationEditorPage.saveChanges();
 
-    expectedHistoryStates = [{
-      label: 'first',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_DELETED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'first',
+        color: COLOR_CHANGED,
+      },
+      {
+        label: 'second',
+        color: COLOR_DELETED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_UNCHANGED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.deselectVersion();
@@ -518,13 +544,16 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.moveToState('first');
     await explorationEditorMainTab.setStateName('third');
     await explorationEditorPage.saveChanges();
-    expectedHistoryStates = [{
-      label: 'third (was: first)',
-      color: COLOR_RENAMED_UNCHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'third (was: first)',
+        color: COLOR_RENAMED_UNCHANGED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_UNCHANGED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions('3', '4');
@@ -538,24 +567,30 @@ describe('Exploration history', function() {
     await responseEditor.setDestination('second', true, null);
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 2'), true);
+      await forms.toRichText('this is card 2'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('Continue');
 
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setDestination('final card', false, null);
     await explorationEditorPage.saveChanges();
 
-    expectedHistoryStates = [{
-      label: 'third (was: first)',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_CHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'third (was: first)',
+        color: COLOR_CHANGED,
+      },
+      {
+        label: 'second',
+        color: COLOR_CHANGED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_UNCHANGED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.deselectVersion();
@@ -566,46 +601,42 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should show the history of exploration metadata', async function() {
+  it('should show the history of exploration metadata', async function () {
     await users.createUser('user3@historyTab.com', 'user3HistoryTab');
     await users.login('user3@historyTab.com');
     await workflow.createExploration(true);
 
-    var METADATA_1_STRING = (
-      'title: \'\'\n' +
-      'category: \'\'\n' +
-      'objective: \'\'\n' +
+    var METADATA_1_STRING =
+      "title: ''\n" +
+      "category: ''\n" +
+      "objective: ''\n" +
       'language_code: en\n' +
       'tags: []\n' +
-      'blurb: \'\'\n' +
-      'author_notes: \'\'\n' +
-      'states_schema_version: 55\n' +
+      "blurb: ''\n" +
+      "author_notes: ''\n" +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
       'auto_tts_enabled: false\n' +
-      'correctness_feedback_enabled: true\n' +
       'edits_allowed: true\n' +
-      ''
-    );
+      '';
 
-    var METADATA_2_STRING = (
+    var METADATA_2_STRING =
       'title: Dummy Exploration\n' +
       'category: Algorithms\n' +
       'objective: Learn more about Oppia\n' +
       'language_code: en\n' +
       'tags: []\n' +
-      'blurb: \'\'\n' +
-      'author_notes: \'\'\n' +
-      'states_schema_version: 55\n' +
+      "blurb: ''\n" +
+      "author_notes: ''\n" +
+      'states_schema_version: 56\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
       'auto_tts_enabled: false\n' +
-      'correctness_feedback_enabled: true\n' +
       'edits_allowed: true\n' +
-      ''
-    );
+      '';
 
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('Dummy Exploration');
@@ -622,7 +653,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should revert to old exploration commit', async function() {
+  it('should revert to old exploration commit', async function () {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
     await workflow.createExploration(true);
@@ -630,18 +661,28 @@ describe('Exploration history', function() {
     // Make changes for second commit.
     // First card.
     await explorationEditorMainTab.setStateName('first');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'enter 6 to continue'), true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('enter 6 to continue'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'second', true, 'Equals', 6);
+      'NumericInput',
+      null,
+      'second',
+      true,
+      'Equals',
+      6
+    );
     // Second card.
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 second commit text'), true);
+      await forms.toRichText('card 2 second commit text'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setDestination('final card', true, null);
     // Final card.
     await explorationEditorMainTab.moveToState('final card');
@@ -655,18 +696,24 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setStateName('third');
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 third commit text'), true);
+      await forms.toRichText('card 2 third commit text'),
+      true
+    );
     await explorationEditorPage.saveChanges();
-    expectedHistoryStates = [{
-      label: 'third (was: first)',
-      color: COLOR_RENAMED_UNCHANGED
-    }, {
-      label: 'second',
-      color: COLOR_CHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    expectedHistoryStates = [
+      {
+        label: 'third (was: first)',
+        color: COLOR_RENAMED_UNCHANGED,
+      },
+      {
+        label: 'second',
+        color: COLOR_CHANGED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_UNCHANGED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions('2', '3');
@@ -680,28 +727,36 @@ describe('Exploration history', function() {
     // Verify exploration is version 2.
     await general.moveToPlayer();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('enter 6 to continue'));
+      await forms.toRichText('enter 6 to continue')
+    );
     await explorationPlayerPage.submitAnswer('NumericInput', 6);
     await explorationPlayerPage.expectExplorationToNotBeOver();
     await explorationPlayerPage.expectContentToMatch(
-      await forms.toRichText('card 2 second commit text'));
+      await forms.toRichText('card 2 second commit text')
+    );
     await explorationPlayerPage.expectInteractionToMatch(
-      'Continue', 'CONTINUE');
+      'Continue',
+      'CONTINUE'
+    );
     await explorationPlayerPage.submitAnswer('Continue', null);
     await explorationPlayerPage.expectExplorationToBeOver();
 
     // Verify history states between original and reversion.
     await general.moveToEditor(false);
-    var expectedHistoryStates = [{
-      label: 'first',
-      color: COLOR_UNCHANGED
-    }, {
-      label: 'second',
-      color: COLOR_UNCHANGED
-    }, {
-      label: 'final card',
-      color: COLOR_UNCHANGED
-    }];
+    var expectedHistoryStates = [
+      {
+        label: 'first',
+        color: COLOR_UNCHANGED,
+      },
+      {
+        label: 'second',
+        color: COLOR_UNCHANGED,
+      },
+      {
+        label: 'final card',
+        color: COLOR_UNCHANGED,
+      },
+    ];
     await explorationEditorPage.navigateToHistoryTab();
     historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
     await historyGraph.selectTwoVersions('2', '4');
@@ -711,7 +766,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

@@ -16,11 +16,11 @@
  * @fileoverview Component for edit thumbnail modal.
  */
 
-import { trigger, transition, style, animate } from '@angular/animations';
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {trigger, transition, style, animate} from '@angular/animations';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 interface InvalidTagsAndAttributes {
   tags: string[];
@@ -39,10 +39,10 @@ interface Dimensions {
     trigger('fade', [
       transition('void => *', [
         style({opacity: 0}),
-        animate(500, style({opacity: 1}))
-      ])
-    ])
-  ]
+        animate(500, style({opacity: 1})),
+      ]),
+    ]),
+  ],
 })
 export class EditThumbnailModalComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -64,7 +64,8 @@ export class EditThumbnailModalComponent {
   @Input() openInUploadMode: boolean = false;
   imgSrc!: string;
   invalidTagsAndAttributes: InvalidTagsAndAttributes = {
-    tags: [], attrs: []
+    tags: [],
+    attrs: [],
   };
 
   invalidImageWarningIsShown = false;
@@ -74,13 +75,13 @@ export class EditThumbnailModalComponent {
 
   constructor(
     private svgSanitizerService: SvgSanitizerService,
-    private ngbActiveModal: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal
   ) {}
 
   setImageDimensions(height: number, width: number): void {
     this.dimensions = {
       height: Math.round(height),
-      width: Math.round(width)
+      width: Math.round(width),
     };
   }
 
@@ -90,7 +91,8 @@ export class EditThumbnailModalComponent {
 
   isValidFilename(file: File): boolean {
     const VALID_THUMBNAIL_FILENAME_REGEX = new RegExp(
-      AppConstants.VALID_THUMBNAIL_FILENAME_REGEX);
+      AppConstants.VALID_THUMBNAIL_FILENAME_REGEX
+    );
     return VALID_THUMBNAIL_FILENAME_REGEX.test(file.name);
   }
 
@@ -110,17 +112,21 @@ export class EditThumbnailModalComponent {
         //   height and width defined.
         this.setImageDimensions(
           img.naturalHeight || 150,
-          img.naturalWidth || 300);
+          img.naturalWidth || 300
+        );
       };
       this.imgSrc = reader.result as string;
       this.updateBackgroundColor(this.tempBgColor);
       img.src = this.imgSrc;
       this.uploadedImage = this.imgSrc;
-      this.invalidTagsAndAttributes = (
+      this.invalidTagsAndAttributes =
         this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-          this.imgSrc));
-      this.uploadedImage = this.svgSanitizerService
-        .removeAllInvalidTagsAndAttributes(this.uploadedImage);
+          this.imgSrc
+        );
+      this.uploadedImage =
+        this.svgSanitizerService.removeAllInvalidTagsAndAttributes(
+          this.uploadedImage
+        );
       this.thumbnailHasChanged = true;
     };
     reader.readAsDataURL(file);
@@ -132,7 +138,7 @@ export class EditThumbnailModalComponent {
     this.invalidFilenameWarningIsShown = false;
     this.invalidTagsAndAttributes = {
       tags: [],
-      attrs: []
+      attrs: [],
     };
     if (this.isUploadedImageSvg() && this.isValidFilename(file)) {
       this.setUploadedFile(file);
@@ -162,7 +168,7 @@ export class EditThumbnailModalComponent {
       newThumbnailDataUrl: this.uploadedImage,
       newBgColor: this.bgColor,
       openInUploadMode: this.openInUploadMode,
-      dimensions: this.dimensions
+      dimensions: this.dimensions,
     });
   }
 

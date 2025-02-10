@@ -16,21 +16,21 @@
  * @fileoverview Module for the delete account page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { DeleteAccountPageComponent } from './delete-account-page.component';
-import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
-import { DeleteAccountPageRootComponent } from './delete-account-page-root.component';
-import { CommonModule } from '@angular/common';
-import { DeleteAccountPageRoutingModule } from './delete-account-page-routing.module';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {DeleteAccountPageComponent} from './delete-account-page.component';
+import {DeleteAccountModalComponent} from './templates/delete-account-modal.component';
+import {DeleteAccountPageRootComponent} from './delete-account-page-root.component';
+import {CommonModule} from '@angular/common';
+import {DeleteAccountPageRoutingModule} from './delete-account-page-routing.module';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     DeleteAccountPageRoutingModule,
-    Error404PageModule
+    Error404PageModule,
   ],
   declarations: [
     DeleteAccountModalComponent,
@@ -41,6 +41,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     DeleteAccountModalComponent,
     DeleteAccountPageComponent,
     DeleteAccountPageRootComponent,
-  ]
+  ],
 })
 export class DeleteAccountPageModule {}

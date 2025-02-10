@@ -1,7 +1,7 @@
 <div class="history-tab-container">
   <mat-card class="oppia-editor-card history-table-card">
     <div class="oppia-mobile-collapsible-card-header">
-      <h3 class="history-card-header-text">History</h3>
+      <h3 class="history-card-header-text" tabindex="0">History</h3>
     </div>
     <div class="oppia-mobile-collapsible-card-content">
       <div class="history-tab-header">
@@ -14,8 +14,8 @@
       </div>
       <div class="filter-container">
         <span>Filter</span>
-        <input class="oppia-autofocus" type="text" (change)="filterByUsername()" [(ngModel)]="username" placeholder="Search for a user" oppiaFocusOn="usernameInputField">
-        <i class="fa fa-search"></i>
+        <input class="oppia-autofocus history-filter-input" type="text" (change)="filterByUsername()" [(ngModel)]="username" placeholder="Search for a user" oppiaFocusOn="usernameInputField">
+        <i class="fa fa-search history-filter-icon"></i>
       </div>
       <div class="history-table-header">
         <div class="history-table-header-version">
@@ -27,7 +27,7 @@
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-date" (click)="reverseDateOrder()">
+        <div class="history-table-header-date" (click)="reverseDateOrder()" (keydown.enter)="reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
@@ -35,31 +35,31 @@
         <span>Displaying {{ startingIndex }}-{{ endIndex }} of {{ totalExplorationVersionMetadata.length }}</span>
       </div>
       <div *ngFor="let metadata of explorationVersionMetadata; index as index" class="history-list-item e2e-test-history-list-item">
-        <div class="history-table-index">
+        <div class="history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
           {{ metadata.versionNumber }}.
         </div>
-        <div class="history-table-message e2e-test-history-table-message">
+        <div class="history-table-message e2e-test-history-table-message" [attr.aria-label]="'Notes: '+ metadata.commitMessage" tabindex="0">
           {{ metadata.commitMessage }}
         </div>
         <div class="history-table-profile">
-          <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
+          <strong><profile-link-text [attr.aria-label]="'Username: '+ metadata.committerId" [username]="metadata.committerId"></profile-link-text></strong>
         </div>
-        <div class="history-table-version" title="{{ metadata.tooltipText }}">
+        <div class="history-table-version" title="{{ metadata.tooltipText }}" [attr.aria-label]="'Date: '+ metadata.createdOnMsecsStr" tabindex="0">
           <em class="e2e-test-history-tab-commit-date">{{ metadata.createdOnMsecsStr }}</em>
         </div>
         <div class="history-table-options e2e-test-history-list-options">
-          <div class="dropdown">
-            <div type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <div ngbDropdown class="dropdown">
+            <button ngbDropdownToggle class="history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
               <i class="fa fa-ellipsis-v"></i>
-            </div>
-            <div class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
-              <a class="dropdown-item e2e-test-revert-version"
+            </button>
+            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
+              <a ngbDropdownItem class="dropdown-item e2e-test-revert-version"
                  href="#"
                  *ngIf="metadata.versionNumber !== currentVersion && isEditable()"
                  (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
-              <a class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
+              <a ngbDropdownItem class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
                  title="Download exploration as a zip file.">
                 Download
               </a>
@@ -141,6 +141,11 @@
 
   .mat-paginator {
     width: 100%;
+  }
+
+  .history-table-option {
+    background-color: transparent;
+    border: none;
   }
 
   .history-tab-container {
@@ -407,6 +412,15 @@
 
     .filter-container {
       margin: 0 0 20px;
+      width: 100%;
+    }
+
+    .filter-container .history-filter-input {
+      width: 70%;
+    }
+
+    .filter-container .history-filter-icon {
+      right: 20%
     }
 
     .compare-revision-header i {

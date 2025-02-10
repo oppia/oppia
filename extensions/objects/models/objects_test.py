@@ -294,10 +294,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type ListOfDict."""
         mappings = [([
             {'content': '<p>Hello</p>', 'title': 'Tabs'},
-            {'content': '<iframe src="site"></iframe>', 'title': u'¡Hola!'}
+            {'content': '<iframe src="site"></iframe>', 'title': '¡Hola!'}
         ], [
-            {'content': '<p>Hello</p>', 'title': u'Tabs'},
-            {'content': '', 'title': u'¡Hola!'}
+            {'content': '<p>Hello</p>', 'title': 'Tabs'},
+            {'content': '', 'title': '¡Hola!'}
         ]), ([], [])]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
@@ -319,9 +319,9 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_set_of_unicode_string_validation(self) -> None:
         """Tests objects of type SetOfUnicodeString."""
         mappings = [
-            (['ff', 'a', u'¡Hola!'], [u'ff', u'a', u'¡Hola!']),
+            (['ff', 'a', '¡Hola!'], ['ff', 'a', '¡Hola!']),
             ([], []),
-            (['ab', 'abc', 'cb'], [u'ab', u'abc', u'cb']),
+            (['ab', 'abc', 'cb'], ['ab', 'abc', 'cb']),
         ]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
@@ -352,7 +352,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_unicode_string_validation(self) -> None:
         """Tests objects of type UnicodeString."""
         mappings = [
-            ('Abc   def', u'Abc   def'), (u'¡Hola!', u'¡Hola!'),
+            ('Abc   def', 'Abc   def'), ('¡Hola!', '¡Hola!'),
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),
@@ -371,13 +371,12 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_html_validation(self) -> None:
         """Tests objects of type HTML."""
-        # TODO(sll): Add more tests.
         mappings = [
             (
                 '<p onclick="evil_function()">a paragraph</p>',
                 '<p>a paragraph</p>'),
             ('<iframe src="evil-site"></iframe>', ''),
-            (u'¡Hola!', u'¡Hola!'),
+            ('¡Hola!', '¡Hola!'),
             (
                 '<a href="evil-site">spam spam SPAM!</a>',
                 '<a>spam spam SPAM!</a>'),
@@ -399,7 +398,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_normalized_string_validation(self) -> None:
         """Tests objects of type NormalizedString."""
         mappings = [
-            ('Abc   def', u'Abc def'), (u'¡hola!', u'¡hola!')
+            ('Abc   def', 'Abc def'), ('¡hola!', '¡hola!')
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),
@@ -421,10 +420,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type MathExpressionContent."""
         mappings = [(
             {'raw_latex': '123456789', 'svg_filename': ''},
-            {'raw_latex': u'123456789', 'svg_filename': u''}
+            {'raw_latex': '123456789', 'svg_filename': ''}
         ), (
-            {'raw_latex': u'x \\times y', 'svg_filename': u''},
-            {'raw_latex': u'x \\times y', 'svg_filename': u''}
+            {'raw_latex': 'x \\times y', 'svg_filename': ''},
+            {'raw_latex': 'x \\times y', 'svg_filename': ''}
         )]
         invalid_values_with_error_messages = [
             (3.0, 'Expected dict, received 3.0'),
@@ -459,7 +458,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_skill_id_string_validation(self) -> None:
         """Tests objects of type SkillSelector."""
         mappings = [
-            ('skill_id', u'skill_id'), (u'abcdef123_', u'abcdef123_'),
+            ('skill_id', 'skill_id'), ('abcdef123_', 'abcdef123_'),
         ]
         invalid_values_with_error_messages = [
             (3.0, 'Expected unicode string, received 3.0'),

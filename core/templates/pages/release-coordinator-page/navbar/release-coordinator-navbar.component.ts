@@ -17,14 +17,13 @@
  * panel.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
-import { UserService } from 'services/user.service';
-
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-release-coordinator-navbar',
@@ -43,27 +42,35 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   profileUrl!: string;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
-  logoutUrl: string = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
+  logoutUrl: string =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE;
+  dropdownMenuIsActive: boolean = false;
 
   profileDropdownIsActive: boolean = false;
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_FEATURES: string = ReleaseCoordinatorPageConstants.TAB_ID_FEATURES;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   activateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = true;
+    return (this.profileDropdownIsActive = true);
   }
 
   deactivateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = false;
+    return (this.profileDropdownIsActive = false);
+  }
+
+  activateDropdownMenu(): boolean {
+    return (this.dropdownMenuIsActive = true);
+  }
+
+  deactivateDropdownMenu(): boolean {
+    return (this.dropdownMenuIsActive = false);
   }
 
   switchTab(tabName: string): void {
@@ -71,26 +78,30 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
       this.activeTabChange.emit(tabName);
       this.activeTab = tabName;
     }
+    this.dropdownMenuIsActive = false;
   }
 
   async getUserInfoAsync(): Promise<void> {
     const userInfo = await this.userService.getUserInfoAsync();
     this.username = userInfo.getUsername();
     if (this.username) {
-      this.profileUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/profile/<username>', {
-            username: this.username
-          }));
-      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-        this.userService.getProfileImageDataUrl(this.username));
+      this.profileUrl = this.urlInterpolationService.interpolateUrl(
+        '/profile/<username>',
+        {
+          username: this.username,
+        }
+      );
+      [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+        this.userService.getProfileImageDataUrl(this.username);
     } else {
-      this.profilePictureWebpDataUrl = (
+      this.profilePictureWebpDataUrl =
         this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-      this.profilePicturePngDataUrl = (
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+        );
+      this.profilePicturePngDataUrl =
         this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+        );
     }
   }
 
@@ -98,14 +109,19 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     this.getUserInfoAsync();
 
     this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(
-      '/logo/288x128_logo_white.png');
+      '/logo/288x128_logo_white.png'
+    );
     this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
-      '/logo/288x128_logo_white.webp');
+      '/logo/288x128_logo_white.webp'
+    );
 
     this.activeTab = this.TAB_ID_BEAM_JOBS;
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaReleaseCoordinatorNavbar', downgradeComponent(
-    {component: ReleaseCoordinatorNavbarComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaReleaseCoordinatorNavbar',
+    downgradeComponent({component: ReleaseCoordinatorNavbarComponent})
+  );

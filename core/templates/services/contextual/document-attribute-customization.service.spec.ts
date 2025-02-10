@@ -15,11 +15,10 @@
 /**
  * @fileoverview Unit tests for DocumentAttributeCustomizationService.
  */
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { DocumentAttributeCustomizationService } from
-  'services/contextual/document-attribute-customization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Document Attribute Customization Service', () => {
   let dacs: DocumentAttributeCustomizationService;
@@ -32,7 +31,9 @@ describe('Document Attribute Customization Service', () => {
 
   it('should add a atribute', () => {
     const setAttributeSpy = spyOn(
-      wrs.nativeWindow.document.documentElement, 'setAttribute').and.stub();
+      wrs.nativeWindow.document.documentElement,
+      'setAttribute'
+    ).and.stub();
     dacs.addAttribute('class', 'oppia-base-container');
 
     expect(setAttributeSpy).toHaveBeenCalled();

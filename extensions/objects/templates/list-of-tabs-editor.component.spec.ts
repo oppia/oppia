@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for list of tabs editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ListOfTabsEditorComponent } from './list-of-tabs-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ListOfTabsEditorComponent} from './list-of-tabs-editor.component';
 
 describe('ListOfTabsEditorComponent', () => {
   let component: ListOfTabsEditorComponent;
@@ -27,7 +27,7 @@ describe('ListOfTabsEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ListOfTabsEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -51,29 +51,34 @@ describe('ListOfTabsEditorComponent', () => {
       type: 'list',
       items: {
         type: 'dict',
-        properties: [{
-          name: 'title',
-          description: 'Tab title',
-          schema: {
-            type: 'unicode',
-            validators: [{
-              id: 'is_nonempty'
-            }]
-          }
-        }, {
-          name: 'content',
-          description: 'Tab content',
-          schema: {
-            type: 'html',
-            ui_config: {
-              hide_complex_extensions: true
-            }
-          }
-        }]
+        properties: [
+          {
+            name: 'title',
+            description: 'Tab title',
+            schema: {
+              type: 'unicode',
+              validators: [
+                {
+                  id: 'is_nonempty',
+                },
+              ],
+            },
+          },
+          {
+            name: 'content',
+            description: 'Tab content',
+            schema: {
+              type: 'html',
+              ui_config: {
+                hide_complex_extensions: true,
+              },
+            },
+          },
+        ],
       },
       ui_config: {
-        add_element_text: 'Add new tab'
-      }
+        add_element_text: 'Add new tab',
+      },
     });
   });
   it('should only update the value when user edits the tabs', () => {
@@ -83,12 +88,12 @@ describe('ListOfTabsEditorComponent', () => {
     let listOfTabs = [
       {
         title: 'Hint introduction',
-        content: 'This set of tabs shows some hints.'
+        content: 'This set of tabs shows some hints.',
       },
       {
         title: 'Hint 1',
-        content: 'This is a first hint.'
-      }
+        content: 'This is a first hint.',
+      },
     ];
 
     component.updateValue(listOfTabs);

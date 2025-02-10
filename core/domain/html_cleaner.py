@@ -41,7 +41,7 @@ class ComponentsDict(TypedDict):
 
 def filter_a(tag: str, name: str, value: str) -> bool:
     """Returns whether the described attribute of a tag should be
-    whitelisted.
+    allowed.
 
     Args:
         tag: str. The name of the tag passed.
@@ -49,7 +49,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
         value: str. The value of the attribute.
 
     Returns:
-        bool. Whether the given attribute should be whitelisted.
+        bool. Whether the given attribute should be allowed.
 
     Raises:
         Exception. The 'tag' is not as expected.
@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_WHITELIST: Final = {
+ATTRS_ALLOWLIST: Final = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -108,7 +108,7 @@ def clean(user_submitted_html: str) -> str:
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
 
-    core_tags = ATTRS_WHITELIST.copy()
+    core_tags = ATTRS_ALLOWLIST.copy()
     core_tags.update(oppia_custom_tags)
     tag_names = list(core_tags.keys())
 
@@ -397,13 +397,6 @@ def validate_rte_tags(
             'end-with-value',
             'Video'
         )
-
-        start_value = float(tag['start-with-value'].strip())
-        end_value = float(tag['end-with-value'].strip())
-        if start_value > end_value and start_value != 0.0 and end_value != 0.0:
-            raise utils.ValidationError(
-                'Start value should not be greater than End value in Video tag.'
-            )
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(

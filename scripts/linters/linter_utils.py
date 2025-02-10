@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for the scripts.linters.pre_commit_linter module.
+"""Helpers for the scripts.linters.run_lint_checks module.
 
 Do not use this module anywhere else in the code base!
 """
@@ -117,10 +117,6 @@ class BaseLinter(abc.ABC):
 
     @abc.abstractmethod
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
-        """Perform all the lint checks and returns the messages returned by all
-        the checks.
-
-        Returns:
-            list(TaskResult). A list of TaskResult objects representing the
-            results of the lint checks.
+        """Perform all the lint checks and returns a list of TaskResult objects
+        representing the results of the lint checks.
         """

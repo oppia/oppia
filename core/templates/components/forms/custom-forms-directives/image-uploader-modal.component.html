@@ -1,0 +1,224 @@
+<div class="oppia-image-uploader-modal-container e2e-test-image-uploader-modal">
+  <div class="modal-header">
+    <h3>{{ 'I18N_IMAGE_UPLOADER_MODAL_UPLOAD_HEADING' | translate:{ imageName: imageUploaderParameters.imageName } }}</h3>
+  </div>
+
+  <div class="modal-body oppia-image-uploader-container">
+    <div *ngIf="(isThumbnail() && imageNotUploaded())">
+      <strong tabindex="0">Please upload an SVG image.</strong>
+      <div class="alert alert-warning" tabindex="0">
+        <span>Here are some guidelines to follow:</span>
+        <ul>
+          <li>Uploaded image should have a transparent background.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="oppia-image-uploader">
+      <div *ngIf="imageNotUploaded()">
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)" [allowedImageFormats]="imageUploaderParameters.allowedImageFormats"
+          [maxImageSizeInKB]="imageUploaderParameters.maxImageSizeInKB">
+        </oppia-image-receiver>
+      </div>
+      <div class="oppia-form-error oppia-form-error-text" *ngIf="invalidImageWarningIsShown">
+        {{ 'I18N_IMAGE_UPLOAD_ERROR' | translate }}
+      </div>
+      <div *ngIf="(isThumbnail() && uploadedImage)">
+        <div>
+          <div *ngIf="hasMoreThanOneBgColor()">
+            <div>Choose background color:</div>
+            <div class="oppia-thumbnail-colour-select">
+              <div *ngFor="let color of imageUploaderParameters.allowedBgColors" [ngStyle]="{'background': color}"
+                   (click)="updateBackgroundColor(color)">
+              </div>
+            </div>
+          </div>
+          <div *ngIf="imageUploaderParameters.allowedBgColors.length === 1" class="alert alert-warning">
+            <span>
+              Please check that the {{imageUploaderParameters.imageName.toLowerCase()}} below has the following background color:
+              <i class="fa fa-square" [ngStyle]="{'color': imageUploaderParameters.allowedBgColors[0]}"></i>.
+              If not, please ensure that you are uploading an image with transparent background. Thanks!
+            </span>
+          </div>
+        </div>
+        <div class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
+          [ngStyle]="{'background': imageUploaderParameters.previewDescriptionBgColor, 'color': imageUploaderParameters.previewDescriptionBgColor ? '#FFFFFF' : '', 'width': imageUploaderParameters.aspectRatio === '4:3' ? '248px' : '320px' }">
+          <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button"
+                  (click)="reset()">
+            <i class="fas fa-times oppia-vcenter"></i>
+          </button>
+          <div>
+            <oppia-thumbnail-display *ngIf="uploadedImage" [classes]="['oppia-thumbnail-image']"
+              [imgSrc]="uploadedImage" [aspectRatio]="'16:9'" [background]="bgColor">
+            </oppia-thumbnail-display>
+            <div *ngIf="previewTitle" class="oppia-thumbnail-preview-title">
+              {{ imageUploaderParameters.previewTitle }}
+            </div>
+            <div *ngIf="previewDescription" class="oppia-thumbnail-preview-description">
+              {{ imageUploaderParameters.previewDescription }}
+            </div>
+            <div *ngIf="previewFooter" class="oppia-thumbnail-preview-footer">
+              {{ imageUploaderParameters.previewFooter }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="(!isThumbnail() && uploadedImage)">
+        <span>{{ 'I18N_IMAGE_UPLOADER_MODAL_DRAG' | translate }}</span>
+        <div class="oppia-image-uploader-modal-crop-area e2e-test-photo-crop">
+          <button class="btn btn-secondary oppia-image-uploader-modal-reset-button" aria-label="close"
+                  (click)="reset()">
+            <i class="fas fa-times oppia-vcenter"></i>
+          </button>
+          <img id="croppable-image" [src]="uploadedImage" #croppableImage>
+        </div>
+        <div *ngIf="hasMoreThanOneBgColor()">
+          <div class="bg-color-text">
+            Choose background color:
+            <div class="oppia-bg-color-container" [ngStyle]="{'background': bgColor}"></div>
+          </div>
+          <div class="oppia-thumbnail-colour-select">
+            <div *ngFor="let color of imageUploaderParameters.allowedBgColors" [ngStyle]="{'background': color}"
+                 (click)="updateBackgroundColor(color)">
+            </div>
+          </div>
+        </div>
+        <div *ngIf="areInvalidTagsOrAttrsPresent()"
+             class="oppia-unsupported-svg-tag-attribute-error"
+             [innerHTML]="'I18N_INVALID_TAGS_AND_ATTRIBUTES_ALERT' | translate: { issueURL: svgSanitizerService.getIssueURL(invalidTagsAndAttributes) }">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="cancel()">
+      {{ 'I18N_IMAGE_UPLOADER_MODAL_CANCEL_BUTTON' | translate }}
+    </button>
+    <button class="btn btn-success e2e-test-photo-upload-submit" (click)="confirm()" [disabled]="!uploadedImage">
+      {{ 'I18N_IMAGE_UPLOADER_MODAL_ADD_BUTTON' | translate:{ imageName: imageUploaderParameters.imageName } }}
+    </button>
+  </div>
+</div>
+<style>
+  .oppia-image-uploader-modal-container .oppia-image-uploader-modal-crop-area {
+    background: #e4e4e4;
+    height: 350px;
+    margin-top: 20px;
+    max-width: 100%;
+    position: relative;
+    width: 500px;
+  }
+
+  .oppia-image-uploader-modal-container .oppia-image-uploader-modal-reset-button {
+    position: absolute;
+    right: -36px;
+    top: 0;
+  }
+
+  .oppia-image-uploader-modal-container .oppia-image-uploader-container {
+    min-height: 300px;
+  }
+
+  .oppia-image-uploader-modal-container .oppia-form-error-text {
+    margin-top: 15px;
+  }
+
+  .oppia-unsupported-svg-tag-attribute-error {
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    color: #8a6d3b;
+    margin-top: 15px;
+    padding: 10px;
+  }
+
+  .oppia-thumbnail-container {
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 4.5px 10px rgba(0, 0, 0, 0.25);
+    height: 260px;
+    margin: 0 auto 15px auto;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .oppia-thumbnail-container img {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .oppia-thumbnail-reset-button {
+    position: absolute;
+    right: -50px;
+    top: 0;
+  }
+
+  .oppia-thumbnail-confirm-button {
+    position: absolute;
+    right: -50px;
+    top: 40px;
+  }
+
+  .oppia-thumbnail-colour-select {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: 25px 25px 25px 25px;
+    grid-template-rows: 20px;
+    margin-bottom: 7px;
+  }
+
+  .oppia-thumbnail-colour-select>* {
+    border: 1px solid;
+    border-radius: 10%;
+  }
+
+  .bg-color-text {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  }
+
+  .oppia-thumbnail-colour-select>*:hover,
+  .oppia-thumbnail-colour-select>*:focus {
+    border: 2px solid;
+    cursor: pointer;
+  }
+
+  .oppia-bg-color-container {
+    border: 1px solid black;
+    border-radius: 10%;
+    height: 20px;
+    width: 25px;
+  }
+
+  .oppia-thumbnail-preview-description {
+    font-size: 16px;
+    line-height: 1.2;
+    overflow: hidden;
+    padding: 0 16px 0 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .oppia-thumbnail-preview-footer {
+    bottom: 10px;
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.2;
+    padding: 0 16px 0 16px;
+    position: absolute;
+  }
+
+  .oppia-thumbnail-preview-title {
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    padding: 10px 16px 10px 16px;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .oppia-thumbnail-uploader-container {
+    min-height: 300px;
+  }
+</style>

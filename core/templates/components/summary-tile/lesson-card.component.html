@@ -1,0 +1,122 @@
+<div class="lesson-card-container">
+  <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
+    <img alt="" class="h-100" [src]="imgUrl">
+    <div class="d-flex flex-column lesson-card-tags w-100">
+      <!--TODO(#18384): Learner group tags-->
+      <!--TODO(#18384): Should goal tags display if completed?-->
+      <div *ngIf="isGoal" class="lesson-card-tags-container">
+        <span aria-hidden="true" class="fas fa-bullseye lesson-card-tags-icon"></span>
+        <p class="lesson-card-tags-text"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION' | translate }} </p>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
+    <div class="d-flex flex-column flex-grow">
+      <div class="lesson-card-title-container mt-1">
+        <p class="lesson-card-title mb-0"> {{ title }} </p>
+      </div>
+      <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
+      <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
+    </div>
+    <div class="align-items-center d-flex justify-content-between mt-2">
+      <circle-progress [percent]="progress"> </circle-progress>
+      <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
+        {{ getButtonTranslationKey() | translate }}
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .lesson-card-button {
+    background-color: #fff;
+    border: 1px solid #00645c;
+    border-radius: 4px;
+    color: #00645c;
+    font-size: 14px;
+    font-weight: 500;
+    height: 36px;
+    padding: 10px 8px;
+    transition: all 300ms ease-out;
+    width: 122px;
+  }
+
+  .lesson-card-button:hover {
+    background-color: #cadbda;
+  }
+
+  .lesson-card-button:focus {
+    background-color: #429488;
+    border-color: #429488;
+    color: #fff;
+  }
+
+  .lesson-card-container {
+    border-radius: 4px;
+    box-shadow: 0 2px 2px 0 #00000040;
+    height: 286px;
+    padding: 0;
+    width: 216px;
+  }
+
+  .lesson-card-info {
+    border-radius: 0 0 .25em .25em;
+    height: 150px;
+    padding: 8px;
+  }
+
+  .lesson-card-img {
+    height: 136px;
+    position: relative;
+  }
+
+  .lesson-card-tags {
+    left: 0;
+    padding: 8px;
+    position: absolute;
+    top: 0;
+  }
+
+  .lesson-card-tags-container {
+    align-items: center;
+    background-color: #fff9;
+    border-radius: 4px;
+    display: flex;
+    gap: 0 4px;
+    padding: 4px;
+    width: fit-content;
+  }
+
+  .lesson-card-tags-icon {
+    color: #00645c;
+    font-size: 16px;
+  }
+
+  .lesson-card-tags-text {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .lesson-card-title {
+    color: #00645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 15px;
+    -webkit-line-clamp: 2;
+    line-height: 20px;
+  }
+
+  .lesson-card-title-container {
+    height: 50px;
+  }
+
+  .lesson-card-topic {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .lesson-card-desc {
+    font-size: 11px;
+    -webkit-line-clamp: 2;
+  }
+</style>

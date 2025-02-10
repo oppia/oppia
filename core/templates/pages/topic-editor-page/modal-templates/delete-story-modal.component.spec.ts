@@ -16,25 +16,25 @@
  * @fileoverview Unit tests for the DeleteStoryModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { DeleteStoryModalComponent } from './delete-story-modal.component';
+import {DeleteStoryModalComponent} from './delete-story-modal.component';
 
-describe('Delete Story Modal Component', function() {
+describe('Delete Story Modal Component', function () {
   let component: DeleteStoryModalComponent;
   let fixture: ComponentFixture<DeleteStoryModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteStoryModalComponent
+      declarations: [DeleteStoryModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

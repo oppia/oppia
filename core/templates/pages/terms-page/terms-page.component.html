@@ -41,7 +41,8 @@
       For more information about how we use your personal information and what
       types of information we collect and why, please refer to our
       <a href="/privacy-policy"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE">
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
+         class="e2e-test-privacy-policy-link">
          Privacy Policy
       </a>.
     </p>
@@ -74,7 +75,10 @@
       license, which means that all of the content on Oppia is irrevocably
       licensed to the general public and can be freely used, reused, and
       shared. You can read more about the CC-BY-SA 4.0 license
-      <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode"> here</a>.
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode"
+         class="e2e-test-cc-license-link">
+        here
+      </a>.
     </p>
 
     <p>
@@ -230,7 +234,10 @@
       from time to time. If we do, we will notify you (and all our registered
       Users) by sending an email to our Google Group mailing list (which you may
       sign up for
-      <a href="https://groups.google.com/forum/#!forum/oppia-announce">here</a>).
+      <a href="https://groups.google.com/g/oppia-announce"
+         class="e2e-test-oppia-announce-google-group-link">
+        here
+      </a>).
       Your continued use of the Website, including logging into your account
       after such changes, indicates to us that you accept the changes and agree
       to be bound by them.
@@ -242,6 +249,7 @@
       reference only and may not always be accurate and up-to-date.
     </p>
 
+    <a class="oppia-privacy-terms-anchor" #changelog></a>
     <h2>Changelog</h2>
     <ul class="e2e-test-changelog">
       <li>19 Oct 2020: Clarified use of CC-BY-SA.</li>
@@ -261,7 +269,8 @@
   <p><a (click)="scrollTo(disclaimerOfWarranty)">Disclaimer of Warranty</a></p>
   <p><a (click)="scrollTo(limitationOfLiability)">Limitation of Liability</a></p>
   <p><a (click)="scrollTo(disputesAndJurisdiction)">Disputes and Jurisdiction</a></p>
-  <p><a (click)="scrollTo(modificationsToTheseTerms)">Modifications to these Terms</a></p>
+  <p><a (click)="scrollTo(modificationsToTheseTerms)">Modifications to These Terms</a></p>
+  <p><a (click)="scrollTo(changelog)">Changelog</a></p>
 </div>
 
 <style>
@@ -296,5 +305,9 @@
   }
   .oppia-page-cards-container .oppia-h2-text {
     margin-top: 40px;
+  }
+
+  a {
+    text-decoration: underline;
   }
 </style>

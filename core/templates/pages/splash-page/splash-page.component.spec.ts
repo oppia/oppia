@@ -16,31 +16,20 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { SplashPageComponent } from './splash-page.component';
-import { of } from 'rxjs';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-
-class MockPlatformFeatureService {
-  status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    }
-  };
-}
+import {EventEmitter} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {SplashPageComponent} from './splash-page.component';
+import {of} from 'rxjs';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockWindowRef {
   _window = {
@@ -52,13 +41,13 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -88,40 +77,35 @@ describe('Splash Page', () => {
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
   let mockWindowRef = new MockWindowRef();
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [SplashPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
+          useClass: MockI18nLanguageCodeService,
         },
         {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
+            getResizeEvent: () => of(resizeEvent),
+          },
         },
         SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
+          useValue: mockWindowRef,
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
-      ]
+      ],
     }).compileComponents();
   });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
@@ -135,32 +119,37 @@ describe('Splash Page', () => {
     component = splashPageComponent.componentInstance;
   });
 
-  it('should get static image url', function() {
+  it('should get static image url', function () {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
+      '/assets/images/path/to/image'
+    );
   });
 
-  it('should record analytics when start learning is clicked', function() {
+  it('should record analytics when start learning is clicked', function () {
     spyOn(
-      siteAnalyticsService, 'registerClickHomePageStartLearningButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickHomePageStartLearningButtonEvent'
+    ).and.callThrough();
 
     component.onClickStartLearningButton();
 
-    expect(siteAnalyticsService.registerClickHomePageStartLearningButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickHomePageStartLearningButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should record analytics when Browse Lessons is clicked', function() {
+  it('should record analytics when Browse Lessons is clicked', function () {
     spyOn(
-      siteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickBrowseLessonsButtonEvent'
+    ).and.callThrough();
     component.onClickBrowseLessonsButton();
-    expect(siteAnalyticsService.registerClickBrowseLessonsButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickBrowseLessonsButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should direct users to the android page on click', function() {
+  it('should direct users to the android page on click', function () {
     expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
 
     component.onClickAccessAndroidButton();
@@ -168,25 +157,29 @@ describe('Splash Page', () => {
     expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
   });
 
-  it('should record analytics when Start Contributing is clicked', function() {
+  it('should record analytics when Start Contributing is clicked', function () {
     spyOn(
-      siteAnalyticsService, 'registerClickStartContributingButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickStartContributingButtonEvent'
+    ).and.callThrough();
     component.onClickStartContributingButton();
-    expect(siteAnalyticsService.registerClickStartContributingButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickStartContributingButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should record analytics when Start Teaching is clicked', function() {
+  it('should record analytics when Start Teaching is clicked', function () {
     spyOn(
-      siteAnalyticsService, 'registerClickStartTeachingButtonEvent'
+      siteAnalyticsService,
+      'registerClickStartTeachingButtonEvent'
     ).and.callThrough();
     component.onClickStartTeachingButton();
-    expect(siteAnalyticsService.registerClickStartTeachingButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickStartTeachingButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should increment and decrement testimonial IDs correctly', function() {
+  it('should increment and decrement testimonial IDs correctly', function () {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
     component.incrementDisplayedTestimonialId();
@@ -202,7 +195,7 @@ describe('Splash Page', () => {
     expect(component.displayedTestimonialId).toBe(2);
   });
 
-  it('should get testimonials correctly', function() {
+  it('should get testimonials correctly', function () {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
@@ -218,10 +211,10 @@ describe('Splash Page', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
     );
     component.ngOnInit();
     flushMicrotasks();
@@ -239,10 +232,10 @@ describe('Splash Page', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: false
+      user_is_logged_in: false,
     };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
     );
     component.ngOnInit();
     flushMicrotasks();
@@ -252,28 +245,15 @@ describe('Splash Page', () => {
   it('should check if loader screen is working', fakeAsync(() => {
     spyOn(loaderService, 'showLoadingScreen').and.callThrough();
     component.ngOnInit();
-    expect(loaderService.showLoadingScreen)
-      .toHaveBeenCalledWith('Loading');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   }));
 
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(4);
-    expect(component.classroomUrl).toBe('/learn/math');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
     expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
-  });
-
-  it('should show android button if the feature is enabled', () => {
-    // The androidPageIsEnabled property is set when the component is
-    // constructed and the value is not modified after that so there is no
-    // pre-check for this test.
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(SplashPageComponent);
-
-    expect(component.componentInstance.androidPageIsEnabled).toBeTrue();
   });
 });

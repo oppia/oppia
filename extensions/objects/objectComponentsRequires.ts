@@ -48,13 +48,10 @@ require('objects/templates/real-editor.component.ts');
 require('objects/templates/sanitized-url-editor.component.ts');
 require('objects/templates/set-of-algebraic-identifier-editor.component.ts');
 require('objects/templates/translatable-html-content-id.component.ts');
-require(
-  'objects/templates/set-of-translatable-html-content-ids-editor.component.ts');
-require(
-  // eslint-disable-next-line max-len
-  'objects/templates/translatable-set-of-normalized-string-editor.component.ts');
-require(
-  'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
+require('objects/templates/set-of-translatable-html-content-ids-editor.component.ts');
+require(// eslint-disable-next-line max-len
+'objects/templates/translatable-set-of-normalized-string-editor.component.ts');
+require('objects/templates/translatable-set-of-unicode-string-editor.component.ts');
 require('objects/templates/set-of-unicode-string-editor.component.ts');
 require('objects/templates/skill-selector-editor.component.ts');
 require('objects/templates/subtitled-html-editor.component.ts');

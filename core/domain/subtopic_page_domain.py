@@ -42,6 +42,8 @@ CMD_CREATE_NEW: Final = 'create_new'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: Final = 'update_subtopic_page_property'
+CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION: Final = (
+    'migrate_subtopic_page_contents_schema_to_latest_version')
 
 
 class SubtopicPageChange(change_domain.BaseChange):
@@ -75,6 +77,13 @@ class SubtopicPageChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_MIGRATE_SUBTOPIC_PAGE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
         'deprecated_values': {}
     }]
 

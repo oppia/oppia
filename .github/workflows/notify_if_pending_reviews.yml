@@ -1,0 +1,36 @@
+name: Send pending review notifications to reviewer on github-discussion
+on:
+  schedule:
+    # Every Tuesday and Thursday at 16:00 UTC.
+    - cron: '0 16 * * 2,4'
+  # GitHub doesn't provide assurance that the scheduled jobs will run on time
+  # (see https://github.community/t/no-assurance-on-scheduled-jobs/133753).
+  # So, we add the workflow_dispatch event here to allow triggering this
+  # workflow manually if needed.
+  workflow_dispatch:
+permissions: read-all
+
+jobs:
+  send_notifications:
+    name: Send pending review notifications
+    runs-on: ubuntu-22.04
+    permissions:
+      discussions: write
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Notify reviewers
+        # SHA1 hash of the develop commit.
+        uses: oppia/stale-review-request-notifier@265e48e829a0513ab68a17167e21ecbe84f1542a
+        with:
+          category-name: Notify\ Reviewers
+          repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
+          review-turnaround-hours: 48
+      - name: Report if failed
+        if: ${{ failure() }}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "A pending-review-notification workflow failed."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

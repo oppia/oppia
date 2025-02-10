@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for ParamChangeObjectFactory.
  */
 
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 
 describe('Param Change Object Factory', () => {
   let pcof: ParamChangeObjectFactory;
@@ -30,67 +29,69 @@ describe('Param Change Object Factory', () => {
     const sampleData = {
       customization_args: {
         parse_with_jinja: false,
-        value: '10'
+        value: '10',
       },
       generator_id: 'Copier',
-      name: 'Param change from backend'
+      name: 'Param change from backend',
     };
-    const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
+    const paramChangeObject = pcof.createFromBackendDict(sampleData);
 
     expect(paramChangeObject.toBackendDict()).toEqual(sampleData);
   });
 
-  it('should reset a copier custom customization args from param change ' +
-    'object', () => {
-    const sampleData = {
-      customization_args: {
-        parse_with_jinja: false,
-        value: ''
-      },
-      generator_id: 'Copier',
-      name: 'Reset copier custom customization args'
-    };
-    const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
-    paramChangeObject.resetCustomizationArgs();
+  it(
+    'should reset a copier custom customization args from param change ' +
+      'object',
+    () => {
+      const sampleData = {
+        customization_args: {
+          parse_with_jinja: false,
+          value: '',
+        },
+        generator_id: 'Copier',
+        name: 'Reset copier custom customization args',
+      };
+      const paramChangeObject = pcof.createFromBackendDict(sampleData);
+      paramChangeObject.resetCustomizationArgs();
 
-    expect(paramChangeObject.toBackendDict()).toEqual({
-      customization_args: {
-        parse_with_jinja: true,
-        value: '5'
-      },
-      generator_id: 'Copier',
-      name: 'Reset copier custom customization args'
-    });
-  });
+      expect(paramChangeObject.toBackendDict()).toEqual({
+        customization_args: {
+          parse_with_jinja: true,
+          value: '5',
+        },
+        generator_id: 'Copier',
+        name: 'Reset copier custom customization args',
+      });
+    }
+  );
 
-  it('should reset a random selector custom customization args from param ' +
-    'change object', () => {
-    const sampleData = {
-      customization_args: {
-        parse_with_jinja: false,
-        value: '10'
-      },
-      generator_id: 'RandomSelector',
-      name: 'Reset random selector custom customization args'
-    };
-    const paramChangeObject = (
-      pcof.createFromBackendDict(sampleData));
-    paramChangeObject.resetCustomizationArgs();
+  it(
+    'should reset a random selector custom customization args from param ' +
+      'change object',
+    () => {
+      const sampleData = {
+        customization_args: {
+          parse_with_jinja: false,
+          value: '10',
+        },
+        generator_id: 'RandomSelector',
+        name: 'Reset random selector custom customization args',
+      };
+      const paramChangeObject = pcof.createFromBackendDict(sampleData);
+      paramChangeObject.resetCustomizationArgs();
 
-    expect(paramChangeObject.toBackendDict()).toEqual({
-      customization_args: {
-        list_of_values: ['sample value']
-      },
-      generator_id: 'RandomSelector',
-      name: 'Reset random selector custom customization args'
-    });
-  });
+      expect(paramChangeObject.toBackendDict()).toEqual({
+        customization_args: {
+          list_of_values: ['sample value'],
+        },
+        generator_id: 'RandomSelector',
+        name: 'Reset random selector custom customization args',
+      });
+    }
+  );
 
   it('should create an empty param change object', () => {
-    const emptyParamChangeObject = (
-      pcof.createEmpty('param'));
+    const emptyParamChangeObject = pcof.createEmpty('param');
 
     expect(emptyParamChangeObject.toBackendDict()).toEqual({
       customization_args: {
@@ -98,13 +99,12 @@ describe('Param Change Object Factory', () => {
         value: '',
       },
       generator_id: 'Copier',
-      name: 'param'
+      name: 'param',
     });
   });
 
   it('should create a default param change object', () => {
-    const emptyParamChangeObject = (
-      pcof.createDefault('param'));
+    const emptyParamChangeObject = pcof.createDefault('param');
 
     expect(emptyParamChangeObject.toBackendDict()).toEqual({
       customization_args: {
@@ -112,7 +112,7 @@ describe('Param Change Object Factory', () => {
         value: '5',
       },
       generator_id: 'Copier',
-      name: 'param'
+      name: 'param',
     });
   });
 });

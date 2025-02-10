@@ -16,19 +16,25 @@
  * @fileoverview Unit tests for the component of the 'State Editor'.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, tick, ComponentFixture, flush } from '@angular/core/testing';
-import { EditabilityService } from 'services/editability.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateNameEditorComponent } from './state-name-editor.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  TestBed,
+  fakeAsync,
+  tick,
+  ComponentFixture,
+  flush,
+} from '@angular/core/testing';
+import {EditabilityService} from 'services/editability.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateNameEditorComponent} from './state-name-editor.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 class MockExplorationDataService {
   explorationId!: 0;
@@ -57,7 +63,7 @@ describe('State Name Editor component', () => {
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
@@ -70,14 +76,8 @@ describe('State Name Editor component', () => {
     explorationDataService = new MockExplorationDataService();
 
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule
-      ],
-      declarations: [
-        StateNameEditorComponent
-      ],
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      declarations: [StateNameEditorComponent],
       providers: [
         EditabilityService,
         ExplorationStatesService,
@@ -86,21 +86,20 @@ describe('State Name Editor component', () => {
         StateNameService,
         {
           provide: ExplorationDataService,
-          useValue: explorationDataService
+          useValue: explorationDataService,
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: ExternalSaveService,
-          useClass: MockExternalSaveService
-        }
+          useClass: MockExternalSaveService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
-
 
   beforeEach(() => {
     fixture = TestBed.createComponent(StateNameEditorComponent);
@@ -113,128 +112,135 @@ describe('State Name Editor component', () => {
 
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
     autosaveChangeListSpy = spyOn(
-      explorationDataService, 'autosaveChangeListAsync');
+      explorationDataService,
+      'autosaveChangeListAsync'
+    );
 
-    explorationStatesService.init({
-      'First State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: 'First State Content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          solution: null,
-          id: null,
-          answer_groups: [],
-          default_outcome: {
-            dest: 'Second State',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-            param_changes: []
+    explorationStatesService.init(
+      {
+        'First State': {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'First State Content',
           },
-          hints: []
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+          interaction: {
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            solution: null,
+            id: null,
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '',
+              },
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              param_changes: [],
+            },
+            hints: [],
+          },
+          param_changes: [],
+          solicit_answer_details: false,
         },
-        param_changes: [],
-        solicit_answer_details: false
+        'Second State': {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'Second State Content',
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+          interaction: {
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            solution: null,
+            id: null,
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '',
+              },
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              param_changes: [],
+            },
+            hints: [],
+          },
+          param_changes: [],
+          solicit_answer_details: false,
+        },
+        'Third State': {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'This is some content.',
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+            },
+          },
+          interaction: {
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            solution: null,
+            id: null,
+            answer_groups: [],
+            default_outcome: {
+              dest: 'Second State',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '',
+              },
+              labelled_as_correct: true,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              param_changes: [],
+            },
+            hints: [],
+          },
+          param_changes: [
+            {
+              name: 'comparison',
+              generator_id: 'Copier',
+              customization_args: {
+                value: 'something clever',
+                parse_with_jinja: false,
+              },
+            },
+          ],
+          solicit_answer_details: false,
+        },
       },
-      'Second State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: 'Second State Content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          solution: null,
-          id: null,
-          answer_groups: [],
-          default_outcome: {
-            dest: 'Second State',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-            param_changes: []
-          },
-          hints: []
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-      },
-      'Third State': {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: 'This is some content.'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          solution: null,
-          id: null,
-          answer_groups: [],
-          default_outcome: {
-            dest: 'Second State',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-            param_changes: []
-          },
-          hints: []
-        },
-        param_changes: [{
-          name: 'comparison',
-          generator_id: 'Copier',
-          customization_args: {
-            value: 'something clever',
-            parse_with_jinja: false
-          }
-        }],
-        solicit_answer_details: false,
-      }
-    }, false);
+      false
+    );
     component.ngOnInit();
   });
 
@@ -246,51 +252,57 @@ describe('State Name Editor component', () => {
     fixture.destroy();
   });
 
-  it('should not save state name when it is longer than 50 characters',
-    () => {
-      expect(component.saveStateName(
-        'babababababababababababababababababababababababababab')).toBe(false);
-    });
-
-  it('should not save state names when it contains invalid characteres',
-    () => {
-      stateEditorService.setActiveStateName('Third State');
-      component.initStateNameEditor();
-      expect(component.saveStateName('#')).toBe(false);
-    });
-
-  it('should not save duplicate state names when trying to save a state' +
-    ' that already exists', () => {
-    expect(component.saveStateName('Second State')).toBe(false);
+  it('should not save state name when it is longer than 50 characters', () => {
+    expect(
+      component.saveStateName(
+        'babababababababababababababababababababababababababab'
+      )
+    ).toBe(false);
   });
 
-  it('should save state name and refresh to main tab when submitting' +
-    ' state name form', () => {
-    spyOn(routerService, 'navigateToMainTab');
-    stateEditorService.setActiveStateName('First State');
+  it('should not save state names when it contains invalid characteres', () => {
+    stateEditorService.setActiveStateName('Third State');
     component.initStateNameEditor();
-
-    component.saveStateNameAndRefresh('Fourth State');
-    expect(routerService.navigateToMainTab).toHaveBeenCalled();
+    expect(component.saveStateName('#')).toBe(false);
   });
 
-  it('should save state names independently when editting more than one state',
-    fakeAsync(() => {
-      stateEditorService.setActiveStateName('Third State');
-      component.saveStateName('Fourth State');
-      tick(200);
-      expect(explorationStatesService.getState('Fourth State')).toBeTruthy();
-      expect(explorationStatesService.getState('Third State')).toBeFalsy();
+  it(
+    'should not save duplicate state names when trying to save a state' +
+      ' that already exists',
+    () => {
+      expect(component.saveStateName('Second State')).toBe(false);
+    }
+  );
 
+  it(
+    'should save state name and refresh to main tab when submitting' +
+      ' state name form',
+    () => {
+      spyOn(routerService, 'navigateToMainTab');
       stateEditorService.setActiveStateName('First State');
-      component.saveStateName('Fifth State');
-      tick(200);
-      expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
-      expect(explorationStatesService.getState('First State')).toBeFalsy();
-      expect(autosaveChangeListSpy).toHaveBeenCalled();
+      component.initStateNameEditor();
 
-      flush();
-    }));
+      component.saveStateNameAndRefresh('Fourth State');
+      expect(routerService.navigateToMainTab).toHaveBeenCalled();
+    }
+  );
+
+  it('should save state names independently when editting more than one state', fakeAsync(() => {
+    stateEditorService.setActiveStateName('Third State');
+    component.saveStateName('Fourth State');
+    tick(200);
+    expect(explorationStatesService.getState('Fourth State')).toBeTruthy();
+    expect(explorationStatesService.getState('Third State')).toBeFalsy();
+
+    stateEditorService.setActiveStateName('First State');
+    component.saveStateName('Fifth State');
+    tick(200);
+    expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
+    expect(explorationStatesService.getState('First State')).toBeFalsy();
+    expect(autosaveChangeListSpy).toHaveBeenCalled();
+
+    flush();
+  }));
 
   it('should not re-save state names when it did not changed', () => {
     stateEditorService.setActiveStateName('Second State');

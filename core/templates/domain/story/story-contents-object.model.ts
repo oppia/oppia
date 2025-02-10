@@ -17,15 +17,13 @@
  * story contents domain objects.
  */
 
-import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants';
-import { StoryNodeBackendDict, StoryNode } from
-  'domain/story/story-node.model';
+import {StoryEditorPageConstants} from 'pages/story-editor-page/story-editor-page.constants';
+import {StoryNodeBackendDict, StoryNode} from 'domain/story/story-node.model';
 
 export interface StoryContentsBackendDict {
-  'initial_node_id': string;
-  'next_node_id': string;
-  'nodes': StoryNodeBackendDict[];
+  initial_node_id: string;
+  next_node_id: string;
+  nodes: StoryNodeBackendDict[];
 }
 
 interface NodeTitles {
@@ -39,8 +37,7 @@ export class StoryContents {
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;
-  constructor(
-      initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
+  constructor(initialNodeId: string, nodes: StoryNode[], nextNodeId: string) {
     this._initialNodeId = initialNodeId;
     this._nodes = nodes;
     this._nextNodeId = nextNodeId;
@@ -48,7 +45,8 @@ export class StoryContents {
 
   getIncrementedNodeId(nodeId: string): string {
     var index = parseInt(
-      nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
+      nodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, '')
+    );
     ++index;
     return StoryEditorPageConstants.NODE_ID_PREFIX + index;
   }
@@ -132,35 +130,43 @@ export class StoryContents {
       var nodeId = nodeIds[i];
       if (nodeIds.indexOf(nodeId) < nodeIds.lastIndexOf(nodeId)) {
         throw new Error(
-          'The node with id ' + nodeId + ' is duplicated in the story');
+          'The node with id ' + nodeId + ' is duplicated in the story'
+        );
       }
     }
     var nextNodeIdNumber = parseInt(
-      this._nextNodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
+      this._nextNodeId.replace(StoryEditorPageConstants.NODE_ID_PREFIX, '')
+    );
     var initialNodeIsPresent = false;
     for (var i = 0; i < nodes.length; i++) {
       var nodeIdNumber = parseInt(
-        nodes[i].getId().replace(StoryEditorPageConstants.NODE_ID_PREFIX, ''));
+        nodes[i].getId().replace(StoryEditorPageConstants.NODE_ID_PREFIX, '')
+      );
       if (nodes[i].getId() === this._initialNodeId) {
         initialNodeIsPresent = true;
       }
       if (nodeIdNumber > nextNodeIdNumber) {
         throw new Error(
-          'Node id out of bounds for node with id ' + nodes[i].getId());
+          'Node id out of bounds for node with id ' + nodes[i].getId()
+        );
       }
       for (var j = 0; j < nodes[i].getDestinationNodeIds().length; j++) {
         if (nodeIds.indexOf(nodes[i].getDestinationNodeIds()[j]) === -1) {
           issues.push(
-            'The node with id ' + nodes[i].getDestinationNodeIds()[j] +
-            ' doesn\'t exist');
+            'The node with id ' +
+              nodes[i].getDestinationNodeIds()[j] +
+              " doesn't exist"
+          );
         }
       }
     }
     if (nodes.length > 0) {
       if (!initialNodeIsPresent) {
         throw new Error(
-          'Initial node - ' + this._initialNodeId +
-          ' - is not present in the story');
+          'Initial node - ' +
+            this._initialNodeId +
+            ' - is not present in the story'
+        );
       }
     }
     return issues;
@@ -168,15 +174,13 @@ export class StoryContents {
 
   setInitialNodeId(nodeId: string | null): void {
     if (this.getNodeIndex(nodeId) === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._initialNodeId = nodeId;
   }
 
   addNode(title: string): void {
-    this._nodes.push(
-      StoryNode.createFromIdAndTitle(
-        this._nextNodeId, title));
+    this._nodes.push(StoryNode.createFromIdAndTitle(this._nextNodeId, title));
     if (this._initialNodeId === null) {
       this._initialNodeId = this._nextNodeId;
     }
@@ -205,7 +209,7 @@ export class StoryContents {
   setNodeOutline(nodeId: string, outline: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setOutline(outline);
   }
@@ -213,7 +217,7 @@ export class StoryContents {
   setNodeTitle(nodeId: string, title: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setTitle(title);
   }
@@ -221,7 +225,7 @@ export class StoryContents {
   setNodeDescription(nodeId: string, description: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setDescription(description);
   }
@@ -229,14 +233,17 @@ export class StoryContents {
   setNodeExplorationId(nodeId: string, explorationId: string | null): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     } else {
       if (explorationId !== null) {
         for (var i = 0; i < this._nodes.length; i++) {
-          if ((this._nodes[i].getExplorationId() === explorationId) && (
-            i !== index)) {
+          if (
+            this._nodes[i].getExplorationId() === explorationId &&
+            i !== index
+          ) {
             throw new Error(
-              'The given exploration already exists in the story.');
+              'The given exploration already exists in the story.'
+            );
           }
         }
       }
@@ -247,48 +254,53 @@ export class StoryContents {
   setNodeStatus(nodeId: string, status: string): void {
     let index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setStatus(status);
   }
 
   setNodePlannedPublicationDateMsecs(
-      nodeId: string, plannedPublicationDateMsecs: number | null): void {
-    let index = this.getNodeIndex(nodeId);
-    if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
-    }
-    this._nodes[index].setPlannedPublicationDateMsecs(
-      plannedPublicationDateMsecs);
-  }
-
-  setNodeLastModifiedMsecs(
-      nodeId: string, lastModifiedMsecs: number | null
+    nodeId: string,
+    plannedPublicationDateMsecs: number | null
   ): void {
     let index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
+    }
+    this._nodes[index].setPlannedPublicationDateMsecs(
+      plannedPublicationDateMsecs
+    );
+  }
+
+  setNodeLastModifiedMsecs(
+    nodeId: string,
+    lastModifiedMsecs: number | null
+  ): void {
+    let index = this.getNodeIndex(nodeId);
+    if (index === -1) {
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setLastModifiedMsecs(lastModifiedMsecs);
   }
 
   setNodeFirstPublicationDateMsecs(
-      nodeId: string, firstPublicationDateMsecs: number | null
+    nodeId: string,
+    firstPublicationDateMsecs: number | null
   ): void {
     let index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
-    this._nodes[index].setFirstPublicationDateMsecs(
-      firstPublicationDateMsecs);
+    this._nodes[index].setFirstPublicationDateMsecs(firstPublicationDateMsecs);
   }
 
   setNodeUnpublishingReason(
-      nodeId: string, unpublishingReason: string | null
+    nodeId: string,
+    unpublishingReason: string | null
   ): void {
     let index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].setUnpublishingReason(unpublishingReason);
   }
@@ -296,7 +308,7 @@ export class StoryContents {
   markNodeOutlineAsFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].markOutlineAsFinalized();
   }
@@ -304,7 +316,7 @@ export class StoryContents {
   markNodeOutlineAsNotFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].markOutlineAsNotFinalized();
   }
@@ -312,7 +324,7 @@ export class StoryContents {
   addPrerequisiteSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].addPrerequisiteSkillId(skillId);
   }
@@ -320,7 +332,7 @@ export class StoryContents {
   removePrerequisiteSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].removePrerequisiteSkillId(skillId);
   }
@@ -328,7 +340,7 @@ export class StoryContents {
   addAcquiredSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].addAcquiredSkillId(skillId);
   }
@@ -336,7 +348,7 @@ export class StoryContents {
   removeAcquiredSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].removeAcquiredSkillId(skillId);
   }
@@ -344,33 +356,38 @@ export class StoryContents {
   addDestinationNodeIdToNode(nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     if (this.getNodeIndex(destinationNodeId) === -1) {
-      throw new Error('The destination node with given id doesn\'t exist');
+      throw new Error("The destination node with given id doesn't exist");
     }
     this._nodes[index].addDestinationNodeId(destinationNodeId);
   }
 
   removeDestinationNodeIdFromNode(
-      nodeId: string, destinationNodeId: string): void {
+    nodeId: string,
+    destinationNodeId: string
+  ): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw new Error('The node with given id doesn\'t exist');
+      throw new Error("The node with given id doesn't exist");
     }
     this._nodes[index].removeDestinationNodeId(destinationNodeId);
   }
 
   static createFromBackendDict(
-      storyContentsBackendObject: StoryContentsBackendDict): StoryContents {
+    storyContentsBackendObject: StoryContentsBackendDict
+  ): StoryContents {
     var nodes = [];
     for (var i = 0; i < storyContentsBackendObject.nodes.length; i++) {
       nodes.push(
-        StoryNode.createFromBackendDict(
-          storyContentsBackendObject.nodes[i]));
+        StoryNode.createFromBackendDict(storyContentsBackendObject.nodes[i])
+      );
     }
     return new StoryContents(
-      storyContentsBackendObject.initial_node_id, nodes,
-      storyContentsBackendObject.next_node_id);
+      storyContentsBackendObject.initial_node_id,
+      nodes,
+      storyContentsBackendObject.next_node_id
+    );
   }
 }

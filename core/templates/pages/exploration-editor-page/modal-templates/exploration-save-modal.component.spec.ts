@@ -16,10 +16,21 @@
  * @fileoverview Unit tests for ExplorationSaveModalcomponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationSaveModalComponent } from './exploration-save-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationSaveModalComponent} from './exploration-save-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -31,29 +42,53 @@ class MockActiveModal {
   }
 }
 
+class MockNgbModalRef {
+  componentInstance = {
+    showingTranslationChanges: false,
+    headers: {
+      leftPane: null,
+      rightPane: null,
+    },
+  };
+  result = Promise.resolve();
+}
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanModifyTranslations: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('Exploration Save Modal component', () => {
   let component: ExplorationSaveModalComponent;
   let fixture: ComponentFixture<ExplorationSaveModalComponent>;
   let isExplorationPrivate = true;
+  let ngbModal: NgbModal;
+  let ngbModalRef: MockNgbModalRef = new MockNgbModalRef();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ExplorationSaveModalComponent
-      ],
+      declarations: [ExplorationSaveModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationSaveModalComponent);
     component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
 
     // This throws "Argument of type 'null' is not assignable to parameter of
     // type 'DiffNodeData'." We need to suppress this error because of the need
@@ -66,21 +101,37 @@ describe('Exploration Save Modal component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after component is initialized',
+  it('should initialize component properties after component is initialized', () => {
+    expect(component.showDiff).toBe(false);
+    expect(component.diffData).toBe(null);
+    expect(component.isExplorationPrivate).toBe(isExplorationPrivate);
+    expect(component.earlierVersionHeader).toBe('Last saved');
+    expect(component.laterVersionHeader).toBe('New changes');
+  });
+
+  it(
+    'should toggle exploration diff visibility when clicking on toggle diff' +
+      ' button',
     () => {
       expect(component.showDiff).toBe(false);
-      expect(component.diffData).toBe(null);
-      expect(component.isExplorationPrivate).toBe(isExplorationPrivate);
-      expect(component.earlierVersionHeader).toBe('Last saved');
-      expect(component.laterVersionHeader).toBe('New changes');
-    });
+      component.onClickToggleDiffButton();
+      expect(component.showDiff).toBe(true);
+      component.onClickToggleDiffButton();
+      expect(component.showDiff).toBe(false);
+    }
+  );
 
-  it('should toggle exploration diff visibility when clicking on toggle diff' +
-    ' button', () => {
-    expect(component.showDiff).toBe(false);
-    component.onClickToggleDiffButton();
-    expect(component.showDiff).toBe(true);
-    component.onClickToggleDiffButton();
-    expect(component.showDiff).toBe(false);
-  });
+  it('should show state diff modal for translation changes', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef as NgbModalRef);
+
+    component.showStateDiffModalForTranslations();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(ngbModalRef.componentInstance.showingTranslationChanges).toBeTrue();
+    expect(ngbModalRef.componentInstance.headers).toEqual({
+      leftPane: 'Last saved',
+      rightPane: 'New changes',
+    });
+  }));
 });

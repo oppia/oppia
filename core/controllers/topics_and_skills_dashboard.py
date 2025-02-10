@@ -27,7 +27,7 @@ from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import domain_objects_validator
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -41,28 +41,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 
 from typing import Dict, List, Optional, TypedDict, Union
-
-
-class FrontendTopicSummaryDict(topic_domain.TopicSummaryDict):
-    """Dictionary that represents TopicSummary domain object for frontend."""
-
-    is_published: bool
-    can_edit_topic: bool
-    classroom: Optional[str]
-
-
-class TopicsAndSkillsDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the topics and skills dashboard."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self) -> None:
-        self.render_template(
-            'topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(
@@ -82,7 +60,7 @@ class TopicsAndSkillsDashboardPageDataHandler(
         # the type from the list of 'TopicSummaryDict' to the list of
         # 'FrontendTopicSummaryDict', and this is done because below we
         # are adding new keys that are not defined on the 'TopicSummaryDict'.
-        topic_summary_dicts: List[FrontendTopicSummaryDict] = [
+        topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict] = [
             summary.to_dict() for summary in topic_summaries]  # type: ignore[misc]
 
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -105,18 +83,36 @@ class TopicsAndSkillsDashboardPageDataHandler(
                             self.user, topic_rights)
                     )
 
-        all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+        classrooms = classroom_config_services.get_all_classrooms()
         all_classroom_names = [
-            classroom['name'] for classroom in all_classrooms_dict]
+            classroom.name for classroom in classrooms]
 
         topic_classroom_dict = {}
-        for classroom in all_classrooms_dict:
-            for topic_id in classroom['topic_ids']:
-                topic_classroom_dict[topic_id] = classroom['name']
+        for classroom in classrooms:
+            for topic_id in classroom.get_topic_ids():
+                topic_classroom_dict[topic_id] = classroom.name
 
         for topic_summary_dict in topic_summary_dicts:
             topic_summary_dict['classroom'] = topic_classroom_dict.get(
                 topic_summary_dict['id'], None)
+
+        chapter_counts_by_topic_id = (
+            topic_services.get_chapter_counts_in_topic_summaries(
+                topic_summary_dicts))
+
+        for topic_summary_dict in topic_summary_dicts:
+            topic_chapter_count = chapter_counts_by_topic_id[
+                topic_summary_dict['id']]
+            topic_summary_dict.update({
+                'total_upcoming_chapters_count': (
+                    topic_chapter_count.total_upcoming_chapters_count),
+                'total_overdue_chapters_count': (
+                    topic_chapter_count.total_overdue_chapters_count),
+                'total_chapter_counts_for_each_story': (
+                    topic_chapter_count.total_chapter_counts_for_each_story),
+                'published_chapter_counts_for_each_story': (
+                    topic_chapter_count.published_chapter_counts_for_each_story)
+            })
 
         mergeable_skill_summary_dicts = []
 
@@ -430,7 +426,12 @@ class NewTopicHandler(
 
     @acl_decorators.can_create_topic
     def post(self) -> None:
-        """Creates a new topic."""
+        """Creates a new topic.
+
+        Raise:
+            InvalidInputException. If there are validation errors
+                during image validation.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         assert self.normalized_request is not None
@@ -555,7 +556,12 @@ class NewSkillHandler(
 
     @acl_decorators.can_create_skill
     def post(self) -> None:
-        """Creates a new skill."""
+        """Creates a new skill.
+
+        Raises:
+            InvalidInputException. The topic is None or there is a duplicate
+                skill description.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         description = self.normalized_payload['description']

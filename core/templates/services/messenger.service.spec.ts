@@ -19,11 +19,11 @@
  * be attempted due to cross-domain security issues.)
  */
 
-import { TestBed } from '@angular/core/testing';
-import { MessengerService } from './messenger.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoggerService } from './contextual/logger.service';
-import { ServicesConstants } from './services.constants';
+import {TestBed} from '@angular/core/testing';
+import {MessengerService} from './messenger.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoggerService} from './contextual/logger.service';
+import {ServicesConstants} from './services.constants';
 
 describe('BannerComponent', () => {
   let messengerService: MessengerService;
@@ -46,11 +46,11 @@ describe('BannerComponent', () => {
         },
         set hash(val) {
           this._hash = val;
-        }
+        },
       },
       parent: {
-        postMessage: () => {}
-      }
+        postMessage: () => {},
+      },
     };
 
     get nativeWindow() {
@@ -63,9 +63,9 @@ describe('BannerComponent', () => {
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
-      ]
+      ],
     });
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
   });
@@ -75,144 +75,188 @@ describe('BannerComponent', () => {
     loggerService = TestBed.inject(LoggerService);
   });
 
-  it('should post height change when the user changes the height of the' +
-  'exploration player', () => {
-    spyOn(mockWindowRef._window.parent, 'postMessage');
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.2&secret=secret1&tagid=1';
-
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
-        height: 100,
-        scroll: true
-      });
-
-    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
-      '{"title":"heightChange",' +
-      '"payload":{"height":100,"scroll":true},' +
-      '"sourceTagId":null,"secret":null}', '*');
-  });
-
-
-  it('should post exploration loaded when the exploration completes loading' +
-  ' in the exploration player', () => {
-    spyOn(mockWindowRef._window.parent, 'postMessage');
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.2&secret=secret1&tagid=1';
-
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED, {
-        explorationVersion: 1,
-        explorationTitle: 'exploration title'
-      });
-
-    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
-      '{"title":"explorationLoaded",' +
-      '"payload":{"explorationVersion":1,' +
-      '"explorationTitle":"exploration title"},' +
-      '"sourceTagId":null,"secret":null}', '*');
-  });
-
-  it('should post state transition when the exploration state changes' +
-  ' in the exploration player', () => {
-    spyOn(mockWindowRef._window.parent, 'postMessage');
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.2&secret=secret1&tagid=1';
-
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION, {
-        explorationVersion: 1,
-        oldStateName: 'old state',
-        jsonAnswer: '{answer: 0}',
-        newStateName: 'new state'
-      });
-
-    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
-      '{"title":"stateTransition","payload":{"explorationVersion":1,' +
-      '"oldStateName":"old state","jsonAnswer":"{answer: 0}",' +
-      '"newStateName":"new state"},"sourceTagId":null,"secret":null}', '*');
-  });
-
-  it('should post exploration completed when the exploration is completed' +
-  ' in the exploration player', () => {
-    spyOn(mockWindowRef._window.parent, 'postMessage');
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.2&secret=secret1&tagid=1';
-
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED, {
-        explorationVersion: 1
-      });
-
-    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
-      '{"title":"explorationCompleted","payload":{"explorationVersion":1},' +
-      '"sourceTagId":null,"secret":null}', '*');
-  });
-
-  it('should post exploration reset when the exploration is reset' +
-  ' in the exploration player', () => {
-    spyOn(mockWindowRef._window.parent, 'postMessage');
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.2&secret=secret1&tagid=1';
-
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET, {
-        stateName: 'state name'
-      });
-
-    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
-      '{"title":"explorationReset","payload":{"stateName":' +
-      '{"stateName":"state name"}},"sourceTagId":null,"secret":null}', '*');
-  });
-
-  it('should post \'Secret\' and \'Tag Id\' if the version is \'0.0.0\'',
+  it(
+    'should post height change when the user changes the height of the' +
+      'exploration player',
     () => {
       spyOn(mockWindowRef._window.parent, 'postMessage');
       mockWindowRef.nativeWindow.location.hash =
-        '/version=0.0.0&secret=secret1&tagid=1';
+        '/version=0.0.2&secret=secret1&tagid=1';
 
       messengerService.sendMessage(
-        ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+        ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+        {
           height: 100,
-          scroll: true
-        });
+          scroll: true,
+        }
+      );
 
       expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
         '{"title":"heightChange",' +
+          '"payload":{"height":100,"scroll":true},' +
+          '"sourceTagId":null,"secret":null}',
+        '*'
+      );
+    }
+  );
+
+  it(
+    'should post exploration loaded when the exploration completes loading' +
+      ' in the exploration player',
+    () => {
+      spyOn(mockWindowRef._window.parent, 'postMessage');
+      mockWindowRef.nativeWindow.location.hash =
+        '/version=0.0.2&secret=secret1&tagid=1';
+
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED,
+        {
+          explorationVersion: 1,
+          explorationTitle: 'exploration title',
+        }
+      );
+
+      expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
+        '{"title":"explorationLoaded",' +
+          '"payload":{"explorationVersion":1,' +
+          '"explorationTitle":"exploration title"},' +
+          '"sourceTagId":null,"secret":null}',
+        '*'
+      );
+    }
+  );
+
+  it(
+    'should post state transition when the exploration state changes' +
+      ' in the exploration player',
+    () => {
+      spyOn(mockWindowRef._window.parent, 'postMessage');
+      mockWindowRef.nativeWindow.location.hash =
+        '/version=0.0.2&secret=secret1&tagid=1';
+
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION,
+        {
+          explorationVersion: 1,
+          oldStateName: 'old state',
+          jsonAnswer: '{answer: 0}',
+          newStateName: 'new state',
+        }
+      );
+
+      expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
+        '{"title":"stateTransition","payload":{"explorationVersion":1,' +
+          '"oldStateName":"old state","jsonAnswer":"{answer: 0}",' +
+          '"newStateName":"new state"},"sourceTagId":null,"secret":null}',
+        '*'
+      );
+    }
+  );
+
+  it(
+    'should post exploration completed when the exploration is completed' +
+      ' in the exploration player',
+    () => {
+      spyOn(mockWindowRef._window.parent, 'postMessage');
+      mockWindowRef.nativeWindow.location.hash =
+        '/version=0.0.2&secret=secret1&tagid=1';
+
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED,
+        {
+          explorationVersion: 1,
+        }
+      );
+
+      expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
+        '{"title":"explorationCompleted","payload":{"explorationVersion":1},' +
+          '"sourceTagId":null,"secret":null}',
+        '*'
+      );
+    }
+  );
+
+  it(
+    'should post exploration reset when the exploration is reset' +
+      ' in the exploration player',
+    () => {
+      spyOn(mockWindowRef._window.parent, 'postMessage');
+      mockWindowRef.nativeWindow.location.hash =
+        '/version=0.0.2&secret=secret1&tagid=1';
+
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET,
+        {
+          stateName: 'state name',
+        }
+      );
+
+      expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
+        '{"title":"explorationReset","payload":{"stateName":' +
+          '{"stateName":"state name"}},"sourceTagId":null,"secret":null}',
+        '*'
+      );
+    }
+  );
+
+  it("should post 'Secret' and 'Tag Id' if the version is '0.0.0'", () => {
+    spyOn(mockWindowRef._window.parent, 'postMessage');
+    mockWindowRef.nativeWindow.location.hash =
+      '/version=0.0.0&secret=secret1&tagid=1';
+
+    messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+      {
+        height: 100,
+        scroll: true,
+      }
+    );
+
+    expect(mockWindowRef._window.parent.postMessage).toHaveBeenCalledWith(
+      '{"title":"heightChange",' +
         '"payload":{"height":100,"scroll":true},' +
-        '"sourceTagId":"1","secret":"secret1"}', '*');
-    });
+        '"sourceTagId":"1","secret":"secret1"}',
+      '*'
+    );
+  });
 
   it('should post message when height of exploration window changes', () => {
     spyOn(loggerService, 'error').and.stub();
-    mockWindowRef.nativeWindow.location.hash =
-      '/version0.0.0';
+    mockWindowRef.nativeWindow.location.hash = '/version0.0.0';
 
     messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+      {
         height: 100,
-        scroll: true
-      });
+        scroll: true,
+      }
+    );
 
-    expect(loggerService.error)
-      .toHaveBeenCalledWith('Invalid hash for embedding: version0.0.0');
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Invalid hash for embedding: version0.0.0'
+    );
   });
 
-  it('should throw error when an invalid version or secret is' +
-  ' presenti in the url', () => {
-    spyOn(loggerService, 'error').and.stub();
-    mockWindowRef.nativeWindow.location.hash =
-      '/version=0.0.0';
+  it(
+    'should throw error when an invalid version or secret is' +
+      ' presenti in the url',
+    () => {
+      spyOn(loggerService, 'error').and.stub();
+      mockWindowRef.nativeWindow.location.hash = '/version=0.0.0';
 
-    messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
-        height: 100,
-        scroll: true
-      });
+      messengerService.sendMessage(
+        ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+        {
+          height: 100,
+          scroll: true,
+        }
+      );
 
-    expect(loggerService.error)
-      .toHaveBeenCalledWith('Invalid hash for embedding: version=0.0.0');
-  });
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Invalid hash for embedding: version=0.0.0'
+      );
+    }
+  );
 
   it('should thow error when hasdict version is not supported', () => {
     spyOn(loggerService, 'error').and.stub();
@@ -220,13 +264,16 @@ describe('BannerComponent', () => {
       '/version=0.0.0&secret=secret1&tagid=1';
 
     messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+      {
         height: 100,
-        scroll: 100
-      });
+        scroll: 100,
+      }
+    );
 
-    expect(loggerService.error)
-      .toHaveBeenCalledWith('Error validating payload: [object Object]');
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Error validating payload: [object Object]'
+    );
   });
 
   it('should throw error when version of embedding is unknown', () => {
@@ -235,12 +282,15 @@ describe('BannerComponent', () => {
       '/version=0.0.10&secret=secret1&tagid=1';
 
     messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE, {
+      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+      {
         height: 100,
-        scroll: true
-      });
+        scroll: true,
+      }
+    );
 
-    expect(loggerService.error)
-      .toHaveBeenCalledWith('Unknown version for embedding: 0.0.10');
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Unknown version for embedding: 0.0.10'
+    );
   });
 });

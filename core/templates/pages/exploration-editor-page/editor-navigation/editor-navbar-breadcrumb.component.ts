@@ -17,17 +17,16 @@
  * in editor navbar.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
-import { ExplorationTitleService } from '../services/exploration-title.service';
-import { RouterService } from '../services/router.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
+import {ExplorationTitleService} from '../services/exploration-title.service';
+import {RouterService} from '../services/router.service';
 
 @Component({
   selector: 'oppia-editor-navbar-breadcrumb',
-  templateUrl: './editor-navbar-breadcrumb.component.html'
+  templateUrl: './editor-navbar-breadcrumb.component.html',
 })
 export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -49,25 +48,25 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   constructor(
     private explorationTitleService: ExplorationTitleService,
     private focusManagerService: FocusManagerService,
-    private routerService: RouterService,
+    private routerService: RouterService
   ) {}
 
   editTitle(): void {
     this.routerService.navigateToSettingsTab();
     this.focusManagerService.setFocus(
-      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL
+    );
   }
 
   getCurrentTabName(): string {
     const that = this;
-    type TabNamesToHumanReadableNamesKeys = (
-      keyof typeof that._TAB_NAMES_TO_HUMAN_READABLE_NAMES);
+    type TabNamesToHumanReadableNamesKeys =
+      keyof typeof that._TAB_NAMES_TO_HUMAN_READABLE_NAMES;
     if (!this.routerService.getActiveTabName()) {
       return '';
     } else {
       return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-        this.routerService.getActiveTabName() as
-          TabNamesToHumanReadableNamesKeys
+        this.routerService.getActiveTabName() as TabNamesToHumanReadableNamesKeys
       ];
     }
   }
@@ -75,13 +74,12 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.explorationTitleService.onExplorationPropertyChanged.subscribe(
-        (propertyName) => {
+        propertyName => {
           const _MAX_TITLE_LENGTH = 20;
           this.navbarTitle = String(this.explorationTitleService.savedMemento);
           if (this.navbarTitle.length > _MAX_TITLE_LENGTH) {
-            this.navbarTitle = (
-              this.navbarTitle.substring(
-                0, _MAX_TITLE_LENGTH - 3) + '...');
+            this.navbarTitle =
+              this.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...';
           }
         }
       )
@@ -92,8 +90,3 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaEditorNavbarBreadcrumb',
-  downgradeComponent({
-    component: EditorNavbarBreadcrumbComponent
-  }) as angular.IDirectiveFactory);

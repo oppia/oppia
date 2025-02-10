@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for WarningsAndAlertsComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
-import { LimitToPipe } from 'filters/limit-to.pipe';
-import { AlertsService, Message, Warning } from 'services/alerts.service';
-import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {AlertMessageComponent} from 'components/common-layout-directives/common-elements/alert-message.component';
+import {LimitToPipe} from 'filters/limit-to.pipe';
+import {AlertsService, Message, Warning} from 'services/alerts.service';
+import {WarningsAndAlertsComponent} from './warnings-and-alerts.component';
 
 describe('Warnings and Alert Component', () => {
   let fixture: ComponentFixture<WarningsAndAlertsComponent>;
@@ -32,8 +32,8 @@ describe('Warnings and Alert Component', () => {
       declarations: [
         WarningsAndAlertsComponent,
         AlertMessageComponent,
-        LimitToPipe
-      ]
+        LimitToPipe,
+      ],
     }).compileComponents();
   }));
 
@@ -48,22 +48,22 @@ describe('Warnings and Alert Component', () => {
   });
 
   it('should get messages', () => {
-    let messages: Message[] =
-      [{ content: 'Test Message', timeout: 100, type: 'success' }];
+    let messages: Message[] = [
+      {content: 'Test Message', timeout: 100, type: 'success'},
+    ];
     spyOnProperty(alertsService, 'messages').and.returnValue(messages);
     expect(componentInstance.getMessages()).toEqual(messages);
   });
 
   it('should get warnings', () => {
-    let warnings: Warning[] =
-      [{ content: 'Test Warning', type: 'success' }];
+    let warnings: Warning[] = [{content: 'Test Warning', type: 'success'}];
     spyOnProperty(alertsService, 'warnings').and.returnValue(warnings);
     expect(componentInstance.getWarnings()).toEqual(warnings);
   });
 
   it('should delete warning', () => {
     spyOn(alertsService, 'deleteWarning');
-    let warning: Warning = { content: 'Test Warning', type: 'success' };
+    let warning: Warning = {content: 'Test Warning', type: 'success'};
     componentInstance.deleteWarning(warning);
     expect(alertsService.deleteWarning).toHaveBeenCalled();
   });

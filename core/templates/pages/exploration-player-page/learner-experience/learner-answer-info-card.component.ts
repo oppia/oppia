@@ -16,14 +16,13 @@
  * @fileoverview Component for asking learner for answer details.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionRulesService } from '../services/answer-classification.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { LearnerAnswerInfoService } from '../services/learner-answer-info.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
+import {Component, EventEmitter, Output} from '@angular/core';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {InteractionRulesService} from '../services/answer-classification.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {LearnerAnswerInfoService} from '../services/learner-answer-info.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
 
 interface SubmitAnswerEventDataInterface {
   currentAnswer: string;
@@ -32,11 +31,11 @@ interface SubmitAnswerEventDataInterface {
 
 @Component({
   selector: 'oppia-learner-answer-info-card',
-  templateUrl: './learner-answer-info-card.component.html'
+  templateUrl: './learner-answer-info-card.component.html',
 })
 export class LearnerAnswerInfoCard {
-  @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> = (
-    new EventEmitter());
+  @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> =
+    new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -54,23 +53,23 @@ export class LearnerAnswerInfoCard {
   }
 
   submitLearnerAnswerInfo(): void {
-    this.learnerAnswerInfoService.recordLearnerAnswerInfo(
-      this.answerDetails);
+    this.learnerAnswerInfoService.recordLearnerAnswerInfo(this.answerDetails);
     this.playerTranscriptService.addNewInput(this.answerDetails, false);
     this.playerTranscriptService.addNewResponse(
-      this.learnerAnswerInfoService.getSolicitAnswerDetailsFeedback());
+      this.learnerAnswerInfoService.getSolicitAnswerDetailsFeedback()
+    );
     this.submitAnswer.emit({
       currentAnswer: this.learnerAnswerInfoService.getCurrentAnswer(),
       rulesService:
-      this.learnerAnswerInfoService.getCurrentInteractionRulesService()});
+        this.learnerAnswerInfoService.getCurrentInteractionRulesService(),
+    });
   }
 
   displayCurrentAnswer(): string {
     return this.explorationHtmlFormatter.getAnswerHtml(
-      this.learnerAnswerInfoService.getCurrentAnswer(), this.interaction.id,
-      this.interaction.customizationArgs);
+      this.learnerAnswerInfoService.getCurrentAnswer(),
+      this.interaction.id,
+      this.interaction.customizationArgs
+    );
   }
 }
-
-angular.module('oppia').directive('oppiaLearnerAnswerInfoCard',
-  downgradeComponent({ component: LearnerAnswerInfoCard }));

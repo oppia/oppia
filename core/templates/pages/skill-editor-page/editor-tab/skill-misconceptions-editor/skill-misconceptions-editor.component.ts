@@ -16,21 +16,20 @@
  * @fileoverview Component for the skill misconceptions editor.
  */
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { AddMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/add-misconception-modal.component';
-import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {AddMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/add-misconception-modal.component';
+import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
 
 @Component({
   selector: 'oppia-skill-misconceptions-editor',
-  templateUrl: './skill-misconceptions-editor.component.html'
+  templateUrl: './skill-misconceptions-editor.component.html',
 })
 export class SkillMisconceptionsEditorComponent implements OnInit {
   @Output() getMisconceptionsChange = new EventEmitter();
@@ -53,29 +52,28 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     private ngbModal: NgbModal,
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
-    private windowDimensionsService: WindowDimensionsService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
     this.skillEditorCardIsShown = true;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(
-        () => {
-          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-          this.misconceptionsListIsShown = (
-            !this.windowDimensionsService.isWindowNarrow());
-        }
-      )
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+        this.misconceptionsListIsShown =
+          !this.windowDimensionsService.isWindowNarrow();
+      })
     );
 
     this.skill = this.skillEditorStateService.getSkill();
-    this.misconceptionsListIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.misconceptionsListIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
     this.misconceptions = this.skill.getMisconceptions();
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(
-        () => this.misconceptions = this.skill.getMisconceptions())
+        () => (this.misconceptions = this.skill.getMisconceptions())
+      )
     );
   }
 
@@ -97,35 +95,47 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
 
   openDeleteMisconceptionModal(index: number, evt: string): void {
     const modalInstance: NgbModalRef = this.ngbModal.open(
-      DeleteMisconceptionModalComponent, {
+      DeleteMisconceptionModalComponent,
+      {
         backdrop: 'static',
-      });
+      }
+    );
     modalInstance.componentInstance.index = index;
-    modalInstance.result.then((result) => {
-      this.skillUpdateService.deleteMisconception(this.skill, result.id);
-      this.misconceptions = this.skill.getMisconceptions();
-      this.activeMisconceptionIndex = null;
-      this.getMisconceptionsChange.emit();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modalInstance.result.then(
+      result => {
+        this.skillUpdateService.deleteMisconception(this.skill, result.id);
+        this.misconceptions = this.skill.getMisconceptions();
+        this.activeMisconceptionIndex = null;
+        this.getMisconceptionsChange.emit();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   openAddMisconceptionModal(): void {
-    this.ngbModal.open(AddMisconceptionModalComponent, {
-      backdrop: 'static'
-    }).result.then((result) => {
-      this.skillUpdateService.addMisconception(
-        this.skill, result.misconception);
-      this.misconceptions = this.skill.getMisconceptions();
-      this.getMisconceptionsChange.emit();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(AddMisconceptionModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        result => {
+          this.skillUpdateService.addMisconception(
+            this.skill,
+            result.misconception
+          );
+          this.misconceptions = this.skill.getMisconceptions();
+          this.getMisconceptionsChange.emit();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   onMisconceptionChange(): void {
@@ -134,8 +144,7 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
 
   toggleMisconceptionLists(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
-      this.misconceptionsListIsShown = (
-        !this.misconceptionsListIsShown);
+      this.misconceptionsListIsShown = !this.misconceptionsListIsShown;
     }
   }
 
@@ -145,6 +154,3 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive('oppiaSkillMisconceptionsEditor',
-  downgradeComponent({component: SkillMisconceptionsEditorComponent}));

@@ -12,63 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
-import { DegreesOfMastery } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { SubtopicBackendDict, Subtopic, SkillIdToDescriptionMap } from './subtopic.model';
+import {
+  StorySummary,
+  StorySummaryBackendDict,
+} from 'domain/story/story-summary.model';
+import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {
+  SubtopicBackendDict,
+  Subtopic,
+  SkillIdToDescriptionMap,
+} from './subtopic.model';
 
 /**
  * @fileoverview Frontend Model for learner topic summary.
  */
 
 export interface LearnerTopicSummaryBackendDict {
-  'id': string;
-  'name': string;
-  'language_code': string;
-  'description': string;
-  'version': number;
-  'story_titles': string[];
-  'total_published_node_count': number;
-  'canonical_story_summary_dict': StorySummaryBackendDict[];
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'classroom': string;
-  'practice_tab_is_displayed': boolean;
-  'degrees_of_mastery': DegreesOfMastery;
-  'skill_descriptions': SkillIdToDescriptionMap;
-  'subtopics': SubtopicBackendDict[];
-  'url_fragment': string;
+  id: string;
+  name: string;
+  language_code: string;
+  description: string;
+  version: number;
+  story_titles: string[];
+  total_published_node_count: number;
+  canonical_story_summary_dict: StorySummaryBackendDict[];
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+  classroom_name: string;
+  classroom_url_fragment: string;
+  practice_tab_is_displayed: boolean;
+  degrees_of_mastery: DegreesOfMastery;
+  skill_descriptions: SkillIdToDescriptionMap;
+  subtopics: SubtopicBackendDict[];
+  url_fragment: string;
 }
 
 export class LearnerTopicSummary {
   constructor(
-      public id: string,
-      public name: string,
-      public languageCode: string,
-      public description: string,
-      public version: number,
-      public storyTitles: string[],
-      public totalPublishedNodeCount: number,
-      public canonicalStorySummaryDicts: StorySummary[],
-      public thumbnailFilename: string,
-      public thumbnailBgColor: string,
-      public classroom: string,
-      public practiceTabIsDisplayed: boolean,
-      public degreesOfMastery: DegreesOfMastery,
-      public skillDescriptions: SkillIdToDescriptionMap,
-      public subtopics: Subtopic[],
-      public urlFragment: string) { }
+    public id: string,
+    public name: string,
+    public languageCode: string,
+    public description: string,
+    public version: number,
+    public storyTitles: string[],
+    public totalPublishedNodeCount: number,
+    public canonicalStorySummaryDicts: StorySummary[],
+    public thumbnailFilename: string,
+    public thumbnailBgColor: string,
+    public classroomName: string,
+    public classroomUrlFragment: string,
+    public practiceTabIsDisplayed: boolean,
+    public degreesOfMastery: DegreesOfMastery,
+    public skillDescriptions: SkillIdToDescriptionMap,
+    public subtopics: Subtopic[],
+    public urlFragment: string
+  ) {}
 
   static createFromBackendDict(
-      topicSummaryBackendDict: LearnerTopicSummaryBackendDict
+    topicSummaryBackendDict: LearnerTopicSummaryBackendDict
   ): LearnerTopicSummary {
     let subtopics = topicSummaryBackendDict.subtopics.map(subtopic => {
       return Subtopic.create(
-        subtopic, topicSummaryBackendDict.skill_descriptions);
+        subtopic,
+        topicSummaryBackendDict.skill_descriptions
+      );
     });
-    let canonicalStorySummaries = (
+    let canonicalStorySummaries =
       topicSummaryBackendDict.canonical_story_summary_dict.map(story => {
         return StorySummary.createFromBackendDict(story);
-      }));
+      });
 
     return new LearnerTopicSummary(
       topicSummaryBackendDict.id,
@@ -81,11 +93,14 @@ export class LearnerTopicSummary {
       canonicalStorySummaries,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.classroom_name,
+      topicSummaryBackendDict.classroom_url_fragment,
       topicSummaryBackendDict.practice_tab_is_displayed,
       topicSummaryBackendDict.degrees_of_mastery,
-      topicSummaryBackendDict.skill_descriptions, subtopics,
-      topicSummaryBackendDict.url_fragment);
+      topicSummaryBackendDict.skill_descriptions,
+      subtopics,
+      topicSummaryBackendDict.url_fragment
+    );
   }
 
   getId(): string {
@@ -128,8 +143,12 @@ export class LearnerTopicSummary {
     return this.thumbnailBgColor;
   }
 
-  getClassroom(): string {
-    return this.classroom;
+  getClassroomName(): string {
+    return this.classroomName;
+  }
+
+  getClassroomUrlFragment(): string {
+    return this.classroomUrlFragment;
   }
 
   getPracticeTabIsDisplayed(): boolean {

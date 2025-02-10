@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for upload blog post tumbnail modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UploadBlogPostThumbnailModalComponent } from './upload-blog-post-thumbnail-modal.component';
-import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UploadBlogPostThumbnailModalComponent} from './upload-blog-post-thumbnail-modal.component';
+import {UploadBlogPostThumbnailComponent} from './upload-blog-post-thumbnail.component';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailModalComponent>;
@@ -33,19 +33,14 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModalModule,
-      ],
+      imports: [HttpClientTestingModule, NgbModalModule],
       declarations: [
         MockTranslatePipe,
         UploadBlogPostThumbnailComponent,
-        UploadBlogPostThumbnailModalComponent
+        UploadBlogPostThumbnailModalComponent,
       ],
-      providers: [
-        NgbActiveModal,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

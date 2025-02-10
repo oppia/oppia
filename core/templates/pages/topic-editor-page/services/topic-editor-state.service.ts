@@ -18,25 +18,37 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Rubric, RubricBackendDict } from 'domain/skill/rubric.model';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StorySummary, StorySummaryBackendDict } from 'domain/story/story-summary.model';
-import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/subtopic-page.model';
-import { SkillIdToDescriptionMap } from 'domain/topic/subtopic.model';
-import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
-import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.model';
-import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
+import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {
+  StorySummary,
+  StorySummaryBackendDict,
+} from 'domain/story/story-summary.model';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {
+  SubtopicPage,
+  SubtopicPageBackendDict,
+} from 'domain/topic/subtopic-page.model';
+import {SkillIdToDescriptionMap} from 'domain/topic/subtopic.model';
+import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
+import {
+  TopicRights,
+  TopicRightsBackendDict,
+} from 'domain/topic/topic-rights.model';
+import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import cloneDeep from 'lodash/cloneDeep';
-import { AlertsService } from 'services/alerts.service';
-import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
-  from 'domain/editor/undo_redo/change.model';
-import { LoaderService } from 'services/loader.service';
-import { SubtopicPageContents } from 'domain/topic/subtopic-page-contents.model';
+import {AlertsService} from 'services/alerts.service';
+import {
+  TopicDeleteCanonicalStoryChange,
+  TopicDeleteAdditionalStoryChange,
+} from 'domain/editor/undo_redo/change.model';
+import {LoaderService} from 'services/loader.service';
+import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
@@ -44,7 +56,7 @@ interface GroupedSkillSummaryDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TopicEditorStateService {
   // These properties below are initialized using Angular lifecycle hooks
@@ -69,22 +81,29 @@ export class TopicEditorStateService {
   private _skillQuestionCountDict: Record<string, number> = {};
   private _groupedSkillSummaries: GroupedSkillSummaryDict = {
     current: [],
-    others: []
+    others: [],
   };
 
   private _skillCreationIsAllowed: boolean = false;
-  private _classroomUrlFragment: string = 'staging';
-  private _storySummariesInitializedEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _classroomUrlFragment: string | null = null;
+  private _curriculumAdminUsernames: string[] = [];
+  private _classroomName: string | null = null;
+  private _questionEditorOpened: boolean = false;
+  private _newQuestionEditor: boolean = false;
+  private _storySummariesInitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
 
-  private _subtopicPageLoadedEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _subtopicPageLoadedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
 
-  private _topicInitializedEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _topicInitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
 
-  private _topicReinitializedEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private _topicReinitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
+
+  private _questionEditorOpenedEventEmitter: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private alertsService: AlertsService,
@@ -96,7 +115,11 @@ export class TopicEditorStateService {
   ) {
     this._topicRights = new TopicRights(false, false, false);
     this._subtopicPage = new SubtopicPage(
-      'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
+      'id',
+      'topic_id',
+      SubtopicPageContents.createDefault(),
+      'en'
+    );
   }
 
   private _getSubtopicPageId(topicId: string, subtopicId: number): string {
@@ -106,17 +129,16 @@ export class TopicEditorStateService {
     return '';
   }
 
-  private _updateGroupedSkillSummaries(
-      groupedSkillSummaries: {
-        [topicName: string]: SkillSummaryBackendDict[];
-      }
-  ): void {
+  private _updateGroupedSkillSummaries(groupedSkillSummaries: {
+    [topicName: string]: SkillSummaryBackendDict[];
+  }): void {
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
 
     for (let idx in groupedSkillSummaries[this._topic.getName()]) {
       this._groupedSkillSummaries.current.push(
-        groupedSkillSummaries[this._topic.getName()][idx]);
+        groupedSkillSummaries[this._topic.getName()][idx]
+      );
     }
     for (let name in groupedSkillSummaries) {
       if (name === this._topic.getName()) {
@@ -157,27 +179,40 @@ export class TopicEditorStateService {
     return null;
   }
 
-  private _updateClassroomUrlFragment(classroomUrlFragment: string): void {
+  private _updateClassroomUrlFragment(
+    classroomUrlFragment: string | null
+  ): void {
     this._classroomUrlFragment = classroomUrlFragment;
   }
 
+  private _updateClassroomName(classroomName: string | null): void {
+    this._classroomName = classroomName;
+  }
+
+  private _updateCurriculumAdminUsernames(
+    curriculumAdminUsernames: string[]
+  ): void {
+    this._curriculumAdminUsernames = curriculumAdminUsernames;
+  }
+
   private _updateTopic(
-      newBackendTopicDict: TopicBackendDict,
-      skillIdToDescriptionDict: SkillIdToDescriptionMap): void {
-    this._setTopic(
-      Topic.create(
-        newBackendTopicDict, skillIdToDescriptionDict));
+    newBackendTopicDict: TopicBackendDict,
+    skillIdToDescriptionDict: SkillIdToDescriptionMap
+  ): void {
+    this._setTopic(Topic.create(newBackendTopicDict, skillIdToDescriptionDict));
   }
 
   private _updateSkillIdToRubricsObject(
-      skillIdToRubricsObject: Record<string, RubricBackendDict[]>): void {
+    skillIdToRubricsObject: Record<string, RubricBackendDict[]>
+  ): void {
     for (let skillId in skillIdToRubricsObject) {
       // Skips deleted skills.
       if (skillIdToRubricsObject[skillId]) {
         let rubrics = skillIdToRubricsObject[skillId].map(
           (rubric: RubricBackendDict) => {
             return Rubric.createFromBackendDict(rubric);
-          });
+          }
+        );
         this._skillIdToRubricsObject[skillId] = rubrics;
       }
     }
@@ -190,9 +225,11 @@ export class TopicEditorStateService {
   }
 
   private _updateSubtopicPage(
-      newBackendSubtopicPageObject: SubtopicPageBackendDict): void {
-    this._setSubtopicPage(SubtopicPage.createFromBackendDict(
-      newBackendSubtopicPageObject));
+    newBackendSubtopicPageObject: SubtopicPageBackendDict
+  ): void {
+    this._setSubtopicPage(
+      SubtopicPage.createFromBackendDict(newBackendSubtopicPageObject)
+    );
   }
 
   private _setTopicRights(topicRights: TopicRights): void {
@@ -200,18 +237,21 @@ export class TopicEditorStateService {
   }
 
   private _updateTopicRights(
-      newBackendTopicRightsObject: TopicRightsBackendDict): void {
-    this._setTopicRights(TopicRights.createFromBackendDict(
-      newBackendTopicRightsObject));
+    newBackendTopicRightsObject: TopicRightsBackendDict
+  ): void {
+    this._setTopicRights(
+      TopicRights.createFromBackendDict(newBackendTopicRightsObject)
+    );
   }
 
   private _setCanonicalStorySummaries(
-      canonicalStorySummaries: StorySummaryBackendDict[]): void {
+    canonicalStorySummaries: StorySummaryBackendDict[]
+  ): void {
     this._canonicalStorySummaries = canonicalStorySummaries.map(
-      (storySummaryDict) => {
-        return StorySummary.createFromBackendDict(
-          storySummaryDict);
-      });
+      storySummaryDict => {
+        return StorySummary.createFromBackendDict(storySummaryDict);
+      }
+    );
     this._storySummariesInitializedEventEmitter.emit();
   }
 
@@ -220,7 +260,8 @@ export class TopicEditorStateService {
   }
 
   private _setTopicWithUrlFragmentExists(
-      topicWithUrlFragmentExists: boolean): void {
+    topicWithUrlFragmentExists: boolean
+  ): void {
     this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
   }
 
@@ -232,46 +273,62 @@ export class TopicEditorStateService {
   loadTopic(topicId: string): void {
     this._topicIsLoading = true;
     this.loaderService.showLoadingScreen('Loading Topic Editor');
-    let topicDataPromise = this.editableTopicBackendApiService
-      .fetchTopicAsync(topicId);
-    let storyDataPromise = this.editableTopicBackendApiService
-      .fetchStoriesAsync(topicId);
-    let topicRightsPromise = this.topicRightsBackendApiService
-      .fetchTopicRightsAsync(topicId);
-    Promise.all([
-      topicDataPromise,
-      storyDataPromise,
-      topicRightsPromise
-    ]).then(([
-      newBackendTopicObject,
-      canonicalStorySummaries,
-      newBackendTopicRightsObject
-    ]) => {
-      this._updateTopic(
-        newBackendTopicObject.topicDict,
-        newBackendTopicObject.skillIdToDescriptionDict
-      );
-      this._skillCreationIsAllowed = (
-        newBackendTopicObject.skillCreationIsAllowed);
-      this._skillQuestionCountDict = (
-        newBackendTopicObject.skillQuestionCountDict);
-      this._updateGroupedSkillSummaries(
-        newBackendTopicObject.groupedSkillSummaries);
-      this._updateGroupedSkillSummaries(
-        newBackendTopicObject.groupedSkillSummaries);
-      this._updateSkillIdToRubricsObject(
-        newBackendTopicObject.skillIdToRubricsDict);
-      this._updateClassroomUrlFragment(
-        newBackendTopicObject.classroomUrlFragment);
-      this._updateTopicRights(newBackendTopicRightsObject);
-      this._setCanonicalStorySummaries(canonicalStorySummaries);
-      this._topicIsLoading = false;
-      this.loaderService.hideLoadingScreen();
-    }, (error) => {
-      this.alertsService.addWarning(
-        error || 'There was an error when loading the topic editor.');
-      this._topicIsLoading = false;
-    });
+    let topicDataPromise =
+      this.editableTopicBackendApiService.fetchTopicAsync(topicId);
+    let storyDataPromise =
+      this.editableTopicBackendApiService.fetchStoriesAsync(topicId);
+    let topicRightsPromise =
+      this.topicRightsBackendApiService.fetchTopicRightsAsync(topicId);
+    Promise.all([topicDataPromise, storyDataPromise, topicRightsPromise]).then(
+      ([
+        newBackendTopicObject,
+        canonicalStorySummaries,
+        newBackendTopicRightsObject,
+      ]) => {
+        this._updateTopic(
+          newBackendTopicObject.topicDict,
+          newBackendTopicObject.skillIdToDescriptionDict
+        );
+        this._skillCreationIsAllowed =
+          newBackendTopicObject.skillCreationIsAllowed;
+        this._skillQuestionCountDict =
+          newBackendTopicObject.skillQuestionCountDict;
+        this._updateGroupedSkillSummaries(
+          newBackendTopicObject.groupedSkillSummaries
+        );
+        this._updateGroupedSkillSummaries(
+          newBackendTopicObject.groupedSkillSummaries
+        );
+        this._updateSkillIdToRubricsObject(
+          newBackendTopicObject.skillIdToRubricsDict
+        );
+        this._updateClassroomUrlFragment(
+          newBackendTopicObject.classroomUrlFragment
+        );
+        this._updateClassroomName(newBackendTopicObject.classroomName);
+        this._updateCurriculumAdminUsernames(
+          newBackendTopicObject.curriculumAdminUsernames
+        );
+        this._updateTopicRights(newBackendTopicRightsObject);
+        this._setCanonicalStorySummaries(canonicalStorySummaries);
+        this._topicIsLoading = false;
+        this.loaderService.hideLoadingScreen();
+      },
+      error => {
+        this.alertsService.addWarning(
+          error || 'There was an error when loading the topic editor.'
+        );
+        this._topicIsLoading = false;
+      }
+    );
+  }
+
+  isQuestionEditorOpened(): boolean {
+    return this._questionEditorOpened;
+  }
+
+  isNewQuestionEditor(): boolean {
+    return this._newQuestionEditor;
   }
 
   getGroupedSkillSummaries(): object {
@@ -304,22 +361,24 @@ export class TopicEditorStateService {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let pageIndex = this._getSubtopicPageIndex(subtopicPageId);
     if (pageIndex !== null) {
-      this._subtopicPage = cloneDeep(
-        this._cachedSubtopicPages[pageIndex]);
+      this._subtopicPage = cloneDeep(this._cachedSubtopicPages[pageIndex]);
       this._subtopicPageLoadedEventEmitter.emit();
       return;
     }
     this.loaderService.showLoadingScreen('Loading Subtopic Editor');
-    this.editableTopicBackendApiService.fetchSubtopicPageAsync(
-      topicId, subtopicId).then(
-      (newBackendSubtopicPageObject) => {
-        this._updateSubtopicPage(newBackendSubtopicPageObject);
-        this.loaderService.hideLoadingScreen();
-      },
-      (error) => {
-        this.alertsService.addWarning(
-          error || 'There was an error when loading the topic.');
-      });
+    this.editableTopicBackendApiService
+      .fetchSubtopicPageAsync(topicId, subtopicId)
+      .then(
+        newBackendSubtopicPageObject => {
+          this._updateSubtopicPage(newBackendSubtopicPageObject);
+          this.loaderService.hideLoadingScreen();
+        },
+        error => {
+          this.alertsService.addWarning(
+            error || 'There was an error when loading the topic.'
+          );
+        }
+      );
   }
 
   /**
@@ -419,6 +478,28 @@ export class TopicEditorStateService {
     }
   }
 
+  /**
+   * When the editor is opened (editorOpened is true),
+   * assign the value of newQuestion to _newQuestionEditor,
+   * and set _questionEditorOpened to true.
+   * When the editor is closed (editorOpened is false),
+   * both flags are set to false.
+   */
+  toggleQuestionEditor(
+    editorOpened: boolean,
+    newQuestion: boolean = false
+  ): void {
+    if (editorOpened) {
+      this._newQuestionEditor = newQuestion;
+      this._questionEditorOpened = true;
+    } else {
+      this._newQuestionEditor = false;
+      this._questionEditorOpened = false;
+    }
+
+    this._questionEditorOpenedEventEmitter.emit();
+  }
+
   deleteSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
@@ -444,20 +525,25 @@ export class TopicEditorStateService {
       this._newSubtopicPageIds.splice(newIndex, 1);
       for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
         let newSubtopicId = this._getSubtopicIdFromSubtopicPageId(
-          this._cachedSubtopicPages[i].getId());
+          this._cachedSubtopicPages[i].getId()
+        );
         if (newSubtopicId > subtopicId) {
           newSubtopicId--;
           this._cachedSubtopicPages[i].setId(
-            this._getSubtopicPageId(topicId, newSubtopicId));
+            this._getSubtopicPageId(topicId, newSubtopicId)
+          );
         }
       }
       for (let i = 0; i < this._newSubtopicPageIds.length; i++) {
         let newSubtopicId = this._getSubtopicIdFromSubtopicPageId(
-          this._newSubtopicPageIds[i]);
+          this._newSubtopicPageIds[i]
+        );
         if (newSubtopicId > subtopicId) {
           newSubtopicId--;
           this._newSubtopicPageIds[i] = this._getSubtopicPageId(
-            topicId, newSubtopicId);
+            topicId,
+            newSubtopicId
+          );
         }
       }
     }
@@ -483,7 +569,8 @@ export class TopicEditorStateService {
   saveTopic(commitMessage: string, successCallback: () => void): boolean {
     if (!this._topicIsInitialized) {
       this.alertsService.fatalWarning(
-        'Cannot save a topic before one is loaded.');
+        'Cannot save a topic before one is loaded.'
+      );
     }
 
     // Don't attempt to save the topic if there are no changes pending.
@@ -491,35 +578,50 @@ export class TopicEditorStateService {
       return false;
     }
     this._topicIsBeingSaved = true;
-    this.editableTopicBackendApiService.updateTopicAsync(
-      this._topic.getId(), this._topic.getVersion(),
-      commitMessage, this.undoRedoService.getCommittableChangeList()).then(
-      (topicBackendObject) => {
-        this._updateTopic(
-          topicBackendObject.topicDict,
-          topicBackendObject.skillIdToDescriptionDict
-        );
-        this._updateSkillIdToRubricsObject(
-          topicBackendObject.skillIdToRubricsDict);
-        let changeList = this.undoRedoService.getCommittableChangeList();
-        for (let i = 0; i < changeList.length; i++) {
-          if (changeList[i].cmd === 'delete_canonical_story' ||
-              changeList[i].cmd === 'delete_additional_story') {
-            this.editableStoryBackendApiService.deleteStoryAsync((
-              changeList[i] as TopicDeleteAdditionalStoryChange |
-              TopicDeleteCanonicalStoryChange).story_id);
+    this.editableTopicBackendApiService
+      .updateTopicAsync(
+        this._topic.getId(),
+        this._topic.getVersion(),
+        commitMessage,
+        this.undoRedoService.getCommittableChangeList()
+      )
+      .then(
+        topicBackendObject => {
+          this._updateTopic(
+            topicBackendObject.topicDict,
+            topicBackendObject.skillIdToDescriptionDict
+          );
+          this._updateSkillIdToRubricsObject(
+            topicBackendObject.skillIdToRubricsDict
+          );
+          let changeList = this.undoRedoService.getCommittableChangeList();
+          for (let i = 0; i < changeList.length; i++) {
+            if (
+              changeList[i].cmd === 'delete_canonical_story' ||
+              changeList[i].cmd === 'delete_additional_story'
+            ) {
+              this.editableStoryBackendApiService.deleteStoryAsync(
+                (
+                  changeList[i] as
+                    | TopicDeleteAdditionalStoryChange
+                    | TopicDeleteCanonicalStoryChange
+                ).story_id
+              );
+            }
           }
+          this.undoRedoService.clearChanges();
+          this._topicIsBeingSaved = false;
+          if (successCallback) {
+            successCallback();
+          }
+        },
+        error => {
+          this.alertsService.addWarning(
+            error || 'There was an error when saving the topic.'
+          );
+          this._topicIsBeingSaved = false;
         }
-        this.undoRedoService.clearChanges();
-        this._topicIsBeingSaved = false;
-        if (successCallback) {
-          successCallback();
-        }
-      }, (error) => {
-        this.alertsService.addWarning(
-          error || 'There was an error when saving the topic.');
-        this._topicIsBeingSaved = false;
-      });
+      );
     return true;
   }
 
@@ -539,11 +641,44 @@ export class TopicEditorStateService {
     return this._topicReinitializedEventEmitter;
   }
 
+  get onQuestionEditorOpened(): EventEmitter<boolean> {
+    return this._questionEditorOpenedEventEmitter;
+  }
+
   /**
-   * Returns the classroom name for the topic.
+   * Returns the classroom url fragment if the topic is assigned to any
+   * classroom, else null.
    */
-  getClassroomUrlFragment(): string {
+  getClassroomUrlFragment(): string | null {
     return this._classroomUrlFragment;
+  }
+
+  /**
+   * Returns the classroom name if the topic is assigned to any
+   * classroom, else null.
+   */
+  getClassroomName(): string | null {
+    return this._classroomName;
+  }
+
+  getCurriculumAdminUsernames(): string[] {
+    return this._curriculumAdminUsernames;
+  }
+
+  /**
+   * Retrieves the name of the skill associated with the given skill ID,
+   * typically the skill whose question is currently being edited.
+   * The skill description will always be present in allSkillSummaries,
+   * but to ensure robustness, the skill ID will be displayed in case of a failure.
+   */
+  getSelectedSkillName(
+    skillId: string,
+    allSkillSummaries: ShortSkillSummary[]
+  ): string {
+    return (
+      allSkillSummaries?.find(skill => skill.id === skillId)?.description ||
+      skillId
+    );
   }
 
   /**
@@ -555,19 +690,26 @@ export class TopicEditorStateService {
    * has been successfully updated.
    */
   updateExistenceOfTopicName(
-      topicName: string, successCallback: () => void): void {
-    this.editableTopicBackendApiService.doesTopicWithNameExistAsync(
-      topicName).then((topicNameExists) => {
-      this._setTopicWithNameExists(topicNameExists);
-      if (successCallback) {
-        successCallback();
-      }
-    }, (error) => {
-      this.alertsService.addWarning(
-        error ||
-        'There was an error when checking if the topic name ' +
-        'exists for another topic.');
-    });
+    topicName: string,
+    successCallback: () => void
+  ): void {
+    this.editableTopicBackendApiService
+      .doesTopicWithNameExistAsync(topicName)
+      .then(
+        topicNameExists => {
+          this._setTopicWithNameExists(topicNameExists);
+          if (successCallback) {
+            successCallback();
+          }
+        },
+        error => {
+          this.alertsService.addWarning(
+            error ||
+              'There was an error when checking if the topic name ' +
+                'exists for another topic.'
+          );
+        }
+      );
   }
 
   /**
@@ -579,34 +721,39 @@ export class TopicEditorStateService {
    * has been successfully updated.
    */
   updateExistenceOfTopicUrlFragment(
-      topicUrlFragment: string,
-      successCallback: () => void,
-      errorCallback: () => void
+    topicUrlFragment: string,
+    successCallback: () => void,
+    errorCallback: () => void
   ): void {
-    this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
-      topicUrlFragment).then((topicUrlFragmentExists) => {
-      this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
-      if (successCallback) {
-        successCallback();
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback();
-      }
-      /**
-       * This backend api service uses a HTTP link which is generated with
-       * the help of inputted url fragment. So, whenever a url fragment is
-       * entered against the specified reg-ex(or rules) wrong HTTP link is
-       * generated and causes server to respond with 400 error. Because
-       * server also checks for reg-ex match.
-       */
-      if (errorResponse.status !== 400) {
-        this.alertsService.addWarning(
-          errorResponse.message ||
-          'There was an error when checking if the topic url fragment ' +
-          'exists for another topic.');
-      }
-    });
+    this.editableTopicBackendApiService
+      .doesTopicWithUrlFragmentExistAsync(topicUrlFragment)
+      .then(
+        topicUrlFragmentExists => {
+          this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
+          if (successCallback) {
+            successCallback();
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback();
+          }
+          /**
+           * This backend api service uses a HTTP link which is generated with
+           * the help of inputted url fragment. So, whenever a url fragment is
+           * entered against the specified reg-ex(or rules) wrong HTTP link is
+           * generated and causes server to respond with 400 error. Because
+           * server also checks for reg-ex match.
+           */
+          if (errorResponse.status !== 400) {
+            this.alertsService.addWarning(
+              errorResponse.message ||
+                'There was an error when checking if the topic url fragment ' +
+                  'exists for another topic.'
+            );
+          }
+        }
+      );
   }
 
   get onStorySummariesInitialized(): EventEmitter<void> {
@@ -618,5 +765,9 @@ export class TopicEditorStateService {
   }
 }
 
-angular.module('oppia').factory('TopicEditorStateService',
-  downgradeInjectable(TopicEditorStateService));
+angular
+  .module('oppia')
+  .factory(
+    'TopicEditorStateService',
+    downgradeInjectable(TopicEditorStateService)
+  );

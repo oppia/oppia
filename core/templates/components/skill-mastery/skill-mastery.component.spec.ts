@@ -16,30 +16,28 @@
  * @fileoverview Unit tests for SkillMasteryViewerComponent.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { SkillMasteryViewerComponent } from './skill-mastery.component';
-import { SkillMasteryListConstants } from 'components/skills-mastery-list/skills-mastery-list.constants';
-import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
-import { SkillMastery } from 'domain/skill/skill-mastery.model';
+import {SkillMasteryViewerComponent} from './skill-mastery.component';
+import {SkillMasteryListConstants} from 'components/skills-mastery-list/skills-mastery-list.constants';
+import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
+import {SkillMastery} from 'domain/skill/skill-mastery.model';
 
 let component: SkillMasteryViewerComponent;
 let fixture: ComponentFixture<SkillMasteryViewerComponent>;
 
 describe('SkillMasteryViewerComponent', () => {
   let skillMasteryBackendApiService: SkillMasteryBackendApiService;
-  const mockSkillMastery = SkillMastery.createFromBackendDict(
-    {
-      skillId1: 1.0,
-    }
-  );
+  const mockSkillMastery = SkillMastery.createFromBackendDict({
+    skillId1: 1.0,
+  });
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SkillMasteryViewerComponent],
       providers: [SkillMasteryBackendApiService],
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     }).compileComponents();
     skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
   }));
@@ -52,11 +50,14 @@ describe('SkillMasteryViewerComponent', () => {
 
   it('should initialize skillMasteryDegree on ngOnInit', () => {
     component.skillId = 'skillId1';
-    spyOn(skillMasteryBackendApiService, 'fetchSkillMasteryDegreesAsync')
-      .and.returnValue(Promise.resolve(mockSkillMastery));
+    spyOn(
+      skillMasteryBackendApiService,
+      'fetchSkillMasteryDegreesAsync'
+    ).and.returnValue(Promise.resolve(mockSkillMastery));
     component.ngOnInit();
-    expect(skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync).
-      toHaveBeenCalledWith(['skillId1']);
+    expect(
+      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync
+    ).toHaveBeenCalledWith(['skillId1']);
   });
 
   it('should get skill mastery percentage', () => {
@@ -79,23 +80,27 @@ describe('SkillMasteryViewerComponent', () => {
     component.masteryChange = 0;
     expect(component.getLearningTips()).toBe(
       'Looks like your mastery of this skill has dropped. ' +
-      'To improve it, try reviewing the concept card below and ' +
-      'then practicing more questions for the skill.');
+        'To improve it, try reviewing the concept card below and ' +
+        'then practicing more questions for the skill.'
+    );
     component.masteryChange = -1;
     expect(component.getLearningTips()).toBe(
       'Looks like your mastery of this skill has dropped. ' +
-      'To improve it, try reviewing the concept card below and ' +
-      'then practicing more questions for the skill.');
+        'To improve it, try reviewing the concept card below and ' +
+        'then practicing more questions for the skill.'
+    );
     component.masteryChange = 1;
-    component.skillMasteryDegree = (
-      SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF);
+    component.skillMasteryDegree =
+      SkillMasteryListConstants.MASTERY_CUTOFF.GOOD_CUTOFF;
     expect(component.getLearningTips()).toBe(
       'You have mastered this skill very well! ' +
-      'You can work on other skills or learn new skills.');
-    component.skillMasteryDegree = (
-      SkillMasteryListConstants.MASTERY_CUTOFF.MEDIUM_CUTOFF);
+        'You can work on other skills or learn new skills.'
+    );
+    component.skillMasteryDegree =
+      SkillMasteryListConstants.MASTERY_CUTOFF.MEDIUM_CUTOFF;
     expect(component.getLearningTips()).toBe(
       'You have made progress! You can increase your ' +
-      'mastery level by doing more practice sessions.');
+        'mastery level by doing more practice sessions.'
+    );
   });
 });

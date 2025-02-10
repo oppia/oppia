@@ -16,29 +16,37 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Subscription } from 'rxjs';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { RouterService } from '../services/router.service';
-import { UserService } from 'services/user.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ChangeListService } from '../services/change-list.service';
-import { HelpModalComponent } from '../modal-templates/help-modal.component';
-import { ContextService } from 'services/context.service';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { ThreadDataBackendApiService } from '../feedback-tab/services/thread-data-backend-api.service';
-import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
-import { ExplorationRightsService } from '../services/exploration-rights.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationSaveService } from '../services/exploration-save.service';
-import { EditorNavigationComponent } from './editor-navigation.component';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  discardPeriodicTasks,
+  fakeAsync,
+  flush,
+  flushMicrotasks,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Subscription} from 'rxjs';
+import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {RouterService} from '../services/router.service';
+import {UserService} from 'services/user.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ChangeListService} from '../services/change-list.service';
+import {HelpModalComponent} from '../modal-templates/help-modal.component';
+import {ContextService} from 'services/context.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {ThreadDataBackendApiService} from '../feedback-tab/services/thread-data-backend-api.service';
+import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
+import {ExplorationRightsService} from '../services/exploration-rights.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationSaveService} from '../services/exploration-save.service';
+import {EditorNavigationComponent} from './editor-navigation.component';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 
 describe('Editor Navigation Component', () => {
   let component: EditorNavigationComponent;
@@ -62,8 +70,9 @@ describe('Editor Navigation Component', () => {
   let testSubscriptions: Subscription;
 
   const openEditorTutorialSpy = jasmine.createSpy('openEditorTutorial');
-  const openTranslationTutorialSpy = (
-    jasmine.createSpy('openTranslationTutorial'));
+  const openTranslationTutorialSpy = jasmine.createSpy(
+    'openTranslationTutorial'
+  );
 
   let explorationId = 'exp1';
   let isImprovementsTabEnabledAsyncSpy: jasmine.Spy;
@@ -79,7 +88,7 @@ describe('Editor Navigation Component', () => {
   class MockUserService {
     getUserInfoAsync(): Promise<UserInfo> {
       return Promise.resolve({
-        isLoggedIn: () => true
+        isLoggedIn: () => true,
       } as UserInfo);
     }
   }
@@ -107,7 +116,7 @@ describe('Editor Navigation Component', () => {
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
@@ -115,50 +124,44 @@ describe('Editor Navigation Component', () => {
   class MockUserExplorationPermissionsService {
     getPermissionsAsync() {
       return Promise.resolve({
-        canPublish: true
+        canPublish: true,
       });
     }
   }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModule
-      ],
-      declarations: [
-        EditorNavigationComponent,
-        HelpModalComponent,
-      ],
+      imports: [HttpClientTestingModule, NgbModule],
+      declarations: [EditorNavigationComponent, HelpModalComponent],
       providers: [
         ChangeListService,
         RouterService,
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: UserExplorationPermissionsService,
-          useClass: MockUserExplorationPermissionsService
+          useClass: MockUserExplorationPermissionsService,
         },
         {
           provide: InternetConnectivityService,
-          useClass: MockInternetConnectivityService
+          useClass: MockInternetConnectivityService,
         },
         {
           provide: UserService,
-          useClass: MockUserService
+          useClass: MockUserService,
         },
         {
           provide: StateTutorialFirstTimeService,
-          useClass: MockStateTutorialFirstTimeService
+          useClass: MockStateTutorialFirstTimeService,
         },
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     });
   });
 
@@ -189,17 +192,20 @@ describe('Editor Navigation Component', () => {
       editabilityService = TestBed.inject(EditabilityService);
       explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
       explorationImprovementsService = TestBed.inject(
-        ExplorationImprovementsService);
+        ExplorationImprovementsService
+      );
       explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-      threadDataBackendApiService = (
-        TestBed.inject(ThreadDataBackendApiService));
-      stateTutorialFirstTimeService = (
-        TestBed.inject(StateTutorialFirstTimeService));
+      threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
+      stateTutorialFirstTimeService = TestBed.inject(
+        StateTutorialFirstTimeService
+      );
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
-        explorationImprovementsService, 'isImprovementsTabEnabledAsync');
+        explorationImprovementsService,
+        'isImprovementsTabEnabledAsync'
+      );
 
       isImprovementsTabEnabledAsyncSpy.and.returnValue(Promise.resolve(false));
     });
@@ -208,10 +214,14 @@ describe('Editor Navigation Component', () => {
       testSubscriptions = new Subscription();
       testSubscriptions.add(
         stateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(
-          openTranslationTutorialSpy));
+          openTranslationTutorialSpy
+        )
+      );
       testSubscriptions.add(
         stateTutorialFirstTimeService.onOpenEditorTutorial.subscribe(
-          openEditorTutorialSpy));
+          openEditorTutorialSpy
+        )
+      );
     });
 
     afterEach(() => {
@@ -219,31 +229,34 @@ describe('Editor Navigation Component', () => {
       component.ngOnDestroy();
     });
 
-    it('should initialize component properties after controller is initialized',
-      () => {
-        spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-        component.postTutorialHelpPopoverIsShown = false;
-        component.userIsLoggedIn = true;
-        component.improvementsTabIsEnabled = false;
-        component.isPublishButtonEnabled = true;
+    it('should initialize component properties after controller is initialized', () => {
+      spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+      component.postTutorialHelpPopoverIsShown = false;
+      component.userIsLoggedIn = true;
+      component.improvementsTabIsEnabled = false;
+      component.isPublishButtonEnabled = true;
 
-        expect(component.isPostTutorialHelpPopoverShown())
-          .toBe(false);
-        expect(component.isUserLoggedIn()).toBe(true);
-        expect(component.isImprovementsTabEnabled()).toBe(false);
-        expect(component.showPublishButton()).toEqual(true);
-      });
+      expect(component.isPostTutorialHelpPopoverShown()).toBe(false);
+      expect(component.isUserLoggedIn()).toBe(true);
+      expect(component.isImprovementsTabEnabled()).toBe(false);
+      expect(component.showPublishButton()).toEqual(true);
+    });
 
     it('should get warnings whenever has one', () => {
-      let warnings = [{
-        type: 'ERROR'
-      }, {
-        type: 'CRITICAL'
-      }];
+      let warnings = [
+        {
+          type: 'ERROR',
+        },
+        {
+          type: 'CRITICAL',
+        },
+      ];
       spyOn(explorationWarningsService, 'getWarnings').and.returnValue(
-        warnings);
+        warnings
+      );
       spyOn(explorationWarningsService, 'countWarnings').and.returnValue(
-        warnings.length);
+        warnings.length
+      );
       component.isScreenLarge();
 
       expect(component.countWarnings()).toBe(2);
@@ -251,33 +264,35 @@ describe('Editor Navigation Component', () => {
       expect(component.hasCriticalWarnings()).toBe(false);
     });
 
-    it('should open editor tutorial after closing user help modal with mode' +
-      'editor', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
+    it(
+      'should open editor tutorial after closing user help modal with mode' +
+        'editor',
+      () => {
+        spyOn(ngbModal, 'open').and.returnValue({
           componentInstance: new MockNgbModalRef(),
-          result: Promise.resolve('editor')
-        } as NgbModalRef
-      );
+          result: Promise.resolve('editor'),
+        } as NgbModalRef);
 
-      component.showUserHelpModal();
+        component.showUserHelpModal();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    });
+        expect(ngbModal.open).toHaveBeenCalled();
+      }
+    );
 
-    it('should open editor tutorial after closing user help modal with mode' +
-      'translation', () => {
-      spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: new MockNgbModalRef(),
-            result: Promise.resolve('translation')
-          } as NgbModalRef
-      );
+    it(
+      'should open editor tutorial after closing user help modal with mode' +
+        'translation',
+      () => {
+        spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve('translation'),
+        } as NgbModalRef);
 
-      component.showUserHelpModal();
+        component.showUserHelpModal();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    });
+        expect(ngbModal.open).toHaveBeenCalled();
+      }
+    );
 
     it('should return if exploration is private', () => {
       spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
@@ -285,20 +300,42 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should return if exploration is locked for editing', () => {
-      spyOn(
-        changeListService,
-        'isExplorationLockedForEditing').and.returnValue(true);
+      spyOn(changeListService, 'isExplorationLockedForEditing').and.returnValue(
+        true
+      );
       expect(component.isExplorationLockedForEditing()).toEqual(true);
     });
 
-    it('should return if exploration is editable outside tutorial mode',
-      () => {
-        spyOn(
-          editabilityService,
-          'isEditableOutsideTutorialMode').and.returnValue(true);
-        spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
-        expect(component.isEditableOutsideTutorialMode()).toEqual(true);
+    it('should return if exploration is editable outside tutorial mode', () => {
+      spyOn(
+        editabilityService,
+        'isEditableOutsideTutorialMode'
+      ).and.returnValue(true);
+      spyOn(editabilityService, 'isTranslatable').and.returnValue(true);
+      expect(component.isEditableOutsideTutorialMode()).toEqual(true);
+    });
+
+    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits true', () => {
+      spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'subscribe'
+      ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+        callback(true);
       });
+      component.ngOnInit();
+      expect(component.autosaveIsInProgress).toBe(true);
+    });
+
+    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits false', () => {
+      spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'subscribe'
+      ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
+        callback(false);
+      });
+      component.ngOnInit();
+      expect(component.autosaveIsInProgress).toBe(false);
+    });
 
     it('should call exploration save service to discard changes', () => {
       let explorationSpy = spyOn(explorationSaveService, 'discardChanges');
@@ -310,7 +347,8 @@ describe('Editor Navigation Component', () => {
       let deferred = Promise.resolve();
       let explorationSpy = spyOn(
         explorationSaveService,
-        'saveChangesAsync').and.returnValue(deferred);
+        'saveChangesAsync'
+      ).and.returnValue(deferred);
       component.saveChanges();
 
       expect(explorationSpy).toHaveBeenCalled();
@@ -324,8 +362,9 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should return if exploration is saveable', () => {
-      spyOn(
-        explorationSaveService, 'isExplorationSaveable').and.returnValue(true);
+      spyOn(explorationSaveService, 'isExplorationSaveable').and.returnValue(
+        true
+      );
       expect(component.isExplorationSaveable()).toEqual(true);
     });
 
@@ -338,28 +377,26 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should return the number of changes', () => {
-      spyOn(
-        changeListService, 'getChangeList').and.returnValue([]);
+      spyOn(changeListService, 'getChangeList').and.returnValue([]);
       expect(component.getChangeListLength()).toEqual(0);
     });
 
-    it('should hide loading dots after publishing the exploration', fakeAsync(
-      () => {
-        component.loadingDotsAreShown = true;
-        let deferred = Promise.resolve();
-        spyOn(
-          explorationSaveService,
-          'showPublishExplorationModal').and.returnValue(deferred);
+    it('should hide loading dots after publishing the exploration', fakeAsync(() => {
+      component.loadingDotsAreShown = true;
+      let deferred = Promise.resolve();
+      spyOn(
+        explorationSaveService,
+        'showPublishExplorationModal'
+      ).and.returnValue(deferred);
 
-        component.showPublishExplorationModal();
-        tick();
+      component.showPublishExplorationModal();
+      tick();
 
-        expect(component.loadingDotsAreShown).toEqual(false);
-      }));
+      expect(component.loadingDotsAreShown).toEqual(false);
+    }));
 
     it('should navigate to main tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('main');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('main');
 
       component.selectMainTab('');
 
@@ -367,8 +404,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to translation tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('translation');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
 
       component.selectTranslationTab();
 
@@ -376,8 +412,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to preview tab when clicking on tab', fakeAsync(() => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('preview');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('preview');
 
       component.selectPreviewTab();
 
@@ -389,8 +424,7 @@ describe('Editor Navigation Component', () => {
     }));
 
     it('should navigate to settings tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('settings');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('settings');
 
       component.selectSettingsTab();
 
@@ -398,8 +432,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to stats tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('stats');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('stats');
 
       component.selectStatsTab();
 
@@ -407,8 +440,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to improvements tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('improvements');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('improvements');
 
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
       isImprovementsTabEnabledAsyncSpy.and.returnValue(Promise.resolve(true));
@@ -418,8 +450,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to history tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('history');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('history');
 
       component.selectHistoryTab();
 
@@ -427,8 +458,7 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should navigate to feedback tab when clicking on tab', () => {
-      spyOn(routerService, 'getActiveTabName')
-        .and.returnValue('feedback');
+      spyOn(routerService, 'getActiveTabName').and.returnValue('feedback');
 
       component.selectFeedbackTab();
 
@@ -436,53 +466,50 @@ describe('Editor Navigation Component', () => {
     });
 
     it('should get open thread count', () => {
-      spyOn(
-        threadDataBackendApiService, 'getOpenThreadsCount').and.returnValue(5);
+      spyOn(threadDataBackendApiService, 'getOpenThreadsCount').and.returnValue(
+        5
+      );
       mockOpenPostTutorialHelpPopover.emit();
 
       expect(component.getOpenThreadsCount()).toBe(5);
     });
 
-    it('should toggle post tutorial help popover when resizing page',
-      fakeAsync(() => {
-        mockGetResizeEvent.emit(new Event('resize'));
-        mockOpenPostTutorialHelpPopover.emit();
+    it('should toggle post tutorial help popover when resizing page', fakeAsync(() => {
+      mockGetResizeEvent.emit(new Event('resize'));
+      mockOpenPostTutorialHelpPopover.emit();
 
-        expect(component.postTutorialHelpPopoverIsShown).toBe(true);
+      expect(component.postTutorialHelpPopoverIsShown).toBe(true);
 
-        tick();
-        flush();
-        flushMicrotasks();
+      tick();
+      flush();
+      flushMicrotasks();
 
-        expect(component.postTutorialHelpPopoverIsShown).toBe(false);
-      }));
+      expect(component.postTutorialHelpPopoverIsShown).toBe(false);
+    }));
 
-    it('should toggle post tutorial help popover when resizing page',
-      fakeAsync(() => {
-        spyOn(windowDimensionsService, 'getWidth').and.returnValue(10);
+    it('should toggle post tutorial help popover when resizing page', fakeAsync(() => {
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(10);
 
-        mockGetResizeEvent.emit(new Event('resize'));
-        mockOpenPostTutorialHelpPopover.emit();
+      mockGetResizeEvent.emit(new Event('resize'));
+      mockOpenPostTutorialHelpPopover.emit();
 
-        expect(component.postTutorialHelpPopoverIsShown).toBe(false);
-      }));
+      expect(component.postTutorialHelpPopoverIsShown).toBe(false);
+    }));
 
-    it('should change connnection status to ONLINE when internet is connected',
-      () => {
-        component.connectedToInternet = false;
-        mockConnectionServiceEmitter.emit(true);
+    it('should change connnection status to ONLINE when internet is connected', () => {
+      component.connectedToInternet = false;
+      mockConnectionServiceEmitter.emit(true);
 
-        expect(component.connectedToInternet).toBe(true);
-      });
+      expect(component.connectedToInternet).toBe(true);
+    });
 
-    it('should change connnection status to OFFLINE when internet disconnects',
-      fakeAsync(() => {
-        component.connectedToInternet = true;
-        mockConnectionServiceEmitter.emit(false);
+    it('should change connnection status to OFFLINE when internet disconnects', fakeAsync(() => {
+      component.connectedToInternet = true;
+      mockConnectionServiceEmitter.emit(false);
 
-        tick();
+      tick();
 
-        expect(component.connectedToInternet).toBe(false);
-      }));
+      expect(component.connectedToInternet).toBe(false);
+    }));
   });
 });

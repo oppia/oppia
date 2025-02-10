@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SuggestionDataModel.
  */
 
-import { Suggestion } from 'domain/suggestion/suggestion.model';
+import {Suggestion} from 'domain/suggestion/suggestion.model';
 
 describe('Suggestion data model', () => {
   it('should create a new suggestion from a backend dict.', () => {
@@ -28,19 +28,20 @@ describe('Suggestion data model', () => {
       target_version_at_submission: 1,
       status: 'accepted',
       author_name: 'author',
-      change: {
+      change_cmd: {
         skill_id: 'skill_id',
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
+        content_id: 'interaction_0',
         new_value: {
-          html: 'new suggestion content'
+          html: 'new suggestion content',
         },
         old_value: {
-          html: 'old suggestion content'
-        }
+          html: 'old suggestion content',
+        },
       },
-      last_updated_msecs: 1000
+      last_updated_msecs: 1000,
     };
     let suggestion = Suggestion.createFromBackendDict(suggestionBackendDict);
     expect(suggestion.suggestionType).toEqual('edit_exploration_state_content');

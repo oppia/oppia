@@ -16,12 +16,13 @@
  * @fileoverview Component for state diff modal.
  */
 
-import { Input, OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { State } from 'domain/state/StateObjectFactory';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
+import {Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {State} from 'domain/state/StateObjectFactory';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 export interface headersAndYamlStrs {
   leftPane: string;
@@ -40,7 +41,9 @@ interface mergeviewOptions {
   templateUrl: './state-diff-modal.component.html',
 })
 export class StateDiffModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -52,6 +55,8 @@ export class StateDiffModalComponent
   @Input() newStateName!: string;
   @Input() oldStateName!: string;
   @Input() headers!: headersAndYamlStrs;
+  showingTranslationChanges: boolean = false;
+
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
     rightPane: '',
@@ -61,27 +66,47 @@ export class StateDiffModalComponent
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',
-    viewportMargin: 100
+    viewportMargin: 100,
   };
 
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private historyTabYamlConversionService: HistoryTabYamlConversionService
+    private ngbActiveModal: NgbActiveModal,
+    private historyTabYamlConversionService: HistoryTabYamlConversionService,
+    private entityTranslationsService: EntityTranslationsService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.oldState)
-      .then((result) => {
-        this.yamlStrs.leftPane = result;
-      });
+    if (!this.showingTranslationChanges) {
+      this.historyTabYamlConversionService
+        .getYamlStringFromStateOrMetadata(this.oldState)
+        .then(result => {
+          this.yamlStrs.leftPane = result;
+        });
 
-    this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.newState)
-      .then((result) => {
-        this.yamlStrs.rightPane = result;
-      });
+      this.historyTabYamlConversionService
+        .getYamlStringFromStateOrMetadata(this.newState)
+        .then(result => {
+          this.yamlStrs.rightPane = result;
+        });
+    } else {
+      this.historyTabYamlConversionService
+        .getYamlStringFromTranslations(
+          this.entityTranslationsService
+            .languageCodeToLastPublishedEntityTranslations
+        )
+        .then(result => {
+          this.yamlStrs.leftPane = result;
+        });
+
+      this.historyTabYamlConversionService
+        .getYamlStringFromTranslations(
+          this.entityTranslationsService.languageCodeToLatestEntityTranslations
+        )
+        .then(result => {
+          this.yamlStrs.rightPane = result;
+        });
+    }
   }
 }

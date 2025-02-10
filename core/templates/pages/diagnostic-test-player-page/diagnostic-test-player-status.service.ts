@@ -17,22 +17,21 @@
  * in the diagnostic test session.
  */
 
-
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DiagnosticTestPlayerStatusService {
-  private _diagnosticTestPlayerCompletedEventEmitter = (
-    new EventEmitter<string[]>());
+  private _diagnosticTestPlayerCompletedEventEmitter = new EventEmitter<
+    string[]
+  >();
 
-  private _diagnosticTestPlayerProgressChangeEventEmitter = (
-    new EventEmitter<number>());
+  private _diagnosticTestPlayerProgressChangeEventEmitter =
+    new EventEmitter<number>();
 
-  private _diagnosticTestSkipQuestionEventEmitter = (
-    new EventEmitter<void>());
+  private _diagnosticTestSkipQuestionEventEmitter = new EventEmitter<void>();
 
   get onDiagnosticTestSessionCompleted(): EventEmitter<string[]> {
     return this._diagnosticTestPlayerCompletedEventEmitter;
@@ -47,5 +46,9 @@ export class DiagnosticTestPlayerStatusService {
   }
 }
 
-angular.module('oppia').factory('DiagnosticTestPlayerStatusService',
-  downgradeInjectable(DiagnosticTestPlayerStatusService));
+angular
+  .module('oppia')
+  .factory(
+    'DiagnosticTestPlayerStatusService',
+    downgradeInjectable(DiagnosticTestPlayerStatusService)
+  );

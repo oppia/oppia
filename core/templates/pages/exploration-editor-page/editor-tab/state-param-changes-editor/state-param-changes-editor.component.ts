@@ -17,16 +17,16 @@
  * state editor.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StateParamChangesService } from
+import {Component, OnInit} from '@angular/core';
+import {
+  StateParamChangesService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-param-changes.service';
+} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
 @Component({
   selector: 'state-param-changes-editor',
   templateUrl: './state-param-changes-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class StateParamChangesEditorComponent implements OnInit {
   // This property below is initialized using Angular lifecycle hooks
@@ -39,6 +39,3 @@ export class StateParamChangesEditorComponent implements OnInit {
     this.spcs = this.stateParamChangesService;
   }
 }
-angular.module('oppia').directive(
-  'stateParamChangesEditor', downgradeComponent(
-    {component: StateParamChangesEditorComponent}));

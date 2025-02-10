@@ -14,13 +14,12 @@
 
 /**
  * @fileoverview Unit tests for ExternalSaveService
-*/
+ */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
-import { ExternalSaveService } from
-  'services/external-save.service';
+import {ExternalSaveService} from 'services/external-save.service';
 
 describe('External Save Service', () => {
   let externalSaveService: ExternalSaveService;
@@ -32,6 +31,7 @@ describe('External Save Service', () => {
   it('should fetch externalSave event emitter', () => {
     let sampleExternalSaveEventEmitter = new EventEmitter();
     expect(externalSaveService.onExternalSave).toEqual(
-      sampleExternalSaveEventEmitter);
+      sampleExternalSaveEventEmitter
+    );
   });
 });

@@ -15,10 +15,21 @@
  * @fileoverview Unit tests for LearnerViewRatingBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { LearnerViewRatingBackendApiService } from './learner-view-rating-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
+import {ExplorationEngineService} from './exploration-engine.service';
+
+class MockExplorationEngineService {
+  getExplorationId() {
+    return 'expId';
+  }
+}
 
 describe('Learner View Rating Backend Api Service', () => {
   let lvrbas: LearnerViewRatingBackendApiService;
@@ -29,7 +40,17 @@ describe('Learner View Rating Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LearnerViewRatingBackendApiService]
+      providers: [
+        LearnerViewRatingBackendApiService,
+        {
+          provide: ExplorationEngineService,
+          useClass: MockExplorationEngineService,
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     lvrbas = TestBed.inject(LearnerViewRatingBackendApiService);
@@ -40,12 +61,11 @@ describe('Learner View Rating Backend Api Service', () => {
 
   it('should fetch user rating', fakeAsync(() => {
     let jobOutput = {
-      user_rating: 5
+      user_rating: 5,
     };
     lvrbas.getUserRatingAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      lvrbas.ratingsUrl);
+    let req = httpTestingController.expectOne(lvrbas.ratingsUrl);
     expect(req.request.method).toEqual('GET');
     req.flush(jobOutput);
 
@@ -57,8 +77,7 @@ describe('Learner View Rating Backend Api Service', () => {
 
   it('should submit user rating', fakeAsync(() => {
     lvrbas.submitUserRatingAsync(3).then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      lvrbas.ratingsUrl);
+    let req = httpTestingController.expectOne(lvrbas.ratingsUrl);
     expect(req.request.method).toEqual('PUT');
     req.flush({});
 

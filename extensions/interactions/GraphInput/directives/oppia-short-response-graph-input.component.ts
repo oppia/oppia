@@ -20,15 +20,15 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { GraphAnswer } from 'interactions/answer-defs';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {GraphAnswer} from 'interactions/answer-defs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-graph-input',
   templateUrl: './graph-input-short-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseGraphInput {
   // These properties are initialized using Angular lifecycle hooks
@@ -43,12 +43,15 @@ export class ShortResponseGraphInput {
     // TODO(#12104): Improve this short response by using a small
     // version of the graph image instead of an arbitrary label of
     // vertices and edges.
-    this.graph = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as GraphAnswer);
+    this.graph = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as GraphAnswer;
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseGraphInput', downgradeComponent({
-    component: ShortResponseGraphInput
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseGraphInput',
+  downgradeComponent({
+    component: ShortResponseGraphInput,
+  }) as angular.IDirectiveFactory
+);

@@ -23,66 +23,65 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('no-multiple-component', rule, {
-  valid: [{
-    code:
-    `angular.module('oppia').directive('testComponent', {
+  valid: [
+    {
+      code: `angular.module('oppia').directive('testComponent', {
       template: require('./test-component.component.html'),
       bindings: {
         message: '<'
       }
-    });`
-  },
-  {
-    code:
-    `angular.module('oppia').controller('testComponent', {
+    });`,
+    },
+    {
+      code: `angular.module('oppia').controller('testComponent', {
       template: require('./test-component.component.html'),
       bindings: {
         message: '<'
       }
-    });`
-  },
-  {
-    code:
-    `angular.module('oppia').filter('testComponent', {
+    });`,
+    },
+    {
+      code: `angular.module('oppia').filter('testComponent', {
       template: require('./test-component.component.html'),
       bindings: {
         message: '<'
       }
-    });`
-  },
-  {
-    code:
-    `angular.module('oppia').factory('testComponent', {
+    });`,
+    },
+    {
+      code: `angular.module('oppia').factory('testComponent', {
       template: require('./test-component.component.html'),
       bindings: {
         message: '<'
       }
-    });`
-  }
+    });`,
+    },
   ],
 
   invalid: [
     {
-      code:
-      `angular.module('oppia').directive('baseContent', [function() {}]);
+      code: `angular.module('oppia').directive('baseContent', [function() {}]);
       angular.module('oppia').directive('baseContent', [function() {}]);`,
-      errors: [{
-        message: (
-          'Please ensure that there is exactly one component in the file.'),
-        type: 'Program'
-      }]
+      errors: [
+        {
+          message:
+            'Please ensure that there is exactly one component in the file.',
+          type: 'Program',
+        },
+      ],
     },
     {
-      code:
-      `angular.module('oppia').directive('baseContent', [function() {}]);
+      code: `angular.module('oppia').directive('baseContent', [function() {}]);
       angular.module('oppia').controller('baseContent', [function() {}]);
       angular.module('oppia').filter('baseContent', [function() {}])
       angular.module('oppia').factory('baseContent', [function() {}])`,
-      errors: [{
-        message: (
-          'Please ensure that there is exactly one component in the file.'),
-        type: 'Program'
-      }]
-    }
-  ]
+      errors: [
+        {
+          message:
+            'Please ensure that there is exactly one component in the file.',
+          type: 'Program',
+        },
+      ],
+    },
+  ],
 });

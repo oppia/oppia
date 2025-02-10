@@ -16,15 +16,24 @@
  * @fileoverview Directive unit tests for the "click hexbins" visualization.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { Hexbin, OppiaVisualizationClickHexbinsComponent } from './oppia-visualization-click-hexbins.directive';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {
+  Hexbin,
+  OppiaVisualizationClickHexbinsComponent,
+} from './oppia-visualization-click-hexbins.directive';
 
-describe('Oppia click hexbins visualization', function() {
+describe('Oppia click hexbins visualization', function () {
   let component: OppiaVisualizationClickHexbinsComponent;
   let fixture: ComponentFixture<OppiaVisualizationClickHexbinsComponent>;
   let imagePreloaderService: ImagePreloaderService;
@@ -34,21 +43,19 @@ describe('Oppia click hexbins visualization', function() {
   let tooltipTarget = {
     x: 0,
     y: 0,
-    length: 10
+    length: 10,
   } as Hexbin;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        OppiaVisualizationClickHexbinsComponent
-      ],
+      declarations: [OppiaVisualizationClickHexbinsComponent],
       providers: [
         AssetsBackendApiService,
         ContextService,
         ImagePreloaderService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -60,20 +67,21 @@ describe('Oppia click hexbins visualization', function() {
 
     spyOn(imagePreloaderService, 'getDimensionsOfImage').and.returnValue({
       width: 10,
-      height: 5
+      height: 5,
     });
-    spyOn(assetsBackendApiService, 'getImageUrlForPreview')
-      .and.returnValue('url');
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
+      'url'
+    );
 
     component.tooltipTarget = tooltipTarget;
     component.data = [
       {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
-      {answer: {clickPosition: [0.50, 0.50], clickedRegions: []}, frequency: 1},
+      {answer: {clickPosition: [0.5, 0.5], clickedRegions: []}, frequency: 1},
     ];
     component.interactionArgs = {
       imageAndRegions: {
-        value: { imagePath: 'solar-system.png' },
-      }
+        value: {imagePath: 'solar-system.png'},
+      },
     };
 
     bannerDe = fixture.debugElement;
@@ -83,14 +91,15 @@ describe('Oppia click hexbins visualization', function() {
   });
 
   it('should group the two answers as two distinct hexagons', () => {
-    expect(
-      bannerEl.querySelectorAll('.click-hexbin-hexagon').length).toEqual(2);
+    expect(bannerEl.querySelectorAll('.click-hexbin-hexagon').length).toEqual(
+      2
+    );
   });
 
   it('should be hidden by default', () => {
     expect(
-      bannerEl.querySelectorAll(
-        '.click-hexbin-chart-tooltip').length).toEqual(0);
+      bannerEl.querySelectorAll('.click-hexbin-chart-tooltip').length
+    ).toEqual(0);
   });
 
   it('should showTooltip', fakeAsync(() => {

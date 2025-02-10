@@ -16,25 +16,35 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import * as d3 from 'd3';
-import { of } from 'rxjs';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
-import { NodeTitle, StateGraphVisualization } from './state-graph-visualization.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import {of} from 'rxjs';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {TranslationStatusService} from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
+import {
+  NodeTitle,
+  StateGraphVisualization,
+} from './state-graph-visualization.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -49,7 +59,7 @@ class MockRouterService {
   onCenterGraph = of(new Event('resize'));
 }
 
-@Pipe({ name: 'truncate' })
+@Pipe({name: 'truncate'})
 class MockTruncatePipe {
   transform(value: string, params: number): string {
     return value;
@@ -66,16 +76,18 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   var mockUpdateGraphDataEmitter = new EventEmitter();
   var graphData = {
     nodes: {
-      State1: 'State 1 Node'
+      State1: 'State 1 Node',
     },
-    links: [{
-      connectsDestIfStuck: false,
-      linkProperty: 'added',
-      source: '',
-      target: '',
-    }],
+    links: [
+      {
+        connectsDestIfStuck: false,
+        linkProperty: 'added',
+        source: '',
+        target: '',
+      },
+    ],
     initStateId: 'state_1',
-    finalStateIds: []
+    finalStateIds: [],
   };
   var nodes = {
     state_1: {
@@ -94,7 +106,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       reachableFromEnd: true,
       style: 'string',
       nodeClass: 'string',
-      canDelete: true
+      canDelete: true,
     },
     state_3: {
       depth: 3,
@@ -112,7 +124,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       secondaryLabel: '2nd',
       style: 'string',
       nodeClass: 'string',
-      canDelete: true
+      canDelete: true,
     },
     state_4: {
       depth: 3,
@@ -130,8 +142,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       secondaryLabel: '2nd',
       style: 'string',
       nodeClass: 'string',
-      canDelete: true
-    }
+      canDelete: true,
+    },
   };
 
   class MockGraphDataService {
@@ -145,33 +157,30 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        StateGraphVisualization,
-        MockTruncatePipe
-      ],
+      declarations: [StateGraphVisualization, MockTruncatePipe],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         ExplorationWarningsService,
         ExplorationStatesService,
         {
           provide: RouterService,
-          useClass: MockRouterService
+          useClass: MockRouterService,
         },
         StateGraphLayoutService,
         TranslationStatusService,
         {
           provide: GraphDataService,
-          useClass: MockGraphDataService
+          useClass: MockGraphDataService,
         },
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -190,16 +199,16 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     component.initStateId2 = 'state_2';
     component.linkPropertyMapping = {
       added: 'background-color: red; ',
-      deleted: 'background-color: red; '
+      deleted: 'background-color: red; ',
     };
     component.nodeColors = {
       state_1: '#000',
       state_2: '#ff0',
-      state_3: '#fff'
+      state_3: '#fff',
     };
     component.nodeFill = '#fff';
     component.nodeSecondaryLabels = {
-      state_3: 'This is a secondary label for state_3'
+      state_3: 'This is a secondary label for state_3',
     };
     component.showTranslationWarnings = true;
     component.mainScreen = {
@@ -208,17 +217,17 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
           baseVal: {
             convertToSpecifiedUnits(value: number) {
               return 1000;
-            }
-          }
+            },
+          },
         },
         width: {
           baseVal: {
             convertToSpecifiedUnits(value: number) {
               return 1000;
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
 
     // This throws "Type 'null' is not assignable to parameter of
@@ -227,31 +236,47 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     // the state name is null.
     // @ts-ignore
     spyOn(explorationStatesService, 'getState').and.returnValue(null);
-    spyOn(stateGraphLayoutService, 'computeLayout')
-      .and.returnValue(nodes);
-    spyOn(translationStatusService, 'getAllStatesNeedUpdatewarning')
-      .and.returnValue({
-        'This is a label for node 1': ['red', 'green']
-      });
-    spyOn(stateGraphLayoutService, 'getAugmentedLinks').and.returnValue([{
-      // This throws "Type 'null' is not assignable to parameter of
-      // type 'NodeData'." We need to suppress this error
-      // because of the need to test validations. This error is
-      // thrown because the source and target are null.
-      // @ts-ignore
-      source: null, target: null, d: null, style: '', connectsDestIfStuck: false
-    }]);
+    spyOn(stateGraphLayoutService, 'computeLayout').and.returnValue(nodes);
+    spyOn(
+      translationStatusService,
+      'getAllStatesNeedUpdatewarning'
+    ).and.returnValue({
+      'This is a label for node 1': ['red', 'green'],
+    });
+    spyOn(stateGraphLayoutService, 'getAugmentedLinks').and.returnValue([
+      {
+        // This throws "Type 'null' is not assignable to parameter of
+        // type 'NodeData'." We need to suppress this error
+        // because of the need to test validations. This error is
+        // thrown because the source and target are null.
+        // @ts-ignore
+        source: null,
+        // This throws "Type 'null' is not assignable to parameter of
+        // type 'NodeData'." We need to suppress this error
+        // because of the need to test validations. This error is
+        // thrown because the source and target are null.
+        // @ts-ignore
+        target: null,
+        // This throws "Type 'null' is not assignable to parameter of
+        // type 'NodeData'." We need to suppress this error
+        // because of the need to test validations. This error is
+        // thrown because the source and target are null.
+        // @ts-ignore
+        d: null,
+        style: '',
+        connectsDestIfStuck: false,
+      },
+    ]);
 
     component.linkPropertyMapping = {
       added: 'string',
-      deleted: 'string'
+      deleted: 'string',
     };
     component.currentStateId = 'state_1';
     component.ngOnInit();
     tick();
     flush();
   }));
-
 
   afterEach(fakeAsync(() => {
     component.ngOnDestroy();
@@ -280,79 +305,90 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
-  it('should initialize $scope properties after controller is initialized',
-    fakeAsync(() => {
-      component.versionGraphData = graphData;
-      component.ngOnInit();
-      tick();
-
-      expect(component.graphLoaded).toBeTrue();
-      expect(component.GRAPH_WIDTH).toBe(630);
-      expect(component.GRAPH_HEIGHT).toBe(280);
-      expect(component.VIEWPORT_WIDTH).toBe('10000px');
-      expect(component.VIEWPORT_HEIGHT).toBe('10000px');
-      expect(component.VIEWPORT_X).toBe('-1260px');
-      expect(component.VIEWPORT_Y).toBe('-1000px');
-
-      expect(component.getGraphHeightInPixels()).toBe('300px');
-
-      expect(component.augmentedLinks[0].style).toBe(
-        'string');
-      expect(component.nodeList.length).toBe(3);
-
-      flush();
-    }));
-
-  it('should check if can navigate to node whenever node id is equal to' +
-      ' current state id', fakeAsync(() => {
-    spyOn(component, 'centerGraph');
-    component.initStateId = 'nodeId';
-    component.onNodeDeletionClick('nodeId2');
-    component.getCenterGraph();
+  it('should initialize $scope properties after controller is initialized', fakeAsync(() => {
+    component.versionGraphData = graphData;
+    component.ngOnInit();
     tick();
 
-    expect(component.centerGraph).toHaveBeenCalled();
-    expect(component.canNavigateToNode('state_1')).toBe(false);
-    expect(component.canNavigateToNode('state_3')).toBe(true);
+    expect(component.graphLoaded).toBeTrue();
+    expect(component.GRAPH_WIDTH).toBe(630);
+    expect(component.GRAPH_HEIGHT).toBe(280);
+    expect(component.VIEWPORT_WIDTH).toBe('10000px');
+    expect(component.VIEWPORT_HEIGHT).toBe('10000px');
+    expect(component.VIEWPORT_X).toBe('-1260px');
+    expect(component.VIEWPORT_Y).toBe('-1000px');
+
+    expect(component.getGraphHeightInPixels()).toBe('300px');
+
+    expect(component.augmentedLinks[0].style).toBe('string');
+    expect(component.nodeList.length).toBe(3);
+
+    flush();
   }));
 
-  it('should get node complete title with its secondary label and' +
-      ' warnings', () => {
-    spyOn(component, 'getNodeErrorMessage').and.returnValue('warning');
+  it(
+    'should check if can navigate to node whenever node id is equal to' +
+      ' current state id',
+    fakeAsync(() => {
+      spyOn(component, 'centerGraph');
+      component.initStateId = 'nodeId';
+      component.onNodeDeletionClick('nodeId2');
+      component.getCenterGraph();
+      tick();
 
-    expect(component.getNodeTitle(nodes.state_1)).toBe(
-      'This is a label for node 1 Second label for node 1 ' +
-        '(Warning: this state is unreachable.)');
+      expect(component.centerGraph).toHaveBeenCalled();
+      expect(component.canNavigateToNode('state_1')).toBe(false);
+      expect(component.canNavigateToNode('state_3')).toBe(true);
+    })
+  );
 
-    expect(component.getNodeTitle(nodes.state_3 as NodeTitle)).toBe(
-      'This is a label for node 3 This is a secondary label for ' +
-        'state_3 (Warning: there is no path from this state to the ' +
-        'END state.)');
+  it(
+    'should get node complete title with its secondary label and' + ' warnings',
+    () => {
+      spyOn(component, 'getNodeErrorMessage').and.returnValue('warning');
 
-    expect(component.getNodeTitle(nodes.state_4)).toBe(
-      'This is a label for node 4 2nd (warning)');
-  });
+      expect(component.getNodeTitle(nodes.state_1)).toBe(
+        'This is a label for node 1 Second label for node 1 ' +
+          '(Warning: this state is unreachable.)'
+      );
+
+      expect(component.getNodeTitle(nodes.state_3 as NodeTitle)).toBe(
+        'This is a label for node 3 This is a secondary label for ' +
+          'state_3 (Warning: there is no path from this state to the ' +
+          'END state.)'
+      );
+
+      expect(component.getNodeTitle(nodes.state_4)).toBe(
+        'This is a label for node 4 2nd (warning)'
+      );
+    }
+  );
 
   it('should get truncated label with truncate filter', () => {
     component.sendOnMaximizeFunction();
     component.sendOnClickFunctionData('');
     expect(component.getTruncatedLabel('This is a label for node 3')).toBe(
-      'This is a la...');
+      'This is a la...'
+    );
   });
 
-
-  it('should get node error message from node label when' +
-      ' showTranslationWarnings is false', () => {
-    component.showTranslationWarnings = false;
-    var nodeErrorMessage = 'Node 1 error message from exploration warnings';
-    spyOn(explorationWarningsService, 'getAllStateRelatedWarnings').and
-      .returnValue({
-        'This is a label for node 1': [nodeErrorMessage]
+  it(
+    'should get node error message from node label when' +
+      ' showTranslationWarnings is false',
+    () => {
+      component.showTranslationWarnings = false;
+      var nodeErrorMessage = 'Node 1 error message from exploration warnings';
+      spyOn(
+        explorationWarningsService,
+        'getAllStateRelatedWarnings'
+      ).and.returnValue({
+        'This is a label for node 1': [nodeErrorMessage],
       });
-    expect(
-      component.getNodeErrorMessage('This is a label for node 1')).toBe(
-      nodeErrorMessage);
-  });
+      expect(component.getNodeErrorMessage('This is a label for node 1')).toBe(
+        nodeErrorMessage
+      );
+    }
+  );
 
   it('should center the graph', fakeAsync(() => {
     component.ngOnInit();
@@ -364,7 +400,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
       right: 30,
       left: 40,
       bottom: 5,
-      top: 20
+      top: 20,
     };
 
     component.centerGraph();
@@ -397,8 +433,8 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
         secondaryLabel: '2nd',
         style: 'string',
         nodeClass: 'string',
-        canDelete: true
-      }
+        canDelete: true,
+      },
     };
     component.centerGraph();
     tick();
@@ -407,101 +443,105 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
-  it('should center graph when centerGraph flag is broadcasted and transform' +
-    ' x and y axis to 0', fakeAsync(() => {
-    spyOn(component, 'getElementDimensions').and.returnValue({
-      w: 1000,
-      h: 1000
-    });
+  it(
+    'should center graph when centerGraph flag is broadcasted and transform' +
+      ' x and y axis to 0',
+    fakeAsync(() => {
+      spyOn(component, 'getElementDimensions').and.returnValue({
+        w: 1000,
+        h: 1000,
+      });
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
-      bottom: 20,
-      left: 10,
-      top: 10,
-      right: 20
-    });
-    flush();
-    // Spies for d3 library.
-    var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-      scaleExtent: () => ({
-        on: (evt: string, callback: () => void) => {
-          callback();
-          return {
-            apply: () => {}
-          };
-        }
-      })
-    });
-    spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-    spyOnProperty(d3, 'event').and.returnValue({
-      transform: {
-        x: 10,
-        y: 20
-      }
-    });
+      spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
+        bottom: 20,
+        left: 10,
+        top: 10,
+        right: 20,
+      });
+      flush();
+      // Spies for d3 library.
+      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
+        scaleExtent: () => ({
+          on: (evt: string, callback: () => void) => {
+            callback();
+            return {
+              apply: () => {},
+            };
+          },
+        }),
+      });
+      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
+      spyOnProperty(d3, 'event').and.returnValue({
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      });
 
-    component.makeGraphPannable();
-    tick();
-    flush();
+      component.makeGraphPannable();
+      tick();
+      flush();
 
-    expect(component.innerTransformStr).toBe(
-      'translate(10,20)');
-  }));
+      expect(component.innerTransformStr).toBe('translate(10,20)');
+    })
+  );
 
-  it('should center graph when centerGraph flag is broadcasted and transform' +
-    ' x and y axis to 10, 20', fakeAsync(() => {
-    component.ngOnInit();
-    tick();
+  it(
+    'should center graph when centerGraph flag is broadcasted and transform' +
+      ' x and y axis to 10, 20',
+    fakeAsync(() => {
+      component.ngOnInit();
+      tick();
 
-    spyOn(component, 'getElementDimensions').and.returnValue({
-      w: 1000,
-      h: 1000
-    });
+      spyOn(component, 'getElementDimensions').and.returnValue({
+        w: 1000,
+        h: 1000,
+      });
 
-    jasmine.createSpy('apply').and.stub();
-    spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
-      bottom: 20,
-      left: 10,
-      top: 10,
-      right: 20
-    });
-    component.graphBounds = {
-      right: 30,
-      left: 40,
-      bottom: 5,
-      top: 20
-    };
+      jasmine.createSpy('apply').and.stub();
+      spyOn(stateGraphLayoutService, 'getGraphBoundaries').and.returnValue({
+        bottom: 20,
+        left: 10,
+        top: 10,
+        right: 20,
+      });
+      component.graphBounds = {
+        right: 30,
+        left: 40,
+        bottom: 5,
+        top: 20,
+      };
 
-    flush();
-    // Spies for d3 library.
-    var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
-      scaleExtent: () => ({
-        on: (evt: string, callback: () => void) => {
-          callback();
-          return {
-            apply: () => {}
-          };
-        }
-      })
-    });
-    spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
-    spyOnProperty(d3, 'event').and.returnValue({
-      transform: {
-        x: 10,
-        y: 20
-      }
-    });
+      flush();
+      // Spies for d3 library.
+      var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
+        scaleExtent: () => ({
+          on: (evt: string, callback: () => void) => {
+            callback();
+            return {
+              apply: () => {},
+            };
+          },
+        }),
+      });
+      spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
+      spyOnProperty(d3, 'event').and.returnValue({
+        transform: {
+          x: 10,
+          y: 20,
+        },
+      });
 
-    component.makeGraphPannable();
-    tick();
-    flush();
+      component.makeGraphPannable();
+      tick();
+      flush();
 
-    expect(d3.event.transform.x).toBe(0);
-    expect(d3.event.transform.y).toBe(0);
-    expect(component.overallTransformStr).toBe(
-      'translate(465,487.5)');
-  }));
+      expect(d3.event.transform.x).toBe(0);
+      expect(d3.event.transform.y).toBe(0);
+      expect(component.overallTransformStr).toBe('translate(465,487.5)');
+    })
+  );
 });

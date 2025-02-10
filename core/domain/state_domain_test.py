@@ -858,32 +858,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'solicit_answer_details': False,
-            'card_is_checkpoint': False
+            'card_is_checkpoint': False,
+            'inapplicable_skill_misconception_ids': []
         }
         self.assertEqual(expected_dict, state_dict)
-
-    def test_can_undergo_classification(self) -> None:
-        """Test the can_undergo_classification() function."""
-        exploration_id = 'eid'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[Tuple[str, bytes]] = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
-            assets_list)
-
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-        state_with_training_data = exploration.states['Home']
-        state_without_training_data = exploration.states['End']
-
-        # A state with 786 training examples.
-        self.assertTrue(
-            state_with_training_data.can_undergo_classification())
-
-        # A state with no training examples.
-        self.assertFalse(
-            state_without_training_data.can_undergo_classification())
 
     def test_get_training_data(self) -> None:
         """Test retrieval of training data."""
@@ -901,8 +879,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         expected_training_data = [{
             'answer_group_index': 1,
-            'answers': [u'cheerful', u'merry', u'ecstatic', u'glad',
-                        u'overjoyed', u'pleased', u'thrilled', u'smile']}]
+            'answers': ['cheerful', 'merry', 'ecstatic', 'glad',
+                        'overjoyed', 'pleased', 'thrilled', 'smile']}]
 
         observed_training_data = state.get_training_data()
 
@@ -1281,6 +1259,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_linked_skill_id('string_2')
         self.assertEqual(state.linked_skill_id, 'string_2')
 
+    def test_update_inapplicable_misconception_skill_ids(self) -> None:
+        """Test updating inapplicable_skill_misconception_ids."""
+        state = state_domain.State.create_default_state(
+            'state_1', 'content_0', 'default_outcome_1')
+        self.assertEqual(state.inapplicable_skill_misconception_ids, [])
+        state.update_inapplicable_skill_misconception_ids(
+            ['string_1']
+        )
+        self.assertEqual(
+            state.inapplicable_skill_misconception_ids,
+            ['string_1']
+        )
+
     def test_update_card_is_checkpoint(self) -> None:
         """Test update card_is_checkpoint."""
         state = state_domain.State.create_default_state(
@@ -1430,6 +1421,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
                 'default_outcome': {
@@ -1500,6 +1492,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
                 'default_outcome': {
@@ -1697,6 +1690,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'card_is_checkpoint': False,
             'linked_skill_id': None,
             'classifier_model_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'interaction': {
                 'solution': {
                     'answer_is_exclusive': True,
@@ -1758,6 +1752,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1901,6 +1896,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -1967,6 +1963,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2077,6 +2074,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2196,6 +2194,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2297,6 +2296,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': old_solution_dict,
@@ -2390,6 +2390,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2436,6 +2437,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'linked_skill_id': None,
+            'inapplicable_skill_misconception_ids': [],
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2518,7 +2520,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', '<p>some html</p>')
         subtitled_html.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, ' +
+            utils.ValidationError, 'Expected content id to be a string, '
             'received 20'):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
@@ -2541,7 +2543,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', 'some html string')
         subtitled_unicode.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, ' +
+            utils.ValidationError, 'Expected content id to be a string, '
             'received 20'):
             with self.swap(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
@@ -2768,7 +2770,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected solicit_answer_details to be ' +
+            utils.ValidationError, 'Expected solicit_answer_details to be '
             'a boolean, received'):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
@@ -2778,7 +2780,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'The Continue interaction does not ' +
+            utils.ValidationError, 'The Continue interaction does not '
             'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
@@ -2802,11 +2804,25 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            utils.ValidationError, 'Expected linked_skill_id to be '
             'a str, received 12.'):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
+
+    def test_validate_state_inapplicable_skill_misconception_ids(self) -> None:
+        """Test validation of inapplicable_skill_misconception_ids."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
+        with self.assertRaisesRegex(
+            utils.ValidationError, 'Expected '
+            'inapplicable_skill_misconception_ids to be a list, received 12.'):
+            with self.swap(
+                init_state, 'inapplicable_skill_misconception_ids', 12
+            ):
+                exploration.validate()
+        self.assertEqual(init_state.inapplicable_skill_misconception_ids, [])
 
     def test_validate_state_card_is_checkpoint(self) -> None:
         """Test validation of card_is_checkpoint."""
@@ -2814,7 +2830,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected card_is_checkpoint to be ' +
+            utils.ValidationError, 'Expected card_is_checkpoint to be '
             'a boolean, received'):
             with self.swap(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()
@@ -3002,10 +3018,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ]
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': True,
-            'correct_answer': u'hello_world!',
+            'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': u'<p>hello_world is a string</p>'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         # Ruling out the possibility of None for mypy type checking.

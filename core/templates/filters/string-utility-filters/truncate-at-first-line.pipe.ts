@@ -16,7 +16,7 @@
  * @fileoverview TruncateAtFirstLine pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({name: 'truncateAtFirstLine'})
 export class TruncateAtFirstLinePipe implements PipeTransform {
@@ -41,8 +41,8 @@ export class TruncateAtFirstLinePipe implements PipeTransform {
       }
     }
     let suffix = otherNonemptyLinesExist ? '...' : '';
-    return (
-            firstNonemptyLineIndex !== -1 ?
-                lines[firstNonemptyLineIndex] + suffix : '');
+    return firstNonemptyLineIndex !== -1
+      ? lines[firstNonemptyLineIndex] + suffix
+      : '';
   }
 }

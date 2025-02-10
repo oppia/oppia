@@ -16,19 +16,18 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { NumericInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {NumericInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 interface Range {
   answerGroupIndex: number;
@@ -40,26 +39,30 @@ interface Range {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NumericInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: NumericInputCustomizationArgs): Warning[] {
+    customizationArgs: NumericInputCustomizationArgs
+  ): Warning[] {
     return [];
   }
 
   getAllWarnings(
-      stateName: string,
-      customizationArgs: NumericInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: NumericInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     /*
     Store an answer range for every rule, then check for redundant
@@ -72,7 +75,12 @@ export class NumericInputValidationService {
     }
     */
     var setLowerAndUpperBounds = (
-        range: Range, lb: number, ub: number, lbi: boolean, ubi: boolean) => {
+      range: Range,
+      lb: number,
+      ub: number,
+      lbi: boolean,
+      ubi: boolean
+    ) => {
       range.lb = lb;
       range.ub = ub;
       range.lbi = lbi;
@@ -81,32 +89,40 @@ export class NumericInputValidationService {
     var isEnclosedBy = (ra: Range, rb: Range) => {
       // Checks if range ra is enclosed by range rb.
       var lowerBoundConditionIsSatisfied =
-          (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
+        rb.lb < ra.lb || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
       var upperBoundConditionIsSatisfied =
-          (rb.ub > ra.ub) || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
-      return lowerBoundConditionIsSatisfied &&
-          upperBoundConditionIsSatisfied;
+        rb.ub > ra.ub || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
+      return lowerBoundConditionIsSatisfied && upperBoundConditionIsSatisfied;
     };
 
     var ranges = [];
-    var raiseWarningForRuleIsInclusivelyBetween = function(
-        ruleIndex: number, answerGroupIndex: number) {
+    var raiseWarningForRuleIsInclusivelyBetween = function (
+      ruleIndex: number,
+      answerGroupIndex: number
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
-          'In learner answer ' + (ruleIndex + 1) + ' from Oppia response ' +
-          (answerGroupIndex + 1) + ', Please ensure that the second number ' +
-          'is greater than the first number.')
+        message:
+          'In learner answer ' +
+          (ruleIndex + 1) +
+          ' from Oppia response ' +
+          (answerGroupIndex + 1) +
+          ', Please ensure that the second number ' +
+          'is greater than the first number.',
       });
     };
-    var raiseWarningForRequireNonnegativeInput = function(
-        ruleIndex: number, input: number) {
+    var raiseWarningForRequireNonnegativeInput = function (
+      ruleIndex: number,
+      input: number
+    ) {
       if (input < 0 && customizationArgs.requireNonnegativeInput.value) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
-            'Learner answer ' + (ruleIndex + 1) + ' input ' +
-            'should be greater than or equal to zero.')
+          message:
+            'Learner answer ' +
+            (ruleIndex + 1) +
+            ' input ' +
+            'should be greater than or equal to zero.',
         });
       }
     };
@@ -135,15 +151,14 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
-            if (
-              a < 0 &&
-              customizationArgs.requireNonnegativeInput.value
-            ) {
+            if (a < 0 && customizationArgs.requireNonnegativeInput.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' upper bound of the range ' +
-                  'should be greater than or equal to zero.')
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' upper bound of the range ' +
+                  'should be greater than or equal to zero.',
               });
             }
             break;
@@ -172,20 +187,23 @@ export class NumericInputValidationService {
             if (tol <= 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) +
-                  ' tolerance must be a positive value.')
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' tolerance must be a positive value.',
               });
             }
             if (
-              (x + tol) < 0 &&
+              x + tol < 0 &&
               customizationArgs.requireNonnegativeInput.value
             ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' Upper bound of the ' +
-                  'tolerance range should be greater than or equal to zero.')
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' Upper bound of the ' +
+                  'tolerance range should be greater than or equal to zero.',
               });
             }
             break;
@@ -195,11 +213,18 @@ export class NumericInputValidationService {
           if (isEnclosedBy(range, ranges[k])) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Learner answer ' + (j + 1) + ' from Oppia response ' +
-                (i + 1) + ' will never be matched because it is made ' +
-                'redundant by answer ' + (ranges[k].ruleIndex + 1) + ' from ' +
-                'response ' + (ranges[k].answerGroupIndex + 1) + '.')
+              message:
+                'Learner answer ' +
+                (j + 1) +
+                ' from Oppia response ' +
+                (i + 1) +
+                ' will never be matched because it is made ' +
+                'redundant by answer ' +
+                (ranges[k].ruleIndex + 1) +
+                ' from ' +
+                'response ' +
+                (ranges[k].answerGroupIndex + 1) +
+                '.',
             });
           }
         }
@@ -209,17 +234,22 @@ export class NumericInputValidationService {
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
 
     return warningsList;
   }
 
   // Returns 'undefined' when no error occurs.
   validateNumericString(
-      value: string, decimalSeparator: string
+    value: string,
+    decimalSeparator: string
   ): string | undefined {
     value = value.toString().trim();
-    const invalidChars = /[^0-9e.-]/g;
+    const invalidChars = /[^0-9e.,-]/g;
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;
@@ -243,10 +273,10 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   validateNumber(
-      // Null can also be passed in as a value, which is further validated.
-      value: number | null,
-      requireNonnegativeInput: boolean,
-      decimalSeparator: string = '.'
+    // Null can also be passed in as a value, which is further validated.
+    value: number | null,
+    requireNonnegativeInput: boolean,
+    decimalSeparator: string = '.'
   ): string | undefined {
     if (requireNonnegativeInput && value && value < 0) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
@@ -301,6 +331,9 @@ export class NumericInputValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'NumericInputValidationService',
-  downgradeInjectable(NumericInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'NumericInputValidationService',
+    downgradeInjectable(NumericInputValidationService)
+  );

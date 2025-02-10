@@ -16,18 +16,25 @@
  * @fileoverview Unit tests for RouterService.
  */
 
-import { RouterService } from './router.service';
-import { Subscription } from 'rxjs';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {RouterService} from './router.service';
+import {Subscription} from 'rxjs';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  discardPeriodicTasks,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import $ from 'jquery';
-import { ContextService } from 'services/context.service';
-import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
-import { ExplorationStatesService } from './exploration-states.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {ContextService} from 'services/context.service';
+import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
+import {ExplorationStatesService} from './exploration-states.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationInitStateNameService} from './exploration-init-state-name.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockContextService {
   getExplorationId() {
@@ -51,11 +58,12 @@ describe('Router Service', () => {
   let explorationImprovementsService: ExplorationImprovementsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
+  let translationLanguageService: TranslationLanguageService;
   let windowRef: WindowRef;
   let hasStateSpy: jasmine.Spy;
   let isInitializedSpy: jasmine.Spy;
 
-  beforeEach((() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -63,38 +71,39 @@ describe('Router Service', () => {
         WindowRef,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         ExplorationImprovementsService,
         ExplorationStatesService,
         StateEditorService,
+        TranslationLanguageService,
         {
           provide: ContextService,
-          useClass: MockContextService
+          useClass: MockContextService,
         },
         {
           provide: ExplorationInitStateNameService,
-          useClass: MockExplorationInitStateNameService
-        }
-      ]
+          useClass: MockExplorationInitStateNameService,
+        },
+      ],
     });
 
     routerService = TestBed.inject(RouterService);
     explorationImprovementsService = TestBed.inject(
-      ExplorationImprovementsService);
-    explorationStatesService = TestBed.inject(
-      ExplorationStatesService);
+      ExplorationImprovementsService
+    );
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
     windowRef = TestBed.inject(WindowRef);
     stateEditorService = TestBed.inject(StateEditorService);
-  }));
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+  });
 
   beforeEach(() => {
     isInitializedSpy = spyOn(explorationStatesService, 'isInitialized');
     isInitializedSpy.and.returnValue(true);
     hasStateSpy = spyOn(explorationStatesService, 'hasState');
     hasStateSpy.and.returnValue(true);
-    spyOn(stateEditorService, 'getActiveStateName')
-      .and.returnValue(null);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
 
     testSubscriptions = new Subscription();
     routerService.navigateToMainTab('first card');
@@ -105,13 +114,14 @@ describe('Router Service', () => {
 
   it('should not navigate to main tab when already there', fakeAsync(() => {
     let jQuerySpy = spyOn(window, '$');
-    jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-      $(document.createElement('div')));
+    jQuerySpy
+      .withArgs('.oppia-editor-cards-container')
+      .and.returnValue($(document.createElement('div')));
     jQuerySpy.and.callThrough();
 
-    spyOn($.fn, 'fadeOut').and.callFake((cb) => {
+    spyOn($.fn, 'fadeOut').and.callFake(cb => {
       cb();
-      setTimeout(() => {},);
+      setTimeout(() => {});
       return null;
     });
 
@@ -123,13 +133,11 @@ describe('Router Service', () => {
 
     tick(300);
 
-
     expect(routerService.getActiveTabName()).toBe('main');
 
     routerService.navigateToMainTab('first card');
 
     tick(300);
-
 
     expect(routerService.getActiveTabName()).toBe('main');
 
@@ -176,6 +184,24 @@ describe('Router Service', () => {
     discardPeriodicTasks();
   }));
 
+  it('should navigate to translation tab', fakeAsync(() => {
+    window.location.hash = '/translation/Start/ca_buttonText_6';
+    routerService._changeTab('/translation/Start/ca_buttonText_6');
+
+    tick(300);
+
+    expect(stateEditorService.getInitActiveContentId()).toBe('ca_buttonText_6');
+  }));
+
+  it('should navigate to translation tab with correct voiceover language', fakeAsync(() => {
+    window.location.hash = '/translation/Start/ca_buttonText_6/ak';
+    routerService._changeTab('/translation/Start/ca_buttonText_6/ak');
+
+    tick(300);
+
+    expect(translationLanguageService.getActiveLanguageCode()).toBe('ak');
+  }));
+
   it('should navigate to preview tab', fakeAsync(() => {
     expect(routerService.getActiveTabName()).toBe('main');
     routerService.navigateToPreviewTab();
@@ -216,37 +242,39 @@ describe('Router Service', () => {
     discardPeriodicTasks();
   }));
 
-  it('should navigate to main tab if improvements tab is not enabled',
-    fakeAsync(() => {
-      spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(Promise.resolve(false));
+  it('should navigate to main tab if improvements tab is not enabled', fakeAsync(() => {
+    spyOn(
+      explorationImprovementsService,
+      'isImprovementsTabEnabledAsync'
+    ).and.returnValue(Promise.resolve(false));
 
-      expect(routerService.getActiveTabName()).toBe('main');
+    expect(routerService.getActiveTabName()).toBe('main');
 
-      routerService.navigateToImprovementsTab();
-      tick(300);
+    routerService.navigateToImprovementsTab();
+    tick(300);
 
-      expect(routerService.getActiveTabName()).toBe('main');
+    expect(routerService.getActiveTabName()).toBe('main');
 
-      flush();
-      discardPeriodicTasks();
-    }));
+    flush();
+    discardPeriodicTasks();
+  }));
 
-  it('should navigate to improvements tab is not enabled',
-    fakeAsync(() => {
-      spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(Promise.resolve(true));
+  it('should navigate to improvements tab is not enabled', fakeAsync(() => {
+    spyOn(
+      explorationImprovementsService,
+      'isImprovementsTabEnabledAsync'
+    ).and.returnValue(Promise.resolve(true));
 
-      expect(routerService.getActiveTabName()).toBe('main');
-      routerService.navigateToImprovementsTab();
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToImprovementsTab();
 
-      tick(300);
+    tick(300);
 
-      expect(routerService.getActiveTabName()).toBe('improvements');
+    expect(routerService.getActiveTabName()).toBe('improvements');
 
-      flush();
-      discardPeriodicTasks();
-    }));
+    flush();
+    discardPeriodicTasks();
+  }));
 
   it('should navigate to history tab', fakeAsync(() => {
     expect(routerService.getActiveTabName()).toBe('main');
@@ -286,45 +314,42 @@ describe('Router Service', () => {
   }));
 
   it('should tell isLocationSetToNonStateEditorTab', fakeAsync(() => {
-    spyOnProperty(windowRef, 'nativeWindow')
-      .and.returnValue({
-        location: {
-          hash: '#/settings'
-        }
-      });
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        hash: '#/settings',
+      },
+    });
 
-    expect(routerService.isLocationSetToNonStateEditorTab())
-      .toBeTrue();
+    expect(routerService.isLocationSetToNonStateEditorTab()).toBeTrue();
 
     flush();
     discardPeriodicTasks();
   }));
 
-  it('should tell current State From Location Path to be null',
-    fakeAsync(() => {
-      spyOnProperty(windowRef, 'nativeWindow')
-        .and.returnValue({
-          location: {
-            hash: '#/gui/Introduction'
-          }
-        });
+  it('should tell current State From Location Path to be null', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        hash: '#/gui/Introduction',
+      },
+    });
 
-      routerService.savePendingChanges();
-      expect(routerService.getCurrentStateFromLocationPath())
-        .toBe('/Introduction');
+    routerService.savePendingChanges();
+    expect(routerService.getCurrentStateFromLocationPath()).toBe(
+      '/Introduction'
+    );
 
-      routerService.navigateToMainTab('/Introduction');
-      flush();
-      discardPeriodicTasks();
-    }));
+    routerService.navigateToMainTab('/Introduction');
+    flush();
+    discardPeriodicTasks();
+  }));
 
   it('should not navigate to main tab', () => {
-    spyOn(routerService, '_getCurrentStateFromLocationPath')
-      .and.returnValue('/main');
+    spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(
+      '/main'
+    );
 
     routerService.navigateToMainTab('main');
 
-    expect(routerService._getCurrentStateFromLocationPath)
-      .toHaveBeenCalled();
+    expect(routerService._getCurrentStateFromLocationPath).toHaveBeenCalled();
   });
 });

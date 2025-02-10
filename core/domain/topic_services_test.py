@@ -18,16 +18,20 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import question_domain
 from core.domain import rights_manager
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -46,8 +50,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([
-    models.Names.TOPIC
+(topic_models, story_models) = models.Registry.import_models([
+    models.Names.TOPIC,
+    models.Names.STORY
 ])
 
 
@@ -98,6 +103,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -105,6 +111,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -162,17 +169,178 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_compute_summary(self) -> None:
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 
-        self.assertEqual(topic_summary.id, self.TOPIC_ID)
-        self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.description, 'Description')
+        self.assertEqual(topic_summary.id, self.topic.id)
+        self.assertEqual(topic_summary.name, self.topic.name)
+        self.assertEqual(
+            topic_summary.canonical_name,
+            self.topic.canonical_name
+        )
+        self.assertEqual(topic_summary.url_fragment, self.topic.url_fragment)
+        self.assertEqual(topic_summary.description, self.topic.description)
+        self.assertEqual(topic_summary.language_code, self.topic.language_code)
+        self.assertEqual(topic_summary.version, self.topic.version)
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.total_published_node_count, 0)
-        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
-        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+        self.assertEqual(
+            topic_summary.thumbnail_filename,
+            self.topic.thumbnail_filename
+        )
+        self.assertEqual(
+            topic_summary.thumbnail_bg_color,
+            self.topic.thumbnail_bg_color
+        )
+        self.assertEqual(
+            topic_summary.topic_model_created_on,
+            self.topic.created_on
+        )
+        self.assertEqual(
+            topic_summary.topic_model_last_updated,
+            self.topic.last_updated
+        )
+
+    def test_compute_summary_when_serial_chapter_launch_disabled(
+        self
+    ) -> None:
+        story_exp_ids = ['exp-1', 'exp-2']
+        no_exp_ids: List[str] = []
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, story_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_2, self.user_id_admin)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
+
+        self.assertEqual(
+            topic_summary.total_published_node_count, len(story_exp_ids))
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: story_exp_ids,
+                self.story_id_2: no_exp_ids
+            })
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_compute_summary_when_serial_chapter_launch_enabled(
+        self
+    ) -> None:
+        story_1_published_chapter_exp_ids = ['exp-1', 'exp-2']
+        story_2_exp_ids = ['exp-3', 'exp-4']
+        story_2_published_chapter_exp_ids = story_2_exp_ids[:1]
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1,
+            story_1_published_chapter_exp_ids)
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_2, story_2_exp_ids,
+            story_2_published_chapter_exp_ids)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
+
+        self.assertEqual(
+            topic_summary.total_published_node_count,
+            len(story_1_published_chapter_exp_ids) +
+            len(story_2_published_chapter_exp_ids))
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: story_1_published_chapter_exp_ids,
+                self.story_id_2: story_2_published_chapter_exp_ids
+            })
+
+    def test_compute_summary_does_not_map_unpublished_stories(
+        self
+    ) -> None:
+        story_exp_ids = ['exp-1', 'exp-2']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, story_exp_ids)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+
+        topic_summary = topic_services.compute_summary_of_topic(
+            updated_topic)
+
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {})
+
+    def _publish_story_chapters_with_explorations(
+        self, topic_id: str, story_id: str, exp_ids: List[str],
+        chapter_exp_ids: Optional[List[str]] = None
+    ) -> None:
+        """Creates explorations with exp_ids. Links them to the story given
+        by story_id. Publishes the story under topic with topic_id, along
+        with its nodes who has linked chapter_exp_ids. If chapter_exp_ids
+        is not provided, then the nodes published will be based on exp_ids.
+
+        Args:
+            topic_id: str. The id of the topic containing the story.
+            story_id: str. The id of the story to publish and to link
+                explorations to.
+            exp_ids: list(str). A list of exploration ids to create
+                explorations with.
+            chapter_exp_ids: list(str)|None. A list of exploration ids that
+                correspond with each story node that will be published.
+        """
+        chapter_exp_ids = chapter_exp_ids or exp_ids
+        self._create_linked_explorations(topic_id, story_id, exp_ids)
+        topic_services.publish_story(topic_id, story_id, self.user_id_admin)
+        self._publish_story_chapters(topic_id, story_id, chapter_exp_ids)
+
+    def _publish_story_chapters(
+        self, topic_id: str, story_id: str, chapter_exp_ids: List[str]
+    ) -> None:
+        """Publishes the story chapters linked to each exploration id in
+        chapter_exp_ids. The chapters belong to story_id, and the story
+        belongs to topic_id.
+
+        Args:
+            topic_id: str. Topic id containing the story.
+            story_id: str. Story id containing the chapters.
+            chapter_exp_ids: list(str). List of exp ids linked to each chapter
+                to be published.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[i].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            }) for i in range(len(chapter_exp_ids))
+            if story.story_contents.nodes[i].exploration_id ==
+            chapter_exp_ids[i]
+        ]
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, story_id, change_list,
+            'Publish these story chapters only.', topic_id)
+
+    def _create_linked_explorations(
+        self, topic_id: str, story_id: str, exp_ids: List[str]
+    ) -> None:
+        """Creates explorations with exp_ids. Links them to the story given
+        by story_id that is in the topic given by topic_id.
+
+        Args:
+            topic_id: str. The id of the topic containing the story.
+            story_id: str. The id of the story to publish and to link
+                explorations to.
+            exp_ids: list(str). A list of exploration ids to create
+                explorations with.
+        """
+        for exp_id in exp_ids:
+            self.save_new_valid_exploration(
+                exp_id, self.user_id_admin, end_state_name='end')
+            self.publish_exploration(self.user_id_admin, exp_id)
+        self.add_explorations_to_story(topic_id, story_id, exp_ids)
 
     def test_raises_error_while_computing_topic_summary_with_invalid_data(
         self
@@ -184,6 +352,257 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'No data available for when the topic was last updated.'
         ):
             topic_services.compute_summary_of_topic(self.topic)
+
+    def test_generate_topic_summary_when_publishing_story(self) -> None:
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: []
+            })
+
+    def test_generate_topic_summary_when_unpublishing_story(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {})
+
+    def test_generate_topic_summary_when_deleting_published_story(
+        self
+    ) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
+        # Keep the swap assertions separate to ensure exactly 1 call to
+        # generate_topic_summary occurs per delete call.
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.delete_canonical_story(
+                self.user_id_admin, self.TOPIC_ID, self.story_id_1)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(topic_summary.canonical_story_count, 0)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_3: []
+            })
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.delete_additional_story(
+                self.user_id_admin, self.TOPIC_ID, self.story_id_3)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(topic_summary.additional_story_count, 0)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {})
+
+    def test_generate_topic_summary_when_publishing_story_chapter(
+        self
+    ) -> None:
+        linked_exp_ids = ['exp_1']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, linked_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+
+        with self.swap_to_always_return(
+            feature_flag_services, 'is_feature_flag_enabled', True
+        ), self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+                })], 'Publish story chapter.', self.TOPIC_ID)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(
+            topic_summary.total_published_node_count, len(linked_exp_ids))
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: linked_exp_ids
+            })
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_generate_topic_summary_when_unpublishing_story_chapter(
+        self
+    ) -> None:
+        linked_exp_ids = ['exp_1']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, linked_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                    'new_value': constants.STORY_NODE_STATUS_DRAFT
+                })], 'Unpublish story chapter.', self.TOPIC_ID)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(
+            topic_summary.total_published_node_count, len(linked_exp_ids) - 1)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: []
+            })
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_generate_topic_summary_when_deleting_published_story_chapter(
+        self
+    ) -> None:
+        linked_exp_ids = ['exp_1']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, linked_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_DELETE_STORY_NODE, 
+                    'node_id': story.story_contents.nodes[0].id,
+                })], 'Delete story chapter.', self.TOPIC_ID)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(
+            topic_summary.total_published_node_count, len(linked_exp_ids) - 1)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: []
+            })
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_generate_topic_summary_when_changing_exp_id_linked_to_published_story_chapter( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        exp_id_1 = 'exp_1'
+        exp_id_2 = 'exp_2'
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, [exp_id_1])
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        story = story_fetchers.get_story_by_id(self.story_id_1)
+        topic_services.update_story_and_topic_summary(
+            self.user_id_admin, self.story_id_1,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
+                'node_id': story.story_contents.nodes[0].id,
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Publish story chapter.', self.TOPIC_ID)
+        self.save_new_valid_exploration(
+            exp_id_2, self.user_id_admin, end_state_name='end')
+        self.publish_exploration(self.user_id_admin, exp_id_2)
+
+        with self.swap_with_checks(
+            topic_services, 'generate_topic_summary',
+            topic_services.generate_topic_summary,
+            expected_args=[(self.TOPIC_ID,)]
+        ):
+            topic_services.update_story_and_topic_summary(
+                self.user_id_admin, self.story_id_1,
+                [story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                    'node_id': story.story_contents.nodes[0].id,
+                    'old_value': exp_id_1,
+                    'new_value': exp_id_2
+                })], 'Change exploration of chapter.', self.TOPIC_ID)
+
+        topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertDictEqual(
+            topic_summary.published_story_exploration_mapping, {
+                self.story_id_1: [exp_id_2]
+            })
 
     def test_get_topic_from_model(self) -> None:
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
@@ -548,10 +967,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.canonical_story_references[0].story_is_published, False)
         self.assertEqual(
             topic.additional_story_references[0].story_is_published, False)
-        topic_services.publish_story(
-            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+
+        with self.swap_with_call_counter(
+                topic_services, 'generate_topic_summary') as (
+                generate_topic_summary):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         # Ruling out the possibility of None for mypy type checking.
@@ -563,10 +988,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 1)
         self.assertEqual(topic_summary.additional_story_count, 1)
 
-        topic_services.unpublish_story(
-            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        with self.swap_with_call_counter(
+                topic_services, 'generate_topic_summary') as (
+                generate_topic_summary):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin)
+
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         # Ruling out the possibility of None for mypy type checking.
@@ -644,29 +1074,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(
             self.user_id_admin, self.TOPIC_ID, 'story_id_new')
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': 'node_1',
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.user_id_admin, 'story_id_new', changelist,
-            'Added node.')
 
-        with self.assertRaisesRegex(
-            Exception, 'Story node with id node_1 does not contain an '
-            'exploration id.'):
-            topic_services.publish_story(
-                self.TOPIC_ID, 'story_id_new', self.user_id_admin)
-
-        # Throw error if exploration isn't published.
         self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
         self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_ADD_STORY_NODE,
+            'node_id': 'node_1',
+            'title': 'Title 1'
+        }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
@@ -676,7 +1093,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         story_services.update_story(
             self.user_id_admin, 'story_id_new', change_list,
-            'Updated story node.')
+            'Added story node with linked exploration.')
 
         self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
         self.user_admin = user_services.get_user_actions_info(
@@ -776,6 +1193,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic.skill_ids_for_diagnostic_test, [])
+
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
@@ -2161,7 +2579,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             total_published_node_count=0,
             uncategorized_skill_count=0,
             subtopic_count=0,
-            version=1
+            version=1,
+            published_story_exploration_mapping={
+                self.story_id_1: [],
+                self.story_id_2: [],
+                self.story_id_3: []
+            }
         )
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
         populated_model = topic_services.populate_topic_summary_model_fields(
@@ -2222,6 +2645,341 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             populated_model.url_fragment,
             topic_summary.url_fragment
         )
+        self.assertDictEqual(
+            populated_model.published_story_exploration_mapping,
+            topic_summary.published_story_exploration_mapping)
+
+    def test_get_chapter_counts_in_topic_summaries(self) -> None:
+        canonical_story_id_1 = story_services.get_new_story_id()
+        story = story_domain.Story.create_default_story(
+            canonical_story_id_1, 'title', 'description', self.TOPIC_ID,
+            'url-fragment')
+        story.meta_tag_content = 'story meta content'
+        node_1: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-1',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'planned_publication_date_msecs': 1690800486000.0,
+            'first_publication_date_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000.0,
+            'unpublishing_reason': None
+        }
+        node_2: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-2',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_2',
+            'title': 'Chapter 2',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'planned_publication_date_msecs': 1659264486000.0,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000.0,
+            'unpublishing_reason': None
+        }
+        node_3: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-3',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_3',
+            'title': 'Chapter 3',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1690800486000.0,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000.0,
+            'unpublishing_reason': None
+        }
+        node_4: story_domain.StoryNodeDict = {
+            'outline': 'outline',
+            'exploration_id': 'exp-4',
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_4',
+            'title': 'Chapter 4',
+            'description': '',
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'thumbnail_size_in_bytes': 21131,
+            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'planned_publication_date_msecs': 1693478886000.0,
+            'first_publication_date_msecs': None,
+            'last_modified_msecs': 1672684200000.0,
+            'unpublishing_reason': None
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3),
+            story_domain.StoryNode.from_dict(node_4)
+        ]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_5'
+
+        story_services.save_new_story(self.user_id, story)
+        topic_services.add_canonical_story(
+            self.user_id, self.TOPIC_ID, canonical_story_id_1)
+
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            topic_summary = (
+                topic_fetchers.get_topic_summary_by_id(
+                self.TOPIC_ID).to_dict())
+            frontend_topic_summary: topic_domain.FrontendTopicSummaryDict = {
+                'id': topic_summary['id'],
+                'name': topic_summary['name'],
+                'url_fragment': topic_summary['url_fragment'],
+                'language_code': topic_summary['language_code'],
+                'description': topic_summary['description'],
+                'version': topic_summary['version'],
+                'canonical_story_count': topic_summary[
+                    'canonical_story_count'],
+                'additional_story_count': topic_summary[
+                    'canonical_story_count'],
+                'uncategorized_skill_count': topic_summary[
+                    'additional_story_count'],
+                'subtopic_count': topic_summary['subtopic_count'],
+                'total_skill_count': topic_summary['total_skill_count'],
+                'total_published_node_count': topic_summary[
+                    'total_published_node_count'],
+                'thumbnail_filename': topic_summary['thumbnail_filename'],
+                'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                'published_story_exploration_mapping': topic_summary[
+                    'published_story_exploration_mapping'],
+                'topic_model_created_on': topic_summary[
+                    'topic_model_created_on'],
+                'topic_model_last_updated': topic_summary[
+                    'topic_model_last_updated'],
+                'is_published': True,
+                'can_edit_topic': True,
+                'classroom': None,
+                'total_upcoming_chapters_count': 0,
+                'total_overdue_chapters_count': 0,
+                'total_chapter_counts_for_each_story': [],
+                'published_chapter_counts_for_each_story': []
+            }
+            chapter_counts = (
+                topic_services.get_chapter_counts_in_topic_summaries(
+                    [frontend_topic_summary]))
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].total_upcoming_chapters_count, 1)
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].total_overdue_chapters_count, 1)
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].
+                    total_chapter_counts_for_each_story, [0, 0, 4])
+            self.assertEqual(
+                chapter_counts[self.TOPIC_ID].
+                    published_chapter_counts_for_each_story, [0, 0, 1])
+
+    def test_get_chapter_counts_in_topic_summaries_logs_error(self) -> None:
+        topic_model = topic_models.TopicModel.get_by_id(self.TOPIC_ID)
+        invalid_story_reference_dict = {
+            'story_id': 'invalid_story_id',
+            'story_is_published': False
+        }
+        topic_model.canonical_story_references = [invalid_story_reference_dict]
+        topic_model.commit(self.user_id, 'reference invalid story id', [])
+
+        def mock_get_current_time_in_millisecs() -> int:
+            return 1690555400000
+
+        with self.swap(
+            utils, 'get_current_time_in_millisecs',
+            mock_get_current_time_in_millisecs):
+            with self.capture_logging(min_level=logging.ERROR) as logs:
+                topic_summary = (
+                    topic_fetchers.get_topic_summary_by_id(
+                    self.TOPIC_ID).to_dict())
+                frontend_topic_summary: (
+                    topic_domain.FrontendTopicSummaryDict
+                ) = {
+                    'id': topic_summary['id'],
+                    'name': topic_summary['name'],
+                    'url_fragment': topic_summary['url_fragment'],
+                    'language_code': topic_summary['language_code'],
+                    'description': topic_summary['description'],
+                    'version': topic_summary['version'],
+                    'canonical_story_count': topic_summary[
+                        'canonical_story_count'],
+                    'additional_story_count': topic_summary[
+                        'canonical_story_count'],
+                    'uncategorized_skill_count': topic_summary[
+                        'additional_story_count'],
+                    'subtopic_count': topic_summary['subtopic_count'],
+                    'total_skill_count': topic_summary['total_skill_count'],
+                    'total_published_node_count': topic_summary[
+                        'total_published_node_count'],
+                    'thumbnail_filename': topic_summary['thumbnail_filename'],
+                    'thumbnail_bg_color': topic_summary['thumbnail_bg_color'],
+                    'published_story_exploration_mapping': topic_summary[
+                        'published_story_exploration_mapping'],
+                    'topic_model_created_on': topic_summary[
+                        'topic_model_created_on'],
+                    'topic_model_last_updated': topic_summary[
+                        'topic_model_last_updated'],
+                    'is_published': True,
+                    'can_edit_topic': True,
+                    'classroom': None,
+                    'total_upcoming_chapters_count': 0,
+                    'total_overdue_chapters_count': 0,
+                    'total_chapter_counts_for_each_story': [],
+                    'published_chapter_counts_for_each_story': []
+                }
+                topic_services.get_chapter_counts_in_topic_summaries(
+                    [frontend_topic_summary]
+                )
+                self.assertEqual(
+                    logs,
+                    [
+                        'Topic %s has an invalid story reference ID '
+                        'invalid_story_id' % self.TOPIC_ID
+                    ]
+                )
+
+    def test_get_published_story_exploration_ids_ignores_exp_ids_from_unpublished_stories( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
+
+        story_exp_ids = topic_services.get_all_published_story_exploration_ids(
+            self.TOPIC_ID)
+
+        self.assertItemsEqual(story_exp_ids, [])
+
+    def test_get_published_story_exploration_ids_from_published_stories_when_serial_chapter_feature_disabled( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids(
+                self.TOPIC_ID))
+
+        self.assertItemsEqual(story_exp_ids, topic_exp_ids)
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_get_published_story_exploration_ids_from_published_chapters_when_serial_chapter_feature_enabled( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        topic_published_chapters_exp_ids = topic_exp_ids[:2]
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids,
+            chapter_exp_ids=topic_published_chapters_exp_ids)
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids(
+                self.TOPIC_ID))
+
+        self.assertItemsEqual(
+            story_exp_ids, topic_published_chapters_exp_ids)
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
+    def test_get_published_story_exploration_ids_in_all_topics_when_topic_id_not_given( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        story_id_4 = 'story_4'
+        self.save_new_topic(
+            topic_id_2, self.user_id, name='Name 2',
+            abbreviated_name='name2', url_fragment='name-two',
+            description='Description',
+            canonical_story_ids=[story_id_4], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+        self.save_new_story(story_id_4, self.user_id, topic_id_2)
+
+        exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_1, exp_ids[:1])
+        self._publish_story_chapters_with_explorations(
+            self.TOPIC_ID, self.story_id_3, exp_ids[1:3])
+        self._publish_story_chapters_with_explorations(
+            topic_id_2, story_id_4, exp_ids[3:])
+
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids())
+
+        self.assertItemsEqual(story_exp_ids, exp_ids)
+
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        story_exp_ids = (
+            topic_services.get_all_published_story_exploration_ids())
+
+        self.assertItemsEqual(story_exp_ids, exp_ids)
+
+    def test_get_published_story_exploration_ids_when_mapping_not_precomputed(
+        self
+    ) -> None:
+        topic_exp_ids = ['exp_1', 'exp_2', 'exp_3', 'exp_4']
+        self._create_linked_explorations(
+            self.TOPIC_ID, self.story_id_1, topic_exp_ids)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin)
+        topic_summary_without_exp_ids = (
+            topic_services.compute_summary_of_topic(self.topic))
+        # -> Here we use MyPy ignore because we introduce the mapping
+        # value of None.
+        topic_summary_without_exp_ids.published_story_exploration_mapping = (
+            None) # type: ignore[assignment]
+
+        with self.swap_to_always_return(
+                topic_fetchers, 'get_topic_summary_by_id',
+                topic_summary_without_exp_ids):
+            story_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    self.TOPIC_ID))
+
+        self.assertItemsEqual(story_exp_ids, topic_exp_ids)
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class

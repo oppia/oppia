@@ -134,8 +134,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
@@ -165,29 +164,6 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
-
-    def test_can_not_access_story_editor_page_with_invalid_story_id(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        new_story_id = story_services.get_new_story_id()
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, new_story_id),
-            expected_status_int=404)
-
-        # Raises error 404 even when story is saved as the new story id is not
-        # associated with the topic.
-        self.save_new_story(new_story_id, self.admin_id, self.topic_id)
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, new_story_id),
-            expected_status_int=404)
-
-        self.logout()
 
     def test_can_not_get_access_story_handler_with_invalid_story_id(
         self
@@ -338,9 +314,10 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: commit_message.',
             json_response['error'],
-            'Missing key in handler args: commit_message.')
+        )
 
         self.logout()
 
@@ -398,24 +375,6 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             expected_status_int=404)
         self.logout()
 
-    def test_access_story_editor_page(self) -> None:
-        """Test access to editor pages for the sample story."""
-        # Check that non-admins cannot access the editor page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.story_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access and edit in the editor
-        # page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.story_id))
-        self.logout()
-
     def test_editable_story_handler_get(self) -> None:
         # Check that non-admins cannot access the editable story data.
         self.login(self.NEW_USER_EMAIL)
@@ -429,8 +388,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.publish_exploration(self.admin_id, '0')
         old_value: List[str] = []
         change_list = [story_domain.StoryChange({
@@ -543,9 +501,10 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: version.',
             json_response['error'],
-            'Missing key in handler args: version.')
+        )
 
         self.logout()
 

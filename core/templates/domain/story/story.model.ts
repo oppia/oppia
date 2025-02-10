@@ -17,26 +17,26 @@
  * story domain objects.
  */
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 import {
   StoryContentsBackendDict,
-  StoryContents
+  StoryContents,
 } from 'domain/story/story-contents-object.model';
 
 export interface StoryBackendDict {
-  'id': string;
-  'title': string;
-  'description': string;
-  'notes': string;
-  'story_contents': StoryContentsBackendDict;
-  'language_code': string;
-  'version': number;
-  'corresponding_topic_id': string;
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'url_fragment': string;
-  'meta_tag_content': string;
+  id: string;
+  title: string;
+  description: string;
+  notes: string;
+  story_contents: StoryContentsBackendDict;
+  language_code: string;
+  version: number;
+  corresponding_topic_id: string;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+  url_fragment: string;
+  meta_tag_content: string;
 }
 
 export class Story {
@@ -53,11 +53,19 @@ export class Story {
   _urlFragment: string;
   _metaTagContent: string;
   constructor(
-      id: string, title: string, description: string,
-      notes: string, storyContents: StoryContents, languageCode: string,
-      version: number, correspondingTopicId: string,
-      thumbnailBgColor: string | null, thumbnailFilename: string | null,
-      urlFragment: string, metaTagContent: string) {
+    id: string,
+    title: string,
+    description: string,
+    notes: string,
+    storyContents: StoryContents,
+    languageCode: string,
+    version: number,
+    correspondingTopicId: string,
+    thumbnailBgColor: string | null,
+    thumbnailFilename: string | null,
+    urlFragment: string,
+    metaTagContent: string
+  ) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -158,23 +166,24 @@ export class Story {
       issues.push('Story title should not be empty');
     }
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX
+    );
     if (!this._urlFragment) {
-      issues.push(
-        'Url Fragment should not be empty.');
+      issues.push('Url Fragment should not be empty.');
     } else {
       if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
         issues.push(
           'Url Fragment contains invalid characters. ' +
-          'Only lowercase words separated by hyphens are allowed.');
+            'Only lowercase words separated by hyphens are allowed.'
+        );
       }
       if (
-        this._urlFragment.length >
-        AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT
+        this._urlFragment.length > AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT
       ) {
         issues.push(
           'Url Fragment should not be greater than ' +
-          `${AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`);
+            `${AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT} characters`
+        );
       }
     }
     issues = issues.concat(this._storyContents.validate());
@@ -192,7 +201,8 @@ export class Story {
     } else if (this._metaTagContent.length > metaTagContentCharLimit) {
       issues.push(
         'Story meta tag content should not be longer than ' +
-        `${metaTagContentCharLimit} characters.`);
+          `${metaTagContentCharLimit} characters.`
+      );
     }
     return issues;
   }
@@ -217,15 +227,18 @@ export class Story {
 
   static createFromBackendDict(storyBackendDict: StoryBackendDict): Story {
     return new Story(
-      storyBackendDict.id, storyBackendDict.title,
-      storyBackendDict.description, storyBackendDict.notes,
-      StoryContents.createFromBackendDict(
-        storyBackendDict.story_contents),
+      storyBackendDict.id,
+      storyBackendDict.title,
+      storyBackendDict.description,
+      storyBackendDict.notes,
+      StoryContents.createFromBackendDict(storyBackendDict.story_contents),
       storyBackendDict.language_code,
-      storyBackendDict.version, storyBackendDict.corresponding_topic_id,
+      storyBackendDict.version,
+      storyBackendDict.corresponding_topic_id,
       storyBackendDict.thumbnail_bg_color,
       storyBackendDict.thumbnail_filename,
-      storyBackendDict.url_fragment, storyBackendDict.meta_tag_content
+      storyBackendDict.url_fragment,
+      storyBackendDict.meta_tag_content
     );
   }
 }

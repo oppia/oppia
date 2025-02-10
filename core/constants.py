@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import io
 import json
 import os
 import pkgutil
@@ -40,9 +39,9 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
         dict. The dict representation of JSON object in the TS file.
     """
     text_without_comments = remove_comments(ts_file_contents)
-    json_start = text_without_comments.find('{\n')
+    json_start = text_without_comments.index('{\n')
     # Add 1 to index returned because the '}' is part of the JSON object.
-    json_end = text_without_comments.rfind('}') + 1
+    json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
     json_dict: Dict[str, Any] = (
@@ -101,16 +100,17 @@ def get_package_file_contents(
         str. The contents of the file.
 
     Raises:
+        Exception. Test error for debugging.
         FileNotFoundError. The file does not exist.
     """
     try:
         if binary_mode:
-            with io.open(
+            with open(
                 os.path.join(package, filepath), 'rb', encoding=None
             ) as binary_file:
                 read_binary_mode_data: bytes = binary_file.read()
                 return read_binary_mode_data
-        with io.open(
+        with open(
             os.path.join(package, filepath), 'r', encoding='utf-8'
         ) as file:
             return file.read()

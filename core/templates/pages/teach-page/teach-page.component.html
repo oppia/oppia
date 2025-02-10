@@ -1,1016 +1,339 @@
 <div class="teach-page">
-  <div class="oppia-teach-section-one" dir="auto">
 
-    <div class="oppia-teach-section-one-left"  *ngIf="!isWindowNarrow">
-      <h1 class="oppia-teach-h1" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
-      <div class="oppia-teach-h2-container">
-        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text"
-            [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
-        </h2>
-      </div>
-      <div class="oppia-teach-button-container">
-        <form action="classroomUrl">
-          <button type="submit"
-                  (click)="onClickStartLearningButton()"
-                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
-            {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
-          </button>
-        </form>
-      </div>
-      <div *ngIf="androidPageIsEnabled" class="oppia-teach-button-container">
-        <button type="submit"
-                (click)="onClickAccessAndroidButton()"
-                class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
-          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
-        </button>
-      </div>
-    </div>
-
-    <div class="oppia-teach-section-one-left" *ngIf="isWindowNarrow">
-      <h1 class="oppia-teach-h1 mobile-heading"
-          [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate">
-      </h1>
-      <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2"
-           [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate">
-      </h2>
-      <div class="oppia-teach-button-container mobile-button">
-        <form action="classroomUrl">
-          <button type="submit"
-                  (click)="onClickStartLearningButton()"
-                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200">
-            {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
-          </button>
-        </form>
-      </div>
-      <div *ngIf="androidPageIsEnabled" class="oppia-splash-button-container">
-        <button type="submit"
-                (click)="onClickAccessAndroidButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
-          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
-        </button>
-      </div>
-    </div>
-
-    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-one-right">
-      <picture class="oppia-teach-main-image image-desktop">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/teach/student.jpg')">
-        <img [src]="getStaticImageUrl('/teach/student.jpg')"
-             alt="Photo of young girl in front of laptop with Oppia webpage">
-      </picture>
-    </div>
-
-    <div *ngIf="isWindowNarrow">
-      <picture class="oppia-teach-main-image image-mobile">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl('/teach/student.jpg')">
-        <img [src]="getStaticImageUrl('/teach/student.jpg')"
-             alt="Photo of young girl in front of laptop with Oppia webpage">
-      </picture>
+  <div class="oppia-teach-hero-section">
+    <div class="oppia-teach-hero-box">
+      <p class="oppia-teach-hero-title">
+        {{ 'I18N_TEACH_PAGE_HEADING' | translate }}
+      </p>
+      <p class="oppia-teach-hero-subtext">
+        {{ 'I18N_TEACH_PAGE_HERO_SUBTEXT' | translate }}
+      </p>
     </div>
   </div>
 
-  <div class="oppia-teach-section-two">
-    <div class="oppia-teach-section-two-left" >
-      <img class="teach-matthew-image"
-           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
-           alt="Illustration of a young person in front of part of Oppia fraction lesson">
+  <div class="oppia-teach-tips-section">
+    <p class="oppia-teach-title">
+      {{ 'I18N_TEACH_PAGE_TIPS_TITLE' | translate }}
+    </p>
+    <div class="oppia-teach-tips-boxes-container">
+      <div class="oppia-teach-tips-box oppia-teach-tips-guide-box">
+        <p class="oppia-teach-subtitle">
+          {{ 'I18N_TEACH_PAGE_TIPS_GUIDE_TITLE' | translate }}
+        </p>
+        <p class="oppia-teach-subtext">
+          {{ 'I18N_TEACH_PAGE_TIPS_GUIDE_CONTENT' | translate }}
+        </p>
+        <oppia-primary-button
+          [buttonHref]="parentsTeachersPdfGuideLink"
+          [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-guide-button']"
+          buttonText="{{ 'I18N_TEACH_PAGE_TIPS_GUIDE_BUTTON' | translate }}">
+        </oppia-primary-button>
+      </div>
+      <div class="oppia-teach-tips-box oppia-teach-tips-blog-box">
+        <p class="oppia-teach-subtitle">
+          {{ 'I18N_TEACH_PAGE_TIPS_BLOG_TITLE' | translate }}
+        </p>
+        <p class="oppia-teach-subtext">
+          {{ 'I18N_TEACH_PAGE_TIPS_BLOG_CONTENT' | translate }}
+        </p>
+        <oppia-primary-button
+          [buttonHref]="teacherStoryTaggedBlogsLink"
+          [customClasses]="['oppia-teach-btn','oppia-teach-secondary-btn', 'e2e-test-teach-page-blog-button']"
+          buttonText="{{ 'I18N_TEACH_PAGE_TIPS_BLOG_BUTTON' | translate }}">
+        </oppia-primary-button>
+      </div>
     </div>
-    <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
-      <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
-      <div class="teach-benefits-section">
-        <img class="bullet-one"
-             [src]="getStaticImageUrl('/splash/bullet1.svg')"
-             alt="Illustration of first bullet point">
-        <div  class="benefits-one">
-          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate"
-              class="teach-benefits">
-          </h2>
+  </div>
+
+  <div class="oppia-teach-creators-section">
+    <p class="oppia-teach-subtitle">
+      {{ 'I18N_TEACH_PAGE_CREATORS_SECTION_TITLE' | translate }}
+    </p>
+    <div #creatorsCarouselContainer class="oppia-teach-creators-carousel e2e-test-teach-page-creators-carousel">
+      <div class="oppia-teach-creators-carousel-item" *ngFor="let index of activeCreatorsIndices">
+        <div class="oppia-teach-creators-carousel-item-header">
+          <p class="oppia-teach-subtext oppia-teach-text e2e-test-teach-page-lesson-creator-name">{{ creatorsData[index].name | translate  }}</p>
+          <p class="oppia-teach-subtext">{{ creatorsData[index].country | translate  }}</p>
+        </div>
+        <div class="oppia-teach-creators-carousel-item-image">
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl(creatorsData[index].imageWebpUrl)">
+            <source type="image/png" [srcset]="getStaticImageUrl(creatorsData[index].imagePngUrl)">
+            <img [src]="getStaticImageUrl(creatorsData[index].imagePngUrl)" alt="{{ creatorsData[index].name  | translate }}">
+          </picture>
+          <p class="oppia-teach-subtext">
+            {{ creatorsData[index].role | translate  }}
+          </p>
+        </div>
+        <oppia-primary-button
+          [buttonHref]="creatorsData[index].linkedInUrl"
+          [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn', index === 0 ? 'e2e-test-teach-page-linkedin-button' : '']"
+          buttonText="{{ 'I18N_TEACH_PAGE_LINKEDIN_BUTTON' | translate }}">
+        </oppia-primary-button>
+      </div>
+    </div>
+    <div class="oppia-teach-creators-arrows-container">
+      <button (click)="showPreviousCreators()"
+              [disabled]="creatorsCarouselLeftArrowIsDisabled"
+              class="e2e-test-teach-page-creators-carousel-prev-btn">
+        <i class="fas"
+           [ngClass]="{'oppia-disabled-icon': creatorsCarouselLeftArrowIsDisabled,
+           'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
+        </i>
+        <span class="sr-only">Previous</span>
+      </button>
+      <button (click)="showNextCreators()"
+              [disabled]="creatorsCarouselRightArrowIsDisabled"
+              class="e2e-test-teach-page-creators-carousel-next-btn">
+        <i class="fas"
+           [ngClass]="{'oppia-disabled-icon': creatorsCarouselRightArrowIsDisabled,
+           'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
+        </i>
+        <span class="sr-only">Next</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="oppia-teach-lesson-section e2e-test-teach-page-lesson-creation-section">
+    <div class="oppia-teach-lesson-top">
+      <p class="oppia-teach-subtitle">
+        {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_TITLE' | translate }}
+      </p>
+      <p class="oppia-teach-heading">
+        {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_SUBTITLE' | translate }}
+      </p>
+      <p class="oppia-teach-subtext">
+        {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_SUBTEXT' | translate }}
+      </p>
+    </div>
+    <div class="oppia-teach-lesson-bottom">
+      <div class="oppia-teach-lesson-left">
+        <p class="oppia-teach-heading">
+          {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_HEADING1' | translate }}
+        </p>
+        <div class="oppia-teach-accordion-container">
+          <oppia-full-expand-accordion [accordionData]="lessonCreationData"
+          [listContainerCustomClasses]="['oppia-teach-lesson-list']">
+          </oppia-full-expand-accordion>
         </div>
       </div>
-      <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
-             alt="Illustration of second bullet point">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate"
-            class="teach-benefits">
-        </h2>
-      </div>
-      <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
-             alt="Illustration of third bullet point">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate"
-            class="teach-benefits">
-        </h2>
+      <div class="oppia-teach-lesson-right">
+        <p class="oppia-teach-heading oppia-teach-lesson-desktop-content">
+          {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_HEADING2_DESKTOP' | translate }}
+        </p>
+        <p class="oppia-teach-heading oppia-teach-lesson-mobile-content">
+          {{ 'I18N_TEACH_PAGE_LESSON_CREATION_SECTION_HEADING2_MOBILE' | translate }}
+        </p>
+        <div class="oppia-teach-lesson-image">
+          <picture>
+            <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia-math-classroom-page.webp')">
+            <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia-math-classroom-page.png')">
+            <img [src]="getStaticImageUrl('/teach/oppia-math-classroom-page.png')"
+                 alt="Oppia Math classroom page">
+          </picture>
+          <oppia-primary-button
+            buttonHref="/learn"
+            [customClasses]="['oppia-teach-btn', 'oppia-teach-lesson-hover-button']"
+            buttonText="{{ 'I18N_ACTION_VIEW_LESSONS' | translate }}">
+          </oppia-primary-button>
+        </div>
+        <oppia-primary-button
+          buttonHref="/learn"
+          (onClickPrimaryButton)="onClickExploreLessonsButton()"
+          [customClasses]="['oppia-teach-btn', 'oppia-teach-lesson-mobile-content', 'e2e-test-teach-page-explore-lessons-button-at-the-top']"
+          buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
+        </oppia-primary-button>
       </div>
     </div>
+  </div>
 
-    <div class="oppia-teach-section-two-right" *ngIf="isWindowNarrow">
-      <div class="teach-benefits-section-heading">
-        <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
-      </div>
-      <div class="teach-benefits-section">
-        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')"
-             alt="Illustration of first bullet point">
-        <div  class="benefits-one">
-          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+  <div class="oppia-teach-outcomes-section">
+    <div class="oppia-teach-outcomes-left">
+      <p class="oppia-teach-title">
+        {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_TITLE' | translate }}
+      </p>
+      <p class="oppia-teach-subtext">
+        {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_CONTENT' | translate }}
+      </p>
+    </div>
+    <div class="oppia-teach-outcomes-right">
+      <p class="oppia-teach-subheading">
+        {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_RCT_HEADING' | translate }}
+      </p>
+      <p class="oppia-teach-subtext">
+        {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_FRACTIONS_CONTENT' | translate }}
+      </p>
+      <div class="oppia-teach-outcomes-rct-container">
+        <p class="oppia-teach-outcomes-rct-heading">
+          {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_FRACTIONS_RCT_HEADING' | translate }}
+        </p>
+        <div class="oppia-teach-outcomes-chart">
+          <div class="oppia-teach-outcomes-legend-container">
+            <p class="oppia-teach-subheading">
+              {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_LEGEND' | translate }}
+            </p>
+            <div class="oppia-teach-outcomes-rct-legend">
+              <div class="oppia-teach-outcomes-rct-label">
+                <div class="oppia-teach-outcomes-rct-control-box"></div>
+                <p>
+                  {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_CONTROL' | translate }}
+                </p>
+              </div>
+              <div class="oppia-teach-outcomes-rct-label">
+                <div class="oppia-teach-outcomes-rct-oppia-box"></div>
+                <p>
+                  {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_OPPIA' | translate }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="oppia-teach-outcomes-charts-container">
+            <div class="oppia-teach-outcomes-pre-test-container">
+              <picture>
+                <source type="image/webp" [srcset]="getStaticImageUrl('/teach/outcomes-pre-test.webp')">
+                <source type="image/png" [srcset]="getStaticImageUrl('/teach/outcomes-pre-test.png')">
+                <img [src]="getStaticImageUrl('/teach/outcomes-pre-test.png')"
+                     alt="Pre-test outcomes">
+              </picture>
+              <p>
+                {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_PRETEST' | translate }}
+              </p>
+            </div>
+            <div class="oppia-teach-outcomes-post-test-container">
+              <picture>
+                <source type="image/webp" [srcset]="getStaticImageUrl('/teach/outcomes-post-test.webp')">
+                <source type="image/png" [srcset]="getStaticImageUrl('/teach/outcomes-post-test.png')">
+                <img [src]="getStaticImageUrl('/teach/outcomes-post-test.png')"
+                     alt="Post-test outcomes">
+              </picture>
+              <p>
+                {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_POSTTEST' | translate }}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="teach-benefits-section">
-        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')"
-             alt="Illustration of second bullet point">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
-      </div>
-      <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
-             alt="Illustration of third bullet point">
-        <div  class="benefits-one">
-          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
+      <p class="oppia-teach-subtext">
+        {{ 'I18N_TEACH_PAGE_OUTCOMES_SECTION_FRACTIONS_RCT_CONTENT' | translate }}
+      </p>
+    </div>
+  </div>
+
+  <div class="oppia-teach-testimonials-section">
+    <p class="oppia-teach-subtitle">
+      {{ 'I18N_TEACH_PAGE_TESTIMONIALS_SECTION_TITLE' | translate}}
+    </p>
+    <div class="oppia-teach-testimonials-container e2e-test-teach-page-testimonial-carousel">
+      <button class="oppia-teach-testimonial-carousel-prev-btn e2e-test-teach-page-testimonial-carousel-prev-btn"
+              (click)="moveTestimonialCarouselToPreviousSlide()">
+        <i class="oppia-teach-testimonial-carousel-prev-icon fas"
+            [ngClass]="{'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
+        </i>
+        <span class="sr-only">Previous</span>
+      </button>
+      <ngb-carousel #testimonialsCarousel [interval]="0" [showNavigationArrows]="false" [animation]="false">
+        <ng-template ngbSlide *ngFor="let testimonial of testimonials">
+          <div class="oppia-teach-testimonial">
+            <div class="oppia-teach-testimonial-top">
+              <div class="oppia-teach-testimonial-left">
+                <picture class="oppia-teach-testimonial-image">
+                  <source type="image/webp" [srcset]="getStaticImageUrl(testimonial.imageUrlWebp)">
+                  <source type="image/jpeg" [srcset]="getStaticImageUrl(testimonial.imageUrl)">
+                  <img [src]="getStaticImageUrl(testimonial.imageUrl)"
+                       [alt]="testimonial.altText">
+                </picture>
+              </div>
+              <div class="oppia-teach-testimonial-right">
+                <p class="oppia-teach-testimonial-name e2e-test-teach-page-testimonial-name">
+                  {{ testimonial.personDetails | translate }}
+                </p>
+                <p class="oppia-teach-subtext oppia-teach-bolded-text">
+                  {{ testimonial.role | translate }}
+                </p>
+                <p class="oppia-teach-subtext oppia-teach-testimonial-quote1">
+                  {{ testimonial.quote | translate }}
+                </p>
+              </div>
+            </div>
+            <p class="oppia-teach-subtext oppia-teach-testimonial-quote2">
+              {{ testimonial.quote | translate }}
+            </p>
+          </div>
+        </ng-template>
+      </ngb-carousel>
+      <button class="oppia-teach-testimonial-carousel-next-btn e2e-test-teach-page-testimonial-carousel-next-btn"
+              (click)="moveTestimonialCarouselToNextSlide()">
+        <i class="oppia-teach-testimonial-carousel-next-icon fas"
+           [ngClass]="{'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
+        </i>
+        <span class="sr-only">Next</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="oppia-teach-features-section">
+    <div class="oppia-teach-features-left">
+      <picture class="oppia-teach-matthew-image">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/matthew-fractions.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/matthew-fractions.png')">
+        <img [src]="getStaticImageUrl('/teach/matthew-fractions.png')"
+             alt="Illustration of a young person in front of part of Oppia Fractions lesson">
+      </picture>
+    </div>
+    <div class="oppia-teach-features-right">
+      <p class="oppia-teach-subtitle">
+        {{ 'I18N_TEACH_PAGE_FEATURES_SECTION_TITLE' | translate }}
+      </p>
+      <div class="oppia-teach-features">
+        <div class="oppia-teach-feature">
+          <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
+               [src]="getStaticImageUrl('/teach/flower-bullet-1.webp')"
+               alt="Illustration of first bullet point">
+          <p class="oppia-teach-feature-text">
+            {{ 'I18N_TEACH_BENEFITS_ONE' | translate }}
+          </p>
+        </div>
+        <div class="oppia-teach-feature">
+          <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
+               [src]="getStaticImageUrl('/teach/flower-bullet-2.webp')"
+               alt="Illustration of second bullet point">
+          <p class="oppia-teach-feature-text">
+            {{ 'I18N_TEACH_BENEFITS_TWO' | translate }}
+          </p>
+        </div>
+        <div class="oppia-teach-feature">
+          <img class="oppia-teach-feature-icon"
+               [ngClass]="{'rtl-flip': isLanguageRTL()}"
+               [src]="getStaticImageUrl('/teach/flower-bullet-3.webp')"
+               alt="Illustration of third bullet point">
+          <p class="oppia-teach-feature-text">
+            {{ 'I18N_TEACH_BENEFITS_THREE' | translate }}
+          </p>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="oppia-teach-section-three">
-    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-three-left">
-      <h2 [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_TITLE' | translate"></h2>
-      <p [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_CONTENT' | translate"></p>
-      <div class="oppia-teach-button-container">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickVisitClassroomButton()"
-                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_BUTTON' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-three-right">
-      <picture class="teach-with-oppia-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-flow.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-flow.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')"
-             alt="Screenshot of Oppia lesson flow">
-      </picture>
-    </div>
-    <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-right">
-      <picture class="teach-with-oppia-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-flow.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-flow.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-flow.png')"
-             alt="Screenshot of Oppia lesson flow">
-      </picture>
-    </div>
-    <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-left mobile">
-      <h2 class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_TITLE' | translate"></h2>
-      <p class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_CONTENT' | translate"></p>
-      <div class="oppia-teach-button-container">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickVisitClassroomButton()"
-                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_BUTTON' | translate">
-          </button>
-        </form>
-      </div>
+  <div class="oppia-teach-cta-section">
+    <p class="oppia-teach-subtitle">
+      {{ 'I18N_TEACH_PAGE_ACTION_START_LEARNING' | translate }}
+    </p>
+    <div class="oppia-teach-cta-buttons-container">
+      <oppia-primary-button
+        buttonHref="/learn"
+        (onClickPrimaryButton)="onClickExploreLessonsButton()"
+        [customClasses]="['oppia-teach-btn', 'e2e-test-teach-page-explore-lessons-button-at-the-bottom']"
+        buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
+      </oppia-primary-button>
+      <oppia-primary-button
+        [buttonHref]="androidUrl"
+        (onClickPrimaryButton)="onClickGetAndroidAppButton()"
+        [customClasses]="['oppia-teach-btn', 'oppia-teach-secondary-btn', 'e2e-test-teach-page-download-android-app-button']"
+        buttonText="{{ 'I18N_ACTION_GET_ANDRIOD_APP' | translate }}">
+      </oppia-primary-button>
     </div>
   </div>
 
-  <div class="oppia-teach-section-four">
-    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-four-left">
-      <h2 [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_TITLE' | translate"></h2>
-      <p [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_CONTENT' | translate"></p>
-      <div class="oppia-teach-button-container">
-        <form action="libraryUrl">
-          <button type="submit" (click)="onClickBrowseLibraryButton()"
-                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_BUTTON' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-    <div class="oppia-teach-section-four-right" *ngIf="!isWindowNarrow">
-      <picture class="teach-with-oppia-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-card.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-card.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-card.png')"
-             alt="Screenshot of Oppia lesson cards">
-      </picture>
-    </div>
-    <div class="oppia-teach-section-four-right" *ngIf="isWindowNarrow">
-      <picture class="teach-with-oppia-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/lessons-card.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/teach/lessons-card.png')">
-        <img [src]="getStaticImageUrl('/teach/lessons-card.png')"
-             alt="Screenshot of Oppia lesson cards">
-      </picture>
-    </div>
-    <div *ngIf="isWindowNarrow" class="oppia-teach-section-four-left mobile">
-      <h2 class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_TITLE' | translate"></h2>
-      <p class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_CONTENT' | translate"></p>
-      <div class="oppia-teach-button-container">
-        <form action="libraryUrl">
-          <button type="submit" (click)="onClickBrowseLibraryButton()"
-                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_BUTTON' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="oppia-teach-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
-    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-five-left">
-      <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-      <h3>-
-        <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
-      </h3>
-      <div class="teach-arrows-container">
-        <span (click)="decrementDisplayedTestimonialId()" class="fas fa-chevron-left font-awesome-arrows"></span>
-        <span (click)="incrementDisplayedTestimonialId()" class="fas fa-chevron-right font-awesome-arrows"></span>
-      </div>
-    </div>
-    <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
-      <picture class="teach-student-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
-        <source type="image/jpeg" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
-        <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)"
-             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
-             [alt]="testimonials[displayedTestimonialId].altText">
-      </picture>
-    </div>
-
-    <div *ngIf="isWindowNarrow">
-      <div class="oppia-teach-section-five-image">
-        <picture class="teach-student-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
-          <source type="image/jpeg" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
-          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)"
-               [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
-               [alt]="testimonials[displayedTestimonialId].altText">
-        </picture>
-      </div>
-      <div class="oppia-teach-section-five-left mobile">
-        <h2 class="mobile-h2" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-        <h3>-
-          <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
-        </h3>
-        <div class="teach-arrows-container">
-          <span (click)="decrementDisplayedTestimonialId()" class="fas fa-chevron-left font-awesome-arrows"></span>
-          <span (click)="incrementDisplayedTestimonialId()" class="fas fa-chevron-right font-awesome-arrows"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="oppia-teach-section-six">
-    <div *ngIf="!isWindowNarrow">
-      <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickExploreLessonsButton()"
-                  class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <div *ngIf="isWindowNarrow">
-      <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickExploreLessonsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
 </div>
-
-<style>
-  .teach-page .benefits-one {
-    display: inline-flex;
-    width: 24vw;
-  }
-  .teach-page .bullet-one {
-    padding-left: 1.5vw;
-  }
-
-  .teach-page .bullet-two {
-    padding-left: 0.9vw;
-  }
-
-  .teach-page .image-mobile {
-    display: inherit;
-  }
-
-  .teach-page .mobile-button {
-    margin-top: 5vh;
-  }
-
-  .teach-page .oppia-teach-h1.mobile-heading {
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
-  }
-
-  .teach-page .oppia-teach-h2-text.mobile-h2 {
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
-  }
-
-  .teach-page .oppia-teach-section-three-left.mobile,
-  .teach-page .oppia-teach-section-four-left.mobile {
-   margin-left: 3vw;
-   margin-right: 3vw;
-   padding-bottom: 2vh;
-   text-align: center;
-   width: fit-content;
-  }
-
-  .teach-page .oppia-teach-section-five-left.mobile {
-   max-width: unset;
-   min-width: unset;
-   padding-bottom: 2vh;
-   text-align: center;
-   width: fit-content;
-  }
-
-  .teach-page .oppia-teach-section-three-left .mobile-h2,
-  .teach-page .oppia-teach-section-four-left .mobile-h2 {
-   margin-left: auto;
-   margin-right: auto;
-   padding: 0;
-   text-align: center;
-   width: fit-content;
-  }
-
-  .teach-page .oppia-teach-section-five-left.mobile h2.mobile-h2 {
-   margin-left: 0;
-   margin-right: 0;
-   min-width: unset;
-   padding: 0;
-   text-align: center;
-   width: auto;
-  }
-
-  .teach-page .oppia-teach-button-container-button-one {
-    margin-bottom: 5vh;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 6vh;
-    max-width: 800px;
-    position: relative;
-    text-align: center;
-    transform: translate(0, 10px);
-    width: 100%;
-  }
-
-  .teach-page .image-with-border {
-    border-radius: 11em;
-  }
-
-  .teach-page .oppia-teach-section-one {
-    background-color: #f4f4f4;
-    display: flex;
-    height: fit-content;
-    max-height: 60vw;
-    overflow: hidden;
-  }
-
-  .teach-page .oppia-teach-h1,
-  .teach-page .oppia-teach-h2 {
-    color: #005c5e;
-    display: flex;
-    display: block;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    margin-bottom: 0;
-    margin-left: 0;
-  }
-
-  .teach-page .oppia-teach-h1 {
-    font-size: 2.5em;
-    line-height: 1.3em;
-    margin-left: 10vw;
-    max-width: 500px;
-    width: 37.5vw;
-  }
-
-  .teach-page .oppia-teach-h2-container {
-    margin-left: 10vw;
-    max-width: 450px;
-  }
-
-  .teach-page .oppia-teach-h2 {
-    line-height: 1.2em;
-    padding-bottom: 65px;
-  }
-
-  .teach-page .oppia-teach-section-two {
-    background-color: #fff;
-    color: #2c4841;
-    display: flex;
-    padding: 50px 5vw 50px 6vw;
-    width: 100vw;
-  }
-
-  .teach-page .oppia-teach-button {
-    background-color: #015c53;
-    border-radius: 0;
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: -20px;
-    min-width: 250px;
-    padding: 10px;
-    text-transform: uppercase;
-  }
-
-  .teach-page .oppia-teach-button-one {
-    background-color: #015c53;
-    border-radius: 5px;
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 40px;
-    margin-top: -20px;
-    min-width: 250px;
-    padding: 10px;
-    text-transform: none;
-  }
-  .teach-page .oppia-teach-bottom-button {
-    background-color: #015c53;
-    border-radius: 0;
-    color: #fff;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: -20px;
-    min-width: 556px;
-    padding: 10px;
-    text-transform: uppercase;
-  }
-  .teach-page .oppia-teach-bottom-button.mobile {
-    min-width: 83vw;
-  }
-  .teach-page .oppia-teach-button:hover,
-  .teach-page .oppia-teach-button:focus,
-  .teach-page .oppia-teach-button:active,
-  .teach-page .oppia-teach-bottom-button:hover,
-  .teach-page .oppia-teach-bottom-button:focus,
-  .teach-page .oppia-teach-bottom-button:active {
-    background-color: #004d45;
-    color: #fff;
-  }
-
-  @media only screen and (max-width: 500px) {
-    .teach-page button.btn.oppia-teach-button,
-    .teach-page button.btn.oppia-teach-bottom-button {
-      font-size: 3.6vw;
-    }
-  }
-
-  .teach-page .oppia-teach-button-container {
-    margin-left: 10vw;
-    margin-right: auto;
-    max-width: 500px;
-    position: relative;
-    transform: translate(0, 10px);
-    width: 100%;
-    z-index: 10;
-  }
-
-  @media (min-width: 768px) {
-    .teach-page .oppia-teach-button-browse {
-      left: -webkit-calc(50% - 200px);
-      left: -moz-calc(50% - 200px);
-      left: -o-calc(50% - 200px);
-      left: calc(50% - 200px);
-    }
-  }
-
-  @media (min-width: 575px) {
-    .teach-page .oppia-teach-button,
-    .teach-page .oppia-teach-bottom-button {
-      left: -webkit-calc(130px - -15%);
-      left: -moz-calc(130px - -15%);
-      left: -o-calc(130px - -15%);
-      left: calc(130px - -15%);
-    }
-  }
-
-  @media (max-width: 365px) {
-    .teach-page .oppia-teach-button,
-    .teach-page .oppia-teach-bottom-button {
-      min-width: 95%;
-    }
-  }
-
-  .teach-page .oppia-teach-section-three {
-    background-color: #f4f4f4;
-    display: flex;
-    padding-bottom: 50px;
-    padding-top: 40px;
-    width: 100vw;
-  }
-
-  .teach-page .oppia-teach-section-four {
-    background-color: #fff;
-    display: flex;
-    padding-bottom: 50px;
-    padding-top: 40px;
-    width: 100vw;
-  }
-
-  .teach-page .teach-arrows-container {
-    position: relative;
-  }
-
-  .teach-page .oppia-teach-section-one-left {
-    margin-bottom: auto;
-    margin-top: 5vh;
-    position: relative;
-    width: 55vw;
-  }
-
-  .teach-page .teach-icon-text-container {
-    padding-left: 5px;
-    padding-top: 5px;
-  }
-
-  .teach-page .oppia-teach-section-one-right {
-    display: contents;
-    margin-left: auto;
-    text-align: center;
-  }
-
-  .teach-page .font-awesome-arrows {
-    color: #6d6d6d;
-    cursor: pointer;
-    font-size: 2.5em;
-    margin-bottom: 50px ;
-    margin-top: 50px;
-    padding: 0 1.5rem;
-  }
-
-  .teach-page .teach-student-image img {
-    max-width: 350px;
-    width: 100%;
-  }
-
-  .teach-page .oppia-teach-section-five {
-    background-color: #fff;
-    background-image: url(/assets/images/splash/dsk_testimonial_background.png);
-    background-size: cover;
-    display: flex;
-    margin-bottom: -1px;
-    margin-top: -1px;
-    padding-top: 20vh;
-    text-align: center;
-    width: 100vw;
-  }
-
-  .teach-page .oppia-teach-section-six {
-    align-items: center;
-    background-color: #fff;
-    clear: both;
-    height: auto;
-    max-height: 600px;
-    max-width: 100%;
-    padding-bottom: 50px;
-    padding-top: 50px;
-    text-align: center;
-    width: 100vw;
-  }
-
-  .teach-page .oppia-teach-section-five-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: 20px;
-    text-align: left;
-    width: 50vw;
-  }
-
-  .teach-page .oppia-teach-section-five-right {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .teach-page .oppia-teach-section-three .oppia-teach-button-container {
-    margin-left: 0;
-    margin-top: 7.5vh;
-  }
-
-  .teach-page .oppia-teach-section-four .oppia-teach-button-container {
-    margin-left: 0;
-    margin-top: 7.5vh;
-  }
-
-  .teach-page .teach-with-oppia-image img {
-    border: 4px solid #fff;
-    border-radius: 10px;
-    max-width: 500px;
-    width: 100%;
-  }
-
-  .teach-page .oppia-teach-section-two-right h3 {
-    color: #6d6d6d;
-  }
-
-  .teach-page .oppia-teach-section-three-left h3,
-  .teach-page .oppia-teach-section-four-left h3,
-  .teach-page .oppia-teach-section-five-left h3 {
-    color: #6d6d6d;
-    display: inline;
-  }
-
-  .teach-page .oppia-teach-section-three-left h2,
-  .teach-page .oppia-teach-section-four-left h2 {
-    color: #094142;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 2.125em;
-    max-width: 450px;
-    width: 32vw ;
-  }
-
-  .teach-page .oppia-teach-section-six h2 {
-    color: #094142;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 2.1em;
-  }
-
-
-  .teach-page .oppia-teach-section-five-left h2 {
-    color: #094142;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 2em;
-    line-height: 1.5em;
-    max-width: 650px;
-    width: 50vw ;
-  }
-
-  .teach-page .oppia-teach-section-three-left p,
-  .teach-page .oppia-teach-section-four-left p {
-    font-family: "Roboto", Arial, sans-serif;
-    line-height: 1.5;
-    padding-right: 8vw;
-  }
-
-  .teach-page .oppia-teach-section-three-right {
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-  }
-
-  .teach-page .oppia-teach-section-four-right {
-    filter: drop-shadow(0 4px 4px #00000040);
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-  }
-
-  .teach-page .oppia-teach-section-three-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: auto;
-    width: 500px;
-  }
-
-  .teach-page .oppia-teach-section-four-left {
-    margin-bottom: auto;
-    margin-left: 10vw;
-    margin-top: auto;
-    width: 500px;
-  }
-
-  .teach-page .teach-benefits-section {
-    margin-top: 30px;
-  }
-
-  .teach-page .oppia-teach-section-two-right {
-    color: #6d6d6d;
-    margin-left: 3vw;
-    margin-right: auto;
-    margin-top: 50px;
-  }
-
-  .teach-page .teach-matthew-image {
-    max-width: 600px;
-    width: 100%;
-  }
-
-  .teach-page .teach-benefits {
-    color: #094142;
-    display: inline;
-    font-size: 1.4em;
-    padding-left: 25px;
-  }
-
-  .teach-page .oppia-teach-icon-1-container {
-    display: flex;
-    float: left;
-    margin-left: 10vw;
-    width: 20vw;
-  }
-
-  .teach-page .oppia-teach-icon-2-container {
-    display: flex;
-    float: left;
-    margin-left: 12vw;
-    width: 30vw;
-  }
-
-  .teach-page .oppia-teach-icon-3-container {
-    display: flex;
-  }
-
-  .teach-page .teach-icon-text {
-    color: #6d6d6d;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
-  .teach-page .oppia-teach-main-image img,
-  .teach-page .oppia-teach-main-image source {
-    max-width: 600px;
-    width: 100%;
-  }
-
-  .teach-page .oppia-teach-browse-button-position {
-    bottom: 210px;
-    z-index: 10;
-  }
-  .teach-page .oppia-teach-create-button-position {
-    bottom: 150px;
-    z-index: 10;
-  }
-  .teach-page .oppia-teach-h2-text {
-    color: #4c4c4c;
-    font-family: "Roboto", Arial, sans-serif;
-    font-size: 1.3em;
-    font-weight: 400;
-    max-width: 400px;
-    padding-bottom: 2vw;
-    padding-top: 0;
-  }
-
-  @media (max-width: 768px) {
-    .teach-page .oppia-teach-main-image img {
-      max-width: 768px;
-    }
-  }
-  @media (max-width: 768px) {
-  .teach-page .benefits-one {
-    width: unset;
-  }
-  }
-  @media (max-width: 768px) {
-    .teach-page .oppia-teach-section-four-right {
-    filter: none
-    }
-  }
-  @media (max-width: 768px) {
-    .teach-page .oppia-teach-section-one ,
-    .teach-page .oppia-teach-section-two,
-    .teach-page .oppia-teach-section-three,
-    .teach-page .oppia-teach-section-four,
-    .teach-page .oppia-teach-section-five,
-    .teach-page .oppia-teach-section-six {
-      display: block;
-      height: auto;
-      max-height: fit-content;
-    }
-
-    .teach-page .oppia-teach-section-five {
-     background-image: url(/assets/images/splash/m_testimonial_background.png);
-     min-height: unset;
-     padding-bottom: 4vh;
-    }
-
-    .teach-page .image-desktop {
-      display: none;
-    }
-
-    .teach-page .oppia-teach-button-browse {
-      left: 50%;
-    }
-
-    .teach-page .oppia-teach-button-container {
-      margin-left: 0;
-      max-width: none;
-      transform: translate(0, 0);
-      width: 100%;
-      z-index: 10;
-    }
-
-    .teach-page .oppia-teach-button {
-      min-width: auto;
-    }
-
-    .teach-page .oppia-teach-section-two {
-      padding-bottom: 50px;
-      padding-top: 50px;
-    }
-
-    .teach-page .oppia-teach-section-five-image {
-      margin-left: auto;
-      margin-right: auto;
-      width: 10em;
-    }
-
-    .teach-page .oppia-teach-section-two-left {
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-    }
-
-    .teach-page .oppia-teach-section-one-left {
-      height: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 7.5vh;
-      padding-bottom: 3vh;
-      text-align: center;
-      width: 75vw;
-    }
-
-    .teach-page .oppia-teach-section-five-left {
-      margin-right: 10vw;
-      text-align: center;
-      width: auto;
-    }
-
-    .teach-page .oppia-teach-section-three-left h2,
-    .teach-page .oppia-teach-section-four-left h2,
-    .teach-page .oppia-teach-section-five-left h2 {
-      font-size: 1.5em;
-    }
-
-    .teach-page .teach-student-image img {
-      max-width: 150px;
-    }
-
-    .teach-page .teach-arrows-container {
-      position: relative;
-    }
-
-    .teach-page .oppia-teach-section-three-left .oppia-teach-button,
-    .teach-page .oppia-teach-section-four-left .oppia-teach-button {
-      width: 90%;
-    }
-
-    .teach-page .teach-icon-text {
-      display: block;
-      font-size: 0.8em;
-    }
-
-    .teach-page .oppia-teach-icon-1-container {
-      display: block;
-      margin-left: 0;
-    }
-
-    .teach-page .oppia-teach-icon-2-container {
-      display: block;
-    }
-
-    .teach-page .oppia-teach-icon-3-container {
-      display: block;
-      margin-left: 70vw;
-    }
-
-    .teach-page .teach-benefits-section {
-      display: flex;
-      margin-left: auto;
-      margin-right: auto;
-      width: 20em;
-    }
-    .teach-page .teach-benefits-section-heading {
-      display: flex;
-      justify-content: center;
-      margin-bottom: -20px;
-      margin-left: auto;
-      margin-right: auto;
-      width: 20em;
-      }
-    }
-
-  @media (max-width: 575px) {
-    .teach-page .teach-benefits-section-heading {
-      display: flex;
-      justify-content: center;
-      margin-bottom: -20px;
-      margin-left: -4vw;
-      margin-right: auto;
-      width: 20em;
-    }
-
-    .teach-page .oppia-teach-section-six h2 {
-      margin-top: 0;
-    }
-
-    .teach-page .oppia-teach-section-four {
-      padding-bottom: 5px;
-    }
-
-    .teach-page .oppia-teach-section-six {
-      padding-top: 20px;
-    }
-
-
-    .teach-page .teach-student-image img {
-      margin-top: 6vh;
-      max-width: 150px;
-    }
-
-    .teach-page .teach-arrows-container {
-      padding-bottom: 6vh;
-      position: relative;
-    }
-  }
-  @media (max-width: 1050px) {
-    .teach-page .teach-student-image img {
-      max-width: 250px;
-    }
-
-    .teach-page .oppia-teach-section-five-left h2 {
-      font-size: 1.5em;
-    }
-
-    @media (min-width: 768px) {
-      .teach-page .oppia-teach-section-one-left
-      .oppia-teach-h2-text {
-        margin-top: 0;
-      }
-
-      @media (max-width: 890px) {
-        .teach-page .oppia-teach-section-one-left {
-        margin-top: 0.5vh;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 970px) {
-    .teach-page .oppia-teach-h1 {
-      font-size: 2em;
-    }
-  }
-
-  @media (min-width: 1350px) {
-    .teach-page .oppia-teach-h1,
-    .teach-page .oppia-teach-h2-container,
-    .teach-page .oppia-teach-button-container {
-      margin-left: 0;
-    }
-
-    .teach-page .oppia-teach-section-one,
-    .teach-page .oppia-teach-section-two,
-    .teach-page .oppia-teach-section-three,
-    .teach-page .oppia-teach-section-four,
-    .teach-page .oppia-teach-section-five,
-    .teach-page .oppia-teach-section-six {
-      justify-content: center;
-    }
-
-    .teach-page .oppia-teach-section-one-right,
-    .teach-page .oppia-teach-section-two-right,
-    .teach-page .oppia-teach-section-three-right,
-    .teach-page .oppia-teach-section-four-right,
-    .teach-page .oppia-teach-section-five-right {
-      margin-left: 0;
-      margin-right: 0;
-    }
-
-    .teach-page .oppia-teach-section-one-left,
-    .teach-page .oppia-teach-section-two-left,
-    .teach-page .oppia-teach-section-three-left,
-    .teach-page .oppia-teach-section-four-left {
-      margin-left: 0;
-      margin-right: 150px;
-    }
-
-    .teach-page .oppia-teach-section-five-left {
-      margin-left: 0;
-      margin-right: 250px;
-    }
-
-    .teach-page .teach-with-oppia-image img {
-      max-width: 650px
-    }
-
-    .teach-page .oppia-teach-section-three-left p,
-    .teach-page .oppia-teach-section-four-left p {
-      font-size: 1.2em;
-      padding-right: 30px;
-    }
-
-    .teach-page .oppia-teach-section-one-left,
-    .teach-page .oppia-teach-section-five-left {
-      width: unset;
-    }
-  }
-</style>

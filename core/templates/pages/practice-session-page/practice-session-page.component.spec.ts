@@ -16,17 +16,28 @@
  * @fileoverview Unit tests for practice session page component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { PracticeSessionPageComponent } from 'pages/practice-session-page/practice-session-page.component';
-import { UrlService } from 'services/contextual/url.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { PracticeSessionsBackendApiService } from './practice-session-backend-api.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import {PracticeSessionPageComponent} from 'pages/practice-session-page/practice-session-page.component';
+import {UrlService} from 'services/contextual/url.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
 
 describe('Practice session page', () => {
   let component: PracticeSessionPageComponent;
@@ -46,13 +57,11 @@ describe('Practice session page', () => {
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })
+            useClass: TranslateFakeLoader,
+          },
+        }),
       ],
-      declarations: [
-        PracticeSessionPageComponent,
-      ],
+      declarations: [PracticeSessionPageComponent],
       providers: [
         TranslateService,
         PracticeSessionsBackendApiService,
@@ -62,7 +71,7 @@ describe('Practice session page', () => {
         LoaderService,
         I18nLanguageCodeService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -76,68 +85,82 @@ describe('Practice session page', () => {
     loaderService = TestBed.inject(LoaderService);
     translateService = TestBed.inject(TranslateService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    practiceSessionsBackendApiService = (
-      TestBed.inject(PracticeSessionsBackendApiService));
+    practiceSessionsBackendApiService = TestBed.inject(
+      PracticeSessionsBackendApiService
+    );
 
     spyOn(translateService, 'use').and.stub();
     spyOn(translateService, 'instant').and.returnValue('translatedTitle');
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
-      .and.returnValue('abbrev-topic');
-    spyOn(urlService, 'getSelectedSubtopicsFromUrl')
-      .and.returnValue('["1","2","3","4","5"]');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('math');
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.returnValue(Promise.resolve('sample-csrf-token'));
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'abbrev-topic'
+    );
+    spyOn(urlService, 'getSelectedSubtopicsFromUrl').and.returnValue(
+      '["1","2","3","4","5"]'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     fixture.detectChanges();
   });
 
-  it('should load topic based on its id on url when component is initialized' +
-    ' and subscribe to languageCodeChange emitter', fakeAsync(() => {
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(component, 'subscribeToOnLanguageCodeChange');
+  it(
+    'should load topic based on its id on url when component is initialized' +
+      ' and subscribe to languageCodeChange emitter',
+    fakeAsync(() => {
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(component, 'subscribeToOnLanguageCodeChange');
 
-    spyOn(practiceSessionsBackendApiService, 'fetchPracticeSessionsData')
-      .and.returnValue(Promise.resolve({
-        skill_ids_to_descriptions_map: {
-          skill_1: 'Description 1',
-          skill_2: 'Description 2',
-        },
-        topic_name: 'Foo Topic'
-      }));
+      spyOn(
+        practiceSessionsBackendApiService,
+        'fetchPracticeSessionsData'
+      ).and.returnValue(
+        Promise.resolve({
+          skill_ids_to_descriptions_map: {
+            skill_1: 'Description 1',
+            skill_2: 'Description 2',
+          },
+          topic_name: 'Foo Topic',
+        })
+      );
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(component.topicName).toBe('Foo Topic');
-    expect(component.stringifiedSubtopicIds).toBe('["1","2","3","4","5"]');
-    expect(component.questionPlayerConfig).toEqual({
-      resultActionButtons: [
-        {
-          type: 'REVIEW_LOWEST_SCORED_SKILL',
-          i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
-        },
-        {
-          type: 'DASHBOARD',
-          i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-          url: '/learn/math/abbrev-topic'
-        },
-        {
-          type: 'RETRY_SESSION',
-          i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
-          url: '/learn/math/abbrev-topic/practice/session?' +
-          'selected_subtopic_ids=' + encodeURIComponent('["1","2","3","4","5"]')
-        }
-      ],
-      skillList: ['skill_1', 'skill_2'],
-      skillDescriptions: ['Description 1', 'Description 2'],
-      questionCount: 20,
-      questionsSortedByDifficulty: false
-    });
-    expect(component.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
+      expect(component.topicName).toBe('Foo Topic');
+      expect(component.stringifiedSubtopicIds).toBe('["1","2","3","4","5"]');
+      expect(component.questionPlayerConfig).toEqual({
+        resultActionButtons: [
+          {
+            type: 'REVIEW_LOWEST_SCORED_SKILL',
+            i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL',
+          },
+          {
+            type: 'DASHBOARD',
+            i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+            url: '/learn/math/abbrev-topic',
+          },
+          {
+            type: 'RETRY_SESSION',
+            i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
+            url:
+              '/learn/math/abbrev-topic/practice/session?' +
+              'selected_subtopic_ids=' +
+              encodeURIComponent('["1","2","3","4","5"]'),
+          },
+        ],
+        skillList: ['skill_1', 'skill_2'],
+        skillDescriptions: ['Description 1', 'Description 2'],
+        questionCount: 20,
+        questionsSortedByDifficulty: false,
+      });
+      expect(component.subscribeToOnLanguageCodeChange).toHaveBeenCalled();
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    })
+  );
 
   it('should subscribe to onLanguageCodeChange', () => {
     spyOn(component.directiveSubscriptions, 'add');
@@ -146,8 +169,9 @@ describe('Practice session page', () => {
     component.subscribeToOnLanguageCodeChange();
 
     expect(component.directiveSubscriptions.add).toHaveBeenCalled();
-    expect(i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe)
-      .toHaveBeenCalled();
+    expect(
+      i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe
+    ).toHaveBeenCalled();
   });
 
   it('should update title whenever the language changes', () => {
@@ -165,8 +189,9 @@ describe('Practice session page', () => {
 
     component.setPageTitle();
 
-    expect(pageTitleService.setDocumentTitle)
-      .toHaveBeenCalledWith('translatedTitle');
+    expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
+      'translatedTitle'
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

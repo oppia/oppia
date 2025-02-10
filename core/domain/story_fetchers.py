@@ -27,7 +27,7 @@ import itertools
 
 from core import feconf
 from core.domain import caching_services
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import topic_fetchers
@@ -607,8 +607,8 @@ def get_multi_users_progress_in_stories(
             'topic_name': topic.name,
             'topic_url_fragment': topic.url_fragment,
             'classroom_url_fragment':
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id),
+                classroom_config_services.
+                get_classroom_url_fragment_for_topic_id(topic.id),
         })
 
     return all_users_stories_progress

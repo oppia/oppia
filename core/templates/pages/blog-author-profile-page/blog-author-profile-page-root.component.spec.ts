@@ -16,34 +16,31 @@
  * @fileoverview Unit tests for the blog author profile page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { UrlService } from 'services/contextual/url.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BlogAuthorProfilePageRootComponent } from './blog-author-profile-page-root.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
+import {UserService} from 'services/user.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {BlogAuthorProfilePageRootComponent} from './blog-author-profile-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string): string {
     return key;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
 }
 
 describe('Blog Author Profile Page Root', () => {
@@ -55,17 +52,11 @@ describe('Blog Author Profile Page Root', () => {
   let loaderService: LoaderService;
   let translateService: TranslateService;
   let userService: UserService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        BlogAuthorProfilePageRootComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [BlogAuthorProfilePageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         MetaTagCustomizationService,
@@ -73,14 +64,10 @@ describe('Blog Author Profile Page Root', () => {
         UserService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
+          useClass: MockTranslateService,
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -90,123 +77,77 @@ describe('Blog Author Profile Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
     urlService = TestBed.inject(UrlService);
-    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
-    spyOn(urlService, 'getBlogAuthorUsernameFromUrl')
-      .and.returnValue('author');
+    spyOn(urlService, 'getBlogAuthorUsernameFromUrl').and.returnValue('author');
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
-  it('should initialize and show page when access is valid and blog project ' +
-  'feature is enabled', fakeAsync(() => {
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToBlogAuthorProfilePage'
-    ).and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    // We first call asynchronous function userService.canUserEditBlogPosts to
-    // check if the user can edit blog posts and then validate access to
-    // page using another asynchronous function
-    // accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage.
-    // Therefore we require 2 ticks here.
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage)
-      .toHaveBeenCalledWith('author');
-    expect(component.pageIsShown).toBeTrue();
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and show error page when server respond with error',
+  it(
+    'should initialize and show page when access is valid and blog project ' +
+      'feature is enabled',
     fakeAsync(() => {
       spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-        Promise.resolve(false));
+        Promise.resolve(false)
+      );
       spyOn(
         accessValidationBackendApiService,
         'validateAccessToBlogAuthorProfilePage'
-      ).and.returnValue(Promise.reject());
+      ).and.returnValue(Promise.resolve());
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
 
       component.ngOnInit();
       // We first call asynchronous function userService.canUserEditBlogPosts to
-      // check if the user can edit blog posts and then validate access to page
-      // using another asynchronous function in
-      // validateAccessToBlogAuthorProfilePage in
-      // AccessValidationBackendApiService. Therefore we require 2 ticks here.
+      // check if the user can edit blog posts and then validate access to
+      // page using another asynchronous function
+      // accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage.
+      // Therefore we require 2 ticks here.
       tick();
       tick();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(
-        accessValidationBackendApiService
-          .validateAccessToBlogAuthorProfilePage)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
+        accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage
+      ).toHaveBeenCalledWith('author');
+      expect(component.pageIsShown).toBeTrue();
+      expect(component.errorPageIsShown).toBeFalse();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
+    })
+  );
 
-  it('should initialize and show error page when blog project feature is ' +
-  'disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
+  it('should initialize and show error page when server respond with error', fakeAsync(() => {
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
+      Promise.resolve(false)
+    );
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToBlogAuthorProfilePage'
-    );
+    ).and.returnValue(Promise.reject());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
+    // We first call asynchronous function userService.canUserEditBlogPosts to
+    // check if the user can edit blog posts and then validate access to page
+    // using another asynchronous function in
+    // validateAccessToBlogAuthorProfilePage in
+    // AccessValidationBackendApiService. Therefore we require 2 ticks here.
+    tick();
     tick();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
-      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage)
-      .not.toHaveBeenCalledWith();
+      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage
+    ).toHaveBeenCalled();
     expect(component.pageIsShown).toBeFalse();
     expect(component.errorPageIsShown).toBeTrue();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled but user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToBlogAuthorProfilePage'
-    ).and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(
-      accessValidationBackendApiService.validateAccessToBlogAuthorProfilePage)
-      .toHaveBeenCalledWith('author');
-    expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
@@ -248,8 +189,8 @@ describe('Blog Author Profile Page Root', () => {
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.TITLE
     );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .BLOG_AUTHOR_PROFILE_PAGE.TITLE,
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE
+        .TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.META
     );
   });

@@ -16,26 +16,29 @@
  * @fileoverview Unit tests for the CancelBeamJobDialogComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { of, throwError } from 'rxjs';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatButtonModule} from '@angular/material/button';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {of, throwError} from 'rxjs';
 
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { AlertsService } from 'services/alerts.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {CancelBeamJobDialogComponent} from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {AlertsService} from 'services/alerts.service';
+import {MatCardModule} from '@angular/material/card';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Cancel beam job dialog', () => {
-  const beamJobRun = (
-    new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false));
+  const beamJobRun = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false);
 
   let fixture: ComponentFixture<CancelBeamJobDialogComponent>;
   let component: CancelBeamJobDialogComponent;
@@ -44,13 +47,11 @@ describe('Cancel beam job dialog', () => {
   let alertsService: AlertsService;
   let matDialogRef: MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun>;
 
-  beforeEach(waitForAsync(async() => {
-    const mockDialogRef = { disableClose: false, close: () => {} };
+  beforeEach(waitForAsync(async () => {
+    const mockDialogRef = {disableClose: false, close: () => {}};
 
     TestBed.configureTestingModule({
-      declarations: [
-        CancelBeamJobDialogComponent,
-      ],
+      declarations: [CancelBeamJobDialogComponent],
       imports: [
         HttpClientTestingModule,
         BrowserDynamicTestingModule,
@@ -64,17 +65,15 @@ describe('Cancel beam job dialog', () => {
       ],
       providers: [
         ReleaseCoordinatorBackendApiService,
-        { provide: MAT_DIALOG_DATA, useValue: beamJobRun },
-        { provide: MatDialogRef, useValue: mockDialogRef },
+        {provide: MAT_DIALOG_DATA, useValue: beamJobRun},
+        {provide: MatDialogRef, useValue: mockDialogRef},
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [
-          CancelBeamJobDialogComponent,
-        ],
-      }
+        entryComponents: [CancelBeamJobDialogComponent],
+      },
     });
     await TestBed.compileComponents();
 
@@ -88,10 +87,18 @@ describe('Cancel beam job dialog', () => {
   }));
 
   it('should lock the dialog and cancel the job before finally closing', () => {
-    const cancelledBeamJobRun = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false));
-    const caneclBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
-      .and.returnValue(of(cancelledBeamJobRun));
+    const cancelledBeamJobRun = new BeamJobRun(
+      '123',
+      'FooJob',
+      'CANCELLED',
+      0,
+      0,
+      false
+    );
+    const caneclBeamJobRunSpy = spyOn(
+      backendApiService,
+      'cancelBeamJobRun'
+    ).and.returnValue(of(cancelledBeamJobRun));
     const closeDialogSpy = spyOn(matDialogRef, 'close');
 
     expect(component.isRunning).toBeFalse();
@@ -108,10 +115,12 @@ describe('Cancel beam job dialog', () => {
     expect(closeDialogSpy).toHaveBeenCalledWith(cancelledBeamJobRun);
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
-    const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
-      .and.returnValue(throwError(error));
+    const cancelBeamJobRunSpy = spyOn(
+      backendApiService,
+      'cancelBeamJobRun'
+    ).and.returnValue(throwError(error));
     const addWarningSpy = spyOn(alertsService, 'addWarning');
 
     component.onActionClick();

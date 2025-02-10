@@ -16,8 +16,8 @@
  * @fileoverview Component for stale tab information component editor.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-stale-tab-info-modal',
@@ -29,9 +29,7 @@ export class StaleTabInfoModalComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   entity!: string;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {}
+  constructor(private ngbActiveModal: NgbActiveModal) {}
 
   closeModal(): void {
     this.ngbActiveModal.close();

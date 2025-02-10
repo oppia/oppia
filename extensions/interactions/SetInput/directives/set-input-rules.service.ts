@@ -16,20 +16,20 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { SetInputAnswer } from 'interactions/answer-defs';
-import { SetInputRuleInputs } from 'interactions/rule-input-defs';
+import {SetInputAnswer} from 'interactions/answer-defs';
+import {SetInputRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SetInputRulesService {
   Equals(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length === inputs.x.unicodeStrSet.length &&
-      inputs.x.unicodeStrSet.every(function(val) {
+      inputs.x.unicodeStrSet.every(function (val) {
         return answer.indexOf(val) >= 0;
       })
     );
@@ -38,7 +38,7 @@ export class SetInputRulesService {
   IsSubsetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length < inputs.x.unicodeStrSet.length &&
-      answer.every(function(val) {
+      answer.every(function (val) {
         return inputs.x.unicodeStrSet.indexOf(val) >= 0;
       })
     );
@@ -47,40 +47,40 @@ export class SetInputRulesService {
   IsSupersetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return (
       answer.length > inputs.x.unicodeStrSet.length &&
-      inputs.x.unicodeStrSet.every(function(val) {
+      inputs.x.unicodeStrSet.every(function (val) {
         return answer.indexOf(val) >= 0;
       })
     );
   }
 
   HasElementsIn(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.some(function(val) {
+    return inputs.x.unicodeStrSet.some(function (val) {
       return answer.indexOf(val) >= 0;
     });
   }
 
   HasElementsNotIn(
-      answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return answer.some(function(val) {
+    answer: SetInputAnswer,
+    inputs: SetInputRuleInputs
+  ): boolean {
+    return answer.some(function (val) {
       return inputs.x.unicodeStrSet.indexOf(val) === -1;
     });
   }
 
-  OmitsElementsIn(
-      answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.some(function(val) {
+  OmitsElementsIn(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+    return inputs.x.unicodeStrSet.some(function (val) {
       return answer.indexOf(val) === -1;
     });
   }
 
-  IsDisjointFrom(
-      answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.unicodeStrSet.every(function(val) {
+  IsDisjointFrom(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
+    return inputs.x.unicodeStrSet.every(function (val) {
       return answer.indexOf(val) === -1;
     });
   }
 }
 
-angular.module('oppia').factory(
-  'SetInputRulesService',
-  downgradeInjectable(SetInputRulesService));
+angular
+  .module('oppia')
+  .factory('SetInputRulesService', downgradeInjectable(SetInputRulesService));

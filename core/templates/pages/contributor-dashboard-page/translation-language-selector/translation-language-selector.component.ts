@@ -17,18 +17,23 @@
  */
 
 import {
-  Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChild,
-  ElementRef
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  HostListener,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
-import { ContributionOpportunitiesBackendApiService } from
+import {
+  ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
-  'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { FeaturedTranslationLanguage } from
-  'domain/opportunity/featured-translation-language.model';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 interface Options {
   id: string;
@@ -37,7 +42,7 @@ interface Options {
 
 @Component({
   selector: 'translation-language-selector',
-  templateUrl: './translation-language-selector.component.html'
+  templateUrl: './translation-language-selector.component.html',
 })
 export class TranslationLanguageSelectorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -45,7 +50,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() activeLanguageCode!: string | null;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
-  @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+  @ViewChild('dropdown', {static: false}) dropdownRef!: ElementRef;
   @ViewChild('filterDiv') filterDivRef!: ElementRef;
 
   options!: Options[];
@@ -61,24 +66,25 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   explanationPopupContent = '';
 
   constructor(
-    private contributionOpportunitiesBackendApiService:
-      ContributionOpportunitiesBackendApiService,
+    private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService,
     private languageUtilService: LanguageUtilService,
-    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly translationLanguageService: TranslationLanguageService
   ) {}
 
   ngOnInit(): void {
-    this.translationLanguageService.onActiveLanguageChanged.subscribe(
-      () => {
-        this.languageSelection = this.languageIdToDescription[
-          this.translationLanguageService.getActiveLanguageCode()];
-      });
+    this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
+      this.languageSelection =
+        this.languageIdToDescription[
+          this.translationLanguageService.getActiveLanguageCode()
+        ];
+    });
     this.filteredOptions = this.options = this.languageUtilService
-      .getAllVoiceoverLanguageCodes().map(languageCode => {
-        const description = this.languageUtilService
-          .getAudioLanguageDescription(languageCode);
+      .getAllVoiceoverLanguageCodes()
+      .map(languageCode => {
+        const description =
+          this.languageUtilService.getAudioLanguageDescription(languageCode);
         this.languageIdToDescription[languageCode] = description;
-        return { id: languageCode, description };
+        return {id: languageCode, description};
       });
 
     this.contributionOpportunitiesBackendApiService
@@ -87,18 +93,15 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.featuredLanguages = featuredLanguages;
       });
 
-    this.languageSelection = (
-      this.activeLanguageCode ?
-      this.languageIdToDescription[this.activeLanguageCode] :
-      'Language'
-    );
+    this.languageSelection = this.activeLanguageCode
+      ? this.languageIdToDescription[this.activeLanguageCode]
+      : 'Language';
 
     this.contributionOpportunitiesBackendApiService
       .getPreferredTranslationLanguageAsync()
-      .then((preferredLanguageCode: string|null) => {
+      .then((preferredLanguageCode: string | null) => {
         if (preferredLanguageCode) {
-          this.populateLanguageSelection(
-            preferredLanguageCode);
+          this.populateLanguageSelection(preferredLanguageCode);
         }
       });
   }
@@ -110,22 +113,21 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       this.filteredOptions = this.options;
       setTimeout(() => {
         this.filterDivRef.nativeElement.focus();
-      }
-      , 1);
+      }, 1);
     }
   }
 
   populateLanguageSelection(languageCode: string): void {
     this.setActiveLanguageCode.emit(languageCode);
-    this.languageSelection = (
-      this.languageIdToDescription[languageCode]);
+    this.languageSelection = this.languageIdToDescription[languageCode];
   }
 
   selectOption(activeLanguageCode: string): void {
     this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
-    this.contributionOpportunitiesBackendApiService
-      .savePreferredTranslationLanguageAsync(activeLanguageCode);
+    this.contributionOpportunitiesBackendApiService.savePreferredTranslationLanguageAsync(
+      activeLanguageCode
+    );
   }
 
   showExplanationPopup(index: number): void {
@@ -135,8 +137,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
      * 30: approximate height of each dropdown element.
      */
     this.explanationPopupPxOffsetY = 75 + 30 * index;
-    this.explanationPopupContent = (
-      this.featuredLanguages[index].explanation);
+    this.explanationPopupContent = this.featuredLanguages[index].explanation;
     this.explanationPopupShown = true;
   }
 
@@ -160,16 +161,10 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   }
 
   filterOptions(): void {
-    this.filteredOptions = this.options.filter(
-      option => option.description.toLowerCase().includes(
-        this.optionsFilter.toLowerCase()));
+    this.filteredOptions = this.options.filter(option =>
+      option.description
+        .toLowerCase()
+        .includes(this.optionsFilter.toLowerCase())
+    );
   }
 }
-
-angular.module('oppia').directive(
-  'translationLanguageSelector',
-  downgradeComponent({
-    component: TranslationLanguageSelectorComponent,
-    inputs: ['activeLanguageCode'],
-    outputs: ['setActiveLanguageCode']
-  }));

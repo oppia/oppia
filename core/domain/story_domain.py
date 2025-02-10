@@ -505,9 +505,9 @@ class StoryNode:
         outline_is_finalized: bool,
         exploration_id: Optional[str],
         status: Optional[str],
-        planned_publication_date: Optional[datetime.datetime],
-        last_modified: Optional[datetime.datetime],
-        first_publication_date: Optional[datetime.datetime],
+        planned_publication_date_msecs: Optional[float],
+        last_modified_msecs: Optional[float],
+        first_publication_date_msecs: Optional[float],
         unpublishing_reason: Optional[str]
     ) -> None:
         """Initializes a StoryNode domain object.
@@ -538,12 +538,12 @@ class StoryNode:
                 has just created a story with the basic storyline (by providing
                 outlines) without linking an exploration to any node.
             status: str. It is the publication status of the node.
-            planned_publication_date: datetime.datetime | None. It is the
-                expected publication date for a node.
-            last_modified: datetime.datetime | None. The date time when a node
-                was last modified.
-            first_publication_date: datetime.datetime | None. The date when
-                the node was first published.
+            planned_publication_date_msecs: float | None. It is the
+                expected publication date in milliseconds for a node.
+            last_modified_msecs: float | None. The date time in milliseconds 
+                when a node was last modified.
+            first_publication_date_msecs: float | None. The date in milliseconds
+                when the node was first published.
             unpublishing_reason: str or None. The reason for unpublishing this
                 node. It is None when the node is published.
         """
@@ -560,9 +560,9 @@ class StoryNode:
         self.outline_is_finalized = outline_is_finalized
         self.exploration_id = exploration_id
         self.status = status
-        self.planned_publication_date = planned_publication_date
-        self.last_modified = last_modified
-        self.first_publication_date = first_publication_date
+        self.planned_publication_date_msecs = planned_publication_date_msecs
+        self.last_modified_msecs = last_modified_msecs
+        self.first_publication_date_msecs = first_publication_date_msecs
         self.unpublishing_reason = unpublishing_reason
 
     @classmethod
@@ -588,7 +588,7 @@ class StoryNode:
             str. The new next node id.
         """
         current_number = StoryNode.get_number_from_node_id(node_id)
-        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
+        incremented_node_id = '%s%s' % (NODE_ID_PREFIX, str(current_number + 1))
         return incremented_node_id
 
     @classmethod
@@ -642,7 +642,7 @@ class StoryNode:
         Returns:
             bool. Whether the status is valid or not.
         """
-        return status in constants.ALLOWED_STORYNODE_STATUS
+        return status in constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
     def require_valid_unpublishing_reason(
@@ -656,7 +656,7 @@ class StoryNode:
             bool. Whether the unpublishing reason is valid or not.
         """
         return unpublishing_reason in (
-            constants.ALLOWED_STORYNODE_UNPUBLISHING_REASONS)
+            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS)
 
     def to_dict(self) -> StoryNodeDict:
         """Returns a dict representing this StoryNode domain object.
@@ -678,14 +678,10 @@ class StoryNode:
             'outline_is_finalized': self.outline_is_finalized,
             'exploration_id': self.exploration_id,
             'status': self.status,
-            'planned_publication_date_msecs': utils.get_time_in_millisecs(
-                self.planned_publication_date) if self.planned_publication_date
-                else None,
-            'last_modified_msecs': utils.get_time_in_millisecs(
-                self.last_modified) if self.last_modified else None,
-            'first_publication_date_msecs': utils.get_time_in_millisecs(
-                self.first_publication_date) if self.first_publication_date
-                else None,
+            'planned_publication_date_msecs': 
+            self.planned_publication_date_msecs,
+            'last_modified_msecs': self.last_modified_msecs,
+            'first_publication_date_msecs': self.first_publication_date_msecs,
             'unpublishing_reason': self.unpublishing_reason
         }
 
@@ -725,15 +721,9 @@ class StoryNode:
             node_dict['outline_is_finalized'],
             node_dict['exploration_id'],
             node_dict['status'] if 'status' in node_dict else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                planned_publication_date_msecs) if
-                planned_publication_date_msecs else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                last_modified_msecs) if
-                last_modified_msecs else None,
-            utils.convert_millisecs_time_to_datetime_object(
-                first_publication_date_msecs) if
-                first_publication_date_msecs else None,
+            planned_publication_date_msecs,
+            last_modified_msecs,
+            first_publication_date_msecs,
             node_dict['unpublishing_reason'] if
             'unpublishing_reason' in node_dict else None
         )
@@ -763,11 +753,18 @@ class StoryNode:
             ValidationError. One or more attributes of the story node are
                 invalid.
         """
-        if self.exploration_id:
-            if not isinstance(self.exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected exploration ID to be a string, received %s' %
-                    self.exploration_id)
+        if self.exploration_id is None:
+            raise utils.ValidationError(
+                'Expected exploration ID to not be None') 
+        if self.exploration_id and not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+                'Expected exploration ID to be a string, received %s' %
+                self.exploration_id)
+        if self.exploration_id == '':
+            raise utils.ValidationError(
+                'Expected exploration ID to not be an empty string, '
+                'received %s' % self.exploration_id)
+
         if self.thumbnail_filename is not None:
             self.require_valid_thumbnail_filename(self.thumbnail_filename)
         if self.thumbnail_bg_color is not None and not (
@@ -785,10 +782,6 @@ class StoryNode:
                 self.thumbnail_size_in_bytes == 0):
             raise utils.ValidationError(
                 'Story node thumbnail size in bytes cannot be zero.')
-        if self.exploration_id == '':
-            raise utils.ValidationError(
-                'Expected exploration ID to not be an empty string, '
-                'received %s' % self.exploration_id)
 
         if not isinstance(self.outline, str):
             raise utils.ValidationError(
@@ -883,23 +876,23 @@ class StoryNode:
                 raise utils.ValidationError(
                     'Chapter status cannot be %s ' % self.status)
 
-        if self.planned_publication_date and (
-            not isinstance(self.planned_publication_date, datetime.datetime)):
+        if self.planned_publication_date_msecs and (
+            not isinstance(self.planned_publication_date_msecs, float)):
             raise utils.ValidationError(
-                'Expected planned publication date to be a datetime, '
-                'received %s' % self.planned_publication_date)
+                'Expected planned publication date to be milliseconds, '
+                'received %s' % self.planned_publication_date_msecs)
 
-        if self.last_modified and (
-            not isinstance(self.last_modified, datetime.datetime)):
+        if self.last_modified_msecs and (
+            not isinstance(self.last_modified_msecs, float)):
             raise utils.ValidationError(
-                'Expected last modified to be a datetime, '
-                'received %s' % self.last_modified)
+                'Expected last modified to be milliseconds, '
+                'received %s' % self.last_modified_msecs)
 
-        if self.first_publication_date and (
-            not isinstance(self.first_publication_date, datetime.datetime)):
+        if self.first_publication_date_msecs and (
+            not isinstance(self.first_publication_date_msecs, float)):
             raise utils.ValidationError(
-                'Expected first publication date to be a datetime, '
-                'received %s' % self.first_publication_date)
+                'Expected first publication date to be milliseconds, '
+                'received %s' % self.first_publication_date_msecs)
 
         if self.unpublishing_reason:
             if not isinstance(self.unpublishing_reason, str):
@@ -911,6 +904,43 @@ class StoryNode:
                 raise utils.ValidationError(
                     'Chapter unpublishing reason cannot be %s ' %
                     self.unpublishing_reason)
+
+    def is_node_upcoming(self) -> bool:
+        """Return whether the StoryNode domain object is expected to be
+        published within the next CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS
+        days.
+
+        Returns:
+            bool. True if the chapter is upcoming else false.
+        """
+        current_time_msecs = utils.get_current_time_in_millisecs()
+        planned_publication_date_msecs = self.planned_publication_date_msecs
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            planned_publication_date_msecs is not None and
+            current_time_msecs < planned_publication_date_msecs <
+            current_time_msecs + (
+                constants.
+                    CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) *
+                    24 * 3600 * 1000):
+            return True
+        return False
+
+    def is_node_behind_schedule(self) -> bool:
+        """Return whether StoryNode domain object is behind-schedule
+        from the planned publication date.
+
+        Returns:
+            bool. True if the chapter is behind-schedule else false.
+        """
+        current_time_msecs = utils.get_current_time_in_millisecs()
+        planned_publication_date_msecs = self.planned_publication_date_msecs
+        if (
+            self.status != constants.STORY_NODE_STATUS_PUBLISHED and
+            planned_publication_date_msecs is not None and
+            current_time_msecs > planned_publication_date_msecs):
+            return True
+        return False
 
 
 class StoryContentsDict(TypedDict):
@@ -1085,6 +1115,28 @@ class StoryContents:
             if node.exploration_id is not None:
                 exp_ids.append(node.exploration_id)
         return exp_ids
+
+    def get_linked_exp_ids_of_published_nodes(self) -> List[str]:
+        """Returns a list of exploration ids linked to each published node of
+        story content.
+
+        Returns:
+            list(str). A list of exploration ids from published nodes.
+        """
+        return self.get_all_linked_exp_ids()[:self.get_published_node_count()]
+
+    def get_published_node_count(self) -> int:
+        """Returns the number of published nodes of story content.
+
+        Returns:
+            int. Number of published nodes.
+        """
+        published_node_count = 0
+        for node in self.nodes:
+            if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
+                break
+            published_node_count += 1
+        return published_node_count
 
     def get_node_with_corresponding_exp_id(self, exp_id: str) -> StoryNode:
         """Returns the node object which corresponds to a given exploration ids.
@@ -1578,7 +1630,10 @@ class Story:
         title: str,
         description: str,
         corresponding_topic_id: str,
-        url_fragment: str
+        url_fragment: str,
+        meta_tag_content: Optional[str] = '',
+        thumbnail_filename: Optional[str] = None,
+        thumbnail_bg_color: Optional[str] = None
     ) -> Story:
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
@@ -1591,6 +1646,11 @@ class Story:
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
             url_fragment: str. The url fragment of the story.
+            meta_tag_content: Optional[str]. The meta tag content of the story.
+            thumbnail_filename: Optional[str]. The filename for the thumbnail 
+                of the story.
+            thumbnail_bg_color: Optional[str]. The background color for the 
+                thumbnail of the story.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -1598,12 +1658,23 @@ class Story:
         # Initial node id for a new story.
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
+        if thumbnail_filename is not None:
+            raw_image = b''
+            with open(
+                f'core/tests/data/{thumbnail_filename}', 'rt',
+                encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                raw_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                thumbnail_filename, feconf.ENTITY_TYPE_STORY, story_id,
+                raw_image, 'thumbnail', False)
         return cls(
-            story_id, title, None, None, None, description,
+            story_id, title, thumbnail_filename,
+            thumbnail_bg_color, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
-            url_fragment, '')
+            url_fragment, str(meta_tag_content))
 
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(
@@ -2025,9 +2096,8 @@ class Story:
                 date of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].planned_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs))
+        self.story_contents.nodes[node_index].planned_publication_date_msecs = (
+            new_planned_publication_date_msecs)
 
     def update_node_last_modified(
             self, node_id: str, new_last_modified_msecs: float) -> None:
@@ -2039,9 +2109,8 @@ class Story:
                 of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].last_modified = (
-            utils.convert_millisecs_time_to_datetime_object(
-            new_last_modified_msecs))
+        self.story_contents.nodes[node_index].last_modified_msecs = (
+        new_last_modified_msecs)
 
     def update_node_first_publication_date(
             self, node_id: str, new_publication_date_msecs: float) -> None:
@@ -2053,9 +2122,8 @@ class Story:
                 of the node in miliseconds.
         """
         node_index = self.story_contents.get_node_index(node_id)
-        self.story_contents.nodes[node_index].first_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs))
+        self.story_contents.nodes[node_index].first_publication_date_msecs = (
+            new_publication_date_msecs)
 
     def update_node_unpublishing_reason(
             self, node_id: str, new_unpublishing_reason: str) -> None:
@@ -2347,3 +2415,34 @@ class StoryChapterProgressSummaryDict(TypedDict):
     exploration_id: str
     visited_checkpoints_count: int
     total_checkpoints_count: int
+
+
+class StoryPublicationTimeliness:
+    """Domain object for stories with behind-schedule chapters
+    or chapters upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+    """
+
+    def __init__(
+        self,
+        story_id: str,
+        story_name: str,
+        topic_name: str,
+        overdue_chapters: List[str],
+        upcoming_chapters: List[str]
+    ) -> None:
+        """Constructs a StoryPublicationTimeliness domain object.
+
+        Args:
+            story_id: str. The unique id of the story.
+            story_name: str. The title of the story.
+            topic_name: str. The title of the topic.
+            overdue_chapters: list(str). The list of behind schedule chapter
+                names.
+            upcoming_chapters: list(str). The list of chapter names
+                upcoming within CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+        """
+        self.id = story_id
+        self.story_name = story_name
+        self.topic_name = topic_name
+        self.overdue_chapters = overdue_chapters
+        self.upcoming_chapters = upcoming_chapters

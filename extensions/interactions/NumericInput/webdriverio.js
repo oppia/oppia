@@ -17,25 +17,23 @@
  * interaction in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
-var customizeInteraction = async function(elem, requireNonnegativeInput) {
-  await objects.BooleanEditor(elem.$(
-    '<schema-based-bool-editor>')).setValue(requireNonnegativeInput);
+var customizeInteraction = async function (elem, requireNonnegativeInput) {
+  await objects
+    .BooleanEditor(elem.$('<schema-based-bool-editor>'))
+    .setValue(requireNonnegativeInput);
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
-  expect(
-    await elem.$(
-      '<oppia-interactive-numeric-input>').isExisting()
-  ).toBe(true);
+var expectInteractionDetailsToMatch = async function (elem) {
+  expect(await elem.$('<oppia-interactive-numeric-input>').isExisting()).toBe(
+    true
+  );
 };
 
-var submitAnswer = async function(elem, answer) {
-  var numericInput = elem.$('<oppia-interactive-numeric-input>')
-    .$('<input>');
+var submitAnswer = async function (elem, answer) {
+  var numericInput = elem.$('<oppia-interactive-numeric-input>').$('<input>');
   await action.setValue('Numeric Input Element', numericInput, answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
@@ -43,25 +41,29 @@ var submitAnswer = async function(elem, answer) {
 
 var answerObjectType = 'Real';
 
-var testSuite = [{
-  interactionArguments: [false],
-  ruleArguments: ['IsWithinTolerance', 2, 143],
-  expectedInteractionDetails: [],
-  wrongAnswers: [146, 130],
-  correctAnswers: [142]
-}, {
-  interactionArguments: [true],
-  ruleArguments: ['IsLessThan', 143],
-  expectedInteractionDetails: [true],
-  wrongAnswers: [146, 152],
-  correctAnswers: [142]
-}, {
-  interactionArguments: [true],
-  ruleArguments: ['IsGreaterThan', 2],
-  expectedInteractionDetails: [true],
-  wrongAnswers: [0, 1],
-  correctAnswers: [3]
-}];
+var testSuite = [
+  {
+    interactionArguments: [false],
+    ruleArguments: ['IsWithinTolerance', 2, 143],
+    expectedInteractionDetails: [],
+    wrongAnswers: [146, 130],
+    correctAnswers: [142],
+  },
+  {
+    interactionArguments: [true],
+    ruleArguments: ['IsLessThan', 143],
+    expectedInteractionDetails: [true],
+    wrongAnswers: [146, 152],
+    correctAnswers: [142],
+  },
+  {
+    interactionArguments: [true],
+    ruleArguments: ['IsGreaterThan', 2],
+    expectedInteractionDetails: [true],
+    wrongAnswers: [0, 1],
+    correctAnswers: [3],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

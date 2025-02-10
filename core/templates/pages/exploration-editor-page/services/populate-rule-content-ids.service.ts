@@ -16,16 +16,16 @@
  * @fileoverview Service that populates rule content ids.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { BaseTranslatableObject } from 'interactions/rule-input-defs';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { Rule } from 'domain/exploration/rule.model';
+import {AppConstants} from 'app.constants';
+import {BaseTranslatableObject} from 'interactions/rule-input-defs';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {Rule} from 'domain/exploration/rule.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PopulateRuleContentIdsService {
   constructor(private generateContentIdService: GenerateContentIdService) {}
@@ -50,22 +50,24 @@ export class PopulateRuleContentIdsService {
       // All rules input types which are translatable are subclasses of
       // BaseTranslatableObject having dict structure with contentId
       // as a key.
-      const hasContentId = (
-        ruleInput && ruleInput.hasOwnProperty('contentId'));
+      const hasContentId = ruleInput && ruleInput.hasOwnProperty('contentId');
       if (!hasContentId) {
         return;
       }
       const needsContentId = ruleInput.contentId === null;
 
       if (needsContentId) {
-        ruleInput.contentId = (
-          this.generateContentIdService.getNextStateId(
-            `${AppConstants.COMPONENT_NAME_RULE_INPUT}`));
+        ruleInput.contentId = this.generateContentIdService.getNextStateId(
+          `${AppConstants.COMPONENT_NAME_RULE_INPUT}`
+        );
       }
     });
   }
 }
 
-angular.module('oppia').factory(
-  'PopulateRuleContentIdsService',
-  downgradeInjectable(PopulateRuleContentIdsService));
+angular
+  .module('oppia')
+  .factory(
+    'PopulateRuleContentIdsService',
+    downgradeInjectable(PopulateRuleContentIdsService)
+  );

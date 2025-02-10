@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Delete Interaction Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteInteractionModalComponent } from './delete-interaction-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteInteractionModalComponent} from './delete-interaction-modal.component';
 
 describe('Delete Hint Modal Component', () => {
   let fixture: ComponentFixture<DeleteInteractionModalComponent>;
@@ -26,12 +26,8 @@ describe('Delete Hint Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteInteractionModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [DeleteInteractionModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

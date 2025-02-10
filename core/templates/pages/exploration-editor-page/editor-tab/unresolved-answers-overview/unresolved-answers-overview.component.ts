@@ -16,29 +16,26 @@
  * @fileoverview Component for the state graph visualization.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { AppConstants } from 'app.constants';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { EditabilityService } from 'services/editability.service';
-import { ImprovementsService } from 'services/improvements.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { TeachOppiaModalComponent } from '../templates/modal-templates/teach-oppia-modal.component';
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { ExternalSaveService } from 'services/external-save.service';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {AppConstants} from 'app.constants';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {EditabilityService} from 'services/editability.service';
+import {ImprovementsService} from 'services/improvements.service';
+import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
+import {TeachOppiaModalComponent} from '../templates/modal-templates/teach-oppia-modal.component';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {ExternalSaveService} from 'services/external-save.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-unresolved-answers-overview',
-  templateUrl: './unresolved-answers-overview.component.html'
+  templateUrl: './unresolved-answers-overview.component.html',
 })
-
-export class UnresolvedAnswersOverviewComponent
-  implements OnInit {
+export class UnresolvedAnswersOverviewComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -53,13 +50,13 @@ export class UnresolvedAnswersOverviewComponent
     private ngbModal: NgbModal,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateTopAnswersStatsService: StateTopAnswersStatsService,
-  ) { }
+    private stateTopAnswersStatsService: StateTopAnswersStatsService
+  ) {}
 
   isStateRequiredToBeResolved(stateName: string): boolean {
-    return this.improvementsService
-      .isStateForcedToResolveOutstandingUnaddressedAnswers(
-        this.explorationStatesService.getState(stateName));
+    return this.improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+      this.explorationStatesService.getState(stateName)
+    );
   }
 
   isUnresolvedAnswersOverviewShown(): boolean {
@@ -67,8 +64,10 @@ export class UnresolvedAnswersOverviewComponent
     if (activeStateName === null) {
       return false;
     }
-    return this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
-      this.isStateRequiredToBeResolved(activeStateName);
+    return (
+      this.stateTopAnswersStatsService.hasStateStats(activeStateName) &&
+      this.isStateRequiredToBeResolved(activeStateName)
+    );
   }
 
   getCurrentInteractionId(): string {
@@ -77,18 +76,18 @@ export class UnresolvedAnswersOverviewComponent
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return Boolean(interactionId) && INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey
-    ].is_linear;
+    return (
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
+    );
   }
 
   isCurrentInteractionTrainable(): boolean {
     let interactionId = this.getCurrentInteractionId();
     return (
       Boolean(interactionId) &&
-      INTERACTION_SPECS[
-        interactionId as InteractionSpecsKey
-      ].is_trainable);
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_trainable
+    );
   }
 
   isEditableOutsideTutorialMode(): boolean {
@@ -98,13 +97,18 @@ export class UnresolvedAnswersOverviewComponent
   openTeachOppiaModal(): void {
     this.externalSaveService.onExternalSave.emit();
 
-    this.ngbModal.open(TeachOppiaModalComponent, {
-      backdrop: 'static'
-    }).result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(TeachOppiaModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {},
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   getUnresolvedStateStats(): AnswerStats[] {
@@ -117,12 +121,7 @@ export class UnresolvedAnswersOverviewComponent
 
   ngOnInit(): void {
     this.unresolvedAnswersOverviewIsShown = false;
-    this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-      AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+    this.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
+      AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
   }
 }
-
-angular.module('oppia').directive('oppiaUnresolvedAnswersOverview',
-  downgradeComponent({
-    component: UnresolvedAnswersOverviewComponent
-  }) as angular.IDirectiveFactory);

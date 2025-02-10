@@ -16,18 +16,18 @@
  * @fileoverview Component for a learner topic summary tile.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
 @Component({
   selector: 'oppia-learner-topic-summary-tile',
-  templateUrl: './learner-topic-summary-tile.component.html'
+  templateUrl: './learner-topic-summary-tile.component.html',
 })
 export class LearnerTopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -40,6 +40,7 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   topicTitle!: string;
   thumbnailBgColor!: string;
   openInNewWindow = false;
+  @Input() redesignFeatureFlag!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -47,22 +48,29 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   ) {}
 
   getTopicLink(): string {
-    if (!this.topicSummary.classroom || !this.topicSummary.urlFragment) {
+    if (
+      !this.topicSummary.classroomUrlFragment ||
+      !this.topicSummary.urlFragment
+    ) {
       return '#';
     }
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+      {
         topic_url_fragment: this.topicSummary.urlFragment,
-        classroom_url_fragment: this.topicSummary.classroom
-      });
+        classroom_url_fragment: this.topicSummary.classroomUrlFragment,
+      }
+    );
   }
 
   ngOnInit(): void {
     if (this.topicSummary.getThumbnailFilename()) {
-      this.thumbnailUrl = (
+      this.thumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.TOPIC, this.topicSummary.getId(),
-          this.topicSummary.getThumbnailFilename()));
+          AppConstants.ENTITY_TYPE.TOPIC,
+          this.topicSummary.getId(),
+          this.topicSummary.getThumbnailFilename()
+        );
     }
     this.topicLink = this.getTopicLink();
     this.topicTitle = this.topicSummary.name;
@@ -71,6 +79,9 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaLearnerTopicSummaryTile', downgradeComponent(
-    {component: LearnerTopicSummaryTileComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLearnerTopicSummaryTile',
+    downgradeComponent({component: LearnerTopicSummaryTileComponent})
+  );

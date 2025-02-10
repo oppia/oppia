@@ -179,7 +179,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
                 [self.NEW_USER_EMAIL],
                 'subject',
                 'body',
-                'body'
+                'body',
+                None
             )]
         )
 

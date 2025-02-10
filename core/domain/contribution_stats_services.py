@@ -18,9 +18,10 @@
 from __future__ import annotations
 
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.platform import models
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -251,8 +252,9 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_last_activity: int. To get number of users
-            who are active in max_days_since_last_activity.
+        max_days_since_last_activity: Optional[int]. The number of days
+            before today from which to start considering users'
+            contributions, to filter users.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -290,11 +292,11 @@ def get_translation_submitter_total_stats(
 
 
 def get_translation_reviewer_total_stats(
-        page_size: int,
-        offset: int,
-        language_code: str,
-        sort_by: Optional[str],
-        max_days_since_last_activity: Optional[int]
+    page_size: int,
+    offset: int,
+    language_code: str,
+    sort_by: Optional[str],
+    max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.TranslationReviewerTotalContributionStats],
         int,
@@ -309,15 +311,16 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_last_activity: int|None. To get number of users
-            who are active in max_days_since_last_activity.
+        max_days_since_last_activity: Optional[int]. The number of days
+            before today from which to start considering users'
+            contributions, to filter users.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(TranslationReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                language_code, and max_days_since_last_activity filters,
+                language_code and max_days_since_last_activity filters,
                 returned in the order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
@@ -368,16 +371,17 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_last_activity: int. To get results of users
-            who are active in max_days_since_last_activity.
+        max_days_since_last_activity: Optional[int]. The number of days
+            before today from which to start considering users'
+            contributions, to filter users.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionSubmitterTotalContributionStats).
                 The list of domain objects which match the supplied topic_ids
-                and max_days_since_last_activity filters,
-                returned in the order specified by sort_by.
+                and max_days_since_last_activity filters, returned in the
+                order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
@@ -407,10 +411,10 @@ def get_question_submitter_total_stats(
 
 
 def get_question_reviewer_total_stats(
-        page_size: int,
-        offset: int,
-        sort_by: Optional[str],
-        max_days_since_last_activity: Optional[int]
+    page_size: int,
+    offset: int,
+    sort_by: Optional[str],
+    max_days_since_last_activity: Optional[int]
 ) -> Tuple[
         List[suggestion_registry.QuestionReviewerTotalContributionStats],
         int,
@@ -424,16 +428,17 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_last_activity: int|None. To get result of users
-            who are active in max_days_since_last_activity.
+        max_days_since_last_activity: Optional[int]. The number of days
+            before today from which to start considering users'
+            contributions, to filter users.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
             sorted_results:
                 list(QuestionReviewerTotalContributionStats).
                 The list of domain objects which match the supplied
-                max_days_since_last_activity filter,
-                returned in the order specified by sort_by.
+                max_days_since_last_activity filter, returned in the
+                order specified by sort_by.
             next_offset: int. Number of results to skip in next batch.
             more: bool. If True, there are (probably) more results after
                 this batch. If False, there are no further results
@@ -458,4 +463,60 @@ def get_question_reviewer_total_stats(
         question_reviewer_stats,
         next_offset,
         more
+    )
+
+
+def get_all_translation_coordinator_stats(
+    sort: str
+) -> List[user_domain.TranslationCoordinatorStats]:
+    """Gets all TranslationCoordinatorStats corresponding to the supplied
+    user and converts them to their corresponding domain objects.
+
+    Args:
+        sort: str. The sort order for coordinator counts.
+
+    Returns:
+        list(TranslationCoordinatorStats). TranslationCoordinatorStats domain
+        objects corresponding to the supplied user.
+    """
+    model_class = suggestion_models.TranslationCoordinatorsModel
+    translation_coordinator_models: Sequence[
+        suggestion_models.TranslationCoordinatorsModel] = []
+    if sort == (
+        suggestion_models.SortChoices.SORT_KEY_INCREASING_COORDINATOR_COUNTS
+        .value):
+        translation_coordinator_models = (
+            model_class.query().order(
+                model_class.coordinators_count).fetch()
+        )
+    else:
+        translation_coordinator_models = (
+            suggestion_models.TranslationCoordinatorsModel.query().order(
+                -model_class.coordinators_count).fetch()
+        )
+    return [
+        user_domain.TranslationCoordinatorStats(
+            model.id,
+            model.coordinator_ids,
+            model.coordinators_count
+        )
+        for model in translation_coordinator_models
+    ]
+
+
+def get_translator_counts(language_code: str) -> int:
+    """Gets the count of translators corresponding to the given language code.
+
+    Args:
+        language_code: str. The language code of which translators count in
+            required.
+
+    Returns:
+        int. Number of translator counts.
+    """
+    model_class = (
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel)
+    return len(
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel
+        .query(model_class.language_code == language_code).fetch()
     )

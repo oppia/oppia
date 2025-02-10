@@ -20,9 +20,10 @@ require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require('interactions/GraphInput/directives/graph-input-validation.service.ts');
 require(
   'interactions/GraphInput/directives/' +
-  'oppia-interactive-graph-input.component.ts');
-require(
-  'interactions/GraphInput/directives/oppia-response-graph-input.component.ts');
+    'oppia-interactive-graph-input.component.ts'
+);
+require('interactions/GraphInput/directives/oppia-response-graph-input.component.ts');
 require(
   'interactions/GraphInput/directives/' +
-  'oppia-short-response-graph-input.component.ts');
+    'oppia-short-response-graph-input.component.ts'
+);

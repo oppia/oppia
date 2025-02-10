@@ -16,14 +16,14 @@
  * @fileoverview Component for revert exploration modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
+import {CheckRevertService} from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
 
 @Component({
   selector: 'oppia-check-revert-exploration-modal',
-  templateUrl: './check-revert-exploration-modal.component.html'
+  templateUrl: './check-revert-exploration-modal.component.html',
 })
 export class CheckRevertExplorationModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -39,7 +39,7 @@ export class CheckRevertExplorationModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.checkRevertService.detailsEventEmitter.subscribe((details) => {
+    this.checkRevertService.detailsEventEmitter.subscribe(details => {
       this.details = details;
     });
   }

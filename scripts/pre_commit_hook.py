@@ -29,20 +29,25 @@ but it will have no effect.
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import shutil
 import subprocess
 import sys
 
-from typing import Final, List, Optional, Tuple
-
-# TODO(#15567): The order can be fixed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
+# When executing Python scripts using `python -m ...` from oppia/oppia,
+# Python adds the repository root to sys.path. See the documentation at
+#
+#   https://docs.python.org/3.9/library/sys.html#sys.path
+#
+# However, when git executes pre_commit_hook.py from its symlink in
+# /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
+# causes the python interpreter to execute this hook directly rather than
+# as a discovered module. So, Python instead adds /.git/hooks to sys.path,
+# rather than the opipa/oppia root. To correct this problem, we add the
+# current working directory to sys.path.
 sys.path.append(os.getcwd())
-from scripts import common  # isort:skip # pylint: disable=wrong-import-position
-from core import utils  # isort:skip # pylint: disable=wrong-import-position
+from core import feconf  # isort:skip # pylint: disable=wrong-import-position
+from typing import Final, List, Optional, Tuple  # isort:skip  # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
@@ -50,16 +55,17 @@ RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
     '.', 'assets', 'release_constants.json')
 KEYS_UPDATED_IN_FECONF: Final = [
     b'ADMIN_EMAIL_ADDRESS',
-    b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
-    b'CAN_SEND_EDITOR_ROLE_EMAILS', b'CAN_SEND_FEEDBACK_MESSAGE_EMAILS',
-    b'CAN_SEND_SUBSCRIPTION_EMAILS', b'DEFAULT_EMAIL_UPDATES_PREFERENCE',
-    b'REQUIRE_EMAIL_ON_MODERATOR_ACTION', b'EMAIL_SERVICE_PROVIDER',
-    b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME']
+    b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS',
+    b'SERVER_CAN_SEND_EMAILS', b'CAN_SEND_TRANSACTIONAL_EMAILS',
+    b'EMAIL_SERVICE_PROVIDER', b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME'
+]
 KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'SITE_FEEDBACK_FORM_URL', b'FIREBASE_CONFIG_API_KEY',
     b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
     b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
     b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
+NPX_CMD: Final = 'npx' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
 
 
 def install_hook() -> None:
@@ -94,13 +100,11 @@ def install_hook() -> None:
             print('Copied file to .git/hooks directory')
 
     print('Making pre-commit hook file executable ...')
-    if not common.is_windows_os():
-        _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
-
-        if not err_chmod_cmd:
-            print('pre-commit hook file is now executable!')
-        else:
-            raise ValueError(err_chmod_cmd)
+    _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
+    if not err_chmod_cmd:
+        print('pre-commit hook file is now executable!')
+    else:
+        raise ValueError(err_chmod_cmd)
 
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
@@ -186,25 +190,9 @@ def check_changes_in_config() -> None:
                 CONSTANTS_FILEPATH))
 
 
-def check_changes_in_gcloud_path() -> None:
-    """Checks that the gcloud path in common.py matches with the path in
-    release_constants.json.
-
-    Raises:
-        Exception. The gcloud path in common.py does not match with the path
-            in release_constants.json.
-    """
-    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
-        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
-
-    if not (
-            os.path.exists(release_constants_gcloud_path) and
-            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
-    ):
-        raise Exception(
-            'The gcloud path in common.py: %s should match the path in '
-            'release_constants.json: %s. Please fix.' % (
-                common.GCLOUD_PATH, release_constants_gcloud_path))
+def run_prettier() -> None:
+    """Runs prettier formatter."""
+    subprocess.run([NPX_CMD, 'lint-staged'], check=True)
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -222,8 +210,6 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    print('Running pre-commit check for gcloud path changes...')
-    check_changes_in_gcloud_path()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
@@ -237,6 +223,9 @@ def main(args: Optional[List[str]] = None) -> None:
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
+    print('Running prettier ...')
+    run_prettier()
+
     return
 
 

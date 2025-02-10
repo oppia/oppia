@@ -17,14 +17,16 @@
  */
 
 require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
-require(
-  'interactions/NumericInput/directives/numeric-input-validation.service.ts');
-require(
-  'interactions/NumericInput/directives/' +
-  'oppia-interactive-numeric-input.component.ts');
+require('interactions/NumericInput/directives/numeric-input-validation.service.ts');
 require(
   'interactions/NumericInput/directives/' +
-  'oppia-response-numeric-input.component.ts');
+    'oppia-interactive-numeric-input.component.ts'
+);
 require(
   'interactions/NumericInput/directives/' +
-  'oppia-short-response-numeric-input.component.ts');
+    'oppia-response-numeric-input.component.ts'
+);
+require(
+  'interactions/NumericInput/directives/' +
+    'oppia-short-response-numeric-input.component.ts'
+);

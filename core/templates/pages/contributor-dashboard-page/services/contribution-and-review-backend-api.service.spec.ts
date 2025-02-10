@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for contribution and review backend api service.
  */
 
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { ContributionAndReviewBackendApiService }
-  from './contribution-and-review-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {ContributionAndReviewBackendApiService} from './contribution-and-review-backend-api.service';
 
 describe('Contribution and review backend API service', () => {
   let carbas: ContributionAndReviewBackendApiService;
@@ -37,9 +38,7 @@ describe('Contribution and review backend API service', () => {
     skill_description: 'skill_description_1',
   };
   const suggestionsBackendObject = {
-    suggestions: [
-      suggestion1
-    ],
+    suggestions: [suggestion1],
     target_id_to_opportunity_dict: {
       skill_id_1: opportunityDict1,
     },
@@ -47,7 +46,7 @@ describe('Contribution and review backend API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     carbas = TestBed.inject(ContributionAndReviewBackendApiService);
     http = TestBed.inject(HttpTestingController);
@@ -68,122 +67,147 @@ describe('Contribution and review backend API service', () => {
 
     it('should fetch submitted question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
-      const url = '/getsubmittedsuggestions/skill/add_question' +
-      '?limit=10&offset=0&sort_key=Date';
+      const url =
+        '/getsubmittedsuggestions/skill/add_question' +
+        '?limit=10&offset=0&sort_key=Date';
 
-      carbas.fetchSuggestionsAsync(
-        'SUBMITTED_QUESTION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        'All'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchSuggestionsAsync(
+          'SUBMITTED_QUESTION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'All',
+          null
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
-      expect(carbas.fetchSubmittedSuggestionsAsync)
-        .toHaveBeenCalledWith(
-          'skill', 'add_question',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0,
-          AppConstants.SUGGESTIONS_SORT_KEY_DATE);
+      expect(carbas.fetchSubmittedSuggestionsAsync).toHaveBeenCalledWith(
+        'skill',
+        'add_question',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0,
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch submitted translation suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchSubmittedSuggestionsAsync').and.callThrough();
-      const url = '/getsubmittedsuggestions/exploration/translate_content' +
-      '?limit=10&offset=0&sort_key=Date';
+      const url =
+        '/getsubmittedsuggestions/exploration/translate_content' +
+        '?limit=10&offset=0&sort_key=Date';
 
-      carbas.fetchSuggestionsAsync(
-        'SUBMITTED_TRANSLATION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        'All'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchSuggestionsAsync(
+          'SUBMITTED_TRANSLATION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'All',
+          null
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
-      expect(carbas.fetchSubmittedSuggestionsAsync)
-        .toHaveBeenCalledWith(
-          'exploration', 'translate_content',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE, 0,
-          AppConstants.SUGGESTIONS_SORT_KEY_DATE);
+      expect(carbas.fetchSubmittedSuggestionsAsync).toHaveBeenCalledWith(
+        'exploration',
+        'translate_content',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0,
+        AppConstants.SUGGESTIONS_SORT_KEY_DATE
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch reviewable question suggestions', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/skill/add_question' +
-      '?limit=10&offset=0&sort_key=Date';
+      const url =
+        '/getreviewablesuggestions/skill/add_question' +
+        '?offset=0&sort_key=Date&limit=10&topic_name=specifiedTopic';
 
-      carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_QUESTION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchSuggestionsAsync(
+          'REVIEWABLE_QUESTION_SUGGESTIONS',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          null,
+          'specifiedTopic'
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
-      expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith(
-          'skill',
-          'add_question',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE,
-          0,
-          'Date'
-        );
+      expect(carbas.fetchReviewableSuggestionsAsync).toHaveBeenCalledWith(
+        'skill',
+        'add_question',
+        AppConstants.OPPORTUNITIES_PAGE_SIZE,
+        0,
+        'Date',
+        null,
+        'specifiedTopic'
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch reviewable suggestions from exp1', fakeAsync(() => {
       spyOn(carbas, 'fetchReviewableSuggestionsAsync').and.callThrough();
-      const url = '/getreviewablesuggestions/exploration/translate_content' +
-      '?limit=10&offset=0&sort_key=Date&exploration_id=exp1';
+      const url =
+        '/getreviewablesuggestions/exploration/translate_content' +
+        '?offset=0&sort_key=Date&exploration_id=exp1';
 
-      carbas.fetchSuggestionsAsync(
-        'REVIEWABLE_TRANSLATION_SUGGESTIONS',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        explorationId
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchSuggestionsAsync(
+          'REVIEWABLE_TRANSLATION_SUGGESTIONS',
+          null,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          explorationId,
+          null
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(suggestionsBackendObject);
       flushMicrotasks();
 
-      expect(carbas.fetchReviewableSuggestionsAsync)
-        .toHaveBeenCalledWith(
-          'exploration',
-          'translate_content',
-          AppConstants.OPPORTUNITIES_PAGE_SIZE,
-          0,
-          'Date',
-          explorationId
-        );
+      expect(carbas.fetchReviewableSuggestionsAsync).toHaveBeenCalledWith(
+        'exploration',
+        'translate_content',
+        null,
+        0,
+        'Date',
+        explorationId,
+        null
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should throw error if fetch type is invalid', fakeAsync(() => {
-      carbas.fetchSuggestionsAsync(
-        'INVALID_SUGGESTION_TYPE',
-        AppConstants.OPPORTUNITIES_PAGE_SIZE,
-        0,
-        AppConstants.SUGGESTIONS_SORT_KEY_DATE,
-        'All'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchSuggestionsAsync(
+          'INVALID_SUGGESTION_TYPE',
+          AppConstants.OPPORTUNITIES_PAGE_SIZE,
+          0,
+          AppConstants.SUGGESTIONS_SORT_KEY_DATE,
+          'All',
+          null
+        )
+        .then(successHandler, failureHandler);
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -198,10 +222,11 @@ describe('Contribution and review backend API service', () => {
     const putBody = {
       action: 'accept',
       review_message: 'test review message',
-      commit_message: 'test commit message'
+      commit_message: 'test commit message',
     };
 
-    carbas.reviewExplorationSuggestionAsync('abc', 'pqr', putBody)
+    carbas
+      .reviewExplorationSuggestionAsync('abc', 'pqr', putBody)
       .then(successHandler, failureHandler);
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('PUT');
@@ -219,10 +244,11 @@ describe('Contribution and review backend API service', () => {
     const putBody = {
       action: 'accept',
       review_message: 'test review message',
-      skill_difficulty: 'easy'
+      skill_difficulty: 'easy',
     };
 
-    carbas.reviewSkillSuggestionAsync('abc', 'pqr', putBody)
+    carbas
+      .reviewSkillSuggestionAsync('abc', 'pqr', putBody)
       .then(successHandler, failureHandler);
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('PUT');
@@ -238,10 +264,11 @@ describe('Contribution and review backend API service', () => {
     const failureHandler = jasmine.createSpy('failure');
     const url = '/updatetranslationsuggestionhandler/abc';
     const putBody = {
-      translation_html: '<p>In English</p>'
+      translation_html: '<p>In English</p>',
     };
 
-    carbas.updateTranslationSuggestionAsync('abc', putBody)
+    carbas
+      .updateTranslationSuggestionAsync('abc', putBody)
       .then(successHandler, failureHandler);
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('PUT');
@@ -260,13 +287,13 @@ describe('Contribution and review backend API service', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
-          default_outcome: {}
-        }
+          default_outcome: {},
+        },
       },
       interaction: {
         answer_groups: [],
@@ -275,20 +302,20 @@ describe('Contribution and review backend API service', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
+              unicode_str: '',
+            },
           },
-          rows: { value: 1 },
+          rows: {value: 1},
           catchMisspellings: {
-            value: false
-          }
+            value: false,
+          },
         },
         default_outcome: {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
           },
           labelled_as_correct: false,
           param_changes: [],
@@ -301,10 +328,10 @@ describe('Contribution and review backend API service', () => {
           correct_answer: 'answer',
           explanation: {
             content_id: 'solution',
-            html: '<p>This is an explanation.</p>'
-          }
+            html: '<p>This is an explanation.</p>',
+          },
         },
-        id: 'TextInput'
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
@@ -313,12 +340,13 @@ describe('Contribution and review backend API service', () => {
     };
     const payload = {
       skill_difficulty: 'easy',
-      question_state_data: questionStateData
+      question_state_data: questionStateData,
     };
     const postBody = new FormData();
     postBody.append('payload', JSON.stringify(payload));
 
-    carbas.updateQuestionSuggestionAsync('abc', postBody)
+    carbas
+      .updateQuestionSuggestionAsync('abc', postBody)
       .then(successHandler, failureHandler);
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('POST');
@@ -333,29 +361,38 @@ describe('Contribution and review backend API service', () => {
     spyOn(carbas, 'downloadContributorCertificateAsync').and.callThrough();
     const successHandler = jasmine.createSpy('success');
     const failureHandler = jasmine.createSpy('failure');
-    const url = (
+    const url =
       '/contributorcertificate/user/translate_content?' +
-      'from_date=2022-01-01&to_date=2022-01-02&language=hi'
-    );
+      'from_date=2022-01-01&to_date=2022-01-02&language=hi';
     const response = {
       from_date: '1 Nov 2022',
       to_date: '1 Dec 2022',
       contribution_hours: 1.0,
       team_lead: 'Test User',
-      language: 'Hindi'
+      language: 'Hindi',
     };
 
-    carbas.downloadContributorCertificateAsync(
-      'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02'
-    ).then(successHandler, failureHandler);
+    carbas
+      .downloadContributorCertificateAsync(
+        'user',
+        'translate_content',
+        'hi',
+        '2022-01-01',
+        '2022-01-02'
+      )
+      .then(successHandler, failureHandler);
     const req = http.expectOne(url);
     expect(req.request.method).toEqual('GET');
     req.flush(response);
     flushMicrotasks();
 
-    expect(carbas.downloadContributorCertificateAsync)
-      .toHaveBeenCalledWith(
-        'user', 'translate_content', 'hi', '2022-01-01', '2022-01-02');
+    expect(carbas.downloadContributorCertificateAsync).toHaveBeenCalledWith(
+      'user',
+      'translate_content',
+      'hi',
+      '2022-01-01',
+      '2022-01-02'
+    );
     expect(successHandler).toHaveBeenCalled();
     expect(failureHandler).not.toHaveBeenCalled();
   }));

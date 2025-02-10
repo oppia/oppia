@@ -18,16 +18,21 @@
 
 require(
   'interactions/MathEquationInput/directives/' +
-  'math-equation-input-rules.service.ts');
+    'math-equation-input-rules.service.ts'
+);
 require(
   'interactions/MathEquationInput/directives/' +
-  'math-equation-input-validation.service.ts');
+    'math-equation-input-validation.service.ts'
+);
 require(
   'interactions/MathEquationInput/directives/' +
-  'oppia-interactive-math-equation-input.component.ts');
+    'oppia-interactive-math-equation-input.component.ts'
+);
 require(
   'interactions/MathEquationInput/directives/' +
-  'oppia-response-math-equation-input.component.ts');
+    'oppia-response-math-equation-input.component.ts'
+);
 require(
   'interactions/MathEquationInput/directives/' +
-  'oppia-short-response-math-equation-input.component.ts');
+    'oppia-short-response-math-equation-input.component.ts'
+);

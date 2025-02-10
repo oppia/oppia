@@ -16,17 +16,16 @@
  * @fileoverview Module for the profile page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ProfilePageNavbarComponent } from
-  'pages/profile-page/profile-page-navbar.component';
-import { ProfilePageComponent } from './profile-page.component';
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { ProfilePageRootComponent } from './profile-page-root.component';
-import { CommonModule } from '@angular/common';
-import { ProfilePageRoutingModule } from './profile-page-routing.module';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ProfilePageNavbarComponent} from 'pages/profile-page/profile-page-navbar.component';
+import {ProfilePageComponent} from './profile-page.component';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {ProfilePageRootComponent} from './profile-page-root.component';
+import {CommonModule} from '@angular/common';
+import {ProfilePageRoutingModule} from './profile-page-routing.module';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -37,17 +36,17 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     // migrated to angular router.
     SmartRouterModule,
     ProfilePageRoutingModule,
-    Error404PageModule
+    Error404PageModule,
   ],
   declarations: [
     ProfilePageNavbarComponent,
     ProfilePageComponent,
-    ProfilePageRootComponent
+    ProfilePageRootComponent,
   ],
   entryComponents: [
     ProfilePageNavbarComponent,
     ProfilePageComponent,
-    ProfilePageRootComponent
-  ]
+    ProfilePageRootComponent,
+  ],
 })
 export class ProfilePageModule {}

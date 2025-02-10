@@ -17,38 +17,41 @@
  * editor page.
  */
 
-
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ParamChange, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { ExplorationParams, LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
-import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
-import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { ExplorationDataService } from '../services/exploration-data.service';
-import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
-import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { GraphDataService } from '../services/graph-data.service';
-import { ParameterMetadataService } from '../services/parameter-metadata.service';
-import { RouterService } from '../services/router.service';
-import { PreviewSetParametersModalComponent } from './templates/preview-set-parameters-modal.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {
+  ParamChange,
+  ParamChangeObjectFactory,
+} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {
+  ExplorationParams,
+  LearnerParamsService,
+} from 'pages/exploration-player-page/services/learner-params.service';
+import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {ExplorationDataService} from '../services/exploration-data.service';
+import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
+import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {GraphDataService} from '../services/graph-data.service';
+import {ParameterMetadataService} from '../services/parameter-metadata.service';
+import {RouterService} from '../services/router.service';
+import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 @Component({
   selector: 'oppia-preview-tab',
-  templateUrl: './preview-tab.component.html'
+  templateUrl: './preview-tab.component.html',
 })
-export class PreviewTabComponent
-  implements OnInit, OnDestroy {
+export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   // These properties below are initialized using Angular lifecycle hooks
@@ -57,11 +60,11 @@ export class PreviewTabComponent
   previewWarning!: string;
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
+  voiceoversAreLoaded: boolean = false;
 
   constructor(
     private contextService: ContextService,
-    private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationDataService: ExplorationDataService,
     private explorationEngineService: ExplorationEngineService,
     private explorationFeaturesService: ExplorationFeaturesService,
@@ -75,23 +78,26 @@ export class PreviewTabComponent
     private numberAttemptsService: NumberAttemptsService,
     private paramChangeObjectFactory: ParamChangeObjectFactory,
     private parameterMetadataService: ParameterMetadataService,
-    private playerCorrectnessFeedbackEnabledService:
-      PlayerCorrectnessFeedbackEnabledService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory
-  ) { }
+    private paramChangesObjectFactory: ParamChangesObjectFactory,
+    private entityVoiceoversService: EntityVoiceoversService
+  ) {}
 
   getManualParamChanges(
-      initStateNameForPreview: string): Promise<ParamChange[]> {
-    let unsetParametersInfo = this.parameterMetadataService
-      .getUnsetParametersInfo([initStateNameForPreview]);
+    initStateNameForPreview: string
+  ): Promise<ParamChange[]> {
+    let unsetParametersInfo =
+      this.parameterMetadataService.getUnsetParametersInfo([
+        initStateNameForPreview,
+      ]);
 
     // Construct array to hold required parameter changes.
     let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
       let newParamChange = this.paramChangeObjectFactory.createEmpty(
-        unsetParametersInfo[i].paramName);
+        unsetParametersInfo[i].paramName
+      );
       manualParamChanges.push(newParamChange);
     }
 
@@ -108,54 +114,66 @@ export class PreviewTabComponent
   showParameterSummary(): boolean {
     return (
       this.explorationFeaturesService.areParametersEnabled() &&
-      !isEqual({}, this.allParams));
+      !isEqual({}, this.allParams)
+    );
   }
 
   showSetParamsModal(
-      manualParamChanges: ParamChange[],
-      callback: Function
+    manualParamChanges: ParamChange[],
+    callback: Function
   ): void {
     const modalRef = this.ngbModal.open(PreviewSetParametersModalComponent, {
       backdrop: 'static',
       windowClass: 'oppia-preview-set-params-modal',
     });
     modalRef.componentInstance.manualParamChanges = manualParamChanges;
-    modalRef.result.then(() => {
-      if (callback) {
-        callback();
+    modalRef.result.then(
+      () => {
+        if (callback) {
+          callback();
+        }
+      },
+      () => {
+        this.routerService.navigateToMainTab(null);
       }
-    }, () => {
-      this.routerService.navigateToMainTab(null);
-    });
+    );
   }
 
   loadPreviewState(
-      stateName: string[] | string,
-      manualParamChanges: ParamChange[] | string[] | string): void {
+    stateName: string[] | string,
+    manualParamChanges: ParamChange[] | string[] | string
+  ): void {
     this.explorationEngineService.initSettingsFromEditor(
-      stateName as string, manualParamChanges as ParamChange[]);
+      stateName as string,
+      manualParamChanges as ParamChange[]
+    );
     this.isExplorationPopulated = true;
   }
 
   resetPreview(): void {
     this.previewWarning = '';
     this.isExplorationPopulated = false;
-    const initStateNameForPreview = (
-      this.explorationInitStateNameService.savedMemento);
+    const initStateNameForPreview =
+      this.explorationInitStateNameService.savedMemento;
     setTimeout(() => {
       const explorationId = this.contextService.getExplorationId();
 
-      this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
-        explorationId).then((returnDict) => {
-        this.explorationEngineService.init(
-          returnDict, 0, null, false, [], [],
-          () => {
-            this.loadPreviewState(initStateNameForPreview, []);
-          });
-        this.playerCorrectnessFeedbackEnabledService.init(
-          returnDict.correctness_feedback_enabled);
-        this.numberAttemptsService.reset();
-      });
+      this.editableExplorationBackendApiService
+        .fetchApplyDraftExplorationAsync(explorationId)
+        .then(returnDict => {
+          this.explorationEngineService.init(
+            returnDict,
+            0,
+            null,
+            false,
+            [],
+            [],
+            () => {
+              this.loadPreviewState(initStateNameForPreview, []);
+            }
+          );
+          this.numberAttemptsService.reset();
+        });
     }, 200);
   }
 
@@ -165,9 +183,10 @@ export class PreviewTabComponent
     // change when toggling between editor and preview.
     this.directiveSubscriptions.add(
       this.explorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
-        (stateName) => {
+        stateName => {
           this.stateEditorService.setActiveStateName(stateName);
-        })
+        }
+      )
     );
 
     this.directiveSubscriptions.add(
@@ -179,37 +198,44 @@ export class PreviewTabComponent
     this.isExplorationPopulated = false;
 
     this.explorationDataService
-      .getDataAsync(
-        () => {}
-      ).then(async(explorationData) => {
-      // TODO(#13564): Remove this part of code and make sure that this
-      // function is executed only after the Promise in initExplorationPage
-      // is fully finished.
+      .getDataAsync(() => {})
+      .then(async explorationData => {
+        // TODO(#13564): Remove this part of code and make sure that this
+        // function is executed only after the Promise in initExplorationPage
+        // is fully finished.
         if (!this.explorationParamChangesService.savedMemento) {
           this.explorationParamChangesService.init(
             this.paramChangesObjectFactory.createFromBackendList(
-              explorationData.param_changes));
+              explorationData.param_changes
+            )
+          );
           this.explorationStatesService.init(explorationData.states, false);
           this.explorationInitStateNameService.init(
-            explorationData.init_state_name);
+            explorationData.init_state_name
+          );
           this.graphDataService.recompute();
           let stateName = this.stateEditorService.getActiveStateName();
           if (
-            !stateName || !this.explorationStatesService.getState(stateName)
+            !stateName ||
+            !this.explorationStatesService.getState(stateName)
           ) {
             this.stateEditorService.setActiveStateName(
-              this.explorationInitStateNameService.displayed as string);
+              this.explorationInitStateNameService.displayed as string
+            );
           }
         }
-        let initStateNameForPreview = (
-          this.stateEditorService.getActiveStateName());
+        let initStateNameForPreview =
+          this.stateEditorService.getActiveStateName();
 
         // Show a warning message if preview doesn't start from the first
         // state.
-        if (initStateNameForPreview && initStateNameForPreview !==
-                this.explorationInitStateNameService.savedMemento) {
+        if (
+          initStateNameForPreview &&
+          initStateNameForPreview !==
+            this.explorationInitStateNameService.savedMemento
+        ) {
           this.previewWarning =
-                'Preview started from \"' + initStateNameForPreview + '\"';
+            'Preview started from "' + initStateNameForPreview + '"';
         } else {
           this.previewWarning = '';
         }
@@ -218,13 +244,27 @@ export class PreviewTabComponent
           // Prompt user to enter any unset parameters, then populate
           // exploration.
           this.getManualParamChanges(initStateNameForPreview).then(
-            (manualParamChanges) => {
+            manualParamChanges => {
               if (initStateNameForPreview) {
                 this.loadPreviewState(
-                  initStateNameForPreview, manualParamChanges);
+                  initStateNameForPreview,
+                  manualParamChanges
+                );
               }
-            });
+            }
+          );
         }
+
+        this.entityVoiceoversService.init(
+          this.contextService.getExplorationId(),
+          'exploration',
+          explorationData.version as number,
+          explorationData.language_code
+        );
+
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.voiceoversAreLoaded = true;
+        });
       });
   }
 
@@ -232,8 +272,3 @@ export class PreviewTabComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaPreviewTab',
-  downgradeComponent({
-    component: PreviewTabComponent
-  }) as angular.IDirectiveFactory);

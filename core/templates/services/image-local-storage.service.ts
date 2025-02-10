@@ -16,12 +16,12 @@
  * @fileoverview Service for managing images in localStorage.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AlertsService } from 'services/alerts.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AlertsService} from 'services/alerts.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 export interface ImagesData {
   filename: string;
@@ -31,7 +31,7 @@ export interface ImagesData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ImageLocalStorageService {
   storedImageFilenames: string[] = [];
@@ -39,7 +39,7 @@ export class ImageLocalStorageService {
   // minimum limit, for all browsers, per hostname, that can be stored in
   // sessionStorage and 100kB is the max size limit for uploaded images, hence
   // the limit below.
-  MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
+  MAX_IMAGES_STORABLE: number = (5 * 1024) / 100;
   // 'null' value here represents that either image is not present in local
   // storage or ImageData has been flushed.
   thumbnailBgColor: string | null = null;
@@ -47,7 +47,8 @@ export class ImageLocalStorageService {
   constructor(
     private alertsService: AlertsService,
     private imageUploadHelperService: ImageUploadHelperService,
-    private windowRef: WindowRef) {}
+    private windowRef: WindowRef
+  ) {}
 
   // Function returns null if filename doesn't exist in local storage.
   getRawImageData(filename: string): string | null {
@@ -66,7 +67,8 @@ export class ImageLocalStorageService {
       // local storage would no longer be used.
       this.alertsService.addInfoMessage(
         'Image storage limit reached. More images can be added after ' +
-        'creation.');
+          'creation.'
+      );
       return;
     }
     this.windowRef.nativeWindow.sessionStorage.setItem(filename, rawImage);
@@ -86,7 +88,9 @@ export class ImageLocalStorageService {
         filename: this.storedImageFilenames[idx],
         imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
           this.windowRef.nativeWindow.sessionStorage.getItem(
-            this.storedImageFilenames[idx]))
+            this.storedImageFilenames[idx]
+          )
+        ),
       });
     }
     return returnData;
@@ -112,9 +116,9 @@ export class ImageLocalStorageService {
   }
 
   async getFilenameToBase64MappingAsync(
-      imagesData: ImagesData[]
+    imagesData: ImagesData[]
   ): Promise<Record<string, string>> {
-    let filesToBase64Mapping: { [key: string]: string } = {};
+    let filesToBase64Mapping: {[key: string]: string} = {};
     if (imagesData.length > 0) {
       for await (const obj of imagesData) {
         if (obj.imageBlob === null) {
@@ -128,7 +132,7 @@ export class ImageLocalStorageService {
   }
 
   private async _blobtoBase64(blob: Blob): Promise<string> {
-    return new Promise<string> ((resolve, reject)=> {
+    return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         // Read the base64 data from result.
@@ -149,5 +153,9 @@ export class ImageLocalStorageService {
   }
 }
 
-angular.module('oppia').factory(
-  'ImageLocalStorageService', downgradeInjectable(ImageLocalStorageService));
+angular
+  .module('oppia')
+  .factory(
+    'ImageLocalStorageService',
+    downgradeInjectable(ImageLocalStorageService)
+  );

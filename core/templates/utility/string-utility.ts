@@ -18,9 +18,7 @@
 
 export default function camelCaseFromHyphen(str: string): string {
   const newStr = str.replace(/[\])}[{(]/g, '');
-  return newStr.replace(
-    /-([a-z])/g,
-    function(g) {
-      return g[1].toUpperCase();
-    });
+  return newStr.replace(/-([a-z])/g, function (g) {
+    return g[1].toUpperCase();
+  });
 }

@@ -16,90 +16,49 @@
  * @fileoverview Module for the diagnostic test player page.
  */
 
-
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module';
-
-
-declare var angular: ng.IAngularStatic;
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {SummaryTilesModule} from 'components/summary-tile/summary-tile.module';
+import {DiagnosticTestPlayerPageRootComponent} from './diagnostic-test-player-page-root.component';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-auth.guard';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
+    CommonModule,
     FormsModule,
-    HttpClientModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
     SummaryTilesModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DiagnosticTestPlayerPageRootComponent,
+        canActivate: [DiagnosticTestPlayerPageAuthGuard],
+      },
+    ]),
   ],
   declarations: [
+    DiagnosticTestPlayerPageRootComponent,
     DiagnosticTestPlayerComponent,
   ],
   entryComponents: [
+    DiagnosticTestPlayerPageRootComponent,
     DiagnosticTestPlayerComponent,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ],
 })
-class DiagnosticTestPlayerPageModule implements DoBootstrap {
-  ngDoBootstrap() {}
-}
-
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(DiagnosticTestPlayerPageModule);
-}));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}));
+export class DiagnosticTestPlayerPageModule {}

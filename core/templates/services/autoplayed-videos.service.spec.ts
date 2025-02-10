@@ -15,7 +15,7 @@
  * @fileoverview Unit tests for AutoplayedVideosService.
  */
 
-import { AutoplayedVideosService } from 'services/autoplayed-videos.service';
+import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
 
 describe('AutoplayedVideosService', () => {
   let autoplayedVideosService: AutoplayedVideosService;
@@ -26,12 +26,14 @@ describe('AutoplayedVideosService', () => {
 
   it('should add video to a list of autoplayed videos', () => {
     autoplayedVideosService.addAutoplayedVideo('Ntcw0H0hwPU');
-    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
-      toBe(true);
+    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).toBe(
+      true
+    );
   });
 
   it('should test video not yet played', () => {
-    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).
-      toBe(false);
+    expect(autoplayedVideosService.hasVideoBeenAutoplayed('Ntcw0H0hwPU')).toBe(
+      false
+    );
   });
 });

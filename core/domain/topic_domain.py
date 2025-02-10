@@ -31,7 +31,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
 
-from typing import List, Literal, Optional, TypedDict
+from typing import Dict, List, Literal, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -133,7 +133,7 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
         TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
-        TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+        TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST,
     ]
 
     # The allowed list of subtopic properties which can be used in
@@ -2244,8 +2244,21 @@ class TopicSummaryDict(TypedDict):
     total_published_node_count: int
     thumbnail_filename: Optional[str]
     thumbnail_bg_color: Optional[str]
+    published_story_exploration_mapping: Dict[str, List[str]]
     topic_model_created_on: float
     topic_model_last_updated: float
+
+
+class FrontendTopicSummaryDict(TopicSummaryDict):
+    """Dictionary that represents TopicSummary domain object for frontend."""
+
+    is_published: bool
+    can_edit_topic: bool
+    classroom: Optional[str]
+    total_upcoming_chapters_count: int
+    total_overdue_chapters_count: int
+    total_chapter_counts_for_each_story: List[int]
+    published_chapter_counts_for_each_story: List[int]
 
 
 class TopicSummary:
@@ -2268,6 +2281,7 @@ class TopicSummary:
         thumbnail_filename: Optional[str],
         thumbnail_bg_color: Optional[str],
         url_fragment: str,
+        published_story_exploration_mapping: Dict[str, List[str]],
         topic_model_created_on: datetime.datetime,
         topic_model_last_updated: datetime.datetime
     ) -> None:
@@ -2297,6 +2311,10 @@ class TopicSummary:
                 thumbnail, or None if no background color provided for
                 the thumbnail.
             url_fragment: str. The url fragment of the topic.
+            published_story_exploration_mapping: dict(str, list(str)). The
+                mappings' keys are the ids of published stories owned by the
+                topic and each key maps to a list of the story's linked
+                exploration ids.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -2319,6 +2337,8 @@ class TopicSummary:
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
         self.url_fragment = url_fragment
+        self.published_story_exploration_mapping = (
+            published_story_exploration_mapping)
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
@@ -2423,6 +2443,8 @@ class TopicSummary:
             'total_published_node_count': self.total_published_node_count,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'published_story_exploration_mapping': (
+                self.published_story_exploration_mapping),
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(
@@ -2462,3 +2484,33 @@ class TopicRights:
             bool. Whether user is a topic manager of this topic.
         """
         return bool(user_id in self.manager_ids)
+
+
+class TopicChapterCounts:
+    """Domain object for chapter counts in a topic."""
+
+    def __init__(
+        self,
+        total_upcoming_chapters_count: int,
+        total_overdue_chapters_count: int,
+        total_chapter_counts_for_each_story: List[int],
+        published_chapter_counts_for_each_story: List[int]
+    ) -> None:
+        """Constructs a TopicChapterCounts domain object.
+
+        Args:
+            total_upcoming_chapters_count: int. Total number of upcoming
+                chapters in all the stories of the topic.
+            total_overdue_chapters_count: int. Total number of behind-schedule
+                chapters in all the stories of the topic.
+            total_chapter_counts_for_each_story: list(int). List of total
+                chapters in each story of the topic.
+            published_chapter_counts_for_each_story: list(int). List of
+                number of published chapters in each story of the topic.
+        """
+        self.total_upcoming_chapters_count = total_upcoming_chapters_count
+        self.total_overdue_chapters_count = total_overdue_chapters_count
+        self.total_chapter_counts_for_each_story = (
+            total_chapter_counts_for_each_story)
+        self.published_chapter_counts_for_each_story = (
+            published_chapter_counts_for_each_story)

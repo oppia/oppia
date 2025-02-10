@@ -1,44 +1,3 @@
-interface KNN {
-  'occurrence': number;
-  'K': number;
-  'T': number;
-  'top': number;
-  'fingerprint_data': {
-    [key: number]: {
-      class: number;
-      fingerprint: number[][];
-    };
-  };
-  'token_to_id': {
-    [key: string]: number;
-  };
-}
-
-interface KernelParams {
-  kernel: string;
-  coef0: number;
-  degree: number;
-  gamma: number;
-}
-
-interface SVM {
-  'classes': number[];
-  'kernel_params': KernelParams;
-  'intercept': number[];
-  'n_support': number[];
-  'probA': number[];
-  'support_vectors': number[][];
-  'probB': number[];
-  'dual_coef': number[][];
-}
-
-type ClassifierAccuracyTest = {
-  'answer_group_index': number;
-  'answers': {
-    code: string;
-  }[];
-}[];
-
 interface Hashes {
   '/hash_test.html': string;
   '/path_test/hash_test.html': string;
@@ -60,27 +19,10 @@ interface InplaceReplaceTest {
 interface TestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
-      'html_content': string;
-      'expected_output': string;
-      'case': string;
+      html_content: string;
+      expected_output: string;
+      case: string;
     }[];
-  };
-}
-
-type TextClassifierResults = {
-  'answer_group_index': number;
-  'answers': string[];
-}[];
-
-interface TextInputClassifierData {
-  'best_params': {
-    kernel: string;
-    C: number;
-  };
-  'best_score': number;
-  'SVM': SVM;
-  'cv_vocabulary': {
-    [key: string]: number;
   };
 }
 
@@ -203,7 +145,4 @@ interface KarmaFixtures {
   'core/tests/data/hashes': Hashes;
   'core/tests/data/inplace_replace_test': InplaceReplaceTest;
   'core/tests/data/test_cases_for_rte': TestCasesRTE;
-  'core/tests/data/text_classifier_results': TextClassifierResults;
-  'core/tests/data/text_input_classifier_data': TextInputClassifierData;
-  'core/tests/data/text_input_training_data': TextClassifierResults;
 }

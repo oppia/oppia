@@ -12,25 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the skill prerequisite skills editor.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { SkillPrerequisiteSkillsEditorComponent } from './skill-prerequisite-skills-editor.component';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { AlertsService } from 'services/alerts.service';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { of } from 'rxjs';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SkillPrerequisiteSkillsEditorComponent} from './skill-prerequisite-skills-editor.component';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {AlertsService} from 'services/alerts.service';
+import {
+  TopicsAndSkillsDashboardBackendApiService,
+  TopicsAndSkillDashboardData,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {of} from 'rxjs';
 
 describe('Skill editor main tab Component', () => {
   let component: SkillPrerequisiteSkillsEditorComponent;
@@ -38,8 +46,7 @@ describe('Skill editor main tab Component', () => {
   let skillUpdateService: SkillUpdateService;
   let skillEditorStateService: SkillEditorStateService;
   let alertsService: AlertsService;
-  let topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService;
+  let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
   let skillObjectFactory: SkillObjectFactory;
@@ -52,12 +59,8 @@ describe('Skill editor main tab Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        SkillPrerequisiteSkillsEditorComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [SkillPrerequisiteSkillsEditorComponent],
       providers: [
         SkillUpdateService,
         SkillEditorStateService,
@@ -66,12 +69,12 @@ describe('Skill editor main tab Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
+            getResizeEvent: () => of(resizeEvent),
+          },
         },
-        NgbModal
+        NgbModal,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -82,8 +85,9 @@ describe('Skill editor main tab Component', () => {
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     alertsService = TestBed.inject(AlertsService);
-    topicsAndSkillsDashboardBackendApiService =
-      TestBed.inject(TopicsAndSkillsDashboardBackendApiService);
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService
+    );
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
@@ -96,7 +100,7 @@ describe('Skill editor main tab Component', () => {
       misconception_count: 3,
       worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
-      skill_model_last_updated: 1593138898626.193
+      skill_model_last_updated: 1593138898626.193,
     };
 
     let misconceptionDict1 = {
@@ -104,12 +108,12 @@ describe('Skill editor main tab Component', () => {
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
 
     const rubricDict = {
       difficulty: 'medium',
-      explanations: ['explanation']
+      explanations: ['explanation'],
     };
 
     const skillContentsDict = {
@@ -119,8 +123,8 @@ describe('Skill editor main tab Component', () => {
       },
       worked_examples: [],
       recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
+        voiceovers_mapping: {},
+      },
     };
 
     sampleSkill = skillObjectFactory.createFromBackendDict({
@@ -134,16 +138,14 @@ describe('Skill editor main tab Component', () => {
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
       superseding_skill_id: 'skill0',
-      all_questions_merged: true
+      all_questions_merged: true,
     });
 
     topicAndSkillsDashboardDataBackendDict = {
-      allClassroomNames: [
-        'math'
-      ],
+      allClassroomNames: ['math'],
       categorizedSkillsDict: {
         'Empty Topic': {
-          uncategorized: []
+          uncategorized: [],
         },
         'Dummy Topic 1': {
           uncategorized: [
@@ -155,8 +157,8 @@ describe('Skill editor main tab Component', () => {
               },
               getDescription(): string {
                 return this.description;
-              }
-            }
+              },
+            },
           ],
           'Dummy Subtopic Title': [
             {
@@ -167,10 +169,10 @@ describe('Skill editor main tab Component', () => {
               },
               getDescription(): string {
                 return this.description;
-              }
-            }
-          ]
-        }
+              },
+            },
+          ],
+        },
       },
       topicSummaries: [
         {
@@ -193,6 +195,10 @@ describe('Skill editor main tab Component', () => {
           additionalStoryCount: 0,
           topicModelLastUpdated: 1623851496406.582,
           thumbnailFilename: 'thumbnail_filename',
+          totalUpcomingChaptersCount: 1,
+          totalOverdueChaptersCount: 1,
+          totalChaptersCounts: [5, 4],
+          publishedChaptersCounts: [3, 4],
           getId(): string {
             return this.id;
           },
@@ -246,8 +252,20 @@ describe('Skill editor main tab Component', () => {
           },
           isTopicPublished(): boolean {
             return this.isPublished;
-          }
-        }
+          },
+          getTotalUpcomingChaptersCount(): number {
+            return this.totalUpcomingChaptersCount;
+          },
+          getTotalOverdueChaptersCount(): number {
+            return this.totalOverdueChaptersCount;
+          },
+          getTotalChaptersCounts(): number[] {
+            return this.totalChaptersCounts;
+          },
+          getPublishedChaptersCounts(): number[] {
+            return this.publishedChaptersCounts;
+          },
+        },
       ],
       canDeleteSkill: true,
       untriagedSkillSummaries: [
@@ -259,8 +277,8 @@ describe('Skill editor main tab Component', () => {
           skillModelLastUpdated: 1623851495022.942,
           workedExamplesCount: 0,
           id: '4P77sLaU14DE',
-          misconceptionCount: 0
-        }
+          misconceptionCount: 0,
+        },
       ],
       totalSkillCount: 3,
       canCreateTopic: true,
@@ -274,7 +292,7 @@ describe('Skill editor main tab Component', () => {
           skillModelLastUpdated: 1623851493737.808,
           workedExamplesCount: 0,
           id: 'BBB6dzfb5pPt',
-          misconceptionCount: 0
+          misconceptionCount: 0,
         },
         {
           version: 1,
@@ -284,24 +302,25 @@ describe('Skill editor main tab Component', () => {
           skillModelLastUpdated: 1623851494780.529,
           workedExamplesCount: 0,
           id: 'D1FdmljJNXdt',
-          misconceptionCount: 0
-        }
+          misconceptionCount: 0,
+        },
       ],
       canDeleteTopic: true,
     };
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
-    spyOn(topicsAndSkillsDashboardBackendApiService, 'fetchDashboardDataAsync')
-      .and.resolveTo(topicAndSkillsDashboardDataBackendDict);
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchDashboardDataAsync'
+    ).and.resolveTo(topicAndSkillsDashboardDataBackendDict);
 
     fixture.detectChanges();
   });
 
   it('should fetch skill when initialized', fakeAsync(() => {
-    spyOn(
-      skillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
+    spyOn(skillEditorStateService, 'getGroupedSkillSummaries').and.returnValue({
       current: [],
-      others: [skillSummaryDict]
+      others: [skillSummaryDict],
     });
 
     component.ngOnInit();
@@ -310,34 +329,39 @@ describe('Skill editor main tab Component', () => {
     expect(component.skill).toEqual(sampleSkill);
   }));
 
-  it('should remove skill id when calling \'removeSkillId\'', () => {
-    let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
-      .and.callThrough();
+  it("should remove skill id when calling 'removeSkillId'", () => {
+    let deleteSpy = spyOn(
+      skillUpdateService,
+      'deletePrerequisiteSkill'
+    ).and.callThrough();
 
     component.removeSkillId('xyz');
 
     expect(deleteSpy).toHaveBeenCalled();
   });
 
-  it('should return skill editor url when calling ' +
-    '\'getSkillEditorUrl\'', () => {
-    let result = component.getSkillEditorUrl('skillId');
+  it(
+    'should return skill editor url when calling ' + "'getSkillEditorUrl'",
+    () => {
+      let result = component.getSkillEditorUrl('skillId');
 
-    expect(result).toBe('/skill_editor/skillId');
-  });
+      expect(result).toBe('/skill_editor/skillId');
+    }
+  );
 
-  it('should toggle prerequisite skills ' +
-    '\'togglePrerequisiteSkills\'', () => {
-    component.prerequisiteSkillsAreShown = false;
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+  it(
+    'should toggle prerequisite skills ' + "'togglePrerequisiteSkills'",
+    () => {
+      component.prerequisiteSkillsAreShown = false;
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
-    component.togglePrerequisiteSkills();
-    expect(component.prerequisiteSkillsAreShown).toBe(true);
+      component.togglePrerequisiteSkills();
+      expect(component.prerequisiteSkillsAreShown).toBe(true);
 
-    component.togglePrerequisiteSkills();
-    expect(component.prerequisiteSkillsAreShown).toBe(false);
-  });
+      component.togglePrerequisiteSkills();
+      expect(component.prerequisiteSkillsAreShown).toBe(false);
+    }
+  );
 
   it('should show skill description on skill-editor tab', fakeAsync(() => {
     component.ngOnInit();
@@ -354,72 +378,89 @@ describe('Skill editor main tab Component', () => {
   }));
 
   describe('while adding a skill', () => {
-    it('should show info message if we try ' +
-      'to add a prerequisite skill to itself', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake(() => {
-        return ({
-          componentInstance: {},
-          result: Promise.resolve({
-            id: 'skill1'
-          })
-        }) as NgbModalRef;
-      });
-      let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.callThrough();
+    it(
+      'should show info message if we try ' +
+        'to add a prerequisite skill to itself',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: {},
+            result: Promise.resolve({
+              id: 'skill1',
+            }),
+          } as NgbModalRef;
+        });
+        let alertsSpy = spyOn(
+          alertsService,
+          'addInfoMessage'
+        ).and.callThrough();
 
-      component.skill = sampleSkill;
-      component.addSkill();
-      tick();
+        component.skill = sampleSkill;
+        component.addSkill();
+        tick();
 
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'A skill cannot be a prerequisite of itself', 5000);
-    }));
+        expect(alertsSpy).toHaveBeenCalledWith(
+          'A skill cannot be a prerequisite of itself',
+          5000
+        );
+      })
+    );
 
-    it('should show info message if we try to add a prerequisite ' +
-      'skill which has already been added', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.callFake(() => {
-        return ({
-          componentInstance: {},
-          result: Promise.resolve({
-            id: 'skill_1'
-          })
-        }) as NgbModalRef;
-      });
+    it(
+      'should show info message if we try to add a prerequisite ' +
+        'skill which has already been added',
+      fakeAsync(() => {
+        spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: {},
+            result: Promise.resolve({
+              id: 'skill_1',
+            }),
+          } as NgbModalRef;
+        });
 
-      let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.callThrough();
+        let alertsSpy = spyOn(
+          alertsService,
+          'addInfoMessage'
+        ).and.callThrough();
 
-      component.skill = sampleSkill;
-      component.addSkill();
-      tick();
+        component.skill = sampleSkill;
+        component.addSkill();
+        tick();
 
-      expect(alertsSpy).toHaveBeenCalledWith(
-        'Given skill is already a prerequisite skill', 5000);
-    }));
+        expect(alertsSpy).toHaveBeenCalledWith(
+          'Given skill is already a prerequisite skill',
+          5000
+        );
+      })
+    );
 
-    it('should add skill sucessfully when calling ' +
-      '\'addSkill\'', fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-        return ({
-          componentInstance: {},
-          result: Promise.resolve({
-            id: 'skillId'
-          })
-        }) as NgbModalRef;
-      });
+    it(
+      'should add skill sucessfully when calling ' + "'addSkill'",
+      fakeAsync(() => {
+        let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return {
+            componentInstance: {},
+            result: Promise.resolve({
+              id: 'skillId',
+            }),
+          } as NgbModalRef;
+        });
 
-      component.skill = sampleSkill;
-      component.addSkill();
-      tick();
+        component.skill = sampleSkill;
+        component.addSkill();
+        tick();
 
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+        expect(modalSpy).toHaveBeenCalled();
+      })
+    );
   });
 
   it('should check if window is narrow when user resizes window', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+      mockEventEmitter
+    );
 
     expect(component.prerequisiteSkillsAreShown).toBeFalse();
 
@@ -433,8 +474,7 @@ describe('Skill editor main tab Component', () => {
 
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
     component.toggleSkillEditorCard();
 
@@ -448,7 +488,8 @@ describe('Skill editor main tab Component', () => {
   it('should show Prerequisites list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+      mockEventEmitter
+    );
     component.windowIsNarrow = false;
 
     expect(component.prerequisiteSkillsAreShown).toBe(false);

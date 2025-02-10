@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for ExplorationPermissionsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ContextService } from 'services/context.service';
-import { ExplorationPermissionsBackendApiService } from
-  'domain/exploration/exploration-permissions-backend-api.service';
-import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import {ContextService} from 'services/context.service';
+import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;
@@ -32,7 +33,7 @@ describe('Exploration permissions backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     epbas = TestBed.get(ExplorationPermissionsBackendApiService);
@@ -55,44 +56,48 @@ describe('Exploration permissions backend api service', () => {
       can_delete: false,
       can_modify_roles: true,
       can_edit: true,
-      can_manage_voice_artist: false
+      can_manage_voice_artist: false,
     };
 
     let expectedResponse =
       ExplorationPermissions.createFromBackendDict(backendResponse);
 
-    epbas.getPermissionsAsync().then((expPermissions) => {
+    epbas.getPermissionsAsync().then(expPermissions => {
       expect(expPermissions).toEqual(expectedResponse);
     });
 
     let req = httpTestingController.expectOne(
-      '/createhandler/permissions/exp1');
+      '/createhandler/permissions/exp1'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 
     flushMicrotasks();
   }));
 
-  it('should use the rejection handler if the backend request failed.',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed.', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      epbas.getPermissionsAsync().then(successHandler, failHandler);
+    epbas.getPermissionsAsync().then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        '/createhandler/permissions/exp1');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    var req = httpTestingController.expectOne(
+      '/createhandler/permissions/exp1'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
 });

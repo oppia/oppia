@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for thanks for donating modal component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -43,9 +43,9 @@ describe('Thanks For Donating Modal Component', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
+          useClass: MockActiveModal,
+        },
+      ],
     }).compileComponents();
   }));
 

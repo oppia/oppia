@@ -17,21 +17,21 @@
  * modal.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoaderService } from 'services/loader.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
-import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {AlertsService} from 'services/alerts.service';
+import {LoaderService} from 'services/loader.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UploadActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import {ExplorationCreationBackendApiService} from './exploration-creation-backend-api.service';
 
- @Injectable({
-   providedIn: 'root'
- })
+@Injectable({
+  providedIn: 'root',
+})
 export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
   explorationCreationInProgress: boolean = false;
@@ -42,8 +42,7 @@ export class ExplorationCreationService {
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
-    private explorationCreationBackendApiService:
-      ExplorationCreationBackendApiService
+    private explorationCreationBackendApiService: ExplorationCreationBackendApiService
   ) {}
 
   createNewExploration(): void {
@@ -54,55 +53,64 @@ export class ExplorationCreationService {
     this.alertsService.clearWarnings();
     this.loaderService.showLoadingScreen('Creating exploration');
 
-    this.explorationCreationBackendApiService.registerNewExplorationAsync({})
-      .then((response) => {
-        this.siteAnalyticsService.registerCreateNewExplorationEvent(
-          response.explorationId);
-        setTimeout(() => {
-          this.windowRef.nativeWindow.location.href = (
-            this.urlInterpolationService.interpolateUrl(
-              this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: response.explorationId
-              }
-            )
+    this.explorationCreationBackendApiService
+      .registerNewExplorationAsync({})
+      .then(
+        response => {
+          this.siteAnalyticsService.registerCreateNewExplorationEvent(
+            response.explorationId
           );
-        }, 150);
-        return false;
-      }, () => {
-        this.loaderService.hideLoadingScreen();
-        this.explorationCreationInProgress = false;
-      });
+          setTimeout(() => {
+            this.windowRef.nativeWindow.location.href =
+              this.urlInterpolationService.interpolateUrl(
+                this.CREATE_NEW_EXPLORATION_URL_TEMPLATE,
+                {
+                  exploration_id: response.explorationId,
+                }
+              );
+          }, 150);
+          return false;
+        },
+        () => {
+          this.loaderService.hideLoadingScreen();
+          this.explorationCreationInProgress = false;
+        }
+      );
   }
 
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
-    this.ngbModal.open(
-      UploadActivityModalComponent, {backdrop: 'static'}
-    ).result.then((result) => {
-      const yamlFile = result.yamlFile;
+    this.ngbModal
+      .open(UploadActivityModalComponent, {backdrop: 'static'})
+      .result.then(result => {
+        const yamlFile = result.yamlFile;
 
-      this.loaderService.showLoadingScreen('Creating exploration');
-      this.explorationCreationBackendApiService.uploadExploration(
-        yamlFile
-      ).then(
-        (data) => {
-          this.windowRef.nativeWindow.location.href = (
-            this.urlInterpolationService.interpolateUrl(
-              this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: data.explorationId
-              }
-            )
+        this.loaderService.showLoadingScreen('Creating exploration');
+        this.explorationCreationBackendApiService
+          .uploadExploration(yamlFile)
+          .then(
+            data => {
+              this.windowRef.nativeWindow.location.href =
+                this.urlInterpolationService.interpolateUrl(
+                  this.CREATE_NEW_EXPLORATION_URL_TEMPLATE,
+                  {
+                    exploration_id: data.explorationId,
+                  }
+                );
+            },
+            response => {
+              this.alertsService.addWarning(
+                response.error || 'Error communicating with server.'
+              );
+              this.loaderService.hideLoadingScreen();
+            }
           );
-        },
-        (response) => {
-          this.alertsService.addWarning(
-            response.error || 'Error communicating with server.');
-          this.loaderService.hideLoadingScreen();
-        }
-      );
-    });
+      });
   }
 }
-angular.module('oppia').factory(
-  'ExplorationCreationService',
-  downgradeInjectable(ExplorationCreationService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationCreationService',
+    downgradeInjectable(ExplorationCreationService)
+  );

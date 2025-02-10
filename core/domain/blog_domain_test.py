@@ -675,7 +675,9 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         self._assert_valid_displayed_author_name(
             'Empty author name supplied.', '')
         self._assert_valid_displayed_author_name(
-            'A author name can have at most 35 characters.', 'user' * 10)
+            'Author name should have at least 2 characters.', 'A')
+        self._assert_valid_displayed_author_name(
+            'Author name can have at most 35 characters.', 'user' * 10)
         self._assert_valid_displayed_author_name(
             'Author name can only have alphanumeric characters and spaces.',
             'name..name'
@@ -685,7 +687,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             'ABC12&heloo'
         )
         self._assert_valid_displayed_author_name(
-            'This name contains reserved username. Please use some ' +
+            'This name contains reserved username. Please use some '
             'other name', 'name admin')
 
         blog_domain.BlogAuthorDetails.require_valid_displayed_author_name(

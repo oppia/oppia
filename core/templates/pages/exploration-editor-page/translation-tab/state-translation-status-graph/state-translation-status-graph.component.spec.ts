@@ -16,21 +16,27 @@
  * @fileoverview Unit tests for stateTranslationStatusGraph.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Subscription } from 'rxjs';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateTranslationStatusGraphComponent } from './state-translation-status-graph.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { TranslationStatusService } from '../services/translation-status.service';
-import { State } from 'domain/state/StateObjectFactory';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {Subscription} from 'rxjs';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateTranslationStatusGraphComponent} from './state-translation-status-graph.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {TranslationStatusService} from '../services/translation-status.service';
+import {State} from 'domain/state/StateObjectFactory';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -43,26 +49,25 @@ describe('State Translation Status Graph Component', () => {
   let translationStatusService: TranslationStatusService;
   let testSubscriptions: Subscription;
   const refreshStateTranslationSpy = jasmine.createSpy(
-    'refreshStateTranslationSpy');
+    'refreshStateTranslationSpy'
+  );
 
   let stateName: string = 'State1';
   let state = {
-    recordedVoiceovers: {}
+    recordedVoiceovers: {},
   } as State;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        StateTranslationStatusGraphComponent
-      ],
+      declarations: [StateTranslationStatusGraphComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -77,8 +82,9 @@ describe('State Translation Status Graph Component', () => {
     testSubscriptions = new Subscription();
     testSubscriptions.add(
       stateEditorService.onRefreshStateTranslation.subscribe(
-        refreshStateTranslationSpy));
-
+        refreshStateTranslationSpy
+      )
+    );
 
     fixture.detectChanges();
   });
@@ -90,34 +96,42 @@ describe('State Translation Status Graph Component', () => {
   describe('when translation tab is not busy', () => {
     beforeEach(() => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
+        stateName
+      );
       spyOn(explorationStatesService, 'getState').and.returnValue(state);
       component.isTranslationTabBusy = false;
     });
 
     it('should get node colors from translation status', () => {
       let nodeColors = {};
-      spyOn(translationStatusService, 'getAllStateStatusColors').and
-        .returnValue(nodeColors);
+      spyOn(
+        translationStatusService,
+        'getAllStateStatusColors'
+      ).and.returnValue(nodeColors);
 
       expect(component.nodeColors()).toEqual(nodeColors);
-      expect(translationStatusService.getAllStateStatusColors)
-        .toHaveBeenCalled();
+      expect(
+        translationStatusService.getAllStateStatusColors
+      ).toHaveBeenCalled();
     });
 
     it('should get active state name from state editor', () => {
       expect(component.getActiveStateName()).toBe(stateName);
     });
 
-    it('should set new active state name and refresh state when clicking' +
-      ' on state in map', () => {
-      spyOn(stateEditorService, 'setActiveStateName');
-      component.onClickStateInMap('State2');
+    it(
+      'should set new active state name and refresh state when clicking' +
+        ' on state in map',
+      () => {
+        spyOn(stateEditorService, 'setActiveStateName');
+        component.onClickStateInMap('State2');
 
-      expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
-        'State2');
-      expect(refreshStateTranslationSpy).toHaveBeenCalled();
-    });
+        expect(stateEditorService.setActiveStateName).toHaveBeenCalledWith(
+          'State2'
+        );
+        expect(refreshStateTranslationSpy).toHaveBeenCalled();
+      }
+    );
   });
 
   describe('when translation tab is busy', () => {
@@ -128,25 +142,27 @@ describe('State Translation Status Graph Component', () => {
       component.isTranslationTabBusy = true;
 
       showTranslationTabBusyModalspy = jasmine.createSpy(
-        'showTranslationTabBusyModal');
+        'showTranslationTabBusyModal'
+      );
       testSubscriptions = new Subscription();
       testSubscriptions.add(
         stateEditorService.onShowTranslationTabBusyModal.subscribe(
-          showTranslationTabBusyModalspy));
+          showTranslationTabBusyModalspy
+        )
+      );
     });
 
     afterEach(() => {
       testSubscriptions.unsubscribe();
     });
 
-    it('should show translation tab busy modal when clicking on state in map',
-      () => {
-        spyOn(stateEditorService, 'setActiveStateName');
-        component.onClickStateInMap('State2');
+    it('should show translation tab busy modal when clicking on state in map', () => {
+      spyOn(stateEditorService, 'setActiveStateName');
+      component.onClickStateInMap('State2');
 
-        expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
-        expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
-      });
+      expect(stateEditorService.setActiveStateName).not.toHaveBeenCalled();
+      expect(showTranslationTabBusyModalspy).toHaveBeenCalled();
+    });
 
     it('should throw error if state name is null', fakeAsync(() => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);

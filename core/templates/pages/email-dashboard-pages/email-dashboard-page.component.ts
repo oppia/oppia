@@ -16,18 +16,17 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { QueryData } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { EmailDashboardDataService } from './email-dashboard-data.service';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {QueryData} from 'domain/email-dashboard/email-dashboard-backend-api.service';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {EmailDashboardDataService} from './email-dashboard-data.service';
 
 @Component({
   selector: 'oppia-email-dashboard-page',
-  templateUrl: './email-dashboard-page.component.html'
+  templateUrl: './email-dashboard-page.component.html',
 })
 export class EmailDashboardPageComponent {
   data!: QueryData;
@@ -41,7 +40,7 @@ export class EmailDashboardPageComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private emailDashboardDataService: EmailDashboardDataService,
     private loaderService: LoaderService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -51,12 +50,12 @@ export class EmailDashboardPageComponent {
     this.loaderService.showLoadingScreen('Loading');
     this.resetForm();
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.username = userInfo.getUsername();
       this.loaderService.hideLoadingScreen();
     });
 
-    this.emailDashboardDataService.getNextQueriesAsync().then((queries) => {
+    this.emailDashboardDataService.getNextQueriesAsync().then(queries => {
       this.currentPageOfQueries = queries;
     });
   }
@@ -77,32 +76,30 @@ export class EmailDashboardPageComponent {
 
   areAllInputsEmpty(): boolean {
     return Object.values(this.data).every(
-      value => value === null || value === false);
+      value => value === null || value === false
+    );
   }
 
   submitQueryAsync(): void {
-    this.emailDashboardDataService.submitQueryAsync(this.data)
-      .then((queries) => {
-        this.currentPageOfQueries = queries;
-      });
+    this.emailDashboardDataService.submitQueryAsync(this.data).then(queries => {
+      this.currentPageOfQueries = queries;
+    });
     this.resetForm();
     this.showSuccessMessage = true;
   }
 
   getNextPageOfQueries(): void {
     if (this.emailDashboardDataService.isNextPageAvailable()) {
-      this.emailDashboardDataService.getNextQueriesAsync().then(
-        (queries) => {
-          this.currentPageOfQueries = queries;
-        }
-      );
+      this.emailDashboardDataService.getNextQueriesAsync().then(queries => {
+        this.currentPageOfQueries = queries;
+      });
     }
   }
 
   getPreviousPageOfQueries(): void {
     if (this.emailDashboardDataService.isPreviousPageAvailable()) {
-      this.currentPageOfQueries = (
-        this.emailDashboardDataService.getPreviousQueries());
+      this.currentPageOfQueries =
+        this.emailDashboardDataService.getPreviousQueries();
     }
   }
 
@@ -114,25 +111,20 @@ export class EmailDashboardPageComponent {
     return this.emailDashboardDataService.isPreviousPageAvailable();
   }
 
-
   recheckStatus(index: number): void {
-    let query = this.currentPageOfQueries !== undefined ?
-      this.currentPageOfQueries[index] : null;
+    let query =
+      this.currentPageOfQueries !== undefined
+        ? this.currentPageOfQueries[index]
+        : null;
     if (query) {
       let queryId = query.id;
-      this.emailDashboardDataService.fetchQueryAsync(queryId).then(
-        (query) => {
-          this.currentPageOfQueries[index] = query;
-        });
+      this.emailDashboardDataService.fetchQueryAsync(queryId).then(query => {
+        this.currentPageOfQueries[index] = query;
+      });
     }
   }
 
   showLinkToResultPage(submitter: string, status: string): boolean {
-    return (submitter === this.username) && (status === 'completed');
+    return submitter === this.username && status === 'completed';
   }
 }
-
-angular.module('oppia').directive('oppiaEmailDashboardPage',
-  downgradeComponent({
-    component: EmailDashboardPageComponent
-  }) as angular.IDirectiveFactory);

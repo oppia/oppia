@@ -17,100 +17,111 @@
  * about explorations from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
-import { AppConstants } from 'app.constants';
-import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
-import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
-import { UrlService } from 'services/contextual/url.service';
+import {AppConstants} from 'app.constants';
+import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamSpecsBackendDict} from 'domain/exploration/ParamSpecsObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ExplorationMetadataBackendDict} from './ExplorationMetadataObjectFactory';
+import {VersionedExplorationCachingService} from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import {UrlService} from 'services/contextual/url.service';
 
 export interface ReadOnlyExplorationBackendDict {
-  'init_state_name': string;
-  'param_changes': ParamChangeBackendDict[];
-  'param_specs': ParamSpecsBackendDict;
-  'states': StateObjectsBackendDict;
-  'title': string;
-  'language_code': string;
-  'objective': string;
-  'next_content_id_index': number;
-  'correctness_feedback_enabled': boolean;
+  init_state_name: string;
+  param_changes: ParamChangeBackendDict[];
+  param_specs: ParamSpecsBackendDict;
+  states: StateObjectsBackendDict;
+  title: string;
+  language_code: string;
+  objective: string;
+  next_content_id_index: number;
 }
 
 export interface FetchExplorationBackendResponse {
-  'can_edit': boolean;
-  'exploration': ReadOnlyExplorationBackendDict;
-  'exploration_metadata': ExplorationMetadataBackendDict;
-  'exploration_id': string;
-  'is_logged_in': boolean;
-  'session_id': string;
-  'version': number;
-  'preferred_audio_language_code': string;
-  'preferred_language_codes': string[];
-  'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
-  'record_playthrough_probability': number;
-  'draft_change_list_id': number;
-  'has_viewed_lesson_info_modal_once': boolean;
-  'furthest_reached_checkpoint_exp_version': number;
-  'furthest_reached_checkpoint_state_name': string;
-  'most_recently_reached_checkpoint_state_name': string;
-  'most_recently_reached_checkpoint_exp_version': number;
-  'displayable_language_codes': string[];
+  can_edit: boolean;
+  exploration: ReadOnlyExplorationBackendDict;
+  exploration_metadata: ExplorationMetadataBackendDict;
+  exploration_id: string;
+  is_logged_in: boolean;
+  session_id: string;
+  version: number;
+  preferred_audio_language_code: string;
+  preferred_language_codes: string[];
+  auto_tts_enabled: boolean;
+  record_playthrough_probability: number;
+  draft_change_list_id: number;
+  has_viewed_lesson_info_modal_once: boolean;
+  furthest_reached_checkpoint_exp_version: number;
+  furthest_reached_checkpoint_state_name: string;
+  most_recently_reached_checkpoint_state_name: string;
+  most_recently_reached_checkpoint_exp_version: number;
+  displayable_language_codes: string[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReadOnlyExplorationBackendApiService {
-  private _explorationCache:
-    Record<string, FetchExplorationBackendResponse> = {};
+  private _explorationCache: Record<string, FetchExplorationBackendResponse> =
+    {};
 
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
-    private versionedExplorationCachingService:
-      VersionedExplorationCachingService,
+    private versionedExplorationCachingService: VersionedExplorationCachingService,
     private urlService: UrlService
   ) {}
 
   private async _fetchExplorationAsync(
-      explorationId: string,
-      version: number | null,
-      uniqueProgressUrlId: string | null = null
+    explorationId: string,
+    version: number | null,
+    uniqueProgressUrlId: string | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       const explorationDataUrl = this._getExplorationUrl(
-        explorationId, version, uniqueProgressUrlId);
+        explorationId,
+        version,
+        uniqueProgressUrlId
+      );
 
       // If version is not null, then check whether the exploration data for
       // the given version is already cached. If so, then resolve the Promise
       // with the cached exploration data.
       if (
-        version && this.versionedExplorationCachingService.isCached(
-          explorationId, version
-        )) {
+        version &&
+        this.versionedExplorationCachingService.isCached(explorationId, version)
+      ) {
         resolve(
-          this.versionedExplorationCachingService
-            .retrieveCachedVersionedExplorationData(explorationId, version));
+          this.versionedExplorationCachingService.retrieveCachedVersionedExplorationData(
+            explorationId,
+            version
+          )
+        );
       } else {
-        this.http.get<FetchExplorationBackendResponse>(
-          explorationDataUrl).toPromise().then(response => {
-          // If version is not null, then cache the fetched
-          // exploration data (response) for the given version.
-          if (version) {
-            this.versionedExplorationCachingService
-              .cacheVersionedExplorationData(explorationId, version, response);
-          }
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+        this.http
+          .get<FetchExplorationBackendResponse>(explorationDataUrl)
+          .toPromise()
+          .then(
+            response => {
+              // If version is not null, then cache the fetched
+              // exploration data (response) for the given version.
+              if (version) {
+                this.versionedExplorationCachingService.cacheVersionedExplorationData(
+                  explorationId,
+                  version,
+                  response
+                );
+              }
+              resolve(response);
+            },
+            errorResponse => {
+              reject(errorResponse.error.error);
+            }
+          );
       }
     });
   }
@@ -120,26 +131,33 @@ export class ReadOnlyExplorationBackendApiService {
   }
 
   private _getExplorationUrl(
-      explorationId: string,
-      version: number | null,
-      uniqueProgressUrlId: string | null = null): string {
+    explorationId: string,
+    version: number | null,
+    uniqueProgressUrlId: string | null = null
+  ): string {
     if (version) {
       return this.urlInterpolationService.interpolateUrl(
-        AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
+        AppConstants.EXPLORATION_VERSION_DATA_URL_TEMPLATE,
+        {
           exploration_id: explorationId,
-          version: String(version)
-        });
+          version: String(version),
+        }
+      );
     } else if (uniqueProgressUrlId) {
       return this.urlInterpolationService.interpolateUrl(
-        AppConstants.EXPLORATION_PROGRESS_PID_URL_TEMPLATE, {
+        AppConstants.EXPLORATION_PROGRESS_PID_URL_TEMPLATE,
+        {
           exploration_id: explorationId,
-          pid: uniqueProgressUrlId
-        });
+          pid: uniqueProgressUrlId,
+        }
+      );
     }
     return this.urlInterpolationService.interpolateUrl(
-      AppConstants.EXPLORATION_DATA_URL_TEMPLATE, {
-        exploration_id: explorationId
-      });
+      AppConstants.EXPLORATION_DATA_URL_TEMPLATE,
+      {
+        exploration_id: explorationId,
+      }
+    );
   }
 
   /**
@@ -154,12 +172,15 @@ export class ReadOnlyExplorationBackendApiService {
    * passed any data returned by the backend in the case of an error.
    */
   async fetchExplorationAsync(
-      explorationId: string,
-      version: number | null,
-      uniqueProgressUrlId: string | null = null):
-     Promise<FetchExplorationBackendResponse> {
+    explorationId: string,
+    version: number | null,
+    uniqueProgressUrlId: string | null = null
+  ): Promise<FetchExplorationBackendResponse> {
     return this._fetchExplorationAsync(
-      explorationId, version, uniqueProgressUrlId);
+      explorationId,
+      version,
+      uniqueProgressUrlId
+    );
   }
 
   /**
@@ -173,8 +194,9 @@ export class ReadOnlyExplorationBackendApiService {
    * backend in further function calls.
    */
   async loadLatestExplorationAsync(
-      explorationId: string, uniqueProgressUrlId: string | null = null):
-    Promise<FetchExplorationBackendResponse> {
+    explorationId: string,
+    uniqueProgressUrlId: string | null = null
+  ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(explorationId)) {
         if (resolve) {
@@ -182,14 +204,16 @@ export class ReadOnlyExplorationBackendApiService {
         }
       } else {
         this._fetchExplorationAsync(
-          explorationId, null, uniqueProgressUrlId)
-          .then(exploration => {
+          explorationId,
+          null,
+          uniqueProgressUrlId
+        ).then(exploration => {
           // Save the fetched exploration to avoid future fetches.
-            this._explorationCache[explorationId] = exploration;
-            if (resolve) {
-              resolve(exploration);
-            }
-          }, reject);
+          this._explorationCache[explorationId] = exploration;
+          if (resolve) {
+            resolve(exploration);
+          }
+        }, reject);
       }
     });
   }
@@ -201,8 +225,10 @@ export class ReadOnlyExplorationBackendApiService {
    * cache. All previous data in the cache will still be retained after
    * this call.
    */
-  async loadExplorationAsync(explorationId: string, version: number):
-    Promise<FetchExplorationBackendResponse> {
+  async loadExplorationAsync(
+    explorationId: string,
+    version: number
+  ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchExplorationAsync(explorationId, version).then(exploration => {
         resolve(exploration);
@@ -224,8 +250,9 @@ export class ReadOnlyExplorationBackendApiService {
    * exploration ID with a new exploration object.
    */
   cacheExploration(
-      explorationId: string,
-      exploration: FetchExplorationBackendResponse): void {
+    explorationId: string,
+    exploration: FetchExplorationBackendResponse
+  ): void {
     this._explorationCache[explorationId] = exploration;
   }
 
@@ -247,6 +274,9 @@ export class ReadOnlyExplorationBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'ReadOnlyExplorationBackendApiService',
-  downgradeInjectable(ReadOnlyExplorationBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ReadOnlyExplorationBackendApiService',
+    downgradeInjectable(ReadOnlyExplorationBackendApiService)
+  );

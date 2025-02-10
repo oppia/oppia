@@ -16,15 +16,15 @@
  * @fileoverview Component for the logout page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 
-import { AlertsService } from 'services/alerts.service';
-import { AuthService } from 'services/auth.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
-import { UtilsService } from 'services/utils.service';
+import {AlertsService} from 'services/alerts.service';
+import {AuthService} from 'services/auth.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {UtilsService} from 'services/utils.service';
 
 @Component({
   selector: 'logout-page',
@@ -32,22 +32,29 @@ import { UtilsService } from 'services/utils.service';
 })
 export class LogoutPageComponent implements OnInit {
   constructor(
-      private alertsService: AlertsService, private authService: AuthService,
-      private loaderService: LoaderService, private windowRef: WindowRef,
-      private utilsService: UtilsService) {}
+    private alertsService: AlertsService,
+    private authService: AuthService,
+    private loaderService: LoaderService,
+    private windowRef: WindowRef,
+    private utilsService: UtilsService
+  ) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('I18N_LOGOUT_LOADING');
-    this.authService.signOutAsync()
-      .then(() => this.redirect(), error => this.onSignOutError(error));
+    this.authService.signOutAsync().then(
+      () => this.redirect(),
+      error => this.onSignOutError(error)
+    );
   }
 
   private redirect(): void {
-    const searchParams = (
-      new URLSearchParams(this.windowRef.nativeWindow.location.search));
+    const searchParams = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search
+    );
     const redirectUrl = searchParams.get('redirect_url') ?? '/';
     this.windowRef.nativeWindow.location.assign(
-      this.utilsService.getSafeReturnUrl(redirectUrl));
+      this.utilsService.getSafeReturnUrl(redirectUrl)
+    );
   }
 
   private onSignOutError(error: firebase.auth.Error): void {
@@ -57,5 +64,9 @@ export class LogoutPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'logoutPage', downgradeComponent({component: LogoutPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'logoutPage',
+    downgradeComponent({component: LogoutPageComponent})
+  );

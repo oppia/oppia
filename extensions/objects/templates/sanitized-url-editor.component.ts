@@ -16,11 +16,19 @@
  * @fileoverview Directive for sanitized URL editor.
  */
 
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
-import { VALIDATION_STATUS_INVALID } from 'utility/forms';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {VALIDATION_STATUS_INVALID} from 'utility/forms';
 
 interface SanitizedUrlSchema {
   type: string;
@@ -31,16 +39,16 @@ interface SanitizedUrlSchema {
     {
       id: string;
       regexPattern: string;
-    }
+    },
   ];
-  'ui_config': {
+  ui_config: {
     placeholder: string;
   };
 }
 @Component({
   selector: 'sanitized-url-editor',
   templateUrl: './sanitized-url-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SanitizedUrlEditorComponent implements AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -55,16 +63,16 @@ export class SanitizedUrlEditorComponent implements AfterViewInit {
     type: 'unicode',
     validators: [
       {
-        id: 'is_nonempty'
+        id: 'is_nonempty',
       },
       {
         id: 'is_regex_matched',
-        regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
-      }
+        regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))',
+      },
     ],
     ui_config: {
-      placeholder: 'https://www.example.com'
-    }
+      placeholder: 'https://www.example.com',
+    },
   };
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
@@ -98,7 +106,7 @@ export class SanitizedUrlEditorComponent implements AfterViewInit {
     // because we are confident that 'statusChanges' will not be null when we
     // use it in our component.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.form.statusChanges!.subscribe((validationStatus) => {
+    this.form.statusChanges!.subscribe(validationStatus => {
       if (validationStatus === VALIDATION_STATUS_INVALID) {
         this.validityChange.emit({validUrl: false});
       } else {
@@ -107,6 +115,9 @@ export class SanitizedUrlEditorComponent implements AfterViewInit {
     });
   }
 }
-angular.module('oppia').directive('sanitizedUrlEditor', downgradeComponent({
-  component: SanitizedUrlEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'sanitizedUrlEditor',
+  downgradeComponent({
+    component: SanitizedUrlEditorComponent,
+  }) as angular.IDirectiveFactory
+);

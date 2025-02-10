@@ -16,39 +16,45 @@
  * @fileoverview Component for the audio translation bar.
  */
 
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import WaveSurfer from 'wavesurfer.js';
-import { Subscription } from 'rxjs';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { DeleteAudioTranslationModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/delete-audio-translation-modal.component';
-import { TranslationTabBusyModalComponent } from 'pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component';
-import { AddAudioTranslationModalComponent } from '../modal-templates/add-audio-translation-modal.component';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { UserService } from 'services/user.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AudioPlayerService } from 'services/audio-player.service';
-import { ContextService } from 'services/context.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { IdGenerationService } from 'services/id-generation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslationLanguageService } from '../services/translation-language.service';
-import { TranslationStatusService } from '../services/translation-status.service';
-import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
-import { Voiceover } from 'domain/exploration/voiceover.model';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { VoiceoverRecordingService } from '../services/voiceover-recording.service';
+import {Subscription} from 'rxjs';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {DeleteAudioTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/delete-audio-translation-modal.component';
+import {TranslationTabBusyModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component';
+import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
+import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import {UserService} from 'services/user.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {ContextService} from 'services/context.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {IdGenerationService} from 'services/id-generation.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {TranslationLanguageService} from '../services/translation-language.service';
+import {TranslationStatusService} from '../services/translation-status.service';
+import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
+import {Voiceover} from 'domain/exploration/voiceover.model';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {VoiceoverRecordingService} from '../services/voiceover-recording.service';
 
 @Component({
   selector: 'oppia-audio-translation-bar',
-  templateUrl: './audio-translation-bar.component.html'
+  templateUrl: './audio-translation-bar.component.html',
 })
 export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy: boolean;
@@ -101,13 +107,11 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
-    private translationTabActiveContentIdService:
-      TranslationTabActiveContentIdService,
-    private userExplorationPermissionsService:
-      UserExplorationPermissionsService,
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
-    public voiceoverRecorder: VoiceoverRecordingService,
-  ) { }
+    public voiceoverRecorder: VoiceoverRecordingService
+  ) {}
 
   setProgress(val: {value: number}): void {
     this.audioPlayerService.setCurrentTime(val.value);
@@ -123,9 +127,10 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
 
   getAvailableAudio(contentId: string, languageCode: string): Voiceover {
     if (this.contentId) {
-      return (
-        this.stateRecordedVoiceoversService.displayed.getVoiceover(
-          contentId, languageCode));
+      return this.stateRecordedVoiceoversService.displayed.getVoiceover(
+        contentId,
+        languageCode
+      );
     }
   }
 
@@ -137,46 +142,53 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
 
   generateNewFilename(): string {
     return (
-      this.contentId + '-' +
-       this.languageCode + '-' +
-       this.idGenerationService.generateNewId() + '.mp3');
+      this.contentId +
+      '-' +
+      this.languageCode +
+      '-' +
+      this.idGenerationService.generateNewId() +
+      '.mp3'
+    );
   }
 
   showPermissionAndStartRecording(): void {
     this.checkingMicrophonePermission = true;
-    this.voiceoverRecorder.startRecordingAsync().then(() => {
-      // When the user accepts the microphone access.
-      this.showRecorderWarning = true;
-      this.isTranslationTabBusy = true;
+    this.voiceoverRecorder.startRecordingAsync().then(
+      () => {
+        // When the user accepts the microphone access.
+        this.showRecorderWarning = true;
+        this.isTranslationTabBusy = true;
 
-      this.recordingPermissionDenied = false;
-      this.cannotRecord = false;
-      this.selectedRecording = true;
-      this.checkingMicrophonePermission = false;
+        this.recordingPermissionDenied = false;
+        this.cannotRecord = false;
+        this.selectedRecording = true;
+        this.checkingMicrophonePermission = false;
 
-      this.recordingDate = 0;
-      this.elapsedTime = 0;
-      OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
-        this.timerInterval = setInterval(() => {
-          OppiaAngularRootComponent.ngZone.run(() => {
-            this.elapsedTime++;
-            this.recordingDate = this.elapsedTime;
+        this.recordingDate = 0;
+        this.elapsedTime = 0;
+        OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
+          this.timerInterval = setInterval(() => {
+            OppiaAngularRootComponent.ngZone.run(() => {
+              this.elapsedTime++;
+              this.recordingDate = this.elapsedTime;
 
-            // This.recordingTimeLimit is decremented to
-            // compensate for the audio recording timing inconsistency,
-            // so it allows the server to accept the recording.
-            if (this.elapsedTime === this.recordingTimeLimit - 1) {
-              this.stopRecording();
-            }
-          });
-        }, 1000);
-      });
-    }, () => {
-      // When the user denies microphone access.
-      this.recordingPermissionDenied = true;
-      this.cannotRecord = true;
-      this.checkingMicrophonePermission = false;
-    });
+              // This.recordingTimeLimit is decremented to
+              // compensate for the audio recording timing inconsistency,
+              // so it allows the server to accept the recording.
+              if (this.elapsedTime === this.recordingTimeLimit - 1) {
+                this.stopRecording();
+              }
+            });
+          }, 1000);
+        });
+      },
+      () => {
+        // When the user denies microphone access.
+        this.recordingPermissionDenied = true;
+        this.cannotRecord = true;
+        this.checkingMicrophonePermission = false;
+      }
+    );
   }
 
   checkAndStartRecording(): void {
@@ -194,7 +206,9 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
 
   toggleAudioNeedsUpdate(): void {
     this.stateRecordedVoiceoversService.displayed.toggleNeedsUpdateAttribute(
-      this.contentId, this.languageCode);
+      this.contentId,
+      this.languageCode
+    );
     this.saveRecordedVoiceoversChanges();
     this.audioNeedsUpdate = !this.audioNeedsUpdate;
   }
@@ -236,12 +250,11 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
         container: '#visualized',
         waveColor: '#009688',
         progressColor: '#cccccc',
-        height: 38
+        height: 38,
       });
       this.waveSurfer.empty();
       this.waveSurfer.load(url);
-    }
-    );
+    });
   }
 
   waveSurferOnFinishCb(): void {
@@ -260,8 +273,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   }
 
   toggleStartAndStopRecording(): void {
-    if (!this.voiceoverRecorder.status().isRecording &&
-         !this.audioBlob) {
+    if (!this.voiceoverRecorder.status().isRecording && !this.audioBlob) {
       this.checkAndStartRecording();
     } else {
       this.stopRecording();
@@ -285,47 +297,63 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     let fileType = 'audio/mp3';
     let contentId = this.contentId;
     let languageCode = this.languageCode;
-    let recordedAudioFile = new File(
-      [this.audioBlob as BlobPart], filename, {type: fileType});
+    let recordedAudioFile = new File([this.audioBlob as BlobPart], filename, {
+      type: fileType,
+    });
     this.showRecorderWarning = false;
 
     Promise.resolve(
       this.assetsBackendApiService.saveAudio(
-        this.contextService.getExplorationId(), filename, recordedAudioFile)
-    ).then((response) => {
-      if (this.audioIsUpdating) {
-        this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
-          contentId, languageCode);
-        this.audioIsUpdating = false;
-      }
-      this.stateRecordedVoiceoversService.displayed.addVoiceover(
-        contentId, languageCode, filename, recordedAudioFile.size,
-        response.duration_secs);
-      this.durationSecs = Math.round(response.duration_secs);
-      this.saveRecordedVoiceoversChanges();
-      this.alertsService.addSuccessMessage(
-        'Succesfuly uploaded recorded audio.');
-      this.audioIsCurrentlyBeingSaved = false;
-      this.initAudioBar();
+        this.contextService.getExplorationId(),
+        filename,
+        recordedAudioFile
+      )
+    ).then(
+      response => {
+        if (this.audioIsUpdating) {
+          this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
+            contentId,
+            languageCode
+          );
+          this.audioIsUpdating = false;
+        }
+        this.stateRecordedVoiceoversService.displayed.addVoiceover(
+          contentId,
+          languageCode,
+          filename,
+          recordedAudioFile.size,
+          response.duration_secs
+        );
+        this.durationSecs = Math.round(response.duration_secs);
+        this.saveRecordedVoiceoversChanges();
+        this.alertsService.addSuccessMessage(
+          'Succesfuly uploaded recorded audio.'
+        );
+        this.audioIsCurrentlyBeingSaved = false;
+        this.initAudioBar();
 
-      setTimeout(() => {
-        this.graphDataService.recompute();
-      });
-    }, (errorResponse) => {
-      this.audioIsCurrentlyBeingSaved = false;
-      this.alertsService.addWarning(errorResponse.error);
-      this.initAudioBar();
-    });
+        setTimeout(() => {
+          this.graphDataService.recompute();
+        });
+      },
+      errorResponse => {
+        this.audioIsCurrentlyBeingSaved = false;
+        this.alertsService.addWarning(errorResponse.error);
+        this.initAudioBar();
+      }
+    );
   }
 
   getTranslationTabBusyMessage(): string {
     let message = '';
     if (this.voiceoverRecorder.status().isRecording) {
-      message = 'You haven\'t finished recording. Please stop ' +
-         'recording and either save or cancel the recording.';
+      message =
+        "You haven't finished recording. Please stop " +
+        'recording and either save or cancel the recording.';
     } else if (this.showRecorderWarning) {
-      message = 'You haven\'t saved your recording. Please save or ' +
-         'cancel the recording.';
+      message =
+        "You haven't saved your recording. Please save or " +
+        'cancel the recording.';
     }
     return message;
   }
@@ -336,13 +364,16 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     });
 
     modalRef.componentInstance.busyMessage =
-       this.getTranslationTabBusyMessage();
+      this.getTranslationTabBusyMessage();
 
-    modalRef.result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modalRef.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   playPauseUploadedAudioTranslation(languageCode: string): void {
@@ -367,16 +398,17 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.audioLoadingIndicatorIsShown = true;
 
     let audioTranslation = this.getAvailableAudio(
-      this.contentId, this.languageCode);
+      this.contentId,
+      this.languageCode
+    );
 
     if (audioTranslation) {
-      this.audioPlayerService.loadAsync(audioTranslation.filename)
-        .then(() => {
-          this.audioLoadingIndicatorIsShown = false;
-          this.audioIsLoading = false;
-          this.audioTimerIsShown = true;
-          this.audioPlayerService.play();
-        });
+      this.audioPlayerService.loadAsync(audioTranslation.filename).then(() => {
+        this.audioLoadingIndicatorIsShown = false;
+        this.audioIsLoading = false;
+        this.audioTimerIsShown = true;
+        this.audioPlayerService.play();
+      });
     }
   }
 
@@ -384,8 +416,10 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     // This stops the voiceoverRecorder when user navigates
     // while recording.
     if (this.voiceoverRecorder) {
-      if (this.voiceoverRecorder.status().isRecording &&
-         this.showRecorderWarning) {
+      if (
+        this.voiceoverRecorder.status().isRecording &&
+        this.showRecorderWarning
+      ) {
         this.voiceoverRecorder.stopRecord();
         this.cancelTimer();
         this.voiceoverRecorder.closeRecorder();
@@ -398,20 +432,20 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     // Re-initialize for unsaved recording.
     this.unsavedAudioIsPlaying = false;
     this.waveSurfer = null;
-    this.languageCode = this.translationLanguageService
-      .getActiveLanguageCode();
+    this.languageCode = this.translationLanguageService.getActiveLanguageCode();
     this.canVoiceover = this.editabilityService.isTranslatable();
-    this.contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId());
+    this.contentId =
+      this.translationTabActiveContentIdService.getActiveContentId();
     let audioTranslationObject = this.getAvailableAudio(
-      this.contentId, this.languageCode);
+      this.contentId,
+      this.languageCode
+    );
     if (audioTranslationObject) {
       this.isAudioAvailable = true;
       this.audioIsLoading = true;
       this.selectedRecording = false;
       this.audioNeedsUpdate = audioTranslationObject.needsUpdate;
-      this.durationSecs =
-         Math.round(audioTranslationObject.durationSecs);
+      this.durationSecs = Math.round(audioTranslationObject.durationSecs);
     } else {
       this.isAudioAvailable = false;
       this.audioBlob = null;
@@ -420,18 +454,25 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   }
 
   openDeleteAudioTranslationModal(): void {
-    this.ngbModal.open(DeleteAudioTranslationModalComponent, {
-      backdrop: true
-    }).result.then(() => {
-      this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
-        this.contentId, this.languageCode);
-      this.saveRecordedVoiceoversChanges();
-      this.initAudioBar();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(DeleteAudioTranslationModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
+            this.contentId,
+            this.languageCode
+          );
+          this.saveRecordedVoiceoversChanges();
+          this.initAudioBar();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   openAddAudioTranslationModal(audioFile: FileList): void {
@@ -441,31 +482,38 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     });
 
     modalRef.componentInstance.audioFile = audioFile;
-    modalRef.componentInstance.generatedFilename = (
-      this.generateNewFilename());
+    modalRef.componentInstance.generatedFilename = this.generateNewFilename();
     modalRef.componentInstance.languageCode = this.languageCode;
-    modalRef.componentInstance.isAudioAvailable = (
-      this.isAudioAvailable);
+    modalRef.componentInstance.isAudioAvailable = this.isAudioAvailable;
 
-    modalRef.result.then((result) => {
-      if (this.isAudioAvailable) {
-        this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
-          this.contentId, this.languageCode);
+    modalRef.result.then(
+      result => {
+        if (this.isAudioAvailable) {
+          this.stateRecordedVoiceoversService.displayed.deleteVoiceover(
+            this.contentId,
+            this.languageCode
+          );
+        }
+        this.stateRecordedVoiceoversService.displayed.addVoiceover(
+          this.contentId,
+          this.languageCode,
+          result.filename,
+          result.fileSizeBytes,
+          result.durationSecs
+        );
+        this.durationSecs = Math.round(result.durationSecs);
+        this.saveRecordedVoiceoversChanges();
+        this.initAudioBar();
+      },
+      () => {
+        this.alertsService.clearWarnings();
       }
-      this.stateRecordedVoiceoversService.displayed.addVoiceover(
-        this.contentId, this.languageCode, result.filename,
-        result.fileSizeBytes, result.durationSecs);
-      this.durationSecs = Math.round(result.durationSecs);
-      this.saveRecordedVoiceoversChanges();
-      this.initAudioBar();
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    );
   }
 
   ngOnInit(): void {
-    this.recordingTimeLimit = (
-      ExplorationEditorPageConstants.RECORDING_TIME_LIMIT);
+    this.recordingTimeLimit =
+      ExplorationEditorPageConstants.RECORDING_TIME_LIMIT;
     this.startingDuration = 0;
     this.unsupportedBrowser = false;
     this.selectedRecording = false;
@@ -482,7 +530,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.elapsedTime = 0;
     this.unsavedAudioIsPlaying = false;
 
-    document.body.onkeyup = (e) => {
+    document.body.onkeyup = e => {
       if (!this.canVoiceover) {
         return;
       }
@@ -504,47 +552,47 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.translationTabActiveContentIdService.onActiveContentIdChanged.
-        subscribe(
-          () => this.initAudioBar()
-        )
-    );
-
-    this.directiveSubscriptions.add(
-      this.translationLanguageService.onActiveLanguageChanged.subscribe(
+      this.translationTabActiveContentIdService.onActiveContentIdChanged.subscribe(
         () => this.initAudioBar()
       )
     );
 
     this.directiveSubscriptions.add(
-      this.stateEditorService.onShowTranslationTabBusyModal.subscribe(
-        () => this.openTranslationTabBusyModal()
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(() =>
+        this.initAudioBar()
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onShowTranslationTabBusyModal.subscribe(() =>
+        this.openTranslationTabBusyModal()
       )
     );
     this.directiveSubscriptions.add(
-      this.audioPlayerService.viewUpdate.subscribe(() => {
-      })
+      this.audioPlayerService.viewUpdate.subscribe(() => {})
     );
     this.directiveSubscriptions.add(
-      this.audioPlayerService.onAudioStop.subscribe(() => {
-      })
+      this.audioPlayerService.onAudioStop.subscribe(() => {})
     );
 
     let userIsLoggedIn;
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      userIsLoggedIn = userInfo.isLoggedIn();
-      return this.userExplorationPermissionsService.getPermissionsAsync();
-    }).then((permissions) => {
-      $('.oppia-translation-tab').on('dragover', (evt) => {
-        evt.preventDefault();
-        this.dropAreaIsAccessible = permissions.canVoiceover;
-        this.userIsGuest = !userIsLoggedIn;
-        return false;
+    this.userService
+      .getUserInfoAsync()
+      .then(userInfo => {
+        userIsLoggedIn = userInfo.isLoggedIn();
+        return this.userExplorationPermissionsService.getPermissionsAsync();
+      })
+      .then(permissions => {
+        $('.oppia-translation-tab').on('dragover', evt => {
+          evt.preventDefault();
+          this.dropAreaIsAccessible = permissions.canVoiceover;
+          this.userIsGuest = !userIsLoggedIn;
+          return false;
+        });
       });
-    });
 
-    $('.oppia-main-body').on('dragleave', (evt) => {
+    $('.oppia-main-body').on('dragleave', evt => {
       evt.preventDefault();
       if (evt.pageX === 0 || evt.pageY === 0) {
         this.dropAreaIsAccessible = false;
@@ -553,7 +601,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       return false;
     });
 
-    $('.oppia-translation-tab').on('drop', (evt) => {
+    $('.oppia-translation-tab').on('drop', evt => {
       evt.preventDefault();
       if (
         // TODO(#13015): Remove use of unknown as a type.
@@ -561,7 +609,8 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
         // So probably #12882 also.
         (evt.target as unknown as Element).classList.contains(
           'oppia-drop-area-message'
-        ) && this.dropAreaIsAccessible
+        ) &&
+        this.dropAreaIsAccessible
       ) {
         let files = (evt.originalEvent as DragEvent).dataTransfer.files;
         this.openAddAudioTranslationModal(files);
@@ -593,8 +642,3 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.waveSurfer?.un('finish', this.waveSurferOnFinishCb.bind(this));
   }
 }
-
-angular.module('oppia').directive('oppiaAudioTranslationBar',
-   downgradeComponent({
-     component: AudioTranslationBarComponent
-   }) as angular.IDirectiveFactory);

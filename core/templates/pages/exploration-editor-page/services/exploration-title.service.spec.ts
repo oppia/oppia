@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for the ExplorationTitleService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationTitleService } from './exploration-title.service';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ValidatorsService } from 'services/validators.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {ExplorationTitleService} from './exploration-title.service';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {ValidatorsService} from 'services/validators.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-describe('Exploration Title Service', function() {
+describe('Exploration Title Service', function () {
   let ets: ExplorationTitleService;
 
   beforeEach(() => {
@@ -34,14 +34,14 @@ describe('Exploration Title Service', function() {
         ExplorationRightsService,
         ValidatorsService,
         NormalizeWhitespacePipe,
-        ExplorationPropertyService
-      ]
+        ExplorationPropertyService,
+      ],
     });
 
     ets = TestBed.inject(ExplorationTitleService);
   });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(ets.propertyName).toBe('title');
     let NotNormalize = '   Exploration         Title Service     ';
     let Normalize = 'Exploration Title Service';

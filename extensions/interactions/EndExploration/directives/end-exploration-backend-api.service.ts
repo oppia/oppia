@@ -16,9 +16,9 @@
  * @fileoverview Backend api service for End Exploration;
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { AppConstants } from 'app.constants';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {AppConstants} from 'app.constants';
 
 export interface RecommendExplorationBackendDict {
   summaries: RecommendExplorationDict[];
@@ -29,20 +29,25 @@ export interface RecommendExplorationDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EndExplorationBackendApiService {
   constructor(private http: HttpClient) {}
 
   getRecommendExplorationsData(
-      authorRecommendedExplorationIds: string[]
+    authorRecommendedExplorationIds: string[]
   ): Promise<RecommendExplorationBackendDict> {
-    return this.http.get<RecommendExplorationBackendDict>(
-      AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-        params: {
-          stringified_exp_ids: JSON.stringify(
-            authorRecommendedExplorationIds)
+    return this.http
+      .get<RecommendExplorationBackendDict>(
+        AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+        {
+          params: {
+            stringified_exp_ids: JSON.stringify(
+              authorRecommendedExplorationIds
+            ),
+          },
         }
-      }).toPromise();
+      )
+      .toPromise();
   }
 }

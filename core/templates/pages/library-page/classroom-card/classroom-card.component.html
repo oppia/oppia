@@ -1,0 +1,145 @@
+<div class="oppia-classroom-card-container classroom-card-dropshadow"
+     [ngClass]="{'classroom-card-big': !usedInCarousel, 'classroom-card-small': usedInCarousel}">
+  <a [href]="getClassroomUrl()" class="classroom-content" [ngClass]="{'classroom-content-big': !usedInCarousel, 'classroom-content-small': usedInCarousel}">
+    <img alt="Classroom thumbnail image" class="classroom-thumbnail"
+         [ngClass]="{'classroom-thumbnail-big': !usedInCarousel, 'classroom-thumbnail-small': usedInCarousel}"
+         [src]="classroomThumbnailUrl">
+    <div class="classroom-text-container">
+      <span class="classroom-name" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ getName() }}</span>
+      <span class="classroom-name" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</span>
+    </div>
+  </a>
+</div>
+
+<style>
+  .classroom-content .classroom-text-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+    text-align: center;
+    top: 12%;
+    width: 158px;
+  }
+
+  .classroom-content .classroom-thumbnail-big {
+    height: 144px;
+    width: 186px;
+  }
+
+  .classroom-content .classroom-thumbnail-small {
+    height: 88px;
+    width: 88px;
+  }
+
+  .classroom-name {
+    color: #005240;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.0075em;
+    margin: 0;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .classroom-card-dropshadow {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .oppia-classroom-card-container {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    padding: 35px;
+  }
+
+  .classroom-card-big {
+    height: 260px;
+    width: 240px;
+  }
+
+  .classroom-card-small {
+    height: 184px;
+    width: 164px;
+  }
+
+  .oppia-classroom-card-container .classroom-content {
+    align-items: center;
+    bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    justify-content: start;
+    position: relative;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  .classroom-content-small {
+    gap: 24px;
+  }
+
+  @media only screen and (max-width: 1024px) {
+    .classroom-card-big {
+      height: 216px;
+      width: 192px;
+    }
+  }
+
+  @media only screen and (max-width: 900px) {
+    .oppia-classroom-card-container {
+      height: 216px;
+      width: 196px;
+    }
+
+    .oppia-classroom-card-container .classroom-content {
+      gap: 10px;
+    }
+
+    .classroom-card-small {
+      height: 142px;
+      width: 140px;
+    }
+
+    .classroom-content .classroom-thumbnail-small {
+      bottom: 10px;
+      position: relative;
+    }
+  }
+
+  @media only screen and (max-width: 575px) {
+    .classroom-text-container {
+      max-width: 134px;
+    }
+
+    .oppia-classroom-card-container .classroom-content {
+      justify-content: space-around;
+    }
+    .classroom-card-big {
+      height: 142px;
+      width: 140px;
+    }
+
+    .classroom-card-small {
+      height: 100px;
+      width: 100px;
+    }
+
+    .classroom-content .classroom-thumbnail-small {
+      bottom: 0;
+      height: 52px;
+      scale: 1.4;
+      width: 52px;
+    }
+
+    .classroom-name {
+      font-size: 12px;
+    }
+  }
+</style>

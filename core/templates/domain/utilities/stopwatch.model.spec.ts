@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Stopwatch model.
  */
 
-import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import {Stopwatch} from 'domain/utilities/stopwatch.model';
 
 describe('Stopwatch model', () => {
   let nowSpy: jasmine.Spy<() => number>;
@@ -74,7 +74,8 @@ describe('Stopwatch model', () => {
     expect(stopwatch._getCurrentTime()).toBe(29);
     expect(stopwatch.getTimeInSecs()).toBe(0);
     expect(errorLog).toHaveBeenCalledWith(
-      'Tried to retrieve the elapsed time, but no start time was set.');
+      'Tried to retrieve the elapsed time, but no start time was set.'
+    );
   });
 
   it('should error if the start time is later than the current time', () => {
@@ -91,8 +92,7 @@ describe('Stopwatch model', () => {
 
     expect(stopwatch._getCurrentTime()).toBe(10);
     expect(stopwatch.getTimeInSecs()).toEqual(0);
-    expect(errorLog).toHaveBeenCalledWith(
-      'Start time was set incorrectly.');
+    expect(errorLog).toHaveBeenCalledWith('Start time was set incorrectly.');
   });
 
   it('should instantiate independent stopwatches', () => {

@@ -16,7 +16,7 @@
  * @fileoverview Tests for CreatorTopicSummaryModel.
  */
 
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 
 describe('Creator topic summary model', () => {
   let _sampleCreatorTopicSummary: CreatorTopicSummary;
@@ -41,10 +41,15 @@ describe('Creator topic summary model', () => {
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
       is_published: false,
-      can_edit_topic: false
+      can_edit_topic: false,
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [2],
+      published_chapter_counts_for_each_story: [1],
     };
     _sampleCreatorTopicSummary = CreatorTopicSummary.createFromBackendDict(
-      sampleCreatorTopicSummaryBackendDict);
+      sampleCreatorTopicSummaryBackendDict
+    );
   });
 
   it('should be able to get all the values', () => {
@@ -61,13 +66,26 @@ describe('Creator topic summary model', () => {
     expect(_sampleCreatorTopicSummary.getVersion()).toEqual(1);
     expect(_sampleCreatorTopicSummary.getAdditionalStoryCount()).toEqual(0);
     expect(_sampleCreatorTopicSummary.getTopicModelCreatedOn()).toEqual(
-      231241343);
+      231241343
+    );
     expect(_sampleCreatorTopicSummary.getTopicModelLastUpdated()).toEqual(
-      3454354354);
+      3454354354
+    );
     expect(_sampleCreatorTopicSummary.getClassroom()).toEqual('math');
     expect(_sampleCreatorTopicSummary.getThumbnailFilename()).toEqual(
-      'image.svg');
+      'image.svg'
+    );
     expect(_sampleCreatorTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
     expect(_sampleCreatorTopicSummary.isTopicPublished()).toBeFalse();
+    expect(_sampleCreatorTopicSummary.getTotalUpcomingChaptersCount()).toEqual(
+      1
+    );
+    expect(_sampleCreatorTopicSummary.getTotalOverdueChaptersCount()).toEqual(
+      1
+    );
+    expect(_sampleCreatorTopicSummary.getTotalChaptersCounts()).toEqual([2]);
+    expect(_sampleCreatorTopicSummary.getPublishedChaptersCounts()).toEqual([
+      1,
+    ]);
   });
 });

@@ -1,0 +1,199 @@
+<div class="modal-header">
+  <h4 class="modal-title">Modify Existing Translations</h4>
+</div>
+<div class="modal-body">
+  <p>
+    Please update any translations below which are easy to update, and tick the ones you're
+    confident about. Those translations will be saved and shown directly to learners as soon
+    as you save the pending changes to the exploration.
+  </p>
+  <p class="modify-translations-modal-text">Any translations that don't have a check mark will be sent for re-translation.</p>
+  <div *ngIf="translationsHaveLoaded && (contentTranslations | keyvalue).length > 0" class="content-translations-container">
+    <form #form="ngForm">
+      <div *ngFor="let item of contentTranslations | keyvalue">
+        <div *ngIf="item.value.needsUpdate === false" class="content-translation-block">
+          <div class="content-translation-language">
+            <span>
+              <input type="checkbox"
+                     name="checkbox-{{item.key}}"
+                     [(ngModel)]="languageIsCheckedStatusDict[item.key]"
+                     class="e2e-test-{{ item.key }}-translation-checkbox">
+              <p>{{ getLanguageName(item.key) }}</p>
+              <div  *ngIf="!languageIsCheckedStatusDict[item.key]" class="re-translation-indicator">
+                Will be sent for re-translation
+              </div>
+            </span>
+            <i class="fas fa-pencil-alt e2e-test-{{ item.key }}-translation-edit" (click)="openTranslationEditor(item.key)"></i>
+          </div>
+          <div class="content-translation-value e2e-test-translation-{{ item.key }}">
+            <oppia-rte-output-display *ngIf="item.value.dataFormat === 'html' || item.value.dataFormat === 'unicode'"
+                                      [rteString]="item.value.translation"
+                                      class="translations-rte-output-display">
+            </oppia-rte-output-display>
+            <div *ngIf="isSetOfStringDataFormat()">
+              <ul role="tablist">
+                <li *ngFor="let ruleContent of item.value.translation">
+                  {{ ruleContent }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div *ngIf="!translationsHaveLoaded">
+    <p class="translations-status-text">Please wait. Fetching translations...</p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" (click)="cancel()" class="btn modify-translations-cancel-button">Cancel</button>
+  <button type="button" (click)="confirm()" class="btn modify-translations-done-button e2e-test-modify-translations-done-button">Done</button>
+</div>
+
+<style>
+  .modal-header {
+    justify-content: center;
+  }
+
+  .modal-title {
+    color: #00645c;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    height: 25px;
+  }
+
+  .modal-body {
+    padding: 0;
+  }
+
+  .modal-body > p {
+    padding: 24px;
+    padding-bottom: 0;
+  }
+
+  .modal-body .modify-translations-modal-text {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    margin-bottom: 0;
+    padding-bottom: 18px;
+    padding-top: 0;
+  }
+
+  .modal-body .content-translations-container {
+    margin-right: 1rem;
+    max-height: 330px;
+    overflow-y: auto;
+    padding-bottom: 0;
+    padding-left: 24px;
+    padding-right: 8px;
+    padding-top: 14px;
+  }
+
+  .content-translations-container::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .content-translations-container::-webkit-scrollbar-track {
+    background: #e7e7e7;
+    border-radius: 5px;
+  }
+
+  .content-translations-container::-webkit-scrollbar-thumb {
+    background: #808080;
+    border-radius: 5px;
+    transition: background 0.5s ease;
+  }
+
+  .content-translations-container::-webkit-scrollbar-thumb:hover {
+    background: rgb(102, 102, 102);
+  }
+
+  .modal-body .content-translation-block {
+    margin-bottom: 12px;
+    padding-bottom: 11px;
+    padding-top: 4px;
+  }
+
+  .modal-body .content-translation-block:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-body .content-translation-block .re-translation-indicator {
+    align-self: center;
+    background-color: #fdf6cd;
+    border: 1px solid;
+    border-radius: 14px;
+    font-size: 12px;
+    margin: 0;
+    margin-left: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .modal-body .content-translation-language {
+    display: flex;
+    font-size: 18px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .content-translation-language span {
+    display: flex;
+  }
+
+  .content-translation-language p {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .content-translation-language input[type=checkbox] {
+    accent-color: #333;
+    margin-right: 8px;
+    width: 18px;
+  }
+
+  .content-translation-value {
+    border: 1px solid #ccc;
+    max-height: 115px;
+    overflow-y: scroll;
+    padding: 20px;
+  }
+
+  .modal-body p.translations-status-text {
+    color: #333;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-footer button {
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 700;
+    height: 44px;
+    line-height: 120%;
+    width: 90px;
+  }
+
+  .modal-footer .modify-translations-cancel-button {
+    background: #fff;
+    border: 1px solid #00645c;
+    color: #00645c;
+  }
+
+  .modal-footer .modify-translations-done-button {
+    background: #00645c;
+    color: #fff;
+  }
+
+  .modal-footer .modify-translations-done-button:hover,
+  .modal-footer .modify-translations-done-button:focus {
+    background-color: #3d9991;
+  }
+</style>

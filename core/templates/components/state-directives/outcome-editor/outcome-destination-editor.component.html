@@ -1,7 +1,7 @@
 <div class="form-inline oppia-form-inline e2e-test-dest-bubble">
   <div class="oppia-rule-details-header">
-    <strong *ngIf="outcomeHasFeedback">And afterwards, directs the learner to...</strong>
-    <strong *ngIf="!outcomeHasFeedback">Oppia directs the learner to...</strong>
+    <strong *ngIf="outcomeHasFeedback" tabindex="0">And afterwards, directs the learner to ...</strong>
+    <strong *ngIf="!outcomeHasFeedback" tabindex="0">Oppia directs the learner to ...</strong>
   </div>
   <div class="form-group oppia-form-group">
     <span>
@@ -26,7 +26,7 @@
              [attr.aria-invalid]="false" required>
     </span>
   </form>
-  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text" tabindex="0">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 
   <div *ngIf="isSelfLoop() && canEditRefresherExplorationId && !!outcome.refresherExplorationId" class="oppia-id-text">
     <b>Refresher exploration ID (optional):</b>

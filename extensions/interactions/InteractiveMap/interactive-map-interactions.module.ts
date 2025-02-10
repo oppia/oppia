@@ -18,35 +18,30 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { InteractiveInteractiveMapComponent } from './directives/oppia-interactive-interactive-map.component';
-import { LeafletModule } from '@asymmetrik/ngx-leaflet';
-import { ResponseInteractiveMapComponent } from './directives/oppia-response-interactive-map.component';
-import { ShortResponseInteractiveMapComponent } from './directives/oppia-short-response-interactive-map.component';
-import { TranslateModule } from '@ngx-translate/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {InteractiveInteractiveMapComponent} from './directives/oppia-interactive-interactive-map.component';
+import {LeafletModule} from '@asymmetrik/ngx-leaflet';
+import {ResponseInteractiveMapComponent} from './directives/oppia-response-interactive-map.component';
+import {ShortResponseInteractiveMapComponent} from './directives/oppia-short-response-interactive-map.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    LeafletModule,
-    TranslateModule
-  ],
+  imports: [CommonModule, LeafletModule, TranslateModule],
   declarations: [
     InteractiveInteractiveMapComponent,
     ResponseInteractiveMapComponent,
-    ShortResponseInteractiveMapComponent
+    ShortResponseInteractiveMapComponent,
   ],
   entryComponents: [
     InteractiveInteractiveMapComponent,
     ResponseInteractiveMapComponent,
-    ShortResponseInteractiveMapComponent
+    ShortResponseInteractiveMapComponent,
   ],
   exports: [
     InteractiveInteractiveMapComponent,
     ResponseInteractiveMapComponent,
-    ShortResponseInteractiveMapComponent
+    ShortResponseInteractiveMapComponent,
   ],
 })
-
-export class InteractiveMapInteractionModule { }
+export class InteractiveMapInteractionModule {}

@@ -1,27 +1,43 @@
-<mat-card class="oppia-topic-dashboard-card">
-  <a [href]="getTopicLink()"
-     target="{{ openInNewWindow ? '_blank' : '_self' }}"
-     class="oppia-topic-link">
-    <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-      <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
-      <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
-    </div>
-    <div class="oppia-summary-section">
-      <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
-        {{topicTitle}}
-      </span>
-      <div class="oppia-topic-lessons">
-        {{totalPublishedNodeCount}}
-        <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
-          <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
-        </div>
-        <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
-          <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+<ng-container>
+  <mat-card *ngIf="!redesignFeatureFlag" class="oppia-topic-dashboard-card">
+    <a [href]="getTopicLink()"
+       target="{{ openInNewWindow ? '_blank' : '_self' }}"
+       class="oppia-topic-link">
+      <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+        <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
+        <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
+      </div>
+      <div class="oppia-summary-section">
+        <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
+          {{ topicTitle }}
+        </span>
+        <div class="oppia-topic-lessons">
+          {{ totalPublishedNodeCount }}
+          <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
+            <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
+          </div>
+          <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
+            <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
+          </div>
         </div>
       </div>
+    </a>
+  </mat-card>
+  <a *ngIf="redesignFeatureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+    <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
+      <img alt="" class="h-100 oppia-thumbnail-image" [src]="thumbnailUrl">
+    </div>
+    <div class="oppia-class-card-info">
+      <p class="mb-2 oppia-class-card-title e2e-test-learner-topic-summary-tile-title">
+        {{ topicTitle }}
+      </p>
+      <p class="oppia-class-card-text">
+        {{ totalPublishedNodeCount }}
+        {{ (totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS') | translate }}
+      </p>
     </div>
   </a>
-</mat-card>
+</ng-container>
 <style>
   .oppia-topic-dashboard-card .oppia-topic-link {
     text-decoration: none;
@@ -70,5 +86,44 @@
   .oppia-topic-dashboard-card .oppia-thumbnail-image {
     height: 108px;
     width: 160px;
+  }
+
+  .oppia-class-card {
+    background-color: #205d86;
+    border-radius: .25em;
+    box-shadow: 0 2px 2px 0 #00000040;
+    height: 220px;
+    padding: 0;
+    transition: all 300ms ease-out;
+    width: 210px;
+  }
+
+  .oppia-class-card:hover {
+    background-color: #00609c;
+    box-shadow: 0 0 8px 0 #00000040;
+  }
+
+  .oppia-class-card-button {
+    border: 1px solid #00645c;
+    font-size: 14px;
+  }
+
+  .oppia-class-card-img {
+    height: 120px;
+  }
+
+  .oppia-class-card-info {
+    color: #fff;
+    height: 100px;
+    padding: 8px 16px;
+  }
+
+  .oppia-class-card-text {
+    font-size: 12px;
+  }
+
+  .oppia-class-card-title {
+    font-size: 16px;
+    font-weight: 700;
   }
 </style>

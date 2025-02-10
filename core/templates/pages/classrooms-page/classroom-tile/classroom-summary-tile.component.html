@@ -1,0 +1,105 @@
+<div class="oppia-classroom-tile-container"
+     [ngClass]="{'classroom-tile-dropshadow': isPublished()}"
+     [ngStyle]="{'background-color': classroomSummary.is_published ? '#FFFFFF' : '#EEEEEE'}"
+    >
+  <a [href]="getClassroomUrl()"
+     class="classroom-content"
+     [ngClass]="{'diable-classroom-tile-click': !isPublished()}"
+  >
+    <img alt="Classroom thumbnail image"
+         class="classroom-thumbnail"
+         [src]="classroomThumbnailUrl">
+    <div class="classroom-text-container">
+      <h3 class="classroom-name">{{getName()}}</h3>
+      <p class="classroom-teaser-text"
+         [ngClass]="{'private-classroom-teaser-text': !isPublished()}"
+      >{{getTeaserText()}}</p>
+    </div>
+  </a>
+</div>
+
+<style>
+  .classroom-content .classroom-text-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    text-align: center;
+    width: 158px;
+  }
+
+  .classroom-content .classroom-thumbnail {
+    height: 100px;
+    width: 100px;
+  }
+
+  .classroom-text-container .classroom-name {
+    color: #005240;
+    font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.0075em;
+    margin: 0;
+    text-align: center;
+  }
+
+  .classroom-text-container .classroom-teaser-text {
+    color: #3c3c3c;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-align: center;
+    width: 158px;
+  }
+
+  .classroom-text-container .private-classroom-teaser-text {
+    width: 193px;
+  }
+
+  .classroom-tile-dropshadow {
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  .diable-classroom-tile-click {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .oppia-classroom-tile-container {
+    align-items: center;
+    background-color: #fff;
+    border-radius: 4px;
+    display: flex;
+    height: 326px;
+    justify-content: center;
+    padding: 35px;
+    width: 278px;
+  }
+
+  .oppia-classroom-tile-container .classroom-content {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    height: 100%;
+    justify-content: start;
+    text-decoration: none;
+    width: 100%;
+  }
+
+  @media only screen and (max-width: 575px) {
+    .oppia-classroom-tile-container {
+      height: 354px;
+      width: 318px;
+    }
+
+    .oppia-classroom-tile-container .classroom-content {
+      gap: 0;
+      justify-content: space-around;
+    }
+  }
+</style>

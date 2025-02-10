@@ -16,54 +16,25 @@
  * @fileoverview Module for the error iframed page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { ErrorIframedPageRootComponent } from './error-iframed-root.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ErrorIframedPageRootComponent} from './error-iframed-root.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ErrorIframedPageRootComponent,
+      },
+    ]),
   ],
-  declarations: [
-    ErrorIframedPageRootComponent,
-  ],
-  entryComponents: [
-    ErrorIframedPageRootComponent,
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-  ],
-  bootstrap: [ErrorIframedPageRootComponent]
+  declarations: [ErrorIframedPageRootComponent],
+  entryComponents: [ErrorIframedPageRootComponent],
 })
 export class ErrorIframedPageModule {}

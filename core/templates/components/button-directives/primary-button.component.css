@@ -1,0 +1,35 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+/*
+  Note: The .primary-button class in this component is necessary in order to avoid
+  style conflicts with other classes such as the .btn class. Do not remove it.
+*/
+
+.primary-button {
+  background-color: #00645c;
+  color: rgba(255, 255, 255, 1.0);
+  font-family: "Roboto", Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+}
+
+.primary-button:hover,
+.primary-button:focus {
+  background-color: #3d9991;
+  color: rgba(255, 255, 255, 1);
+}
+
+a.primary-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.primary-button:disabled {
+  background: rgba(0, 0, 0, .2);
+  opacity: 0.65;
+}

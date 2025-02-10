@@ -16,10 +16,13 @@
  * @fileoverview Component for the question misconception selector.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  Misconception,
+  MisconceptionSkillMap,
+} from 'domain/skill/MisconceptionObjectFactory';
 
 interface UpdatedValues {
   misconception: Misconception;
@@ -29,11 +32,11 @@ interface UpdatedValues {
 
 @Component({
   selector: 'oppia-question-misconception-selector',
-  templateUrl: './question-misconception-selector.component.html'
+  templateUrl: './question-misconception-selector.component.html',
 })
 export class QuestionMisconceptionSelectorComponent implements OnInit {
-  @Output() updateMisconceptionValues:
-  EventEmitter<UpdatedValues> = (new EventEmitter());
+  @Output() updateMisconceptionValues: EventEmitter<UpdatedValues> =
+    new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -44,14 +47,12 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Input() taggedSkillMisconceptionId!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
 
-  constructor(
-    private stateEditorService: StateEditorService,
-  ) {}
+  constructor(private stateEditorService: StateEditorService) {}
 
   ngOnInit(): void {
     this.misconceptionFeedbackIsUsed = true;
-    this.misconceptionsBySkill = (
-      this.stateEditorService.getMisconceptionsBySkill());
+    this.misconceptionsBySkill =
+      this.stateEditorService.getMisconceptionsBySkill();
   }
 
   selectMisconception(misconception: Misconception, skillId: string): void {
@@ -60,13 +61,18 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
     let updatedValues = {
       misconception: this.selectedMisconception,
       skillId: this.selectedMisconceptionSkillId,
-      feedbackIsUsed: this.misconceptionFeedbackIsUsed
+      feedbackIsUsed: this.misconceptionFeedbackIsUsed,
     };
     this.updateMisconceptionValues.emit(updatedValues);
   }
 
   toggleMisconceptionFeedbackUsage(): void {
-    this.misconceptionFeedbackIsUsed = (
-      !this.misconceptionFeedbackIsUsed);
+    this.misconceptionFeedbackIsUsed = !this.misconceptionFeedbackIsUsed;
+    let updatedValues = {
+      misconception: this.selectedMisconception,
+      skillId: this.selectedMisconceptionSkillId,
+      feedbackIsUsed: this.misconceptionFeedbackIsUsed,
+    };
+    this.updateMisconceptionValues.emit(updatedValues);
   }
 }

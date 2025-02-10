@@ -16,23 +16,24 @@
  * @fileoverview Unit tests for LostChangesModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { LostChange, LostChangeObjectFactory } from
-  'domain/exploration/LostChangeObjectFactory';
+import {
+  LostChange,
+  LostChangeObjectFactory,
+} from 'domain/exploration/LostChangeObjectFactory';
 
-import { LostChangesModalComponent } from './lost-changes-modal.component';
-import { LoggerService } from 'services/contextual/logger.service';
-import { UtilsService } from 'services/utils.service';
+import {LostChangesModalComponent} from './lost-changes-modal.component';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UtilsService} from 'services/utils.service';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  template: ''
+  template: '',
 })
-class ChangesInHumanReadableFormComponentStub {
-}
+class ChangesInHumanReadableFormComponentStub {}
 
 class MockActiveModal {
   close(): void {
@@ -44,47 +45,48 @@ class MockActiveModal {
   }
 }
 
-
 describe('Lost Changes Modal Component', () => {
   let component: LostChangesModalComponent;
   let fixture: ComponentFixture<LostChangesModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
-  const lostChanges = [{
-    cmd: 'add_state',
-    state_name: 'State name',
-    content_id_for_state_content: 'content_0',
-    content_id_for_default_outcome: 'default_outcome_1',
-    utilsService: new UtilsService,
-    isEndingExploration: () => false,
-    isAddingInteraction: () => false,
-    isOldValueEmpty: () => false,
-    isNewValueEmpty: () => false,
-    isOutcomeFeedbackEqual: () => false,
-    isOutcomeDestEqual: () => false,
-    isDestEqual: () => false,
-    isFeedbackEqual: () => false,
-    isRulesEqual: () => false,
-    getRelativeChangeToGroups: () => 'string',
-    getLanguage: () => 'en',
-    getStatePropertyValue: (value1) => 'string'
-  } as LostChange];
+  const lostChanges = [
+    {
+      cmd: 'add_state',
+      state_name: 'State name',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1',
+      utilsService: new UtilsService(),
+      isEndingExploration: () => false,
+      isAddingInteraction: () => false,
+      isOldValueEmpty: () => false,
+      isNewValueEmpty: () => false,
+      isOutcomeFeedbackEqual: () => false,
+      isOutcomeDestEqual: () => false,
+      isDestEqual: () => false,
+      isFeedbackEqual: () => false,
+      isRulesEqual: () => false,
+      getRelativeChangeToGroups: () => 'string',
+      getLanguage: () => 'en',
+      getStatePropertyValue: value1 => 'string',
+    } as LostChange,
+  ];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         LostChangesModalComponent,
-        ChangesInHumanReadableFormComponentStub
+        ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
         LostChangeObjectFactory,
         LoggerService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -107,44 +109,50 @@ describe('Lost Changes Modal Component', () => {
 
   it('should contain correct modal header', () => {
     const modalHeader =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-header').innerText;
+      fixture.debugElement.nativeElement.querySelector(
+        '.modal-header'
+      ).innerText;
 
     expect(modalHeader).toBe('Error Loading Exploration');
   });
 
   it('should contain correct modal body', () => {
     const modalBody =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-body').children[0].innerText;
+      fixture.debugElement.nativeElement.querySelector('.modal-body')
+        .children[0].innerText;
 
     expect(modalBody).toBe(
       'Sorry! The following changes will be lost. It appears that your ' +
-      'draft was overwritten by changes on another machine.');
+        'draft was overwritten by changes on another machine.'
+    );
   });
 
-  it('should contain description on lost changes' +
-    'only if they exists in modal body', () => {
-    const modalBody =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-body').children[1].innerText;
+  it(
+    'should contain description on lost changes' +
+      'only if they exists in modal body',
+    () => {
+      const modalBody =
+        fixture.debugElement.nativeElement.querySelector('.modal-body')
+          .children[1].innerText;
 
-    component.hasLostChanges = true;
-    fixture.detectChanges();
+      component.hasLostChanges = true;
+      fixture.detectChanges();
 
-    expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to export or ' +
-      'copy and paste these changes before discarding them.');
-  });
+      expect(modalBody).toBe(
+        'The lost changes are displayed below. You may want to export or ' +
+          'copy and paste these changes before discarding them.'
+      );
+    }
+  );
 
   it('should export the lost changes and close the modal', () => {
-    spyOn(
-      fixture.elementRef.nativeElement, 'getElementsByClassName'
-    ).withArgs('oppia-lost-changes').and.returnValue([
-      {
-        innerText: 'Dummy Inner Text'
-      }
-    ]);
+    spyOn(fixture.elementRef.nativeElement, 'getElementsByClassName')
+      .withArgs('oppia-lost-changes')
+      .and.returnValue([
+        {
+          innerText: 'Dummy Inner Text',
+        },
+      ]);
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     const spyObj = jasmine.createSpyObj('a', ['click']);
     spyOn(document, 'createElement').and.returnValue(spyObj);

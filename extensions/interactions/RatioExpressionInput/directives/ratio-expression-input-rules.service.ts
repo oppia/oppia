@@ -16,50 +16,52 @@
  * @fileoverview Rules service for the RatioExpressionInput interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { Ratio } from 'domain/objects/ratio.model';
-import { RatioInputAnswer } from 'interactions/answer-defs';
+import {Ratio} from 'domain/objects/ratio.model';
+import {RatioInputAnswer} from 'interactions/answer-defs';
 import {
   RatioInputEqualRuleInputs,
   RatioInputHasNumberOfTermsEqualToRuleInputs,
-  RatioInputHasSpecificTermEqualToRuleInputs
+  RatioInputHasSpecificTermEqualToRuleInputs,
 } from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RatioExpressionInputRulesService {
-  Equals(
-      answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
+  Equals(answer: RatioInputAnswer, inputs: RatioInputEqualRuleInputs): boolean {
     return Ratio.arrayEquals(answer, inputs.x);
   }
 
   HasNumberOfTermsEqualTo(
-      answer: RatioInputAnswer,
-      inputs: RatioInputHasNumberOfTermsEqualToRuleInputs): boolean {
+    answer: RatioInputAnswer,
+    inputs: RatioInputHasNumberOfTermsEqualToRuleInputs
+  ): boolean {
     return answer.length === inputs.y;
   }
 
   HasSpecificTermEqualTo(
-      answer: RatioInputAnswer,
-      inputs: RatioInputHasSpecificTermEqualToRuleInputs): boolean {
+    answer: RatioInputAnswer,
+    inputs: RatioInputHasSpecificTermEqualToRuleInputs
+  ): boolean {
     return answer[inputs.x - 1] === inputs.y;
   }
 
   IsEquivalent(
-      answer: RatioInputAnswer,
-      inputs: RatioInputEqualRuleInputs): boolean {
-    var simplifiedInput = Ratio.fromList(
-      inputs.x).convertToSimplestForm();
-    var simplifiedAnswer = Ratio.fromList(
-      answer).convertToSimplestForm();
-    return Ratio.arrayEquals(
-      simplifiedAnswer, simplifiedInput);
+    answer: RatioInputAnswer,
+    inputs: RatioInputEqualRuleInputs
+  ): boolean {
+    var simplifiedInput = Ratio.fromList(inputs.x).convertToSimplestForm();
+    var simplifiedAnswer = Ratio.fromList(answer).convertToSimplestForm();
+    return Ratio.arrayEquals(simplifiedAnswer, simplifiedInput);
   }
 }
 
-angular.module('oppia').factory(
-  'RatioExpressionInputRulesService',
-  downgradeInjectable(RatioExpressionInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'RatioExpressionInputRulesService',
+    downgradeInjectable(RatioExpressionInputRulesService)
+  );

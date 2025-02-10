@@ -5,6 +5,7 @@ link before completing the signup process, they will be logged out.
 <div class="oppia-page-cards-container oppia-signup-page-container">
   <mat-card class="oppia-page-card">
     <h2 class="oppia-signup-page-title"
+        tabindex="0"
         translate="I18N_SIGNUP_COMPLETE_REGISTRATION">
     </h2>
 
@@ -21,17 +22,17 @@ link before completing the signup process, they will be logged out.
                    [(ngModel)]="username"
                    [ngModelOptions]="{ standalone: true }"
                    id="username"
+                   [attr.aria-label]="('I18N_SIGNUP_USERNAME' | translate) + '. ' + ('I18N_SIGNUP_USERNAME_EXPLANATION' | translate)"
                    class="form-control oppia-username-input e2e-test-username-input"
-                   (blur)="onUsernameInputFormBlur(username)"
-                   (change)="updateWarningText(username)"
-                   oppiaFocusOn="usernameInputField"
-                   autofocus="true">
+                   (ngModelChange)="updateWarningText(username)"
+                   (blur)="onUsernameInputFormBlur(username)">
             <span class="form-text oppia-username-explanation-text"
                   translate="I18N_SIGNUP_USERNAME_EXPLANATION">
             </span>
             <div class="oppia-warning-text-container">
               <p class="oppia-warning-text"
                  aria-live="assertive"
+                 tabindex="0"
                  *ngIf="warningI18nCode"
                  [translate]="warningI18nCode"
                  [translateParams]="{maxUsernameLength: MAX_USERNAME_LENGTH}">
@@ -97,14 +98,14 @@ link before completing the signup process, they will be logged out.
           <em translate="I18N_SIGNUP_UPDATE_WARNING"></em>
         </p>
       </div>
-      <div class="oppia-long-text" *ngIf="!hasEverRegistered">
+      <div class="oppia-long-text" *ngIf="!hasEverRegistered" tabindex="0">
         <p class="oppia-signup-site-description-text"
            translate="I18N_SIGNUP_SITE_DESCRIPTION"
            [translateParams]="{sitename: siteName}">
         </p>
       </div>
 
-      <div>
+      <div tabindex="0">
         <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
         <br>
         <span innerHTML="{{ 'I18N_SIGNUP_LICENSE_NOTE' | translate }}"
@@ -165,4 +166,10 @@ link before completing the signup process, they will be logged out.
   .oppia-checkbox-margin {
     margin-right: 6px;
   }
+
+  .radio label {
+    display: flex;
+    gap: 4px;
+  }
+
 </style>

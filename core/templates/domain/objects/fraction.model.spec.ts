@@ -16,9 +16,8 @@
  * @fileoverview unit tests for the fraction.model.ts.
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { Fraction } from 'domain/objects/fraction.model';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {Fraction} from 'domain/objects/fraction.model';
 
 describe('Fraction', () => {
   let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS;
@@ -32,7 +31,7 @@ describe('Fraction', () => {
       isNegative: false,
       wholeNumber: 0,
       numerator: 0,
-      denominator: 1
+      denominator: 1,
     };
     const createdFraction = Fraction.fromDict(fractionObject);
 
@@ -44,7 +43,7 @@ describe('Fraction', () => {
       isNegative: false,
       wholeNumber: 0,
       numerator: 0,
-      denominator: 1
+      denominator: 1,
     };
     let createdFraction = Fraction.fromDict(fractionObject);
     let createdFraction2 = Fraction.fromDict(fractionObject);
@@ -53,26 +52,26 @@ describe('Fraction', () => {
       isNegative: false,
       wholeNumber: 0,
       numerator: 1,
-      denominator: 2
+      denominator: 2,
     });
     createdFraction2 = Fraction.fromDict({
       isNegative: false,
       wholeNumber: 0,
       numerator: 2,
-      denominator: 4
+      denominator: 4,
     });
     expect(createdFraction.isEqualTo(createdFraction2)).toBe(true);
     createdFraction = Fraction.fromDict({
       isNegative: false,
       wholeNumber: 0,
       numerator: 1,
-      denominator: 3
+      denominator: 3,
     });
     createdFraction2 = Fraction.fromDict({
       isNegative: false,
       wholeNumber: 0,
       numerator: 2,
-      denominator: 4
+      denominator: 4,
     });
     expect(createdFraction.isEqualTo(createdFraction2)).toBe(false);
   });
@@ -101,31 +100,41 @@ describe('Fraction', () => {
 
   it('should parse valid strings', () => {
     expect(Fraction.fromRawInputString('10/ 2').toDict()).toEqual(
-      new Fraction(false, 0, 10, 2).toDict());
+      new Fraction(false, 0, 10, 2).toDict()
+    );
     expect(Fraction.fromRawInputString('10/20').toDict()).toEqual(
-      new Fraction(false, 0, 10, 20).toDict());
+      new Fraction(false, 0, 10, 20).toDict()
+    );
     expect(Fraction.fromRawInputString('1   1/ 2').toDict()).toEqual(
-      new Fraction(false, 1, 1, 2).toDict());
+      new Fraction(false, 1, 1, 2).toDict()
+    );
     expect(Fraction.fromRawInputString('- 1 1 /2').toDict()).toEqual(
-      new Fraction(true, 1, 1, 2).toDict());
+      new Fraction(true, 1, 1, 2).toDict()
+    );
     expect(Fraction.fromRawInputString('1      ').toDict()).toEqual(
-      new Fraction(false, 1, 0, 1).toDict());
+      new Fraction(false, 1, 0, 1).toDict()
+    );
     expect(Fraction.fromRawInputString('  - 1').toDict()).toEqual(
-      new Fraction(true, 1, 0, 1).toDict());
+      new Fraction(true, 1, 0, 1).toDict()
+    );
     expect(Fraction.fromRawInputString('1  /  22').toDict()).toEqual(
-      new Fraction(false, 0, 1, 22).toDict());
+      new Fraction(false, 0, 1, 22).toDict()
+    );
     expect(Fraction.fromRawInputString(' -1 /2').toDict()).toEqual(
-      new Fraction(true, 0, 1, 2).toDict());
+      new Fraction(true, 0, 1, 2).toDict()
+    );
     expect(Fraction.fromRawInputString('0  1/2').toDict()).toEqual(
-      new Fraction(false, 0, 1, 2).toDict());
+      new Fraction(false, 0, 1, 2).toDict()
+    );
     expect(Fraction.fromRawInputString('1 0 /2').toDict()).toEqual(
-      new Fraction(false, 1, 0, 2).toDict());
+      new Fraction(false, 1, 0, 2).toDict()
+    );
   });
 
   it('should throw errors for invalid fractions', () => {
     // Invalid characters.
     expect(() => {
-      Fraction.fromRawInputString('3 \ b');
+      Fraction.fromRawInputString('3  b');
     }).toThrowError(errors.INVALID_CHARS);
     expect(() => {
       Fraction.fromRawInputString('a 3/5');
@@ -186,49 +195,53 @@ describe('Fraction', () => {
   });
 
   it('should correctly detect nonzero integer part', () => {
-    expect(
-      Fraction.fromRawInputString('0').hasNonzeroIntegerPart()).toBe(false);
-    expect(
-      Fraction.fromRawInputString('1').hasNonzeroIntegerPart()).toBe(true);
-    expect(
-      Fraction.fromRawInputString('1 0/5').hasNonzeroIntegerPart()
-    ).toBe(true);
-    expect(
-      Fraction.fromRawInputString('1 3/5').hasNonzeroIntegerPart()
-    ).toBe(true);
-    expect(
-      Fraction.fromRawInputString('7/5').hasNonzeroIntegerPart()).toBe(false);
-    expect(
-      Fraction.fromRawInputString('2/5').hasNonzeroIntegerPart()).toBe(false);
+    expect(Fraction.fromRawInputString('0').hasNonzeroIntegerPart()).toBe(
+      false
+    );
+    expect(Fraction.fromRawInputString('1').hasNonzeroIntegerPart()).toBe(true);
+    expect(Fraction.fromRawInputString('1 0/5').hasNonzeroIntegerPart()).toBe(
+      true
+    );
+    expect(Fraction.fromRawInputString('1 3/5').hasNonzeroIntegerPart()).toBe(
+      true
+    );
+    expect(Fraction.fromRawInputString('7/5').hasNonzeroIntegerPart()).toBe(
+      false
+    );
+    expect(Fraction.fromRawInputString('2/5').hasNonzeroIntegerPart()).toBe(
+      false
+    );
   });
 
   it('should correctly detect improper fractions', () => {
     expect(Fraction.fromRawInputString('0').isImproperFraction()).toBe(false);
     expect(Fraction.fromRawInputString('1').isImproperFraction()).toBe(false);
-    expect(
-      Fraction.fromRawInputString('1 0/5').isImproperFraction()
-    ).toBe(false);
-    expect(
-      Fraction.fromRawInputString('1 3/5').isImproperFraction()
-    ).toBe(false);
-    expect(
-      Fraction.fromRawInputString('2/5').isImproperFraction()).toBe(false);
-    expect(
-      Fraction.fromRawInputString('7/5').isImproperFraction()).toBe(true);
-    expect(
-      Fraction.fromRawInputString('5/5').isImproperFraction()).toBe(true);
+    expect(Fraction.fromRawInputString('1 0/5').isImproperFraction()).toBe(
+      false
+    );
+    expect(Fraction.fromRawInputString('1 3/5').isImproperFraction()).toBe(
+      false
+    );
+    expect(Fraction.fromRawInputString('2/5').isImproperFraction()).toBe(false);
+    expect(Fraction.fromRawInputString('7/5').isImproperFraction()).toBe(true);
+    expect(Fraction.fromRawInputString('5/5').isImproperFraction()).toBe(true);
   });
 
   it('should convert to simplest form', () => {
-    expect(Fraction.fromRawInputString('1').convertToSimplestForm())
-      .toEqual(new Fraction(false, 1, 0, 1));
-    expect(Fraction.fromRawInputString('0').convertToSimplestForm())
-      .toEqual(new Fraction(false, 0, 0, 1));
-    expect(Fraction.fromRawInputString('2/5').convertToSimplestForm())
-      .toEqual(new Fraction(false, 0, 2, 5));
-    expect(Fraction.fromRawInputString('5/5').convertToSimplestForm())
-      .toEqual(new Fraction(false, 0, 1, 1));
-    expect(Fraction.fromRawInputString('1 0/5').convertToSimplestForm())
-      .toEqual(new Fraction(false, 1, 0, 1));
+    expect(Fraction.fromRawInputString('1').convertToSimplestForm()).toEqual(
+      new Fraction(false, 1, 0, 1)
+    );
+    expect(Fraction.fromRawInputString('0').convertToSimplestForm()).toEqual(
+      new Fraction(false, 0, 0, 1)
+    );
+    expect(Fraction.fromRawInputString('2/5').convertToSimplestForm()).toEqual(
+      new Fraction(false, 0, 2, 5)
+    );
+    expect(Fraction.fromRawInputString('5/5').convertToSimplestForm()).toEqual(
+      new Fraction(false, 0, 1, 1)
+    );
+    expect(
+      Fraction.fromRawInputString('1 0/5').convertToSimplestForm()
+    ).toEqual(new Fraction(false, 1, 0, 1));
   });
 });

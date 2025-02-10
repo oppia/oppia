@@ -16,101 +16,54 @@
  * @fileoverview Module for the topic viewer page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TopicViewerNavbarBreadcrumbComponent } from
-  // eslint-disable-next-line max-len
-  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { TopicViewerPageComponent } from
-  'pages/topic-viewer-page/topic-viewer-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { PracticeSessionConfirmationModal } from './modals/practice-session-confirmation-modal.component';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {PracticeSessionConfirmationModal} from './modals/practice-session-confirmation-modal.component';
+import {ToastrModule} from 'ngx-toastr';
+import {TopicViewerPageRootComponent} from './topic-viewer-page-root.component';
+import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewer-player-common.module';
+import {StoriesListComponent} from './stories-list/topic-viewer-stories-list.component';
+import {PracticeTabComponent} from './practice-tab/practice-tab.component';
+import {SubtopicsListComponent} from './subtopics-list/subtopics-list.component';
+import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     SharedComponentsModule,
+    CommonModule,
     TopicPlayerViewerCommonModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: TopicViewerPageRootComponent,
+        canActivate: [TopicViewerAccessGuard],
+        children: [
+          {
+            path: 'story',
+            component: StoriesListComponent,
+          },
+          {
+            path: 'practice',
+            component: PracticeTabComponent,
+          },
+          {
+            path: 'revision',
+            component: SubtopicsListComponent,
+          },
+        ],
+      },
+    ]),
   ],
   declarations: [
-    TopicViewerNavbarBreadcrumbComponent,
+    TopicViewerPageRootComponent,
     TopicViewerPageComponent,
-    PracticeSessionConfirmationModal
+    PracticeSessionConfirmationModal,
   ],
-  entryComponents: [
-    TopicViewerNavbarBreadcrumbComponent,
-    TopicViewerPageComponent,
-    PracticeSessionConfirmationModal
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+  entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
 })
-class TopicViewerPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { TopicPlayerViewerCommonModule } from './topic-viewer-player-common.module';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(TopicViewerPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class TopicViewerPageModule {}

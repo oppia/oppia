@@ -168,6 +168,35 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v55_dict_to_v56_dict(self) -> None:
+        draft_change_list_v55 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'TextInput'
+            })
+        ]
+        # Migrate exploration to state schema version 56.
+        self.create_and_migrate_new_exploration('55', '56')
+        migrated_draft_change_list_v56 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v55, 1, 2, self.EXP_ID)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v56 is not None
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v55_dict_list = [
+            change.to_dict() for change in draft_change_list_v55
+        ]
+        migrated_draft_change_list_v56_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v56
+        ]
+        self.assertEqual(
+            draft_change_list_v55_dict_list,
+            migrated_draft_change_list_v56_dict_list)
+
     def test_convert_states_v54_dict_to_v55_dict_without_state_changes(
         self
     ) -> None:

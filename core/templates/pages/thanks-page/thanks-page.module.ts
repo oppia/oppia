@@ -16,27 +16,17 @@
  * @fileoverview Module for the thanks page.
  */
 
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 
-import { ThanksPageComponent } from './thanks-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ThanksPageRootComponent } from './thanks-page-root.component';
-import { CommonModule } from '@angular/common';
-import { ThanksPageRoutingModule } from './thanks-page-routing.module';
+import {ThanksPageComponent} from './thanks-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ThanksPageRootComponent} from './thanks-page-root.component';
+import {CommonModule} from '@angular/common';
+import {ThanksPageRoutingModule} from './thanks-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    ThanksPageRoutingModule
-  ],
-  declarations: [
-    ThanksPageComponent,
-    ThanksPageRootComponent
-  ],
-  entryComponents: [
-    ThanksPageComponent,
-    ThanksPageRootComponent
-  ]
+  imports: [CommonModule, SharedComponentsModule, ThanksPageRoutingModule],
+  declarations: [ThanksPageComponent, ThanksPageRootComponent],
+  entryComponents: [ThanksPageComponent, ThanksPageRootComponent],
 })
 export class ThanksPageModule {}

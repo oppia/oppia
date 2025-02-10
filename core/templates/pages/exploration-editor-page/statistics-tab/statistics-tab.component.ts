@@ -17,21 +17,23 @@
  * exploration editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { ExplorationStats } from 'domain/statistics/exploration-stats.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateInteractionStatsService } from 'services/state-interaction-stats.service';
-import { ExplorationDataService } from '../services/exploration-data.service';
-import { RouterService } from '../services/router.service';
-import { StateStatsModalComponent } from './templates/state-stats-modal.component';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  States,
+  StatesObjectFactory,
+} from 'domain/exploration/StatesObjectFactory';
+import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {ComputeGraphService, GraphData} from 'services/compute-graph.service';
+import {ExplorationStatsService} from 'services/exploration-stats.service';
+import {StateInteractionStatsService} from 'services/state-interaction-stats.service';
+import {ExplorationDataService} from '../services/exploration-data.service';
+import {RouterService} from '../services/router.service';
+import {StateStatsModalComponent} from './templates/state-stats-modal.component';
 
 interface PieChartOptions {
   chartAreaWidth: number;
@@ -48,10 +50,9 @@ interface PieChartOptions {
 
 @Component({
   selector: 'oppia-statistics-tab',
-  templateUrl: './statistics-tab.component.html'
+  templateUrl: './statistics-tab.component.html',
 })
-export class StatisticsTabComponent implements
-    OnInit, OnDestroy {
+export class StatisticsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -59,7 +60,7 @@ export class StatisticsTabComponent implements
   stateStatsModalIsOpen!: boolean;
   explorationHasBeenVisited!: boolean;
   pieChartOptions!: PieChartOptions;
-  pieChartData!: ((string | number)[] | string[]) [];
+  pieChartData!: ((string | number)[] | string[])[];
   statsGraphData!: GraphData;
   numPassersby!: number;
   states!: States;
@@ -72,38 +73,40 @@ export class StatisticsTabComponent implements
     private explorationDataService: ExplorationDataService,
     private explorationStatsService: ExplorationStatsService,
     private ngbModal: NgbModal,
-    private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private routerService: RouterService,
     private stateInteractionStatsService: StateInteractionStatsService,
     private statesObjectFactory: StatesObjectFactory,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   refreshExplorationStatistics(): void {
     Promise.all([
-      this.readOnlyExplorationBackendApiService
-        .loadLatestExplorationAsync(this.expId),
-      this.explorationStatsService.getExplorationStatsAsync(this.expId)
-    ]).then((responses) => {
+      this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
+        this.expId
+      ),
+      this.explorationStatsService.getExplorationStatsAsync(this.expId),
+    ]).then(responses => {
       const [expResponse, expStats] = responses;
       const initStateName = expResponse.exploration.init_state_name;
-      const numNonCompletions = (
-        expStats.numActualStarts - expStats.numCompletions);
+      const numNonCompletions =
+        expStats.numActualStarts - expStats.numCompletions;
 
       this.states = this.statesObjectFactory.createFromBackendDict(
-        expResponse.exploration.states);
+        expResponse.exploration.states
+      );
       this.expStats = expStats;
 
-      this.statsGraphData = (
-        this.computeGraphService.compute(initStateName, this.states));
-      this.numPassersby = (
-        expStats.numStarts - expStats.numActualStarts);
+      this.statsGraphData = this.computeGraphService.compute(
+        initStateName,
+        this.states
+      );
+      this.numPassersby = expStats.numStarts - expStats.numActualStarts;
 
       this.pieChartData = [
         ['Type', 'Number'],
         ['Completions', expStats.numCompletions],
-        ['Non-Completions', numNonCompletions]
+        ['Non-Completions', numNonCompletions],
       ];
 
       this.pieChartOptions = {
@@ -132,27 +135,28 @@ export class StatisticsTabComponent implements
       const state = this.states.getState(stateName);
       this.alertsService.clearWarnings();
 
-      this.stateInteractionStatsService.computeStatsAsync(
-        this.expId, state)
-        .then((stats) => {
+      this.stateInteractionStatsService
+        .computeStatsAsync(this.expId, state)
+        .then(stats => {
           const modalRef = this.ngbModal.open(StateStatsModalComponent, {
             backdrop: false,
           });
 
-          modalRef.componentInstance.interactionArgs = (
-            state.interaction.customizationArgs);
+          modalRef.componentInstance.interactionArgs =
+            state.interaction.customizationArgs;
           modalRef.componentInstance.stateName = stateName;
-          modalRef.componentInstance.visualizationsInfo = (
-            stats.visualizationsInfo);
-          modalRef.componentInstance.stateStats = (
-            this.expStats.getStateStats(stateName));
+          modalRef.componentInstance.visualizationsInfo =
+            stats.visualizationsInfo;
+          modalRef.componentInstance.stateStats =
+            this.expStats.getStateStats(stateName);
 
           modalRef.result.then(
-            () => this.stateStatsModalIsOpen = false,
+            () => (this.stateStatsModalIsOpen = false),
             () => {
               this.alertsService.clearWarnings();
               this.stateStatsModalIsOpen = false;
-            });
+            }
+          );
         });
     }
   }
@@ -164,8 +168,9 @@ export class StatisticsTabComponent implements
     this.explorationHasBeenVisited = false;
 
     this.directiveSubscriptions.add(
-      this.routerService.onRefreshStatisticsTab.subscribe(
-        () => this.refreshExplorationStatistics())
+      this.routerService.onRefreshStatisticsTab.subscribe(() =>
+        this.refreshExplorationStatistics()
+      )
     );
 
     this.refreshExplorationStatistics();
@@ -175,8 +180,3 @@ export class StatisticsTabComponent implements
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaStatisticsTab',
-   downgradeComponent({
-     component: StatisticsTabComponent
-   }) as angular.IDirectiveFactory);

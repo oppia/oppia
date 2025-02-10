@@ -16,23 +16,49 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardPageService.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions } from
-// eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-import { TopicsAndSkillsDashboardFilter } from
+import {
+  ETopicPublishedOptions,
+  ETopicSortOptions,
+  ETopicNewSortingOptions,
+  ETopicStatusOptions,
   // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicsAndSkillsDashboardPageService } from
+} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {
+  TopicsAndSkillsDashboardFilter,
   // eslint-disable-next-line max-len
-  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { CreatorTopicSummary } from
-  'domain/topic/creator-topic-summary.model';
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+import {
+  TopicsAndSkillsDashboardPageService,
+  // eslint-disable-next-line max-len
+} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {PlatformFeatureService} from '../../services/platform-feature.service';
+import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchCurriculumAdminView: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Topic and Skill dashboard page service', () => {
   let tsds: TopicsAndSkillsDashboardPageService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(() => {
-    tsds = new TopicsAndSkillsDashboardPageService();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
+    });
+    tsds = TestBed.inject(TopicsAndSkillsDashboardPageService);
   });
 
   it('should filter the topics', () => {
@@ -55,7 +81,11 @@ describe('Topic and Skill dashboard page service', () => {
       language_code: 'en',
       url_fragment: 'alpha',
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 2,
+      total_overdue_chapters_count: 5,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [5, 4],
     });
     const topic2 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1681839432987.596,
@@ -76,7 +106,11 @@ describe('Topic and Skill dashboard page service', () => {
       language_code: 'en',
       url_fragment: 'beta',
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 3,
+      total_overdue_chapters_count: 1,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4],
     });
     const topic3 = CreatorTopicSummary.createFromBackendDict({
       topic_model_created_on: 1781839432987.596,
@@ -97,8 +131,14 @@ describe('Topic and Skill dashboard page service', () => {
       language_code: 'en',
       url_fragment: 'gamma',
       thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA'
+      thumbnail_bg_color: '#C6DCDA',
+      total_upcoming_chapters_count: 1,
+      total_overdue_chapters_count: 0,
+      total_chapter_counts_for_each_story: [5, 4],
+      published_chapter_counts_for_each_story: [3, 4],
     });
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
     let topicsArray = [topic1, topic2, topic3];
     let filterOptions = TopicsAndSkillsDashboardFilter.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
@@ -117,6 +157,21 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
+
+    filterOptions.status = ETopicStatusOptions.FullyPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic1]);
+
+    filterOptions.status = ETopicStatusOptions.NotPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic2]);
+
+    filterOptions.status = ETopicStatusOptions.PartiallyPublished;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic3]);
+
     filterOptions.status = ETopicPublishedOptions.All;
     filterOptions.sort = ETopicSortOptions.IncreasingUpdatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
@@ -133,6 +188,18 @@ describe('Topic and Skill dashboard page service', () => {
     filterOptions.sort = ETopicSortOptions.DecreasingCreatedOn;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic1, topic2, topic3]);
+
+    filterOptions.sort = ETopicNewSortingOptions.DecreasingUpcomingLaunches;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic2, topic1, topic3]);
+
+    filterOptions.sort = ETopicNewSortingOptions.DecreasingOverdueLaunches;
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual([topic1, topic2, topic3]);
+
+    filterOptions.classroom = 'All Classrooms';
+    filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
+    expect(filteredArray).toEqual(topicsArray);
 
     filterOptions.sort = ETopicSortOptions.IncreasingCreatedOn;
     filterOptions.classroom = 'Math';

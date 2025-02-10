@@ -43,7 +43,7 @@
             </i>
           </ng-template>
           <ng-template ngbPaginationNumber let-p>
-            <button disabled class="pagination-button">{{ p }}</button>
+            <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
           </ng-template>
           <ng-template ngbPaginationNext>
             <i class="fa fa-angle-right text-center w-100 align-middle"
@@ -65,10 +65,10 @@
          class="posts-display-heading text-center">
       <picture>
         <source type="image/webp"
-                [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
         <source type="image/png"
-                [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-        <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+        <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
       </picture>
       {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
     </div>
@@ -91,7 +91,7 @@
           </i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
-          <button disabled class="pagination-button">{{ p }}</button>
+          <button class="pagination-button" (click)="onPageChange(p)">{{ p }}</button>
         </ng-template>
         <ng-template ngbPaginationNext>
           <i class="fa fa-angle-right text-center w-100 align-middle"

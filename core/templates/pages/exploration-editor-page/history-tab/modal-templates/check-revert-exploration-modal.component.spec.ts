@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the CheckRevertExplorationModalComponent.
  */
 
-import { EventEmitter } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {EventEmitter} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { CheckRevertService } from '../services/check-revert.service';
-import { CheckRevertExplorationModalComponent } from './check-revert-exploration-modal.component';
-import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+import {CheckRevertService} from '../services/check-revert.service';
+import {CheckRevertExplorationModalComponent} from './check-revert-exploration-modal.component';
+import {LoadingDotsComponent} from 'components/common-layout-directives/common-elements/loading-dots.component';
 
 class MockActiveModal {
   close(): void {
@@ -31,7 +30,7 @@ class MockActiveModal {
   }
 }
 
-describe('Check Revert Exploration Modal Component', function() {
+describe('Check Revert Exploration Modal Component', function () {
   let component: CheckRevertExplorationModalComponent;
   let fixture: ComponentFixture<CheckRevertExplorationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -42,20 +41,20 @@ describe('Check Revert Exploration Modal Component', function() {
     TestBed.configureTestingModule({
       declarations: [
         CheckRevertExplorationModalComponent,
-        LoadingDotsComponent
+        LoadingDotsComponent,
       ],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: CheckRevertService,
           useValue: {
-            detailsEventEmitter: mockDetailsEventEmitter
-          }
-        }
-      ]
+            detailsEventEmitter: mockDetailsEventEmitter,
+          },
+        },
+      ],
     }).compileComponents();
   }));
 

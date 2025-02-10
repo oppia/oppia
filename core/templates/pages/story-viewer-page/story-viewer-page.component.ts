@@ -16,28 +16,36 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { UserService } from 'services/user.service';
-import { AppConstants } from 'app.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { AlertsService } from 'services/alerts.service';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {UserService} from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {AlertsService} from 'services/alerts.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 import './story-viewer-page.component.css';
-import { StoryNode } from 'domain/story/story-node.model';
-
+import {StoryNode} from 'domain/story/story-node.model';
 
 interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -49,7 +57,7 @@ interface IconParametersArray {
 @Component({
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html',
-  styleUrls: ['./story-viewer-page.component.css']
+  styleUrls: ['./story-viewer-page.component.css'],
 })
 export class StoryViewerPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -97,8 +105,10 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       return;
     }
     const target = eventTarget;
-    if (target.closest('.story-viewer-login-container') !==
-        this.overlay.nativeElement) {
+    if (
+      target.closest('.story-viewer-login-container') !==
+      this.overlay.nativeElement
+    ) {
       this.skipButton.nativeElement.focus();
     }
   }
@@ -116,14 +126,14 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
 
   generatePathIconParameters(): IconParametersArray[] {
     let iconParametersArray: IconParametersArray[] = [];
-    for (
-      let i = 0; i < this.storyPlaythroughObject.getStoryNodeCount();
-      i++) {
+    for (let i = 0; i < this.storyPlaythroughObject.getStoryNodeCount(); i++) {
       this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
       this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
       this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.STORY, this.storyId,
-        this.thumbnailFilename);
+        AppConstants.ENTITY_TYPE.STORY,
+        this.storyId,
+        this.thumbnailFilename
+      );
       iconParametersArray.push({
         thumbnailIconUrl: this.iconUrl,
         left: '225px',
@@ -139,30 +149,35 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
   }
 
   signIn(): void {
-    this.userService.getLoginUrlAsync().then(
-      (loginUrl) => {
-        loginUrl ? this.windowRef.nativeWindow.location.href = loginUrl : (
-          this.windowRef.nativeWindow.location.reload());
-      });
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      loginUrl
+        ? (this.windowRef.nativeWindow.location.href = loginUrl)
+        : this.windowRef.nativeWindow.location.reload();
+    });
   }
 
   getExplorationUrl(node: StoryNode): string {
     let result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
-      result, 'topic_url_fragment',
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      result,
+      'topic_url_fragment',
+      this.urlService.getTopicUrlFragmentFromLearnerUrl()
+    );
     result = this.urlService.addField(
-      result, 'classroom_url_fragment',
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    let storyUrlFragment = (
-      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+      result,
+      'classroom_url_fragment',
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl()
+    );
+    let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
     if (storyUrlFragment === null) {
       throw new Error('Story url fragment is null');
     }
     result = this.urlService.addField(
-      result, 'story_url_fragment', storyUrlFragment);
-    result = this.urlService.addField(
-      result, 'node_id', node.getId());
+      result,
+      'story_url_fragment',
+      storyUrlFragment
+    );
+    result = this.urlService.addField(result, 'node_id', node.getId());
     return result;
   }
 
@@ -176,88 +191,94 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_STORY_VIEWER_PAGE_TITLE', {
+      'I18N_STORY_VIEWER_PAGE_TITLE',
+      {
         topicName: this.topicName,
-        storyTitle: this.storyTitle
-      });
+        storyTitle: this.storyTitle,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   ngOnInit(): void {
     this.storyIsLoaded = false;
     this.isLoggedIn = false;
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.isLoggedIn = userInfo.isLoggedIn();
     });
-    this.topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    this.classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    let storyUrlFragment = (
-      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+    let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
     if (storyUrlFragment === null) {
       throw new Error('Story url fragment is null');
     }
     this.storyUrlFragment = storyUrlFragment;
     this.loaderService.showLoadingScreen('Loading');
-    this.storyViewerBackendApiService.fetchStoryDataAsync(
-      this.topicUrlFragment,
-      this.classroomUrlFragment,
-      this.storyUrlFragment).then(
-      (storyDataDict) => {
-        this.storyIsLoaded = true;
-        this.storyPlaythroughObject = storyDataDict;
-        this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
-        this.storyId = this.storyPlaythroughObject.getStoryId();
-        this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.updateMetaTag(
-          storyDataDict.getMetaTagContent());
-        this.storyTitle = storyDataDict.title;
+    this.storyViewerBackendApiService
+      .fetchStoryDataAsync(
+        this.topicUrlFragment,
+        this.classroomUrlFragment,
+        this.storyUrlFragment
+      )
+      .then(
+        storyDataDict => {
+          this.storyIsLoaded = true;
+          this.storyPlaythroughObject = storyDataDict;
+          this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
+          this.storyId = this.storyPlaythroughObject.getStoryId();
+          this.topicName = this.storyPlaythroughObject.topicName;
+          this.pageTitleService.updateMetaTag(
+            storyDataDict.getMetaTagContent()
+          );
+          this.storyTitle = storyDataDict.title;
 
-        // The onLangChange event is initially fired before the story is
-        // loaded. Hence the first setpageTitle() call needs to made
-        // manually, and the onLangChange subscription is added after
-        // the story is loaded.
-        this.setPageTitle();
-        this.subscribeToOnLangChange();
-        this.storyTitleTranslationKey = (
-          this.i18nLanguageCodeService
-            .getStoryTranslationKey(
-              this.storyId, TranslationKeyType.TITLE)
-        );
-        this.storyDescription = storyDataDict.description;
-        this.storyDescTranslationKey = (
-          this.i18nLanguageCodeService
-            .getStoryTranslationKey(
-              this.storyId, TranslationKeyType.DESCRIPTION)
-        );
-        this.loaderService.hideLoadingScreen();
-        this.pathIconParameters = this.generatePathIconParameters();
-        for (let idx in this.storyNodes) {
-          let storyNode: ReadOnlyStoryNode = this.storyNodes[idx];
-          let storyNodeTitleTranslationKey = (
-            this.i18nLanguageCodeService.
-              getExplorationTranslationKey(
-                storyNode.getExplorationId(), TranslationKeyType.TITLE)
-          );
-          let storyNodeDescTranslationKey = (
-            this.i18nLanguageCodeService.
-              getExplorationTranslationKey(
-                storyNode.getExplorationId(), TranslationKeyType.DESCRIPTION)
-          );
-          this.storyNodesTitleTranslationKeys.push(
-            storyNodeTitleTranslationKey);
-          this.storyNodesDescTranslationKeys.push(
-            storyNodeDescTranslationKey);
+          // The onLangChange event is initially fired before the story is
+          // loaded. Hence the first setpageTitle() call needs to made
+          // manually, and the onLangChange subscription is added after
+          // the story is loaded.
+          this.setPageTitle();
+          this.subscribeToOnLangChange();
+          this.storyTitleTranslationKey =
+            this.i18nLanguageCodeService.getStoryTranslationKey(
+              this.storyId,
+              TranslationKeyType.TITLE
+            );
+          this.storyDescription = storyDataDict.description;
+          this.storyDescTranslationKey =
+            this.i18nLanguageCodeService.getStoryTranslationKey(
+              this.storyId,
+              TranslationKeyType.DESCRIPTION
+            );
+          this.loaderService.hideLoadingScreen();
+          this.pathIconParameters = this.generatePathIconParameters();
+          for (let idx in this.storyNodes) {
+            let storyNode: ReadOnlyStoryNode = this.storyNodes[idx];
+            let storyNodeTitleTranslationKey =
+              this.i18nLanguageCodeService.getExplorationTranslationKey(
+                storyNode.getExplorationId(),
+                TranslationKeyType.TITLE
+              );
+            let storyNodeDescTranslationKey =
+              this.i18nLanguageCodeService.getExplorationTranslationKey(
+                storyNode.getExplorationId(),
+                TranslationKeyType.DESCRIPTION
+              );
+            this.storyNodesTitleTranslationKeys.push(
+              storyNodeTitleTranslationKey
+            );
+            this.storyNodesDescTranslationKeys.push(
+              storyNodeDescTranslationKey
+            );
+          }
+        },
+        errorResponse => {
+          let errorCodes = AppConstants.FATAL_ERROR_CODES;
+          if (errorCodes.indexOf(errorResponse.status) !== -1) {
+            this.alertsService.addWarning('Failed to get dashboard data');
+          }
         }
-      },
-      (errorResponse) => {
-        let errorCodes = AppConstants.FATAL_ERROR_CODES;
-        if (errorCodes.indexOf(errorResponse.status) !== -1) {
-          this.alertsService.addWarning('Failed to get dashboard data');
-        }
-      }
-    );
+      );
 
     // The pathIconParameters is an array containing the co-ordinates,
     // background color and icon url for the icons generated on the
@@ -302,5 +323,9 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaStoryViewerPage',
-  downgradeComponent({component: StoryViewerPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaStoryViewerPage',
+    downgradeComponent({component: StoryViewerPageComponent})
+  );

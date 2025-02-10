@@ -45,10 +45,6 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
-  adminPage: [
-    './core/tests/webdriverio_desktop/adminTabFeatures.js'
-  ],
-
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
@@ -57,20 +53,12 @@ var suites = {
     './core/tests/webdriverio_desktop/blog.js'
   ],
 
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
-  ],
-
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
+  ],
+
+  contributorAdminDashboard: [
+    './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
   ],
 
   contributorDashboard: [
@@ -113,14 +101,6 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
-  featureGating: [
-    './core/tests/webdriverio/featureGatingFlow.js'
-  ],
-
-  feedbackUpdates: [
-    './core/tests/webdriverio_desktop/feedbackUpdates.js'
-  ],
-
   fileUploadExtensions: [
     './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
@@ -133,24 +113,8 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  learnerDashboard: [
-    './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
-  ],
-
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  playVoiceovers: [
-    './core/tests/webdriverio_desktop/playVoiceovers.js'
-  ],
-
-  preferences: [
-    './core/tests/webdriverio_desktop/preferences.js'
   ],
 
   profileFeatures: [
@@ -183,10 +147,6 @@ var suites = {
 
   topicAndStoryEditorFileUploadFeatures: [
     './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
-  ],
-
-  topicAndStoryViewer: [
-    './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],
 
   users: [
@@ -264,7 +224,7 @@ exports.config = {
   // the path portion of your baseUrl. If your `url` parameter starts
   // without a scheme or `/` (like `some/path`), the base url gets
   //  prepended directly.
-  baseUrl: 'http://localhost:9001',
+  baseUrl: 'http://localhost:8181',
 
   // Default timeout in milliseconds for request
   // if browser driver or grid doesn't send response.
@@ -310,7 +270,9 @@ exports.config = {
   // Options to be passed to Jasmine.
   jasmineOpts: {
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 1200000
+    defaultTimeoutInterval: 1200000,
+    // Option to stop execution of the suite after the first spec failure.
+    stopOnSpecFailure: true,
   },
 
 
@@ -349,7 +311,7 @@ exports.config = {
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
 
     // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:9001');
+    browser.url('http://localhost:8181');
   },
   /**
     * Function to be executed before a test (in Mocha/Jasmine only)
@@ -357,9 +319,8 @@ exports.config = {
     * @param {Object} context scope object the test was executed with
     */
   beforeTest: function(test, context) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
         '-r', '30',
@@ -409,9 +370,8 @@ exports.config = {
    */
   afterTest: async function(
       test, context, { error, result, duration, passed, retries }) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);

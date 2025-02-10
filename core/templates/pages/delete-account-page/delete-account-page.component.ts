@@ -16,15 +16,15 @@
  * @fileoverview Component for the Oppia 'Delete Account' page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
-import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteAccountBackendApiService} from './services/delete-account-backend-api.service';
+import {DeleteAccountModalComponent} from './templates/delete-account-modal.component';
 
 @Component({
   selector: 'oppia-delete-account-page',
-  templateUrl: './delete-account-page.component.html'
+  templateUrl: './delete-account-page.component.html',
 })
 export class DeleteAccountPageComponent {
   constructor(
@@ -33,18 +33,25 @@ export class DeleteAccountPageComponent {
   ) {}
 
   deleteAccount(): void {
-    const modelRef = this.ngbModal.open(
-      DeleteAccountModalComponent, { backdrop: true });
-    modelRef.result.then(() => {
-      this.deleteAccountBackendApiService.deleteAccount();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
+    const modelRef = this.ngbModal.open(DeleteAccountModalComponent, {
+      backdrop: true,
     });
+    modelRef.result.then(
+      () => {
+        this.deleteAccountBackendApiService.deleteAccount();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaDeleteAccountPage', downgradeComponent(
-    {component: DeleteAccountPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaDeleteAccountPage',
+    downgradeComponent({component: DeleteAccountPageComponent})
+  );

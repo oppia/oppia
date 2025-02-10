@@ -16,53 +16,57 @@
  * @fileoverview Validator service for the NumericExpressionInput interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { NumericExpressionInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { NumericExpressionInputRulesService } from
-  './numeric-expression-input-rules.service';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { AppConstants } from 'app.constants';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {NumericExpressionInputRulesService} from './numeric-expression-input-rules.service';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NumericExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: NumericExpressionInputCustomizationArgs): Warning[] {
+    customizationArgs: NumericExpressionInputCustomizationArgs
+  ): Warning[] {
     return [];
   }
 
   getAllWarnings(
-      stateName: string,
-      customizationArgs: NumericExpressionInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: NumericExpressionInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     let warningsList: Warning[] = [];
-    let algebraicRulesService = (
-      new NumericExpressionInputRulesService());
+    let algebraicRulesService = new NumericExpressionInputRulesService();
     let mathInteractionsService = new MathInteractionsService();
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
-
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
 
     // This validations ensures that there are no redundant rules present in the
     // answer groups.
@@ -78,18 +82,24 @@ export class NumericExpressionInputValidationService {
         let currentInput = rules[j].inputs.x as string;
         let currentRuleType = rules[j].type as string;
 
-        let unsupportedFunctions = (
-          mathInteractionsService.checkUnsupportedFunctions(currentInput));
+        let unsupportedFunctions =
+          mathInteractionsService.checkUnsupportedFunctions(currentInput);
         if (unsupportedFunctions.length > 0) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
-            message: (
-              'Input for learner answer ' + (j + 1) + ' from Oppia ' +
-              'response ' + (i + 1) + ' uses these function(s) ' +
-              'that aren\'t supported: [' + unsupportedFunctions +
+            message:
+              'Input for learner answer ' +
+              (j + 1) +
+              ' from Oppia ' +
+              'response ' +
+              (i + 1) +
+              ' uses these function(s) ' +
+              "that aren't supported: [" +
+              unsupportedFunctions +
               '] The supported functions are: ' +
-              '[' + this.supportedFunctionNames + ']'
-            )
+              '[' +
+              this.supportedFunctionNames +
+              ']',
           });
         }
 
@@ -97,31 +107,43 @@ export class NumericExpressionInputValidationService {
           let seenInput = seenRule.inputs.x as string;
           let seenRuleType = seenRule.type as string;
 
-          if (seenRuleType === 'IsEquivalentTo' && (
-            algebraicRulesService.IsEquivalentTo(
-              seenInput, {x: currentInput}))) {
+          if (
+            seenRuleType === 'IsEquivalentTo' &&
+            algebraicRulesService.IsEquivalentTo(seenInput, {x: currentInput})
+          ) {
             // This rule will make all of the following matching
             // inputs obsolete.
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Learner answer ' + (j + 1) + ' from Oppia ' +
-                'response ' + (i + 1) + ' will never be matched ' +
-                'because it is preceded by an \'IsEquivalentTo\' ' +
-                'answer with a matching input.')
+              message:
+                'Learner answer ' +
+                (j + 1) +
+                ' from Oppia ' +
+                'response ' +
+                (i + 1) +
+                ' will never be matched ' +
+                "because it is preceded by an 'IsEquivalentTo' " +
+                'answer with a matching input.',
             });
-          } else if (currentRuleType === 'MatchesExactlyWith' && (
-            algebraicRulesService.MatchesExactlyWith(
-              seenInput, {x: currentInput}))) {
+          } else if (
+            currentRuleType === 'MatchesExactlyWith' &&
+            algebraicRulesService.MatchesExactlyWith(seenInput, {
+              x: currentInput,
+            })
+          ) {
             // This rule will make the following inputs with MatchesExactlyWith
             // rule obsolete.
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
-              message: (
-                'Learner answer ' + (j + 1) + ' from Oppia ' +
-                'response ' + (i + 1) + ' will never be matched ' +
-                'because it is preceded by a \'MatchesExactlyWith\' ' +
-                'answer with a matching input.')
+              message:
+                'Learner answer ' +
+                (j + 1) +
+                ' from Oppia ' +
+                'response ' +
+                (i + 1) +
+                ' will never be matched ' +
+                "because it is preceded by a 'MatchesExactlyWith' " +
+                'answer with a matching input.',
             });
           }
         }
@@ -133,6 +155,9 @@ export class NumericExpressionInputValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'NumericExpressionInputValidationService',
-  downgradeInjectable(NumericExpressionInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'NumericExpressionInputValidationService',
+    downgradeInjectable(NumericExpressionInputValidationService)
+  );

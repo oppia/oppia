@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -350,19 +349,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_classroom_returns_correct_json(self) -> None:
         classroom_id = classroom_config_services.get_new_classroom_id()
 
-        classroom_dict: classroom_config_domain.ClassroomDict = {
-            'classroom_id': classroom_id,
-            'name': 'Math',
-            'url_fragment': 'math',
-            'course_details': '',
-            'topic_list_intro': '',
-            'topic_id_to_prerequisite_topic_ids': {}
-        }
-
-        classroom = classroom_config_domain.Classroom.from_dict(
-            classroom_dict)
-
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classroom = self.save_new_valid_classroom(
+            classroom_id=classroom_id, name='math'
+        )
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
@@ -380,19 +369,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_classroom_with_version_returns_error(self) -> None:
         classroom_id = classroom_config_services.get_new_classroom_id()
 
-        classroom_dict: classroom_config_domain.ClassroomDict = {
-            'classroom_id': classroom_id,
-            'name': 'Math',
-            'url_fragment': 'math',
-            'course_details': '',
-            'topic_list_intro': '',
-            'topic_id_to_prerequisite_topic_ids': {}
-        }
-
-        classroom = classroom_config_domain.Classroom.from_dict(
-            classroom_dict)
-
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id, name='math'
+        )
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(

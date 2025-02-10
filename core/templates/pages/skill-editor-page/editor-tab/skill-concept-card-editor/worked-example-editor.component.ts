@@ -16,26 +16,25 @@
  * @fileoverview Component for the worked example editor.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WorkedExample } from 'domain/skill/worked-example.model';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WorkedExample} from 'domain/skill/worked-example.model';
 
 interface HtmlFormSchema {
   type: 'html';
-  'ui_config': object;
+  ui_config: object;
 }
 
 interface Container {
-  'workedExampleQuestionHtml': string;
-  'workedExampleExplanationHtml': string;
+  workedExampleQuestionHtml: string;
+  workedExampleExplanationHtml: string;
 }
 
 @Component({
   selector: 'oppia-worked-example-editor',
-  templateUrl: './worked-example-editor.component.html'
+  templateUrl: './worked-example-editor.component.html',
 })
 export class WorkedExampleEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -54,23 +53,21 @@ export class WorkedExampleEditorComponent implements OnInit {
   questionEditorIsOpen: boolean = false;
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
-    ui_config: {}
+    ui_config: {},
   };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private skillEditorStateService: SkillEditorStateService,
-    private skillUpdateService: SkillUpdateService,
+    private skillUpdateService: SkillUpdateService
   ) {}
 
   ngOnInit(): void {
     this.questionEditorIsOpen = false;
     this.explanationEditorIsOpen = false;
     this.container = {
-      workedExampleQuestionHtml:
-      this.workedExample.getQuestion().html,
-      workedExampleExplanationHtml:
-      this.workedExample.getExplanation().html
+      workedExampleQuestionHtml: this.workedExample.getQuestion().html,
+      workedExampleExplanationHtml: this.workedExample.getExplanation().html,
     };
   }
 
@@ -96,16 +93,18 @@ export class WorkedExampleEditorComponent implements OnInit {
 
   openQuestionEditor(): void {
     if (this.isEditable) {
-      this.workedExampleQuestionMemento =
-        cloneDeep(this.container.workedExampleQuestionHtml);
+      this.workedExampleQuestionMemento = cloneDeep(
+        this.container.workedExampleQuestionHtml
+      );
       this.questionEditorIsOpen = true;
     }
   }
 
   openExplanationEditor(): void {
     if (this.isEditable) {
-      this.workedExampleExplanationMemento =
-        cloneDeep(this.container.workedExampleExplanationHtml);
+      this.workedExampleExplanationMemento = cloneDeep(
+        this.container.workedExampleExplanationHtml
+      );
       this.explanationEditorIsOpen = true;
     }
   }
@@ -116,12 +115,11 @@ export class WorkedExampleEditorComponent implements OnInit {
     } else {
       this.explanationEditorIsOpen = false;
     }
-    let contentHasChanged = ((
+    let contentHasChanged =
       this.workedExampleQuestionMemento !==
-      this.container.workedExampleQuestionHtml) || (
+        this.container.workedExampleQuestionHtml ||
       this.workedExampleExplanationMemento !==
-        this.container.workedExampleExplanationHtml)
-    );
+        this.container.workedExampleExplanationHtml;
     this.workedExampleQuestionMemento = null;
     this.workedExampleExplanationMemento = null;
 
@@ -130,7 +128,8 @@ export class WorkedExampleEditorComponent implements OnInit {
         this.skillEditorStateService.getSkill(),
         this.index,
         this.container.workedExampleQuestionHtml,
-        this.container.workedExampleExplanationHtml);
+        this.container.workedExampleExplanationHtml
+      );
     }
   }
 
@@ -139,7 +138,8 @@ export class WorkedExampleEditorComponent implements OnInit {
       return;
     }
     this.container.workedExampleQuestionHtml = cloneDeep(
-      this.workedExampleQuestionMemento);
+      this.workedExampleQuestionMemento
+    );
     this.workedExampleQuestionMemento = null;
     this.questionEditorIsOpen = false;
   }
@@ -149,11 +149,9 @@ export class WorkedExampleEditorComponent implements OnInit {
       return;
     }
     this.container.workedExampleExplanationHtml = cloneDeep(
-      this.workedExampleExplanationMemento);
+      this.workedExampleExplanationMemento
+    );
     this.workedExampleExplanationMemento = null;
     this.explanationEditorIsOpen = false;
   }
 }
-
-angular.module('oppia').directive('oppiaWorkedExampleEditor',
-  downgradeComponent({component: WorkedExampleEditorComponent}));

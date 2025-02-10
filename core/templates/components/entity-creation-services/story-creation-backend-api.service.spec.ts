@@ -16,15 +16,25 @@
  * @fileoverview Unit test for Story Creation Service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { async, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { StoryCreationBackendApiService } from './story-creation-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  async,
+  fakeAsync,
+  flush,
+  flushMicrotasks,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {StoryCreationBackendApiService} from './story-creation-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Story Creation Backend Api Service', () => {
   let scbas: StoryCreationBackendApiService;
@@ -38,18 +48,14 @@ describe('Story Creation Backend Api Service', () => {
   let windowRef: WindowRef;
   let mockWindow = {
     location: {
-      href: ''
-    }
+      href: '',
+    },
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      providers: [
-        StoryCreationBackendApiService
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [StoryCreationBackendApiService],
     });
   }));
 
@@ -61,33 +67,41 @@ describe('Story Creation Backend Api Service', () => {
         description: 'Topic description',
         version: 1,
         uncategorized_skill_ids: ['skill_1'],
-        canonical_story_references: [{
-          story_id: 'story_1',
-          story_is_published: true
-        }, {
-          story_id: 'story_2',
-          story_is_published: true
-        }, {
-          story_id: 'story_3',
-          story_is_published: true
-        }],
-        additional_story_references: [{
-          story_id: 'story_2',
-          story_is_published: true
-        }],
-        subtopics: [{
-          id: 1,
-          title: 'Title',
-          skill_ids: ['skill_2']
-        }],
+        canonical_story_references: [
+          {
+            story_id: 'story_1',
+            story_is_published: true,
+          },
+          {
+            story_id: 'story_2',
+            story_is_published: true,
+          },
+          {
+            story_id: 'story_3',
+            story_is_published: true,
+          },
+        ],
+        additional_story_references: [
+          {
+            story_id: 'story_2',
+            story_is_published: true,
+          },
+        ],
+        subtopics: [
+          {
+            id: 1,
+            title: 'Title',
+            skill_ids: ['skill_2'],
+          },
+        ],
         next_subtopic_id: 2,
         language_code: 'en',
-        skill_ids_for_diagnostic_test: []
+        skill_ids_for_diagnostic_test: [],
       },
       skillIdToDescriptionDict: {
         skill_1: 'Description 1',
-        skill_2: 'Description 2'
-      }
+        skill_2: 'Description 2',
+      },
     };
 
     windowRef = TestBed.inject(WindowRef);
@@ -101,23 +115,27 @@ describe('Story Creation Backend Api Service', () => {
     imageBlob = new Blob(['image data'], {type: 'imagetype'});
     topic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
-      sampleTopicBackendObject.skillIdToDescriptionDict);
+      sampleTopicBackendObject.skillIdToDescriptionDict
+    );
     topic.getId = () => {
       return 'id';
     };
 
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
-    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
+      {
         filename: 'Image1',
-        imageBlob: imageBlob
-      }]);
+        imageBlob: imageBlob,
+      },
+    ]);
     spyOn(imageLocalStorageService, 'flushStoredImagesData').and.stub();
     spyOn(imageLocalStorageService, 'getThumbnailBgColor').and.returnValue(
-      '#f00');
+      '#f00'
+    );
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
-    spyOn(csrfTokenService, 'getTokenAsync')
-      .and.returnValue(Promise.resolve('sample-csrf-token'));
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
   }));
 
   afterEach(() => {
@@ -130,8 +148,8 @@ describe('Story Creation Backend Api Service', () => {
         isValid: () => true,
         title: 'Title',
         description: 'Description',
-        urlFragment: 'url'
-      })
+        urlFragment: 'url',
+      }),
     } as NgbModalRef);
 
     scbas.createNewCanonicalStory();
@@ -148,8 +166,8 @@ describe('Story Creation Backend Api Service', () => {
         isValid: () => true,
         title: 'Title',
         description: 'Description',
-        urlFragment: 'url'
-      })
+        urlFragment: 'url',
+      }),
     } as NgbModalRef);
 
     scbas.createNewCanonicalStory();
@@ -158,60 +176,69 @@ describe('Story Creation Backend Api Service', () => {
     expect(scbas.createNewCanonicalStory()).toBeUndefined();
   });
 
+  it(
+    'should post story data to server and change window location' +
+      ' on success',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({
+          isValid: () => true,
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url',
+        }),
+      } as NgbModalRef);
 
-  it('should post story data to server and change window location' +
-    ' on success', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
-      })
-    } as NgbModalRef);
+      expect(mockWindow.location.href).toBe('');
+      scbas.createNewCanonicalStory();
+      tick();
 
-    expect(mockWindow.location.href).toBe('');
-    scbas.createNewCanonicalStory();
-    tick();
+      let req = httpTestingController.expectOne(
+        '/topic_editor_story_handler/' + 'id'
+      );
+      expect(req.request.method).toEqual('POST');
+      req.flush({storyId: 'id'});
 
-    let req = httpTestingController.expectOne(
-      '/topic_editor_story_handler/' + 'id');
-    expect(req.request.method).toEqual('POST');
-    req.flush({storyId: 'id'});
+      flush();
+      flushMicrotasks();
 
-    flush();
-    flushMicrotasks();
+      expect(mockWindow.location.href).toBe('/story_editor/id');
+    })
+  );
 
-    expect(mockWindow.location.href).toBe('/story_editor/id');
-  }));
+  it(
+    'should post story data to server and change window location' + ' on Error',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({
+          isValid: () => true,
+          title: 'Title',
+          description: 'Description',
+          urlFragment: 'url',
+        }),
+      } as NgbModalRef);
 
-  it('should post story data to server and change window location' +
-    ' on Error', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve({
-        isValid: () => true,
-        title: 'Title',
-        description: 'Description',
-        urlFragment: 'url'
-      })
-    } as NgbModalRef);
+      scbas.createNewCanonicalStory();
+      tick();
 
-    scbas.createNewCanonicalStory();
-    tick();
+      let req = httpTestingController.expectOne(
+        '/topic_editor_story_handler/' + 'id'
+      );
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        {
+          error: 'Error creating a new exploration.',
+        },
+        {
+          status: 500,
+          statusText: 'Error creating a new exploration.',
+        }
+      );
 
-    let req = httpTestingController.expectOne(
-      '/topic_editor_story_handler/' + 'id');
-    expect(req.request.method).toEqual('POST');
-    req.flush({
-      error: 'Error creating a new exploration.'
-    }, {
-      status: 500,
-      statusText: 'Error creating a new exploration.'
-    });
-
-    flush();
-    flushMicrotasks();
-  }));
+      flush();
+      flushMicrotasks();
+    })
+  );
 
   it('should throw error if the newly created story is not valid', () => {
     spyOn(ngbModal, 'open').and.returnValue({
@@ -219,8 +246,8 @@ describe('Story Creation Backend Api Service', () => {
         isValid: () => false,
         title: 'Title',
         description: 'Description',
-        urlFragment: 'url'
-      })
+        urlFragment: 'url',
+      }),
     } as NgbModalRef);
     try {
       scbas.createNewCanonicalStory();

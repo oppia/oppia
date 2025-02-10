@@ -16,13 +16,13 @@
  * @fileoverview Module for the participation playbook page.
  */
 
-import { NgModule } from '@angular/core';
-import { PlaybookPageComponent } from './playbook.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { PlaybookPageRootComponent } from './playbook-page-root.component';
-import { CommonModule } from '@angular/common';
-import { PlaybookPageRoutingModule } from './playbook-page-routing.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {NgModule} from '@angular/core';
+import {PlaybookPageComponent} from './playbook.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {PlaybookPageRootComponent} from './playbook-page-root.component';
+import {CommonModule} from '@angular/common';
+import {PlaybookPageRoutingModule} from './playbook-page-routing.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -31,15 +31,9 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     // TODO(#13443): Remove hybrid router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    PlaybookPageRoutingModule
+    PlaybookPageRoutingModule,
   ],
-  declarations: [
-    PlaybookPageComponent,
-    PlaybookPageRootComponent
-  ],
-  entryComponents: [
-    PlaybookPageComponent,
-    PlaybookPageRootComponent,
-  ]
+  declarations: [PlaybookPageComponent, PlaybookPageRootComponent],
+  entryComponents: [PlaybookPageComponent, PlaybookPageRootComponent],
 })
 export class PlaybookPageModule {}

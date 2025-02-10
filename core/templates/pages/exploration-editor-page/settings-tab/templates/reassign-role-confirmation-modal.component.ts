@@ -16,24 +16,20 @@
  * @fileoverview Component for reassign role confirmation modal.
  */
 
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-remove-role-confirmation-modal',
-  templateUrl: './reassign-role-confirmation-modal.component.html'
+  templateUrl: './reassign-role-confirmation-modal.component.html',
 })
-
-export class ReassignRoleConfirmationModalComponent
-  extends ConfirmOrCancelModal {
+export class ReassignRoleConfirmationModalComponent extends ConfirmOrCancelModal {
   @Input() username!: string;
   @Input() newRole!: string;
   @Input() oldRole!: string;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

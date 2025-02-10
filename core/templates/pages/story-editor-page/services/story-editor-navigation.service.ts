@@ -16,23 +16,25 @@
  * @fileoverview Service to handle navigation in story editor page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {Injectable, EventEmitter} from '@angular/core';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 const STORY_EDITOR = 'story_editor';
 const CHAPTER_EDITOR = 'chapter_editor';
 const STORY_PREVIEW = 'story_preview';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StoryEditorNavigationService {
   activeTab: string = 'story_editor';
   chapterId!: string;
   // 'chapterIndex' is null when we are navigating to a chapter with its ID.
   chapterIndex: number | null = null;
+
+  private _activeTabIsSwitchedEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
 
   constructor(private windowRef: WindowRef) {}
 
@@ -55,6 +57,7 @@ export class StoryEditorNavigationService {
   navigateToChapterEditorWithId(id: string, index: number | null): void {
     this.activeTab = CHAPTER_EDITOR;
     this.setChapterId(id);
+    this._activeTabIsSwitchedEventEmitter.emit(CHAPTER_EDITOR);
     this.chapterIndex = index;
     this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
   }
@@ -71,7 +74,8 @@ export class StoryEditorNavigationService {
   checkIfPresentInStoryPreviewTab(): boolean {
     return (
       this.windowRef.nativeWindow.location.hash.split('/')[1] ===
-        'story_preview');
+      'story_preview'
+    );
   }
 
   navigateToChapterEditor(): void {
@@ -80,6 +84,7 @@ export class StoryEditorNavigationService {
 
   navigateToStoryEditor(): void {
     this.activeTab = STORY_EDITOR;
+    this._activeTabIsSwitchedEventEmitter.emit(STORY_EDITOR);
     this.windowRef.nativeWindow.location.hash = '';
   }
 
@@ -87,8 +92,8 @@ export class StoryEditorNavigationService {
     this.windowRef.nativeWindow.location.hash = '/story_preview/';
     this.activeTab = STORY_PREVIEW;
   }
-}
 
-angular.module('oppia').factory(
-  'StoryEditorNavigationService',
-  downgradeInjectable(StoryEditorNavigationService));
+  get onChangeActiveTab(): EventEmitter<string> {
+    return this._activeTabIsSwitchedEventEmitter;
+  }
+}

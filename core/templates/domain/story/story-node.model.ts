@@ -17,26 +17,25 @@
  * story node domain objects.
  */
 
-import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants';
+import {StoryEditorPageConstants} from 'pages/story-editor-page/story-editor-page.constants';
 
 export interface StoryNodeBackendDict {
-  'id': string;
-  'title': string;
-  'description': string;
-  'destination_node_ids': string[];
-  'prerequisite_skill_ids': string[];
-  'acquired_skill_ids': string[];
-  'outline': string;
-  'outline_is_finalized': boolean;
-  'exploration_id': string | null;
-  'thumbnail_bg_color': string | null;
-  'thumbnail_filename': string | null;
-  'status': string;
-  'planned_publication_date_msecs': number | null;
-  'last_modified_msecs': number | null;
-  'first_publication_date_msecs': number | null;
-  'unpublishing_reason': string | null;
+  id: string;
+  title: string;
+  description: string;
+  destination_node_ids: string[];
+  prerequisite_skill_ids: string[];
+  acquired_skill_ids: string[];
+  outline: string;
+  outline_is_finalized: boolean;
+  exploration_id: string | null;
+  thumbnail_bg_color: string | null;
+  thumbnail_filename: string | null;
+  status: string;
+  planned_publication_date_msecs: number | null;
+  last_modified_msecs: number | null;
+  first_publication_date_msecs: number | null;
+  unpublishing_reason: string | null;
 }
 
 export class StoryNode {
@@ -58,15 +57,23 @@ export class StoryNode {
   _unpublishingReason: string | null;
 
   constructor(
-      id: string, title: string, description: string,
-      destinationNodeIds: string[], prerequisiteSkillIds: string[],
-      acquiredSkillIds: string[], outline: string,
-      outlineIsFinalized: boolean, explorationId: string | null,
-      thumbnailBgColor: string | null, thumbnailFilename: string | null,
-      status: string, plannedPublicationDateMsecs: number | null,
-      lastModifiedMsecs: number | null,
-      firstPublicationDateMsecs: number | null,
-      unpublishingReason: string | null) {
+    id: string,
+    title: string,
+    description: string,
+    destinationNodeIds: string[],
+    prerequisiteSkillIds: string[],
+    acquiredSkillIds: string[],
+    outline: string,
+    outlineIsFinalized: boolean,
+    explorationId: string | null,
+    thumbnailBgColor: string | null,
+    thumbnailFilename: string | null,
+    status: string,
+    plannedPublicationDateMsecs: number | null,
+    lastModifiedMsecs: number | null,
+    firstPublicationDateMsecs: number | null,
+    unpublishingReason: string | null
+  ) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -90,7 +97,9 @@ export class StoryNode {
       return false;
     }
     var nodeIdPattern = new RegExp(
-      StoryEditorPageConstants.NODE_ID_PREFIX + '[0-9]+', 'g');
+      StoryEditorPageConstants.NODE_ID_PREFIX + '[0-9]+',
+      'g'
+    );
     if (!nodeId.match(nodeIdPattern)) {
       return false;
     }
@@ -146,7 +155,7 @@ export class StoryNode {
   }
 
   setPlannedPublicationDateMsecs(
-      plannedPublicationDateMsecs: number | null
+    plannedPublicationDateMsecs: number | null
   ): void {
     this._plannedPublicationDateMsecs = plannedPublicationDateMsecs;
   }
@@ -155,9 +164,7 @@ export class StoryNode {
     this._lastModifiedMsecs = lastModifiedMsecs;
   }
 
-  setFirstPublicationDateMsecs(
-      firstPublicationDateMsecs: number | null
-  ): void {
+  setFirstPublicationDateMsecs(firstPublicationDateMsecs: number | null): void {
     this._firstPublicationDateMsecs = firstPublicationDateMsecs;
   }
 
@@ -225,54 +232,83 @@ export class StoryNode {
 
     for (var i = 0; i < prerequisiteSkillIds.length; i++) {
       var skillId = prerequisiteSkillIds[i];
-      if (prerequisiteSkillIds.indexOf(skillId) <
-        prerequisiteSkillIds.lastIndexOf(skillId)) {
+      if (
+        prerequisiteSkillIds.indexOf(skillId) <
+        prerequisiteSkillIds.lastIndexOf(skillId)
+      ) {
         issues.push(
-          'The prerequisite skill with id ' + skillId + ' is duplicated in' +
-          ' node with id ' + this._id);
+          'The prerequisite skill with id ' +
+            skillId +
+            ' is duplicated in' +
+            ' node with id ' +
+            this._id
+        );
       }
     }
     for (var i = 0; i < acquiredSkillIds.length; i++) {
       var skillId = acquiredSkillIds[i];
-      if (acquiredSkillIds.indexOf(skillId) <
-        acquiredSkillIds.lastIndexOf(skillId)) {
+      if (
+        acquiredSkillIds.indexOf(skillId) <
+        acquiredSkillIds.lastIndexOf(skillId)
+      ) {
         issues.push(
-          'The acquired skill with id ' + skillId + ' is duplicated in' +
-          ' node with id ' + this._id);
+          'The acquired skill with id ' +
+            skillId +
+            ' is duplicated in' +
+            ' node with id ' +
+            this._id
+        );
       }
     }
     for (var i = 0; i < prerequisiteSkillIds.length; i++) {
       if (acquiredSkillIds.indexOf(prerequisiteSkillIds[i]) !== -1) {
         issues.push(
-          'The skill with id ' + prerequisiteSkillIds[i] + ' is common ' +
-          'to both the acquired and prerequisite skill id list in node with' +
-          ' id ' + this._id);
+          'The skill with id ' +
+            prerequisiteSkillIds[i] +
+            ' is common ' +
+            'to both the acquired and prerequisite skill id list in node with' +
+            ' id ' +
+            this._id
+        );
       }
     }
     for (var i = 0; i < destinationNodeIds.length; i++) {
       if (!this._checkValidNodeId(destinationNodeIds[i])) {
         throw new Error(
-          'The destination node id ' + destinationNodeIds[i] + ' is ' +
-          'invalid in node with id ' + this._id);
+          'The destination node id ' +
+            destinationNodeIds[i] +
+            ' is ' +
+            'invalid in node with id ' +
+            this._id
+        );
       }
     }
 
     var currentNodeId = this._id;
     if (
-      destinationNodeIds.some((nodeId) => {
+      destinationNodeIds.some(nodeId => {
         return nodeId === currentNodeId;
-      })) {
+      })
+    ) {
       issues.push(
-        'The destination node id of node with id ' + this._id +
-        ' points to itself.');
+        'The destination node id of node with id ' +
+          this._id +
+          ' points to itself.'
+      );
     }
     for (var i = 0; i < destinationNodeIds.length; i++) {
       var nodeId = destinationNodeIds[i];
-      if (destinationNodeIds.indexOf(nodeId) <
-        destinationNodeIds.lastIndexOf(nodeId)) {
+      if (
+        destinationNodeIds.indexOf(nodeId) <
+        destinationNodeIds.lastIndexOf(nodeId)
+      ) {
         issues.push(
-          'The destination node with id ' + nodeId + ' is duplicated in' +
-          ' node with id ' + this._id);
+          'The destination node with id ' +
+            nodeId +
+            ' is duplicated in' +
+            ' node with id ' +
+            this._id
+        );
       }
     }
     return issues;
@@ -336,9 +372,11 @@ export class StoryNode {
   }
 
   static createFromBackendDict(
-      storyNodeBackendObject: StoryNodeBackendDict): StoryNode {
+    storyNodeBackendObject: StoryNodeBackendDict
+  ): StoryNode {
     return new StoryNode(
-      storyNodeBackendObject.id, storyNodeBackendObject.title,
+      storyNodeBackendObject.id,
+      storyNodeBackendObject.title,
       storyNodeBackendObject.description,
       storyNodeBackendObject.destination_node_ids,
       storyNodeBackendObject.prerequisite_skill_ids,
@@ -358,7 +396,22 @@ export class StoryNode {
 
   static createFromIdAndTitle(nodeId: string, title: string): StoryNode {
     return new StoryNode(
-      nodeId, title, '', [], [], [], '', false, null,
-      null, null, 'Draft', null, null, null, null);
+      nodeId,
+      title,
+      '',
+      [],
+      [],
+      [],
+      '',
+      false,
+      null,
+      null,
+      null,
+      'Draft',
+      null,
+      null,
+      null,
+      null
+    );
   }
 }

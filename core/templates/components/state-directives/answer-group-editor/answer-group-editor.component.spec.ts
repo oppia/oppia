@@ -16,18 +16,33 @@
  * @fileoverview Unit test for Answer Group Editor Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Rule } from 'domain/exploration/rule.model';
-import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
-import { AlertsService } from 'services/alerts.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { AnswerGroupEditor } from './answer-group-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {Rule} from 'domain/exploration/rule.model';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
+import {AlertsService} from 'services/alerts.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {AnswerGroupEditor} from './answer-group-editor.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanTagMisconceptions: {
+      isEnabled: true,
+    },
+  };
+}
 
 describe('Answer Group Editor Component', () => {
   let component: AnswerGroupEditor;
@@ -41,6 +56,7 @@ describe('Answer Group Editor Component', () => {
   let mockOnExternalSave = new EventEmitter();
   let mockOnUpdateAnswerChoices = new EventEmitter();
   let mockOnInteractionIdChanged = new EventEmitter();
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let answerChoices = [
     {
@@ -59,13 +75,8 @@ describe('Answer Group Editor Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      declarations: [
-        AnswerGroupEditor,
-        ParameterizeRuleDescriptionPipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [AnswerGroupEditor, ParameterizeRuleDescriptionPipe],
       providers: [
         ExternalSaveService,
         StateEditorService,
@@ -73,8 +84,12 @@ describe('Answer Group Editor Component', () => {
         ResponsesService,
         AlertsService,
         TrainingDataEditorPanelService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -88,14 +103,18 @@ describe('Answer Group Editor Component', () => {
     responsesService = TestBed.inject(ResponsesService);
     alertsService = TestBed.inject(AlertsService);
     trainingDataEditorPanelService = TestBed.inject(
-      TrainingDataEditorPanelService);
+      TrainingDataEditorPanelService
+    );
 
-    spyOn(externalSaveService, 'onExternalSave')
-      .and.returnValue(mockOnExternalSave);
-    spyOn(stateEditorService, 'onUpdateAnswerChoices')
-      .and.returnValue(mockOnUpdateAnswerChoices);
-    spyOn(stateInteractionIdService, 'onInteractionIdChanged')
-      .and.returnValue(mockOnInteractionIdChanged);
+    spyOn(externalSaveService, 'onExternalSave').and.returnValue(
+      mockOnExternalSave
+    );
+    spyOn(stateEditorService, 'onUpdateAnswerChoices').and.returnValue(
+      mockOnUpdateAnswerChoices
+    );
+    spyOn(stateInteractionIdService, 'onInteractionIdChanged').and.returnValue(
+      mockOnInteractionIdChanged
+    );
   });
 
   it('should set component properties on initialization', () => {
@@ -117,54 +136,64 @@ describe('Answer Group Editor Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should save rules when current rule is valid and user' +
-    ' triggers an external save', fakeAsync(() => {
-    let externalSaveEmitter = new EventEmitter();
-    spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
-      externalSaveEmitter);
-    spyOn(stateEditorService, 'checkCurrentRuleInputIsValid').and.returnValue(
-      true);
-    spyOn(component, 'saveRules').and.stub();
+  it(
+    'should save rules when current rule is valid and user' +
+      ' triggers an external save',
+    fakeAsync(() => {
+      let externalSaveEmitter = new EventEmitter();
+      spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
+        externalSaveEmitter
+      );
+      spyOn(stateEditorService, 'checkCurrentRuleInputIsValid').and.returnValue(
+        true
+      );
+      spyOn(component, 'saveRules').and.stub();
 
-    component.ngOnInit();
-    component.activeRuleIndex = 1;
-    component.sendOnSaveTaggedMisconception(null);
-    component.sendOnSaveAnswerGroupCorrectnessLabel(null);
-    component.sendOnSaveAnswerGroupFeedback(null);
+      component.ngOnInit();
+      component.activeRuleIndex = 1;
+      component.sendOnSaveTaggedMisconception(null);
+      component.sendOnSaveAnswerGroupCorrectnessLabel(null);
+      component.sendOnSaveAnswerGroupFeedback(null);
 
-    externalSaveEmitter.emit();
-    tick();
+      externalSaveEmitter.emit();
+      tick();
 
-    expect(component.saveRules).toHaveBeenCalled();
+      expect(component.saveRules).toHaveBeenCalled();
 
-    component.ngOnDestroy();
-  }));
+      component.ngOnDestroy();
+    })
+  );
 
-  it('should warning message when current rule is invalid and user' +
-    ' triggers an external save', fakeAsync(() => {
-    let externalSaveEmitter = new EventEmitter();
-    spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
-      externalSaveEmitter);
-    spyOn(stateEditorService, 'checkCurrentRuleInputIsValid').and.returnValue(
-      false);
-    spyOn(alertsService, 'addInfoMessage');
+  it(
+    'should warning message when current rule is invalid and user' +
+      ' triggers an external save',
+    fakeAsync(() => {
+      let externalSaveEmitter = new EventEmitter();
+      spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
+        externalSaveEmitter
+      );
+      spyOn(stateEditorService, 'checkCurrentRuleInputIsValid').and.returnValue(
+        false
+      );
+      spyOn(alertsService, 'addInfoMessage');
 
-    component.ngOnInit();
-    component.activeRuleIndex = 1;
-    alertsService.addMessage('info', 'Some other message', 0);
-    component.sendOnSaveAnswerGroupDest(null);
-    component.sendOnSaveAnswerGroupDestIfStuck(null);
+      component.ngOnInit();
+      component.activeRuleIndex = 1;
+      alertsService.addMessage('info', 'Some other message', 0);
+      component.sendOnSaveAnswerGroupDest(null);
+      component.sendOnSaveAnswerGroupDestIfStuck(null);
 
-    externalSaveEmitter.emit();
-    tick();
+      externalSaveEmitter.emit();
+      tick();
 
-    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-      'There was an unsaved rule input which was invalid' +
-      ' and has been discarded.'
-    );
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'There was an unsaved rule input which was invalid' +
+          ' and has been discarded.'
+      );
 
-    component.ngOnDestroy();
-  }));
+      component.ngOnDestroy();
+    })
+  );
 
   it('should return back when ruleTypes length is 0', () => {
     spyOn(component, 'getCurrentInteractionId').and.returnValue('Continue');
@@ -175,42 +204,47 @@ describe('Answer Group Editor Component', () => {
     expect(component.changeActiveRuleIndex).not.toHaveBeenCalled();
   });
 
-  it('should get answer choices when user updates answer choices',
-    fakeAsync(() => {
-      let updateAnswerChoicesEmitter = new EventEmitter();
-      spyOnProperty(stateEditorService, 'onUpdateAnswerChoices')
-        .and.returnValue(updateAnswerChoicesEmitter);
-      spyOn(responsesService, 'getAnswerChoices')
-        .and.returnValue(answerChoices);
-
-      component.ngOnInit();
-      updateAnswerChoicesEmitter.emit();
-      tick();
-
-      expect(component.answerChoices).toEqual(answerChoices);
-
-      component.ngOnDestroy();
-    }));
-
-  it('should save rules and get answer choices when interaction' +
-    ' is changed', fakeAsync(() => {
-    let interactionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
-      .and.returnValue(interactionIdChangedEmitter);
-    spyOn(component, 'saveRules').and.stub();
+  it('should get answer choices when user updates answer choices', fakeAsync(() => {
+    let updateAnswerChoicesEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onUpdateAnswerChoices').and.returnValue(
+      updateAnswerChoicesEmitter
+    );
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
     component.ngOnInit();
-    component.activeRuleIndex = 1;
-
-    interactionIdChangedEmitter.emit();
+    updateAnswerChoicesEmitter.emit();
     tick();
 
-    expect(component.saveRules).toHaveBeenCalled();
     expect(component.answerChoices).toEqual(answerChoices);
 
     component.ngOnDestroy();
   }));
+
+  it(
+    'should save rules and get answer choices when interaction' + ' is changed',
+    fakeAsync(() => {
+      let interactionIdChangedEmitter = new EventEmitter();
+      spyOnProperty(
+        stateInteractionIdService,
+        'onInteractionIdChanged'
+      ).and.returnValue(interactionIdChangedEmitter);
+      spyOn(component, 'saveRules').and.stub();
+      spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+        answerChoices
+      );
+
+      component.ngOnInit();
+      component.activeRuleIndex = 1;
+
+      interactionIdChangedEmitter.emit();
+      tick();
+
+      expect(component.saveRules).toHaveBeenCalled();
+      expect(component.answerChoices).toEqual(answerChoices);
+
+      component.ngOnDestroy();
+    })
+  );
 
   it('should check if editor is in question mode', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
@@ -218,7 +252,7 @@ describe('Answer Group Editor Component', () => {
     expect(component.isInQuestionMode()).toBe(true);
   });
 
-  it('should get current interaction\'s ID', () => {
+  it("should get current interaction's ID", () => {
     stateInteractionIdService.savedMemento = 'TextIput';
 
     expect(component.getCurrentInteractionId()).toBe('TextIput');
@@ -239,71 +273,81 @@ describe('Answer Group Editor Component', () => {
       code: '',
       error: '',
       evaluation: '',
-      output: ''
+      output: '',
     });
-    expect(component.getDefaultInputValue('CoordTwoDim')).toEqual([
-      0, 0
-    ]);
+    expect(component.getDefaultInputValue('CoordTwoDim')).toEqual([0, 0]);
     expect(component.getDefaultInputValue('MusicPhrase')).toEqual([]);
     expect(component.getDefaultInputValue('CheckedProof')).toEqual({
       assumptions_string: '',
       correct: false,
       proof_string: '',
-      target_string: ''
+      target_string: '',
     });
     expect(component.getDefaultInputValue('Graph')).toEqual({
       edges: [],
       isDirected: false,
       isLabeled: false,
       isWeighted: false,
-      vertices: []
+      vertices: [],
     });
     expect(component.getDefaultInputValue('NormalizedRectangle2D')).toEqual([
       [0, 0],
-      [0, 0]
+      [0, 0],
     ]);
     expect(component.getDefaultInputValue('ImageRegion')).toEqual({
-      area: [[0, 0], [0, 0]],
-      regionType: ''
+      area: [
+        [0, 0],
+        [0, 0],
+      ],
+      regionType: '',
     });
     expect(component.getDefaultInputValue('ImageWithRegions')).toEqual({
       imagePath: '',
-      labeledRegions: []
+      labeledRegions: [],
     });
     expect(component.getDefaultInputValue('ClickOnImage')).toEqual({
       clickPosition: [0, 0],
-      clickedRegions: []
+      clickedRegions: [],
     });
-    expect(component.getDefaultInputValue('TranslatableSetOfNormalizedString'))
-      .toEqual({
-        contentId: null,
-        normalizedStrSet: []
-      });
-    expect(component.getDefaultInputValue('TranslatableSetOfUnicodeString'))
-      .toEqual({
-        contentId: null,
-        normalizedStrSet: []
-      });
+    expect(
+      component.getDefaultInputValue('TranslatableSetOfNormalizedString')
+    ).toEqual({
+      contentId: null,
+      normalizedStrSet: [],
+    });
+    expect(
+      component.getDefaultInputValue('TranslatableSetOfUnicodeString')
+    ).toEqual({
+      contentId: null,
+      normalizedStrSet: [],
+    });
   });
 
-  it('should add new rule when user click on \'+ Add Another' +
-    ' Possible Answer\'', () => {
-    component.rules = [];
-    stateInteractionIdService.savedMemento = 'TextInput';
+  it(
+    "should add new rule when user click on '+ Add Another" +
+      " Possible Answer'",
+    () => {
+      component.rules = [];
+      stateInteractionIdService.savedMemento = 'TextInput';
 
-    component.addNewRule();
+      component.addNewRule();
 
-    expect(component.rules).toEqual([
-      new Rule('StartsWith', {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
-        }
-      }, {
-        x: 'TranslatableSetOfNormalizedString'
-      })
-    ]);
-  });
+      expect(component.rules).toEqual([
+        new Rule(
+          'StartsWith',
+          {
+            x: {
+              contentId: null,
+              normalizedStrSet: [],
+            },
+          },
+          {
+            x: 'TranslatableSetOfNormalizedString',
+          }
+        ),
+      ]);
+    }
+  );
 
   it('should not add rule for interaction specs without description', () => {
     stateInteractionIdService.savedMemento = 'MultipleChoiceInput';
@@ -313,51 +357,67 @@ describe('Answer Group Editor Component', () => {
 
   it('should delete rule when user clicks on delete', () => {
     component.originalContentIdToContent = {
-      id1: 'content'
+      id1: 'content',
     };
     component.rules = [
-      new Rule('StartsWith', {
-        x: {
-          contentId: 'id1',
-          normalizedStrSet: []
+      new Rule(
+        'StartsWith',
+        {
+          x: {
+            contentId: 'id1',
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'TranslatableSetOfNormalizedString',
         }
-      }, {
-        x: 'TranslatableSetOfNormalizedString'
-      }),
-      new Rule('StartsWith', {
-        x: {
-          contentId: 'id2',
-          normalizedStrSet: []
+      ),
+      new Rule(
+        'StartsWith',
+        {
+          x: {
+            contentId: 'id2',
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'TranslatableSetOfNormalizedString',
         }
-      }, {
-        x: 'TranslatableSetOfNormalizedString'
-      })
+      ),
     ];
 
     component.deleteRule(1);
 
     expect(component.rules).toEqual([
-      new Rule('StartsWith', {
-        x: {
-          contentId: 'id1',
-          normalizedStrSet: []
+      new Rule(
+        'StartsWith',
+        {
+          x: {
+            contentId: 'id1',
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'TranslatableSetOfNormalizedString',
         }
-      }, {
-        x: 'TranslatableSetOfNormalizedString'
-      })
+      ),
     ]);
   });
 
   it('should show warning if user deletes the only existing rule', () => {
     component.rules = [
-      new Rule('StartsWith', {
-        x: {
-          contentId: 'id1',
-          normalizedStrSet: []
+      new Rule(
+        'StartsWith',
+        {
+          x: {
+            contentId: 'id1',
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'TranslatableSetOfNormalizedString',
         }
-      }, {
-        x: 'TranslatableSetOfNormalizedString'
-      })
+      ),
     ];
     spyOn(alertsService, 'addWarning');
 
@@ -370,22 +430,30 @@ describe('Answer Group Editor Component', () => {
   });
 
   it('should cancel active rule edits, when user clicks on cancel', () => {
-    let rule1 = new Rule('StartsWith', {
-      x: {
-        contentId: 'id1',
-        normalizedStrSet: []
+    let rule1 = new Rule(
+      'StartsWith',
+      {
+        x: {
+          contentId: 'id1',
+          normalizedStrSet: [],
+        },
+      },
+      {
+        x: 'TranslatableSetOfNormalizedString',
       }
-    }, {
-      x: 'TranslatableSetOfNormalizedString'
-    });
-    let rule2 = new Rule('StartsWith', {
-      x: {
-        contentId: 'id2',
-        normalizedStrSet: []
+    );
+    let rule2 = new Rule(
+      'StartsWith',
+      {
+        x: {
+          contentId: 'id2',
+          normalizedStrSet: [],
+        },
+      },
+      {
+        x: 'TranslatableSetOfNormalizedString',
       }
-    }, {
-      x: 'TranslatableSetOfNormalizedString'
-    });
+    );
 
     component.rules = [rule1];
     component.rulesMemento = [rule2];
@@ -399,15 +467,19 @@ describe('Answer Group Editor Component', () => {
     expect(component.isMLEnabled()).toBe(false);
   });
 
-  it('should open training data editor when user click on' +
-    ' \'Modify Training Data\'', () => {
-    spyOn(trainingDataEditorPanelService, 'openTrainingDataEditor');
+  it(
+    'should open training data editor when user click on' +
+      " 'Modify Training Data'",
+    () => {
+      spyOn(trainingDataEditorPanelService, 'openTrainingDataEditor');
 
-    component.openTrainingDataEditor();
+      component.openTrainingDataEditor();
 
-    expect(trainingDataEditorPanelService.openTrainingDataEditor)
-      .toHaveBeenCalled();
-  });
+      expect(
+        trainingDataEditorPanelService.openTrainingDataEditor
+      ).toHaveBeenCalled();
+    }
+  );
 
   it('should check if current interaction is trainable', () => {
     // We set the current interaction as TextInput, which is trainable.
@@ -415,7 +487,7 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.isCurrentInteractionTrainable()).toBe(true);
 
-    // We set the current interaction as MultipleChoiceInpit, which is not
+    // We set the current interaction as MultipleChoiceInput, which is not
     // trainable, according to the values provided during setup.
     stateInteractionIdService.savedMemento = 'MultipleChoiceInput';
 
@@ -425,30 +497,38 @@ describe('Answer Group Editor Component', () => {
     stateInteractionIdService.savedMemento = 'InvalidInteraction';
     component.rules = [];
     component.rules.push(
-      new Rule('dummyRule1', {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
+      new Rule(
+        'dummyRule1',
+        {
+          x: {
+            contentId: null,
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'dummyInputType1',
         }
-      }, {
-        x: 'dummyInputType1'
-      })
+      )
     );
     component.rules.push(
-      new Rule('dummyRule2', {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
+      new Rule(
+        'dummyRule2',
+        {
+          x: {
+            contentId: null,
+            normalizedStrSet: [],
+          },
+        },
+        {
+          x: 'dummyInputType2',
         }
-      }, {
-        x: 'dummyInputType2'
-      })
+      )
     );
 
-    expect(() => component.isCurrentInteractionTrainable())
-      .toThrowError(
-        'Invalid interaction id - InvalidInteraction. Answer group rules: ' +
-        'dummyRule1, dummyRule2');
+    expect(() => component.isCurrentInteractionTrainable()).toThrowError(
+      'Invalid interaction id - InvalidInteraction. Answer group rules: ' +
+        'dummyRule1, dummyRule2'
+    );
   });
 
   it('should not open rule editor if it is in read-only mode', () => {
@@ -461,14 +541,18 @@ describe('Answer Group Editor Component', () => {
   });
 
   it('should open rule editor if it is not in read-only mode', () => {
-    let rule1 = new Rule('StartsWith', {
-      x: {
-        contentId: 'id1',
-        normalizedStrSet: []
+    let rule1 = new Rule(
+      'StartsWith',
+      {
+        x: {
+          contentId: 'id1',
+          normalizedStrSet: [],
+        },
+      },
+      {
+        x: 'TranslatableSetOfNormalizedString',
       }
-    }, {
-      x: 'TranslatableSetOfNormalizedString'
-    });
+    );
     component.rules = [rule1];
     spyOn(component, 'changeActiveRuleIndex');
 

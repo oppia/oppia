@@ -16,8 +16,8 @@
  * @fileoverview Tests for FormatRtePreview pipe for Oppia.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import {TestBed} from '@angular/core/testing';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 
 describe('Testing CamelCaseToHyphensPipe', () => {
   let pipe: FormatRtePreviewPipe;
@@ -35,30 +35,34 @@ describe('Testing CamelCaseToHyphensPipe', () => {
     expect(
       pipe.transform(
         '<p><oppia-noninteractive-math attr1=value1>' +
-        '</oppia-noninteractive-math>Text input</p>'
-      )).toEqual('[Math] Text input');
+          '</oppia-noninteractive-math>Text input</p>'
+      )
+    ).toEqual('[Math] Text input');
     expect(
       pipe.transform(
         '<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text input<oppia-noninteractive-collapsible>' +
-        '</oppia-noninteractive-collapsible>Text input 2</p>'
-      )).toEqual('[Math] Text input [Collapsible] Text input 2');
+          'Text input<oppia-noninteractive-collapsible>' +
+          '</oppia-noninteractive-collapsible>Text input 2</p>'
+      )
+    ).toEqual('[Math] Text input [Collapsible] Text input 2');
     expect(
       pipe.transform(
         '<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text&nbsp;input<sample_tag><oppia-noninteractive-collapsible>' +
-        '</oppia-noninteractive-collapsible><a><sample_tag>Text input 2' +
-        '</sample_tag></a></p>'
-      )).toEqual('[Math] Text input [Collapsible] Text input 2');
+          'Text&nbsp;input<sample_tag><oppia-noninteractive-collapsible>' +
+          '</oppia-noninteractive-collapsible><a><sample_tag>Text input 2' +
+          '</sample_tag></a></p>'
+      )
+    ).toEqual('[Math] Text input [Collapsible] Text input 2');
     expect(
       pipe.transform(
         '<oppia-noninteractive-math></oppia-noninteractive-math>' +
-        'Text input<oppia-noninteractive-collapsible>' +
-        '</oppia-noninteractive-collapsible>Text input 2' +
-        '<oppia-noninteractive-image>' +
-        '</oppia-noninteractive-image> Text Input 3 '
-      )).toEqual(
-      '[Math] Text input [Collapsible] Text input 2 [Image]  ' +
-      'Text Input 3');
+          'Text input<oppia-noninteractive-collapsible>' +
+          '</oppia-noninteractive-collapsible>Text input 2' +
+          '<oppia-noninteractive-image>' +
+          '</oppia-noninteractive-image> Text Input 3 '
+      )
+    ).toEqual(
+      '[Math] Text input [Collapsible] Text input 2 [Image]  ' + 'Text Input 3'
+    );
   });
 });

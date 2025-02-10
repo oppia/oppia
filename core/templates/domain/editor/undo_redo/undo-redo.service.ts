@@ -15,12 +15,12 @@
 /**
  * @fileoverview Undo Redo Service.
  */
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {BaseUndoRedo} from 'domain/editor/undo_redo/base-undo-redo.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UndoRedoService extends BaseUndoRedo {
   constructor() {
@@ -28,5 +28,6 @@ export class UndoRedoService extends BaseUndoRedo {
   }
 }
 
-angular.module('oppia').factory('UndoRedoService',
-  downgradeInjectable(UndoRedoService));
+angular
+  .module('oppia')
+  .factory('UndoRedoService', downgradeInjectable(UndoRedoService));

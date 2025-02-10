@@ -16,16 +16,15 @@
  * @fileoverview Tests for the convert unicode to html filter.
  */
 
+import {TestBed} from '@angular/core/testing';
+import {ConvertUnicodeToHtml} from 'filters/convert-unicode-to-html.pipe';
 
-import { TestBed } from '@angular/core/testing';
-import { ConvertUnicodeToHtml } from 'filters/convert-unicode-to-html.pipe';
-
-describe('HTML to text', function() {
+describe('HTML to text', function () {
   let pipe: ConvertUnicodeToHtml;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ConvertUnicodeToHtml]
+      providers: [ConvertUnicodeToHtml],
     });
 
     pipe = TestBed.inject(ConvertUnicodeToHtml);
@@ -38,11 +37,11 @@ describe('HTML to text', function() {
     ['<br>a', 'a', 'a'],
     ['<br/>a', 'a', 'a'],
     ['<br></br>a', 'a', 'a'],
-    ['abc  a', 'abc  a', 'abc  a']
+    ['abc  a', 'abc  a', 'abc  a'],
   ];
 
   it('should convert HTML from raw text correctly', () => {
-    htmlUnicodeHtmlPairings.forEach((pairing) => {
+    htmlUnicodeHtmlPairings.forEach(pairing => {
       expect(pipe.transform(pairing[1])).toEqual(pairing[2]);
     });
   });

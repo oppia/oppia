@@ -17,8 +17,7 @@
  * ParamMetadata domain objects.
  */
 
-import { ExplorationEditorPageConstants } from
-  'pages/exploration-editor-page/exploration-editor-page.constants';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
 export class ParamMetadata {
   action: string;
@@ -35,7 +34,11 @@ export class ParamMetadata {
    * @param {String} sourceInd - index of this parameter in a set of changes
    */
   constructor(
-      action: string, paramName: string, source: string, sourceInd: string) {
+    action: string,
+    paramName: string,
+    source: string,
+    sourceInd: string
+  ) {
     this.action = action;
     this.paramName = paramName;
     this.source = source;
@@ -51,10 +54,16 @@ export class ParamMetadata {
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
   static createWithSetAction(
-      paramName: string, source: string, sourceInd: string): ParamMetadata {
+    paramName: string,
+    source: string,
+    sourceInd: string
+  ): ParamMetadata {
     return new ParamMetadata(
-      ExplorationEditorPageConstants.PARAM_ACTION_SET, paramName, source,
-      sourceInd);
+      ExplorationEditorPageConstants.PARAM_ACTION_SET,
+      paramName,
+      source,
+      sourceInd
+    );
   }
 
   /**
@@ -66,9 +75,15 @@ export class ParamMetadata {
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
   static createWithGetAction(
-      paramName: string, source: string, sourceInd: string): ParamMetadata {
+    paramName: string,
+    source: string,
+    sourceInd: string
+  ): ParamMetadata {
     return new ParamMetadata(
-      ExplorationEditorPageConstants.PARAM_ACTION_GET, paramName, source,
-      sourceInd);
+      ExplorationEditorPageConstants.PARAM_ACTION_GET,
+      paramName,
+      source,
+      sourceInd
+    );
   }
 }

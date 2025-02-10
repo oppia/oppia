@@ -16,24 +16,24 @@
  * @fileoverview Tests for the Base Transclusion Component.
  */
 
-import { DOCUMENT } from '@angular/common';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NavigationEnd, Router } from '@angular/router';
-import { AppConstants } from 'app.constants';
-import { LimitToPipe } from 'filters/limit-to.pipe';
-import { CookieModule, CookieService } from 'ngx-cookie';
-import { Observable, of } from 'rxjs';
-import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { SidebarStatusService } from 'services/sidebar-status.service';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BaseContentComponent } from './base-content.component';
+import {DOCUMENT} from '@angular/common';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NavigationEnd, Router} from '@angular/router';
+import {AppConstants} from 'app.constants';
+import {LimitToPipe} from 'filters/limit-to.pipe';
+import {CookieModule, CookieService} from 'ngx-cookie';
+import {Observable, of} from 'rxjs';
+import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {SidebarStatusService} from 'services/sidebar-status.service';
+import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {BaseContentComponent} from './base-content.component';
 
 describe('Base Content Component', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -69,10 +69,9 @@ describe('Base Content Component', () => {
   // We are mocking Router service to return the NavigationEnd object,
   // so that we can test the routing event in our base component.
   class MockRouteService {
-    public events: Observable<NavigationEnd> = (
-      of(new NavigationEnd(
-        0, 'http://localhost:8181', 'http://localhost:8181')
-      ));
+    public events: Observable<NavigationEnd> = of(
+      new NavigationEnd(0, 'http://localhost:8181', 'http://localhost:8181')
+    );
   }
 
   class MockWindowRef {
@@ -82,13 +81,13 @@ describe('Base Content Component', () => {
         href: href,
         pathname: pathname,
         search: search,
-        hash: hash
+        hash: hash,
       },
       document: {
         addEventListener(event: string, callback: () => void) {
           callback();
-        }
-      }
+        },
+      },
     };
   }
 
@@ -104,41 +103,35 @@ describe('Base Content Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        CookieModule.forRoot()
-      ],
-      declarations: [
-        BaseContentComponent,
-        MockTranslatePipe,
-        LimitToPipe
-      ],
+      imports: [CookieModule.forRoot()],
+      declarations: [BaseContentComponent, MockTranslatePipe, LimitToPipe],
       providers: [
         {
           provide: Router,
-          useClass: MockRouteService
+          useClass: MockRouteService,
         },
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         {
           provide: UrlService,
-          useClass: MockUrlService
+          useClass: MockUrlService,
         },
         BackgroundMaskService,
         BottomNavbarStatusService,
         KeyboardShortcutService,
         {
           provide: LoaderService,
-          useClass: MockLoaderService
+          useClass: MockLoaderService,
         },
         {
           provide: PageTitleService,
-          useClass: MockPageTitleService
+          useClass: MockPageTitleService,
         },
-        SidebarStatusService
+        SidebarStatusService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -148,19 +141,19 @@ describe('Base Content Component', () => {
     loaderService = TestBed.inject(LoaderService);
     loaderService = loaderService as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
-    keyboardShortcutService = keyboardShortcutService as
-     jasmine.SpyObj<KeyboardShortcutService>;
+    keyboardShortcutService =
+      keyboardShortcutService as jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
     windowRef = windowRef as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
-    sidebarStatusService = sidebarStatusService as
-     jasmine.SpyObj<SidebarStatusService>;
+    sidebarStatusService =
+      sidebarStatusService as jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
-    bottomNavbarStatusService = bottomNavbarStatusService as
-     jasmine.SpyObj<BottomNavbarStatusService>;
+    bottomNavbarStatusService =
+      bottomNavbarStatusService as jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
-    backgroundMaskService = backgroundMaskService as
-     jasmine.SpyObj<BackgroundMaskService>;
+    backgroundMaskService =
+      backgroundMaskService as jasmine.SpyObj<BackgroundMaskService>;
     cookieService = TestBed.inject(CookieService);
   });
 
@@ -183,8 +176,7 @@ describe('Base Content Component', () => {
     expect(componentInstance.getSubheaderText()).toEqual('Page Subtitle');
     expect(componentInstance.getSubheaderText).toBeDefined();
     expect(windowRef.nativeWindow.location.href).toEqual(
-      'https://oppiatestserver.appspot.com' +
-       pathname + search + hash
+      'https://oppiatestserver.appspot.com' + pathname + search + hash
     );
   });
 
@@ -195,8 +187,9 @@ describe('Base Content Component', () => {
   });
 
   it('should get bottom navbar status', () => {
-    spyOn(bottomNavbarStatusService, 'isBottomNavbarEnabled')
-      .and.returnValue(false);
+    spyOn(bottomNavbarStatusService, 'isBottomNavbarEnabled').and.returnValue(
+      false
+    );
     expect(componentInstance.isBottomNavbarShown()).toBeFalse();
     expect(bottomNavbarStatusService.isBottomNavbarEnabled).toHaveBeenCalled();
   });
@@ -231,7 +224,8 @@ describe('Base Content Component', () => {
     let document = TestBed.inject(DOCUMENT);
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
-      'Variable mainContentElement is null.');
+      'Variable mainContentElement is null.'
+    );
   });
 
   it('should show the cookie banner if there is no cookie set', () => {
@@ -239,39 +233,48 @@ describe('Base Content Component', () => {
     expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
   });
 
-  it('should show the cookie banner if a cookie exists but the policy has ' +
-     'been updated', () => {
-    spyOn(cookieService, 'get').and.returnValue(
-      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000));
-    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
-  });
+  it(
+    'should show the cookie banner if a cookie exists but the policy has ' +
+      'been updated',
+    () => {
+      spyOn(cookieService, 'get').and.returnValue(
+        String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000)
+      );
+      expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+    }
+  );
 
   it('should not show the cookie banner if a valid cookie exists', () => {
     spyOn(cookieService, 'get').and.returnValue(
-      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000));
+      String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000)
+    );
     expect(componentInstance.hasAcknowledgedCookies()).toBeTrue();
   });
 
   it('should be able to acknowledge cookies', () => {
     spyOn(window, 'Date')
+      .withArgs()
       // This throws "Argument of type 'Date' is not assignable to parameter of
       // type 'string'.". We need to suppress this error because DateConstructor
       // cannot be mocked without it.
       // @ts-expect-error
-      .withArgs().and.returnValue(new oldDate(NOW_MILLIS))
+      .and.returnValue(new oldDate(NOW_MILLIS))
       // This throws "Expected 0 arguments, but got 1.". We need to suppress
       // this error because we pass an argument to the Date constructor in the
       // component code.
       // @ts-expect-error
-      .withArgs(ONE_YEAR_FROM_NOW_MILLIS).and.callThrough();
+      .withArgs(ONE_YEAR_FROM_NOW_MILLIS)
+      .and.callThrough();
     spyOn(cookieService, 'put');
     componentInstance.acknowledgeCookies();
     expect(cookieService.put).toHaveBeenCalledWith(
-      'OPPIA_COOKIES_ACKNOWLEDGED', String(NOW_MILLIS),
+      'OPPIA_COOKIES_ACKNOWLEDGED',
+      String(NOW_MILLIS),
       {
         expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS),
         secure: true,
-        sameSite: 'none'
-      });
+        sameSite: 'none',
+      }
+    );
   });
 });

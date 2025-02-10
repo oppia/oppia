@@ -16,20 +16,19 @@
  * @fileoverview Root component for blog author profile page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
-import { UrlService } from 'services/contextual/url.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { UserService } from 'services/user.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
+import {UrlService} from 'services/contextual/url.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-blog-author-profile-page-root',
-  templateUrl: './blog-author-profile-page-root.component.html'
+  templateUrl: './blog-author-profile-page-root.component.html',
 })
 export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
   directiveSubscriptions = new Subscription();
@@ -38,14 +37,12 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
   authorUsername!: string;
 
   constructor(
-    private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private translateService: TranslateService,
     private urlService: UrlService,
-    private userService: UserService,
-    private platformFeatureService: PlatformFeatureService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -59,24 +56,20 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
 
     this.authorUsername = this.urlService.getBlogAuthorUsernameFromUrl();
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.canUserEditBlogPosts().then((userCanEditBlogPost) => {
-      if (
-        this.platformFeatureService.status.BlogPages.isEnabled ||
-        userCanEditBlogPost
-      ) {
-        this.accessValidationBackendApiService
-          .validateAccessToBlogAuthorProfilePage(this.authorUsername)
-          .then(() => {
+    this.userService.canUserEditBlogPosts().then(userCanEditBlogPost => {
+      this.accessValidationBackendApiService
+        .validateAccessToBlogAuthorProfilePage(this.authorUsername)
+        .then(
+          () => {
             this.pageIsShown = true;
-          }, () => {
+          },
+          () => {
             this.errorPageIsShown = true;
-          }).then(() => {
-            this.loaderService.hideLoadingScreen();
-          });
-      } else {
-        this.errorPageIsShown = true;
-        this.loaderService.hideLoadingScreen();
-      }
+          }
+        )
+        .then(() => {
+          this.loaderService.hideLoadingScreen();
+        });
     });
   }
 
@@ -84,9 +77,12 @@ export class BlogAuthorProfilePageRootComponent implements OnDestroy, OnInit {
     const blogAuthorProfilePage =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE;
     const translatedTitle = this.translateService.instant(
-      blogAuthorProfilePage.TITLE);
+      blogAuthorProfilePage.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle, blogAuthorProfilePage.META);
+      translatedTitle,
+      blogAuthorProfilePage.META
+    );
   }
 
   ngOnDestroy(): void {

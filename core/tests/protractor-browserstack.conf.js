@@ -84,32 +84,20 @@ exports.config = {
       'protractor/libraryFlow.js',
       'protractor_mobile/navigation.js',
       'protractor/profileMenuFlow.js',
-      'protractor/subscriptionsFlow.js'
+      'protractor/subscriptionsFlow.js',
     ],
 
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
+    accessibility: ['protractor/accessibility.js'],
 
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
+    learner: ['protractor/learnerFlow.js'],
 
-    library: [
-      'protractor/libraryFlow.js'
-    ],
+    library: ['protractor/libraryFlow.js'],
 
-    navigation: [
-      'protractor_mobile/navigation.js'
-    ],
+    navigation: ['protractor_mobile/navigation.js'],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
+    profileMenu: ['protractor/profileMenuFlow.js'],
 
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ]
+    subscriptions: ['protractor/subscriptionsFlow.js'],
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -129,15 +117,16 @@ exports.config = {
     device: process.env.DEVICE,
     os_version: process.env.OS_VERSION,
     real_mobile: 'true',
-    browserName: ''
+    browserName: '',
   },
 
   // Code to start browserstack local before start of test.
-  beforeLaunch: function() {
-    var checkSuites = function() {
+  beforeLaunch: function () {
+    var checkSuites = function () {
       // eslint-disable-next-line no-console
       console.log(
-        'Checking whether the suites in "full" match the actual suites...');
+        'Checking whether the suites in "full" match the actual suites...'
+      );
       var suitesInFull = exports.config.suites.full;
       var allSuiteGroups = Object.keys(exports.config.suites);
       for (var suiteIndex in allSuiteGroups) {
@@ -150,8 +139,11 @@ exports.config = {
         if (!suitesInFull.includes(suiteFile)) {
           // eslint-disable-next-line no-console
           console.log(
-            'Expected test file ' + suiteFile + ' to be in "full" ' +
-            'but it was not present.');
+            'Expected test file ' +
+              suiteFile +
+              ' to be in "full" ' +
+              'but it was not present.'
+          );
           process.exit(1);
         }
       }
@@ -159,26 +151,29 @@ exports.config = {
     checkSuites();
     // eslint-disable-next-line no-console
     console.log('Connecting browserstack local');
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       exports.bs_local = new browserstack.Local();
-      exports.bs_local.start({
-        key: exports.config.capabilities['browserstack.key'],
-        forceLocal: true
-      }, function(error) {
-        if (error) {
-          return reject(error);
-        }
-        // eslint-disable-next-line no-console
-        console.log('Connected. Now testing...');
+      exports.bs_local.start(
+        {
+          key: exports.config.capabilities['browserstack.key'],
+          forceLocal: true,
+        },
+        function (error) {
+          if (error) {
+            return reject(error);
+          }
+          // eslint-disable-next-line no-console
+          console.log('Connected. Now testing...');
 
-        resolve();
-      });
+          resolve();
+        }
+      );
     });
   },
 
   // Code to stop browserstack local after end of test.
-  afterLaunch: function() {
-    return new Promise(function(resolve, reject) {
+  afterLaunch: function () {
+    return new Promise(function (resolve, reject) {
       exports.bs_local.stop(resolve);
     });
   },
@@ -192,20 +187,22 @@ exports.config = {
   //
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
-  baseUrl: 'http://localhost:9001',
+  baseUrl: 'http://localhost:8181',
 
   // Selector for the element housing the angular app - this defaults to
   // body, but is necessary if ng-app is on a descendant of <body>.
   rootElement: 'body',
 
-  onPrepare: function() {
+  onPrepare: function () {
     browser.isMobile = true;
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-    jasmine.getEnv().addReporter(new SpecReporter({
-      displayStacktrace: 'pretty',
-      displaySpecDuration: true
-    }));
+    jasmine.getEnv().addReporter(
+      new SpecReporter({
+        displayStacktrace: 'pretty',
+        displaySpecDuration: true,
+      })
+    );
   },
 
   // ----- The test framework -----
@@ -228,6 +225,6 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 1200000
-  }
+    defaultTimeoutInterval: 1200000,
+  },
 };

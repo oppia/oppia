@@ -19,30 +19,33 @@
 
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 var request = require('request');
 
-var customizeComponent = async function(modal, rawLatex) {
-  await (objects.MathExpressionContentEditor(
-    modal.$('<math-expression-content-editor>')
-  ).setValue(rawLatex));
+var customizeComponent = async function (modal, rawLatex) {
+  await objects
+    .MathExpressionContentEditor(modal.$('<math-expression-content-editor>'))
+    .setValue(rawLatex);
 };
 
 // This function is used to convert the escaped Json to unescaped object.
 // This is required because the customizationArg value which we get initially
 // from the Math rich text component is in escaped format and we need to
 // convert it to unescaped format.
-var escapedJsonToObj = function(json) {
-  return (JSON.parse((
-    json.toString())
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, '\'')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')));
+var escapedJsonToObj = function (json) {
+  return JSON.parse(
+    json
+      .toString()
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+  );
 };
 const SVGTAGS = {
-  'x^2 + y^2': (
+  'x^2 + y^2':
     '<svg xmlns="http://www.w3.org/2000/svg" width="7.485ex" height="2.85ex" ' +
     'viewBox="0 -919.2 3222.8 1226.9" focusable="false" style="vertical-align' +
     ': -0.715ex;"><g stroke="currentColor" fill="currentColor" stroke-widt' +
@@ -86,21 +89,19 @@ const SVGTAGS = {
     '7Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 40' +
     '1T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 55' +
     '0Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"/></g' +
-    '></g></g></svg>')
+    '></g></g></svg>',
 };
 
-var expectComponentDetailsToMatch = async function(elem, rawLatex) {
-  // TODO(Jacob): Check that the actual latex being displayed is correct.
+var expectComponentDetailsToMatch = async function (elem, rawLatex) {
+  // TODO(#20444): Check that the actual latex being displayed is correct.
   var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
   var mathSvgImage = elem.$('.e2e-test-math-svg');
-  await waitFor.visibilityOf(
-    mathSvgImage,
-    'Math SVG takes too long to load.');
+  await waitFor.visibilityOf(mathSvgImage, 'Math SVG takes too long to load.');
   var src = await mathSvgImage.getAttribute('src');
-  var pre = 'http://localhost:9001';
+  var pre = 'http://localhost:8181';
   var link = pre + src;
-  await request(link, function(error, response, body) {
+  await request(link, function (error, response, body) {
     expect(body).toBe(SVGTAGS[rawLatex]);
   });
 };

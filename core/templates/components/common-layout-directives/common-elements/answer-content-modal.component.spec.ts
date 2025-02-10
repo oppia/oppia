@@ -16,11 +16,17 @@
  * @fileoverview Unit tests for AnswerContentModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AnswerContentModalComponent } from './answer-content-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AnswerContentModalComponent} from './answer-content-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -40,16 +46,14 @@ describe('Improvement Confirmation Modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        AnswerContentModalComponent
-      ],
+      declarations: [AnswerContentModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,13 +67,12 @@ describe('Improvement Confirmation Modal', () => {
     fixture.detectChanges();
   });
 
-  it('should check whether component is initialized correctly',
-    fakeAsync(() => {
-      expect(component.answerHtml).toEqual('');
+  it('should check whether component is initialized correctly', fakeAsync(() => {
+    expect(component.answerHtml).toEqual('');
 
-      component.close();
-      tick();
+    component.close();
+    tick();
 
-      expect(ngbActiveModal.close).toHaveBeenCalled();
-    }));
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  }));
 });

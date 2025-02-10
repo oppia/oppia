@@ -15,8 +15,8 @@
 /**
  * @fileoverview Component for set of translatable html content id editor.
  */
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 interface Choice {
   val: string;
@@ -25,13 +25,13 @@ interface Choice {
 @Component({
   selector: 'set-of-translatable-html-content-ids-editor',
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() initArgs!: { choices: Choice[] };
+  @Input() initArgs!: {choices: Choice[]};
   @Input() modalId!: symbol;
   @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
@@ -40,8 +40,8 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   SCHEMA = {
     type: 'list',
     items: {
-      type: 'html'
-    }
+      type: 'html',
+    },
   };
 
   ngOnInit(): void {
@@ -72,6 +72,8 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'setOfTranslatableHtmlContentIdsEditor', downgradeComponent({
-    component: SetOfTranslatableHtmlContentIdsEditorComponent
-  }));
+  'setOfTranslatableHtmlContentIdsEditor',
+  downgradeComponent({
+    component: SetOfTranslatableHtmlContentIdsEditorComponent,
+  })
+);

@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the progress reminder modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ProgressReminderModalComponent } from './progress-reminder-modal.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ProgressReminderModalComponent} from './progress-reminder-modal.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('Progress reminder modal component', () => {
   let fixture: ComponentFixture<ProgressReminderModalComponent>;
@@ -30,15 +30,9 @@ describe('Progress reminder modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ProgressReminderModalComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        NgbActiveModal,
-        I18nLanguageCodeService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [ProgressReminderModalComponent, MockTranslatePipe],
+      providers: [NgbActiveModal, I18nLanguageCodeService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -54,13 +48,19 @@ describe('Progress reminder modal component', () => {
 
     component.ngOnInit();
 
-    expect(component.checkpointStatusArray).toEqual(
-      ['completed', 'completed', 'in-progress', 'incomplete']);
+    expect(component.checkpointStatusArray).toEqual([
+      'completed',
+      'completed',
+      'in-progress',
+      'incomplete',
+    ]);
   });
 
   it('should determine if language is RTL', () => {
     const i18nSpy = spyOn(
-      i18nLanguageCodeService, 'isLanguageRTL').and.returnValues(true);
+      i18nLanguageCodeService,
+      'isLanguageRTL'
+    ).and.returnValues(true);
 
     expect(component.isLanguageRTL()).toBe(true);
 

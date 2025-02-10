@@ -21,18 +21,20 @@ interface SkillDescriptions {
 }
 
 export interface ReviewTestBackendDict {
-  'story_name': string;
-  'skill_descriptions': SkillDescriptions;
+  story_name: string;
+  skill_descriptions: SkillDescriptions;
 }
 
 export class ReviewTest {
   constructor(
     public storyName: string,
-    public skillDescriptions: SkillDescriptions) {}
+    public skillDescriptions: SkillDescriptions
+  ) {}
 
-  static createFromBackendDict(
-      backendDict: ReviewTestBackendDict): ReviewTest {
+  static createFromBackendDict(backendDict: ReviewTestBackendDict): ReviewTest {
     return new ReviewTest(
-      backendDict.story_name, backendDict.skill_descriptions);
+      backendDict.story_name,
+      backendDict.skill_descriptions
+    );
   }
 }

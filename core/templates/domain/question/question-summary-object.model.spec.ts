@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for QuestionSummaryModel.
  */
 
-import { QuestionSummaryBackendDict, QuestionSummary } from
-  'domain/question/question-summary-object.model';
+import {
+  QuestionSummaryBackendDict,
+  QuestionSummary,
+} from 'domain/question/question-summary-object.model';
 
 describe('Question summary', () => {
   let summaryDict: QuestionSummaryBackendDict;
@@ -27,13 +29,12 @@ describe('Question summary', () => {
       id: 'question_id',
       question_content: 'Question 1',
       interaction_id: 'TextInput',
-      misconception_ids: ['skillid-0']
+      misconception_ids: ['skillid-0'],
     };
   });
 
   it('should create a new question summary', () => {
-    const questionSummary = (
-      QuestionSummary.createFromBackendDict(summaryDict));
+    const questionSummary = QuestionSummary.createFromBackendDict(summaryDict);
     expect(questionSummary.getQuestionId()).toEqual('question_id');
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
     expect(questionSummary.getInteractionId()).toEqual('TextInput');
@@ -42,8 +43,7 @@ describe('Question summary', () => {
 
   it('should change question content in a question summary', () => {
     const newQuestionContent = 'New question content';
-    const questionSummary = (
-      QuestionSummary.createFromBackendDict(summaryDict));
+    const questionSummary = QuestionSummary.createFromBackendDict(summaryDict);
     expect(questionSummary.getQuestionContent()).toEqual('Question 1');
 
     questionSummary.setQuestionContent(newQuestionContent);

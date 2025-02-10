@@ -43,18 +43,18 @@ export const AppConstants = {
 
   /* Called when the learner moves to a new card that they haven't seen
      before. */
-  EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE: (
-    '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>'),
-  EDITABLE_EXPLORATION_DATA_URL_TEMPLATE: (
-    '/createhandler/data/<exploration_id>'),
+  EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE:
+    '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>',
+  EDITABLE_EXPLORATION_DATA_URL_TEMPLATE:
+    '/createhandler/data/<exploration_id>',
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
-  EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
-    '/explorehandler/init/<exploration_id>?v=<version>'),
-  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
+  EXPLORATION_VERSION_DATA_URL_TEMPLATE:
+    '/explorehandler/init/<exploration_id>?v=<version>',
+  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE:
     '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
-    '<language_code>'),
-  EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
-    '/explorehandler/init/<exploration_id>?pid=<pid>'),
+    '<language_code>',
+  EXPLORATION_PROGRESS_PID_URL_TEMPLATE:
+    '/explorehandler/init/<exploration_id>?pid=<pid>',
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.
@@ -74,8 +74,9 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
-    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
-      ' 3 cards in the lesson.'
+    INVALID_REDIRECTION:
+      'Learner should not be directed back by more than' +
+      ' 3 cards in the lesson.',
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -84,7 +85,7 @@ export const AppConstants = {
       'Checkpoints are not allowed on the last card of the lesson.',
     CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
     BYPASSABLE_CARD:
-      'Checkpoints must not be assigned to cards that can be bypassed.'
+      'Checkpoints must not be assigned to cards that can be bypassed.',
   },
 
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
@@ -98,11 +99,13 @@ export const AppConstants = {
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
   // Feature still in development.
-  // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-  ENABLE_ML_CLASSIFIERS: false,
+  // NOTE TO DEVELOPERS: This should only be turned on after we have
+  // infrastructure to process answer-group-specific training data for ML
+  // classification.
+  ENABLE_TRAINING_DATA_UI: false,
   // Feature still in development.
-  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: (
-    'The current solution does not lead to another card.'),
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION:
+    'The current solution does not lead to another card.',
   PARAMETER_TYPES: {
     REAL: 'Real',
     UNICODE_STRING: 'UnicodeString',
@@ -113,7 +116,7 @@ export const AppConstants = {
   DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
 
   INTERACTION_NAMES: {
-    TEXT_INPUT: 'TextInput'
+    TEXT_INPUT: 'TextInput',
   },
 
   // The maximum number of nodes to show in a row of the state graph.
@@ -172,12 +175,11 @@ export const AppConstants = {
 
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
-  SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
-    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
+  SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE:
+    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>',
   // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
   // in feconf.
-  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: (
-    '/subtopic_mastery_handler/data'),
+  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: '/subtopic_mastery_handler/data',
   EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic_editor_handler/data/<topic_id>',
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
@@ -193,23 +195,23 @@ export const AppConstants = {
     STORY: 'story',
     QUESTION: 'question',
     BLOG_POST: 'blog_post',
+    CLASSROOM: 'classroom',
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
-  IMAGE_UPLOAD_URL_TEMPLATE: (
-    '/createhandler/imageupload/<entity_type>/<entity_id>'),
+  IMAGE_UPLOAD_URL_TEMPLATE:
+    '/createhandler/imageupload/<entity_type>/<entity_id>',
 
   MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
   MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
 
   IMAGE_CONTEXT: {
     EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
-    QUESTION_SUGGESTIONS: 'question_suggestions'
+    QUESTION_SUGGESTIONS: 'question_suggestions',
   },
 
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
-  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
-    'imageSaveDestinationLocalStorage',
+  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE: 'imageSaveDestinationLocalStorage',
   SVG_MIME_TYPE: 'data:image/svg+xml',
 
   CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
@@ -220,22 +222,207 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
-      DISPLAY_NAME: 'Translation Contributions'
+      DISPLAY_NAME: 'Translation Contributions',
     },
     TRANSLATION_REVIEW: {
       NAME: 'translationReview',
-      DISPLAY_NAME: 'Translation Reviews'
+      DISPLAY_NAME: 'Translation Reviews',
     },
     QUESTION_CONTRIBUTION: {
       NAME: 'questionContribution',
-      DISPLAY_NAME: 'Question Contributions'
+      DISPLAY_NAME: 'Question Contributions',
     },
     QUESTION_REVIEW: {
       NAME: 'questionReview',
-      DISPLAY_NAME: 'Question Reviews'
-    }
+      DISPLAY_NAME: 'Question Reviews',
+    },
   },
+  LESSON_CREATORS_DATA_TEACH_PAGE: [
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_1_ROLE',
+      linkedInUrl:
+        'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
+      imagePngUrl: '/teach/creators/rita.png',
+      imageWebpUrl: '/teach/creators/rita.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_2_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/rafiat-sulaimon-54b817205/',
+      imagePngUrl: '/teach/creators/rafiat.png',
+      imageWebpUrl: '/teach/creators/rafiat.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_3_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/aanuoluwapo-adeoti-a25b93188/',
+      imagePngUrl: '/teach/creators/aanuoluwapo.png',
+      imageWebpUrl: '/teach/creators/aanuoluwapo.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_4_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/erin-c-drake/',
+      imagePngUrl: '/teach/creators/erin.png',
+      imageWebpUrl: '/teach/creators/erin.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_5_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/adewumimobolaji/',
+      imagePngUrl: '/teach/creators/adewumi.png',
+      imageWebpUrl: '/teach/creators/adewumi.webp',
+    },
+    {
+      name: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_NAME',
+      country: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_COUNTRY',
+      role: 'I18N_TEACH_PAGE_LESSON_CREATOR_6_ROLE',
+      linkedInUrl: 'https://www.linkedin.com/in/successoghogho/',
+      imagePngUrl: '/teach/creators/successOghogho.png',
+      imageWebpUrl: '/teach/creators/successOghogho.webp',
+    },
+  ],
+  TESTIMONIAlS_DATA_TEACHERS: [
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_1',
+      imageUrl: '/teach/testimonials/riya.jpg',
+      imageUrlWebp: '/teach/testimonials/riya.webp',
+      altText: 'Riya Sogani',
+    },
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_2',
+      imageUrl: '/teach/testimonials/awad.jpg',
+      imageUrlWebp: '/teach/testimonials/awad.webp',
+      altText: 'Wala Awad',
+    },
+    {
+      personDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+      role: 'I18N_TEACH_PAGE_TESTIMONIAL_ROLE_TEACHER',
+      quote: 'I18N_TEACH_TESTIMONIAL_3',
+      imageUrl: '/teach/testimonials/himanshu.jpg',
+      imageUrlWebp: '/teach/testimonials/himanshu.webp',
+      altText: 'Himanshu Taneja',
+    },
+  ],
   CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
   CONTRIBUTOR_CERTIFICATE_LOGO:
     '/assets/images/contributor_dashboard/oppia-logo.jpg',
+  PARTNERSHIPS_FORM_LINK:
+    'https://docs.google.com/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform',
+  PARTNERSHIPS_FORM_TRANSLATED_LINK: {
+    PREFIX:
+      'https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=',
+    SUFFIX: '&_x_tr_hl=en-US&_x_tr_pto=wapp',
+  },
+  VOLUNTEER_FORM_LINK:
+    'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
+  IMPACT_REPORT_LINK:
+    'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  PARENTS_TEACHERS_PDF_GUIDE_LINK:
+    'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
+  TEACHER_STORY_TAGGED_BLOGS_LINK:
+    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+  VOLUNTEER_EXPECTATIONS: [
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_3',
+    'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_4',
+  ],
+  VOLUNTEER_PREFERRED_SKILLS: {
+    OUTREACH: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET1_SKILL4',
+        ],
+      },
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL4',
+          'I18N_VOLUNTEER_PAGE_SKILLS_OUTREACH_SET2_SKILL5',
+        ],
+      },
+    ],
+    SOFTWARE: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_SOFTWARE_SET1_SKILL4',
+        ],
+      },
+    ],
+    ART_AND_DESIGN: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_ART_AND_DESIGN_SET1_SKILL3',
+        ],
+      },
+    ],
+    TRANSLATION: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET1_SKILL3',
+        ],
+      },
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_TRANSLATION_SET2_SKILL4',
+        ],
+      },
+    ],
+    LESSON_CREATION: [
+      {
+        title: 'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_HEADING',
+        skills: [
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL1',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL2',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL3',
+          'I18N_VOLUNTEER_PAGE_SKILLS_LESSON_CREATION_SET1_SKILL4',
+        ],
+      },
+    ],
+  },
+  LAST_PAGE_VIEW_TIME_LOCAL_STORAGE_KEYS_FOR_GA: {
+    ABOUT: 'lastAboutPageViewTime',
+    TEACH: 'lastTeachPageViewTime',
+    VOLUNTEER: 'lastVolunteerPageViewTime',
+  },
+  ONE_WEEK_IN_MILLIS: 7 * 24 * 60 * 60 * 1000,
+  ONE_MONTH_IN_MILLIS: 30 * 24 * 60 * 60 * 1000,
 } as const;
+
+export enum NavbarAndFooterGATrackingPages {
+  ABOUT = 'About',
+  VOLUNTEER = 'Volunteer',
+  TEACH = 'Teach',
+}

@@ -16,25 +16,29 @@
  * @fileoverview Component for the skill description editor.
  */
 
-import { Subscription } from 'rxjs';
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { SkillRights } from 'domain/skill/skill-rights.model';
+import {Subscription} from 'rxjs';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {AppConstants} from 'app.constants';
+import {SkillRights} from 'domain/skill/skill-rights.model';
 
 @Component({
   selector: 'oppia-skill-description-editor',
-  templateUrl: './skill-description-editor.component.html'
+  templateUrl: './skill-description-editor.component.html',
 })
 export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveDescription = new EventEmitter<void>();
   errorMsg: string = '';
   directiveSubscriptions = new Subscription();
-  MAX_CHARS_IN_SKILL_DESCRIPTION = (
-    AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+  MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -61,17 +65,17 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
-    if (this.skillObjectFactory.hasValidDescription(
-      newSkillDescription)) {
+    if (this.skillObjectFactory.hasValidDescription(newSkillDescription)) {
       this.skillDescriptionEditorIsShown = false;
       this.skillUpdateService.setSkillDescription(
         this.skill,
-        newSkillDescription);
+        newSkillDescription
+      );
       this.onSaveDescription.emit();
     } else {
-      this.errorMsg = (
+      this.errorMsg =
         'Please use a non-empty description consisting of ' +
-        'alphanumeric characters, spaces and/or hyphens.');
+        'alphanumeric characters, spaces and/or hyphens.';
     }
   }
 
@@ -86,12 +90,8 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     this.errorMsg = '';
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(
-        () => this.tmpSkillDescription = this.skill.getDescription()
+        () => (this.tmpSkillDescription = this.skill.getDescription())
       )
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillDescriptionEditor', downgradeComponent(
-    {component: SkillDescriptionEditorComponent}));

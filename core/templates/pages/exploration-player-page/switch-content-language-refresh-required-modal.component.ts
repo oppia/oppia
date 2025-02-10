@@ -17,20 +17,18 @@
  * refresh the exploration when changing languages.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-
-export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM = (
-  'initialContentLanguageCode');
+export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
+  'initialContentLanguageCode';
 
 @Component({
   selector: 'switch-content-language-refresh-required-modal',
   templateUrl:
     './switch-content-language-refresh-required-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SwitchContentLanguageRefreshRequiredModalComponent {
   @Input() languageCode!: string;
@@ -47,12 +45,9 @@ export class SwitchContentLanguageRefreshRequiredModalComponent {
   confirm(): void {
     const url = new URL(this.windowRef.nativeWindow.location.href);
     url.searchParams.set(
-      INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM, this.languageCode);
+      INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM,
+      this.languageCode
+    );
     this.windowRef.nativeWindow.location.href = url.href;
   }
 }
-
-angular.module('oppia').factory(
-  'SwitchContentLanguageRefreshRequiredModalComponent',
-  downgradeComponent(
-    {component: SwitchContentLanguageRefreshRequiredModalComponent}));

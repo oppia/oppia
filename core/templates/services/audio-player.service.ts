@@ -16,15 +16,18 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
-import { EventEmitter, Injectable, NgZone } from '@angular/core';
-import { AudioFile } from 'domain/utilities/audio-file.model';
-import { AudioTranslationManagerService, AudioTranslations } from 'pages/exploration-player-page/services/audio-translation-manager.service';
-import { AssetsBackendApiService } from './assets-backend-api.service';
-import { ContextService } from './context.service';
-import { Howl } from 'howler';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { interval, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {EventEmitter, Injectable, NgZone} from '@angular/core';
+import {AudioFile} from 'domain/utilities/audio-file.model';
+import {
+  AudioTranslationManagerService,
+  AudioTranslations,
+} from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import {AssetsBackendApiService} from './assets-backend-api.service';
+import {ContextService} from './context.service';
+import {Howl} from 'howler';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {interval, Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 export interface AutoPlayAudioEvent {
   audioTranslations: AudioTranslations;
@@ -33,7 +36,7 @@ export interface AutoPlayAudioEvent {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AudioPlayerService {
   // 'currentTrackFilename','currentTrack' and 'lastPauseOrSeekPos'
@@ -42,8 +45,8 @@ export class AudioPlayerService {
   private _currentTrack: Howl | null = null;
   private _lastPauseOrSeekPos: number | null = null;
   private _updateViewEventEmitter = new EventEmitter<void>();
-  private _autoplayAudioEventEmitter = (
-    new EventEmitter<void | AutoPlayAudioEvent>());
+  private _autoplayAudioEventEmitter =
+    new EventEmitter<void | AutoPlayAudioEvent>();
 
   private _stopIntervalSubject = new Subject<void>();
   constructor(
@@ -54,36 +57,37 @@ export class AudioPlayerService {
   ) {}
 
   private async _loadAsync(
-      filename: string,
-      successCallback: () => void,
-      errorCallback: (reason?: string[]) => void
+    filename: string,
+    successCallback: () => void,
+    errorCallback: (reason?: string[]) => void
   ) {
     if (this._currentTrackFilename === filename) {
       return;
     }
-    this.assetsBackendApiService.loadAudio(
-      this.contextService.getExplorationId(),
-      filename).then(
-      (loadedAudioFile: AudioFile) => {
-        this._currentTrack = new Howl({
-          src: [URL.createObjectURL(loadedAudioFile.data)],
-          format: ['mp3']
-        });
-        this._currentTrack.on('load', () => {
-          this._stopIntervalSubject.next();
-          this._currentTrackFilename = loadedAudioFile.filename;
-          this._lastPauseOrSeekPos = 0;
-          successCallback();
-        });
-        this._currentTrack.on('end', () => {
-          this._stopIntervalSubject.next();
-          this._currentTrack = null;
-          this._currentTrackFilename = null;
-          this._lastPauseOrSeekPos = null;
-          this.audioTranslationManagerService.clearSecondaryAudioTranslations();
-        });
-      }, (e) => errorCallback(e)
-    );
+    this.assetsBackendApiService
+      .loadAudio(this.contextService.getExplorationId(), filename)
+      .then(
+        (loadedAudioFile: AudioFile) => {
+          this._currentTrack = new Howl({
+            src: [URL.createObjectURL(loadedAudioFile.data)],
+            format: ['mp3'],
+          });
+          this._currentTrack.on('load', () => {
+            this._stopIntervalSubject.next();
+            this._currentTrackFilename = loadedAudioFile.filename;
+            this._lastPauseOrSeekPos = 0;
+            successCallback();
+          });
+          this._currentTrack.on('end', () => {
+            this._stopIntervalSubject.next();
+            this._currentTrack = null;
+            this._currentTrackFilename = null;
+            this._lastPauseOrSeekPos = null;
+            this.audioTranslationManagerService.clearSecondaryAudioTranslations();
+          });
+        },
+        e => errorCallback(e)
+      );
   }
 
   async loadAsync(filename: string): Promise<void> {
@@ -103,12 +107,13 @@ export class AudioPlayerService {
         // We can safely typecast it to 'number'.
         this._currentTrack.seek(this._lastPauseOrSeekPos as number);
       }
-      interval(500).pipe(takeUntil(
-        this._stopIntervalSubject)).subscribe(() => {
-        this.ngZone.run(() => {
-          this._updateViewEventEmitter.emit();
+      interval(500)
+        .pipe(takeUntil(this._stopIntervalSubject))
+        .subscribe(() => {
+          this.ngZone.run(() => {
+            this._updateViewEventEmitter.emit();
+          });
         });
-      });
       // 'currentTrack' is not null since the audio event has been emitted
       // and that is why we use '?'.
       this._currentTrack?.play();
@@ -142,8 +147,7 @@ export class AudioPlayerService {
     if (!this._currentTrack) {
       return;
     }
-    const currentSeconds = (
-      this._currentTrack.seek());
+    const currentSeconds = this._currentTrack.seek();
     if (typeof currentSeconds !== 'number') {
       return;
     }
@@ -228,6 +232,6 @@ export class AudioPlayerService {
   }
 }
 
-angular.module('oppia').factory('AudioPlayerService', downgradeInjectable(
-  AudioPlayerService
-));
+angular
+  .module('oppia')
+  .factory('AudioPlayerService', downgradeInjectable(AudioPlayerService));

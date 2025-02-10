@@ -18,7 +18,7 @@
     <div class="oppia-rule-preview-section-mask"></div>
   </div>
 </div>
-<div class="clearfix" *ngIf="misconceptionEditorIsOpen">
+<div class="clearfix oppia-misconception-selector-container" *ngIf="misconceptionEditorIsOpen">
   <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
                                          [misconceptionFeedbackIsUsed]="feedbackIsUsed"
                                          [selectedMisconception]="selectedMisconception"
@@ -54,5 +54,11 @@
   .oppia-misconception-editor-container {
     height: 100%;
     max-width: 95%;
+  }
+
+  .oppia-misconception-selector-container {
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    padding-bottom: 12px;
   }
 </style>

@@ -16,17 +16,23 @@
  * @fileoverview Directive for the Math rich-text component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SimpleChanges } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { NoninteractiveMath } from './oppia-noninteractive-math.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SimpleChanges} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {NoninteractiveMath} from './oppia-noninteractive-math.component';
 
 describe('NoninteractiveMath', () => {
   let assetsBackendApiService: AssetsBackendApiService;
@@ -37,7 +43,8 @@ describe('NoninteractiveMath', () => {
   let imagePreloaderService: ImagePreloaderService;
   let imageLocalStorageService: ImageLocalStorageService;
   let contextService: ContextService;
-  let serverImageUrl = '/exploration/expId/assets/image/' +
+  let serverImageUrl =
+    '/exploration/expId/assets/image/' +
     'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
     '_1d784_vertical_1d306.svg';
   let explorationPlayerImageUrl =
@@ -96,9 +103,9 @@ describe('NoninteractiveMath', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: mockHtmlEscaperService,
         },
-      ]
+      ],
     }).compileComponents();
   }));
 
@@ -114,20 +121,24 @@ describe('NoninteractiveMath', () => {
 
     component.mathContentWithValue = {
       raw_latex: '\\frac{x}{y}',
-      svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
-      '_1d784_vertical_1d306.svg'
+      svg_filename:
+        'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
+        '_1d784_vertical_1d306.svg',
     };
   });
 
   it('should initialise component when user inserts a math equation', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
+      AppConstants.ENTITY_TYPE.EXPLORATION
+    );
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
-    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and
-      .returnValue(explorationPlayerImageUrl);
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
+      explorationPlayerImageUrl
+    );
 
     component.ngOnInit();
 
@@ -140,16 +151,20 @@ describe('NoninteractiveMath', () => {
   it('should retrieve image from local storage if present', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
+      AppConstants.ENTITY_TYPE.EXPLORATION
+    );
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
-    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and
-      .callFake((data) => {
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
+      data => {
         return data;
-      });
-    spyOn(imageLocalStorageService, 'getRawImageData').and
-      .returnValue(rawImagedata);
+      }
+    );
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      rawImagedata
+    );
 
     component.ngOnInit();
 
@@ -159,88 +174,105 @@ describe('NoninteractiveMath', () => {
     expect(component.imageUrl).toBe(rawImagedata);
   });
 
-  it('should display equation when user is viewing a concept card in the' +
-  ' exploration player', fakeAsync(() => {
-    spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
-    spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
-    spyOn(imagePreloaderService, 'getImageUrlAsync').and
-      .returnValue(Promise.resolve(serverImageUrl));
+  it(
+    'should display equation when user is viewing a concept card in the' +
+      ' exploration player',
+    fakeAsync(() => {
+      spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
+      spyOn(contextService, 'getEntityType').and.returnValue(
+        AppConstants.ENTITY_TYPE.EXPLORATION
+      );
+      spyOn(imagePreloaderService, 'getImageUrlAsync').and.returnValue(
+        Promise.resolve(serverImageUrl)
+      );
 
-    component.ngOnInit();
-    tick();
+      component.ngOnInit();
+      tick();
 
-    expect(component.imageContainerStyle.height).toBe('3.205ex');
-    expect(component.imageContainerStyle.width).toBe('1.784ex');
-    expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
-    expect(component.imageUrl).toBe(serverImageUrl);
-  }));
+      expect(component.imageContainerStyle.height).toBe('3.205ex');
+      expect(component.imageContainerStyle.width).toBe('1.784ex');
+      expect(component.imageContainerStyle['vertical-align']).toBe('-1.306ex');
+      expect(component.imageUrl).toBe(serverImageUrl);
+    })
+  );
 
   it('should throw error when retrieving from local storage fails', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
+      AppConstants.ENTITY_TYPE.EXPLORATION
+    );
     spyOn(contextService, 'getEntityId').and.returnValue('expId');
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+    );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
-    spyOn(imageLocalStorageService, 'getRawImageData').and
-      .returnValue(rawImagedata);
-    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and
-      .callFake((data) => {
+    spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
+      rawImagedata
+    );
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
+      data => {
         throw new Error('Error');
-      });
+      }
+    );
 
     expect(() => {
       component.ngOnInit();
     }).toThrowError(
       'Error\n' +
-      'Entity type: exploration\n' +
-      'Entity ID: expId\n' +
-      'Filepath: mathImg_20210721_224145_dyim6a131p_height_3d205_width_1d784' +
-      '_vertical_1d306.svg'
+        'Entity type: exploration\n' +
+        'Entity ID: expId\n' +
+        'Filepath: mathImg_20210721_224145_dyim6a131p_height_3d205_width_1d784' +
+        '_vertical_1d306.svg'
     );
   });
 
   it('should throw error when retrieving from server fails', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
+      AppConstants.ENTITY_TYPE.EXPLORATION
+    );
     spyOn(contextService, 'getEntityId').and.returnValue('expId');
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
-    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and
-      .callFake((data) => {
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.callFake(
+      data => {
         throw new Error('Error');
-      });
+      }
+    );
 
     expect(() => {
       component.ngOnInit();
     }).toThrowError(
       'Error\n' +
-      'Entity type: exploration\n' +
-      'Entity ID: expId\n' +
-      'Filepath: mathImg_20210721_224145_dyim6a131p_height_3d205_width_1d784' +
-      '_vertical_1d306.svg'
+        'Entity type: exploration\n' +
+        'Entity ID: expId\n' +
+        'Filepath: mathImg_20210721_224145_dyim6a131p_height_3d205_width_1d784' +
+        '_vertical_1d306.svg'
     );
   });
 
-  it('should not update image when \'mathContentWithValue\' is not defined ' +
-  'or empty', () => {
-    spyOn(htmlEscaperService, 'escapedJsonToObj');
-    spyOn(imagePreloaderService, 'getDimensionsOfMathSvg');
-    spyOn(imagePreloaderService, 'inExplorationPlayer');
-    component.mathContentWithValue = '';
+  it(
+    "should not update image when 'mathContentWithValue' is not defined " +
+      'or empty',
+    () => {
+      spyOn(htmlEscaperService, 'escapedJsonToObj');
+      spyOn(imagePreloaderService, 'getDimensionsOfMathSvg');
+      spyOn(imagePreloaderService, 'inExplorationPlayer');
+      component.mathContentWithValue = '';
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(htmlEscaperService.escapedJsonToObj).not.toHaveBeenCalled();
-    expect(imagePreloaderService.getDimensionsOfMathSvg).not.toHaveBeenCalled();
-    expect(imagePreloaderService.inExplorationPlayer).not.toHaveBeenCalled();
-  });
+      expect(htmlEscaperService.escapedJsonToObj).not.toHaveBeenCalled();
+      expect(
+        imagePreloaderService.getDimensionsOfMathSvg
+      ).not.toHaveBeenCalled();
+      expect(imagePreloaderService.inExplorationPlayer).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should not update image when \'mathExpressionContent\' is empty', () => {
+  it("should not update image when 'mathExpressionContent' is empty", () => {
     spyOn(htmlEscaperService, 'escapedJsonToObj').and.returnValue('');
     spyOn(imagePreloaderService, 'getDimensionsOfMathSvg');
     spyOn(imagePreloaderService, 'inExplorationPlayer');
@@ -259,31 +291,35 @@ describe('NoninteractiveMath', () => {
           raw_latex: '\\frac{a}{b}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
-            '_1d784_vertical_1d306.svg'
+            '_1d784_vertical_1d306.svg',
         },
         previousValue: {
           raw_latex: '\\frac{x}{y}',
           svg_filename:
             'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
-            '_1d784_vertical_1d306.svg'
+            '_1d784_vertical_1d306.svg',
         },
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.mathContentWithValue = {
       raw_latex: '\\frac{a}{b}',
-      svg_filename: 'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
-      '_1d784_vertical_1d306.svg'
+      svg_filename:
+        'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
+        '_1d784_vertical_1d306.svg',
     };
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
     spyOn(contextService, 'getEntityType').and.returnValue(
-      AppConstants.ENTITY_TYPE.EXPLORATION);
+      AppConstants.ENTITY_TYPE.EXPLORATION
+    );
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
-    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and
-      .returnValue(explorationPlayerImageUrl);
+    spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
+      explorationPlayerImageUrl
+    );
 
     component.ngOnChanges(changes);
 

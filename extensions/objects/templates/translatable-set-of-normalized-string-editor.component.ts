@@ -15,42 +15,52 @@
 /**
  * @fileoverview Directive for translatable set of normalized string editor.
  */
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 export interface TranslatableSetOfStringSchema {
   type: string;
-  items: { type: string };
-  validators: { id: string }[];
+  items: {type: string};
+  validators: {id: string}[];
 }
 
 @Component({
   selector: 'translatable-set-of-normalized-string-editor',
-  templateUrl: './translatable-set-of-normalized-string-editor.component.html'
+  templateUrl: './translatable-set-of-normalized-string-editor.component.html',
 })
 export class TranslatableSetOfNormalizedStringEditorComponent
-  implements OnInit {
+  implements OnInit
+{
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() value!: { normalizedStrSet: string };
+  @Input() value!: {normalizedStrSet: string};
   @Output() valueChanged = new EventEmitter();
   schema: TranslatableSetOfStringSchema = {
     type: 'list',
     items: {
-      type: 'unicode'
+      type: 'unicode',
     },
-    validators: [{
-      id: 'is_uniquified'
-    }]
+    validators: [
+      {
+        id: 'is_uniquified',
+      },
+    ],
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     if (this.value === undefined) {
       this.value = {
-        normalizedStrSet: ''
+        normalizedStrSet: '',
       };
     }
   }
@@ -72,5 +82,6 @@ export class TranslatableSetOfNormalizedStringEditorComponent
 angular.module('oppia').directive(
   'translatableSetOfNormalizedStringEditor',
   downgradeComponent({
-    component: TranslatableSetOfNormalizedStringEditorComponent
-  }) as angular.IDirectiveFactory);
+    component: TranslatableSetOfNormalizedStringEditorComponent,
+  }) as angular.IDirectiveFactory
+);

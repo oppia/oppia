@@ -37,7 +37,9 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_fetchers
 from core.domain import translation_domain
+from core.domain import user_services
 
 from typing import (
     Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
@@ -75,7 +77,7 @@ class FrontendBaseSuggestionDict(TypedDict):
     status: str
     author_name: str
     final_reviewer_id: Optional[str]
-    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    change_cmd: Dict[str, change_domain.AcceptableChangeDictTypes]
     score_category: str
     language_code: str
     last_updated: float
@@ -136,7 +138,7 @@ class SuggestionHandlerNormalizedPayloadDict(TypedDict):
     target_type: str
     target_id: str
     target_version_at_submission: int
-    change: Mapping[str, change_domain.AcceptableChangeDictTypes]
+    change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes]
     description: str
     files: Optional[Dict[str, str]]
 
@@ -178,7 +180,7 @@ class SuggestionHandler(
                     }]
                 }
             },
-            'change': {
+            'change_cmd': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
@@ -206,7 +208,12 @@ class SuggestionHandler(
 
     @acl_decorators.can_suggest_changes
     def post(self) -> None:
-        """Handles POST requests."""
+        """Handles POST requests.
+
+        Raises:
+            InvalidInputException. The suggestion type is 'edit_state_content',
+                as content suggestion submissions are no longer supported.
+        """
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
@@ -222,7 +229,7 @@ class SuggestionHandler(
             self.normalized_payload['target_id'],
             self.normalized_payload['target_version_at_submission'],
             self.user_id,
-            self.normalized_payload['change'],
+            self.normalized_payload['change_cmd'],
             self.normalized_payload['description']
         )
 
@@ -240,7 +247,7 @@ class SuggestionHandler(
                 suggestion_services
             ).update_question_contribution_stats_at_submission(suggestion)
 
-        suggestion_change = suggestion.change
+        suggestion_change = suggestion.change_cmd
         if (
                 suggestion_change.cmd == 'add_written_translation' and (
                     translation_domain.TranslatableContentFormat
@@ -257,16 +264,94 @@ class SuggestionHandler(
         # adding an image, there is no method to remove the uploaded image.
         # See more - https://github.com/oppia/oppia/issues/14298
         if suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            assert isinstance(
+                suggestion,
+                suggestion_registry.SuggestionTranslateContent
+            )
+            self._copy_images_from_target_exploration_content_to_translation(
+                suggestion
+            )
+
             files = self.normalized_payload.get('files')
             new_image_filenames = (
                 suggestion.get_new_image_filenames_added_in_suggestion()
             )
             if new_image_filenames and files is not None:
-                _upload_suggestion_images(
-                    files, suggestion, new_image_filenames
+                new_image_files = {
+                    filename: image_blob
+                    for filename, image_blob
+                    in files.items()
+                    if filename in new_image_filenames
+                }
+                self._save_new_images_added_in_translation(
+                    new_image_files, suggestion
                 )
 
         self.render_json(self.values)
+
+    def _save_new_images_added_in_translation(
+        self,
+        new_files: Dict[str, str],
+        suggestion: suggestion_registry.SuggestionTranslateContent
+    ) -> None:
+        """Saves new images introduced in translation suggestion to storage.
+
+        Args:
+            new_files: dict. A mapping from each new image's filename to its
+                corresponding image blob.
+            suggestion: SuggestionTranslateContent. The translation suggestion
+                for which images are being uploaded.
+        """
+        for filename, image in new_files.items():
+            decoded_image = base64.decodebytes(image.encode('utf-8'))
+            file_format = (
+                image_validation_services.validate_image_and_filename(
+                    decoded_image, filename))
+            image_is_compressible = (
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+            fs_services.save_original_and_compressed_versions_of_image(
+                filename, suggestion.image_context, suggestion.target_id,
+                decoded_image, 'image', image_is_compressible)
+
+    def _copy_images_from_target_exploration_content_to_translation(
+        self,
+        suggestion: suggestion_registry.SuggestionTranslateContent
+    ) -> None:
+        """Creates copies of images from the suggestion's target exploration
+        for the translation suggestion to use.
+
+        Args:
+            suggestion: SuggestionTranslateContent. The translation suggestion
+                to copy its target exploration's images to.
+
+        Raises:
+            Exception. An image in the target exploration's content is not a
+                saved asset belonging to the target exploration.
+        """
+        target_image_filenames = (
+            html_cleaner.get_image_filenames_from_html_strings(
+                suggestion.get_target_entity_html_strings()
+            )
+        )
+        try:
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                suggestion.image_context, suggestion.target_id,
+                target_image_filenames
+            )
+        except ValueError as error:
+            _, source_asset_path, *_ = error.args
+            filename_start_index = source_asset_path.rfind('/') + 1
+            source_asset_filename = source_asset_path[filename_start_index:]
+            source_asset_directory = source_asset_path[:filename_start_index]
+            raise Exception(
+                'An image in the submitted translation\'s original content '
+                'named "%s" cannot be found. Please save it to the ' % (
+                    source_asset_filename
+                ) + 'backend file system at /%s ' % (
+                    source_asset_directory
+                ) + 'before submitting this translation again.'
+            ) from error
 
 
 class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
@@ -397,7 +482,7 @@ class ResubmitSuggestionHandlerNormalizedPayloadDict(TypedDict):
     """
 
     action: str
-    change: Dict[str, Union[str, state_domain.SubtitledHtmlDict]]
+    change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]]
     summary_message: str
 
 
@@ -425,7 +510,7 @@ class ResubmitSuggestionHandler(
                     'choices': ['resubmit']
                 }
             },
-            'change': {
+            'change_cmd': {
                 'schema': {
                     'type': 'dict',
                     'properties': [{
@@ -474,8 +559,8 @@ class ResubmitSuggestionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        new_change = self.normalized_payload['change']
-        change_cls = type(suggestion.change)
+        new_change = self.normalized_payload['change_cmd']
+        change_cls = type(suggestion.change_cmd)
         change_object = change_cls(new_change)
         summary_message = self.normalized_payload['summary_message']
         suggestion_services.resubmit_rejected_suggestion(
@@ -556,6 +641,10 @@ class SuggestionToSkillActionHandler(
         Args:
             target_id: str. The ID of the suggestion target.
             suggestion_id: str. The ID of the suggestion.
+
+        Raises:
+            InvalidInputException. The suggestion is not for skills
+                or the provided skill ID is invalid.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -676,10 +765,11 @@ class ReviewableSuggestionsHandlerNormalizedRequestDict(TypedDict):
     normalized_request dictionary.
     """
 
-    limit: int
+    limit: Optional[int]
     offset: int
     sort_key: str
     exploration_id: Optional[str]
+    topic_name: Optional[str]
 
 
 class ReviewableSuggestionsHandler(
@@ -714,7 +804,8 @@ class ReviewableSuggestionsHandler(
                         'id': 'is_at_least',
                         'min_value': 1
                     }]
-                }
+                },
+                'default_value': None
             },
             'offset': {
                 'schema': {
@@ -736,9 +827,33 @@ class ReviewableSuggestionsHandler(
                     'type': 'basestring'
                 },
                 'default_value': None
-            }
+            },
+            'topic_name': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
         }
     }
+
+    def _get_skill_ids_for_topic(
+            self, topic_name: Optional[str]
+    ) -> Optional[List[str]]:
+        """Gets all skill ids for the provided topic.
+
+        Returns None to indicate that no filtering is needed.
+        """
+        if (
+            topic_name is None or
+            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+        ):
+            return None
+        topic = topic_fetchers.get_topic_by_name(topic_name)
+        if topic is None:
+            raise self.InvalidInputException(
+                f'The topic \'{topic_name}\' is not valid')
+        return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type: str, suggestion_type: str) -> None:
@@ -747,33 +862,59 @@ class ReviewableSuggestionsHandler(
         Args:
             target_type: str. The type of the suggestion target.
             suggestion_type: str. The type of the suggestion.
+
+        Raises:
+            ValueError. If limit is None for question suggestions.
         """
         assert self.user_id is not None
         assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
-        limit = self.normalized_request['limit']
+        limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
         exploration_id = self.normalized_request.get('exploration_id')
         exp_ids = [exploration_id] if exploration_id else []
-
+        user_settings = user_services.get_user_settings(self.user_id)
+        # User_settings.preferred_translation_language_code is the language
+        # selected by user in language filter of contributor dashboard.
+        language_code_to_filter_by = (
+            user_settings.preferred_translation_language_code)
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-            reviewable_suggestions, next_offset = (
-                suggestion_services
-                .get_reviewable_translation_suggestions_by_offset(
-                    self.user_id, exp_ids, limit, offset, sort_key))
+            reviewable_suggestions: List[
+                suggestion_registry.SuggestionTranslateContent] = []
+            if (exp_ids and len(exp_ids) == 1 and language_code_to_filter_by):
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_for_single_exp(
+                        self.user_id, exp_ids[0],
+                        language_code_to_filter_by))
+            else:
+                # TODO(#18745): Deprecate the
+                # get_reviewable_translation_suggestions_by_offset method
+                # as its limit is unbounded and it can be given an
+                # unlimited number of exp_ids.
+                reviewable_suggestions, next_offset = (
+                    suggestion_services
+                    .get_reviewable_translation_suggestions_by_offset(
+                        self.user_id, exp_ids, limit, offset, sort_key))
             suggestions = (
                 suggestion_services
                 .get_suggestions_with_editable_explorations(
                     reviewable_suggestions))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+            if limit is None:
+                raise ValueError(
+                    'Limit must be provided for question suggestions.')
+            topic_name = self.normalized_request.get('topic_name')
+            skill_ids = self._get_skill_ids_for_topic(topic_name)
+
             suggestions, next_offset = (
                 suggestion_services
                 .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key))
+                    self.user_id, limit, offset, sort_key, skill_ids))
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -1058,7 +1199,7 @@ class UpdateQuestionSuggestionHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_state_dict
+                        domain_objects_validator.validate_question_state_dict
                     )
                 }
             },
@@ -1177,6 +1318,9 @@ def _construct_exploration_suggestions(
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
         exploration's current content.
+
+    Raises:
+        ValueError. Exploration content is unavailable.
     """
     suggestion_dicts: List[FrontendBaseSuggestionDict] = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}
@@ -1186,7 +1330,8 @@ def _construct_exploration_suggestions(
         content_html: Optional[Union[str, List[str]]] = None
         try:
             content_html = exploration.get_content_html(
-                suggestion.change.state_name, suggestion.change.content_id)
+                suggestion.change_cmd.state_name,
+                suggestion.change_cmd.content_id)
         except ValueError:
             # Exploration content is no longer available.
             pass
@@ -1202,7 +1347,7 @@ def _construct_exploration_suggestions(
             'status': suggestion_dict['status'],
             'author_name': suggestion_dict['author_name'],
             'final_reviewer_id': suggestion_dict['final_reviewer_id'],
-            'change': suggestion_dict['change'],
+            'change_cmd': suggestion_dict['change_cmd'],
             'score_category': suggestion_dict['score_category'],
             'language_code': suggestion_dict['language_code'],
             'last_updated': suggestion_dict['last_updated'],
@@ -1211,43 +1356,3 @@ def _construct_exploration_suggestions(
         }
         suggestion_dicts.append(updated_suggestion_dict)
     return suggestion_dicts
-
-
-def _upload_suggestion_images(
-    files: Dict[str, str],
-    suggestion: suggestion_registry.BaseSuggestion,
-    filenames: List[str]
-) -> None:
-    """Saves a suggestion's images to storage.
-
-    Args:
-        files: dict. Files containing a mapping of image
-            filename to image blob.
-        suggestion: BaseSuggestion. The suggestion for which images are being
-            uploaded.
-        filenames: list(str). The image filenames.
-    """
-    suggestion_image_context = suggestion.image_context
-    # TODO(#10513): Find a way to save the images before the suggestion is
-    # created.
-    for filename in filenames:
-        image = files[filename]
-        decoded_image = base64.decodebytes(image.encode('utf-8'))
-        file_format = (
-            image_validation_services.validate_image_and_filename(
-                decoded_image, filename))
-        image_is_compressible = (
-            file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
-        fs_services.save_original_and_compressed_versions_of_image(
-            filename, suggestion_image_context, suggestion.target_id,
-            decoded_image, 'image', image_is_compressible)
-
-    target_entity_html_list = suggestion.get_target_entity_html_strings()
-    target_image_filenames = (
-        html_cleaner.get_image_filenames_from_html_strings(
-            target_entity_html_list))
-
-    fs_services.copy_images(
-        suggestion.target_type, suggestion.target_id,
-        suggestion_image_context, suggestion.target_id,
-        target_image_filenames)

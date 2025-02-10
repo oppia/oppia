@@ -98,13 +98,14 @@
 </ng-template>
 
 <ng-template #TranslationLengthLabel>
-  <div class="oppia-translation-label-container oppia-animate-fadein"
-       *ngIf="opportunity?.translationWordCount < 20">
-    <div class="oppia-translation-length-label"
-         ngbTooltip="Translation word count: {{opportunity.translationWordCount}}">
-      <ng-container>
-          short
-      </ng-container>
+  <div>
+    <div class="oppia-animate-fadein"
+       *ngIf="opportunity?.translationWordCount < 20"
+       [ngStyle]="labelStyle">
+      <div class="oppia-translation-length-label"
+      ngbTooltip="Translation word count: {{opportunity.translationWordCount === 0 ? 1 : opportunity.translationWordCount}}">
+        <ng-container>Short Translation</ng-container>
+      </div>
     </div>
   </div>
 </ng-template>
@@ -134,6 +135,16 @@
 <!-- Desktop -->
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
+  <mat-icon *ngIf="showPinUnpinButton && !opportunity.isPinned"
+            class="pin-icon"
+            (click)="pinOpportunity()">
+            push_pin
+  </mat-icon>
+  <mat-icon *ngIf="showPinUnpinButton && opportunity.isPinned"
+            class="unpin-icon"
+            (click)="unpinOpportunity()">
+            push_pin
+  </mat-icon>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -144,6 +155,16 @@
 <!-- Mobile -->
 <div *ngIf="showOpportunityButton && onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item e2e-test-opportunity-list-item">
+  <mat-icon *ngIf="showPinUnpinButton && !opportunity.isPinned"
+            class="pin-icon"
+            (click)="pinOpportunity()">
+            push_pin
+  </mat-icon>
+  <mat-icon *ngIf="showPinUnpinButton && opportunity.isPinned"
+            class="unpin-icon"
+            (click)="unpinOpportunity()">
+            push_pin
+  </mat-icon>
   <ng-template [ngTemplateOutlet]="ProgressBar"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesDetails"></ng-template>
   <ng-template [ngTemplateOutlet]="OpportunitiesLabel"></ng-template>
@@ -163,6 +184,12 @@
 </button>
 
 <style>
+  mat-icon.pin-icon {
+    color: #a29a9a;
+  }
+  mat-icon.unpin-icon {
+    transform: rotate(45deg);
+  }
   .oppia-lazy-loading-container {
     height: 120px;
     margin-bottom: -20px;
@@ -293,26 +320,19 @@
     min-height: 90px;
     padding: 0% 3%;
   }
-  .oppia-translation-label-container {
-    align-items: center;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    margin: 1% 0;
-    width: 20%;
-  }
   .oppia-translation-length-label {
     align-items: center;
-    background-color: #4e89b1;
-    color: #fff;
+    background-color: #eee;
+    border-radius: 10px;
+    color: #1b1b1b;
     display: flex;
-    font-size: 12px;
-    height: 26px;
+    font-size: 16px;
+    height: 60px;
     justify-content: center;
     margin: 18px;
     padding: 3px;
     text-align: center;
-    width: 60px;
+    width: 95px;
   }
   .oppia-animate-fadein {
     -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */

@@ -16,12 +16,20 @@
  * @fileoverview Constants for the question player directive.
  */
 
-import { QuestionsListConstants } from
-  'components/question-directives/questions-list/questions-list.constants';
+import {QuestionsListConstants} from 'components/question-directives/questions-list/questions-list.constants';
 
-angular.module('oppia').constant(
-  'DEFAULT_SKILL_DIFFICULTY', QuestionsListConstants.DEFAULT_SKILL_DIFFICULTY);
-angular.module('oppia').constant(
-  'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULTY);
-angular.module('oppia').constant(
-  'MODE_SELECT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);
+angular
+  .module('oppia')
+  .constant(
+    'DEFAULT_SKILL_DIFFICULTY',
+    QuestionsListConstants.DEFAULT_SKILL_DIFFICULTY
+  );
+angular
+  .module('oppia')
+  .constant(
+    'MODE_SELECT_DIFFICULTY',
+    QuestionsListConstants.MODE_SELECT_DIFFICULTY
+  );
+angular
+  .module('oppia')
+  .constant('MODE_SELECT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);

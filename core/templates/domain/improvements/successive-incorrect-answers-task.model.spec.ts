@@ -16,30 +16,41 @@
  * @fileoverview Unit tests for the SuccessiveIncorrectAnswersTaskModel.
  */
 
-import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/successive-incorrect-answers-task.model';
+import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
 
-describe('Successive incorrect answers task model', function() {
-  it('should return new task if there are playthroughs demonstrating ' +
-    'multiple incorrect submissions', () => {
-    const task = SuccessiveIncorrectAnswersTask.createNew(
-      'eid', 1, 'Introduction', 3);
+describe('Successive incorrect answers task model', function () {
+  it(
+    'should return new task if there are playthroughs demonstrating ' +
+      'multiple incorrect submissions',
+    () => {
+      const task = SuccessiveIncorrectAnswersTask.createNew(
+        'eid',
+        1,
+        'Introduction',
+        3
+      );
 
-    expect(task.entityType).toEqual('exploration');
-    expect(task.entityId).toEqual('eid');
-    expect(task.entityVersion).toEqual(1);
-    expect(task.taskType).toEqual('successive_incorrect_answers');
-    expect(task.targetType).toEqual('state');
-    expect(task.targetId).toEqual('Introduction');
-    expect(task.getIssueDescription()).toEqual(
-      'At least 3 learners had quit after entering many incorrect answers at ' +
-      'this card.');
-    expect(task.isOpen()).toBeTrue();
-  });
+      expect(task.entityType).toEqual('exploration');
+      expect(task.entityId).toEqual('eid');
+      expect(task.entityVersion).toEqual(1);
+      expect(task.taskType).toEqual('successive_incorrect_answers');
+      expect(task.targetType).toEqual('state');
+      expect(task.targetId).toEqual('Introduction');
+      expect(task.getIssueDescription()).toEqual(
+        'At least 3 learners had quit after entering many incorrect answers at ' +
+          'this card.'
+      );
+      expect(task.isOpen()).toBeTrue();
+    }
+  );
 
   it('should be resolvable', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(
-      'eid', 1, 'Introduction', 1);
+      'eid',
+      1,
+      'Introduction',
+      1
+    );
 
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
@@ -51,7 +62,11 @@ describe('Successive incorrect answers task model', function() {
 
   it('should return obsolete task if all answers are addressed', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(
-      'eid', 1, 'Introduction', 0);
+      'eid',
+      1,
+      'Introduction',
+      0
+    );
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -64,21 +79,20 @@ describe('Successive incorrect answers task model', function() {
   });
 
   it('should create from an IFL task backend dict', () => {
-    const task = (
-      SuccessiveIncorrectAnswersTask.createFromBackendDict({
-        entity_type: 'exploration',
-        entity_id: 'eid',
-        entity_version: 1,
-        task_type: 'successive_incorrect_answers',
-        target_type: 'state',
-        target_id: 'Introduction',
-        issue_description: (
-          'At least 3 learners had quit after entering many incorrect ' +
-          'answers at this card.'),
-        status: 'open',
-        resolver_username: null,
-        resolved_on_msecs: null,
-      }));
+    const task = SuccessiveIncorrectAnswersTask.createFromBackendDict({
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: 'successive_incorrect_answers',
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description:
+        'At least 3 learners had quit after entering many incorrect ' +
+        'answers at this card.',
+      status: 'open',
+      resolver_username: null,
+      resolved_on_msecs: null,
+    });
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -88,33 +102,35 @@ describe('Successive incorrect answers task model', function() {
     expect(task.targetId).toEqual('Introduction');
     expect(task.getIssueDescription()).toEqual(
       'At least 3 learners had quit after entering many incorrect answers at ' +
-      'this card.');
+        'this card.'
+    );
     expect(task.isOpen()).toBeTrue();
   });
 
   it('should throw when backend dict entity type is not exploration', () => {
-    expect(
-      () => SuccessiveIncorrectAnswersTask.createFromBackendDict({
+    expect(() =>
+      SuccessiveIncorrectAnswersTask.createFromBackendDict({
         entity_type: '???',
         entity_id: 'eid',
         entity_version: 1,
         task_type: 'successive_incorrect_answers',
         target_type: 'state',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           'At least 3 learners had quit after entering many incorrect ' +
-          'answers at this card.'),
+          'answers at this card.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
-      'backend dict has entity_type "???" but expected "exploration"');
+      'backend dict has entity_type "???" but expected "exploration"'
+    );
   });
 
   it('should throw when backend dict task type is not IFL', () => {
-    expect(
-      () => SuccessiveIncorrectAnswersTask.createFromBackendDict({
+    expect(() =>
+      SuccessiveIncorrectAnswersTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -126,31 +142,31 @@ describe('Successive incorrect answers task model', function() {
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           'At least 3 learners had quit after entering many incorrect ' +
-          'answers at this card.'),
+          'answers at this card.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
       'backend dict has task_type "???" but expected ' +
-      '"successive_incorrect_answers"'
+        '"successive_incorrect_answers"'
     );
   });
 
   it('should throw when backend dict target type is not state', () => {
-    expect(
-      () => SuccessiveIncorrectAnswersTask.createFromBackendDict({
+    expect(() =>
+      SuccessiveIncorrectAnswersTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
         task_type: 'successive_incorrect_answers',
         target_type: '???',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           'At least 3 learners had quit after entering many incorrect ' +
-          'answers at this card.'),
+          'answers at this card.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
@@ -160,22 +176,29 @@ describe('Successive incorrect answers task model', function() {
 
   it('should not change issue description after it is generated', () => {
     const task = SuccessiveIncorrectAnswersTask.createNew(
-      'eid', 1, 'Introduction', 0);
+      'eid',
+      1,
+      'Introduction',
+      0
+    );
     expect(task.getIssueDescription()).toBeNull();
 
     task.refreshStatus(7);
     expect(task.getIssueDescription()).toEqual(
       'At least 7 learners had quit after entering many incorrect answers at ' +
-      'this card.');
+        'this card.'
+    );
 
     task.refreshStatus(0);
     expect(task.getIssueDescription()).toEqual(
       'At least 7 learners had quit after entering many incorrect answers at ' +
-      'this card.');
+        'this card.'
+    );
 
     task.refreshStatus(3);
     expect(task.getIssueDescription()).toEqual(
       'At least 7 learners had quit after entering many incorrect answers at ' +
-      'this card.');
+        'this card.'
+    );
   });
 });

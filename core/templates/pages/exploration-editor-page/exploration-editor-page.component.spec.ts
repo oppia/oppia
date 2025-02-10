@@ -16,64 +16,87 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, discardPeriodicTasks, tick, flush, ComponentFixture } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { AlertsService } from 'services/alerts.service';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { ContextService } from 'services/context.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answers-stats-backend-api.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
-import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
-import { ChangeListService } from './services/change-list.service';
-import { ExplorationDataService } from './services/exploration-data.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { WelcomeModalComponent } from './modal-templates/welcome-modal.component';
-import { HelpModalComponent } from './modal-templates/help-modal.component';
-import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
-import { UserService } from 'services/user.service';
-import { ExplorationEditorPageComponent } from './exploration-editor-page.component';
-import { ThreadDataBackendApiService } from './feedback-tab/services/thread-data-backend-api.service';
-import { ExplorationPropertyService } from './services/exploration-property.service';
-import { ExplorationRightsService } from './services/exploration-rights.service';
-import { ExplorationSaveService } from './services/exploration-save.service';
-import { ExplorationStatesService } from './services/exploration-states.service';
-import { ExplorationTitleService } from './services/exploration-title.service';
-import { ExplorationWarningsService } from './services/exploration-warnings.service';
-import { GraphDataService } from './services/graph-data.service';
-import { RouterService } from './services/router.service';
-import { StateTutorialFirstTimeService } from './services/state-tutorial-first-time.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  discardPeriodicTasks,
+  tick,
+  flush,
+  ComponentFixture,
+} from '@angular/core/testing';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import {AlertsService} from 'services/alerts.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {ContextService} from 'services/context.service';
+import {EditabilityService} from 'services/editability.service';
+import {
+  ExplorationFeatures,
+  ExplorationFeaturesBackendApiService,
+} from 'services/exploration-features-backend-api.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {LostChangesModalComponent} from './modal-templates/lost-changes-modal.component';
+import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
+import {ChangeListService} from './services/change-list.service';
+import {ExplorationDataService} from './services/exploration-data.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
+import {HelpModalComponent} from './modal-templates/help-modal.component';
+import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
+import {UserService} from 'services/user.service';
+import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
+import {ThreadDataBackendApiService} from './feedback-tab/services/thread-data-backend-api.service';
+import {ExplorationPropertyService} from './services/exploration-property.service';
+import {ExplorationRightsService} from './services/exploration-rights.service';
+import {ExplorationSaveService} from './services/exploration-save.service';
+import {ExplorationStatesService} from './services/exploration-states.service';
+import {ExplorationTitleService} from './services/exploration-title.service';
+import {ExplorationWarningsService} from './services/exploration-warnings.service';
+import {GraphDataService} from './services/graph-data.service';
+import {RouterService} from './services/router.service';
+import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
+import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
- class MockNgbModalRef {
-   componentInstance = {};
- }
+class MockNgbModalRef {
+  componentInstance = {};
+}
 
- class MockNgbModal {
-   open() {
-     return {
-       result: Promise.resolve()
-     };
-   }
- }
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve(),
+    };
+  }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanModifyTranslations: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Exploration editor page component', () => {
   let component: ExplorationEditorPageComponent;
@@ -104,8 +127,9 @@ describe('Exploration editor page component', () => {
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
   let focusManagerService: FocusManagerService;
-  let explorationPermissionsBackendApiService:
-    ExplorationPermissionsBackendApiService;
+  let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
+  let entityTranslationsService: EntityTranslationsService;
+  let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
@@ -115,6 +139,7 @@ describe('Exploration editor page component', () => {
   let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
   let isLocationSetToNonStateEditorTabSpy;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   let explorationId = 'exp1';
   let explorationData = {
@@ -135,7 +160,7 @@ describe('Exploration editor page component', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'content_1',
-              html: ''
+              html: '',
             },
           },
           confirmed_unclassified_answers: [],
@@ -143,14 +168,14 @@ describe('Exploration editor page component', () => {
           hints: [],
         },
         recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
+          voiceovers_mapping: {},
+        },
       },
       Final: {
         param_changes: [],
         content: {
           html: '',
-          audio_translations: {}
+          audio_translations: {},
         },
         unresolved_answers: {},
         interaction: {
@@ -162,17 +187,17 @@ describe('Exploration editor page component', () => {
             dest_if_really_stuck: null,
             feedback: {
               html: '',
-              audio_translations: {}
-            }
+              audio_translations: {},
+            },
           },
           confirmed_unclassified_answers: [],
           id: null,
-          hints: []
+          hints: [],
         },
         recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
-      }
+          voiceovers_mapping: {},
+        },
+      },
     },
     title: 'Exploration Title',
     category: 'Exploration Category',
@@ -183,9 +208,7 @@ describe('Exploration editor page component', () => {
     param_specs: [],
     param_changes: [],
     auto_tts_enabled: {},
-    correctness_feedback_enabled: {},
     edits_allowed: true,
-    state_classifier_mapping: [],
     user: {},
     version: '1',
     rights: {},
@@ -193,22 +216,22 @@ describe('Exploration editor page component', () => {
     draft_changes: [{}, {}, {}],
     is_version_of_draft_valid: false,
     show_state_editor_tutorial_on_load: true,
-    show_state_translation_tutorial_on_load: true
+    show_state_translation_tutorial_on_load: true,
   };
 
   class MockWindowRef {
-    location = { path: '/create/2234' };
+    location = {path: '/create/2234'};
     nativeWindow = {
       scrollTo: (value1, value2) => {},
       sessionStorage: {
         promoIsDismissed: null,
         setItem: (testKey1, testKey2) => {},
-        removeItem: (testKey) => {}
+        removeItem: testKey => {},
       },
       gtag: (value1, value2, value3) => {},
       navigator: {
         onLine: true,
-        userAgent: null
+        userAgent: null,
       },
       location: {
         path: '/create/2234',
@@ -230,19 +253,17 @@ describe('Exploration editor page component', () => {
           clientWidth: null,
           clientHeight: null,
           style: {
-            overflowY: ''
-          }
-        }
+            overflowY: '',
+          },
+        },
       },
-      addEventListener: (value1, value2) => {}
+      addEventListener: (value1, value2) => {},
     };
   }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [
         ExplorationEditorPageComponent,
         LostChangesModalComponent,
@@ -260,8 +281,9 @@ describe('Exploration editor page component', () => {
             getExplorationId: () => {
               return explorationId;
             },
-            setExplorationIsLinkedToStory: () => {}
-          }
+            setExplorationIsLinkedToStory: () => {},
+            setExplorationVersion: expVersion => {},
+          },
         },
         EditabilityService,
         ExplorationFeaturesBackendApiService,
@@ -274,7 +296,6 @@ describe('Exploration editor page component', () => {
         ParamSpecsObjectFactory,
         RouterService,
         SiteAnalyticsService,
-        StateClassifierMappingService,
         StateEditorRefreshService,
         StateEditorService,
         StateTopAnswersStatsBackendApiService,
@@ -287,29 +308,34 @@ describe('Exploration editor page component', () => {
         },
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: ExplorationDataService,
           useValue: {
-            getDataAsync: (callback) => {
+            getDataAsync: callback => {
               callback();
               return Promise.resolve(explorationData);
             },
             autosaveChangeListAsync: () => {
               return;
-            }
-          }
-        }
+            },
+          },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
         entryComponents: [
           LostChangesModalComponent,
           WelcomeModalComponent,
-          HelpModalComponent]
-      }
+          HelpModalComponent,
+        ],
+      },
     });
   });
 
@@ -342,19 +368,39 @@ describe('Exploration editor page component', () => {
     ueps = TestBed.inject(UserExplorationPermissionsService);
     focusManagerService = TestBed.inject(FocusManagerService);
     explorationPermissionsBackendApiService = TestBed.inject(
-      ExplorationPermissionsBackendApiService);
+      ExplorationPermissionsBackendApiService
+    );
+    entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityBulkTranslationsBackendApiService = TestBed.inject(
+      EntityBulkTranslationsBackendApiService
+    );
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
-      rs, 'isLocationSetToNonStateEditorTab');
+      rs,
+      'isLocationSetToNonStateEditorTab'
+    );
     isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
 
-    spyOn(explorationPermissionsBackendApiService, 'getPermissionsAsync')
-      .and.returnValue(Promise.resolve(
+    spyOn(
+      explorationPermissionsBackendApiService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve(
         new ExplorationPermissions(
-          null, null, null, null, null, null, true, null)
-      ));
-    spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.callFake((value) => {});
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          true,
+          null
+        )
+      )
+    );
+    spyOn(autosaveInfoModalsService, 'showVersionMismatchModal').and.callFake(
+      value => {}
+    );
     spyOn(autosaveInfoModalsService, 'showLostChangesModal').and.stub();
     spyOn(autosaveInfoModalsService, 'isModalOpen').and.returnValue(false);
 
@@ -377,39 +423,61 @@ describe('Exploration editor page component', () => {
       ews = TestBed.inject(ExplorationWarningsService);
       ueps = TestBed.inject(UserExplorationPermissionsService);
 
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({
+      registerAcceptTutorialModalEventSpy = spyOn(
+        sas,
+        'registerAcceptTutorialModalEvent'
+      );
+      registerDeclineTutorialModalEventSpy = spyOn(
+        sas,
+        'registerDeclineTutorialModalEvent'
+      );
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({
           explorationIsCurated: null,
-        } as ExplorationFeatures));
+        } as ExplorationFeatures)
+      );
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend').and.returnValue(
+        Promise.resolve()
+      );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getFeedbackThreadsAsync')
-        .and.returnValue(Promise.resolve([]));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve(
-           {
-             canEdit: true,
-             canVoiceover: true
-           } as ExplorationPermissions));
-      spyOnProperty(rs, 'onRefreshTranslationTab')
-        .and.returnValue(mockRefreshTranslationTabEventEmitter);
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+        Promise.resolve([])
+      );
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({
+          canEdit: true,
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
+      spyOnProperty(rs, 'onRefreshTranslationTab').and.returnValue(
+        mockRefreshTranslationTabEventEmitter
+      );
       spyOn(cls, 'getChangeList').and.returnValue(null);
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve(new UserInfo(
-          ['USER_ROLE'], true, true, false, false, false, null, null, null,
-          false)));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo(
+            ['USER_ROLE'],
+            true,
+            true,
+            false,
+            false,
+            false,
+            null,
+            null,
+            null,
+            false
+          )
+        )
+      );
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
-        mockOpenEditorTutorialEmitter);
+        mockOpenEditorTutorialEmitter
+      );
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
-        mockOpenTranslationTutorialEmitter);
+        mockOpenTranslationTutorialEmitter
+      );
 
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
@@ -442,6 +510,17 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
+    it('should skip to main content', () => {
+      const mockElement = document.createElement('div');
+      mockElement.classList.add('exploration-editor-content');
+      document.body.appendChild(mockElement);
+
+      component.skipEditorNavbar();
+
+      const focusedElement = document.activeElement as HTMLElement;
+      expect(focusedElement.tabIndex).toBe(-1);
+    });
+
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
@@ -457,53 +536,50 @@ describe('Exploration editor page component', () => {
       expect(rs.navigateToMainTab).toHaveBeenCalled();
     }));
 
-    it('should start translation tutorial when on translation page',
-      fakeAsync(() => {
-        tds.countOfOpenFeedbackThreads = 2;
-        spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
-        spyOn(component, 'startTranslationTutorial').and.callThrough();
-        rs.navigateToTranslationTab();
-        mockRefreshTranslationTabEventEmitter.emit();
+    it('should start translation tutorial when on translation page', fakeAsync(() => {
+      tds.countOfOpenFeedbackThreads = 2;
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      spyOn(component, 'startTranslationTutorial').and.callThrough();
+      rs.navigateToTranslationTab();
+      mockRefreshTranslationTabEventEmitter.emit();
 
-        tick();
+      tick();
 
-        mockOpenTranslationTutorialEmitter.emit();
-        expect(component.startTranslationTutorial).toHaveBeenCalled();
+      mockOpenTranslationTutorialEmitter.emit();
+      expect(component.startTranslationTutorial).toHaveBeenCalled();
 
-        flush();
-        discardPeriodicTasks();
-      }));
+      flush();
+      discardPeriodicTasks();
+    }));
 
-    it('should start translation tutorial when not on translation page',
-      fakeAsync(() => {
-        tds.countOfOpenFeedbackThreads = 2;
-        spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
-        spyOn(component, 'startTranslationTutorial').and.callThrough();
-        spyOn(rs, 'navigateToTranslationTab');
+    it('should start translation tutorial when not on translation page', fakeAsync(() => {
+      tds.countOfOpenFeedbackThreads = 2;
+      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      spyOn(component, 'startTranslationTutorial').and.callThrough();
+      spyOn(rs, 'navigateToTranslationTab');
 
-        rs.navigateToSettingsTab();
-        tick();
-        mockOpenTranslationTutorialEmitter.emit();
-        tick();
+      rs.navigateToSettingsTab();
+      tick();
+      mockOpenTranslationTutorialEmitter.emit();
+      tick();
 
-        expect(component.startTranslationTutorial).toHaveBeenCalled();
-        expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+      expect(component.startTranslationTutorial).toHaveBeenCalled();
+      expect(rs.navigateToTranslationTab).toHaveBeenCalled();
 
-        flush();
-        discardPeriodicTasks();
-      }));
+      flush();
+      discardPeriodicTasks();
+    }));
 
     it('should return navbar text', () => {
       expect(component.getNavbarText()).toEqual('Exploration Editor');
     });
 
-    it('should return warning count, warnings list & critical warning',
-      () => {
-        spyOn(ews, 'countWarnings').and.returnValue(1);
-        expect(component.countWarnings()).toEqual(1);
-        spyOn(ews, 'getWarnings').and.returnValue([]);
-        expect(component.getWarnings()).toEqual([]);
-      });
+    it('should return warning count, warnings list & critical warning', () => {
+      spyOn(ews, 'countWarnings').and.returnValue(1);
+      expect(component.countWarnings()).toEqual(1);
+      spyOn(ews, 'getWarnings').and.returnValue([]);
+      expect(component.getWarnings()).toEqual([]);
+    });
 
     it('should return the thread count', () => {
       tds.countOfOpenFeedbackThreads = 2;
@@ -584,12 +660,28 @@ describe('Exploration editor page component', () => {
       expect(focusSpy).toHaveBeenCalled();
     });
 
-    it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-          {
-            result: Promise.resolve('editor')
-          } as NgbModalRef
+    it('should generate the aria label correctly', () => {
+      const mockWarnings = [
+        {message: 'Warning 1'},
+        {message: 'Warning 2'},
+        {message: 'Warning 3'},
+      ];
+
+      spyOn(component, 'getWarnings').and.returnValue(mockWarnings);
+      spyOn(component, 'countWarnings').and.returnValue(mockWarnings.length);
+
+      const ariaLabel = component.generateAriaLabelForWarnings();
+
+      expect(ariaLabel).toBe(
+        'Total warnings: 3. Warning 1: Warning 1. Warning 2: ' +
+          'Warning 2. Warning 3: Warning 3'
       );
+    });
+
+    it('should show the user help modal for editor tutorial', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve('editor'),
+      } as NgbModalRef);
 
       component.showUserHelpModal();
       tick();
@@ -600,11 +692,9 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-          {
-            result: Promise.resolve('translation')
-          } as NgbModalRef
-      );
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve('translation'),
+      } as NgbModalRef);
 
       component.showUserHelpModal();
       tick();
@@ -618,33 +708,43 @@ describe('Exploration editor page component', () => {
   describe('Checking internet Connection', () => {
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve(null));
+      registerAcceptTutorialModalEventSpy = spyOn(
+        sas,
+        'registerAcceptTutorialModalEvent'
+      );
+      registerDeclineTutorialModalEventSpy = spyOn(
+        sas,
+        'registerDeclineTutorialModalEvent'
+      );
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve(null)
+      );
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend').and.returnValue(
+        Promise.resolve()
+      );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
-      spyOn(tds, 'getFeedbackThreadsAsync')
-        .and.returnValue(Promise.resolve([]));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve(
-           {
-             canEdit: true,
-             canVoiceover: true
-           } as ExplorationPermissions));
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+        Promise.resolve([])
+      );
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({
+          canEdit: true,
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
       spyOnProperty(stfts, 'onOpenEditorTutorial').and.returnValue(
-        mockOpenEditorTutorialEmitter);
+        mockOpenEditorTutorialEmitter
+      );
       spyOnProperty(ics, 'onInternetStateChange').and.returnValue(
-        mockConnectionServiceEmitter);
+        mockConnectionServiceEmitter
+      );
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
-        mockOpenTranslationTutorialEmitter);
+        mockOpenTranslationTutorialEmitter
+      );
       spyOn(as, 'addInfoMessage');
       spyOn(as, 'addSuccessMessage');
       explorationData.is_version_of_draft_valid = false;
@@ -682,47 +782,134 @@ describe('Exploration editor page component', () => {
 
   describe('when user permission is false and draft changes are true', () => {
     let mockExplorationPropertyChangedEventEmitter = new EventEmitter();
+    let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
     beforeEach(() => {
       ueps = TestBed.inject(UserExplorationPermissionsService);
       tds = TestBed.inject(ThreadDataBackendApiService);
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve({
+      registerAcceptTutorialModalEventSpy = spyOn(
+        sas,
+        'registerAcceptTutorialModalEvent'
+      );
+      registerDeclineTutorialModalEventSpy = spyOn(
+        sas,
+        'registerDeclineTutorialModalEvent'
+      );
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({
           explorationIsCurated: null,
-        } as ExplorationFeatures));
+        } as ExplorationFeatures)
+      );
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend').and.returnValue(
+        Promise.resolve()
+      );
       spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
-        mockExplorationPropertyChangedEventEmitter);
+        mockExplorationPropertyChangedEventEmitter
+      );
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
       spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
-      spyOn(tds, 'getFeedbackThreadsAsync')
-        .and.returnValue(Promise.resolve([]));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve(
-           {
-             canEdit: true,
-             canVoiceover: true
-           } as ExplorationPermissions));
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve(new UserInfo(
-          ['USER_ROLE'], true, true, false, false, false, null, null, null,
-          false)));
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+        Promise.resolve([])
+      );
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({
+          canEdit: true,
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo(
+            ['USER_ROLE'],
+            true,
+            true,
+            false,
+            false,
+            false,
+            null,
+            null,
+            null,
+            false
+          )
+        )
+      );
       spyOnProperty(ess, 'onRefreshGraph').and.returnValue(refreshGraphEmitter);
       spyOnProperty(cls, 'autosaveIsInProgress$').and.returnValue(
-        autosaveIsInProgress);
+        autosaveIsInProgress
+      );
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
-        mockInitExplorationPageEmitter);
+        mockInitExplorationPageEmitter
+      );
+      lastPublishedTranslations = {
+        hi: EntityTranslation.createFromBackendDict({
+          entity_id: 'exp1',
+          entity_type: 'exploration',
+          entity_version: 5,
+          language_code: 'hi',
+          translations: {
+            content1: {
+              translation: '<p>This is content 1.</p>',
+              dataFormat: 'html',
+              needsUpdate: true,
+            },
+          },
+        }),
+      };
+      spyOn(
+        entityBulkTranslationsBackendApiService,
+        'fetchEntityBulkTranslationsAsync'
+      ).and.returnValue(Promise.resolve(lastPublishedTranslations));
       explorationData.is_version_of_draft_valid = false;
-      explorationData.draft_changes = ['data1', 'data2'];
-
+      explorationData.draft_changes = [
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content0',
+          translation: {
+            content_value: '<p>test content one</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'mark_translations_needs_update',
+          content_id: 'content0',
+        },
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content0',
+          translation: {
+            content_value: '',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'remove_translations',
+          content_id: 'content0',
+        },
+        {
+          cmd: 'edit_translation',
+          language_code: 'fr',
+          content_id: 'content0',
+          translation: {
+            content_value: '<p>new test content one</p>',
+            content_format: 'html',
+            needs_update: false,
+          },
+        },
+        {
+          cmd: 'mark_translation_needs_update_for_language',
+          content_id: 'content0',
+          language_code: 'fr',
+        },
+      ];
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
+        true;
       component.ngOnInit();
     });
 
@@ -740,9 +927,11 @@ describe('Exploration editor page component', () => {
     it('should have component properties correspond to backend data', () => {
       expect(component.explorationUrl).toBe('/create/' + explorationId);
       expect(component.explorationDownloadUrl).toBe(
-        '/createhandler/download/' + explorationId);
+        '/createhandler/download/' + explorationId
+      );
       expect(component.revertExplorationUrl).toBe(
-        '/createhandler/revert/' + explorationId);
+        '/createhandler/revert/' + explorationId
+      );
       expect(component.areExplorationWarningsVisible).toBeFalse();
     });
 
@@ -762,7 +951,8 @@ describe('Exploration editor page component', () => {
       mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setDocumentTitle).toHaveBeenCalledWith(
-        'Exploration Title - Oppia Editor');
+        'Exploration Title - Oppia Editor'
+      );
     });
 
     it('should react when untitled exploration property changes', () => {
@@ -770,7 +960,8 @@ describe('Exploration editor page component', () => {
       mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setDocumentTitle).toHaveBeenCalledWith(
-        'Untitled Exploration - Oppia Editor');
+        'Untitled Exploration - Oppia Editor'
+      );
     });
 
     it('should react when refreshing graph', () => {
@@ -796,46 +987,136 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
-    it('should start editor tutorial when closing welcome exploration' +
-        ' modal', fakeAsync(() => {
-      spyOn(component, 'startEditorTutorial').and.callThrough();
-      spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: new MockNgbModalRef(),
-            result: Promise.resolve(explorationId)
-          } as NgbModalRef
-      );
+    it('should update entity translations dict with draft changes', fakeAsync(() => {
+      spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
+      let entityTranslation = EntityTranslation.createFromBackendDict({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {
+          content0: {
+            content_value: '<p>new test content one</p>',
+            content_format: 'html',
+            needs_update: true,
+          },
+        },
+      });
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      ).toEqual({});
 
-      component.isModalOpenable = true;
-      component.showWelcomeExplorationModal();
-      tick();
+      mockInitExplorationPageEmitter.emit();
       tick();
 
-      expect(registerAcceptTutorialModalEventSpy)
-        .toHaveBeenCalledWith(explorationId);
-      expect(component.startEditorTutorial).toHaveBeenCalled();
+      expect(EntityTranslation.createFromBackendDict).toHaveBeenCalledWith({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {},
+      });
+
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+      ).toEqual(entityTranslation);
 
       flush();
       discardPeriodicTasks();
     }));
 
-    it('should dismiss tutorial when dismissing welcome exploration' +
-        ' modal', fakeAsync(() => {
-      spyOn(component, 'startEditorTutorial').and.callThrough();
-      spyOn(ngbModal, 'open').and.returnValue(
-          {
-            componentInstance: new MockNgbModalRef(),
-            result: Promise.reject(explorationId)
-          } as NgbModalRef
-      );
-
-      component.showWelcomeExplorationModal();
+    it('should initialize entity translation object for last published translations', fakeAsync(() => {
+      mockInitExplorationPageEmitter.emit();
       tick();
 
-      expect(registerDeclineTutorialModalEventSpy)
-        .toHaveBeenCalled();
-      expect(component.startEditorTutorial).not.toHaveBeenCalled();
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual(lastPublishedTranslations);
+
+      flush();
+      discardPeriodicTasks();
     }));
+
+    it('should initialize only latest draft changes when feature flag is disabled', fakeAsync(() => {
+      spyOn(EntityTranslation, 'createFromBackendDict').and.callThrough();
+      let entityTranslation = EntityTranslation.createFromBackendDict({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: explorationData.version,
+        language_code: 'fr',
+        translations: {
+          content0: {
+            content_value: '<p>new test content one</p>',
+            content_format: 'html',
+            needs_update: true,
+          },
+        },
+      });
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
+        false;
+
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual({});
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations
+      ).toEqual({});
+
+      mockInitExplorationPageEmitter.emit();
+      tick();
+
+      expect(
+        entityTranslationsService.languageCodeToLastPublishedEntityTranslations
+      ).toEqual({});
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.fr
+      ).toEqual(entityTranslation);
+
+      flush();
+      discardPeriodicTasks();
+    }));
+
+    it(
+      'should start editor tutorial when closing welcome exploration' +
+        ' modal',
+      fakeAsync(() => {
+        spyOn(component, 'startEditorTutorial').and.callThrough();
+        spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(explorationId),
+        } as NgbModalRef);
+
+        component.isModalOpenable = true;
+        component.showWelcomeExplorationModal();
+        tick();
+        tick();
+
+        expect(registerAcceptTutorialModalEventSpy).toHaveBeenCalledWith(
+          explorationId
+        );
+        expect(component.startEditorTutorial).toHaveBeenCalled();
+
+        flush();
+        discardPeriodicTasks();
+      })
+    );
+
+    it(
+      'should dismiss tutorial when dismissing welcome exploration' + ' modal',
+      fakeAsync(() => {
+        spyOn(component, 'startEditorTutorial').and.callThrough();
+        spyOn(ngbModal, 'open').and.returnValue({
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.reject(explorationId),
+        } as NgbModalRef);
+
+        component.showWelcomeExplorationModal();
+        tick();
+
+        expect(registerDeclineTutorialModalEventSpy).toHaveBeenCalled();
+        expect(component.startEditorTutorial).not.toHaveBeenCalled();
+      })
+    );
 
     it('should toggle exploration warning visibility', () => {
       expect(component.areExplorationWarningsVisible).toBeFalse();
@@ -868,30 +1149,38 @@ describe('Exploration editor page component', () => {
       tds = TestBed.inject(ThreadDataBackendApiService);
       ueps = TestBed.inject(UserExplorationPermissionsService);
 
-      registerAcceptTutorialModalEventSpy = (
-        spyOn(sas, 'registerAcceptTutorialModalEvent'));
-      registerDeclineTutorialModalEventSpy = (
-        spyOn(sas, 'registerDeclineTutorialModalEvent'));
+      registerAcceptTutorialModalEventSpy = spyOn(
+        sas,
+        'registerAcceptTutorialModalEvent'
+      );
+      registerDeclineTutorialModalEventSpy = spyOn(
+        sas,
+        'registerDeclineTutorialModalEvent'
+      );
       mockEnterEditorForTheFirstTime = new EventEmitter();
-      spyOn(efbas, 'fetchExplorationFeaturesAsync')
-        .and.returnValue(Promise.resolve(null));
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve(null)
+      );
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
-        .and.returnValue(Promise.resolve());
+      spyOn(eis, 'flushUpdatedTasksToBackend').and.returnValue(
+        Promise.resolve()
+      );
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
       spyOn(pts, 'setDocumentTitle').and.callThrough();
       spyOn(tds, 'getOpenThreadsCount').and.returnValue(5);
-      spyOn(tds, 'getFeedbackThreadsAsync')
-        .and.returnValue(Promise.resolve([]));
-      spyOn(ueps, 'getPermissionsAsync')
-        .and.returnValue(Promise.resolve(
-           {
-             canEdit: true
-           } as ExplorationPermissions));
+      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+        Promise.resolve([])
+      );
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({
+          canEdit: true,
+        } as ExplorationPermissions)
+      );
       spyOnProperty(sts, 'onEnterEditorForTheFirstTime').and.returnValue(
-        mockEnterEditorForTheFirstTime);
+        mockEnterEditorForTheFirstTime
+      );
 
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
@@ -904,12 +1193,12 @@ describe('Exploration editor page component', () => {
     it('should recognize when improvements tab is enabled', fakeAsync(() => {
       spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
-        Promise.resolve(true));
+        Promise.resolve(true)
+      );
 
       component.ngOnInit();
       tick();
       flushMicrotasks();
-
 
       expect(component.isImprovementsTabEnabled()).toBeTrue();
     }));
@@ -917,7 +1206,8 @@ describe('Exploration editor page component', () => {
     it('should recognize when improvements tab is disabled', fakeAsync(() => {
       spyOn(ics, 'startCheckingConnection');
       spyOn(eis, 'isImprovementsTabEnabledAsync').and.returnValue(
-        Promise.resolve(false));
+        Promise.resolve(false)
+      );
 
       component.ngOnInit();
       tick();

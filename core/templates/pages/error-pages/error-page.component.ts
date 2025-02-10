@@ -16,48 +16,22 @@
  * @fileoverview Component for the error page.
  */
 
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, Input} from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { PageTitleService } from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'error-page',
   templateUrl: './error-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class ErrorPageComponent implements OnInit, OnDestroy {
+export class ErrorPageComponent {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() statusCode!: string;
-  directiveSubscriptions = new Subscription();
-  constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private pageTitleService: PageTitleService,
-    private translateService: TranslateService
-  ) {}
 
-  ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
-  }
-
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_ERROR_PAGE_TITLE', {
-        statusCode: this.statusCode
-      }
-    );
-    this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -66,12 +40,4 @@ export class ErrorPageComponent implements OnInit, OnDestroy {
   getStatusCode(): number {
     return Number(this.statusCode);
   }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
-  }
 }
-
-angular.module('oppia').directive(
-  'errorPage', downgradeComponent(
-    {component: ErrorPageComponent}));

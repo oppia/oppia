@@ -18,27 +18,23 @@
 
 require('base-components/base-content.component.ts');
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { TopicLandingPageConstants } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { PageTitleService } from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicLandingPageConstants} from 'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PageTitleService} from 'services/page-title.service';
 
-import { AppConstants } from 'app.constants';
+type TopicLandingPageDataKey =
+  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA;
 
-type TopicLandingPageDataKey = (
-  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);
-
-type TopicLandingPageMathDataKey = (
-    keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA.math);
+type TopicLandingPageMathDataKey =
+  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA.math;
 
 interface LessonsQuality {
   title: string;
@@ -58,7 +54,7 @@ interface TopicData {
 @Component({
   selector: 'topic-landing-page',
   templateUrl: './topic-landing-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class TopicLandingPageComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -82,37 +78,41 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
   ) {}
 
   getLessonQualities(): LessonsQuality[] {
-    return [{
-      title: 'Fun storytelling',
-      description: (
-        'Oppia\'s lessons tell stories using video and images to ' +
-          'help learners apply math concepts in everyday life.'),
-      imagePngFilename: 'fun_storytelling.png',
-      imageWebpFilename: 'fun_storytelling.webp',
-      imageAlt: 'Storytelling lessons presentation.'
-    }, {
-      title: 'Accessible lessons',
-      description: (
-        'Our lessons come with audio translations in different ' +
-          'languages, can be used on mobile phones, and don\'t require a ' +
+    return [
+      {
+        title: 'Fun storytelling',
+        description:
+          "Oppia's lessons tell stories using video and images to " +
+          'help learners apply math concepts in everyday life.',
+        imagePngFilename: 'fun_storytelling.png',
+        imageWebpFilename: 'fun_storytelling.webp',
+        imageAlt: 'Storytelling lessons presentation.',
+      },
+      {
+        title: 'Accessible lessons',
+        description:
+          'Our lessons come with audio translations in different ' +
+          "languages, can be used on mobile phones, and don't require a " +
           'lot of data so that they can be used and enjoyed by anyone, ' +
-          'anywhere.'),
-      imagePngFilename: 'accessible_lessons.png',
-      imageWebpFilename: 'accessible_lessons.webp',
-      imageAlt: 'Lesson accessibility presentation.'
-    }, {
-      title: 'Suitable for all',
-      description: (
-        'No matter your level, there\'s a lesson for you! From learning ' +
-          this.topicData.chapters[0].toLowerCase() + ', to ' +
+          'anywhere.',
+        imagePngFilename: 'accessible_lessons.png',
+        imageWebpFilename: 'accessible_lessons.webp',
+        imageAlt: 'Lesson accessibility presentation.',
+      },
+      {
+        title: 'Suitable for all',
+        description:
+          "No matter your level, there's a lesson for you! From learning " +
+          this.topicData.chapters[0].toLowerCase() +
+          ', to ' +
           this.topicData.chapters[1].toLowerCase() +
-          ' - Oppia has you covered.'),
-      imagePngFilename: 'suitable_for_all.png',
-      imageWebpFilename: 'suitable_for_all.webp',
-      imageAlt: 'Lesson viewers and learners.'
-    }];
+          ' - Oppia has you covered.',
+        imagePngFilename: 'suitable_for_all.png',
+        imageWebpFilename: 'suitable_for_all.webp',
+        imageAlt: 'Lesson viewers and learners.',
+      },
+    ];
   }
-
 
   ngOnInit(): void {
     let pathArray = this.windowRef.nativeWindow.location.pathname.split('/');
@@ -121,32 +121,32 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
 
     this.topicData =
       TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA[
-        subjectName as TopicLandingPageDataKey][
-          topicName as TopicLandingPageMathDataKey];
+        subjectName as TopicLandingPageDataKey
+      ][topicName as TopicLandingPageMathDataKey];
     this.topicTitle = this.topicData.topicTitle;
 
     this.lessonsQualities = this.getLessonQualities();
-    this.backgroundBannerUrl = (
-      this.urlInterpolationService.getStaticImageUrl(
-        '/background/bannerB.svg'));
+    this.backgroundBannerUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/background/bannerB.svg'
+    );
 
     let topicImageUrlTemplate = '/landing/<subject>/<topic>/<filename>';
-    this.lessonInDevicesPngImageSrc = (
+    this.lessonInDevicesPngImageSrc =
       this.urlInterpolationService.getStaticImageUrl(
-        this.urlInterpolationService.interpolateUrl(
-          topicImageUrlTemplate, {
-            subject: subjectName,
-            topic: topicName,
-            filename: 'lesson_in_devices.png'
-          })));
-    this.lessonInDevicesWebpImageSrc = (
+        this.urlInterpolationService.interpolateUrl(topicImageUrlTemplate, {
+          subject: subjectName,
+          topic: topicName,
+          filename: 'lesson_in_devices.png',
+        })
+      );
+    this.lessonInDevicesWebpImageSrc =
       this.urlInterpolationService.getStaticImageUrl(
-        this.urlInterpolationService.interpolateUrl(
-          topicImageUrlTemplate, {
-            subject: subjectName,
-            topic: topicName,
-            filename: 'lesson_in_devices.webp'
-          })));
+        this.urlInterpolationService.interpolateUrl(topicImageUrlTemplate, {
+          subject: subjectName,
+          topic: topicName,
+          filename: 'lesson_in_devices.webp',
+        })
+      );
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
@@ -156,33 +156,36 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
 
   getLessonQualityImageSrc(filename: string): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.urlInterpolationService.interpolateUrl(
-        '/landing/<filename>', {filename: filename}));
+      this.urlInterpolationService.interpolateUrl('/landing/<filename>', {
+        filename: filename,
+      })
+    );
   }
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_TOPIC_LANDING_PAGE_TITLE', {
+      'I18N_TOPIC_LANDING_PAGE_TITLE',
+      {
         topicTitle: this.topicTitle,
-        topicTagline: this.topicData.topicTagline
-      });
+        topicTagline: this.topicData.topicTagline,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   onClickGetStartedButton(): void {
     let collectionId = this.topicData.collectionId;
     this.siteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
-      collectionId);
+      collectionId
+    );
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = (
-        `/learn${this.urlService.getPathname()}`);
+      this.windowRef.nativeWindow.location.href = `/learn${this.urlService.getPathname()}`;
     }, 150);
   }
 
   goToClassroom(): void {
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = (
-        `/learn/${AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
+      this.windowRef.nativeWindow.location.href = '/learn';
     }, 150);
   }
 
@@ -191,5 +194,9 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('topicLandingPage',
-  downgradeComponent({component: TopicLandingPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'topicLandingPage',
+    downgradeComponent({component: TopicLandingPageComponent})
+  );

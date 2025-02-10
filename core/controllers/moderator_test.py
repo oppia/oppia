@@ -16,33 +16,12 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core.domain import platform_parameter_list
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
 from typing import Final
-
-
-class ModeratorPageTests(test_utils.GenericTestBase):
-
-    def test_moderator_page(self) -> None:
-        """Tests access to the Moderator page."""
-        # Try accessing the moderator page without logging in.
-        self.get_html_response('/moderator', expected_status_int=302)
-
-        # Try accessing the moderator page without being a moderator.
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
-        self.get_html_response('/moderator', expected_status_int=401)
-        self.logout()
-
-        # Try accessing the moderator page after logging in as a moderator.
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.login(self.MODERATOR_EMAIL)
-        self.get_html_response('/moderator')
-        self.logout()
 
 
 class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
@@ -109,21 +88,22 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-        self.can_send_email_moderator_action_ctx = self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True)
-
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
+                'I\'m writing to inform you that '
+                'I have unpublished the above exploration.'
+            ),
+        ]
+    )
     def test_get_draft_email_body(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        d_text = self.get_json(
-            '/moderatorhandler/email_draft')['draft_email_body']
-        self.assertEqual(d_text, '')
         expected_draft_text_body = (
             'I\'m writing to inform you that '
             'I have unpublished the above exploration.')
-        with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
-            d_text = self.get_json(
-                '/moderatorhandler/email_draft')['draft_email_body']
-            self.assertEqual(d_text, expected_draft_text_body)
+        d_text = self.get_json(
+            '/moderatorhandler/email_draft')['draft_email_body']
+        self.assertEqual(d_text, expected_draft_text_body)
         self.logout()

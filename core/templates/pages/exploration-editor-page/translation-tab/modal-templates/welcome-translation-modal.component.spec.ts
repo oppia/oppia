@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for welcome translation tab.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WelcomeTranslationModalComponent } from './welcome-translation-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WelcomeTranslationModalComponent} from './welcome-translation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -35,7 +34,7 @@ class MockActiveModal {
   }
 }
 
-describe('Welcome Translation Modal Component', function() {
+describe('Welcome Translation Modal Component', function () {
   let component: WelcomeTranslationModalComponent;
   let fixture: ComponentFixture<WelcomeTranslationModalComponent>;
   let contextService: ContextService;
@@ -45,19 +44,17 @@ describe('Welcome Translation Modal Component', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        WelcomeTranslationModalComponent
-      ],
+      declarations: [WelcomeTranslationModalComponent],
       providers: [
         ContextService,
         UrlInterpolationService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
-        SiteAnalyticsService
+        SiteAnalyticsService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
   beforeEach(() => {
@@ -70,17 +67,20 @@ describe('Welcome Translation Modal Component', function() {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(siteAnalyticsService, 'registerTutorialModalOpenEvent')
-      .and.callThrough();
+    spyOn(
+      siteAnalyticsService,
+      'registerTutorialModalOpenEvent'
+    ).and.callThrough();
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after it is initialized',
-    function() {
-      expect(component.explorationId).toBe(explorationId);
-      expect(siteAnalyticsService.registerTutorialModalOpenEvent)
-        .toHaveBeenCalledWith(explorationId);
-      expect(component.translationWelcomeImgUrl).toBe(
-        '/assets/images/general/editor_welcome.svg');
-    });
+  it('should initialize component properties after it is initialized', function () {
+    expect(component.explorationId).toBe(explorationId);
+    expect(
+      siteAnalyticsService.registerTutorialModalOpenEvent
+    ).toHaveBeenCalledWith(explorationId);
+    expect(component.translationWelcomeImgUrl).toBe(
+      '/assets/copyrighted-images/general/editor_welcome.svg'
+    );
+  });
 });

@@ -16,17 +16,17 @@
  * @fileoverview Component for the test interaction panel in the state editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { AppConstants } from 'app.constants';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {AppConstants} from 'app.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-test-interaction-panel',
-  templateUrl: './test-interaction-panel.component.html'
+  templateUrl: './test-interaction-panel.component.html',
 })
 export class TestInteractionPanel implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks
@@ -38,8 +38,8 @@ export class TestInteractionPanel implements OnInit {
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
-    private explorationStatesService: ExplorationStatesService,
-  ) { }
+    private explorationStatesService: ExplorationStatesService
+  ) {}
 
   isSubmitButtonDisabled(): boolean {
     return this.currentInteractionService.isSubmitButtonDisabled();
@@ -52,15 +52,15 @@ export class TestInteractionPanel implements OnInit {
   ngOnInit(): void {
     let _stateName = this.stateName;
     let _state = this.explorationStatesService.getState(_stateName);
-    this.interactionIsInline = (
-      INTERACTION_SPECS[
-        _state.interaction.id as InteractionSpecsKey
-      ].display_mode ===
-      AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+    this.interactionIsInline =
+      INTERACTION_SPECS[_state.interaction.id as InteractionSpecsKey]
+        .display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
   }
 }
 
-angular.module('oppia').directive('oppiaTestInteractionPanel',
+angular.module('oppia').directive(
+  'oppiaTestInteractionPanel',
   downgradeComponent({
-    component: TestInteractionPanel
-  }) as angular.IDirectiveFactory);
+    component: TestInteractionPanel,
+  }) as angular.IDirectiveFactory
+);

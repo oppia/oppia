@@ -23,6 +23,7 @@ import os
 
 from core import feconf
 from core.domain import android_services
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import skill_fetchers
@@ -45,6 +46,13 @@ secrets_services = models.Registry.import_secrets_services()
 
 class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
     """Tests for the initialize_android_test_data."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        classroom_id = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id
+        )
 
     def test_initialize_topic_is_published(self) -> None:
         android_services.initialize_android_test_data()
@@ -112,7 +120,6 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         old_topic = topic_fetchers.get_topic_by_name(
             'Android test', strict=True)
         old_topic_last_updated = old_topic.last_updated
-
         android_services.initialize_android_test_data()
         self.assertTrue(
             topic_services.does_topic_with_name_exist('Android test'))

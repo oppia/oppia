@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +16,14 @@
  * @fileoverview Unit test for ExplorationFeaturesService
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import {TestBed} from '@angular/core/testing';
+import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
 
-import { ExplorationFeaturesService, ExplorationDataDict} from
-  'services/exploration-features.service';
-import { ExplorationFeatures } from './exploration-features-backend-api.service';
+import {
+  ExplorationFeaturesService,
+  ExplorationDataDict,
+} from 'services/exploration-features.service';
+import {ExplorationFeatures} from './exploration-features-backend-api.service';
 
 describe('ExplorationFeatureService', () => {
   let explorationFeatureService: ExplorationFeaturesService;
@@ -41,11 +42,11 @@ describe('ExplorationFeatureService', () => {
     // for complete the ExplorationFeatures interface.
     featureData = {
       explorationIsCurated: true,
-      alwaysAskLearnersForAnswerDetails: false
+      alwaysAskLearnersForAnswerDetails: false,
     };
     explorationData = {
       param_changes: [testParamChange],
-      states: {}
+      states: {},
     };
     explorationData2 = {
       param_changes: [],
@@ -55,51 +56,51 @@ describe('ExplorationFeatureService', () => {
           classifier_model_id: '',
           content: {
             content_id: 'content',
-            html: ''
+            html: '',
           },
           recorded_voiceovers: {
             voiceovers_mapping: {
               content: {},
-              default_outcome: {}
-            }
+              default_outcome: {},
+            },
           },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
             customization_args: {
               buttonText: {
-                value: 'Continue'
-              }
+                value: 'Continue',
+              },
             },
             default_outcome: {
               dest: 'End State',
               dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
-                html: ''
+                html: '',
               },
               param_changes: [],
               labelled_as_correct: true,
               refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+              missing_prerequisite_skill_id: null,
             },
             hints: [],
             solution: null,
-            id: 'Continue'
+            id: 'Continue',
           },
           linked_skill_id: null,
           solicit_answer_details: false,
-          card_is_checkpoint: false
-        }
-      }
+          card_is_checkpoint: false,
+        },
+      },
     };
     testParamChange = {
       name: 'param_1',
       generator_id: 'test_id',
       customization_args: {
         parse_with_jinja: true,
-        value: '1'
-      }
+        value: '1',
+      },
     };
   });
 
@@ -107,25 +108,27 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService.init(explorationData, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(true);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled()).toEqual(
+      true
+    );
   });
 
   it('should init the exploration features from states', () => {
     explorationFeatureService.init(explorationData2, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
-    expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-      .toEqual(true);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled()).toEqual(
+      true
+    );
   });
 
-  it('should not init the exploration feature if service is initialized',
-    () => {
-      ExplorationFeaturesService.serviceIsInitialized = true;
-      explorationFeatureService.init(explorationData, featureData);
-      expect(explorationFeatureService.isInitialized()).toEqual(true);
-      expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
-      expect(explorationFeatureService.isPlaythroughRecordingEnabled())
-        .toEqual(false);
-    });
+  it('should not init the exploration feature if service is initialized', () => {
+    ExplorationFeaturesService.serviceIsInitialized = true;
+    explorationFeatureService.init(explorationData, featureData);
+    expect(explorationFeatureService.isInitialized()).toEqual(true);
+    expect(explorationFeatureService.areParametersEnabled()).toEqual(false);
+    expect(explorationFeatureService.isPlaythroughRecordingEnabled()).toEqual(
+      false
+    );
+  });
 });

@@ -19,13 +19,13 @@
  * into the component is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-response-multiple-choice-input',
-  templateUrl: './multiple-choice-input-response.component.html'
+  templateUrl: './multiple-choice-input-response.component.html',
 })
 export class ResponseMultipleChoiceInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -34,13 +34,15 @@ export class ResponseMultipleChoiceInputComponent implements OnInit {
   @Input() answer!: string;
   @Input() choices!: string;
   response!: string;
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string;
+      this.answer
+    ) as string;
     const _choices = this.htmlEscaperService.escapedJsonToObj(
-      this.choices) as Record<string, { _html: string }>;
+      this.choices
+    ) as Record<string, {_html: string}>;
     this.response = _choices[_answer]._html;
   }
 }
@@ -48,6 +50,6 @@ export class ResponseMultipleChoiceInputComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaResponseMultipleChoiceInput',
   downgradeComponent({
-    component: ResponseMultipleChoiceInputComponent
+    component: ResponseMultipleChoiceInputComponent,
   })
 );

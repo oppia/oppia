@@ -16,10 +16,10 @@
  * @fileoverview Unit Test for Mark Audio As Needing Update Modal Component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MarkAudioAsNeedingUpdateModalComponent } from './mark-audio-as-needing-update-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MarkAudioAsNeedingUpdateModalComponent} from './mark-audio-as-needing-update-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -37,14 +37,14 @@ describe('Delete Exploration Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        MarkAudioAsNeedingUpdateModalComponent
+      declarations: [MarkAudioAsNeedingUpdateModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MarkAudioAsNeedingUpdateModalComponent);

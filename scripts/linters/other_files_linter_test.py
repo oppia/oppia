@@ -28,10 +28,10 @@ from core.tests import test_utils
 from typing import Final, List, Tuple
 
 from . import other_files_linter
-from . import pre_commit_linter
+from . import run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
-NAME_SPACE.files = pre_commit_linter.FileCache()
+NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
 LINTER_TESTS_DIR: Final = os.path.join(
@@ -84,7 +84,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-4.3.1/')
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
@@ -102,7 +102,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '# Third party files:', '- third_party/static/bootstrap-4.3/')
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
@@ -131,7 +131,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
@@ -156,7 +156,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
@@ -180,7 +180,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
@@ -272,7 +272,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
-    def test_check_github_workflows_use_merge_action_checks(self) -> None:
+    def test_check_github_workflows_have_name_checks(self) -> None:
         def mock_listdir(unused_path: str) -> List[str]:
             return ['pass.yml', 'fail.yml', 'README']
 
@@ -288,13 +288,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     'jobs:',
                     '  run:',
                     '    steps:',
-                    '      - uses: actions/checkout@v2',
-                    '      - uses: ./.github/actions/merge',
-                    '      - run: echo "oppia"',
+                    '      - name: Print',
+                    '        run: echo "oppia"',
                 ])
             elif path.endswith('fail.yml'):
                 return '\n'.join([
-                    'name: Passing workflow file',
+                    'name: Failing workflow file',
                     'on:',
                     '  push:',
                     '    branches:',
@@ -303,7 +302,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                     'jobs:',
                     '  run:',
                     '    steps:',
-                    '      - uses: actions/checkout@v2',
                     '      - run: echo "oppia"',
                 ])
             raise AssertionError(
@@ -315,14 +313,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         read_swap = self.swap(FILE_CACHE, 'read', mock_read)
 
         expected = [
-            '%s --> Job run does not use the .github/actions/merge action.' %
+            '%s --> Job run has an unnamed step' %
             os.path.join(other_files_linter.WORKFLOWS_DIR, 'fail.yml'),
-            'FAILED  Github workflows use merge action check failed',
+            'FAILED  Github workflow steps have a name check failed',
         ]
 
         with listdir_swap, read_swap:
             task_results = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_github_workflows_use_merge_action()
+                FILE_CACHE).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
 
     def test_perform_all_lint_checks(self) -> None:

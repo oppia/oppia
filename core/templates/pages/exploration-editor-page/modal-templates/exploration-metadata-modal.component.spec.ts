@@ -16,21 +16,28 @@
  * @fileoverview Unit tests for ExplorationMetadataModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
-import { AlertsService } from 'services/alerts.service';
-import { ExplorationCategoryService } from '../services/exploration-category.service';
-import { ExplorationDataService } from '../services/exploration-data.service';
-import { ExplorationLanguageCodeService } from '../services/exploration-language-code.service';
-import { ExplorationObjectiveService } from '../services/exploration-objective.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { ExplorationTagsService } from '../services/exploration-tags.service';
-import { ExplorationTitleService } from '../services/exploration-title.service';
-import { ExplorationMetadataModalComponent } from './exploration-metadata-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {AlertsService} from 'services/alerts.service';
+import {ExplorationCategoryService} from '../services/exploration-category.service';
+import {ExplorationDataService} from '../services/exploration-data.service';
+import {ExplorationLanguageCodeService} from '../services/exploration-language-code.service';
+import {ExplorationObjectiveService} from '../services/exploration-objective.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {ExplorationTagsService} from '../services/exploration-tags.service';
+import {ExplorationTitleService} from '../services/exploration-title.service';
+import {ExplorationMetadataModalComponent} from './exploration-metadata-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -63,9 +70,7 @@ describe('Exploration Metadata Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ExplorationMetadataModalComponent
-      ],
+      declarations: [ExplorationMetadataModalComponent],
       providers: [
         {
           provide: ExplorationDataService,
@@ -73,16 +78,16 @@ describe('Exploration Metadata Modal Component', () => {
             explorationId: 0,
             autosaveChangeListAsync() {
               return;
-            }
-          }
+            },
+          },
         },
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         AlertsService,
         ExplorationCategoryService,
@@ -92,7 +97,7 @@ describe('Exploration Metadata Modal Component', () => {
         ExplorationTagsService,
         ExplorationTitleService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -103,9 +108,9 @@ describe('Exploration Metadata Modal Component', () => {
 
       explorationCategoryService = TestBed.inject(ExplorationCategoryService);
       explorationLanguageCodeService = TestBed.inject(
-        ExplorationLanguageCodeService);
-      explorationObjectiveService = TestBed.inject(
-        ExplorationObjectiveService);
+        ExplorationLanguageCodeService
+      );
+      explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
       explorationStatesService = TestBed.inject(ExplorationStatesService);
       explorationTagsService = TestBed.inject(ExplorationTagsService);
       explorationTitleService = TestBed.inject(ExplorationTitleService);
@@ -127,87 +132,147 @@ describe('Exploration Metadata Modal Component', () => {
       component.add({
         value: 'name',
         input: {
-          value: ''
-        }
+          value: '',
+        },
       } as MatChipInputEvent);
       tick();
 
       expect(explorationTagsService.displayed).toEqual(['name']);
     }));
 
-    it('should not add same exploration editor tags' +
-      'when user enter same tag again', fakeAsync(() => {
-      component.explorationTags = [];
-      explorationTagsService.displayed = [];
-      component.add({
-        value: 'name',
-        input: {
-          value: ''
-        }
-      } as MatChipInputEvent);
-      tick();
+    it(
+      'should not add same exploration editor tags' +
+        'when user enter same tag again',
+      fakeAsync(() => {
+        component.explorationTags = [];
+        explorationTagsService.displayed = [];
+        component.add({
+          value: 'name',
+          input: {
+            value: '',
+          },
+        } as MatChipInputEvent);
+        tick();
 
-      expect(explorationTagsService.displayed).toEqual(['name']);
+        expect(explorationTagsService.displayed).toEqual(['name']);
 
-      // When user try to enter same tag again.
-      component.add({
-        value: 'name',
-        input: {
-          value: ''
-        }
-      } as MatChipInputEvent);
-      tick();
-      expect(explorationTagsService.displayed).toEqual(['name']);
-    }));
+        // When user try to enter same tag again.
+        component.add({
+          value: 'name',
+          input: {
+            value: '',
+          },
+        } as MatChipInputEvent);
+        tick();
+        expect(explorationTagsService.displayed).toEqual(['name']);
+      })
+    );
 
-    it('should be able to add multiple exploration editor tags',
+    it(
+      'should not add exploration editor tags' +
+        'when user enter same tag, but with varying uppercase and lowercase',
+      fakeAsync(() => {
+        component.explorationTags = [];
+        explorationTagsService.displayed = [];
+        component.add({
+          value: 'name',
+          input: {
+            value: '',
+          },
+        } as MatChipInputEvent);
+        tick();
+
+        expect(explorationTagsService.displayed).toEqual(['name']);
+
+        // When user try to enter same tag again.
+        component.add({
+          value: 'NAME',
+          input: {
+            value: '',
+          },
+        } as MatChipInputEvent);
+        tick();
+        expect(explorationTagsService.displayed).toEqual(['name']);
+      })
+    );
+
+    it(
+      'should not add exploration editor tags' +
+        'when user enter number or special character',
       fakeAsync(() => {
         component.explorationTags = [];
         explorationTagsService.displayed = [];
 
+        // When user try to enter special characters.
         component.add({
-          value: 'tag-one',
+          value: '!@#$%^&*()',
           input: {
-            value: ''
-          }
+            value: '',
+          },
         } as MatChipInputEvent);
         tick();
 
+        expect(explorationTagsService.displayed).toEqual([]);
+
+        // When user try to enter numbers.
         component.add({
-          value: 'tag-two',
+          value: '1234567890',
           input: {
-            value: ''
-          }
+            value: '',
+          },
         } as MatChipInputEvent);
         tick();
+        expect(explorationTagsService.displayed).toEqual([]);
+      })
+    );
 
-        component.add({
-          value: 'tag-three',
-          input: {
-            value: ''
-          }
-        } as MatChipInputEvent);
-        tick();
+    it('should be able to add multiple exploration editor tags', fakeAsync(() => {
+      component.explorationTags = [];
+      explorationTagsService.displayed = [];
 
-        expect(explorationTagsService.displayed).toEqual(
-          ['tag-one', 'tag-two', 'tag-three']);
-      }));
+      component.add({
+        value: 'tagone',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
 
-    it('should be able to remove multiple exploration editor tags',
-      fakeAsync(() => {
-        component.explorationTags = ['tag-one', 'tag-two', 'tag-three'];
-        explorationTagsService.displayed = ['tag-one', 'tag-two', 'tag-three'];
+      component.add({
+        value: 'tagtwo',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
 
-        component.remove('tag-two');
-        tick();
+      component.add({
+        value: 'tagthree',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      tick();
 
-        component.remove('tag-three');
-        tick();
+      expect(explorationTagsService.displayed).toEqual([
+        'tagone',
+        'tagtwo',
+        'tagthree',
+      ]);
+    }));
 
-        expect(explorationTagsService.displayed).toEqual(
-          ['tag-one']);
-      }));
+    it('should be able to remove multiple exploration editor tags', fakeAsync(() => {
+      component.explorationTags = ['tag-one', 'tag-two', 'tag-three'];
+      explorationTagsService.displayed = ['tag-one', 'tag-two', 'tag-three'];
 
+      component.remove('tag-two');
+      tick();
+
+      component.remove('tag-three');
+      tick();
+
+      expect(explorationTagsService.displayed).toEqual(['tag-one']);
+    }));
 
     it('should be able to remove exploration editor tags', fakeAsync(() => {
       component.explorationTags = [];
@@ -216,14 +281,14 @@ describe('Exploration Metadata Modal Component', () => {
       component.add({
         value: 'first',
         input: {
-          value: ''
-        }
+          value: '',
+        },
       } as MatChipInputEvent);
       component.add({
         value: 'second',
         input: {
-          value: ''
-        }
+          value: '',
+        },
       } as MatChipInputEvent);
 
       component.remove('second');
@@ -231,57 +296,63 @@ describe('Exploration Metadata Modal Component', () => {
       expect(explorationTagsService.displayed).toEqual(['first']);
     }));
 
-    it('should initialize component properties after Component is initialized',
-      fakeAsync(() => {
-        let TOTAL_CATEGORIES = 42;
-        expect(component.objectiveHasBeenPreviouslyEdited).toBe(false);
-        expect(component.requireTitleToBeSpecified).toBe(true);
-        expect(component.requireObjectiveToBeSpecified).toBe(true);
-        expect(component.requireCategoryToBeSpecified).toBe(true);
-        expect(component.askForLanguageCheck).toBe(true);
-        expect(component.askForTags).toBe(true);
-        expect(component.CATEGORY_LIST_FOR_SELECT2.length)
-          .toBe(TOTAL_CATEGORIES);
+    it('should initialize component properties after Component is initialized', fakeAsync(() => {
+      let TOTAL_CATEGORIES = 44;
+      expect(component.objectiveHasBeenPreviouslyEdited).toBe(false);
+      expect(component.requireTitleToBeSpecified).toBe(true);
+      expect(component.requireObjectiveToBeSpecified).toBe(true);
+      expect(component.requireCategoryToBeSpecified).toBe(true);
+      expect(component.askForLanguageCheck).toBe(true);
+      expect(component.askForTags).toBe(true);
+      expect(component.CATEGORY_LIST_FOR_SELECT2.length).toBe(TOTAL_CATEGORIES);
 
-        component.filterChoices('');
+      component.filterChoices('');
 
-        component.explorationTags = [];
-        component.add({
-          value: 'shivam',
-          input: {
-            value: ''
-          }
-        } as MatChipInputEvent);
-        component.remove('shivam');
-        tick();
+      component.explorationTags = [];
+      component.add({
+        value: 'shivam',
+        input: {
+          value: '',
+        },
+      } as MatChipInputEvent);
+      component.remove('shivam');
+      tick();
 
-        component.filterChoices('filterChoices');
-        component.updateCategoryListWithUserData();
-        expect(component.newCategory).toEqual({
-          id: 'filterChoices',
-          text: 'filterChoices',
-        });
-      }));
-
-    it('should save all exploration metadata values when it contains title,' +
-      ' category and objective', fakeAsync(() => {
-      spyOn(ngbActiveModal, 'close').and.stub();
-
-      explorationCategoryService.displayed = 'New Category';
-      explorationLanguageCodeService.displayed = 'es';
-      explorationObjectiveService.displayed = (
-        'Exp Objective is ready to be saved');
-      explorationTagsService.displayed = ['h1'];
-      explorationTitleService.displayed = 'New Title';
-      expect(component.isSavingAllowed()).toBe(true);
-      component.save();
-
-      tick(500);
-      flush();
-
-      expect(ngbActiveModal.close).toHaveBeenCalledWith([
-        'title', 'objective', 'category', 'language', 'tags']);
+      component.filterChoices('filterChoices');
+      component.updateCategoryListWithUserData();
+      expect(component.newCategory).toEqual({
+        id: 'filterChoices',
+        text: 'filterChoices',
+      });
     }));
+
+    it(
+      'should save all exploration metadata values when it contains title,' +
+        ' category and objective',
+      fakeAsync(() => {
+        spyOn(ngbActiveModal, 'close').and.stub();
+
+        explorationCategoryService.displayed = 'New Category';
+        explorationLanguageCodeService.displayed = 'es';
+        explorationObjectiveService.displayed =
+          'Exp Objective is ready to be saved';
+        explorationTagsService.displayed = ['h1'];
+        explorationTitleService.displayed = 'New Title';
+        expect(component.isSavingAllowed()).toBe(true);
+        component.save();
+
+        tick(500);
+        flush();
+
+        expect(ngbActiveModal.close).toHaveBeenCalledWith([
+          'title',
+          'objective',
+          'category',
+          'language',
+          'tags',
+        ]);
+      })
+    );
   });
 
   describe('when all metadata are not filled', () => {
@@ -292,9 +363,9 @@ describe('Exploration Metadata Modal Component', () => {
       alertsService = TestBed.inject(AlertsService);
       explorationCategoryService = TestBed.inject(ExplorationCategoryService);
       explorationLanguageCodeService = TestBed.inject(
-        ExplorationLanguageCodeService);
-      explorationObjectiveService = TestBed.inject(
-        ExplorationObjectiveService);
+        ExplorationLanguageCodeService
+      );
+      explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
       explorationStatesService = TestBed.inject(ExplorationStatesService);
       explorationTagsService = TestBed.inject(ExplorationTagsService);
       explorationTitleService = TestBed.inject(ExplorationTitleService);
@@ -309,53 +380,65 @@ describe('Exploration Metadata Modal Component', () => {
       fixture.detectChanges();
     });
 
-    it('should not save exploration metadata values when title is not' +
-      ' provided', fakeAsync(() => {
-      spyOn(ngbActiveModal, 'close').and.stub();
-      spyOn(alertsService, 'addWarning');
-      expect(component.isSavingAllowed()).toBe(false);
+    it(
+      'should not save exploration metadata values when title is not' +
+        ' provided',
+      fakeAsync(() => {
+        spyOn(ngbActiveModal, 'close').and.stub();
+        spyOn(alertsService, 'addWarning');
+        expect(component.isSavingAllowed()).toBe(false);
 
-      component.save();
-      tick(500);
+        component.save();
+        tick(500);
 
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Please specify a title');
-      expect(ngbActiveModal.close).not.toHaveBeenCalled();
-    }));
+        expect(alertsService.addWarning).toHaveBeenCalledWith(
+          'Please specify a title'
+        );
+        expect(ngbActiveModal.close).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not save exploration metadata values when objective is not' +
-      ' provided', fakeAsync(() => {
-      spyOn(ngbActiveModal, 'close').and.stub();
-      spyOn(alertsService, 'addWarning');
+    it(
+      'should not save exploration metadata values when objective is not' +
+        ' provided',
+      fakeAsync(() => {
+        spyOn(ngbActiveModal, 'close').and.stub();
+        spyOn(alertsService, 'addWarning');
 
-      explorationTitleService.displayed = 'New Title';
+        explorationTitleService.displayed = 'New Title';
 
-      expect(component.isSavingAllowed()).toBe(false);
+        expect(component.isSavingAllowed()).toBe(false);
 
-      component.save();
-      tick();
+        component.save();
+        tick();
 
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Please specify an objective');
-      expect(ngbActiveModal.close).not.toHaveBeenCalled();
-    }));
+        expect(alertsService.addWarning).toHaveBeenCalledWith(
+          'Please specify an objective'
+        );
+        expect(ngbActiveModal.close).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not save exploration metadata values when category is not' +
-      ' provided', fakeAsync(() => {
-      spyOn(ngbActiveModal, 'close').and.stub();
+    it(
+      'should not save exploration metadata values when category is not' +
+        ' provided',
+      fakeAsync(() => {
+        spyOn(ngbActiveModal, 'close').and.stub();
 
-      explorationTitleService.displayed = 'New Title';
-      explorationObjectiveService.displayed = 'Exp Objective';
-      explorationCategoryService.displayed = '';
+        explorationTitleService.displayed = 'New Title';
+        explorationObjectiveService.displayed = 'Exp Objective';
+        explorationCategoryService.displayed = '';
 
-      spyOn(alertsService, 'addWarning');
-      expect(component.isSavingAllowed()).toBe(false);
+        spyOn(alertsService, 'addWarning');
+        expect(component.isSavingAllowed()).toBe(false);
 
-      component.save();
-      tick();
+        component.save();
+        tick();
 
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Please specify a category');
-    }));
+        expect(alertsService.addWarning).toHaveBeenCalledWith(
+          'Please specify a category'
+        );
+      })
+    );
   });
 });

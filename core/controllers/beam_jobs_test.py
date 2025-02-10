@@ -130,4 +130,7 @@ class BeamJobRunResultHandlerTests(BeamHandlerTestBase):
             self.get_json('/beam_job_run_result', expected_status_int=400))
 
         self.assertEqual(
-            response['error'], 'Missing key in handler args: job_id.')
+            response['error'],
+            'At \'http://localhost/beam_job_run_result\' these errors are '
+            'happening:\n'
+            'Missing key in handler args: job_id.')

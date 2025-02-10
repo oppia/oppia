@@ -26,10 +26,7 @@ export class LearnerGroupUserInfo {
   _username: string;
   _error: string;
 
-  constructor(
-      username: string,
-      error: string
-  ) {
+  constructor(username: string, error: string) {
     this._username = username;
     this._error = error;
   }
@@ -43,7 +40,7 @@ export class LearnerGroupUserInfo {
   }
 
   static createFromBackendDict(
-      infoBackendDict: LearnerGroupUserInfoBackendDict
+    infoBackendDict: LearnerGroupUserInfoBackendDict
   ): LearnerGroupUserInfo {
     return new LearnerGroupUserInfo(
       infoBackendDict.username,

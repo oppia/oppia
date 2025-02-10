@@ -16,11 +16,16 @@
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
 
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from
-  '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { EditorReloadingModalComponent } from './editor-reloading-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {EditorReloadingModalComponent} from './editor-reloading-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 class MockActiveModal {
   close(): void {
@@ -39,16 +44,14 @@ describe('Editor Reloading Modal Controller', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        EditorReloadingModalComponent,
-      ],
+      declarations: [EditorReloadingModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+          useClass: MockActiveModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

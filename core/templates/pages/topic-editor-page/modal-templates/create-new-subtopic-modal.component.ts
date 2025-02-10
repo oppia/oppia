@@ -16,30 +16,31 @@
  * @fileoverview Component for create new subtopic modal controller.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AppConstants } from 'app.constants';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Topic } from 'domain/topic/topic-object.model';
-import { SubtopicPage } from 'domain/topic/subtopic-page.model';
-import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
-import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
+import {Topic} from 'domain/topic/topic-object.model';
+import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {TopicUpdateService} from 'domain/topic/topic-update.service';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
+import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
-  templateUrl: './create-new-subtopic-modal.component.html'
+  templateUrl: './create-new-subtopic-modal.component.html',
 })
-
 export class CreateNewSubtopicModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   hostname!: string;
-  classroomUrlFragment!: string;
+  classroomUrlFragment!: string | null;
   topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
   htmlData!: string;
@@ -70,25 +71,24 @@ export class CreateNewSubtopicModalComponent
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.hostname = this.windowRef.nativeWindow.location.hostname;
-    this.classroomUrlFragment = (
-      this.topicEditorStateService.getClassroomUrlFragment());
+    this.classroomUrlFragment =
+      this.topicEditorStateService.getClassroomUrlFragment();
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
       ui_config: {
-        rows: 100
-      }
+        rows: 100,
+      },
     };
     this.htmlData = '';
     this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
-    this.allowedBgColors = (
-      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic);
+    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
     this.subtopicId = this.topic.getNextSubtopicId();
     this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
-    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT = (
-      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
+    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
+      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
@@ -103,14 +103,23 @@ export class CreateNewSubtopicModalComponent
   }
 
   addSubtopic(): void {
-    this.topicUpdateService
-      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
+    this.topicUpdateService.addSubtopic(
+      this.topic,
+      this.subtopicTitle,
+      this.editableUrlFragment
+    );
 
     this.topicUpdateService.setSubtopicThumbnailFilename(
-      this.topic, this.subtopicId, this.editableThumbnailFilename);
+      this.topic,
+      this.subtopicId,
+      this.editableThumbnailFilename
+    );
 
     this.topicUpdateService.setSubtopicThumbnailBgColor(
-      this.topic, this.subtopicId, this.editableThumbnailBgColor);
+      this.topic,
+      this.subtopicId,
+      this.editableThumbnailBgColor
+    );
   }
 
   updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
@@ -128,33 +137,39 @@ export class CreateNewSubtopicModalComponent
   isSubtopicValid(): boolean {
     return Boolean(
       this.editableThumbnailFilename &&
-      this.subtopicTitle &&
-      this.htmlData &&
-      this.editableUrlFragment &&
-      this.isUrlFragmentValid());
+        this.subtopicTitle &&
+        this.htmlData &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
+    );
   }
 
   cancel(): void {
     this.topicEditorStateService.deleteSubtopicPage(
-      this.topic.getId(), this.subtopicId);
+      this.topic.getId(),
+      this.subtopicId
+    );
     this.topicEditorStateService.onTopicReinitialized.emit();
     this.ngbActiveModal.dismiss('cancel');
   }
 
   isUrlFragmentValid(): boolean {
     return this.subtopicValidationService.isUrlFragmentValid(
-      this.editableUrlFragment);
+      this.editableUrlFragment
+    );
   }
 
   checkSubtopicExistence(): void {
-    this.subtopicUrlFragmentExists = (
+    this.subtopicUrlFragmentExists =
       this.subtopicValidationService.doesSubtopicWithUrlFragmentExist(
-        this.editableUrlFragment));
+        this.editableUrlFragment
+      );
   }
 
   save(): void {
-    if (!this.subtopicValidationService.checkValidSubtopicName(
-      this.subtopicTitle)) {
+    if (
+      !this.subtopicValidationService.checkValidSubtopicName(this.subtopicTitle)
+    ) {
       this.errorMsg = 'A subtopic with this title already exists';
       return;
     }
@@ -162,22 +177,37 @@ export class CreateNewSubtopicModalComponent
     this.addSubtopic();
 
     this.topicUpdateService.setSubtopicTitle(
-      this.topic, this.subtopicId, this.subtopicTitle);
+      this.topic,
+      this.subtopicId,
+      this.subtopicTitle
+    );
     this.topicUpdateService.setSubtopicUrlFragment(
-      this.topic, this.subtopicId, this.editableUrlFragment);
+      this.topic,
+      this.subtopicId,
+      this.editableUrlFragment
+    );
 
     this.subtopicPage = SubtopicPage.createDefault(
-      this.topic.getId(), this.subtopicId);
+      this.topic.getId(),
+      this.subtopicId
+    );
 
     let subtitledHtml = cloneDeep(
-      this.subtopicPage.getPageContents().getSubtitledHtml());
+      this.subtopicPage.getPageContents().getSubtitledHtml()
+    );
     subtitledHtml.html = this.htmlData;
     this.topicUpdateService.setSubtopicPageContentsHtml(
-      this.subtopicPage, this.subtopicId, subtitledHtml);
+      this.subtopicPage,
+      this.subtopicId,
+      subtitledHtml
+    );
     this.subtopicPage.getPageContents().setHtml(this.htmlData);
     this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
     this.topicUpdateService.setSubtopicTitle(
-      this.topic, this.subtopicId, this.subtopicTitle);
+      this.topic,
+      this.subtopicId,
+      this.subtopicTitle
+    );
     this.ngbActiveModal.close(this.subtopicId);
   }
 

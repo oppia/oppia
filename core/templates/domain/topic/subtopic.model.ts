@@ -17,17 +17,17 @@
  * subtopic domain objects.
  */
 
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 export interface SubtopicBackendDict {
-  'id': number;
-  'title': string;
-  'skill_ids': string[];
-  'thumbnail_filename': string | null;
-  'thumbnail_bg_color': string | null;
-  'url_fragment': string | null;
+  id: number;
+  title: string;
+  skill_ids: string[];
+  thumbnail_filename: string | null;
+  thumbnail_bg_color: string | null;
+  url_fragment: string | null;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -45,22 +45,26 @@ export class Subtopic {
   _thumbnailBgColor: string | null;
   _urlFragment: string | null;
   constructor(
-      subtopicId: number, title: string, skillIds: string[],
-      skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null,
-      thumbnailBgColor: string | null,
-      urlFragment: string | null) {
+    subtopicId: number,
+    title: string,
+    skillIds: string[],
+    skillIdToDescriptionMap: SkillIdToDescriptionMap,
+    thumbnailFilename: string | null,
+    thumbnailBgColor: string | null,
+    urlFragment: string | null
+  ) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
     this._urlFragment = urlFragment;
-    this._skillSummaries = skillIds.map(
-      (skillId) => {
-        return ShortSkillSummary.create(
-          skillId, skillIdToDescriptionMap[skillId]);
-      });
+    this._skillSummaries = skillIds.map(skillId => {
+      return ShortSkillSummary.create(
+        skillId,
+        skillIdToDescriptionMap[skillId]
+      );
+    });
   }
 
   getId(): number {
@@ -96,7 +100,8 @@ export class Subtopic {
   validate(): string[] {
     let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX
+    );
     if (
       this._urlFragment &&
       !VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)
@@ -106,15 +111,19 @@ export class Subtopic {
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
-    let skillIds = this._skillSummaries.map((skillSummary) => {
+    let skillIds = this._skillSummaries.map(skillSummary => {
       return skillSummary.getId();
     });
     for (let i = 0; i < skillIds.length; i++) {
       let skillId = skillIds[i];
       if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
         issues.push(
-          'The skill with id ' + skillId + ' is duplicated in' +
-          ' subtopic with id ' + this._id);
+          'The skill with id ' +
+            skillId +
+            ' is duplicated in' +
+            ' subtopic with id ' +
+            this._id
+        );
       }
     }
     return issues;
@@ -138,28 +147,31 @@ export class Subtopic {
   }
 
   hasSkill(skillId: string): boolean {
-    return this._skillSummaries.some(function(skillSummary) {
+    return this._skillSummaries.some(function (skillSummary) {
       return skillSummary.getId() === skillId;
     });
   }
 
   addSkill(skillId: string, skillDescription: string): boolean {
     if (!this.hasSkill(skillId)) {
-      this._skillSummaries.push(ShortSkillSummary.create(
-        skillId, skillDescription));
+      this._skillSummaries.push(
+        ShortSkillSummary.create(skillId, skillDescription)
+      );
       return true;
     }
     return false;
   }
 
   removeSkill(skillId: string): void {
-    let index = this._skillSummaries.map((skillSummary) => {
-      return skillSummary.getId();
-    }).indexOf(skillId);
+    let index = this._skillSummaries
+      .map(skillSummary => {
+        return skillSummary.getId();
+      })
+      .indexOf(skillId);
     if (index > -1) {
       this._skillSummaries.splice(index, 1);
     } else {
-      throw new Error('The given skill doesn\'t exist in the subtopic');
+      throw new Error("The given skill doesn't exist in the subtopic");
     }
   }
 
@@ -182,24 +194,31 @@ export class Subtopic {
   }
 
   static create(
-      subtopicBackendDict: SubtopicBackendDict,
-      skillIdToDescriptionMap: SkillIdToDescriptionMap): Subtopic {
+    subtopicBackendDict: SubtopicBackendDict,
+    skillIdToDescriptionMap: SkillIdToDescriptionMap
+  ): Subtopic {
     return new Subtopic(
-      subtopicBackendDict.id, subtopicBackendDict.title,
-      subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
+      subtopicBackendDict.id,
+      subtopicBackendDict.title,
+      subtopicBackendDict.skill_ids,
+      skillIdToDescriptionMap,
       subtopicBackendDict.thumbnail_filename,
       subtopicBackendDict.thumbnail_bg_color,
-      subtopicBackendDict.url_fragment);
+      subtopicBackendDict.url_fragment
+    );
   }
 
   static createFromTitle(subtopicId: number, title: string): Subtopic {
-    return this.create({
-      id: subtopicId,
-      title: title,
-      skill_ids: [],
-      thumbnail_filename: null,
-      thumbnail_bg_color: null,
-      url_fragment: null
-    }, {});
+    return this.create(
+      {
+        id: subtopicId,
+        title: title,
+        skill_ids: [],
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null,
+      },
+      {}
+    );
   }
 }

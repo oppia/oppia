@@ -16,7 +16,7 @@
  * @fileoverview Tests for short learner group summary model.
  */
 
-import { ShortLearnerGroupSummary } from './short-learner-group-summary.model';
+import {ShortLearnerGroupSummary} from './short-learner-group-summary.model';
 
 describe('Short Learner Group Summary', () => {
   it('should correctly convert backend dict to object', () => {
@@ -25,20 +25,22 @@ describe('Short Learner Group Summary', () => {
       title: 'sampleTitle',
       description: 'sampleDescription',
       facilitator_usernames: ['username1'],
-      learners_count: 5
+      learners_count: 5,
     };
 
-    let sampleShortLearnerGroupSummary = (
+    let sampleShortLearnerGroupSummary =
       ShortLearnerGroupSummary.createFromBackendDict(
-        sampleShortLearnerGroupSummaryDict)
-    );
+        sampleShortLearnerGroupSummaryDict
+      );
 
     expect(sampleShortLearnerGroupSummary.id).toEqual('sampleId');
     expect(sampleShortLearnerGroupSummary.title).toEqual('sampleTitle');
     expect(sampleShortLearnerGroupSummary.description).toEqual(
-      'sampleDescription');
-    expect(sampleShortLearnerGroupSummary.facilitatorUsernames).toEqual(
-      ['username1']);
+      'sampleDescription'
+    );
+    expect(sampleShortLearnerGroupSummary.facilitatorUsernames).toEqual([
+      'username1',
+    ]);
     expect(sampleShortLearnerGroupSummary.learnersCount).toEqual(5);
   });
 });

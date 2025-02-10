@@ -16,13 +16,12 @@
  * @fileoverview Component for removeActivityModal.
  */
 
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 
 @Component({
   selector: 'oppia-remove-activity-modal',
@@ -40,56 +39,62 @@ export class RemoveActivityModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
     let activityType = '';
-    if (this.subsectionName ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+    if (
+      this.subsectionName ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .EXPLORATIONS
+    ) {
       activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
-    } else if (this.subsectionName ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-        .COLLECTIONS) {
+    } else if (
+      this.subsectionName ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .COLLECTIONS
+    ) {
       activityType = AppConstants.ACTIVITY_TYPE_COLLECTION;
-    } else if (this.subsectionName ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-        .LEARN_TOPIC) {
+    } else if (
+      this.subsectionName ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .LEARN_TOPIC
+    ) {
       activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     } else {
       throw new Error('Subsection name is not valid.');
     }
 
     let removeActivityUrlPrefix = '';
-    if (this.sectionNameI18nId ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-      removeActivityUrlPrefix =
-        '/learnerplaylistactivityhandler/';
-    } else if (this.sectionNameI18nId ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-      removeActivityUrlPrefix =
-        '/learnerincompleteactivityhandler/';
-    } else if (this.sectionNameI18nId ===
-      LearnerDashboardPageConstants
-        .LEARNER_DASHBOARD_SECTION_I18N_IDS.CURRENT_GOALS) {
-      removeActivityUrlPrefix =
-        '/learnergoalshandler/';
+    if (
+      this.sectionNameI18nId ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST
+    ) {
+      removeActivityUrlPrefix = '/learnerplaylistactivityhandler/';
+    } else if (
+      this.sectionNameI18nId ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .INCOMPLETE
+    ) {
+      removeActivityUrlPrefix = '/learnerincompleteactivityhandler/';
+    } else if (
+      this.sectionNameI18nId ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .CURRENT_GOALS
+    ) {
+      removeActivityUrlPrefix = '/learnergoalshandler/';
     } else {
       throw new Error('Section name is not valid.');
     }
 
-    this.removeActivityUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        removeActivityUrlPrefix +
-        '<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: this.activityId
-        }));
+    this.removeActivityUrl = this.urlInterpolationService.interpolateUrl(
+      removeActivityUrlPrefix + '<activityType>/<activityId>',
+      {
+        activityType: activityType,
+        activityId: this.activityId,
+      }
+    );
   }
 
   remove(): void {
@@ -100,8 +105,3 @@ export class RemoveActivityModalComponent implements OnInit {
     this.activeModal.dismiss();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRemoveActivityModalComponent',
-  downgradeComponent(
-    {component: RemoveActivityModalComponent}));

@@ -16,18 +16,16 @@
  * @fileoverview Component for delete worked example modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-worked-example-modal',
-  templateUrl: './delete-worked-example-modal.component.html'
+  templateUrl: './delete-worked-example-modal.component.html',
 })
 export class DeleteWorkedExampleComponent extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for entity editor browser tabs info.
  */
 
-import { EntityEditorBrowserTabsInfo } from './entity-editor-browser-tabs-info.model';
+import {EntityEditorBrowserTabsInfo} from './entity-editor-browser-tabs-info.model';
 
 describe('Entity Editor Browser Tabs Info', () => {
   let topicEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo;
@@ -25,15 +25,22 @@ describe('Entity Editor Browser Tabs Info', () => {
     entityType: 'skill',
     latestVersion: 1,
     numberOfOpenedTabs: 1,
-    someTabHasUnsavedChanges: false
+    someTabHasUnsavedChanges: false,
   };
 
   beforeEach(() => {
-    skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo
-      .fromLocalStorageDict(
-        skillEditorBrowserTabsInfoLocalStorageDict, 'skill_1');
+    skillEditorBrowserTabsInfo =
+      EntityEditorBrowserTabsInfo.fromLocalStorageDict(
+        skillEditorBrowserTabsInfoLocalStorageDict,
+        'skill_1'
+      );
     topicEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'topic', 'topic_1', 1, 1, false);
+      'topic',
+      'topic_1',
+      1,
+      1,
+      false
+    );
   });
 
   it('should correctly get the various properties', () => {
@@ -53,11 +60,11 @@ describe('Entity Editor Browser Tabs Info', () => {
     ).toBeFalse();
   });
 
-  it('should correctly convert into dict that can be stored in local storage',
-    () => {
-      expect(skillEditorBrowserTabsInfo.toLocalStorageDict()).toEqual(
-        skillEditorBrowserTabsInfoLocalStorageDict);
-    });
+  it('should correctly convert into dict that can be stored in local storage', () => {
+    expect(skillEditorBrowserTabsInfo.toLocalStorageDict()).toEqual(
+      skillEditorBrowserTabsInfoLocalStorageDict
+    );
+  });
 
   it('should correctly set latest version to the given value', () => {
     expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(1);
@@ -67,31 +74,35 @@ describe('Entity Editor Browser Tabs Info', () => {
     expect(topicEditorBrowserTabsInfo.getLatestVersion()).toEqual(2);
   });
 
-  it('should correctly increment and decrement the value of ' +
+  it(
+    'should correctly increment and decrement the value of ' +
       'number of opened tabs',
-  () => {
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+    () => {
+      expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
 
-    skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
+      skillEditorBrowserTabsInfo.incrementNumberOfOpenedTabs();
 
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
+      expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(2);
 
-    skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+      skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
 
-    expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
-  });
+      expect(skillEditorBrowserTabsInfo.getNumberOfOpenedTabs()).toEqual(1);
+    }
+  );
 
-  it('should correctly set the value of \'someTabHasUnsavedChanges\' ' +
+  it(
+    "should correctly set the value of 'someTabHasUnsavedChanges' " +
       'to the given value',
-  () => {
-    expect(
-      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeFalse();
+    () => {
+      expect(
+        skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toBeFalse();
 
-    skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
 
-    expect(
-      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
-    ).toBeTrue();
-  });
+      expect(
+        skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
+      ).toBeTrue();
+    }
+  );
 });

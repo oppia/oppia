@@ -16,12 +16,12 @@
  * @fileoverview Component for the Create Exploration/Collection modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserService} from 'services/user.service';
+import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
+import {CollectionCreationService} from 'components/entity-creation-services/collection-creation.service';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'create-activity-modal',
@@ -43,9 +43,8 @@ export class CreateActivityModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      this.canCreateCollections = (
-        userInfo.canCreateCollections());
+    this.userService.getUserInfoAsync().then(userInfo => {
+      this.canCreateCollections = userInfo.canCreateCollections();
     });
   }
 

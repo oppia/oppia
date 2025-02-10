@@ -16,20 +16,33 @@
  * @fileoverview Unit tests for Blog Dashboard Tile component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { MockTranslatePipe, MockCapitalizePipe } from 'tests/unit-test-utils';
-import { BlogDashboardTileComponent } from './blog-dashboard-tile.component';
-import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { MatCardModule } from '@angular/material/card';
-import { MatMenuModule } from '@angular/material/menu';
-import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
-import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
-import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { BlogPostData } from 'domain/blog/blog-post.model';
-import { AlertsService } from 'services/alerts.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {MockTranslatePipe, MockCapitalizePipe} from 'tests/unit-test-utils';
+import {BlogDashboardTileComponent} from './blog-dashboard-tile.component';
+import {
+  BlogPostSummaryBackendDict,
+  BlogPostSummary,
+} from 'domain/blog/blog-post-summary.model';
+import {MatCardModule} from '@angular/material/card';
+import {MatMenuModule} from '@angular/material/menu';
+import {BlogDashboardPageService} from '../services/blog-dashboard-page.service';
+import {BlogPostEditorBackendApiService} from 'domain/blog/blog-post-editor-backend-api.service';
+import {
+  NgbModal,
+  NgbModalModule,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {BlogPostData} from 'domain/blog/blog-post.model';
+import {AlertsService} from 'services/alerts.service';
 
 describe('Blog Dashboard Tile Component', () => {
   let component: BlogDashboardTileComponent;
@@ -56,22 +69,19 @@ describe('Blog Dashboard Tile Component', () => {
         HttpClientTestingModule,
         MatCardModule,
         MatMenuModule,
-        NgbModalModule
+        NgbModalModule,
       ],
-      declarations: [
-        BlogDashboardTileComponent,
-        MockTranslatePipe
-      ],
+      declarations: [BlogDashboardTileComponent, MockTranslatePipe],
       providers: [
         {
           provide: CapitalizePipe,
-          useClass: MockCapitalizePipe
+          useClass: MockCapitalizePipe,
         },
         BlogDashboardPageService,
         BlogPostEditorBackendApiService,
-        AlertsService
+        AlertsService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -80,10 +90,12 @@ describe('Blog Dashboard Tile Component', () => {
     component = fixture.componentInstance;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     blogPostEditorBackendApiService = TestBed.inject(
-      BlogPostEditorBackendApiService);
+      BlogPostEditorBackendApiService
+    );
     ngbModal = TestBed.inject(NgbModal);
     sampleBlogPostData = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
+      sampleBlogPostBackendDict
+    );
     alertsService = TestBed.inject(AlertsService);
     sampleBlogPostSummary = {
       id: 'sampleId',
@@ -105,7 +117,8 @@ describe('Blog Dashboard Tile Component', () => {
 
   it('should initialize', () => {
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
 
     component.ngOnInit();
 
@@ -132,7 +145,8 @@ describe('Blog Dashboard Tile Component', () => {
     };
 
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
 
     expect(() => {
       component.ngOnInit();
@@ -140,119 +154,128 @@ describe('Blog Dashboard Tile Component', () => {
     }).toThrowError();
   }));
 
-  it('should get formatted date string from the timestamp in milliseconds',
-    () => {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let DATE = '11/21/2014';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('Nov 21, 2014');
+  it('should get formatted date string from the timestamp in milliseconds', () => {
+    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+    let DATE = '11/21/2014';
+    expect(component.getDateStringInWords(DATE)).toBe('Nov 21, 2014');
 
-      DATE = '01/16/2027';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('Jan 16, 2027');
+    DATE = '01/16/2027';
+    expect(component.getDateStringInWords(DATE)).toBe('Jan 16, 2027');
 
-      DATE = '02/02/2018';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('Feb 2, 2018');
-    });
+    DATE = '02/02/2018';
+    expect(component.getDateStringInWords(DATE)).toBe('Feb 2, 2018');
+  });
 
   it('should navigate to blog post editor interface on clicking edit', () => {
     spyOn(blogDashboardPageService, 'navigateToEditorTabWithId');
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
+      sampleBlogPostSummary
+    );
 
     component.editBlogPost();
 
-    expect(blogDashboardPageService.navigateToEditorTabWithId)
-      .toHaveBeenCalledWith('sampleId');
+    expect(
+      blogDashboardPageService.navigateToEditorTabWithId
+    ).toHaveBeenCalledWith('sampleId');
   });
 
-  it('should successfully place call to delete blog post model', fakeAsync(
-    () => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve()
-      } as NgbModalRef);
-      spyOn(blogDashboardPageService, 'deleteBlogPost');
-      component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-        sampleBlogPostSummary);
+  it('should successfully place call to delete blog post model', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(),
+    } as NgbModalRef);
+    spyOn(blogDashboardPageService, 'deleteBlogPost');
+    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+      sampleBlogPostSummary
+    );
 
-      component.deleteBlogPost();
-      tick();
+    component.deleteBlogPost();
+    tick();
 
-      expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
-    }));
+    expect(blogDashboardPageService.deleteBlogPost).toHaveBeenCalled();
+  }));
 
   it('should cancel delete blog post model', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
     } as NgbModalRef);
     spyOn(blogDashboardPageService, 'deleteBlogPost');
 
     component.deleteBlogPost();
     tick();
 
-    expect(blogDashboardPageService.deleteBlogPost)
-      .not.toHaveBeenCalled();
+    expect(blogDashboardPageService.deleteBlogPost).not.toHaveBeenCalled();
   }));
 
   it('should unpublish blog post data successfully.', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
+      result: Promise.resolve(),
     } as NgbModalRef);
 
     component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
-    spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
-      .and.returnValue(Promise.resolve({blogPostDict: sampleBlogPostData}));
+      sampleBlogPostSummary
+    );
+    spyOn(
+      blogPostEditorBackendApiService,
+      'updateBlogPostDataAsync'
+    ).and.returnValue(Promise.resolve({blogPostDict: sampleBlogPostData}));
     spyOn(component.unpublisedBlogPost, 'emit');
 
     component.unpublishBlogPost();
     tick();
 
-    expect(blogPostEditorBackendApiService.updateBlogPostDataAsync)
-      .toHaveBeenCalled();
+    expect(
+      blogPostEditorBackendApiService.updateBlogPostDataAsync
+    ).toHaveBeenCalled();
 
     tick();
 
     expect(component.unpublisedBlogPost.emit).toHaveBeenCalled();
   }));
 
+  it(
+    'should display error when unable to unpublish blog post data' +
+      ' successfully.',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve(),
+      } as NgbModalRef);
 
-  it('should display error when unable to unpublish blog post data' +
-  ' successfully.', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
-    } as NgbModalRef);
+      component.blogPostSummary = BlogPostSummary.createFromBackendDict(
+        sampleBlogPostSummary
+      );
+      spyOn(
+        blogPostEditorBackendApiService,
+        'updateBlogPostDataAsync'
+      ).and.returnValue(Promise.reject('status: 500'));
+      spyOn(component, 'unpublisedBlogPost');
+      spyOn(alertsService, 'addWarning');
 
-    component.blogPostSummary = BlogPostSummary.createFromBackendDict(
-      sampleBlogPostSummary);
-    spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync')
-      .and.returnValue(Promise.reject('status: 500'));
-    spyOn(component, 'unpublisedBlogPost');
-    spyOn(alertsService, 'addWarning');
+      component.unpublishBlogPost();
+      tick();
 
-    component.unpublishBlogPost();
-    tick();
+      expect(
+        blogPostEditorBackendApiService.updateBlogPostDataAsync
+      ).toHaveBeenCalled();
 
-    expect(blogPostEditorBackendApiService.updateBlogPostDataAsync)
-      .toHaveBeenCalled();
+      tick();
 
-    tick();
-
-    expect(component.unpublisedBlogPost).not.toHaveBeenCalled();
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to unpublish Blog Post. Internal Error: status: 500');
-  }));
+      expect(component.unpublisedBlogPost).not.toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to unpublish Blog Post. Internal Error: status: 500'
+      );
+    })
+  );
 
   it('should not unpublish blog post data if cancelled.', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject()
+      result: Promise.reject(),
     } as NgbModalRef);
     spyOn(blogPostEditorBackendApiService, 'updateBlogPostDataAsync');
     component.unpublishBlogPost();
     tick();
 
-    expect(blogPostEditorBackendApiService.updateBlogPostDataAsync)
-      .not.toHaveBeenCalled();
+    expect(
+      blogPostEditorBackendApiService.updateBlogPostDataAsync
+    ).not.toHaveBeenCalled();
   }));
 });

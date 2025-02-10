@@ -26,14 +26,12 @@ var ruleTester = new RuleTester();
 ruleTester.run('no-test-blockers', rule, {
   valid: [
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         console.log(elem.click);
       });`,
     },
     {
-      code:
-      `describe('Testing apply-validation directive', function() {
+      code: `describe('Testing apply-validation directive', function() {
         except(5).toBe(true);
       });`,
     },
@@ -41,24 +39,26 @@ ruleTester.run('no-test-blockers', rule, {
 
   invalid: [
     {
-      code:
-      `xit('should test a feature', function() {
+      code: `xit('should test a feature', function() {
         element(by.css('.e2e-test')).click();
       });`,
-      errors: [{
-        message: 'Please use "it" instead of "xit".',
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: 'Please use "it" instead of "xit".',
+          type: 'CallExpression',
+        },
+      ],
     },
     {
-      code:
-      `xdescribe('Testing apply-validation directive', function() {
+      code: `xdescribe('Testing apply-validation directive', function() {
         except(5).toBe(true);
       });`,
-      errors: [{
-        message: 'Please use "describe" instead of "xdescribe".',
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message: 'Please use "describe" instead of "xdescribe".',
+          type: 'CallExpression',
+        },
+      ],
     },
-  ]
+  ],
 });

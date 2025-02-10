@@ -16,13 +16,14 @@
  * @fileoverview Tests for short-skill-summary Model.
  */
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 describe('Skill summary object factory', () => {
   it('should be able to create a skill summary object', () => {
     var shortSkillSummary = ShortSkillSummary.create(
-      'skill_1', 'Description 1');
+      'skill_1',
+      'Description 1'
+    );
     expect(shortSkillSummary.getId()).toBe('skill_1');
     expect(shortSkillSummary.getDescription()).toBe('Description 1');
   });
@@ -30,11 +31,11 @@ describe('Skill summary object factory', () => {
   it('should covert backend dict to domain object correctly', () => {
     var backendDict = {
       skill_id: 'skill',
-      skill_description: 'description'
+      skill_description: 'description',
     };
 
-    var shortSkillSummary = (
-      ShortSkillSummary.createFromBackendDict(backendDict));
+    var shortSkillSummary =
+      ShortSkillSummary.createFromBackendDict(backendDict);
 
     expect(shortSkillSummary.id).toBe('skill');
     expect(shortSkillSummary.description).toBe('description');

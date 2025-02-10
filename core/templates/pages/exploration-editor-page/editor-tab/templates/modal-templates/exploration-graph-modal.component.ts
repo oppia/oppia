@@ -16,20 +16,21 @@
  * @fileoverview Component for exploration graph modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { GraphData } from 'services/compute-graph.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {GraphData} from 'services/compute-graph.service';
 
 @Component({
   selector: 'oppia-exploration-graph-modal',
-  templateUrl: './exploration-graph-modal.component.html'
+  templateUrl: './exploration-graph-modal.component.html',
 })
 export class ExplorationGraphModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -42,7 +43,7 @@ export class ExplorationGraphModalComponent
   constructor(
     private graphDataService: GraphDataService,
     private ngbActiveModal: NgbActiveModal,
-    private stateEditorService: StateEditorService,
+    private stateEditorService: StateEditorService
   ) {
     super(ngbActiveModal);
   }
@@ -50,25 +51,19 @@ export class ExplorationGraphModalComponent
   deleteState(stateName: string): void {
     this.ngbActiveModal.close({
       action: 'delete',
-      stateName: stateName
+      stateName: stateName,
     });
   }
 
   selectState(stateName: string): void {
     this.ngbActiveModal.close({
       action: 'navigate',
-      stateName: stateName
+      stateName: stateName,
     });
   }
 
   ngOnInit(): void {
-    this.currentStateName = this.stateEditorService
-      .getActiveStateName();
+    this.currentStateName = this.stateEditorService.getActiveStateName();
     this.graphData = this.graphDataService.getGraphData();
   }
 }
-
-angular.module('oppia').directive('oppiaPostPublishModal',
-  downgradeComponent({
-    component: ExplorationGraphModalComponent
-  }) as angular.IDirectiveFactory);

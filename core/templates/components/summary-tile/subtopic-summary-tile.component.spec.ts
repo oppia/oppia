@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for SubtopicSummaryTileComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SubtopicSummaryTileComponent } from './subtopic-summary-tile.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SubtopicSummaryTileComponent} from './subtopic-summary-tile.component';
 
 class MockWindowRef {
   nativeWindow = {
-    open: (url: string) => {}
+    open: (url: string) => {},
   };
 }
 
@@ -43,16 +43,13 @@ describe('SubtopicSummaryTileComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        SubtopicSummaryTileComponent,
-        MockTranslatePipe
-      ],
+      declarations: [SubtopicSummaryTileComponent, MockTranslatePipe],
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
-        }
-      ]
+          useClass: MockWindowRef,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -64,46 +61,56 @@ describe('SubtopicSummaryTileComponent', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
-    component.subtopic = Subtopic.create({
-      id: 1,
-      title: 'Title',
-      skill_ids: ['skill_1'],
-      thumbnail_filename: 'img.png',
-      thumbnail_bg_color: '#a11f40',
-      url_fragment: 'title'
-    }, {
-      skill_1: 'Description 1'
-    });
+    component.subtopic = Subtopic.create(
+      {
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_1'],
+        thumbnail_filename: 'img.png',
+        thumbnail_bg_color: '#a11f40',
+        url_fragment: 'title',
+      },
+      {
+        skill_1: 'Description 1',
+      }
+    );
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'topic';
   });
 
   it('should set component properties on initialization', () => {
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
-    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
-      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey').and.returnValue(
+      'I18N_SUBTOPIC_123abcd_title_TITLE'
+    );
 
     component.ngOnInit();
 
     expect(component.subtopicTitle).toBe('Title');
     expect(component.thumbnailUrl).toBe('/thumbnail/url');
     expect(component.subtopicTitleTranslationKey).toBe(
-      'I18N_SUBTOPIC_123abcd_title_TITLE');
+      'I18N_SUBTOPIC_123abcd_title_TITLE'
+    );
   });
 
   it('should check if subtopic translation is displayed correctly', () => {
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
-    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
-      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey').and.returnValue(
+      'I18N_SUBTOPIC_123abcd_test_TITLE'
+    );
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
 
     component.ngOnInit();
 
     expect(component.subtopicTitleTranslationKey).toBe(
-      'I18N_SUBTOPIC_123abcd_test_TITLE');
+      'I18N_SUBTOPIC_123abcd_test_TITLE'
+    );
     let hackySubtopicTitleTranslationIsDisplayed =
       component.isHackySubtopicTitleTranslationDisplayed();
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
@@ -111,8 +118,9 @@ describe('SubtopicSummaryTileComponent', () => {
 
   it('should throw error if subtopic url is null', () => {
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
-    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
-      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey').and.returnValue(
+      'I18N_SUBTOPIC_123abcd_title_TITLE'
+    );
     component.subtopic = Subtopic.createFromTitle(1, 'Title');
 
     expect(() => {
@@ -120,11 +128,14 @@ describe('SubtopicSummaryTileComponent', () => {
     }).toThrowError('Expected subtopic to have a URL fragment');
   });
 
-  it('should not open subtopic page if classroom or topic url' +
-    ' does not exist', () => {
-    component.subtopic = Subtopic.createFromTitle(1, 'Title');
-    expect(component.openSubtopicPage()).toBe(undefined);
-  });
+  it(
+    'should not open subtopic page if classroom or topic url' +
+      ' does not exist',
+    () => {
+      component.subtopic = Subtopic.createFromTitle(1, 'Title');
+      expect(component.openSubtopicPage()).toBe(undefined);
+    }
+  );
 
   it('should open subtopic page when user clicks on subtopic card', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('/url');

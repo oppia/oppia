@@ -16,9 +16,8 @@
  * @fileoverview Service to get data of Practice Sessions page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 interface PracticeSessionsData {
   skill_ids_to_descriptions_map: Record<string, string>;
@@ -26,30 +25,30 @@ interface PracticeSessionsData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PracticeSessionsBackendApiService {
-  constructor(
-     private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  async _fetchPracticeSessionsData(practiceSessionsDataUrl: string):
-     Promise<PracticeSessionsData> {
-    return this.http.get<PracticeSessionsData>(
-      practiceSessionsDataUrl
-    ).toPromise().then(backendResponse => {
-      return backendResponse;
-    }, errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+  async _fetchPracticeSessionsData(
+    practiceSessionsDataUrl: string
+  ): Promise<PracticeSessionsData> {
+    return this.http
+      .get<PracticeSessionsData>(practiceSessionsDataUrl)
+      .toPromise()
+      .then(
+        backendResponse => {
+          return backendResponse;
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 
-  async fetchPracticeSessionsData(storyUrlFragment: string):
-     Promise<PracticeSessionsData> {
+  async fetchPracticeSessionsData(
+    storyUrlFragment: string
+  ): Promise<PracticeSessionsData> {
     return this._fetchPracticeSessionsData(storyUrlFragment);
   }
 }
-
-angular.module('oppia').factory(
-  'PracticeSessionsBackendApiService',
-  downgradeInjectable(PracticeSessionsBackendApiService));

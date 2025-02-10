@@ -16,38 +16,39 @@
  * @fileoverview Utility service for the diagnostic test player.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { DiagnosticTestCurrentTopicStatusModel } from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
-import { DiagnosticTestTopicTrackerModel } from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { DiagnosticTestPlayerStatusService } from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
-import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import {AppConstants} from 'app.constants';
+import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {Question} from 'domain/question/QuestionObjectFactory';
+import {State} from 'domain/state/StateObjectFactory';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {
+  AnswerClassificationService,
+  InteractionRulesService,
+} from 'pages/exploration-player-page/services/answer-classification.service';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {DiagnosticTestCurrentTopicStatusModel} from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
+import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {DiagnosticTestPlayerStatusService} from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
+import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DiagnosticTestPlayerEngineService {
   private _answerIsBeingProcessed: boolean = false;
   private _diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   private _initialCopyOfTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
-  private _diagnosticTestCurrentTopicStatusModel!:
-    DiagnosticTestCurrentTopicStatusModel;
+  private _diagnosticTestCurrentTopicStatusModel!: DiagnosticTestCurrentTopicStatusModel;
 
   private _currentQuestion!: Question;
   private _currentTopicId!: string;
@@ -65,108 +66,121 @@ export class DiagnosticTestPlayerEngineService {
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private questionBackendApiService: QuestionBackendApiService,
-    private diagnosticTestPlayerStatusService:
-      DiagnosticTestPlayerStatusService) {
+    private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService
+  ) {
     this._numberOfAttemptedQuestions = 0;
     this._encounteredQuestionIds = [];
   }
 
   init(
-      diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
-      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
+    diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
+    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
     this._diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this._initialCopyOfTopicTrackerModel = cloneDeep(
-      diagnosticTestTopicTrackerModel);
-    this._currentTopicId = (
-      this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
+      diagnosticTestTopicTrackerModel
+    );
+    this._currentTopicId =
+      this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest();
 
-    this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-      this._currentTopicId, this._encounteredQuestionIds).then((response) => {
-      this._diagnosticTestCurrentTopicStatusModel = (
-        new DiagnosticTestCurrentTopicStatusModel(response));
+    this.questionBackendApiService
+      .fetchDiagnosticTestQuestionsAsync(
+        this._currentTopicId,
+        this._encounteredQuestionIds
+      )
+      .then(
+        response => {
+          this._diagnosticTestCurrentTopicStatusModel =
+            new DiagnosticTestCurrentTopicStatusModel(response);
 
-      // The diagnostic test current topic status model is initialized in the
-      // above step, so there will always be at least one skill ID in the
-      // pending list. Hence accessing the first element from the pending list
-      // in the below line is safe.
-      this._currentSkillId = (
-        this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
-      this._currentQuestion = (
-        this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-          this._currentSkillId)
+          // The diagnostic test current topic status model is initialized in the
+          // above step, so there will always be at least one skill ID in the
+          // pending list. Hence accessing the first element from the pending list
+          // in the below line is safe.
+          this._currentSkillId =
+            this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0];
+          this._currentQuestion =
+            this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
+              this._currentSkillId
+            );
+          const stateCard = this.createCard(this._currentQuestion);
+          successCallback(stateCard, this._focusLabel);
+        },
+        () => {
+          this.alertsService.addWarning('Failed to load the questions.');
+        }
       );
-      const stateCard = this.createCard(this._currentQuestion);
-      successCallback(stateCard, this._focusLabel);
-    }, () => {
-      this.alertsService.addWarning('Failed to load the questions.');
-    });
   }
 
   private _getNextQuestion(
-      successCallback: (value: Question) => void,
-      errorCallback: () => void
+    successCallback: (value: Question) => void,
+    errorCallback: () => void
   ): void {
-    let currentTopicIsCompletelyTested = (
-      this._diagnosticTestCurrentTopicStatusModel.isTopicCompletelyTested());
+    let currentTopicIsCompletelyTested =
+      this._diagnosticTestCurrentTopicStatusModel.isTopicCompletelyTested();
 
     if (currentTopicIsCompletelyTested) {
-      let topicIsPassed = (
-        this._diagnosticTestCurrentTopicStatusModel.isTopicPassed());
+      let topicIsPassed =
+        this._diagnosticTestCurrentTopicStatusModel.isTopicPassed();
 
       if (topicIsPassed) {
         this._diagnosticTestTopicTrackerModel.recordTopicPassed(
-          this._currentTopicId);
+          this._currentTopicId
+        );
       } else {
         this._diagnosticTestTopicTrackerModel.recordTopicFailed(
-          this._currentTopicId);
+          this._currentTopicId
+        );
       }
 
       if (this.isDiagnosticTestFinished()) {
         errorCallback();
       }
 
-      this._currentTopicId = (
-        this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest());
+      this._currentTopicId =
+        this._diagnosticTestTopicTrackerModel.selectNextTopicIdToTest();
 
-      this.questionBackendApiService.fetchDiagnosticTestQuestionsAsync(
-        this._currentTopicId, this._encounteredQuestionIds).then(
-        skillIdToQuestionsModel => {
-          this._diagnosticTestCurrentTopicStatusModel = (
-            new DiagnosticTestCurrentTopicStatusModel(
-              skillIdToQuestionsModel)
-          );
-          // The diagnostic test current topic status model is initialized in
-          // the above step, so there will always be at least one skill ID in
-          // the pending list. Hence accessing the first element from the
-          // pending list in the below line is safe.
-          this._currentSkillId = (
-            this._diagnosticTestCurrentTopicStatusModel
-              .getPendingSkillIds()[0]
-          );
+      this.questionBackendApiService
+        .fetchDiagnosticTestQuestionsAsync(
+          this._currentTopicId,
+          this._encounteredQuestionIds
+        )
+        .then(
+          skillIdToQuestionsModel => {
+            this._diagnosticTestCurrentTopicStatusModel =
+              new DiagnosticTestCurrentTopicStatusModel(
+                skillIdToQuestionsModel
+              );
+            // The diagnostic test current topic status model is initialized in
+            // the above step, so there will always be at least one skill ID in
+            // the pending list. Hence accessing the first element from the
+            // pending list in the below line is safe.
+            this._currentSkillId =
+              this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0];
 
-          this._currentQuestion = (
-            this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-              this._currentSkillId)
-          );
-          return successCallback(this._currentQuestion);
-        }, () => {
-          this.alertsService.addWarning('Failed to load the questions.');
-        }
-      );
+            this._currentQuestion =
+              this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
+                this._currentSkillId
+              );
+            return successCallback(this._currentQuestion);
+          },
+          () => {
+            this.alertsService.addWarning('Failed to load the questions.');
+          }
+        );
     } else {
       if (!this._diagnosticTestCurrentTopicStatusModel.isLifelineConsumed()) {
         // The topic completion is checked in the above step, so there will
         // always be at least one skill ID left for checking. Hence accessing
         // the first element from the pending list in the below line is safe.
-        this._currentSkillId = (
-          this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0]);
+        this._currentSkillId =
+          this._diagnosticTestCurrentTopicStatusModel.getPendingSkillIds()[0];
       }
 
-      this._currentQuestion = (
+      this._currentQuestion =
         this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-          this._currentSkillId)
-      );
+          this._currentSkillId
+        );
       return successCallback(this._currentQuestion);
     }
   }
@@ -178,29 +192,32 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   submitAnswer(
-      answer: InteractionAnswer,
-      interactionRulesService: InteractionRulesService,
-      successCallback: (
-        nextCard: StateCard,
-        refreshInteraction: boolean,
-        feedbackHtml: string,
-        feedbackAudioTranslations: BindableVoiceovers,
-        refresherExplorationId: string,
-        missingPrerequisiteSkillId: string,
-        remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
-        isFinalQuestion: boolean,
-        nextCardIfReallyStuck: StateCard,
-        focusLabel: string
-      ) => void
+    answer: InteractionAnswer,
+    interactionRulesService: InteractionRulesService,
+    successCallback: (
+      nextCard: StateCard,
+      refreshInteraction: boolean,
+      feedbackHtml: string,
+      feedbackAudioTranslations: BindableVoiceovers,
+      refresherExplorationId: string,
+      missingPrerequisiteSkillId: string,
+      remainOnCurrentCard: boolean,
+      taggedSkillMisconceptionId: string,
+      wasOldStateInitial: boolean,
+      isFirstHit: boolean,
+      isFinalQuestion: boolean,
+      nextCardIfReallyStuck: StateCard,
+      focusLabel: string
+    ) => void
   ): boolean {
     const oldState: State = this._currentQuestion.getStateData();
-    const classificationResult: AnswerClassificationResult = (
+    const classificationResult: AnswerClassificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
-        oldState.name as string, oldState.interaction, answer,
-        interactionRulesService));
+        oldState.name as string,
+        oldState.interaction,
+        answer,
+        interactionRulesService
+      );
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
     let stateCard: StateCard;
@@ -220,54 +237,71 @@ export class DiagnosticTestPlayerEngineService {
 
     if (answerIsCorrect) {
       this._diagnosticTestCurrentTopicStatusModel.recordCorrectAttempt(
-        this._currentSkillId);
+        this._currentSkillId
+      );
     } else {
       this._diagnosticTestCurrentTopicStatusModel.recordIncorrectAttempt(
-        this._currentSkillId);
+        this._currentSkillId
+      );
     }
 
-    this.getNextQuestionAsync().then((question: Question) => {
-      stateCard = this.createCard(question);
-      focusLabel = this._focusLabel;
+    this.getNextQuestionAsync().then(
+      (question: Question) => {
+        stateCard = this.createCard(question);
+        focusLabel = this._focusLabel;
 
-      successCallback(
-        stateCard, refreshInteraction, feedbackHtml,
-        feedbackAudioTranslations, refresherExplorationId,
-        missingPrerequisiteSkillId, remainOnCurrentCard,
-        taggedSkillMisconceptionId, wasOldStateInitial, isFirstHit,
-        isFinalQuestion, stateCard, focusLabel
-      );
-      this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionProgressChange.emit(
+        successCallback(
+          stateCard,
+          refreshInteraction,
+          feedbackHtml,
+          feedbackAudioTranslations,
+          refresherExplorationId,
+          missingPrerequisiteSkillId,
+          remainOnCurrentCard,
+          taggedSkillMisconceptionId,
+          wasOldStateInitial,
+          isFirstHit,
+          isFinalQuestion,
+          stateCard,
+          focusLabel
+        );
+        this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange.emit(
           this.computeProgressPercentage()
         );
-    }, () => {
-      // Test is finished.
-      const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
-      this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionCompleted.emit(recommendedTopicIds);
-    });
+      },
+      () => {
+        // Test is finished.
+        const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
+        this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit(
+          recommendedTopicIds
+        );
+      }
+    );
     return answerIsCorrect;
   }
 
   skipCurrentQuestion(successCallback: (stateCard: StateCard) => void): void {
     this._diagnosticTestCurrentTopicStatusModel.recordIncorrectAttempt(
-      this._currentSkillId);
+      this._currentSkillId
+    );
 
-    this.getNextQuestionAsync().then((question: Question) => {
-      let stateCard = this.createCard(question);
+    this.getNextQuestionAsync().then(
+      (question: Question) => {
+        let stateCard = this.createCard(question);
 
-      successCallback(stateCard);
-      this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionProgressChange.emit(
+        successCallback(stateCard);
+        this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionProgressChange.emit(
           this.computeProgressPercentage()
         );
-    }, () => {
-      // Test is finished.
-      const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
-      this.diagnosticTestPlayerStatusService
-        .onDiagnosticTestSessionCompleted.emit(recommendedTopicIds);
-    });
+      },
+      () => {
+        // Test is finished.
+        const recommendedTopicIds: string[] = this.getRecommendedTopicIds();
+        this.diagnosticTestPlayerStatusService.onDiagnosticTestSessionCompleted.emit(
+          recommendedTopicIds
+        );
+      }
+    );
   }
 
   getRecommendedTopicIds(): string[] {
@@ -308,8 +342,8 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   getRootTopicIds(): string[] {
-    let topicIdToPrerequisiteTopicId = (
-      this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
+    let topicIdToPrerequisiteTopicId =
+      this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds();
     // The topics which do not contain any prerequisites are referred to as
     // root topics.
     let rootTopicIds: string[] = [];
@@ -324,8 +358,8 @@ export class DiagnosticTestPlayerEngineService {
 
   getTopologicallySortedTopicIds(): string[] {
     let visitedTopicIds: string[] = [];
-    let topicIdToPrerequisiteTopicId = (
-      this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds());
+    let topicIdToPrerequisiteTopicId =
+      this._initialCopyOfTopicTrackerModel.getTopicIdToPrerequisiteTopicIds();
 
     for (let currentTopicId in topicIdToPrerequisiteTopicId) {
       if (visitedTopicIds.indexOf(currentTopicId) !== -1) {
@@ -359,35 +393,35 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   computeProgressPercentage(): number {
-    let numberOfAttemptedQuestionsInCurrentTopic = (
-      this._diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions);
-    let initialTopicIdsList = (
-      this._initialCopyOfTopicTrackerModel.getPendingTopicIdsToTest());
-    let pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest());
+    let numberOfAttemptedQuestionsInCurrentTopic =
+      this._diagnosticTestCurrentTopicStatusModel.numberOfAttemptedQuestions;
+    let initialTopicIdsList =
+      this._initialCopyOfTopicTrackerModel.getPendingTopicIdsToTest();
+    let pendingTopicIdsToTest =
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest();
 
     // Each topic can contain a maximum of 3 diagnostic test skills and at most
     // 2 questions [main question & backup question] can be presented from each
     // skill. Thus, the maximum number of questions that can be asked from a
     // topic is 6.
-    let completionMetric = (((
-      initialTopicIdsList.length - pendingTopicIdsToTest.length) * 6 +
-        numberOfAttemptedQuestionsInCurrentTopic) / (
-      initialTopicIdsList.length * 6));
+    let completionMetric =
+      ((initialTopicIdsList.length - pendingTopicIdsToTest.length) * 6 +
+        numberOfAttemptedQuestionsInCurrentTopic) /
+      (initialTopicIdsList.length * 6);
 
     return Math.round(completionMetric * 100);
   }
 
   getLanguageCode(): string {
-    return (
-      this._diagnosticTestCurrentTopicStatusModel.getNextQuestion(
-        this._currentSkillId).getLanguageCode()
-    );
+    return this._diagnosticTestCurrentTopicStatusModel
+      .getNextQuestion(this._currentSkillId)
+      .getLanguageCode();
   }
 
   recordNewCardAdded(): void {
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this._currentQuestion.getId() as string
+      AppConstants.ENTITY_TYPE.QUESTION,
+      this._currentQuestion.getId() as string
     );
   }
 
@@ -395,10 +429,11 @@ export class DiagnosticTestPlayerEngineService {
     this._encounteredQuestionIds.push(question.getId() as string);
 
     const stateData: State = question.getStateData();
-    const questionHtml: string = (
+    const questionHtml: string =
       this.expressionInterpolationService.processHtml(
-        stateData.content.html, [])
-    );
+        stateData.content.html,
+        []
+      );
 
     if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
@@ -410,16 +445,21 @@ export class DiagnosticTestPlayerEngineService {
     let interactionHtml: string = '';
 
     if (interactionId) {
-      interactionHtml = (
-        this.explorationHtmlFormatterService.getInteractionHtml(
-          interactionId, interaction.customizationArgs,
-          true, this._focusLabel, null)
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        interaction.customizationArgs,
+        true,
+        this._focusLabel,
+        null
       );
     }
 
     return StateCard.createNewCard(
-      stateData.name as string, questionHtml, interactionHtml as string,
-      interaction, stateData.recordedVoiceovers,
+      stateData.name as string,
+      questionHtml,
+      interactionHtml as string,
+      interaction,
+      stateData.recordedVoiceovers,
       stateData.content.contentId as string,
       this.audioTranslationLanguageService
     );
@@ -430,15 +470,15 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   isDiagnosticTestFinished(): boolean {
-    const pendingTopicIdsToTest = (
-      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest().length
-    );
+    const pendingTopicIdsToTest =
+      this._diagnosticTestTopicTrackerModel.getPendingTopicIdsToTest().length;
 
     if (pendingTopicIdsToTest === 0) {
       return true;
     } else if (
-      this._numberOfAttemptedQuestions >= DiagnosticTestPlayerEngineService
-        .MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST) {
+      this._numberOfAttemptedQuestions >=
+      DiagnosticTestPlayerEngineService.MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST
+    ) {
       return true;
     } else {
       return false;

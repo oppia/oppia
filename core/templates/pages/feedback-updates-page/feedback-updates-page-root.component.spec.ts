@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for the feedback-updates page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { FeedbackUpdatesPageRootComponent } from './feedback-updates-page-root.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -44,21 +50,16 @@ describe('FeedbackUpdates Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        FeedbackUpdatesPageRootComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [FeedbackUpdatesPageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -68,7 +69,8 @@ describe('FeedbackUpdates Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     translateService = TestBed.inject(TranslateService);
   });
 
@@ -76,14 +78,15 @@ describe('FeedbackUpdates Page Root', () => {
     component.ngOnDestroy();
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and show page when access is valid', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
-      .and.returnValue(Promise.resolve());
+    spyOn(
+      accessValidationBackendApiService,
+      'validateCanManageOwnAccount'
+    ).and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
 
@@ -91,34 +94,39 @@ describe('FeedbackUpdates Page Root', () => {
     tick();
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(accessValidationBackendApiService.validateCanManageOwnAccount)
-      .toHaveBeenCalled();
+    expect(
+      accessValidationBackendApiService.validateCanManageOwnAccount
+    ).toHaveBeenCalled();
     expect(component.pageIsShown).toBeTrue();
     expect(component.errorPageIsShown).toBeFalse();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
-  it('should initialize and show error page when server respond with error',
-    fakeAsync(() => {
-      spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
-        .and.returnValue(Promise.reject());
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
+  it('should initialize and show error page when server respond with error', fakeAsync(() => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateCanManageOwnAccount'
+    ).and.returnValue(Promise.reject());
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
 
-      component.ngOnInit();
-      tick();
+    component.ngOnInit();
+    tick();
 
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.validateCanManageOwnAccount)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      accessValidationBackendApiService.validateCanManageOwnAccount
+    ).toHaveBeenCalled();
+    expect(component.pageIsShown).toBeFalse();
+    expect(component.errorPageIsShown).toBeTrue();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
-    spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
-      .and.returnValue(Promise.resolve());
+    spyOn(
+      accessValidationBackendApiService,
+      'validateCanManageOwnAccount'
+    ).and.returnValue(Promise.resolve());
     spyOn(component.directiveSubscriptions, 'add');
     spyOn(translateService.onLangChange, 'subscribe');
 
@@ -130,8 +138,10 @@ describe('FeedbackUpdates Page Root', () => {
   }));
 
   it('should update page title whenever the language changes', () => {
-    spyOn(accessValidationBackendApiService, 'validateCanManageOwnAccount')
-      .and.returnValue(Promise.resolve());
+    spyOn(
+      accessValidationBackendApiService,
+      'validateCanManageOwnAccount'
+    ).and.returnValue(Promise.resolve());
     component.ngOnInit();
     spyOn(component, 'setPageTitleAndMetaTags');
 
@@ -147,10 +157,12 @@ describe('FeedbackUpdates Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

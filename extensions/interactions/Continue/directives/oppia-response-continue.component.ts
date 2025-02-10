@@ -19,14 +19,14 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-response-continue',
   templateUrl: './continue-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class OppiaResponseContinueComponent implements OnInit {
   // This property is initialized using Angular lifecycle hooks
@@ -38,14 +38,15 @@ export class OppiaResponseContinueComponent implements OnInit {
   constructor(private readonly htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.escapedAnswer = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
+    this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as string;
   }
 }
 
 angular.module('oppia').directive(
   'oppiaResponseContinue',
-  downgradeComponent(
-    {
-      component: OppiaResponseContinueComponent
-    }) as angular.IDirectiveFactory);
+  downgradeComponent({
+    component: OppiaResponseContinueComponent,
+  }) as angular.IDirectiveFactory
+);

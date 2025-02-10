@@ -16,9 +16,16 @@
  * @fileoverview Component for a schema-based editor for HTML.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {
+  NG_VALUE_ACCESSOR,
+  NG_VALIDATORS,
+  AbstractControl,
+  ControlValueAccessor,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-html-editor',
@@ -27,24 +34,24 @@ import { downgradeComponent } from '@angular/upgrade/static';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       useExisting: forwardRef(() => SchemaBasedHtmlEditorComponent),
-      multi: true
+      multi: true,
     },
-  ]
+  ],
 })
-
 export class SchemaBasedHtmlEditorComponent
-implements ControlValueAccessor, OnInit, Validator {
+  implements ControlValueAccessor, OnInit, Validator
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
-  @Input() uiConfig!: {'add_element_text': string};
+  @Input() uiConfig!: {add_element_text: string};
   localValue!: string;
   onChange: (val: string) => void = () => {};
 
@@ -59,8 +66,7 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(): void {
-  }
+  registerOnTouched(): void {}
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
@@ -72,7 +78,7 @@ implements ControlValueAccessor, OnInit, Validator {
     return {};
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   updateValue(value: string): void {
     this.onChange(value);
@@ -82,6 +88,9 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 }
 
-angular.module('oppia').directive('schemaBasedHtmlEditor', downgradeComponent({
-  component: SchemaBasedHtmlEditorComponent
-}));
+angular.module('oppia').directive(
+  'schemaBasedHtmlEditor',
+  downgradeComponent({
+    component: SchemaBasedHtmlEditorComponent,
+  })
+);

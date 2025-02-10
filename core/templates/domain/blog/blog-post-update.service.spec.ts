@@ -16,9 +16,9 @@
  * @fileoverview Tests for Blog Post update service.
  */
 
-import { BlogPostUpdateService } from 'domain/blog/blog-post-update.service';
-import { BlogPostData } from 'domain/blog/blog-post.model';
-import { TestBed } from '@angular/core/testing';
+import {BlogPostUpdateService} from 'domain/blog/blog-post-update.service';
+import {BlogPostData} from 'domain/blog/blog-post.model';
+import {TestBed} from '@angular/core/testing';
 
 describe('Blog Post update service', () => {
   let blogPostUpdateService: BlogPostUpdateService;
@@ -38,32 +38,36 @@ describe('Blog Post update service', () => {
       published_on: '3454354354',
     };
     sampleBlogPost = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
+      sampleBlogPostBackendDict
+    );
   });
 
-  it('should update the blog post title and add the change in change dict',
-    () => {
-      let expectedChangeDict = {
-        title: 'story'
-      };
-      expect(sampleBlogPost.title).toEqual('sampleTitle');
+  it('should update the blog post title and add the change in change dict', () => {
+    let expectedChangeDict = {
+      title: 'story',
+    };
+    expect(sampleBlogPost.title).toEqual('sampleTitle');
 
-      blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
+    blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
 
-      expect(sampleBlogPost.title).toEqual('story');
-      expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-        expectedChangeDict);
-    });
+    expect(sampleBlogPost.title).toEqual('story');
+    expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
+      expectedChangeDict
+    );
+  });
 
   it('should update the blog post thumbnail and add the change', () => {
-    let imageBlob = new Blob(
-      ['data:image/png;base64,xyz'], {type: 'image/png'});
-    let image = [{
-      filename: 'sample_image',
-      imageBlob: imageBlob
-    }];
+    let imageBlob = new Blob(['data:image/png;base64,xyz'], {
+      type: 'image/png',
+    });
+    let image = [
+      {
+        filename: 'sample_image',
+        imageBlob: imageBlob,
+      },
+    ];
     let expectedChangeDict = {
-      thumbnail_filename: 'sample_image'
+      thumbnail_filename: 'sample_image',
     };
 
     expect(sampleBlogPost.thumbnailFilename).toEqual('image');
@@ -72,7 +76,8 @@ describe('Blog Post update service', () => {
 
     expect(sampleBlogPost.thumbnailFilename).toEqual('sample_image');
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-      expectedChangeDict);
+      expectedChangeDict
+    );
   });
 
   it('should update the blog post tags and add the change', () => {
@@ -81,48 +86,54 @@ describe('Blog Post update service', () => {
     blogPostUpdateService.setBlogPostTags(sampleBlogPost, ['news', 'learners']);
 
     expect(sampleBlogPost.tags).toEqual(['news', 'learners']);
+    expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual({
+      tags: ['news', 'learners'],
+    });
+  });
+
+  it('should update the blog post content and add the change in change dict', () => {
+    let expectedChangeDict = {
+      content: '<p>Hello World</p>',
+    };
+    expect(sampleBlogPost.content).toEqual('<p>Hello</p>');
+
+    blogPostUpdateService.setBlogPostContent(
+      sampleBlogPost,
+      '<p>Hello World</p>'
+    );
+
+    expect(sampleBlogPost.content).toEqual('<p>Hello World</p>');
     expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-      { tags: ['news', 'learners'] });
+      expectedChangeDict
+    );
   });
 
-  it('should update the blog post content and add the change in change dict',
-    () => {
-      let expectedChangeDict = {
-        content: '<p>Hello World</p>'
-      };
-      expect(sampleBlogPost.content).toEqual('<p>Hello</p>');
+  it('should return the correct blog post change dict with multiple changes', () => {
+    let expectedChangeDict = {
+      title: 'story',
+      tags: ['news', 'learners'],
+      content: '<p>Hello World</p>',
+    };
 
-      blogPostUpdateService.setBlogPostContent(
-        sampleBlogPost, '<p>Hello World</p>');
+    blogPostUpdateService.setBlogPostContent(
+      sampleBlogPost,
+      '<p>Hello World</p>'
+    );
+    blogPostUpdateService.setBlogPostTags(sampleBlogPost, ['news', 'learners']);
+    blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
 
-      expect(sampleBlogPost.content).toEqual('<p>Hello World</p>');
-      expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-        expectedChangeDict);
-    });
-
-  it('should return the correct blog post change dict with multiple changes',
-    () => {
-      let expectedChangeDict = {
-        title: 'story',
-        tags: ['news', 'learners'],
-        content: '<p>Hello World</p>',
-      };
-
-      blogPostUpdateService.setBlogPostContent(
-        sampleBlogPost, '<p>Hello World</p>');
-      blogPostUpdateService.setBlogPostTags(
-        sampleBlogPost, ['news', 'learners']);
-      blogPostUpdateService.setBlogPostTitle(sampleBlogPost, 'story');
-
-      expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
-        expectedChangeDict);
-    });
-
-
-  it('should set change dict to default when' +
-  ' setBlogPostChangeDictToDefault is called.', () => {
-    blogPostUpdateService.setBlogPostChangeDictToDefault();
-
-    expect(blogPostUpdateService.changeDict).toEqual({});
+    expect(blogPostUpdateService.getBlogPostChangeDict()).toEqual(
+      expectedChangeDict
+    );
   });
+
+  it(
+    'should set change dict to default when' +
+      ' setBlogPostChangeDictToDefault is called.',
+    () => {
+      blogPostUpdateService.setBlogPostChangeDictToDefault();
+
+      expect(blogPostUpdateService.changeDict).toEqual({});
+    }
+  );
 });

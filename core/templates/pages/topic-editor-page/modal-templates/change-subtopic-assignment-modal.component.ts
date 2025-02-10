@@ -16,27 +16,26 @@
  * @fileoverview Component for change subtopic assignment modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Subtopic } from 'domain/topic/subtopic.model';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Subtopic} from 'domain/topic/subtopic.model';
 
 @Component({
   selector: 'oppia-change-subtopic-assignment-modal',
-  templateUrl: './change-subtopic-assignment-modal.component.html'
+  templateUrl: './change-subtopic-assignment-modal.component.html',
 })
-
 export class ChangeSubtopicAssignmentModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   subtopics!: Subtopic[];
   // Selected subtopic id is null when the user not selects any subtopic.
   selectedSubtopicId!: number | null;
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

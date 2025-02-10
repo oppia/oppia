@@ -16,24 +16,16 @@
  * @fileoverview Component for DeleteChapterModal modal.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-chapter-modal',
-  templateUrl: './delete-chapter-modal.component.html'
+  templateUrl: './delete-chapter-modal.component.html',
 })
 export class DeleteChapterModalComponent extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }
-
-angular.module('oppia').directive('oppiaDeleteChapterModal',
-  downgradeComponent({
-    component: DeleteChapterModalComponent
-  }) as angular.IDirectiveFactory);

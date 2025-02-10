@@ -498,12 +498,91 @@ class UserSettingsTests(test_utils.GenericTestBase):
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         time_of_creation = user_settings_model.created_on
+        user_settings.created_on = time_of_creation
 
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
+        user_settings.user_bio = 'New bio.'
+        user_services.save_user_settings(user_settings)
 
         user_settings_model = user_models.UserSettingsModel.get_by_id(
             user_settings.user_id)
         self.assertEqual(user_settings_model.created_on, time_of_creation)
+
+
+class UserGroupDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.user_group = user_domain.UserGroup(
+            'USER_GROUP_ID', 'USERGROUPNAME', ['user1', 'user2', 'user3']
+        )
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_user_group_name(self) -> None:
+        self.user_group.name = 2 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception, 'Expected name to be a string, received 2.'):
+            self.user_group.validate()
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type the
+    # codebase we plan to get rid of the tests that intentionally test wrong
+    # inputs that we can normally catch by typing.
+    def test_validate_member_names_is_list(self) -> None:
+        self.user_group.member_usernames = 2 # type: ignore[assignment]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected \'member_usernames\' to be a list, received 2.'
+        ):
+            self.user_group.validate()
+
+    def test_validate_each_username_is_of_string_type(self) -> None:
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        self.user_group.member_usernames = ['user1', 2] # type: ignore[list-item]
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected each user username to be a string, received 2.'
+        ):
+            self.user_group.validate()
+
+    def test_validate_user_group_name_follows_regex_pattern(self) -> None:
+        self.user_group.name = 'user_group_1'
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid user group name user_group_1. User group name can only '
+            'contain alphanumeric characters and spaces.'
+        ):
+            self.user_group.validate()
+
+    def test_update_name_successfully(self) -> None:
+        self.user_group.update_name('USERGROUPNEW')
+        self.assertEqual(self.user_group.name, 'USERGROUPNEW')
+
+    def test_update_member_usernames_successfully(self) -> None:
+        self.user_group.update_member_usernames(['user1', 'user2'])
+        self.assertEqual(self.user_group.member_usernames, ['user1', 'user2'])
+
+    def test_to_dict_returns_correct_user_group_dict(self) -> None:
+        self.assertEqual(
+            self.user_group.to_dict(),
+            {
+                'user_group_id': 'USER_GROUP_ID',
+                'name': 'USERGROUPNAME',
+                'member_usernames': ['user1', 'user2', 'user3']
+            }
+        )
+
+    def test_user_group_from_dict(self) -> None:
+        user_group_dict: user_domain.UserGroupDict = {
+            'user_group_id': 'USER_GROUP_ID',
+            'name': 'USERGROUPNAME',
+            'member_usernames': ['user1', 'user2', 'user3']
+        }
+        user_group = user_domain.UserGroup.from_dict(user_group_dict)
+        self.assertEqual(user_group.name, user_group_dict['name'])
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -1694,3 +1773,59 @@ class LearnerGroupsUserTest(test_utils.GenericTestBase):
                 'user1', ['group_id_1'], [learner_group_user_details], 1),
             'Learner cannot be invited to join learner group group_id_1 since '
             'they are already its learner.')
+
+
+class TranslationCoordinatorStatsUnitTests(
+    test_utils.GenericTestBase
+):
+    """Tests for the TranslationCoordinatorStats class."""
+
+    expected_stats_dict = {
+        'language_id': 'en',
+        'coordinator_ids': ['user1', 'user2'],
+        'coordinators_count': 2
+    }
+
+    def test_to_dict(self) -> None:
+        actual_stats = user_domain.TranslationCoordinatorStats(
+            'en',
+            ['user1', 'user2'],
+            2
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), self.expected_stats_dict)
+
+
+class UserContributionRightsUnitTest(
+    test_utils.GenericTestBase
+):
+    """Tests for the UserContributionRights class."""
+
+    def test_initialization(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', ['en', 'es'], ['fr'], True, False))
+
+        self.assertEqual(user_contribution_rights.id, 'a')
+        self.assertEqual(user_contribution_rights.can_review_questions, True)
+        self.assertEqual(user_contribution_rights.can_submit_questions, False)
+        self.assertEqual(
+            user_contribution_rights.can_review_translation_for_language_codes,
+            ['en', 'es'])
+        self.assertEqual(
+            user_contribution_rights.can_review_voiceover_for_language_codes,
+             ['fr'])
+
+    def test_can_review_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, True))
+        self.assertTrue(user_contribution_rights.can_review_at_least_one_item())
+
+    def test_can_submit_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, False))
+        self.assertFalse(
+            user_contribution_rights.can_submit_at_least_one_item())

@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import abc
 import base64
 import datetime
 import functools
@@ -35,9 +34,6 @@ from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
-from core.domain import classifier_domain
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import user_services
 
 from typing import (
@@ -53,10 +49,6 @@ _NormalizedRequestDictType = TypeVar('_NormalizedRequestDictType')
 _NormalizedPayloadDictType = TypeVar('_NormalizedPayloadDictType')
 
 ONE_DAY_AGO_IN_SECS: Final = -24 * 60 * 60
-DEFAULT_CSRF_SECRET: Final = 'oppia csrf secret'
-CSRF_SECRET: Final = config_domain.ConfigProperty(
-    'oppia_csrf_secret', {'type': 'unicode'},
-    'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
 # NOTE: These handlers manage user sessions and serve auth pages. Thus, we
 # should never reject or replace them when running in maintenance mode;
@@ -138,8 +130,8 @@ class UserFacingExceptions:
 
         pass
 
-    class PageNotFoundException(Exception):
-        """Error class for a page not found error (error code 404)."""
+    class NotFoundException(Exception):
+        """Error class for resource not found error (error code 404)."""
 
         pass
 
@@ -529,7 +521,11 @@ class BaseHandler(
             'Use self.normalized_payload instead of self.payload.')
 
         if errors:
-            raise self.InvalidInputException('\n'.join(errors))
+            raise self.InvalidInputException(
+                'At \'%s\' these errors are happening:\n%s' % (
+                    self.request.uri, '\n'.join(errors)
+                )
+            )
 
     @property
     def current_user_is_site_maintainer(self) -> bool:
@@ -562,7 +558,7 @@ class BaseHandler(
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
         values: ResponseValueDict = {
-            'error': 'Could not find the page %s.' % self.request.uri,
+            'error': 'Could not find the resource %s.' % self.request.uri,
             'status_code': 404
         }
         self._render_exception(values)
@@ -573,9 +569,9 @@ class BaseHandler(
         """Base method to handle POST requests.
 
         Raises:
-            PageNotFoundException. Page not found error (error code 404).
+            NotFoundException. Resource not found error (error code 404).
         """
-        raise self.PageNotFoundException
+        raise self.NotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'put' method with different number of arguments and types.
@@ -583,9 +579,9 @@ class BaseHandler(
         """Base method to handle PUT requests.
 
         Raises:
-            PageNotFoundException. Page not found error (error code 404).
+            NotFoundException. Resource not found error (error code 404).
         """
-        raise self.PageNotFoundException
+        raise self.NotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'delete' method with different number of arguments and types.
@@ -593,9 +589,9 @@ class BaseHandler(
         """Base method to handle DELETE requests.
 
         Raises:
-            PageNotFoundException. Page not found error (error code 404).
+            NotFoundException. Resource not found error (error code 404).
         """
-        raise self.PageNotFoundException
+        raise self.NotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
@@ -677,7 +673,7 @@ class BaseHandler(
                 True when the template is compiled by angular AoT compiler.
 
         Raises:
-            Exception. Invalid X-Frame-Options.
+            Exception. Invalid iframe restriction value.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we
@@ -688,14 +684,16 @@ class BaseHandler(
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
-
         if iframe_restriction is not None:
-            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = (
-                    str(iframe_restriction))
+            if iframe_restriction == 'SAMEORIGIN':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'self\'')
+            elif iframe_restriction == 'DENY':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'none\'')
             else:
                 raise Exception(
-                    'Invalid X-Frame-Options: %s' % iframe_restriction)
+                    'Invalid iframe restriction value: %s' % iframe_restriction)
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
@@ -717,10 +715,7 @@ class BaseHandler(
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if self.iframed:
-                self.render_template(
-                    'error-iframed.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 404:
+            if values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
@@ -745,7 +740,7 @@ class BaseHandler(
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert values['status_code'] in [400, 401, 404, 500]
+        assert values['status_code'] in [400, 401, 404, 405, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -776,6 +771,8 @@ class BaseHandler(
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
@@ -805,20 +802,18 @@ class BaseHandler(
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.exception(
-            'Exception raised at %s: %s', self.request.uri, exception)
-
-        if isinstance(exception, self.PageNotFoundException):
+        if isinstance(exception, self.NotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
             self.error(404)
             values = {
-                'error': 'Could not find the page %s.' % self.request.uri,
+                'error': 'Could not find the resource %s.' % self.request.uri,
                 'status_code': 404
             }
             self._render_exception(values)
             return
 
-        logging.exception('Exception raised: %s', exception)
+        logging.exception(
+            'Exception raised at %s: %s', self.request.uri, exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
@@ -847,6 +842,16 @@ class BaseHandler(
             self._render_exception(values)
             return
 
+        if isinstance(exception, TypeError):
+            self.error(405)
+            values = {
+                'error': 'Invalid method %s for %s' % (
+                    request_method, handler_class_name),
+                'status_code': 405
+            }
+            self._render_exception(values)
+            return
+
         self.error(500)
         values = {
             'error': str(exception),
@@ -857,7 +862,7 @@ class BaseHandler(
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
-    PageNotFoundException = UserFacingExceptions.PageNotFoundException
+    NotFoundException = UserFacingExceptions.NotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 
@@ -889,31 +894,22 @@ class CsrfTokenManager:
     _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
-    def init_csrf_secret(cls) -> None:
-        """Verify that non-default CSRF secret exists; creates one if not."""
-
-        # Any non-default value is fine.
-        if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
-            return
-
-        # Initialize to random value.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
-            base64.urlsafe_b64encode(os.urandom(20)))
-
-    @classmethod
-    def _create_token(cls, user_id: Optional[str], issued_on: float) -> str:
+    def _create_token(
+            cls, user_id: Optional[str], issued_on: float,
+            nonce: Optional[str] = None) -> str:
         """Creates a new CSRF token.
 
         Args:
             user_id: str|None. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
+            nonce: str|None. A token that is never reused to prevent reply
+                attacks. This argument should only be provided when validating a
+                received CSRF token, in which case the nonce in the received
+                token should be provided here.
 
         Returns:
             str. The generated CSRF token.
         """
-        cls.init_csrf_secret()
-
         # The token has 4 parts: hash of the actor user id, hash of the page
         # name, hash of the time issued and plain text of the time issued.
 
@@ -923,19 +919,31 @@ class CsrfTokenManager:
         # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
+        # Generate a nonce (number used once) to ensure that even two
+        # consecutive calls to the same endpoint in the same second generate
+        # different tokens. Note that this nonce is just for anti-collision
+        # purposes, so it's okay that the nonce is stored in the CSRF token and
+        # therefore can be controlled by an attacker. See OWASP guidance here:
+        # https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#signed-double-submit-cookie.
+        if nonce is None:
+            nonce = base64.urlsafe_b64encode(os.urandom(20)).decode('utf-8')
+
         digester = hmac.new(
-            key=CSRF_SECRET.value.encode('utf-8'),
-            digestmod='md5'
+            key=auth_services.get_csrf_secret_value().encode('utf-8'),
+            digestmod='sha256'
         )
         digester.update(user_id.encode('utf-8'))
         digester.update(b':')
         digester.update(issued_on_str.encode('utf-8'))
+        digester.update(b':')
+        digester.update(nonce.encode('utf-8'))
 
         digest = digester.digest()
         # The b64encode returns bytes, so we first need to decode the returned
         # bytes to string.
-        token = '%s/%s' % (
-            issued_on_str, base64.urlsafe_b64encode(digest).decode('utf-8'))
+        token = '%s/%s/%s' % (
+            issued_on_str, nonce,
+            base64.urlsafe_b64encode(digest).decode('utf-8'))
 
         return token
 
@@ -973,7 +981,7 @@ class CsrfTokenManager:
         """
         try:
             parts = token.split('/')
-            if len(parts) != 2:
+            if len(parts) != 3:
                 return False
 
             issued_on = int(parts[0])
@@ -981,8 +989,12 @@ class CsrfTokenManager:
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
 
-            authentic_token = cls._create_token(user_id, issued_on)
-            if authentic_token == token:
+            nonce = parts[1]
+
+            authentic_token = cls._create_token(user_id, issued_on, nonce)
+            if hmac.compare_digest(
+                authentic_token.encode('utf-8'), token.encode('utf-8')
+            ):
                 return True
 
             return False
@@ -1006,40 +1018,3 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json({
             'token': csrf_token,
         })
-
-
-class OppiaMLVMHandler(
-    BaseHandler[_NormalizedPayloadDictType, _NormalizedRequestDictType]
-):
-    """Base class for the handlers that communicate with Oppia-ML VM instances.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
-
-    @abc.abstractmethod
-    def extract_request_message_vm_id_and_signature(
-        self
-    ) -> classifier_domain.OppiaMLAuthInfo:
-        """Returns the OppiaMLAuthInfo domain object containing
-        information from the incoming request that is necessary for
-        authentication.
-
-        Since incoming request can be either a protobuf serialized binary or
-        a JSON object, the derived classes must implement the necessary
-        logic to decode the incoming request and return a tuple of size 3
-        where message is at index 0, vm_id is at index 1 and signature is at
-        index 2.
-
-        Raises:
-            NotImplementedError. The derived child classes must implement the
-                necessary logic as described above.
-        """
-        raise NotImplementedError

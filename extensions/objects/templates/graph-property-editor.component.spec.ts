@@ -24,54 +24,52 @@ describe('graphPropertyEditor', () => {
   let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('graphPropertyEditor');
+  beforeEach(
+    angular.mock.inject(function ($injector, $componentController) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      ctrl = $componentController('graphPropertyEditor');
 
-    ctrl.savedSolution = [
-      [
-        'ca_choices_1'
-      ],
-      [
-        'ca_choices_2',
-        'ca_choices_3'
-      ],
-      [
-        'ca_choices_4'
-      ]
-    ];
-  }));
+      ctrl.savedSolution = [
+        ['ca_choices_1'],
+        ['ca_choices_2', 'ca_choices_3'],
+        ['ca_choices_4'],
+      ];
+    })
+  );
 
   it('should initialise component when user selects graph property', () => {
     ctrl.value = 'regular';
     ctrl.$onInit();
 
     expect(ctrl.alwaysEditable).toBeTrue();
-    expect(ctrl.graphProperties).toEqual([{
-      name: 'regular',
-      humanReadableName: 'regular'
-    }, {
-      name: 'acyclic',
-      humanReadableName: 'acyclic'
-    }, {
-      name: 'strongly_connected',
-      humanReadableName: 'strongly connected'
-    }, {
-      name: 'weakly_connected',
-      humanReadableName: 'weakly connected'
-    }]);
-    expect(ctrl.localValue).toEqual(
+    expect(ctrl.graphProperties).toEqual([
       {
-        property: {
-          name: 'regular',
-          humanReadableName: 'regular'
-        }
-      }
-    );
+        name: 'regular',
+        humanReadableName: 'regular',
+      },
+      {
+        name: 'acyclic',
+        humanReadableName: 'acyclic',
+      },
+      {
+        name: 'strongly_connected',
+        humanReadableName: 'strongly connected',
+      },
+      {
+        name: 'weakly_connected',
+        humanReadableName: 'weakly connected',
+      },
+    ]);
+    expect(ctrl.localValue).toEqual({
+      property: {
+        name: 'regular',
+        humanReadableName: 'regular',
+      },
+    });
     expect(ctrl.localValue.property).toEqual({
       name: 'regular',
-      humanReadableName: 'regular'
+      humanReadableName: 'regular',
     });
   });
 
@@ -82,7 +80,7 @@ describe('graphPropertyEditor', () => {
 
     ctrl.localValue.property = {
       name: 'regular',
-      humanReadableName: 'regular'
+      humanReadableName: 'regular',
     };
     $scope.$apply();
 

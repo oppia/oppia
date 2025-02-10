@@ -16,23 +16,18 @@
  * @fileoverview Module for the number with units components.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { HelpModalNumberWithUnitsComponent } from './directives/oppia-help-modal-number-with-units.component';
-import { InteractiveNumberWithUnitsComponent } from './directives/oppia-interactive-number-with-units.component';
-import { ResponseNumberWithUnitsComponent } from './directives/oppia-response-number-with-units.component';
-import { ShortResponseNumberWithUnitsComponent } from './directives/oppia-short-response-number-with-units.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {HelpModalNumberWithUnitsComponent} from './directives/oppia-help-modal-number-with-units.component';
+import {InteractiveNumberWithUnitsComponent} from './directives/oppia-interactive-number-with-units.component';
+import {ResponseNumberWithUnitsComponent} from './directives/oppia-response-number-with-units.component';
+import {ShortResponseNumberWithUnitsComponent} from './directives/oppia-short-response-number-with-units.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    SharedComponentsModule,
-    TranslateModule,
-  ],
+  imports: [CommonModule, FormsModule, SharedComponentsModule, TranslateModule],
   declarations: [
     HelpModalNumberWithUnitsComponent,
     InteractiveNumberWithUnitsComponent,
@@ -52,5 +47,4 @@ import { SharedComponentsModule } from 'components/shared-component.module';
     ShortResponseNumberWithUnitsComponent,
   ],
 })
-
-export class NumberWithUnitsInteractionModule { }
+export class NumberWithUnitsInteractionModule {}

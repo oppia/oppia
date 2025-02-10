@@ -16,26 +16,28 @@
  * @fileoverview Component for confirming blog post actions.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {BlogDashboardPageConstants} from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 
 @Component({
   selector: 'oppia-blog-post-action-confirmation-modal',
   templateUrl: './blog-post-action-confirmation.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class BlogPostActionConfirmationModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   blogPostAction!: string;
   constructor(
-      ngbActiveModal: NgbActiveModal,
-      private blogDashboardPageService: BlogDashboardPageService,
+    ngbActiveModal: NgbActiveModal,
+    private blogDashboardPageService: BlogDashboardPageService
   ) {
     super(ngbActiveModal);
   }
@@ -45,17 +47,23 @@ export class BlogPostActionConfirmationModalComponent
   }
 
   isActionDelete(): boolean {
-    return this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.DELETE);
+    return (
+      this.blogPostAction ===
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.DELETE
+    );
   }
 
   isActionPublish(): boolean {
-    return this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH);
+    return (
+      this.blogPostAction ===
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.PUBLISH
+    );
   }
 
   isActionUnpublish(): boolean {
-    return this.blogPostAction === (
-      BlogDashboardPageConstants.BLOG_POST_ACTIONS.UNPUBLISH);
+    return (
+      this.blogPostAction ===
+      BlogDashboardPageConstants.BLOG_POST_ACTIONS.UNPUBLISH
+    );
   }
 }

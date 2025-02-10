@@ -16,12 +16,18 @@
  * @fileoverview Spec for rte output component.
  */
 
-import { DebugElement, SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { OppiaRteParserService } from 'services/oppia-rte-parser.service';
-import { RichTextComponentsModule } from './rich-text-components.module';
-import { RteOutputDisplayComponent } from './rte-output-display.component';
+import {DebugElement, SimpleChanges} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
+import {RichTextComponentsModule} from './rich-text-components.module';
+import {RteOutputDisplayComponent} from './rte-output-display.component';
 
 describe('RTE display component', () => {
   let fixture: ComponentFixture<RteOutputDisplayComponent>;
@@ -30,7 +36,7 @@ describe('RTE display component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RichTextComponentsModule]
+      imports: [RichTextComponentsModule],
     }).compileComponents();
     rteParserService = TestBed.inject(OppiaRteParserService);
     fixture = TestBed.createComponent(RteOutputDisplayComponent);
@@ -44,13 +50,13 @@ describe('RTE display component', () => {
   // because angular supports multiple platforms including DOM. You can typecast
   // it to HTMLElement to get autocomplete and intellisense.
   it('should display a rte string', () => {
-    let rteString = (
+    let rteString =
       '<p>Hi<em>Hello</em>Hello</p>' +
       '<pre> Hello </pre>' +
       '<oppia-noninteractive-link ' +
       'url-with-value="&quot;https://oppia.org&quot;" ' +
       'text-with-value="&quot;Oppia&quot;">' +
-      '</oppia-noninteractive-link>');
+      '</oppia-noninteractive-link>';
     let rteComponentDe: DebugElement = fixture.debugElement;
 
     // eslint-disable-next-line oppia/no-inner-html
@@ -63,16 +69,17 @@ describe('RTE display component', () => {
         previousValue: '',
         currentValue: rteString,
         firstChange: true,
-        isFirstChange: () => true
-      }
+        isFirstChange: () => true,
+      },
     };
     component.rteString = rteString;
     component.ngOnChanges(changes);
     component.ngAfterViewInit();
     fixture.detectChanges();
 
-    const attrs = (
-      rteComponentDe.query(By.css('oppia-noninteractive-link')).attributes);
+    const attrs = rteComponentDe.query(
+      By.css('oppia-noninteractive-link')
+    ).attributes;
     expect(attrs['url-with-value']).toBe('"https://oppia.org"');
     expect(attrs['text-with-value']).toBe('"Oppia"');
     const link = rteComponentDe.query(By.css('a')).nativeElement;
@@ -83,13 +90,13 @@ describe('RTE display component', () => {
 
   it('should report errors when parsing', fakeAsync(() => {
     spyOn(rteParserService, 'constructFromDomParser').and.throwError('error');
-    let rteString = (
+    let rteString =
       '<p>Hi<em>Hello</em>Hello</p>' +
       '<pre> Hello </pre>' +
       '<oppia-noninteractive-link ' +
       'url-with-value="&quot;https://oppia.org&quot;" ' +
       'text-with-value="&quot;Oppia&quot;">' +
-      '</oppia-noninteractive-link>');
+      '</oppia-noninteractive-link>';
 
     expect(() => {
       // eslint-disable-next-line oppia/no-inner-html
@@ -102,8 +109,8 @@ describe('RTE display component', () => {
           previousValue: '',
           currentValue: rteString,
           firstChange: true,
-          isFirstChange: () => true
-        }
+          isFirstChange: () => true,
+        },
       };
       component.rteString = rteString;
       component.ngOnChanges(changes);
@@ -120,23 +127,21 @@ describe('RTE display component', () => {
           {
             nodeType: 3,
             parentElement: {
-              removeChild: removeChildSpy
-            }
-          }
-        ]
-      }
+              removeChild: removeChildSpy,
+            },
+          },
+        ],
+      },
     };
-    let rteString = (
-      '<p>Hi<em>Hello</em>Hello</p>' +
-      '<pre> Hello </pre>');
+    let rteString = '<p>Hi<em>Hello</em>Hello</p>' + '<pre> Hello </pre>';
 
     let changes: SimpleChanges = {
       rteString: {
         previousValue: '',
         currentValue: rteString,
         firstChange: true,
-        isFirstChange: () => true
-      }
+        isFirstChange: () => true,
+      },
     };
 
     component.ngOnChanges(changes);
@@ -145,34 +150,34 @@ describe('RTE display component', () => {
     expect(removeChildSpy).toHaveBeenCalled();
   }));
 
-  it('should remove text nodes which are outside ng container bounds',
-    fakeAsync(() => {
-      let rteString = (
-        '<p>Hi<em>Hello</em>Hello</p>');
+  it('should remove text nodes which are outside ng container bounds', fakeAsync(() => {
+    let rteString = '<p>Hi<em>Hello</em>Hello</p>';
 
-      let changes: SimpleChanges = {
-        rteString: {
-          previousValue: '',
-          currentValue: rteString,
-          firstChange: true,
-          isFirstChange: () => true
-        }
-      };
+    let changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: rteString,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    };
 
-      const node = document.createTextNode(
-        'Congratulations! You have finished');
-      component.elementRef.nativeElement.parentNode.insertBefore(
-        node, component.elementRef.nativeElement);
-      component.rteString = rteString;
+    const node = document.createTextNode('Congratulations! You have finished');
+    component.elementRef.nativeElement.parentNode.insertBefore(
+      node,
+      component.elementRef.nativeElement
+    );
+    component.rteString = rteString;
 
-      fixture.detectChanges();
+    fixture.detectChanges();
 
-      component.ngOnChanges(changes);
+    component.ngOnChanges(changes);
 
-      tick(100);
-      fixture.detectChanges();
+    tick(100);
+    fixture.detectChanges();
 
-      expect(component.elementRef.nativeElement.innerText).toEqual(
-        'HiHelloHello');
-    }));
+    expect(component.elementRef.nativeElement.innerText).toEqual(
+      'HiHelloHello'
+    );
+  }));
 });

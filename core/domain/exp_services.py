@@ -31,21 +31,23 @@ import logging
 import math
 import os
 import pprint
+import re
 import zipfile
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
 from core.domain import caching_services
 from core.domain import change_domain
-from core.domain import classifier_services
 from core.domain import draft_upgrade_services
 from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import html_cleaner
@@ -64,6 +66,7 @@ from core.domain import taskqueue_services
 from core.domain import translation_services
 from core.domain import user_domain
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 from extensions import domain
 
@@ -113,7 +116,6 @@ class UserExplorationDataDict(TypedDict):
     param_changes: List[param_domain.ParamChangeDict]
     version: int
     auto_tts_enabled: bool
-    correctness_feedback_enabled: bool
     edits_allowed: bool
     draft_change_list_id: int
     rights: rights_domain.ActivityRightsDict
@@ -395,7 +397,14 @@ def export_to_zip_file(
         if not exploration.title:
             zfile.writestr('Unpublished_exploration.yaml', yaml_repr)
         else:
-            zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
+            exploration_file_name = re.sub(
+                r'[^A-Za-z0-9_ -]+', '', exploration.title)
+            # Trim whitespace when checking to handle potential
+            # whitespace-only 'exploration_file_name'.
+            if not exploration_file_name.strip():
+                zfile.writestr('exploration.yaml', yaml_repr)
+            else:
+                zfile.writestr('%s.yaml' % exploration_file_name, yaml_repr)
 
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
@@ -543,6 +552,20 @@ def apply_change_list(
                     )
                     state.update_linked_skill_id(
                         edit_linked_skill_id_cmd.new_value
+                    )
+                elif (change.property_name ==
+                      exp_domain.
+                      STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd.
+                    edit_inapplicable_skill_misconception_ids = cast(
+                        exp_domain.
+                        EditExpStatePropertyInapplicableSkillMisconceptionIdsCmd, # pylint: disable=line-too-long
+                        change
+                    )
+                    state.update_inapplicable_skill_misconception_ids(
+                        edit_inapplicable_skill_misconception_ids.new_value
                     )
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
@@ -822,16 +845,6 @@ def apply_change_list(
                     exploration.update_auto_tts_enabled(
                         edit_auto_tts_enabled_cmd.new_value
                     )
-                elif change.property_name == 'correctness_feedback_enabled':
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExplorationPropertyCorrectnessFeedbackEnabledCmd.
-                    edit_correctness_feedback_enabled_cmd = cast(
-                        exp_domain.EditExplorationPropertyCorrectnessFeedbackEnabledCmd,  # pylint: disable=line-too-long
-                        change
-                    )
-                    exploration.update_correctness_feedback_enabled(
-                        edit_correctness_feedback_enabled_cmd.new_value)
                 elif change.property_name == 'next_content_id_index':
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
@@ -908,8 +921,6 @@ def populate_exp_model_fields(
     exp_model.param_specs = exploration.param_specs_dict
     exp_model.param_changes = exploration.param_change_dicts
     exp_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exp_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
     exp_model.edits_allowed = exploration.edits_allowed
     exp_model.next_content_id_index = exploration.next_content_id_index
 
@@ -1352,36 +1363,7 @@ def _compute_models_for_updating_exploration(
         )
     )
 
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, exp_versions_diff)
-        state_names_with_changed_answer_groups = trainable_states_dict[
-            'state_names_with_changed_answer_groups']
-        state_names_with_unchanged_answer_groups = trainable_states_dict[
-            'state_names_with_unchanged_answer_groups']
-        state_names_to_train_classifier = state_names_with_changed_answer_groups
-        if state_names_with_unchanged_answer_groups:
-            (
-                state_names_without_classifier,
-                state_training_jobs_mapping_models_to_put
-            ) = (
-                classifier_services
-                .get_new_job_models_for_non_trainable_states(
-                    exploration, state_names_with_unchanged_answer_groups,
-                    exp_versions_diff
-                )
-            )
-            state_names_to_train_classifier.extend(
-                state_names_without_classifier)
-            models_to_put.extend(state_training_jobs_mapping_models_to_put)
-        if state_names_to_train_classifier:
-            models_to_put.extend(
-                classifier_services.get_new_job_models_for_trainable_states(
-                    exploration, state_names_to_train_classifier
-                )
-            )
-
-    # Trigger exploration issues model updation.
+    # Trigger updates for exploration issues models.
     models_to_put.extend(
         stats_services.get_updated_exp_issues_models_for_new_exp_version(
             exploration,
@@ -1434,7 +1416,6 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
         next_content_id_index=exploration.next_content_id_index
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
@@ -1463,22 +1444,6 @@ def _create_exploration(
     exploration_stats = stats_services.get_stats_for_new_exploration(
         exploration.id, exploration.version, list(exploration.states.keys()))
     stats_services.create_stats_model(exploration_stats)
-
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        # Find out all states that need a classifier to be trained.
-        state_names_to_train = []
-        for state_name in exploration.states:
-            state = exploration.states[state_name]
-            if state.can_undergo_classification():
-                state_names_to_train.append(state_name)
-
-        if state_names_to_train:
-            datastore_services.put_multi(
-                classifier_services.get_new_job_models_for_trainable_states(
-                    exploration,
-                    state_names_to_train
-                )
-            )
 
     # Trigger exploration issues model creation.
     stats_services.create_exp_issues_for_new_exploration(
@@ -1851,15 +1816,6 @@ def validate_exploration_for_story(
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
-    if not exp.correctness_feedback_enabled:
-        error_string = (
-            'Expected all explorations in a story to '
-            'have correctness feedback '
-            'enabled. Invalid exploration: %s' % exp.id)
-        if strict:
-            raise utils.ValidationError(error_string)
-        validation_error_messages.append(error_string)
-
     if exp.category not in constants.ALL_CATEGORIES:
         error_string = (
             'Expected all explorations in a story to '
@@ -2094,27 +2050,54 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
 
+    voiceover_services.update_exploration_voice_artist_link_model(
+        committer_id, change_list, old_exploration, updated_exploration)
+
     new_content_id_set = set(updated_exploration.get_translatable_content_ids())
     content_ids_corresponding_translations_to_remove = (
         old_content_id_set - new_content_id_set
     )
-    content_ids_corresponding_translations_to_mark_needs_update = set()
+
+    voiceover_changes = []
     for change in change_list:
-        if change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            content_ids_corresponding_translations_to_mark_needs_update.add(
-                change.content_id)
+        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
+            voiceover_changes.append(change)
+
+    new_voiceover_models = voiceover_services.compute_voiceover_related_change(
+        updated_exploration,
+        voiceover_changes
+    )
+
+    models_to_put.extend(new_voiceover_models)
+
+    translation_changes = []
+    for change in change_list:
+        if not change.cmd in [
+            exp_domain.CMD_EDIT_TRANSLATION,
+            exp_domain.CMD_REMOVE_TRANSLATIONS,
+            exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE,
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE
+        ]:
             continue
 
         if change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
             content_ids_corresponding_translations_to_remove.add(
-                change.content_id)
+                change.content_id
+            )
+        translation_changes.append(change)
+
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_change(
             updated_exploration,
-            list(content_ids_corresponding_translations_to_remove),
-            list(content_ids_corresponding_translations_to_mark_needs_update),
+            translation_changes
         )
     )
+
+    for new_translation_model in new_translation_models:
+        for content_id in content_ids_corresponding_translations_to_remove:
+            if content_id in new_translation_model.translations:
+                del new_translation_model.translations[content_id]
+
     models_to_put.extend(new_translation_models)
     # Auto-reject any pending translation suggestions that are now obsolete due
     # to the corresponding content being deleted. See issue #16022 for context.
@@ -2551,6 +2534,29 @@ def revert_exploration(
 
     revert_version_history(exploration_id, current_version, revert_to_version)
 
+    reverted_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    new_translation_models, translation_counts = (
+        translation_services.compute_translation_related_changes_upon_revert(
+            reverted_exploration, revert_to_version))
+
+    translation_and_opportunity_models_to_put: List[
+        base_models.BaseModel
+    ] = []
+
+    translation_and_opportunity_models_to_put.extend(new_translation_models)
+
+    if opportunity_services.is_exploration_available_for_contribution(
+        exploration_id
+    ):
+        translation_and_opportunity_models_to_put.extend(
+            opportunity_services
+            .compute_opportunity_models_with_updated_exploration(
+                exploration_id,
+                exploration.get_content_count(),
+                translation_counts
+            )
+        )
+
     regenerate_exploration_and_contributors_summaries(exploration_id)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
@@ -2568,12 +2574,7 @@ def revert_exploration(
         )
     )
     datastore_services.put_multi(exp_issues_models_to_put)
-
-    if feconf.ENABLE_ML_CLASSIFIERS:
-        exploration_to_revert_to = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=revert_to_version)
-        classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
-            current_exploration, exploration_to_revert_to)
+    datastore_services.put_multi(translation_and_opportunity_models_to_put)
 
 
 # Creation and deletion methods.
@@ -2887,10 +2888,22 @@ def is_voiceover_change_list(
         bool. Whether the change_list contains only the changes which are
         allowed for voice artist to do.
     """
+    voiceover_with_accent_feature_is_enabled = (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value,
+            None)
+    )
+
     for change in change_list:
-        if (change.property_name !=
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-            return False
+        if voiceover_with_accent_feature_is_enabled:
+            if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
+                return False
+        else:
+            if (
+                change.property_name !=
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+            ):
+                return False
     return True
 
 
@@ -3042,8 +3055,6 @@ def get_user_exploration_data(
     editor_dict: UserExplorationDataDict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
-        'correctness_feedback_enabled': (
-            exploration.correctness_feedback_enabled),
         'draft_change_list_id': draft_change_list_id,
         'exploration_id': exploration_id,
         'init_state_name': exploration.init_state_name,

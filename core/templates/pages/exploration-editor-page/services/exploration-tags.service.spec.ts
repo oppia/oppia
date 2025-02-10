@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the ExplorationTagsService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationTagsService } from './exploration-tags.service';
+import {TestBed} from '@angular/core/testing';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ExplorationTagsService} from './exploration-tags.service';
 
 describe('Exploration Tags Service', () => {
   let explorationTagsService: ExplorationTagsService;
@@ -27,9 +27,7 @@ describe('Exploration Tags Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ExplorationPropertyService
-      ]
+      providers: [ExplorationPropertyService],
     });
 
     explorationTagsService = TestBed.inject(ExplorationTagsService);
@@ -42,11 +40,9 @@ describe('Exploration Tags Service', () => {
     let UpperCaseNotValid = ['Angularjs', 'google cloud storage', 'Python'];
     let NumberNotValid = ['angularjs', 'google cloud storage', 'Python123'];
     let SpecialNotValid = ['@ngularjs', 'google cloud storage', 'Python'];
-    expect(
-      explorationTagsService._normalize(NotNormalize)).toEqual(Normalize);
+    expect(explorationTagsService._normalize(NotNormalize)).toEqual(Normalize);
     expect(explorationTagsService._isValid(Normalize)).toBe(true);
-    expect(
-      explorationTagsService._isValid(UpperCaseNotValid)).toBe(false);
+    expect(explorationTagsService._isValid(UpperCaseNotValid)).toBe(false);
     expect(explorationTagsService._isValid(NumberNotValid)).toBe(false);
     expect(explorationTagsService._isValid(SpecialNotValid)).toBe(false);
   });

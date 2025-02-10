@@ -16,48 +16,38 @@
  * @fileoverview Tests for SkillMasteryModel.
  */
 
-import { SkillMastery } from
-  'domain/skill/skill-mastery.model';
+import {SkillMastery} from 'domain/skill/skill-mastery.model';
 
 describe('Skill mastery model', () => {
-  it('should be able to create a skill mastery object',
-    () => {
-      const skillMastery = SkillMastery.createFromBackendDict(
-        {
-          skillId1: 1.0,
-          skillId2: 0.3
-        }
-      );
-
-      expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
-      expect(skillMastery.getMasteryDegree('skillId2')).toBe(0.3);
+  it('should be able to create a skill mastery object', () => {
+    const skillMastery = SkillMastery.createFromBackendDict({
+      skillId1: 1.0,
+      skillId2: 0.3,
     });
 
-  it('should be able to convert to a dict object',
-    () => {
-      const skillMastery = SkillMastery.createFromBackendDict(
-        {
-          skillId1: 1.0,
-          skillId2: 0.3
-        }
-      );
-      const skillMasteryBackendDict = skillMastery.toBackendDict();
+    expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
+    expect(skillMastery.getMasteryDegree('skillId2')).toBe(0.3);
+  });
 
-      expect(skillMasteryBackendDict.skillId1).toBe(1.0);
-      expect(skillMasteryBackendDict.skillId2).toBe(0.3);
+  it('should be able to convert to a dict object', () => {
+    const skillMastery = SkillMastery.createFromBackendDict({
+      skillId1: 1.0,
+      skillId2: 0.3,
+    });
+    const skillMasteryBackendDict = skillMastery.toBackendDict();
+
+    expect(skillMasteryBackendDict.skillId1).toBe(1.0);
+    expect(skillMasteryBackendDict.skillId2).toBe(0.3);
+  });
+
+  it('should be able to set degree of mastery', () => {
+    const skillMastery = SkillMastery.createFromBackendDict({
+      skillId1: 1.0,
+      skillId2: 0.3,
     });
 
-  it('should be able to set degree of mastery',
-    () => {
-      const skillMastery = SkillMastery.createFromBackendDict(
-        {
-          skillId1: 1.0,
-          skillId2: 0.3
-        }
-      );
-
-      expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
-      skillMastery.setMasteryDegree('skillId1', 0.5);
-      expect(skillMastery.getMasteryDegree('skillId1')).toBe(0.5);
-    });
+    expect(skillMastery.getMasteryDegree('skillId1')).toBe(1.0);
+    skillMastery.setMasteryDegree('skillId1', 0.5);
+    expect(skillMastery.getMasteryDegree('skillId1')).toBe(0.5);
+  });
 });

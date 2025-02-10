@@ -16,37 +16,37 @@
  * @fileoverview Component for add outcome modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 @Component({
   selector: 'oppia-add-outcome-modal',
-  templateUrl: './add-outcome-modal.component.html'
+  templateUrl: './add-outcome-modal.component.html',
 })
-export class AddOutcomeModalComponent extends ConfirmOrCancelModal
-implements OnInit {
+export class AddOutcomeModalComponent
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() outcome!: Outcome;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.outcome.feedback._html.length > 10000);
+    return this.outcome.feedback._html.length > 10000;
   }
 
   save(): void {
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
-      outcome: cloneDeep(this.outcome)
+      outcome: cloneDeep(this.outcome),
     });
   }
 }

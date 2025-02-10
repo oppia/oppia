@@ -16,7 +16,7 @@
                 <th>Commit message</th>
                 <th>Community-owned?</th>
               </tr>
-              <tr *ngFor="let commit of allCommits">
+              <tr *ngFor="let commit of allCommits" class="e2e-test-commit-row">
                 <td>{{ getDatetimeAsString(commit.last_updated) }}</td>
                 <td>
                   <a [href]="getExplorationCreateUrl(commit.exploration_id)">
@@ -36,7 +36,7 @@
       </div>
 
       <div [ngbNavItem]="2">
-        <a ngbNavLink>Recent Feedback Messages</a>
+        <a ngbNavLink class="e2e-test-feedback-messages-tab-link">Recent Feedback Messages</a>
         <ng-template ngbNavContent>
           <h3>Recent Feedback Messages</h3>
           (Note that some of these links may be to private explorations, and thus result in authorization errors.)
@@ -49,7 +49,7 @@
                 <th>Exploration ID</th>
                 <th>Username</th>
               </tr>
-              <tr *ngFor="let message of allFeedbackMessages">
+              <tr *ngFor="let message of allFeedbackMessages" class="e2e-test-feedback-messages-row">
                 <td>{{ getDatetimeAsString(message.createdOnMsecs) }}</td>
                 <td>
                   <a *ngIf="isMessageFromExploration(message)"
@@ -65,7 +65,7 @@
       </div>
 
       <div [ngbNavItem]="3">
-        <a ngbNavLink>Featured Activities</a>
+        <a ngbNavLink class="e2e-test-featured-activities-tab-link">Featured Activities</a>
         <ng-template ngbNavContent>
           <h3>Activities to feature in the library</h3>
           <br>

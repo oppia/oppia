@@ -16,10 +16,10 @@
  * @fileoverview Tests for SidebarStatusService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SidebarStatusService } from 'services/sidebar-status.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {SidebarStatusService} from 'services/sidebar-status.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {
   let sss: SidebarStatusService;
@@ -37,7 +37,7 @@ describe('SidebarStatusService', () => {
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty($window.nativeWindow, 'innerWidth', {
-      get: () => undefined
+      get: () => undefined,
     });
     spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(600);
   });

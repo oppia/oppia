@@ -16,19 +16,18 @@
  * @fileoverview Component for the navbar of the skill editor.
  */
 
-import { Subscription } from 'rxjs';
-import { SkillEditorSaveModalComponent } from '../modal-templates/skill-editor-save-modal.component';
-import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-import { Component, OnInit } from '@angular/core';
-import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { UrlService } from 'services/contextual/url.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {SkillEditorSaveModalComponent} from '../modal-templates/skill-editor-save-modal.component';
+import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {UrlService} from 'services/contextual/url.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
 
 @Component({
   selector: 'oppia-skill-editor-navbar',
@@ -58,7 +57,6 @@ export class SkillEditorNavabarComponent implements OnInit {
   ACTIVE_TAB_QUESTIONS = 'Questions';
   ACTIVE_TAB_PREVIEW = 'Preview';
 
-
   getActiveTabName(): string {
     return this.skillEditorRoutingService.getActiveTabName();
   }
@@ -85,24 +83,26 @@ export class SkillEditorNavabarComponent implements OnInit {
   }
 
   isSkillSaveable(): boolean {
-    return (
-      this.getChangeListCount() > 0 &&
-      this.getWarningsCount() === 0
-    );
+    return this.getChangeListCount() > 0 && this.getWarningsCount() === 0;
   }
 
   saveChanges(): void {
-    this.ngbModal.open(SkillEditorSaveModalComponent, {
-      backdrop: 'static',
-    }).result.then((commitMessage) => {
-      this.skillEditorStateService.saveSkill(commitMessage, () => {
-        this.alertsService.addSuccessMessage('Changes Saved.');
-      });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(SkillEditorSaveModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        commitMessage => {
+          this.skillEditorStateService.saveSkill(commitMessage, () => {
+            this.alertsService.addSuccessMessage('Changes Saved.');
+          });
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   toggleNavigationOptions(): void {
@@ -130,14 +130,13 @@ export class SkillEditorNavabarComponent implements OnInit {
     // discarded, the misconceptions won't be saved, but there will be
     // some questions with these now non-existent misconceptions.
     if (this.undoRedoService.getChangeCount() > 0) {
-      const modalRef = this.ngbModal.open(
-        SavePendingChangesModalComponent, {
-          backdrop: true
-        });
+      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
+        backdrop: true,
+      });
 
-      modalRef.componentInstance.body = (
+      modalRef.componentInstance.body =
         'Please save all pending ' +
-        'changes before viewing the questions list.');
+        'changes before viewing the questions list.';
 
       modalRef.result.then(null, () => {
         // Note to developers:
@@ -153,22 +152,15 @@ export class SkillEditorNavabarComponent implements OnInit {
   ngOnInit(): void {
     this.activeTab = this.ACTIVE_TAB_EDITOR;
     this.directiveSubscriptions.add(
-      this.skillEditorStateService.onSkillChange.subscribe(
-        () => {
-          this.skill = this.skillEditorStateService.getSkill();
-        }),
+      this.skillEditorStateService.onSkillChange.subscribe(() => {
+        this.skill = this.skillEditorStateService.getSkill();
+      })
     );
     this.directiveSubscriptions.add(
-      this.skillUpdateService.onPrerequisiteSkillChange.subscribe(
-        () => {}
-      ));
+      this.skillUpdateService.onPrerequisiteSkillChange.subscribe(() => {})
+    );
     this.directiveSubscriptions.add(
       this.undoRedoService._undoRedoChangeEventEmitter.subscribe(() => {})
     );
   }
 }
-
-angular.module('oppia').directive('oppiaSkillEditorNavbar',
-  downgradeComponent({
-    component: SkillEditorNavabarComponent
-  }) as angular.IDirectiveFactory);

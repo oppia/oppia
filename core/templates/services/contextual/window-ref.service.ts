@@ -16,22 +16,22 @@
  * @fileoverview Service to wrap the window object.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WindowRef {
   /**
-  * @returns The global native browser window object.
-  */
+   * @returns The global native browser window object.
+   */
   _window(): Window {
     return window;
   }
 
   /**
-  * @returns The global native browser window object.
-  */
+   * @returns The global native browser window object.
+   */
   get nativeWindow(): Window {
     return this._window();
   }

@@ -5,19 +5,19 @@
     <div class="oppia-wide-panel-content e2e-test-error-container">
       <h1 class="oppia-error-h1">
         <div *ngIf="getStatusCode() === 400">
-          <span [innerHTML]="'I18N_ERROR_HEADER_400' | translate"></span>
+          <span [innerHTML]="'I18N_ERROR_HEADER_400' | translate" class="e2e-test-error-page-heading"></span>
           - Bad Request
         </div>
         <div *ngIf="getStatusCode() === 401">
-          <span [innerHTML]="'I18N_ERROR_HEADER_401' | translate"></span>
+          <span [innerHTML]="'I18N_ERROR_HEADER_401' | translate" class="e2e-test-error-page-heading"></span>
           - Unauthorized
         </div>
         <div *ngIf="getStatusCode() === 404">
-          <span [innerHTML]="'I18N_ERROR_HEADER_404' | translate"></span>
+          <span [innerHTML]="'I18N_ERROR_HEADER_404' | translate" class="e2e-test-error-page-heading"></span>
           - Page Not Found
         </div>
         <div *ngIf="getStatusCode() === 500">
-          <span [innerHTML]="'I18N_ERROR_HEADER_500' | translate"></span>
+          <span [innerHTML]="'I18N_ERROR_HEADER_500' | translate" class="e2e-test-error-page-heading"></span>
           - System Error
         </div>
       </h1>

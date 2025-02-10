@@ -16,14 +16,13 @@
  * @fileoverview Module for the terms page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TermsPageComponent } from
-  'pages/terms-page/terms-page.component';
-import { TermsPageRootComponent } from './terms-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TermsPageRoutingModule } from './terms-page-routing.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {TermsPageComponent} from 'pages/terms-page/terms-page.component';
+import {TermsPageRootComponent} from './terms-page-root.component';
+import {CommonModule} from '@angular/common';
+import {TermsPageRoutingModule} from './terms-page-routing.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -32,15 +31,9 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    TermsPageRoutingModule
+    TermsPageRoutingModule,
   ],
-  declarations: [
-    TermsPageComponent,
-    TermsPageRootComponent
-  ],
-  entryComponents: [
-    TermsPageComponent,
-    TermsPageRootComponent
-  ]
+  declarations: [TermsPageComponent, TermsPageRootComponent],
+  entryComponents: [TermsPageComponent, TermsPageRootComponent],
 })
 export class TermsPageModule {}

@@ -16,9 +16,13 @@
  * @fileoverview Spec for service that parses rich text string.
  */
 
-import { DOCUMENT } from '@angular/common';
-import { TestBed } from '@angular/core/testing';
-import { OppiaRteNode, OppiaRteParserService, TextNode } from './oppia-rte-parser.service';
+import {DOCUMENT} from '@angular/common';
+import {TestBed} from '@angular/core/testing';
+import {
+  OppiaRteNode,
+  OppiaRteParserService,
+  TextNode,
+} from './oppia-rte-parser.service';
 
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
@@ -75,43 +79,47 @@ describe('RTE parser service', () => {
   });
 
   it('should generate a custom representation of the rte string', () => {
-    let testCases = [{
-      rteString: '<p>Hi<em>Hello</em>Hello</p>' +
-                 '<oppia-noninteractive-link url-with-value="url"' +
-                                            'link-with-value="link">' +
-                 '</oppia-noninteractive-link>',
-      representation: {
-        tag: 'body',
-        attrs: {},
-        children: [
-          {
-            tag: 'p',
-            attrs: {},
-            children: [
-              new TextNode('Hi'),
-              {
-                tag: 'em',
-                attrs: {},
-                children: [new TextNode('Hello')]
+    let testCases = [
+      {
+        rteString:
+          '<p>Hi<em>Hello</em>Hello</p>' +
+          '<oppia-noninteractive-link url-with-value="url"' +
+          'link-with-value="link">' +
+          '</oppia-noninteractive-link>',
+        representation: {
+          tag: 'body',
+          attrs: {},
+          children: [
+            {
+              tag: 'p',
+              attrs: {},
+              children: [
+                new TextNode('Hi'),
+                {
+                  tag: 'em',
+                  attrs: {},
+                  children: [new TextNode('Hello')],
+                },
+                new TextNode('Hello'),
+              ],
+            },
+            {
+              tag: 'oppia-noninteractive-link',
+              attrs: {
+                urlWithValue: 'url',
+                linkWithValue: 'link',
               },
-              new TextNode('Hello')
-            ]
-          },
-          {
-            tag: 'oppia-noninteractive-link',
-            attrs: {
-              urlWithValue: 'url',
-              linkWithValue: 'link'
-            }
-          }
-        ]
-      }
-    }];
+            },
+          ],
+        },
+      },
+    ];
     testCases.forEach(testCase => {
       let node = rteParserService.constructFromRteString(testCase.rteString);
-      expect(
-        compareRteNodeToObject(node, testCase.representation)
-      ).toBe(true, testCase.rteString);
+      expect(compareRteNodeToObject(node, testCase.representation)).toBe(
+        true,
+        testCase.rteString
+      );
     });
   });
 
@@ -131,8 +139,9 @@ describe('RTE parser service', () => {
       rteParserService.constructFromDomParser(new DummyHtmlElement());
     }).toThrowError(
       'tagName is undefined.\n' +
-      'body: <dummy-element></dummy-element>\n ' +
-      'node: <dummy-element></dummy-element>');
+        'body: <dummy-element></dummy-element>\n ' +
+        'node: <dummy-element></dummy-element>'
+    );
   });
 
   it('should parse a simple element', () => {
@@ -148,18 +157,22 @@ describe('RTE parser service', () => {
   // by the prefix. In that case, the code will throw an error.
   it(
     'should throw an error when a noninteractive component is not valid rte ' +
-    'component',
+      'component',
     () => {
-      let testCases = [{
-        rteString: '<oppia-noninteractive-lin url-with-value="url"' +
-                                            'link-with-value="link">' +
-                 '</oppia-noninteractive-lin>',
-        errorString: 'Unexpected tag encountered: oppia-noninteractive-lin'
-      }];
+      let testCases = [
+        {
+          rteString:
+            '<oppia-noninteractive-lin url-with-value="url"' +
+            'link-with-value="link">' +
+            '</oppia-noninteractive-lin>',
+          errorString: 'Unexpected tag encountered: oppia-noninteractive-lin',
+        },
+      ];
       testCases.forEach(testCase => {
-        expect(
-          () => rteParserService.constructFromRteString(testCase.rteString)
+        expect(() =>
+          rteParserService.constructFromRteString(testCase.rteString)
         ).toThrowError(testCase.errorString);
       });
-    });
+    }
+  );
 });

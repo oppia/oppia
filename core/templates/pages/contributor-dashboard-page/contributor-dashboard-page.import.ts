@@ -24,15 +24,20 @@ import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate', ngInfiniteScroll,
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.tree', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  ngInfiniteScroll,
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  'ui.tree',
+  uiValidate,
 ]);
 
-require(
-  'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
+require('pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require(
-  'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
+require('pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');

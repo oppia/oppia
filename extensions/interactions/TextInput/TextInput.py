@@ -47,7 +47,7 @@ class TextInput(base.BaseInteraction):
     # older explorations may have this customization parameter still set
     # in the exploration definition, so, in order to minimize the possibility
     # of collisions, do not add a new parameter with this name to this list.
-    # TODO(sll): Migrate old definitions which still contain the 'columns'
+    # TODO(#20445): Migrate old definitions which still contain the 'columns'
     # parameter.
     _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
         'name': 'placeholder',
@@ -76,8 +76,10 @@ class TextInput(base.BaseInteraction):
         'default_value': 1,
     }, {
         'name': 'catchMisspellings',
-        'description': 'Catch Misspellings (Detect if answer is misspelled' +
-        ' and nudge the learner to correct the misspelling)',
+        'description': (
+            'Catch Misspellings (Detect if answer is misspelled'
+            ' and nudge the learner to correct the misspelling)'
+        ),
         'schema': {
             'type': 'bool'
         },

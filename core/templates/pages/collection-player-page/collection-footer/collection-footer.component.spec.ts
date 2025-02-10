@@ -16,14 +16,13 @@
  * @fileoverview Unit tests for collection footer component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync, ComponentFixture } from '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { CollectionFooterComponent } from './collection-footer.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestBed, waitForAsync, ComponentFixture} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {CollectionFooterComponent} from './collection-footer.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('Collection footer component', () => {
   let urlInterpolationService: UrlInterpolationService;
@@ -34,17 +33,9 @@ describe('Collection footer component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CollectionFooterComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        UrlInterpolationService,
-        UrlService
-      ],
-      schemas: [
-        NO_ERRORS_SCHEMA
-      ]
+      declarations: [CollectionFooterComponent, MockTranslatePipe],
+      providers: [UrlInterpolationService, UrlService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -56,13 +47,15 @@ describe('Collection footer component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   beforeEach(() => {
     spyOn(urlService, 'getCollectionIdFromUrl').and.returnValue('abcdef');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      '/assets/images/general/apple.svg');
+      '/assets/images/general/apple.svg'
+    );
     component.ngOnInit();
   });
 
@@ -72,9 +65,11 @@ describe('Collection footer component', () => {
   });
 
   it('should get the static image url from the image path', () => {
-    expect(component.getStaticImageUrl('/general/apple.svg'))
-      .toBe('/assets/images/general/apple.svg');
-    expect(urlInterpolationService.getStaticImageUrl)
-      .toHaveBeenCalledWith('/general/apple.svg');
+    expect(component.getStaticImageUrl('/general/apple.svg')).toBe(
+      '/assets/images/general/apple.svg'
+    );
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      '/general/apple.svg'
+    );
   });
 });

@@ -1,4 +1,3 @@
-
 // Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +16,19 @@
  * @fileoverview Component for profile page
  */
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { UrlService } from 'services/contextual/url.service';
+import {UrlService} from 'services/contextual/url.service';
 
 import './profile-page-navbar.component.css';
-
 
 @Component({
   selector: 'profile-page-navbar',
   templateUrl: './profile-page-navbar.component.html',
-  styleUrls: ['./profile-page-navbar.component.css']
+  styleUrls: ['./profile-page-navbar.component.css'],
 })
 export class ProfilePageNavbarComponent implements OnInit {
-  constructor(
-    private urlService: UrlService
-  ) {}
+  constructor(private urlService: UrlService) {}
 
   username: string = '';
   ngOnInit(): void {

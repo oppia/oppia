@@ -42,15 +42,15 @@ export class LearnerGroupSubtopicSummary {
   _classroomUrlFragment?: string;
 
   constructor(
-      parentTopicId: string,
-      parentTopicName: string,
-      subtopicId: number,
-      subtopicTitle: string,
-      thumbnailFilename: string,
-      thumbnailBgColor: string,
-      subtopicMastery?: number,
-      parentTopicUrlFragment?: string,
-      classroomUrlFragment?: string
+    parentTopicId: string,
+    parentTopicName: string,
+    subtopicId: number,
+    subtopicTitle: string,
+    thumbnailFilename: string,
+    thumbnailBgColor: string,
+    subtopicMastery?: number,
+    parentTopicUrlFragment?: string,
+    classroomUrlFragment?: string
   ) {
     this._parentTopicId = parentTopicId;
     this._parentTopicName = parentTopicName;
@@ -104,8 +104,7 @@ export class LearnerGroupSubtopicSummary {
   }
 
   static createFromBackendDict(
-      LearnerGroupSubtopicSummaryBackendDict:
-        LearnerGroupSubtopicSummaryBackendDict
+    LearnerGroupSubtopicSummaryBackendDict: LearnerGroupSubtopicSummaryBackendDict
   ): LearnerGroupSubtopicSummary {
     return new LearnerGroupSubtopicSummary(
       LearnerGroupSubtopicSummaryBackendDict.parent_topic_id,
@@ -116,6 +115,7 @@ export class LearnerGroupSubtopicSummary {
       LearnerGroupSubtopicSummaryBackendDict.thumbnail_bg_color,
       LearnerGroupSubtopicSummaryBackendDict.subtopic_mastery,
       LearnerGroupSubtopicSummaryBackendDict.parent_topic_url_fragment,
-      LearnerGroupSubtopicSummaryBackendDict.classroom_url_fragment);
+      LearnerGroupSubtopicSummaryBackendDict.classroom_url_fragment
+    );
   }
 }

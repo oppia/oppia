@@ -23,9 +23,12 @@ import sys
 
 from core.tests import test_utils
 
+from typing import Dict, List, Optional, Tuple
+
 from . import build
 from . import check_frontend_test_coverage
 from . import common
+from . import git_changes_utils
 from . import install_third_party_libs
 from . import run_frontend_tests
 
@@ -121,8 +124,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.build_args.append(args)
 
         self.frontend_coverage_checks_called = False
-        def mock_check_frontend_coverage() -> None:
+        self.frontend_coverage_checks_args: list[list[str]] = []
+        def mock_check_frontend_coverage(args: list[str]) -> None:
             self.frontend_coverage_checks_called = True
+            self.frontend_coverage_checks_args.append(args)
 
         self.swap_success_Popen = self.swap(
             subprocess, 'Popen', mock_success_check_call)
@@ -173,6 +178,158 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
 
+    def test_frontend_tests_with_specs_to_run(self) -> None:
+        original_os_path_exists = os.path.exists
+        def mock_os_path_exists(path: str) -> bool:
+            if path == 'home-page.component.spec.ts':
+                return True
+            if path == 'about-page.component.spec.ts':
+                return True
+            if path == 'test-module.spec.js':
+                return True
+            if path == 'AppSpec.ts':
+                return True
+            return original_os_path_exists(path)
+        os_path_exists_swap = self.swap(
+            os.path, 'exists', mock_os_path_exists)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, os_path_exists_swap:
+                    run_frontend_tests.main(
+                        args=['--check_coverage', '--specs_to_run='
+                              'home-page.component.spec.ts,'
+                              'about-page.component.ts,'
+                              'test-module.js,'
+                              'App.ts'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--specs_to_run=AppSpec.ts,'
+            'about-page.component.spec.ts,'
+            'home-page.component.spec.ts,'
+            'test-module.spec.js']
+        self.assertIn(cmd, self.cmd_token_list)
+        self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[
+            '--files_to_check=AppSpec.ts,'
+            'about-page.component.spec.ts,'
+            'home-page.component.spec.ts,'
+            'test-module.spec.js'
+        ]])
+
+    def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaisesRegex(
+                        ValueError,
+                        'No spec file found for the file: invalid.ts'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts'])
+
+    def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
+        self
+    ) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaisesRegex(SystemExit, '0'):
+                        run_frontend_tests.main(
+                            args=['--specs_to_run', 'invalid.ts',
+                                    '--allow_no_spec'])
+
+    def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
+        git_refs = [git_changes_utils.GitRef(
+            'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1')]
+        def mock_get_remote_name() -> str:
+            return 'remote'
+        def mock_get_refs() -> List[git_changes_utils.GitRef]:
+            return git_refs
+        def mock_get_changed_files(
+            unused_refs: List[git_changes_utils.GitRef],
+            unused_remote_name: str
+        ) -> Dict[str, Tuple[List[git_changes_utils.FileDiff], List[bytes]]]:
+            return {
+                'branch1': (
+                    [git_changes_utils.FileDiff('M', b'file1.js'),
+                     git_changes_utils.FileDiff('M', b'file2.ts'),
+                     git_changes_utils.FileDiff('M', b'file3.py')],
+                    [b'file1.js', b'file2.ts', b'file3.py']
+                ),
+                'branch2': (
+                    [],
+                    []
+                )
+            }
+        def mock_get_staged_acmrt_files() -> List[bytes]:
+            return [b'file1.js', b'file2.ts', b'file3.ts']
+        def mock_get_file_spec(file_path: str) -> Optional[str]:
+            if file_path == 'file1.js':
+                return 'file1.spec.js'
+            if file_path == 'file2.ts':
+                return 'file2.spec.ts'
+            if file_path == 'file3.ts':
+                return 'file3.spec.ts'
+            return None
+        def mock_get_parent_branch_name_for_diff() -> str:
+            return 'develop'
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+        get_refs_swap = self.swap(
+            git_changes_utils, 'get_refs', mock_get_refs)
+        get_changed_files_swap = self.swap_with_checks(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files,
+            expected_args=[(git_refs, 'remote')])
+        get_staged_acmrt_files_swap = self.swap(
+            git_changes_utils, 'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files)
+        get_file_spec_swap = self.swap(
+            run_frontend_tests, 'get_file_spec', mock_get_file_spec)
+        get_parent_branch_name_for_diff_swap = self.swap(
+            git_changes_utils, 'get_parent_branch_name_for_diff',
+            mock_get_parent_branch_name_for_diff)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, get_remote_name_swap:
+                    with get_refs_swap, get_changed_files_swap:
+                        with get_file_spec_swap, get_staged_acmrt_files_swap:
+                            with get_parent_branch_name_for_diff_swap:
+                                run_frontend_tests.main(
+                                    args=['--run_on_changed_files_in_branch'])
+
+        cmd = [
+            common.NODE_BIN_PATH, '--max-old-space-size=4096',
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts']
+        self.assertIn(cmd, self.cmd_token_list)
+
+    def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
+        self
+    ) -> None:
+        def mock_get_remote_name() -> str:
+            return ''
+
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage, get_remote_name_swap:
+                    with self.assertRaisesRegex(
+                        SystemExit,
+                        'Error: No remote repository found.'
+                    ):
+                        run_frontend_tests.main(
+                            args=['--run_on_changed_files_in_branch'])
+
     def test_frontend_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
@@ -190,6 +347,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'Frontend-unit-tests-guide#how-to-handle-common-errors'
             ' for details on how to fix it.', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun(self) -> None:
@@ -216,6 +374,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun_twice(self) -> None:
@@ -244,6 +403,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
         self.assertIn('Attempt 2 of 2', self.print_arr)
         self.assertTrue(self.frontend_coverage_checks_called)
+        self.assertEqual(self.frontend_coverage_checks_args, [[]])
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_failed(self) -> None:
@@ -303,8 +463,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         combined_spec_download_cmd = [
             'wget',
-            'http://localhost:9876/base/core/templates/' +
-            'combined-tests.spec.js',
+            'http://localhost:9876/base/core/templates/combined-tests.spec.js',
             '-P',
             os.path.join('../karma_coverage_reports')]
         self.assertIn(combined_spec_download_cmd, self.cmd_token_list)
@@ -321,8 +480,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
         combined_spec_download_cmd = [
             'wget',
-            'http://localhost:9876/base/core/templates/' +
-            'combined-tests.spec.js',
+            'http://localhost:9876/base/core/templates/combined-tests.spec.js',
             '-P',
             os.path.join('../karma_coverage_reports')]
         self.assertIn(combined_spec_download_cmd, self.cmd_token_list)

@@ -1,12 +1,12 @@
 <div class="modal-header e2e-test-add-response-modal-header" ngbAutofocus>
-  <h3>Add Response</h3>
-  <i class="fa fa-times" (click)="cancel()"></i>
+  <h3 tabindex="0" #addResponse>Add Response</h3>
+  <i class="fa fa-times" tabindex="0" role="button" (keydown.enter)="cancel()" (click)="cancel()"></i>
 </div>
 
 <div class="modal-body">
   <form name="addAnswerGroupForm.outcomeDetailsForm" class="e2e-test-add-response-details">
-    <div class="oppia-rule-details-header">
-      <strong>If the learner's answer...</strong>
+    <div class="oppia-rule-details-header" tabindex="0">
+      <strong>If the learner's answer ...</strong>
     </div>
 
     <oppia-rule-editor class="rule-editor-add-answer"
@@ -22,10 +22,10 @@
          title="Edit feedback" class="oppia-edit-feedback">
       <div class="oppia-rule-details-header oppia-editable-section">
         <div class="oppia-rule-preview oppia-transition-200">
+          <strong tabindex="0">Oppia tells the learner ...</strong>
           <div class="oppia-click-to-start-editing" (click)="openFeedbackEditor()">
-            <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" (keydown.enter)="openFeedbackEditor()" aria-label="edit button" tabindex="0" title="Edit Feedback">&#xE254;</i>
+            <i class="fa fa-pen oppia-editor-edit-icon e2e-test-open-feedback-editor" (keydown.enter)="openFeedbackEditor()" aria-label="edit feedback button" tabindex="0" title="Edit Feedback">&#xE254;</i>
           </div>
-          <strong>Oppia tells the learner...</strong>
           <div class="position-relative">
             <span class="oppia-nothing-text">
               <em>Nothing</em>
@@ -58,15 +58,15 @@
     </oppia-outcome-if-stuck-destination-editor>
   </form>
 
-  <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-    <input id="labelledAsCorrect"
+  <div class="oppia-correctness-label-editor" *ngIf="!isCurrentInteractionLinear()">
+    <input id="labelledAsCorrectForAnswerGroupModal"
            class="e2e-test-editor-correctness-toggle mr-2"
            type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
-    <strong><label for="labelledAsCorrect">The answers in this group are correct</label></strong>
+    <strong><label for="labelledAsCorrectForAnswerGroupModal">The answers in this group are correct</label></strong>
   </div>
 
-  <oppia-question-misconception-editor *ngIf="questionModeEnabled"
+  <oppia-question-misconception-editor *ngIf="questionModeEnabled || tagMisconceptionsFeatureFlagIsEnabled"
                                        (saveTaggedMisconception)="updateTaggedMisconception($event)"
                                        (saveAnswerGroupFeedback)="updateAnswerGroupFeedback($event)"
                                        [isEditable]="true"
@@ -79,7 +79,7 @@
 <div class="modal-footer">
   <button class="btn btn-secondary e2e-test-close-add-response-modal" (click)="cancel()">Cancel</button>
   <button class="btn btn-success e2e-test-add-new-response" (click)="saveResponse(false)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save Response</button>
-  <button class="btn btn-success" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
+  <button class="btn btn-success e2e-test-add-another-response" (click)="saveResponse(true)" [disabled]="(isInvalid || validation) || isSelfLoopWithNoFeedback(tmpOutcome) || isFeedbackLengthExceeded(tmpOutcome)">Save and Add Another</button>
 </div>
 
 <style>
@@ -136,10 +136,15 @@
   }
   @media screen and (max-width: 500px) {
     strong {
-      font-size: 18px;
+      font-size: 1.5rem;
     }
     .oppia-correctness-label-editor {
       margin-top: 0;
+    }
+  }
+  @media screen and (max-width: 700px) {
+    .oppia-edit-feedback {
+      margin-top: 3rem;
     }
   }
 </style>

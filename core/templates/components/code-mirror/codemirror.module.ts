@@ -16,32 +16,19 @@
  * @fileoverview Module for the CodeRepl interaction components.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
 import 'core-js/es7/reflect';
 import 'zone.js';
-import { CodemirrorModule } from '@ctrl/ngx-codemirror';
-import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
-import { CodeMirrorComponent } from './codemirror.component';
-import { FormsModule } from '@angular/forms';
+import {CodemirrorModule} from '@ctrl/ngx-codemirror';
+import {CodemirrorMergeviewComponent} from './codemirror-mergeview.component';
+import {CodeMirrorComponent} from './codemirror.component';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    CodemirrorModule,
-    FormsModule
-  ],
-  declarations: [
-    CodemirrorMergeviewComponent,
-    CodeMirrorComponent
-  ],
-  entryComponents: [
-    CodemirrorMergeviewComponent,
-    CodeMirrorComponent
-  ],
-  exports: [
-    CodemirrorMergeviewComponent,
-    CodeMirrorComponent
-  ]
+  imports: [CommonModule, CodemirrorModule, FormsModule],
+  declarations: [CodemirrorMergeviewComponent, CodeMirrorComponent],
+  entryComponents: [CodemirrorMergeviewComponent, CodeMirrorComponent],
+  exports: [CodemirrorMergeviewComponent, CodeMirrorComponent],
 })
 export class CodeMirrorModule {}

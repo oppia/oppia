@@ -16,23 +16,23 @@
  * @fileoverview Module for the shared blog-dashboard components.
  */
 
-import { NgModule} from '@angular/core';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { HttpClientModule } from '@angular/common/http';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import {NgModule} from '@angular/core';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {HttpClientModule} from '@angular/common/http';
+import {SharedComponentsModule} from 'components/shared-component.module';
 
-import { BlogPostActionConfirmationModalComponent } from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
-import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { BlogDashboardTileComponent } from 'pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component';
-import { BlogDashboardNavbarBreadcrumbComponent } from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
-import { BlogPostEditorComponent } from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
-import { UploadBlogPostThumbnailModalComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
-import { BlogCardPreviewModalComponent } from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
-import { UploadBlogPostThumbnailComponent } from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
-import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
-import { CommonModule } from '@angular/common';
+import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
+import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
+import {BlogDashboardTileComponent} from 'pages/blog-dashboard-page/blog-dashboard-tile/blog-dashboard-tile.component';
+import {BlogDashboardNavbarBreadcrumbComponent} from 'pages/blog-dashboard-page/navbar/navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component';
+import {BlogPostEditorComponent} from 'pages/blog-dashboard-page/blog-post-editor/blog-post-editor.component';
+import {UploadBlogPostThumbnailModalComponent} from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail-modal.component';
+import {BlogCardPreviewModalComponent} from 'pages/blog-dashboard-page/modal-templates/blog-card-preview-modal.component';
+import {UploadBlogPostThumbnailComponent} from 'pages/blog-dashboard-page/modal-templates/upload-blog-post-thumbnail.component';
+import {BlogPostEditorNavbarPreLogoActionComponent} from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   imports: [
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
     SharedComponentsModule,
     MatTabsModule,
     MatMenuModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
   ],
   declarations: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -52,7 +52,7 @@ import { CommonModule } from '@angular/common';
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent
+    BlogPostEditorNavbarPreLogoActionComponent,
   ],
   entryComponents: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -63,7 +63,7 @@ import { CommonModule } from '@angular/common';
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent
+    BlogPostEditorNavbarPreLogoActionComponent,
   ],
   exports: [
     BlogDashboardNavbarBreadcrumbComponent,
@@ -74,7 +74,7 @@ import { CommonModule } from '@angular/common';
     UploadBlogPostThumbnailModalComponent,
     BlogCardPreviewModalComponent,
     UploadBlogPostThumbnailComponent,
-    BlogPostEditorNavbarPreLogoActionComponent
+    BlogPostEditorNavbarPreLogoActionComponent,
   ],
 })
 export class SharedBlogComponentsModule {}

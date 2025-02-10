@@ -16,25 +16,27 @@
  * @fileoverview Component for the Story Editor Unpublish Modal Component.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-story-editor-unpublish-modal',
-  templateUrl: './story-editor-unpublish-modal.component.html'
+  templateUrl: './story-editor-unpublish-modal.component.html',
 })
 export class StoryEditorUnpublishModalComponent {
   constructor(
-     private platformFeatureService: PlatformFeatureService,
-     private activeModal: NgbActiveModal
+    private platformFeatureService: PlatformFeatureService,
+    private activeModal: NgbActiveModal
   ) {}
 
-  badContentReasonText: string = 'Bad content (no new explorations ' +
-    'will be added)';
+  unpublishedChapters: number[] = [];
 
-  splitChapterReasonText: string = 'Split Chapters' +
-    ' (requires new explorations to be added)';
+  badContentReasonText: string =
+    'Bad content (no new explorations ' + 'will be added)';
+
+  splitChapterReasonText: string =
+    'Split Chapters' + ' (requires new explorations to be added)';
 
   selectedReasonText: string = this.badContentReasonText;
   unpublishingReason: string = 'BAD_CONTENT';
@@ -44,13 +46,16 @@ export class StoryEditorUnpublishModalComponent {
   }
 
   confirm(): void {
-    this.activeModal.close();
+    if (this.isSerialChapterFeatureFlagEnabled()) {
+      this.activeModal.close(this.unpublishingReason);
+    } else {
+      this.activeModal.close();
+    }
   }
 
   isSerialChapterFeatureFlagEnabled(): boolean {
-    return (
-      this.platformFeatureService.
-        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   setReason(reason: string): void {

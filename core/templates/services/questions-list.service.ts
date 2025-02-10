@@ -17,20 +17,18 @@
  * questions list in editors.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { EventEmitter } from '@angular/core';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service';
-import { QuestionSummaryForOneSkill } from
-  'domain/question/question-summary-for-one-skill-object.model';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import {AppConstants} from 'app.constants';
+import {EventEmitter} from '@angular/core';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {QuestionSummaryForOneSkill} from 'domain/question/question-summary-for-one-skill-object.model';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QuestionsListService {
   private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
@@ -38,23 +36,25 @@ export class QuestionsListService {
   // Whether there are more questions available to fetch.
   private _moreQuestionsAvailable: boolean = true;
   private _currentPage: number = 0;
-  private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
-    new EventEmitter<void>());
+  private _questionSummartiesInitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter<void>();
 
   constructor(
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private questionBackendApiService: QuestionBackendApiService,
-    private truncatePipe: TruncatePipe) {}
+    private truncatePipe: TruncatePipe
+  ) {}
 
   private _setQuestionSummariesForOneSkill(
-      newQuestionSummaries: QuestionSummaryForOneSkill[],
-      resetHistory: boolean): void {
+    newQuestionSummaries: QuestionSummaryForOneSkill[],
+    resetHistory: boolean
+  ): void {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
     }
 
-    this._questionSummariesForOneSkill = (
-      this._questionSummariesForOneSkill.concat(newQuestionSummaries));
+    this._questionSummariesForOneSkill =
+      this._questionSummariesForOneSkill.concat(newQuestionSummaries);
 
     this._questionSummartiesInitializedEventEmitter.emit();
   }
@@ -74,11 +74,15 @@ export class QuestionsListService {
     return (
       this._moreQuestionsAvailable === false &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
-        this._questionSummariesForOneSkill.length);
+        this._questionSummariesForOneSkill.length
+    );
   }
 
-  getQuestionSummariesAsync(
-      skillId: string, fetchMore: boolean, resetHistory: boolean): void {
+  async getQuestionSummariesAsync(
+    skillId: string,
+    fetchMore: boolean,
+    resetHistory: boolean
+  ): Promise<void> {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
@@ -93,37 +97,43 @@ export class QuestionsListService {
 
     if (
       (this._currentPage + 1) * num >
-       this._questionSummariesForOneSkill.length &&
-       this._moreQuestionsAvailable === true && fetchMore) {
-      this.questionBackendApiService.fetchQuestionSummariesAsync(
-        skillId, this._nextOffsetForQuestions).then(response => {
-        let questionSummaries = response.questionSummaries.map(summary => {
-          return (
-            QuestionSummaryForOneSkill.
-              createFromBackendDict(summary));
-        });
+        this._questionSummariesForOneSkill.length &&
+      this._moreQuestionsAvailable === true &&
+      fetchMore
+    ) {
+      return this.questionBackendApiService
+        .fetchQuestionSummariesAsync(skillId, this._nextOffsetForQuestions)
+        .then(response => {
+          let questionSummaries = response.questionSummaries.map(summary => {
+            return QuestionSummaryForOneSkill.createFromBackendDict(summary);
+          });
 
-        this._changeNextQuestionsOffset(resetHistory);
-        this._setMoreQuestionsAvailable(response.more);
-        this._setQuestionSummariesForOneSkill(
-          questionSummaries, resetHistory);
-      });
+          this._changeNextQuestionsOffset(resetHistory);
+          this._setMoreQuestionsAvailable(response.more);
+          this._setQuestionSummariesForOneSkill(
+            questionSummaries,
+            resetHistory
+          );
+        });
     }
   }
 
   getCachedQuestionSummaries(): QuestionSummaryForOneSkill[] {
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
 
-    return this._questionSummariesForOneSkill.slice(
-      this._currentPage * num, (this._currentPage + 1) * num).map(question => {
-      const summary = this.formatRtePreviewPipe.transform(
-        question.getQuestionSummary().getQuestionContent());
+    return this._questionSummariesForOneSkill
+      .slice(this._currentPage * num, (this._currentPage + 1) * num)
+      .map(question => {
+        const summary = this.formatRtePreviewPipe.transform(
+          question.getQuestionSummary().getQuestionContent()
+        );
 
-      question.getQuestionSummary().setQuestionContent(
-        this.truncatePipe.transform(summary, 100));
+        question
+          .getQuestionSummary()
+          .setQuestionContent(this.truncatePipe.transform(summary, 100));
 
-      return question;
-    });
+        return question;
+      });
   }
 
   incrementPageNumber(): void {
@@ -147,6 +157,6 @@ export class QuestionsListService {
   }
 }
 
-angular.module('oppia').factory(
-  'QuestionsListService',
-  downgradeInjectable(QuestionsListService));
+angular
+  .module('oppia')
+  .factory('QuestionsListService', downgradeInjectable(QuestionsListService));

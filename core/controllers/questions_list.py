@@ -77,7 +77,7 @@ class QuestionsListHandler(
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(

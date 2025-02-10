@@ -16,19 +16,19 @@
  * @fileoverview Component for create new story modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { NewlyCreatedStory } from 'domain/topic/newly-created-story.model';
-import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {NewlyCreatedStory} from 'domain/topic/newly-created-story.model';
+import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
 
 @Component({
   selector: 'oppia-create-new-story-modal',
-  templateUrl: './create-new-story-modal.component.html'
+  templateUrl: './create-new-story-modal.component.html',
 })
 export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   constructor(
@@ -41,38 +41,38 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  validUrlFragmentRegex = new RegExp(
-    AppConstants.VALID_URL_FRAGMENT_REGEX);
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   story = NewlyCreatedStory.createDefault();
   MAX_CHARS_IN_STORY_TITLE = AppConstants.MAX_CHARS_IN_STORY_TITLE;
-  MAX_CHARS_IN_STORY_URL_FRAGMENT = (
-    AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT);
+  MAX_CHARS_IN_STORY_URL_FRAGMENT =
+    AppConstants.MAX_CHARS_IN_STORY_URL_FRAGMENT;
 
-  MAX_CHARS_IN_STORY_DESCRIPTION = (
-    AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION);
+  MAX_CHARS_IN_STORY_DESCRIPTION = AppConstants.MAX_CHARS_IN_STORY_DESCRIPTION;
 
-  allowedBgColors = (
-    AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story);
+  allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.story;
 
   storyUrlFragmentExists = false;
   hostname = this.windowRef.nativeWindow.location.hostname;
 
-  classroomUrlFragment = (
-    this.topicEditorStateService.getClassroomUrlFragment());
+  classroomUrlFragment = this.topicEditorStateService.getClassroomUrlFragment();
 
-  topicUrlFragment = (
-    this.topicEditorStateService.getTopic()?.getUrlFragment());
+  topicUrlFragment = this.topicEditorStateService.getTopic()?.getUrlFragment();
 
   onStoryUrlFragmentChange(): void {
     if (!this.story.urlFragment) {
       return;
     }
     this.storyEditorStateService.updateExistenceOfStoryUrlFragment(
-      this.story.urlFragment, () => {
-        this.storyUrlFragmentExists = (
-          this.storyEditorStateService.getStoryWithUrlFragmentExists());
-      });
+      this.story.urlFragment,
+      () => {
+        this.storyUrlFragmentExists =
+          this.storyEditorStateService.getStoryWithUrlFragmentExists();
+      },
+      () => {
+        return;
+      }
+    );
   }
 
   save(): void {
@@ -86,7 +86,8 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   isValid(): boolean {
     return Boolean(
       this.story.isValid() &&
-      this.imageLocalStorageService.getStoredImagesData().length > 0 &&
-      !this.storyUrlFragmentExists);
+        this.imageLocalStorageService.getStoredImagesData().length > 0 &&
+        !this.storyUrlFragmentExists
+    );
   }
 }

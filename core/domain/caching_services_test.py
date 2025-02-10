@@ -49,7 +49,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 53,
+        'states_schema_version': 56,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -76,6 +76,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
                 'linked_skill_id': None,
+                'inapplicable_skill_misconception_ids': [],
                 'interaction': {
                     'hints': [{
                         'hint_content': {
@@ -140,7 +141,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                 }
             }
         },
-        'correctness_feedback_enabled': False,
         'next_content_id_index': 7,
         'edits_allowed': True,
         'language_code': 'en',
@@ -153,9 +153,10 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, '
         '"next_content_id_index": 7, "tags"'
-        ': [], "states_schema_version": 53, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 56, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
-        'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
+        'ard_is_checkpoint": true, "inapplicable_skill_misconception_ids": [], '
+        '"interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
         'nges": [], "feedback": {"content_id": "feedback_4", "html": "<p>This i'
         's great! \\u00ae\\u00ae</p>"}, "dest": "Introduction", "dest_if_really'
@@ -180,7 +181,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '{"content_id": "content_0", "html": "<p>Unicode Characters '
         '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, '
         '"solicit_answer_details": false}}, "version": 0, '
-        '"correctness_feedback_enabled": false, "edits_allowed": true, "l'
+        '"edits_allowed": true, "l'
         'anguage_code": "en", "objective": "", "init_state_name": "Introduction'
         '", "blurb": "", "author_notes": ""}'
     )
@@ -574,75 +575,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         for namespace in caching_services.SERIALIZATION_FUNCTIONS:
             self.assertNotIn(caching_services.MEMCACHE_KEY_DELIMITER, namespace)
 
-    def test_config_properties_identically_cached_in_dev_and_test_environment(
-        self
-    ) -> None:
-        """Test to make sure that caching in the test environment is in sync
-        with caching in the main development server. More specifically, when a
-        config property is created with fields that contain unicode characters,
-        the resulting string that is set to the memory cache on the development
-        server should be the same as the string that is set to the testing cache
-        on the testing server.
-        """
-        def mock_memory_cache_services_set_multi(
-            id_value_mapping: Dict[str, str]
-        ) -> None:
-            # This mock asserts that for the same config domain attribute
-            # containing unicode characters, the string that is set to the cache
-            # in the testing environment is the same as the string set to the
-            # cache in the development environment.
-            for key, value in id_value_mapping.items():
-                self.assertEqual(key, 'config::email_footer')
-                self.assertEqual(
-                    value,
-                    '"You can change your email preferences via the <a href'
-                    '=\\"https://www.example.com\\">Preferences</a> page. '
-                    '\\u00a9\\u00a9\\u00ae\\u00ae"'
-                )
-
-        config_id = 'email_footer'
-
-        self.assertEqual(
-            caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_CONFIG, None,
-                [config_id]),
-            {})
-
-        with self.swap(
-            memory_cache_services, 'set_multi',
-            mock_memory_cache_services_set_multi
-        ):
-            caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_CONFIG, None,
-                {
-                    config_id: (
-                        'You can change your email preferences via the <a href'
-                        '="https://www.example.com">Preferences</a> page. ©©®®'
-                    )
-                })
-
-        cache_strings_response = caching_services.set_multi(
-            caching_services.CACHE_NAMESPACE_CONFIG, None,
-            {
-                config_id: (
-                    'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®'
-                )
-            })
-
-        self.assertTrue(cache_strings_response)
-
-        self.assertEqual(
-            caching_services.get_multi(
-                caching_services.CACHE_NAMESPACE_CONFIG, None,
-                [config_id]),
-            {
-                config_id: (
-                    'You can change your email preferences via the <a href'
-                    '="https://www.example.com">Preferences</a> page. ©©®®'
-                )
-            })
-
     def test_explorations_identically_cached_in_dev_and_test_environment(
         self
     ) -> None:
@@ -939,15 +871,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'rules': [
                 {
                     'filters': [
-                        {'type': 'server_mode', 'conditions': [['=', 'prod']]}],
+                        {
+                            'type': 'platform_type',
+                            'conditions': [['=', 'Backend']]
+                        }
+                    ],
                     'value_when_matched': True
                 }
             ],
             'rule_schema_version': (
                 feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': False,
-            'is_feature': True,
-            'feature_stage': 'test 😍',
+            'default_value': False
         })
 
         caching_services.set_multi(

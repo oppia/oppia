@@ -32,6 +32,11 @@
              [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
              [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
              (change)="onTopicUrlFragmentChange()">
+      <div class="oppia-input-box-subtitle text-danger" [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)">
+        <b>
+          Please use only lowercase letters, optionally separated by hyphen.
+        </b>
+      </div>
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
@@ -52,6 +57,7 @@
       <div>
         <input class="e2e-test-new-page-title-fragm-field required"
                [(ngModel)]="newlyCreatedTopic.pageTitleFragment"
+               [maxlength]="maxWebTitleFrag"
                [ngModelOptions]="{standalone: true}">
       </div>
       <span class="oppia-input-box-subtitle">

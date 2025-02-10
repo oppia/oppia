@@ -16,27 +16,40 @@
  * @fileoverview Unit tests for the Blog Author Profile Page component.
  */
 
-import { Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { BlogAuthorProfilePageComponent } from 'pages/blog-author-profile-page/blog-author-profile-page.component';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BlogAuthorProfilePageData, BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { BlogAuthorProfilePageConstants } from './blog-author-profile-page.constants';
-import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
-import { AlertsService } from 'services/alerts.service';
-import { UserService } from 'services/user.service';
+import {Pipe} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {BlogAuthorProfilePageComponent} from 'pages/blog-author-profile-page/blog-author-profile-page.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {
+  BlogAuthorProfilePageData,
+  BlogHomePageBackendApiService,
+} from 'domain/blog/blog-homepage-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
+import {BlogAuthorProfilePageConstants} from './blog-author-profile-page.constants';
+import {
+  BlogPostSummary,
+  BlogPostSummaryBackendDict,
+} from 'domain/blog/blog-post-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AlertsService} from 'services/alerts.service';
+import {UserService} from 'services/user.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -55,6 +68,7 @@ describe('Blog home page component', () => {
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let urlService: UrlService;
+  let urlInterpolationService: UrlInterpolationService;
   let loaderService: LoaderService;
   let blogHomePageBackendApiService: BlogHomePageBackendApiService;
   let blogAuthorProfilePageDataObject: BlogAuthorProfilePageData;
@@ -89,14 +103,14 @@ describe('Blog home page component', () => {
         BlogAuthorProfilePageComponent,
         BlogCardComponent,
         MockTranslatePipe,
-        MockTruncatePipe
+        MockTruncatePipe,
       ],
       providers: [
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
+          useClass: MockWindowDimensionsService,
         },
-        LoaderService
+        LoaderService,
       ],
     }).compileComponents();
   }));
@@ -107,13 +121,14 @@ describe('Blog home page component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     alertsService = TestBed.inject(AlertsService);
     blogHomePageBackendApiService = TestBed.inject(
-      BlogHomePageBackendApiService);
+      BlogHomePageBackendApiService
+    );
     urlService = TestBed.inject(UrlService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     loaderService = TestBed.inject(LoaderService);
     userService = TestBed.inject(UserService);
-    blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
-      blogPostSummary
-    );
+    blogPostSummaryObject =
+      BlogPostSummary.createFromBackendDict(blogPostSummary);
     blogAuthorProfilePageDataObject = {
       displayedAuthorName: 'author',
       authorBio: 'author Bio',
@@ -123,9 +138,9 @@ describe('Blog home page component', () => {
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(urlService, 'getBlogAuthorUsernameFromUrl').and.returnValue(
-      'authorUsername');
+      'authorUsername'
+    );
   });
-
 
   it('should initialize', () => {
     spyOn(component, 'loadInitialBlogAuthorProfilePageData');
@@ -135,105 +150,118 @@ describe('Blog home page component', () => {
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(component.authorUsername).toBe('authorUsername');
     expect(component.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE).toBe(
-      BlogAuthorProfilePageConstants
-        .MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE
+      BlogAuthorProfilePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE
     );
     expect(component.loadInitialBlogAuthorProfilePageData).toHaveBeenCalled();
   });
 
-  it('should load blog author profile page data with no published blog post ' +
-  'summary', fakeAsync(() => {
-    spyOn(blogHomePageBackendApiService, 'fetchBlogAuthorProfilePageDataAsync')
-      .and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
-
-    expect(component.noResultsFound).toBeUndefined();
-
-    component.ngOnInit();
-    component.loadInitialBlogAuthorProfilePageData();
-
-    expect(blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync)
-      .toHaveBeenCalledWith('authorUsername', '0');
-
-    tick();
-    expect(component.noResultsFound).toBeTrue();
-
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should load blog author profile page data with published blog post ' +
-  'summary', fakeAsync(() => {
-    blogAuthorProfilePageDataObject.blogPostSummaries = [blogPostSummaryObject];
-    blogAuthorProfilePageDataObject.numOfBlogPostSummaries = 1;
-
-    spyOn(blogHomePageBackendApiService, 'fetchBlogAuthorProfilePageDataAsync')
-      .and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
-
-    component.ngOnInit();
-    component.loadInitialBlogAuthorProfilePageData();
-
-    expect(blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync)
-      .toHaveBeenCalledWith('authorUsername', '0');
-
-    tick();
-
-    expect(component.noResultsFound).toBeFalse();
-    expect(component.totalBlogPosts).toBe(1);
-    expect(component.authorName).toBe('author');
-    expect(component.authorBio).toBe('author Bio');
-    expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
-    expect(component.authorProfilePicPngUrl).toBe('default-image-url-png');
-    expect(component.authorProfilePicWebpUrl).toBe('default-image-url-webp');
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should succesfully load multiple blog home pages data',
+  it(
+    'should load blog author profile page data with no published blog post ' +
+      'summary',
     fakeAsync(() => {
-      component.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE = 1;
-      component.authorUsername = 'authorUsername';
-      blogAuthorProfilePageDataObject.numOfBlogPostSummaries = 3;
-      blogAuthorProfilePageDataObject.blogPostSummaries = [
-        blogPostSummaryObject
-      ];
-      spyOn(alertsService, 'addWarning');
       spyOn(
         blogHomePageBackendApiService,
         'fetchBlogAuthorProfilePageDataAsync'
       ).and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
 
+      expect(component.noResultsFound).toBeUndefined();
+
+      component.ngOnInit();
       component.loadInitialBlogAuthorProfilePageData();
+
+      expect(
+        blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync
+      ).toHaveBeenCalledWith('authorUsername', '0');
+
+      tick();
+      expect(component.noResultsFound).toBeTrue();
+
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should load blog author profile page data with published blog post ' +
+      'summary',
+    fakeAsync(() => {
+      blogAuthorProfilePageDataObject.blogPostSummaries = [
+        blogPostSummaryObject,
+      ];
+      blogAuthorProfilePageDataObject.numOfBlogPostSummaries = 1;
+
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogAuthorProfilePageDataAsync'
+      ).and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+        'default-image-url-png',
+        'default-image-url-webp',
+      ]);
+
+      component.ngOnInit();
+      component.loadInitialBlogAuthorProfilePageData();
+
+      expect(
+        blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync
+      ).toHaveBeenCalledWith('authorUsername', '0');
+
       tick();
 
-      expect(component.totalBlogPosts).toBe(3);
       expect(component.noResultsFound).toBeFalse();
+      expect(component.totalBlogPosts).toBe(1);
+      expect(component.authorName).toBe('author');
+      expect(component.authorBio).toBe('author Bio');
       expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
-      expect(component.blogPostSummariesToShow).toEqual(
-        [blogPostSummaryObject]);
-      expect(component.lastPostOnPageNum).toBe(1);
+      expect(component.authorProfilePicPngUrl).toBe('default-image-url-png');
+      expect(component.authorProfilePicWebpUrl).toBe('default-image-url-webp');
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    })
+  );
 
-      component.page = 2;
-      component.loadMoreBlogPostSummaries(1);
-      tick();
+  it('should succesfully load multiple blog home pages data', fakeAsync(() => {
+    component.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE = 1;
+    component.authorUsername = 'authorUsername';
+    blogAuthorProfilePageDataObject.numOfBlogPostSummaries = 3;
+    blogAuthorProfilePageDataObject.blogPostSummaries = [blogPostSummaryObject];
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogAuthorProfilePageDataAsync'
+    ).and.returnValue(Promise.resolve(blogAuthorProfilePageDataObject));
 
-      expect(blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync)
-        .toHaveBeenCalledWith('authorUsername', '1');
-      expect(component.totalBlogPosts).toBe(3);
-      expect(component.blogPostSummaries).toEqual(
-        [blogPostSummaryObject, blogPostSummaryObject]);
-      expect(component.blogPostSummariesToShow).toEqual(
-        [blogPostSummaryObject]);
-      expect(component.lastPostOnPageNum).toBe(2);
+    component.loadInitialBlogAuthorProfilePageData();
+    tick();
 
-      expect(alertsService.addWarning).not.toHaveBeenCalled();
-    }));
+    expect(component.totalBlogPosts).toBe(3);
+    expect(component.noResultsFound).toBeFalse();
+    expect(component.blogPostSummaries).toEqual([blogPostSummaryObject]);
+    expect(component.blogPostSummariesToShow).toEqual([blogPostSummaryObject]);
+    expect(component.lastPostOnPageNum).toBe(1);
+
+    component.page = 2;
+    component.loadMoreBlogPostSummaries(1);
+    tick();
+
+    expect(
+      blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync
+    ).toHaveBeenCalledWith('authorUsername', '1');
+    expect(component.totalBlogPosts).toBe(3);
+    expect(component.blogPostSummaries).toEqual([
+      blogPostSummaryObject,
+      blogPostSummaryObject,
+    ]);
+    expect(component.blogPostSummariesToShow).toEqual([blogPostSummaryObject]);
+    expect(component.lastPostOnPageNum).toBe(2);
+
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  }));
 
   it('should load data for page on changing page', () => {
     spyOn(component, 'loadMoreBlogPostSummaries');
     component.totalBlogPosts = 5;
     component.blogPostSummaries = [
       blogPostSummaryObject,
-      blogPostSummaryObject
+      blogPostSummaryObject,
     ];
     component.ngOnInit();
     component.MAX_NUM_CARD_TO_DISPLAY_ON_PAGE = 2;
@@ -254,7 +282,7 @@ describe('Blog home page component', () => {
     // Adding blog post summaries for page 2.
     component.blogPostSummaries = component.blogPostSummaries.concat([
       blogPostSummaryObject,
-      blogPostSummaryObject
+      blogPostSummaryObject,
     ]);
     component.showBlogPostCardsLoadingScreen = false;
 
@@ -269,7 +297,7 @@ describe('Blog home page component', () => {
     expect(component.lastPostOnPageNum).toBe(5);
     // Adding blog post summaries for page 3.
     component.blogPostSummaries = component.blogPostSummaries.concat([
-      blogPostSummaryObject
+      blogPostSummaryObject,
     ]);
     component.showBlogPostCardsLoadingScreen = false;
 
@@ -286,55 +314,78 @@ describe('Blog home page component', () => {
     expect(component.blogPostSummariesToShow.length).toBe(2);
   });
 
-  it('should use reject handler if fetching blog home page data fails',
+  it('should use reject handler if fetching blog home page data fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogAuthorProfilePageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Backend error'},
+        status: 500,
+      })
+    );
+    component.authorUsername = 'authorUsername';
+
+    component.loadInitialBlogAuthorProfilePageData();
+
+    expect(
+      blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync
+    ).toHaveBeenCalledWith('authorUsername', '0');
+
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to get blog author profile page data.Error: Backend error'
+    );
+  }));
+
+  it(
+    'should use reject handler if fetching data for loading more published' +
+      'blog post fails',
     fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(
         blogHomePageBackendApiService,
         'fetchBlogAuthorProfilePageDataAsync'
-      ).and.returnValue(Promise.reject({
-        error: {error: 'Backend error'},
-        status: 500
-      }));
+      ).and.returnValue(
+        Promise.reject({
+          error: {error: 'Backend error'},
+          status: 500,
+        })
+      );
+
       component.authorUsername = 'authorUsername';
+      component.loadMoreBlogPostSummaries(1);
 
-      component.loadInitialBlogAuthorProfilePageData();
-
-      expect(blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync)
-        .toHaveBeenCalledWith('authorUsername', '0');
+      expect(
+        blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync
+      ).toHaveBeenCalledWith('authorUsername', '1');
 
       tick();
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get blog author profile page data.Error: Backend error');
-    }));
-
-  it('should use reject handler if fetching data for loading more published' +
-  'blog post fails', fakeAsync(() => {
-    spyOn(alertsService, 'addWarning');
-    spyOn(blogHomePageBackendApiService, 'fetchBlogAuthorProfilePageDataAsync')
-      .and.returnValue(Promise.reject({
-        error: {error: 'Backend error'},
-        status: 500
-      }));
-
-    component.authorUsername = 'authorUsername';
-    component.loadMoreBlogPostSummaries(1);
-
-    expect(blogHomePageBackendApiService.fetchBlogAuthorProfilePageDataAsync)
-      .toHaveBeenCalledWith('authorUsername', '1');
-
-    tick();
-
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Failed to get blog author page data.Error: Backend error');
-  }));
+        'Failed to get blog author page data.Error: Backend error'
+      );
+    })
+  );
 
   it('should determine if small screen view is active', () => {
-    const windowWidthSpy =
-      spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
+    const windowWidthSpy = spyOn(
+      windowDimensionsService,
+      'getWidth'
+    ).and.returnValue(766);
     expect(component.isSmallScreenViewActive()).toBe(true);
     windowWidthSpy.and.returnValue(1028);
     expect(component.isSmallScreenViewActive()).toBe(false);
+  });
+
+  it('should get static asset image url', () => {
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('image_url');
+
+    expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
   });
 });

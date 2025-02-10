@@ -16,16 +16,18 @@
  * @fileoverview Component for the questions tab.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Rubric } from 'domain/skill/rubric.model';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { Subscription } from 'rxjs';
-import { GroupedSkillSummaries, SkillEditorStateService } from '../services/skill-editor-state.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Rubric} from 'domain/skill/rubric.model';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Subscription} from 'rxjs';
+import {
+  GroupedSkillSummaries,
+  SkillEditorStateService,
+} from '../services/skill-editor-state.service';
 
 @Component({
   selector: 'oppia-questions-tab',
-  templateUrl: './skill-questions-tab.component.html'
+  templateUrl: './skill-questions-tab.component.html',
 })
 export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   // These properties below are initialized using Angular lifecycle hooks
@@ -35,18 +37,15 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToRubricsObject: Record<string, Rubric[]> = {};
 
-  constructor(
-    private skillEditorStateService: SkillEditorStateService
-  ) {}
+  constructor(private skillEditorStateService: SkillEditorStateService) {}
 
   directiveSubscriptions = new Subscription();
   _init(): void {
     this.skill = this.skillEditorStateService.getSkill();
-    this.groupedSkillSummaries = (
-      this.skillEditorStateService.getGroupedSkillSummaries());
+    this.groupedSkillSummaries =
+      this.skillEditorStateService.getGroupedSkillSummaries();
     this.skillIdToRubricsObject = {};
-    this.skillIdToRubricsObject[this.skill.getId()] =
-      this.skill.getRubrics();
+    this.skillIdToRubricsObject[this.skill.getId()] = this.skill.getRubrics();
   }
 
   ngOnInit(): void {
@@ -54,8 +53,7 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
       this._init();
     }
     this.directiveSubscriptions.add(
-      this.skillEditorStateService.onSkillChange.subscribe(
-        () => this._init())
+      this.skillEditorStateService.onSkillChange.subscribe(() => this._init())
     );
   }
 
@@ -63,8 +61,3 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaQuestionsTab',
-  downgradeComponent({
-    component: SkillQuestionsTabComponent
-  }) as angular.IDirectiveFactory);

@@ -21,66 +21,108 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
-var CreatorDashboardPage = require(
-  '../webdriverio_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage = require(
-  '../webdriverio_utils/ExplorationEditorPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 
-describe('Exploration translation and voiceover tab', function() {
+describe('Exploration translation and voiceover tab', function () {
+  var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorTranslationTab = null;
+  var releaseCoordinatorPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationPreviewTab = explorationEditorPage.getPreviewTab();
+    adminPage = new AdminPage.AdminPage();
+    releaseCoordinatorPage =
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
-    await users.createUser(
-      'voiceArtist@translationTab.com', 'userVoiceArtist');
+    await users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
     await users.createUserWithRole(
-      'voiceoverAdmin@exp.com', 'voiceoverManager', 'voiceover admin');
+      'voiceoverAdmin@exp.com',
+      'voiceoverManager',
+      'voiceover admin'
+    );
+
+    await users.createAndLoginCurriculumAdminUser(
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
+    );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    await users.logout();
+
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
 
     await explorationEditorMainTab.setStateName('first');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'This is first card.'), true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('This is first card.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
-      'NumericInput', await forms.toRichText('This is feedback1.'),
-      'second', true, 'Equals', 6);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText(
-      'This is default_outcome.'));
+      'NumericInput',
+      await forms.toRichText('This is feedback1.'),
+      'second',
+      true,
+      'Equals',
+      6
+    );
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
+    await responseEditor.setFeedback(
+      await forms.toRichText('This is default_outcome.')
+    );
     await explorationEditorMainTab.addHint('This is hint1.');
     await explorationEditorMainTab.addHint('This is hint2.');
     await explorationEditorMainTab.addSolution('NumericInput', {
       correctAnswer: 6,
-      explanation: 'This is solution.'
+      explanation: 'This is solution.',
     });
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('This is second card.'), true);
+      await forms.toRichText('This is second card.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('Continue');
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
     await explorationEditorMainTab.moveToState('final card');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('This is final card.'), true);
+      await forms.toRichText('This is final card.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.saveChanges('Done!');
     await explorationEditorPage.publishCardExploration(
-      'Test Exploration', 'Run tests using same exploration.', 'Algorithms',
-      'English', ['maths']);
+      'Test Exploration',
+      'Run tests using same exploration.',
+      'Algorithms',
+      'English',
+      ['maths']
+    );
     var explorationId = await general.getExplorationIdFromEditor();
     await users.logout();
     await users.login('voiceoverAdmin@exp.com');
@@ -90,43 +132,40 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it('should walkthrough translation tutorial when user clicks next',
-    async function() {
-      await users.login('user@editorTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.startTutorial();
-      await explorationEditorTranslationTab.playTutorial();
-      await explorationEditorTranslationTab.finishTutorial();
-      await users.logout();
+  it('should walkthrough translation tutorial when user clicks next', async function () {
+    await users.login('user@editorTab.com');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration('Test Exploration');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.startTutorial();
+    await explorationEditorTranslationTab.playTutorial();
+    await explorationEditorTranslationTab.finishTutorial();
+    await users.logout();
 
-      await users.login('voiceArtist@translationTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorMainTab.exitTutorial();
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.startTutorial();
-      await explorationEditorTranslationTab.playTutorial();
-      await explorationEditorTranslationTab.finishTutorial();
-      await users.logout();
-    });
+    await users.login('voiceArtist@translationTab.com');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration('Test Exploration');
+    await explorationEditorMainTab.exitTutorial();
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.startTutorial();
+    await explorationEditorTranslationTab.playTutorial();
+    await explorationEditorTranslationTab.finishTutorial();
+    await users.logout();
+  });
 
-  it('should cache the selected language for translation and voiceover',
-    async function() {
-      await users.login('voiceArtist@translationTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.expectSelectedLanguageToBe(
-        'English');
-      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-      await browser.refresh();
-      await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
-      await users.logout();
-    });
+  it('should cache the selected language for translation and voiceover', async function () {
+    await users.login('voiceArtist@translationTab.com');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration('Test Exploration');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.expectSelectedLanguageToBe('English');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
+    await browser.refresh();
+    await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
+    await users.logout();
+  });
 
-  it('should have voiceover as a default mode', async function() {
+  it('should have voiceover as a default mode', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -136,25 +175,30 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  it('should have all the state contents for voiceover in exploration language',
-    async function() {
-      await users.login('voiceArtist@translationTab.com');
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration('Test Exploration');
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.changeLanguage('English');
-      await explorationEditorTranslationTab.expectContentTabContentToMatch(
-        'This is first card.');
-      await explorationEditorTranslationTab.expectFeedbackTabContentsToMatch(
-        ['This is feedback1.', 'This is default_outcome.']);
-      await explorationEditorTranslationTab.expectSolutionTabContentToMatch(
-        'This is solution.');
-      await explorationEditorTranslationTab.expectHintsTabContentsToMatch(
-        ['This is hint1.', 'This is hint2.']);
-      await users.logout();
-    });
+  it('should have all the state contents for voiceover in exploration language', async function () {
+    await users.login('voiceArtist@translationTab.com');
+    await creatorDashboardPage.get();
+    await creatorDashboardPage.editExploration('Test Exploration');
+    await explorationEditorPage.navigateToTranslationTab();
+    await explorationEditorTranslationTab.changeLanguage('English');
+    await explorationEditorTranslationTab.expectContentTabContentToMatch(
+      'This is first card.'
+    );
+    await explorationEditorTranslationTab.expectFeedbackTabContentsToMatch([
+      'This is feedback1.',
+      'This is default_outcome.',
+    ]);
+    await explorationEditorTranslationTab.expectSolutionTabContentToMatch(
+      'This is solution.'
+    );
+    await explorationEditorTranslationTab.expectHintsTabContentsToMatch([
+      'This is hint1.',
+      'This is hint2.',
+    ]);
+    await users.logout();
+  });
 
-  it('should contain accessibility elements', async function() {
+  it('should contain accessibility elements', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -162,25 +206,33 @@ describe('Exploration translation and voiceover tab', function() {
     let expEditorTranslationTab = explorationEditorTranslationTab;
 
     await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '0 items translated out of 9 items');
+      '0 items translated out of 9 items'
+    );
     await expEditorTranslationTab.expectContentAccessibilityToMatch(
-      'Content of the card');
+      'Content of the card'
+    );
     await expEditorTranslationTab.expectFeedbackAccessibilityToMatch(
-      'Feedback responses for answer groups');
+      'Feedback responses for answer groups'
+    );
     await expEditorTranslationTab.expectHintAccessibilityToMatch(
-      'Hints for the state');
+      'Hints for the state'
+    );
     await expEditorTranslationTab.expectSolutionAccessibilityToMatch(
-      'Solutions for the state');
+      'Solutions for the state'
+    );
     await expEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
-      'Start recording');
+      'Start recording'
+    );
     await expEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-      'Upload voiceovered file');
+      'Upload voiceovered file'
+    );
     await expEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
-      'Play recorded audio');
+      'Play recorded audio'
+    );
     await users.logout();
   });
 
-  it('should change translation language correctly', async function() {
+  it('should change translation language correctly', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
@@ -190,7 +242,7 @@ describe('Exploration translation and voiceover tab', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

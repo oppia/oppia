@@ -1,9 +1,40 @@
 <div>
-  <background-banner></background-banner>
-  <div class="embedded-body" *ngIf="pageIsIframed">
-    <oppia-conversation-skin></oppia-conversation-skin>
+  <div *ngIf="isLoadingExploration" class="loader-container">
+    <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
   </div>
-  <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
-  <attribution-guide></attribution-guide>
-  <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
+  <background-banner *ngIf="!isLoadingExploration"></background-banner>
+  <div *ngIf="explorationIsUnpublished" class="oppia-unpublished-exploration-banner">
+    <p>
+      {{ 'I18N_PLAYER_UNPUBLISHED_EXPLORATION_BANNER' | translate }}
+    </p>
+  </div>
+  <div *ngIf="voiceoversAreLoaded">
+    <div class="embedded-body" *ngIf="pageIsIframed">
+      <div class="navbar-container">
+        <oppia-top-navigation-bar></oppia-top-navigation-bar>
+      </div>
+      <oppia-conversation-skin></oppia-conversation-skin>
+    </div>
+    <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
+    <attribution-guide></attribution-guide>
+    <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
+  </div>
 </div>
+
+<style>
+  .oppia-unpublished-exploration-banner {
+    align-items: center;
+    background-color: #015f9c ;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    position: absolute;
+    text-align: center;
+    width: 100vw;
+  }
+  .navbar-container {
+    background-color: #00645c;
+    padding: 0 10px;
+  }
+</style>

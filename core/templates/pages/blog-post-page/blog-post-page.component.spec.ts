@@ -16,29 +16,29 @@
  * @fileoverview Unit tests for Blog Home Page Component.
  */
 
-import { Pipe } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BlogPostPageComponent } from 'pages/blog-post-page/blog-post-page.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UrlService } from 'services/contextual/url.service';
-import { BlogCardComponent } from 'pages/blog-dashboard-page/blog-card/blog-card.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
+import {Pipe} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {BlogPostPageComponent} from 'pages/blog-post-page/blog-post-page.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlService} from 'services/contextual/url.service';
+import {BlogCardComponent} from 'pages/blog-dashboard-page/blog-card/blog-card.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserService} from 'services/user.service';
 
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
-import { SharingLinksComponent } from 'components/common-layout-directives/common-elements/sharing-links.component';
-import { BlogPostPageService } from './services/blog-post-page.service';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
+import {SharingLinksComponent} from 'components/common-layout-directives/common-elements/sharing-links.component';
+import {BlogPostPageService} from './services/blog-post-page.service';
 
 @Pipe({name: 'truncate'})
 class MockTruncatePipe {
@@ -55,8 +55,8 @@ class MockWindowRef {
       toString() {
         return 'http://localhost/test_path';
       },
-      reload: () => { }
-    }
+      reload: () => {},
+    },
   };
 }
 
@@ -92,19 +92,19 @@ describe('Blog home page component', () => {
         BlogCardComponent,
         MockTranslatePipe,
         MockTruncatePipe,
-        SharingLinksComponent
+        SharingLinksComponent,
       ],
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
+          useClass: MockWindowDimensionsService,
         },
         LoaderService,
-        BlogPostPageService
+        BlogPostPageService,
       ],
     }).compileComponents();
   }));
@@ -124,9 +124,7 @@ describe('Blog home page component', () => {
   });
 
   it('should get the blog post page url', () => {
-    expect(component.getPageUrl()).toBe(
-      'http://localhost/blog/blog-test'
-    );
+    expect(component.getPageUrl()).toBe('http://localhost/blog/blog-test');
   });
 
   it('should run the copy command successfully', () => {
@@ -136,34 +134,32 @@ describe('Blog home page component', () => {
     dummyDivElement.appendChild(dummyTextNode);
     let dummyDocumentFragment = document.createDocumentFragment();
     dummyDocumentFragment.appendChild(dummyDivElement);
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs('class-name').and.returnValue(dummyDocumentFragment.children);
+    spyOn(document, 'getElementsByClassName')
+      .withArgs('class-name')
+      .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
     spyOn($.fn, 'tooltip');
     component.copyLink('class-name');
     expect(document.execCommand).toHaveBeenCalled();
   });
 
-  it('should get formatted date string from the timestamp in milliseconds',
-    () => {
-      // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      let DATE = '11/21/2014';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('November 21, 2014');
+  it('should get formatted date string from the timestamp in milliseconds', () => {
+    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
+    let DATE = '11/21/2014';
+    expect(component.getDateStringInWords(DATE)).toBe('November 21, 2014');
 
-      DATE = '01/16/2027';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('January 16, 2027');
+    DATE = '01/16/2027';
+    expect(component.getDateStringInWords(DATE)).toBe('January 16, 2027');
 
-      DATE = '02/02/2018';
-      expect(component.getDateStringInWords(DATE))
-        .toBe('February 2, 2018');
-    });
+    DATE = '02/02/2018';
+    expect(component.getDateStringInWords(DATE)).toBe('February 2, 2018');
+  });
 
   it('should determine if small screen view is active', () => {
-    const windowWidthSpy =
-      spyOn(windowDimensionsService, 'getWidth').and.returnValue(766);
+    const windowWidthSpy = spyOn(
+      windowDimensionsService,
+      'getWidth'
+    ).and.returnValue(766);
     expect(component.isSmallScreenViewActive()).toBe(true);
     windowWidthSpy.and.returnValue(1028);
     expect(component.isSmallScreenViewActive()).toBe(false);
@@ -182,16 +178,20 @@ describe('Blog home page component', () => {
       published_on: '11/21/2014, 09:45:00',
     };
     let blogPostData = BlogPostData.createFromBackendDict(
-      sampleBlogPostBackendDict);
+      sampleBlogPostBackendDict
+    );
     component.blogPostPageData = {
       authorUsername: 'test_username',
       blogPostDict: blogPostData,
       summaryDicts: [],
     };
-    spyOn(urlService, 'getBlogPostUrlFromUrl').
-      and.returnValue('sample-post-url');
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(urlService, 'getBlogPostUrlFromUrl').and.returnValue(
+      'sample-post-url'
+    );
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
 
     component.ngOnInit();
 
@@ -207,12 +207,14 @@ describe('Blog home page component', () => {
 
   it('should navigate to author profile page', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/blog/author/test-username');
+      '/blog/author/test-username'
+    );
     component.authorUsername = 'test-username';
 
     component.navigateToAuthorProfilePage();
 
     expect(mockWindowRef.nativeWindow.location.href).toEqual(
-      '/blog/author/test-username');
+      '/blog/author/test-username'
+    );
   });
 });

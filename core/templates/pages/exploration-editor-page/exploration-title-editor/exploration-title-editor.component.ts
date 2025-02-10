@@ -16,17 +16,23 @@
  * @fileoverview Component for the exploration title field in forms.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { AppConstants } from 'app.constants';
-import { ExplorationTitleService } from '../services/exploration-title.service';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {AppConstants} from 'app.constants';
+import {ExplorationTitleService} from '../services/exploration-title.service';
 
 @Component({
   selector: 'oppia-exploration-title-editor',
-  templateUrl: './exploration-title-editor.component.html'
+  templateUrl: './exploration-title-editor.component.html',
 })
 export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -45,23 +51,21 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   constructor(
     public explorationTitleService: ExplorationTitleService,
     private focusManagerService: FocusManagerService,
-    private routerService: RouterService,
-  ) { }
+    private routerService: RouterService
+  ) {}
 
   inputFieldBlur(): void {
     this.onInputFieldBlur.emit();
   }
 
   ngOnInit(): void {
-    this.MAX_CHARS_IN_EXPLORATION_TITLE = (
-      AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE);
+    this.MAX_CHARS_IN_EXPLORATION_TITLE =
+      AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE;
 
     this.directiveSubscriptions.add(
-      this.routerService.onRefreshSettingsTab.subscribe(
-        () => {
-          this.focusManagerService.setFocus(this.focusLabel);
-        }
-      )
+      this.routerService.onRefreshSettingsTab.subscribe(() => {
+        this.focusManagerService.setFocus(this.focusLabel);
+      })
     );
   }
 
@@ -69,8 +73,3 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationTitleEditor', downgradeComponent({
-    component: ExplorationTitleEditorComponent
-  }));

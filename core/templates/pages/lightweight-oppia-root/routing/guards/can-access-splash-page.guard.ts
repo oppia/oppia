@@ -16,13 +16,13 @@
  * @fileoverview Route guard for validating access to splash page.
  */
 
-import { Injectable } from '@angular/core';
-import { CanLoad, Route, UrlSegment } from '@angular/router';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserService } from 'services/user.service';
+import {Injectable} from '@angular/core';
+import {CanLoad, Route, UrlSegment} from '@angular/router';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UserService} from 'services/user.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CanAccessSplashPageGuard implements CanLoad {
   constructor(
@@ -31,22 +31,25 @@ export class CanAccessSplashPageGuard implements CanLoad {
   ) {}
 
   canLoad(route: Route, segments: UrlSegment[]): Promise<boolean> {
-    return this.userService.getUserInfoAsync().then((userInfo) => {
-      if (userInfo.isLoggedIn()) {
-        this.userService.getUserPreferredDashboardAsync().then(
-          (preferredDashboard) => {
-          // Use router.navigate once both learner dashbaord page and
-          // creator dashboard page are migrated to angular router.
-            this.windowRef.nativeWindow.location.href = (
-              '/' + preferredDashboard + '-dashboard');
-          }
-        );
-        return false;
-      } else {
+    return this.userService.getUserInfoAsync().then(
+      userInfo => {
+        if (userInfo.isLoggedIn()) {
+          this.userService
+            .getUserPreferredDashboardAsync()
+            .then(preferredDashboard => {
+              // Use router.navigate once both learner dashbaord page and
+              // creator dashboard page are migrated to angular router.
+              this.windowRef.nativeWindow.location.href =
+                '/' + preferredDashboard + '-dashboard';
+            });
+          return false;
+        } else {
+          return true;
+        }
+      },
+      () => {
         return true;
       }
-    }, () => {
-      return true;
-    });
+    );
   }
 }

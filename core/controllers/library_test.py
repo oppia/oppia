@@ -344,6 +344,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=missing-'
+            'outer-parens&language_code=%28%22en%22%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'category\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
@@ -356,6 +359,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28missing-'
+            'inner-quotes%29&language_code=%28%22en%22%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'category\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'
@@ -369,6 +375,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28%22A+'
+            'category%22%29&language_code=missing-outer-parens\' '
+            'these errors are happening:\n'
             'Schema validation for \'language_code\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
@@ -381,6 +390,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28%22A+'
+            'category%22%29&language_code=%28missing-inner-quotes%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'language_code\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'
@@ -411,10 +423,12 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         # Change the user's preferred language to de.
-        self.put_json(
-            feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
-            csrf_token=csrf_token)
+        self.put_json(feconf.PREFERENCES_DATA_URL, {
+            'updates': [{
+                'update_type': 'preferred_language_codes',
+                'data': ['de']
+            }]
+        }, csrf_token=csrf_token)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
@@ -542,10 +556,12 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
-            feconf.PREFERENCES_DATA_URL,
-            {'update_type': 'preferred_language_codes', 'data': ['de']},
-            csrf_token=csrf_token)
+        self.put_json(feconf.PREFERENCES_DATA_URL, {
+            'updates': [{
+                'update_type': 'preferred_language_codes',
+                'data': ['de']
+            }]
+        }, csrf_token=csrf_token)
 
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,

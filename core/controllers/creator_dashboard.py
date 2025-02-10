@@ -95,21 +95,6 @@ class OldCreatorDashboardRedirectPage(
         self.redirect(feconf.CREATOR_DASHBOARD_URL, permanent=True)
 
 
-class CreatorDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the user's creator dashboard."""
-
-    ADDITIONAL_DEPENDENCY_IDS = ['codemirror']
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_creator_dashboard
-    def get(self) -> None:
-
-        self.render_template('creator-dashboard-page.mainpage.html')
-
-
 class CreatorDashboardHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of CreatorDashboardHandler's normalized_payload
     dictionary.
@@ -178,9 +163,6 @@ class CreatorDashboardHandler(
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
-        # TODO(bhenning): Update this to use unresolved answers from
-        # stats_services once the training interface is enabled and it's cheaper
-        # to retrieve top answers from stats_services.
         displayable_exploration_summary_dicts: List[
             DisplayableExplorationSummaryDict
         ] = []
@@ -355,8 +337,10 @@ class CreatorDashboardHandler(
         assert self.normalized_payload is not None
         creator_dashboard_display_pref = self.normalized_payload[
             'display_preference']
-        user_services.update_user_creator_dashboard_display(
-            self.user_id, creator_dashboard_display_pref)
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings.creator_dashboard_display_pref = (
+            creator_dashboard_display_pref)
+        user_services.save_user_settings(user_settings)
         self.render_json({})
 
 

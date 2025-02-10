@@ -55,7 +55,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'translation_counts': {},
                     'language_codes_needing_voice_artists': ['en'],
                     'language_codes_with_assigned_voice_artists': ['hi'],
-                    'translation_in_review_counts': {}
+                    'translation_in_review_counts': {},
+                    'is_pinned': False
                 }))
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -77,7 +78,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'translation_counts': {},
             'language_codes_needing_voice_artists': ['en'],
             'language_codes_with_assigned_voice_artists': [],
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         }
 
         with self.mock_supported_audio_languages_context:
@@ -93,7 +95,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'chapter_title': 'A new chapter',
             'content_count': 5,
             'translation_counts': {},
-            'translation_in_review_counts': {}
+            'translation_in_review_counts': {},
+            'is_pinned': False
         })
 
     def test_negative_content_count_fails_validation_check(self) -> None:
@@ -335,3 +338,37 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
             'Expected question_count to be a non-negative integer, '
             'received -5'
         )
+
+
+class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
+    """Tests for the PinnedOpportunity domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = { # pylint: disable=line-too-long
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict( # pylint: disable=line-too-long
+            valid_pinned_opportunity_dict
+        )
+
+    def test_to_and_from_dict_works_correctly(self) -> None:
+        pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        }
+
+        pinned_opportunity = (
+            opportunity_domain.PinnedOpportunity.
+                from_dict(pinned_opportunity_dict))
+
+        self.assertTrue(isinstance(
+            pinned_opportunity, opportunity_domain.PinnedOpportunity))
+        self.assertEqual(pinned_opportunity.to_dict(), {
+            'language_code': 'en',
+            'topic_id': 'topic_id_1',
+            'opportunity_id': 'opportunity_id1'
+        })

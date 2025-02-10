@@ -17,10 +17,14 @@
  * Voiceover domain objects.
  */
 export interface VoiceoverBackendDict {
-  'duration_secs': number;
-  'filename': string;
-  'file_size_bytes': number;
-  'needs_update': boolean;
+  duration_secs: number;
+  filename: string;
+  file_size_bytes: number;
+  needs_update: boolean;
+}
+
+export interface VoiceoverTypeToVoiceoversBackendDict {
+  [manual: string]: VoiceoverBackendDict;
 }
 
 export class Voiceover {
@@ -30,8 +34,11 @@ export class Voiceover {
   durationSecs: number;
 
   constructor(
-      filename: string, fileSizeBytes: number, needsUpdate: boolean,
-      durationSecs: number) {
+    filename: string,
+    fileSizeBytes: number,
+    needsUpdate: boolean,
+    durationSecs: number
+  ) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
@@ -56,22 +63,26 @@ export class Voiceover {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate,
-      duration_secs: this.durationSecs
+      duration_secs: this.durationSecs,
     };
   }
 
   static createNew(
-      filename: string, fileSizeBytes: number,
-      durationSecs: number): Voiceover {
+    filename: string,
+    fileSizeBytes: number,
+    durationSecs: number
+  ): Voiceover {
     return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }
 
   static createFromBackendDict(
-      translationBackendDict: VoiceoverBackendDict): Voiceover {
+    translationBackendDict: VoiceoverBackendDict
+  ): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,
       translationBackendDict.needs_update,
-      translationBackendDict.duration_secs);
+      translationBackendDict.duration_secs
+    );
   }
 }

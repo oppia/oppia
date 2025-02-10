@@ -110,7 +110,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(expected_summary, summary)
 
         content = '<p>abc</p><strong>QWERTY</strong>' * 150
-        expected_summary = 'abc' * 99 + '...'
+        expected_summary = '%s...' % ('abc' * 99)
         summary = blog_services.generate_summary_of_blog_post(content)
         self.assertEqual(expected_summary, summary)
 
@@ -452,7 +452,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(blog_services.check_can_edit_blog_post(
             user_info_a, None))
 
-        user_info_b.actions.append(u'EDIT_ANY_BLOG_POST')
+        user_info_b.actions.append('EDIT_ANY_BLOG_POST')
         self.assertTrue(blog_services.check_can_edit_blog_post(
             user_info_b, blog_post_rights))
 
@@ -581,7 +581,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # Invalid month.
         with self.assertRaisesRegex(
             Exception,
-            'time data \'123/09/2000, 00:00:00:00\' does not match' +
+            'time data \'123/09/2000, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '123/09/2000')
@@ -589,7 +589,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # Invalid day.
         with self.assertRaisesRegex(
             Exception,
-            'time data \'01/38/2000, 00:00:00:00\' does not match' +
+            'time data \'01/38/2000, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '01/38/2000')
@@ -597,7 +597,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # Invalid year.
         with self.assertRaisesRegex(
             Exception,
-            'time data \'01/22/31126, 00:00:00:00\' does not match' +
+            'time data \'01/22/31126, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\''):
             blog_services.update_blog_models_author_and_published_on_date(
                 self.blog_post_a_id, self.user_id_b, '01/22/31126')
@@ -653,7 +653,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             change_dict: blog_services.BlogPostChangeDict = {
                 'title': all_blog_post_titles[i],
                 'thumbnail_filename': all_blog_post_thumbnails[i],
-                'content': '<p>Hello Blog Post +</p>' + str(i),
+                'content': '<p>Hello Blog Post +</p>%s' % i,
                 'tags': [all_blog_post_tags[i]]
             }
             blog_services.update_blog_post(
@@ -761,11 +761,11 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         self.user_bio = 'new bio'
         self.user_name = 'username'
         user_email = 'user@example.com'
-
-        self.user_id = user_services.create_new_user(
-            auth_id, user_email).user_id
+        user_settings = user_services.create_new_user(auth_id, user_email)
+        self.user_id = user_settings.user_id
+        user_settings.user_bio = self.user_bio
+        user_services.save_user_settings(user_settings)
         user_services.set_username(self.user_id, self.user_name)
-        user_services.update_user_bio(self.user_id, self.user_bio)
 
     def test_get_blog_author_details_model(self) -> None:
         author_details = blog_services.get_blog_author_details(self.user_id)

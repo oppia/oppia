@@ -16,33 +16,31 @@
  * @fileoverview Component for the playbook page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 import './playbook.component.css';
-
 
 @Component({
   selector: 'participation-playbook',
   templateUrl: './playbook.component.html',
-  styleUrls: ['./playbook.component.css']
+  styleUrls: ['./playbook.component.css'],
 })
 export class PlaybookPageComponent implements OnInit {
   TAB_ID_PARTICIPATION: string = 'participation';
   TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-  communityLibraryUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+  communityLibraryUrl =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {}
@@ -60,5 +58,9 @@ export class PlaybookPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('participationPlaybook',
-  downgradeComponent({component: PlaybookPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'participationPlaybook',
+    downgradeComponent({component: PlaybookPageComponent})
+  );

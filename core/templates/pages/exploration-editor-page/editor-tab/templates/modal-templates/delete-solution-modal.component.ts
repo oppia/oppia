@@ -16,16 +16,15 @@
  * @fileoverview Component for Delete Solution Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'delete-solution-modal',
-  templateUrl: './delete-solution-modal.component.html'
+  templateUrl: './delete-solution-modal.component.html',
 })
-export class DeleteSolutionModalComponent
-  extends ConfirmOrCancelModal {
+export class DeleteSolutionModalComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

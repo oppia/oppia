@@ -15,7 +15,7 @@
 }
 .oppia-top-navigation-bar .launch {
   font-size: 12px;
-  margin-left: 90px;
+  margin-left: 30px;
 }
 
 .oppia-top-navigation-bar .underline:hover,
@@ -164,6 +164,8 @@
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  width: 300px;
 }
 .oppia-top-navigation-bar .learn {
   height: 66.5px;
@@ -426,7 +428,7 @@
   display: block;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:focus {
   outline: 1px dotted #212121;
@@ -507,6 +509,11 @@
   font-size: 11px;
   font-weight: bold;
   position: absolute;
+}
+.oppia-top-navigation-bar .oppia-impact-report-btn {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {

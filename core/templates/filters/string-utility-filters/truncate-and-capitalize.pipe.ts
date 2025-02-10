@@ -16,7 +16,7 @@
  * @fileoverview TruncateAndCapitalize pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 // Note that this filter does not truncate at the middle of a word.
 @Pipe({name: 'truncateAndCapitalize'})
@@ -37,8 +37,10 @@ export class TruncateAndCapitalizePipe implements PipeTransform {
     // Add the remaining words to the result until the character limit is
     // reached.
     for (let i = 1; i < words.length; i++) {
-      if (!maxNumberOfCharacters ||
-                result.length + 1 + words[i].length <= maxNumberOfCharacters) {
+      if (
+        !maxNumberOfCharacters ||
+        result.length + 1 + words[i].length <= maxNumberOfCharacters
+      ) {
         result += ' ';
         result += words[i];
       } else {

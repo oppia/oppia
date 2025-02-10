@@ -16,13 +16,13 @@
  * @fileoverview Unit Tests for Blog Dashboard Page service.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
-import { BlogPostEditorBackendApiService } from 'domain/blog/blog-post-editor-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { BlogDashboardPageService } from './blog-dashboard-page.service';
-import { BlogPostData } from 'domain/blog/blog-post.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {BlogPostEditorBackendApiService} from 'domain/blog/blog-post-editor-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {BlogDashboardPageService} from './blog-dashboard-page.service';
+import {BlogPostData} from 'domain/blog/blog-post.model';
 
 describe('Blog Post Page service', () => {
   let alertsService: AlertsService;
@@ -34,7 +34,7 @@ describe('Blog Post Page service', () => {
       location: {
         href: '',
         hash: '/',
-        reload: () => {}
+        reload: () => {},
       },
       open: (url: string) => {},
       onhashchange() {},
@@ -43,22 +43,21 @@ describe('Blog Post Page service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule],
       providers: [
         BlogPostEditorBackendApiService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
-      ]
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     blogPostEditorBackendApiService = TestBed.inject(
-      BlogPostEditorBackendApiService);
+      BlogPostEditorBackendApiService
+    );
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     alertsService = TestBed.inject(AlertsService);
@@ -80,7 +79,6 @@ describe('Blog Post Page service', () => {
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/blog-dashboard');
   });
-
 
   it('should handle calls with unexpect paths', () => {
     expect(blogDashboardPageService.activeTab).toEqual('main');
@@ -105,56 +103,67 @@ describe('Blog Post Page service', () => {
     expect(blogDashboardPageService.imageUploaderIsNarrow).toEqual(false);
   });
 
-  it('should display alert when unable to delete blog post data',
-    fakeAsync(() => {
-      spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
-        .and.returnValue(Promise.reject({status: 500}));
-      spyOn(alertsService, 'addWarning');
+  it('should display alert when unable to delete blog post data', fakeAsync(() => {
+    spyOn(
+      blogPostEditorBackendApiService,
+      'deleteBlogPostAsync'
+    ).and.returnValue(Promise.reject({status: 500}));
+    spyOn(alertsService, 'addWarning');
 
-      blogDashboardPageService.deleteBlogPost();
-      tick();
+    blogDashboardPageService.deleteBlogPost();
+    tick();
 
-      expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
-        .toHaveBeenCalled();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to delete blog post.');
-    }));
+    expect(
+      blogPostEditorBackendApiService.deleteBlogPostAsync
+    ).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to delete blog post.'
+    );
+  }));
 
-  it('should successfully delete blog post data from blog post editor',
-    fakeAsync(() => {
-      // Setting active tab as blog post editor.
-      blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
-      mockWindowRef.nativeWindow.onhashchange();
-      spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
-        .and.returnValue(Promise.resolve(200));
-      spyOn(alertsService, 'addSuccessMessage');
+  it('should successfully delete blog post data from blog post editor', fakeAsync(() => {
+    // Setting active tab as blog post editor.
+    blogDashboardPageService.navigateToEditorTabWithId('sampleId1234');
+    mockWindowRef.nativeWindow.onhashchange();
+    spyOn(
+      blogPostEditorBackendApiService,
+      'deleteBlogPostAsync'
+    ).and.returnValue(Promise.resolve(200));
+    spyOn(alertsService, 'addSuccessMessage');
 
-      blogDashboardPageService.deleteBlogPost();
-      tick();
+    blogDashboardPageService.deleteBlogPost();
+    tick();
 
-      expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
-        .toHaveBeenCalled();
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Deleted Successfully.', 5000);
-      expect(blogDashboardPageService.activeTab).toBe('editor_tab');
-    }));
+    expect(
+      blogPostEditorBackendApiService.deleteBlogPostAsync
+    ).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Blog Post Deleted Successfully.',
+      5000
+    );
+    expect(blogDashboardPageService.activeTab).toBe('editor_tab');
+  }));
 
-  it('should successfully delete blog post data from dashboard',
-    fakeAsync(() => {
-      spyOn(blogPostEditorBackendApiService, 'deleteBlogPostAsync')
-        .and.returnValue(Promise.resolve(200));
-      spyOn(blogDashboardPageService, 'navigateToMainTab');
-      spyOn(alertsService, 'addSuccessMessage');
+  it('should successfully delete blog post data from dashboard', fakeAsync(() => {
+    spyOn(
+      blogPostEditorBackendApiService,
+      'deleteBlogPostAsync'
+    ).and.returnValue(Promise.resolve(200));
+    spyOn(blogDashboardPageService, 'navigateToMainTab');
+    spyOn(alertsService, 'addSuccessMessage');
 
-      blogDashboardPageService.deleteBlogPost();
-      tick();
+    blogDashboardPageService.deleteBlogPost();
+    tick();
 
-      expect(blogPostEditorBackendApiService.deleteBlogPostAsync)
-        .toHaveBeenCalled();
-      expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Blog Post Deleted Successfully.', 5000);
-      expect(blogDashboardPageService.navigateToMainTab).not.toHaveBeenCalled();
-    }));
+    expect(
+      blogPostEditorBackendApiService.deleteBlogPostAsync
+    ).toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Blog Post Deleted Successfully.',
+      5000
+    );
+    expect(blogDashboardPageService.navigateToMainTab).not.toHaveBeenCalled();
+  }));
 
   it('should succesfully set the blog post title in navbar', fakeAsync(() => {
     spyOn(blogDashboardPageService.updateNavTitleEventEmitter, 'emit');
@@ -162,20 +171,23 @@ describe('Blog Post Page service', () => {
     blogDashboardPageService.setNavTitle(false, '');
     tick();
 
-    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
-      .toHaveBeenCalledWith('New Post - Untitled');
+    expect(
+      blogDashboardPageService.updateNavTitleEventEmitter.emit
+    ).toHaveBeenCalledWith('New Post - Untitled');
 
     blogDashboardPageService.setNavTitle(false, 'Sample Title');
     tick();
 
-    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
-      .toHaveBeenCalledWith('Draft - Sample Title');
+    expect(
+      blogDashboardPageService.updateNavTitleEventEmitter.emit
+    ).toHaveBeenCalledWith('Draft - Sample Title');
 
     blogDashboardPageService.setNavTitle(true, 'Sample Title');
     tick();
 
-    expect(blogDashboardPageService.updateNavTitleEventEmitter.emit)
-      .toHaveBeenCalledWith('Published - Sample Title');
+    expect(
+      blogDashboardPageService.updateNavTitleEventEmitter.emit
+    ).toHaveBeenCalledWith('Published - Sample Title');
   }));
 
   it('should set and retrieve blogPostId correctly', () => {
@@ -185,17 +197,17 @@ describe('Blog Post Page service', () => {
   });
 
   it('should set and retrieve blog post data correctly', () => {
-    let summaryObject = BlogPostData.createFromBackendDict(
-      { id: 'sampleId',
-        displayed_author_name: 'test_user',
-        title: 'Title',
-        content: 'Hello World',
-        tags: ['news'],
-        thumbnail_filename: 'image.png',
-        url_fragment: 'title',
-        last_updated: '3232323',
-        published_on: '3232323',
-      });
+    let summaryObject = BlogPostData.createFromBackendDict({
+      id: 'sampleId',
+      displayed_author_name: 'test_user',
+      title: 'Title',
+      content: 'Hello World',
+      tags: ['news'],
+      thumbnail_filename: 'image.png',
+      url_fragment: 'title',
+      last_updated: '3232323',
+      published_on: '3232323',
+    });
 
     blogDashboardPageService.blogPostData = summaryObject;
 

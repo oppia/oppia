@@ -16,7 +16,7 @@
  * @fileoverview Tests for ConvertToPlainText pipe for Oppia.
  */
 
-import { ConvertToPlainTextPipe } from './convert-to-plain-text.pipe';
+import {ConvertToPlainTextPipe} from './convert-to-plain-text.pipe';
 
 describe('Testing ConvertToPlainTextPipe', () => {
   let pipe: ConvertToPlainTextPipe;
@@ -28,10 +28,10 @@ describe('Testing ConvertToPlainTextPipe', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should correctly convert to plain text', () =>{
-    expect(pipe.transform(' <test>&quot;test&nbsp;test&quot;</test> '))
-      .toBe('test test');
-    expect(pipe.transform('<test>&quot; &quot;</test>'))
-      .toBe(' ');
+  it('should correctly convert to plain text', () => {
+    expect(pipe.transform(' <test>&quot;test&nbsp;test&quot;</test> ')).toBe(
+      'test test'
+    );
+    expect(pipe.transform('<test>&quot; &quot;</test>')).toBe(' ');
   });
 });

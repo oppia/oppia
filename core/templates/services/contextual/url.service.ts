@@ -17,12 +17,12 @@
  * functions on $window to be mocked in unit tests.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
@@ -31,7 +31,7 @@ export interface UrlParamsType {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UrlService {
   constructor(private windowRef: WindowRef) {}
@@ -63,8 +63,9 @@ export class UrlService {
   getUrlParams(): UrlParamsType {
     let params: UrlParamsType = {};
     this.getCurrentQueryString().replace(
-      /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        return params[decodeURIComponent(key)] = decodeURIComponent(value);
+      /[?&]+([^=&]+)=([^&]*)/gi,
+      function (m, key, value) {
+        return (params[decodeURIComponent(key)] = decodeURIComponent(value));
       }
     );
     return params;
@@ -117,7 +118,9 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('topic_url_fragment') &&
         this.getUrlParams().topic_url_fragment.match(
-          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX
+        )
+      ) {
         return this.getUrlParams().topic_url_fragment;
       }
     }
@@ -130,7 +133,8 @@ export class UrlService {
     // pages.
     if (
       pathname.startsWith('/learn') &&
-      pathname.match(/\/story\/|\/review-test\//g)) {
+      pathname.match(/\/story\/|\/review-test\//g)
+    ) {
       return decodeURIComponent(pathname.split('/')[5]);
     }
     // The following section is for getting the URL fragment from the
@@ -139,7 +143,9 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('story_url_fragment') &&
         this.getUrlParams().story_url_fragment.match(
-          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX
+        )
+      ) {
         return this.getUrlParams().story_url_fragment;
       }
     }
@@ -166,7 +172,9 @@ export class UrlService {
       if (
         this.getUrlParams().hasOwnProperty('classroom_url_fragment') &&
         this.getUrlParams().classroom_url_fragment.match(
-          AppConstants.VALID_URL_FRAGMENT_REGEX)) {
+          AppConstants.VALID_URL_FRAGMENT_REGEX
+        )
+      ) {
         return this.getUrlParams().classroom_url_fragment;
       }
     }
@@ -186,7 +194,6 @@ export class UrlService {
     }
     throw new Error('Invalid URL for practice session');
   }
-
 
   /**
    * This function is used to find the classroom URL fragment from the learner's
@@ -225,7 +232,8 @@ export class UrlService {
   getStoryIdFromUrl(): string {
     let pathname = this.getPathname();
     var matchedPath = pathname.match(
-      /\/(story_editor|review-test)\/(\w|-){12}/g);
+      /\/(story_editor|review-test)\/(\w|-){12}/g
+    );
     if (matchedPath) {
       return matchedPath[0].split('/')[2];
     }
@@ -274,10 +282,10 @@ export class UrlService {
   }
 
   /**
- * This function is used to find the blog post url fragment from the url.
- * @return {string} the blog post url fragment.
- * @throws Will throw an error if the blog post url is invalid.
- */
+   * This function is used to find the blog post url fragment from the url.
+   * @return {string} the blog post url fragment.
+   * @throws Will throw an error if the blog post url is invalid.
+   */
   getBlogPostUrlFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -289,10 +297,10 @@ export class UrlService {
   }
 
   /**
- * This function is used to find the blog author username from the url.
- * @return {string} the blog author username fragment.
- * @throws Will throw an error if the url is invalid.
- */
+   * This function is used to find the blog author username from the url.
+   * @return {string} the blog author username fragment.
+   * @throws Will throw an error if the url is invalid.
+   */
   getBlogAuthorUsernameFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
@@ -312,13 +320,12 @@ export class UrlService {
     let fieldValues = [];
     if (this.getCurrentQueryString().indexOf('?') > -1) {
       // Each queryItem return one field-value pair in the url.
-      let queryItems = this.getCurrentQueryString().slice(
-        this.getCurrentQueryString().indexOf('?') + 1).split('&');
+      let queryItems = this.getCurrentQueryString()
+        .slice(this.getCurrentQueryString().indexOf('?') + 1)
+        .split('&');
       for (let i = 0; i < queryItems.length; i++) {
-        let currentFieldName = decodeURIComponent(
-          queryItems[i].split('=')[0]);
-        let currentFieldValue = decodeURIComponent(
-          queryItems[i].split('=')[1]);
+        let currentFieldName = decodeURIComponent(queryItems[i].split('=')[0]);
+        let currentFieldValue = decodeURIComponent(queryItems[i].split('=')[1]);
         if (currentFieldName === fieldName) {
           fieldValues.push(currentFieldValue);
         }
@@ -338,8 +345,13 @@ export class UrlService {
   addField(url: string, fieldName: string, fieldValue: string): string {
     let encodedFieldValue = encodeURIComponent(fieldValue);
     let encodedFieldName = encodeURIComponent(fieldName);
-    return url + (url.indexOf('?') !== -1 ? '&' : '?') + encodedFieldName +
-        '=' + encodedFieldValue;
+    return (
+      url +
+      (url.indexOf('?') !== -1 ? '&' : '?') +
+      encodedFieldName +
+      '=' +
+      encodedFieldValue
+    );
   }
 
   /**
@@ -445,5 +457,4 @@ export class UrlService {
   }
 }
 
-angular.module('oppia').factory(
-  'UrlService', downgradeInjectable(UrlService));
+angular.module('oppia').factory('UrlService', downgradeInjectable(UrlService));

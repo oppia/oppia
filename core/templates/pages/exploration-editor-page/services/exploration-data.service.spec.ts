@@ -16,20 +16,26 @@
  * @fileoverview Unit tests for the Exploration data service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ExplorationDataService } from './exploration-data.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationChange, ExplorationDraft } from 'domain/exploration/exploration-draft.model';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
-import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ExplorationDataService} from './exploration-data.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  ExplorationChange,
+  ExplorationDraft,
+} from 'domain/exploration/exploration-draft.model';
+import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 
-describe('Exploration data service', function() {
+describe('Exploration data service', function () {
   let eds: ExplorationDataService;
   let eebas: EditableExplorationBackendApiService;
   let lss: LocalStorageService;
@@ -49,7 +55,6 @@ describe('Exploration data service', function() {
     states: {},
     title: 'Test Exploration',
     language_code: 'en',
-    correctness_feedback_enabled: false,
     exploration_metadata: {
       title: 'Exploration',
       category: 'Algebra',
@@ -63,9 +68,8 @@ describe('Exploration data service', function() {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
-      edits_allowed: true
-    }
+      edits_allowed: true,
+    },
   };
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
@@ -76,7 +80,7 @@ describe('Exploration data service', function() {
           param_changes: [],
           content: {
             html: '',
-            audio_translations: {}
+            audio_translations: {},
           },
           unresolved_answers: {},
           interaction: {
@@ -84,10 +88,10 @@ describe('Exploration data service', function() {
             answer_groups: [],
             default_outcome: {},
             confirmed_unclassified_answers: [],
-            id: null
-          }
-        }
-      }
+            id: null,
+          },
+        },
+      },
     },
     exploration_id: '1',
     is_logged_in: true,
@@ -95,7 +99,6 @@ describe('Exploration data service', function() {
     version: 1,
     preferred_audio_language_code: 'en',
     auto_tts_enabled: true,
-    correctness_feedback_enabled: false,
     record_playthrough_probability: 1,
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
@@ -123,9 +126,9 @@ describe('Exploration data service', function() {
   const windowMock = {
     nativeWindow: {
       location: {
-        reload: function() {}
-      }
-    }
+        reload: function () {},
+      },
+    },
   };
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -133,14 +136,14 @@ describe('Exploration data service', function() {
       providers: [
         {
           provide: UrlService,
-          useValue: {getPathname: () => '/create/0'}
+          useValue: {getPathname: () => '/create/0'},
         },
         {
           provide: EditableExplorationBackendApiService,
-          useClass: MockEditableExplorationBackendApiService
+          useClass: MockEditableExplorationBackendApiService,
         },
-        {provide: WindowRef, useValue: windowMock }
-      ]
+        {provide: WindowRef, useValue: windowMock},
+      ],
     });
   });
   beforeEach(() => {
@@ -150,89 +153,84 @@ describe('Exploration data service', function() {
     eebas = TestBed.inject(EditableExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
 
-  afterEach(function() {
+  afterEach(function () {
     httpTestingController.verify();
   });
 
-  it('should trigger success handler when auto saved successfully', fakeAsync(
-    () => {
-      eds.data = sampleDataResults;
-      const errorCallback = jasmine.createSpy('error');
-      const successCallback = jasmine.createSpy('success');
-      eds.autosaveChangeListAsync([], successCallback, errorCallback);
-      const req = httpTestingController.expectOne(
-        '/createhandler/autosave_draft/0');
-      expect(req.request.method).toBe('PUT');
-      req.flush(sampleDataResults);
-      flushMicrotasks();
-      expect(successCallback).toHaveBeenCalledWith(sampleDataResults);
-      expect(errorCallback).not.toHaveBeenCalled();
-    }
-  ));
+  it('should trigger success handler when auto saved successfully', fakeAsync(() => {
+    eds.data = sampleDataResults;
+    const errorCallback = jasmine.createSpy('error');
+    const successCallback = jasmine.createSpy('success');
+    eds.autosaveChangeListAsync([], successCallback, errorCallback);
+    const req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0'
+    );
+    expect(req.request.method).toBe('PUT');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+    expect(successCallback).toHaveBeenCalledWith(sampleDataResults);
+    expect(errorCallback).not.toHaveBeenCalled();
+  }));
 
-  it('should trigger errorcallback handler when auto save fails', fakeAsync(
-    () => {
-      eds.data = sampleDataResults;
-      const errorCallback = jasmine.createSpy('error');
-      const successCallback = jasmine.createSpy('success');
-      eds.autosaveChangeListAsync([], successCallback, errorCallback);
-      const req = httpTestingController.expectOne(
-        '/createhandler/autosave_draft/0');
-      expect(req.request.method).toBe('PUT');
-      req.error(new ErrorEvent('Server error'));
-      flushMicrotasks();
-      expect(successCallback).not.toHaveBeenCalled();
-      expect(errorCallback).toHaveBeenCalled();
-    }
-  ));
+  it('should trigger errorcallback handler when auto save fails', fakeAsync(() => {
+    eds.data = sampleDataResults;
+    const errorCallback = jasmine.createSpy('error');
+    const successCallback = jasmine.createSpy('success');
+    eds.autosaveChangeListAsync([], successCallback, errorCallback);
+    const req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0'
+    );
+    expect(req.request.method).toBe('PUT');
+    req.error(new ErrorEvent('Server error'));
+    flushMicrotasks();
+    expect(successCallback).not.toHaveBeenCalled();
+    expect(errorCallback).toHaveBeenCalled();
+  }));
 
-  it('should trigger errorcallback handler when version number is undefined',
-    fakeAsync(() => {
-      let dataResults: ExplorationBackendDict = {
-        draft_change_list_id: 3,
-        version: undefined,
-        auto_tts_enabled: false,
-        draft_changes: [],
-        is_version_of_draft_valid: true,
-        init_state_name: 'init',
-        param_changes: [],
-        param_specs: {randomProp: {obj_type: 'randomVal'}},
-        states: {},
-        title: 'Test Exploration',
+  it('should trigger errorcallback handler when version number is undefined', fakeAsync(() => {
+    let dataResults: ExplorationBackendDict = {
+      draft_change_list_id: 3,
+      version: undefined,
+      auto_tts_enabled: false,
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      init_state_name: 'init',
+      param_changes: [],
+      param_specs: {randomProp: {obj_type: 'randomVal'}},
+      states: {},
+      title: 'Test Exploration',
+      language_code: 'en',
+      next_content_id_index: 5,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
         language_code: 'en',
-        next_content_id_index: 5,
-        correctness_feedback_enabled: false,
-        exploration_metadata: {
-          title: 'Exploration',
-          category: 'Algebra',
-          objective: 'To learn',
-          language_code: 'en',
-          tags: [],
-          blurb: '',
-          author_notes: '',
-          states_schema_version: 50,
-          init_state_name: 'Introduction',
-          param_specs: {},
-          param_changes: [],
-          auto_tts_enabled: false,
-          correctness_feedback_enabled: true,
-          edits_allowed: true
-        }
-      };
-      eds.data = dataResults;
-      const errorCallback = jasmine.createSpy('error');
-      const successCallback = jasmine.createSpy('success');
-      eds.autosaveChangeListAsync([], successCallback, errorCallback);
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+    };
+    eds.data = dataResults;
+    const errorCallback = jasmine.createSpy('error');
+    const successCallback = jasmine.createSpy('success');
+    eds.autosaveChangeListAsync([], successCallback, errorCallback);
 
-      flushMicrotasks();
-      expect(successCallback).not.toHaveBeenCalled();
-      expect(errorCallback).toHaveBeenCalled();
-    }));
+    flushMicrotasks();
+    expect(successCallback).not.toHaveBeenCalled();
+    expect(errorCallback).toHaveBeenCalled();
+  }));
 
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
@@ -243,50 +241,54 @@ describe('Exploration data service', function() {
     eds.getDataAsync(errorCallback).then(successCallback);
     flushMicrotasks();
     const req = httpTestingController.expectOne(
-      '/createhandler/autosave_draft/0');
+      '/createhandler/autosave_draft/0'
+    );
     expect(req.request.method).toBe('PUT');
     req.flush(sampleDataResults);
     flushMicrotasks();
     expect(successCallback).toHaveBeenCalledWith(sampleDataResults);
   }));
 
-  it('should not autosave draft changes when draft is already cached',
-    fakeAsync(() => {
-      const errorCallback = jasmine.createSpy('error');
-      const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
-      spyOn(explorationDraft, 'isValid').and.callFake(() => true);
-      spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-      // Save draft.
-      eds.getDataAsync(errorCallback).then(data => {
-        expect(data).toEqual(sampleDataResults);
-        expect(errorCallback).not.toHaveBeenCalled();
-      });
-      flushMicrotasks();
-      const req = httpTestingController.expectOne(
-        '/createhandler/autosave_draft/0');
-      expect(req.request.method).toBe('PUT');
-      req.flush(sampleDataResults);
-      flushMicrotasks();
-      httpTestingController.verify();
+  it('should not autosave draft changes when draft is already cached', fakeAsync(() => {
+    const errorCallback = jasmine.createSpy('error');
+    const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
+    spyOn(explorationDraft, 'isValid').and.callFake(() => true);
+    spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
+    // Save draft.
+    eds.getDataAsync(errorCallback).then(data => {
+      expect(data).toEqual(sampleDataResults);
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+    flushMicrotasks();
+    const req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0'
+    );
+    expect(req.request.method).toBe('PUT');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+    httpTestingController.verify();
 
-      const logInfoSpy = spyOn(ls, 'info').and.callThrough();
-      // Draft is already saved and it's in cache.
-      eds.getDataAsync(errorCallback).then(data => {
-        expect(logInfoSpy).toHaveBeenCalledWith(
-          'Found exploration data in cache.');
-        expect(data).toEqual(sampleDataResults);
-        expect(errorCallback).not.toHaveBeenCalled();
-      });
-      flushMicrotasks();
-    }));
+    const logInfoSpy = spyOn(ls, 'info').and.callThrough();
+    // Draft is already saved and it's in cache.
+    eds.getDataAsync(errorCallback).then(data => {
+      expect(logInfoSpy).toHaveBeenCalledWith(
+        'Found exploration data in cache.'
+      );
+      expect(data).toEqual(sampleDataResults);
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+    flushMicrotasks();
+  }));
 
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => true);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
-      .and.callThrough();
+    const windowRefSpy = spyOn(
+      windowMock.nativeWindow.location,
+      'reload'
+    ).and.callThrough();
     eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
@@ -294,9 +296,10 @@ describe('Exploration data service', function() {
     });
     flushMicrotasks();
     const req = httpTestingController.expectOne(
-      '/createhandler/autosave_draft/0');
+      '/createhandler/autosave_draft/0'
+    );
     expect(req.request.method).toBe('PUT');
-    req.flush('Whoops!', { status: 500, statusText: 'Internal Server error' });
+    req.flush('Whoops!', {status: 500, statusText: 'Internal Server error'});
     flushMicrotasks();
   }));
 
@@ -317,7 +320,8 @@ describe('Exploration data service', function() {
     const failHandler = jasmine.createSpy('fail');
     eds.discardDraftAsync().then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/createhandler/autosave_draft/0');
+      '/createhandler/autosave_draft/0'
+    );
     req.flush({});
     flushMicrotasks();
     expect(successHandler).toHaveBeenCalled();
@@ -329,7 +333,8 @@ describe('Exploration data service', function() {
     const failHandler = jasmine.createSpy('fail');
     eds.discardDraftAsync().then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
-      '/createhandler/autosave_draft/0');
+      '/createhandler/autosave_draft/0'
+    );
     req.error(new ErrorEvent('Internal server error'));
     flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
@@ -339,7 +344,6 @@ describe('Exploration data service', function() {
   it('should get last saved data', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    const logInfoSpy = spyOn(ls, 'info').and.callThrough();
 
     eds.getLastSavedDataAsync().then(successHandler, failHandler);
 
@@ -348,9 +352,7 @@ describe('Exploration data service', function() {
     req.flush(sampleExploration);
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleExploration.exploration);
-    expect(logInfoSpy).toHaveBeenCalledTimes(2);
+    expect(successHandler).toHaveBeenCalledWith(sampleExploration.exploration);
   }));
 
   it('should save an exploration to the backend', fakeAsync(() => {
@@ -368,31 +370,34 @@ describe('Exploration data service', function() {
     });
     flushMicrotasks();
     const req = httpTestingController.expectOne(
-      '/createhandler/autosave_draft/0');
+      '/createhandler/autosave_draft/0'
+    );
     req.flush(sampleDataResults);
     flushMicrotasks();
     eds.save(changeList, 'Commit Message', successHandler, failHandler);
     flushMicrotasks();
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.is_version_of_draft_valid,
-      sampleDataResults.draft_changes);
+      sampleDataResults.draft_changes
+    );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should save an exploration to the backend even when ' +
-    'data.exploration is not defined', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
+  it(
+    'should save an exploration to the backend even when ' +
+      'data.exploration is not defined',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
-    const errorCallback = jasmine.createSpy('error');
-    const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
-    spyOn(explorationDraft, 'isValid').and.callFake(() => false);
-    spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const changeList: ExplorationChange[] = [];
-    let toBeResolved = false;
-    // The data.exploration won't receive a value.
-    spyOn(eebas, 'updateExplorationAsync').and.callFake(
-      async() => {
+      const errorCallback = jasmine.createSpy('error');
+      const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
+      spyOn(explorationDraft, 'isValid').and.callFake(() => false);
+      spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
+      const changeList: ExplorationChange[] = [];
+      let toBeResolved = false;
+      // The data.exploration won't receive a value.
+      spyOn(eebas, 'updateExplorationAsync').and.callFake(async () => {
         return new Promise((resolve, reject) => {
           if (toBeResolved) {
             resolve(sampleDataResults);
@@ -400,54 +405,53 @@ describe('Exploration data service', function() {
             reject();
           }
         });
-      }
-    );
-    eds.getDataAsync(errorCallback);
-    flushMicrotasks();
-    expect(errorCallback).toHaveBeenCalled();
-    toBeResolved = true;
-    eds.save(changeList, 'Commit Message', successHandler, failHandler);
-    flushMicrotasks();
-    expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.is_version_of_draft_valid,
-      sampleDataResults.draft_changes);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use reject handler when save an exploration to the backend fails',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      const errorCallback = jasmine.createSpy('error');
-      const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
-      spyOn(explorationDraft, 'isValid').and.callFake(() => true);
-      spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-      const changeList: ExplorationChange[] = [];
-      eds.getDataAsync(errorCallback).then(function(data) {
-        expect(data).toEqual(sampleDataResults);
-        expect(errorCallback).not.toHaveBeenCalled();
       });
+      eds.getDataAsync(errorCallback);
       flushMicrotasks();
-      const req = httpTestingController.expectOne(
-        '/createhandler/autosave_draft/0');
-      req.flush(sampleDataResults);
-      spyOn(eebas, 'updateExplorationAsync').and.callFake(
-        async() => {
-          return new Promise((resolve, reject) => {
-            reject();
-          });
-        }
-      );
-      flushMicrotasks();
+      expect(errorCallback).toHaveBeenCalled();
+      toBeResolved = true;
       eds.save(changeList, 'Commit Message', successHandler, failHandler);
       flushMicrotasks();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResults.is_version_of_draft_valid,
+        sampleDataResults.draft_changes
+      );
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use reject handler when save an exploration to the backend fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const errorCallback = jasmine.createSpy('error');
+    const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
+    spyOn(explorationDraft, 'isValid').and.callFake(() => true);
+    spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
+    const changeList: ExplorationChange[] = [];
+    eds.getDataAsync(errorCallback).then(function (data) {
+      expect(data).toEqual(sampleDataResults);
+      expect(errorCallback).not.toHaveBeenCalled();
+    });
+    flushMicrotasks();
+    const req = httpTestingController.expectOne(
+      '/createhandler/autosave_draft/0'
+    );
+    req.flush(sampleDataResults);
+    spyOn(eebas, 'updateExplorationAsync').and.callFake(async () => {
+      return new Promise((resolve, reject) => {
+        reject();
+      });
+    });
+    flushMicrotasks();
+    eds.save(changeList, 'Commit Message', successHandler, failHandler);
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });
 
-describe('Exploration data service', function() {
+describe('Exploration data service', function () {
   var eds: ExplorationDataService;
   var ls = null;
   var logErrorSpy: jasmine.Spy;
@@ -459,9 +463,9 @@ describe('Exploration data service', function() {
       providers: [
         {
           provide: UrlService,
-          useValue: {getPathname: () => '/exploration/0'}
-        }
-      ]
+          useValue: {getPathname: () => '/exploration/0'},
+        },
+      ],
     });
   });
 
@@ -476,6 +480,7 @@ describe('Exploration data service', function() {
     eds.getDataAsync(errorCallback);
 
     expect(logErrorSpy).toHaveBeenCalledWith(
-      'Unexpected call to ExplorationDataService for pathname: ' + pathname);
+      'Unexpected call to ExplorationDataService for pathname: ' + pathname
+    );
   });
 });

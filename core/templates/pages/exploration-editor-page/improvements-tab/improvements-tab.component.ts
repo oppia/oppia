@@ -18,20 +18,22 @@
  *  have returned true. The component should be disabled by an ngIf until then.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
-import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
-import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
-import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationImprovementsTaskRegistryService, StateTasks } from 'services/exploration-improvements-task-registry.service';
-import { RouterService } from '../services/router.service';
+import {Component, OnInit} from '@angular/core';
+import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
+import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedback-loop-task.model';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  ExplorationImprovementsTaskRegistryService,
+  StateTasks,
+} from 'services/exploration-improvements-task-registry.service';
+import {RouterService} from '../services/router.service';
 
 @Component({
   selector: 'oppia-improvements-tab',
-  templateUrl: './improvements-tab.component.html'
+  templateUrl: './improvements-tab.component.html',
 })
 export class ImprovementsTabComponent implements OnInit {
   stateRetentions: Map<string, number>;
@@ -46,11 +48,10 @@ export class ImprovementsTabComponent implements OnInit {
   allStateTasks: StateTasks[];
 
   constructor(
-     private explorationImprovementsTaskRegistryService:
-       ExplorationImprovementsTaskRegistryService,
-     private routerService: RouterService,
-     private urlInterpolationService: UrlInterpolationService,
-  ) { }
+    private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
+    private routerService: RouterService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   navigateToStateEditor(stateName: string): void {
     this.routerService.navigateToMainTab(stateName);
@@ -58,8 +59,11 @@ export class ImprovementsTabComponent implements OnInit {
 
   getNumTasks(): number {
     return (
-      this.hbrTasks.length + this.iflTasks.length + this.ngrTasks.length +
-       this.siaTasks.length);
+      this.hbrTasks.length +
+      this.iflTasks.length +
+      this.ngrTasks.length +
+      this.siaTasks.length
+    );
   }
 
   getNumExpLevelTasks(): number {
@@ -71,11 +75,11 @@ export class ImprovementsTabComponent implements OnInit {
   }
 
   getNumCardLevelTasks(): number {
-    return (this.ngrTasks.length + this.siaTasks.length);
+    return this.ngrTasks.length + this.siaTasks.length;
   }
 
   hasCriticalTasks(): boolean {
-    return (this.ngrTasks.length > 0);
+    return this.ngrTasks.length > 0;
   }
 
   getExplorationHealth(): string {
@@ -89,9 +93,8 @@ export class ImprovementsTabComponent implements OnInit {
   }
 
   getNumCardLevelTasksForState(stateName: string): number {
-    const stateTasks = (
-      this.explorationImprovementsTaskRegistryService.getStateTasks(
-        stateName));
+    const stateTasks =
+      this.explorationImprovementsTaskRegistryService.getStateTasks(stateName);
     const ngrTask = stateTasks.ngrTask;
     const siaTask = stateTasks.siaTask;
     return (ngrTask.isOpen() ? 1 : 0) + (siaTask.isOpen() ? 1 : 0);
@@ -102,9 +105,10 @@ export class ImprovementsTabComponent implements OnInit {
   }
 
   toggleStateTasks(stateName: string): Map<string, boolean> {
-    return (
-      this.stateVisibility.set(
-        stateName, !this.stateVisibility.get(stateName)));
+    return this.stateVisibility.set(
+      stateName,
+      !this.stateVisibility.get(stateName)
+    );
   }
 
   getStateRetentionPercent(stateName: string): string {
@@ -112,55 +116,51 @@ export class ImprovementsTabComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.timeMachineImageUrl = (
-      this.urlInterpolationService
-        .getStaticImageUrl('/icons/time_machine.svg'));
+    this.timeMachineImageUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/time_machine.svg'
+    );
 
-    const expStats = (
-      this.explorationImprovementsTaskRegistryService.getExplorationStats());
+    const expStats =
+      this.explorationImprovementsTaskRegistryService.getExplorationStats();
 
-    this.completionRate = (
-       (expStats && expStats.numStarts > 0) ?
-         (expStats.numCompletions / expStats.numStarts) : 0);
+    this.completionRate =
+      expStats && expStats.numStarts > 0
+        ? expStats.numCompletions / expStats.numStarts
+        : 0;
 
-    this.completionRateAsPercent = (
-      Math.round(100.0 * this.completionRate) + '%');
+    this.completionRateAsPercent =
+      Math.round(100.0 * this.completionRate) + '%';
 
-    this.hbrTasks = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenHighBounceRateTasks());
-    this.iflTasks = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenIneffectiveFeedbackLoopTasks());
-    this.ngrTasks = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenNeedsGuidingResponsesTasks());
-    this.siaTasks = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenSuccessiveIncorrectAnswersTasks());
+    this.hbrTasks =
+      this.explorationImprovementsTaskRegistryService.getOpenHighBounceRateTasks();
+    this.iflTasks =
+      this.explorationImprovementsTaskRegistryService.getOpenIneffectiveFeedbackLoopTasks();
+    this.ngrTasks =
+      this.explorationImprovementsTaskRegistryService.getOpenNeedsGuidingResponsesTasks();
+    this.siaTasks =
+      this.explorationImprovementsTaskRegistryService.getOpenSuccessiveIncorrectAnswersTasks();
 
-    this.allStateTasks = (
-      this.explorationImprovementsTaskRegistryService.getAllStateTasks());
+    this.allStateTasks =
+      this.explorationImprovementsTaskRegistryService.getAllStateTasks();
 
-    const namesOfStatesWithTasks = (
-      this.allStateTasks.map(stateTasks => stateTasks.stateName));
+    const namesOfStatesWithTasks = this.allStateTasks.map(
+      stateTasks => stateTasks.stateName
+    );
 
-    this.stateRetentions = (
-      new Map(namesOfStatesWithTasks.map(stateName => {
+    this.stateRetentions = new Map(
+      namesOfStatesWithTasks.map(stateName => {
         const stateStats = expStats.getStateStats(stateName);
         const numCompletions = stateStats.numCompletions;
         const totalHitCount = stateStats.totalHitCount;
         const retentionRate = Math.round(
-           totalHitCount ? (100.0 * numCompletions / totalHitCount) : 0);
+          totalHitCount ? (100.0 * numCompletions) / totalHitCount : 0
+        );
         return [stateName, retentionRate];
-      })));
+      })
+    );
 
-    this.stateVisibility = (
-      new Map(namesOfStatesWithTasks.map(stateName => [stateName, true])));
+    this.stateVisibility = new Map(
+      namesOfStatesWithTasks.map(stateName => [stateName, true])
+    );
   }
 }
-
-angular.module('oppia').directive('oppiaImprovementsTab',
-    downgradeComponent({
-      component: ImprovementsTabComponent
-    }) as angular.IDirectiveFactory);

@@ -22,9 +22,14 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
@@ -33,14 +38,16 @@ require('Polyfills.ts');
 // main module the elements are attached to.
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.module.ts');
+    'topics-and-skills-dashboard-page.module.ts'
+);
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/navbar/' +
-  'topics-and-skills-dashboard-navbar-breadcrumb.component.ts'
+    'topics-and-skills-dashboard-navbar-breadcrumb.component.ts'
 );
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.component.ts');
+    'topics-and-skills-dashboard-page.component.ts'
+);

@@ -18,11 +18,11 @@
  */
 
 export interface MisconceptionBackendDict {
-  'feedback': string;
-  'id': number;
-  'must_be_addressed': boolean;
-  'name': string;
-  'notes': string;
+  feedback: string;
+  id: number;
+  must_be_addressed: boolean;
+  name: string;
+  notes: string;
 }
 export interface MisconceptionSkillMap {
   [skillName: string]: Misconception[];
@@ -33,8 +33,8 @@ export interface TaggedMisconception {
   misconceptionId: number;
 }
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 export class Misconception {
   _id: number;
@@ -44,8 +44,12 @@ export class Misconception {
   _mustBeAddressed: boolean;
 
   constructor(
-      id: number, name: string, notes: string, feedback: string,
-      mustBeAddressed: boolean) {
+    id: number,
+    name: string,
+    notes: string,
+    feedback: string,
+    mustBeAddressed: boolean
+  ) {
     this._id = id;
     this._name = name;
     this._notes = notes;
@@ -59,7 +63,7 @@ export class Misconception {
       name: this._name,
       notes: this._notes,
       feedback: this._feedback,
-      must_be_addressed: this._mustBeAddressed
+      must_be_addressed: this._mustBeAddressed,
     };
   }
 
@@ -101,26 +105,35 @@ export class Misconception {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MisconceptionObjectFactory {
   createFromBackendDict(
-      misconceptionBackendDict: MisconceptionBackendDict): Misconception {
+    misconceptionBackendDict: MisconceptionBackendDict
+  ): Misconception {
     return new Misconception(
       misconceptionBackendDict.id,
       misconceptionBackendDict.name,
       misconceptionBackendDict.notes,
       misconceptionBackendDict.feedback,
-      misconceptionBackendDict.must_be_addressed);
+      misconceptionBackendDict.must_be_addressed
+    );
   }
 
   create(
-      id: number, name: string, notes: string,
-      feedback: string, mustBeAddressed: boolean): Misconception {
+    id: number,
+    name: string,
+    notes: string,
+    feedback: string,
+    mustBeAddressed: boolean
+  ): Misconception {
     return new Misconception(id, name, notes, feedback, mustBeAddressed);
   }
 }
 
-angular.module('oppia').factory(
-  'MisconceptionObjectFactory',
-  downgradeInjectable(MisconceptionObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'MisconceptionObjectFactory',
+    downgradeInjectable(MisconceptionObjectFactory)
+  );

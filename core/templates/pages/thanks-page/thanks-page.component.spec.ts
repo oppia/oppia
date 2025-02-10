@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for thanks page component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ThanksPageComponent } from './thanks-page.component';
+import {ThanksPageComponent} from './thanks-page.component';
 
-describe('Thanks page', function() {
+describe('Thanks page', function () {
   let component: ThanksPageComponent;
   let fixture: ComponentFixture<ThanksPageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ThanksPageComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -39,7 +39,8 @@ describe('Thanks page', function() {
   });
 
   it('should set thanks image url when getStaticImageUrl is called', () => {
-    expect(component.getStaticImageUrl('/general/donate.png'))
-      .toBe('/assets/images/general/donate.png');
+    expect(component.getStaticCopyrightedImageUrl('/general/donate.png')).toBe(
+      '/assets/copyrighted-images/general/donate.png'
+    );
   });
 });

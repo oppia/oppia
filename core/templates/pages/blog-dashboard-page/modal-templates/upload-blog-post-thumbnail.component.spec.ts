@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for upload blog post tumbnail modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UploadBlogPostThumbnailComponent } from './upload-blog-post-thumbnail.component';
-import { ImageUploaderComponent } from 'components/forms/custom-forms-directives/image-uploader.component';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { of } from 'rxjs';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UploadBlogPostThumbnailComponent} from './upload-blog-post-thumbnail.component';
+import {ImageReceiverComponent} from 'components/forms/custom-forms-directives/image-receiver.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {of} from 'rxjs';
 
 describe('Upload Blog Post Thumbnail Component', () => {
   let fixture: ComponentFixture<UploadBlogPostThumbnailComponent>;
@@ -33,34 +33,32 @@ describe('Upload Blog Post Thumbnail Component', () => {
   let resizeEvent = new Event('resize');
 
   class MockChangeDetectorRef {
-    detectChanges(): void { }
+    detectChanges(): void {}
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [
         UploadBlogPostThumbnailComponent,
-        ImageUploaderComponent,
-        MockTranslatePipe
+        ImageReceiverComponent,
+        MockTranslatePipe,
       ],
       providers: [
         SvgSanitizerService,
         {
           provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
+          useClass: MockChangeDetectorRef,
         },
         {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
+            getResizeEvent: () => of(resizeEvent),
+          },
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -75,11 +73,11 @@ describe('Upload Blog Post Thumbnail Component', () => {
   });
 
   it('should initialize cropper when window is not narrow', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(false);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     fixture.detectChanges();
-    componentInstance.croppableImageRef = (
-      new ElementRef(document.createElement('img')));
+    componentInstance.croppableImageRef = new ElementRef(
+      document.createElement('img')
+    );
 
     componentInstance.initializeCropper();
 
@@ -87,11 +85,11 @@ describe('Upload Blog Post Thumbnail Component', () => {
   });
 
   it('should initialize cropper when window is narrow', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     fixture.detectChanges();
-    componentInstance.croppableImageRef = (
-      new ElementRef(document.createElement('img')));
+    componentInstance.croppableImageRef = new ElementRef(
+      document.createElement('img')
+    );
 
     componentInstance.initializeCropper();
 
@@ -109,8 +107,9 @@ describe('Upload Blog Post Thumbnail Component', () => {
     spyOn(componentInstance, 'initializeCropper');
     // This is just a mock base 64 in order to test the FileReader event.
     let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
+      c.charCodeAt(0)
+    );
     let file = new File([arrayBuffer], 'filename.mp3');
 
     componentInstance.onFileChanged(file);
@@ -122,7 +121,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
 
   it('should remove invalid tags and attributes', () => {
     componentInstance.ngOnInit();
-    const svgString = (
+    const svgString =
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
       'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
@@ -130,8 +129,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
       'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
       'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
-      'data-name="dataName"/></g><circel></circel></svg>'
-    );
+      'data-name="dataName"/></g><circel></circel></svg>';
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
@@ -153,9 +151,9 @@ describe('Upload Blog Post Thumbnail Component', () => {
     componentInstance.cropper = {
       getCroppedCanvas: () => {
         return {
-          toDataURL: () => pictureDataUrl
+          toDataURL: () => pictureDataUrl,
         };
-      }
+      },
     } as Cropper;
 
     componentInstance.save();
@@ -165,7 +163,9 @@ describe('Upload Blog Post Thumbnail Component', () => {
 
   it('should initialize', () => {
     const windowResizeSpy = spyOn(
-      windowDimensionsService, 'getResizeEvent').and.callThrough();
+      windowDimensionsService,
+      'getResizeEvent'
+    ).and.callThrough();
 
     componentInstance.ngOnInit();
     expect(componentInstance.windowIsNarrow).toBe(true);
@@ -176,9 +176,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
 
   it('should cancel', () => {
     spyOn(componentInstance.cancelThumbnailUpload, 'emit');
-    componentInstance.uploadedImage = true,
-
-    componentInstance.cancel();
+    (componentInstance.uploadedImage = true), componentInstance.cancel();
 
     expect(componentInstance.uploadedImage).toEqual(null);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();

@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for pieChart.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { PieChartComponent } from './pie-chart.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PieChartComponent} from './pie-chart.component';
 
 describe('Pie Chart component', () => {
   let component: PieChartComponent;
@@ -37,31 +43,25 @@ describe('Pie Chart component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-      ],
-      declarations: [
-        PieChartComponent
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [PieChartComponent],
       providers: [
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      PieChartComponent);
+    fixture = TestBed.createComponent(PieChartComponent);
     component = fixture.componentInstance;
 
     mockedChart = {
-      draw: () => { },
-      data: 1
+      draw: () => {},
+      data: 1,
     } as unknown as google.visualization.PieChart;
 
     // This approach was choosen because spyOnProperty() doesn't work on
@@ -72,7 +72,7 @@ describe('Pie Chart component', () => {
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty(window, 'google', {
-      get: () => ({})
+      get: () => ({}),
     });
     component.data = [];
     component.chart = mockedChart;
@@ -86,7 +86,7 @@ describe('Pie Chart component', () => {
       chartAreaWidth: 0,
       colors: [],
       height: 0,
-      width: 0
+      width: 0,
     };
   });
 
@@ -100,13 +100,13 @@ describe('Pie Chart component', () => {
         arrayToDataTable: () => {},
         PieChart: () => {
           return mockedChart;
-        }
+        },
       },
       charts: {
         setOnLoadCallback: (callback: () => void) => {
           callback();
-        }
-      }
+        },
+      },
     } as unknown as typeof google);
     component.redrawChart();
     tick();
@@ -123,16 +123,16 @@ describe('Pie Chart component', () => {
         PieChart: class Mockdraw {
           constructor(value: string) {}
           draw() {}
-        }
+        },
       },
       charts: {
         setOnLoadCallback: (callback: () => void) => {
           callback();
-        }
-      }
+        },
+      },
     } as unknown as typeof google);
     component.pieChart = {
-      nativeElement: null
+      nativeElement: null,
     };
     // This throws "Type 'null' is not assignable to
     // parameter of type 'Piechart'." We need to suppress this error
@@ -152,13 +152,13 @@ describe('Pie Chart component', () => {
         PieChart: class Mockdraw {
           constructor(value: string) {}
           draw() {}
-        }
+        },
       },
       charts: {
         setOnLoadCallback: (callback: () => void) => {
           callback();
-        }
-      }
+        },
+      },
     } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
     component.chart = mockedChart;
@@ -175,13 +175,13 @@ describe('Pie Chart component', () => {
         PieChart: class Mockdraw {
           constructor(value: string) {}
           draw() {}
-        }
+        },
       },
       charts: {
         setOnLoadCallback: (callback: () => void) => {
           callback();
-        }
-      }
+        },
+      },
     } as unknown as typeof google);
     spyOn(component, 'redrawChart').and.stub();
 

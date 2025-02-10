@@ -16,18 +16,23 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-import { Component, Injector } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
-import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
-import { TranslateTextService } from '../services/translate-text.service';
+import {Component, Injector} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {
+  TranslationModalComponent,
+  TranslationOpportunity,
+} from '../modal-templates/translation-modal.component';
+import {
+  ContributionOpportunitiesService,
+  ExplorationOpportunitiesDict,
+} from '../services/contribution-opportunities.service';
+import {TranslateTextService} from '../services/translate-text.service';
 
 @Component({
   selector: 'oppia-translation-opportunities',
@@ -45,8 +50,7 @@ export class TranslationOpportunitiesComponent {
   languageSelected = false;
   constructor(
     private readonly contextService: ContextService,
-    private readonly contributionOpportunitiesService:
-      ContributionOpportunitiesService,
+    private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
     private readonly modalService: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translationLanguageService: TranslationLanguageService,
@@ -61,8 +65,10 @@ export class TranslationOpportunitiesComponent {
     return this.allOpportunities[expId];
   }
 
-  getPresentableOpportunitiesData(
-      {opportunities, more}: ExplorationOpportunitiesDict): {
+  getPresentableOpportunitiesData({
+    opportunities,
+    more,
+  }: ExplorationOpportunitiesDict): {
     opportunitiesDicts: TranslationOpportunity[];
     more: boolean;
   } {
@@ -72,10 +78,10 @@ export class TranslationOpportunitiesComponent {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
       const heading = opportunity.getOpportunityHeading();
-      const languageCode = (
-        this.translationLanguageService.getActiveLanguageCode());
-      const progressPercentage = (
-        opportunity.getTranslationProgressPercentage(languageCode));
+      const languageCode =
+        this.translationLanguageService.getActiveLanguageCode();
+      const progressPercentage =
+        opportunity.getTranslationProgressPercentage(languageCode);
       const opportunityDict: TranslationOpportunity = {
         id: opportunity.getExplorationId(),
         heading: heading,
@@ -84,11 +90,13 @@ export class TranslationOpportunitiesComponent {
         actionButtonTitle: 'Translate',
         inReviewCount: opportunity.getTranslationsInReviewCount(languageCode),
         totalCount: opportunity.getContentCount(),
-        translationsCount: opportunity.getTranslationsCount(languageCode)
+        translationsCount: opportunity.getTranslationsCount(languageCode),
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
-      if (opportunityDict.translationsCount +
-          opportunityDict.inReviewCount === opportunityDict.totalCount) {
+      if (
+        opportunityDict.translationsCount + opportunityDict.inReviewCount ===
+        opportunityDict.totalCount
+      ) {
         untranslatableOpportunitiesDicts.push(opportunityDict);
       } else {
         opportunitiesDicts.push(opportunityDict);
@@ -104,35 +112,37 @@ export class TranslationOpportunitiesComponent {
       return;
     }
     this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
-      'Translation');
+      'Translation'
+    );
     const opportunity = this.getOpportunitySummary(expId);
-    const modalRef = this.modalService.open(
-      TranslationModalComponent, {
-        size: 'lg',
-        backdrop: 'static',
-        injector: this.injector,
-        // TODO(#12768): Remove the backdropClass & windowClass once the
-        // rte-component-modal is migrated to Angular. Currently, the custom
-        // class is used for correctly stacking AngularJS modal on top of
-        // Angular modal.
-        backdropClass: 'forced-modal-stack',
-        windowClass: 'forced-modal-stack'
-      });
+    const modalRef = this.modalService.open(TranslationModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      injector: this.injector,
+      // TODO(#12768): Remove the backdropClass & windowClass once the
+      // rte-component-modal is migrated to Angular. Currently, the custom
+      // class is used for correctly stacking AngularJS modal on top of
+      // Angular modal.
+      backdropClass: 'forced-modal-stack',
+      windowClass: 'forced-modal-stack',
+    });
     modalRef.componentInstance.opportunity = opportunity;
   }
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.translationLanguageService.onActiveLanguageChanged.subscribe(
-      () => this.languageSelected = true);
+      () => (this.languageSelected = true)
+    );
     if (this.translationLanguageService.getActiveLanguageCode()) {
       this.languageSelected = true;
     } else {
-      this.OPPIA_AVATAR_IMAGE_URL = (
-        this.urlInterpolationService.getStaticImageUrl(
-          '/avatar/oppia_avatar_100px.svg'));
+      this.OPPIA_AVATAR_IMAGE_URL =
+        this.urlInterpolationService.getStaticCopyrightedImageUrl(
+          '/avatar/oppia_avatar_100px.svg'
+        );
     }
   }
 
@@ -143,7 +153,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getMoreTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName())
+        this.translationTopicService.getActiveTopicName()
+      )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
@@ -154,11 +165,8 @@ export class TranslationOpportunitiesComponent {
     return this.contributionOpportunitiesService
       .getTranslationOpportunitiesAsync(
         this.translationLanguageService.getActiveLanguageCode(),
-        this.translationTopicService.getActiveTopicName())
+        this.translationTopicService.getActiveTopicName()
+      )
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTranslationOpportunities', downgradeComponent(
-    {component: TranslationOpportunitiesComponent}));

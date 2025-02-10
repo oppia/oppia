@@ -16,17 +16,16 @@
  * @fileoverview Service for querying the INTERACTION_SPECS constants.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 
 @Injectable({providedIn: 'root'})
 export class InteractionSpecsService {
   isInteractionTrainable(interactionId: string): boolean {
-    const _interactionId = (
-      interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
-    );
+    const _interactionId =
+      interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS;
     const interactionSpecs =
       InteractionSpecsConstants.INTERACTION_SPECS[_interactionId];
     if (!interactionSpecs) {
@@ -36,6 +35,9 @@ export class InteractionSpecsService {
   }
 }
 
-angular.module('oppia').factory(
-  'InteractionSpecsService',
-  downgradeInjectable(InteractionSpecsService));
+angular
+  .module('oppia')
+  .factory(
+    'InteractionSpecsService',
+    downgradeInjectable(InteractionSpecsService)
+  );

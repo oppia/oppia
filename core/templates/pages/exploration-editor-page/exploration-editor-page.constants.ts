@@ -18,8 +18,7 @@
  */
 
 export const ExplorationEditorPageConstants = {
-  EXPLORATION_TITLE_INPUT_FOCUS_LABEL:
-    'explorationTitleInputFocusLabel',
+  EXPLORATION_TITLE_INPUT_FOCUS_LABEL: 'explorationTitleInputFocusLabel',
 
   PARAM_ACTION_GET: 'get',
 
@@ -45,8 +44,7 @@ export const ExplorationEditorPageConstants = {
 
   DEFAULT_AUDIO_LANGUAGE: 'en',
 
-  INFO_MESSAGE_SOLUTION_IS_VALID:
-    'The solution is now valid!',
+  INFO_MESSAGE_SOLUTION_IS_VALID: 'The solution is now valid!',
 
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE:
     'The current solution is no longer valid.',
@@ -57,5 +55,5 @@ export const ExplorationEditorPageConstants = {
   STATUS_FIXED: 'fixed',
   STATUS_IGNORED: 'ignored',
   STATUS_NOT_ACTIONABLE: 'not_actionable',
-  STATUS_OPEN: 'open'
+  STATUS_OPEN: 'open',
 } as const;

@@ -16,19 +16,18 @@
  * @fileoverview Backend Api Service for the Oppia moderator page.
  */
 
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { ThreadMessageBackendDict }
-  from 'domain/feedback_message/ThreadMessage.model';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {ThreadMessageBackendDict} from 'domain/feedback_message/ThreadMessage.model';
 
 export interface CommitMessage {
-  'commit_message': string;
-  'commit_type': string;
-  'exploration_id': string;
-  'last_updated': number;
-  'post_commit_community_owned': boolean;
-  'post_commit_is_private': boolean;
-  'post_commit_status': string;
+  commit_message: string;
+  commit_type: string;
+  exploration_id: string;
+  last_updated: number;
+  post_commit_community_owned: boolean;
+  post_commit_is_private: boolean;
+  post_commit_status: string;
   username: string;
   version: number;
 }
@@ -44,53 +43,63 @@ export interface ActivityIdTypeDict {
 }
 
 export interface RecentCommitResponse {
-  'results': CommitMessage[];
-  'cursor': string;
-  'more': boolean;
-  'exp_ids_to_exp_data': ExplorationDict[];
+  results: CommitMessage[];
+  cursor: string;
+  more: boolean;
+  exp_ids_to_exp_data: ExplorationDict[];
 }
 
 export interface RecentFeedbackMessages {
-  'results': ThreadMessageBackendDict[];
-  'cursor': string;
-  'more': boolean;
+  results: ThreadMessageBackendDict[];
+  cursor: string;
+  more: boolean;
 }
 
 export interface FeaturedActivityResponse {
-  'featured_activity_references': ActivityIdTypeDict[];
+  featured_activity_references: ActivityIdTypeDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ModeratorPageBackendApiService {
-  constructor(
-    private httpClient: HttpClient
-  ) {}
+  constructor(private httpClient: HttpClient) {}
 
   async saveFeaturedActivityReferencesAsync(
-      activityReferencesToSave: ActivityIdTypeDict[]): Promise<Object> {
-    return this.httpClient.post('/moderatorhandler/featured', {
-      featured_activity_reference_dicts: activityReferencesToSave
-    }, {}).toPromise();
+    activityReferencesToSave: ActivityIdTypeDict[]
+  ): Promise<Object> {
+    return this.httpClient
+      .post(
+        '/moderatorhandler/featured',
+        {
+          featured_activity_reference_dicts: activityReferencesToSave,
+        },
+        {}
+      )
+      .toPromise();
   }
 
   async getRecentCommitsAsync(): Promise<RecentCommitResponse> {
-    let options = {params: new HttpParams()
-      .set('query_type', 'all_non_private_commits')};
-    // TODO(sll): Update this to also support collections.
-    return this.httpClient.get<RecentCommitResponse>(
-      '/recentcommitshandler/recent_commits', options).toPromise();
+    let options = {
+      params: new HttpParams().set('query_type', 'all_non_private_commits'),
+    };
+    return this.httpClient
+      .get<RecentCommitResponse>(
+        '/recentcommitshandler/recent_commits',
+        options
+      )
+      .toPromise();
   }
 
   async getRecentFeedbackMessagesAsync(): Promise<RecentFeedbackMessages> {
     return this.httpClient
-      .get<RecentFeedbackMessages>('/recent_feedback_messages').toPromise();
+      .get<RecentFeedbackMessages>('/recent_feedback_messages')
+      .toPromise();
   }
 
-  async getFeaturedActivityReferencesAsync():
-  Promise<FeaturedActivityResponse> {
+  async getFeaturedActivityReferencesAsync(): Promise<FeaturedActivityResponse> {
     return this.httpClient
-      .get<FeaturedActivityResponse>('/moderatorhandler/featured').toPromise();
+      .get<FeaturedActivityResponse>('/moderatorhandler/featured')
+      .toPromise();
   }
 }

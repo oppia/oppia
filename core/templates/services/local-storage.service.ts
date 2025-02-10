@@ -21,28 +21,29 @@
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 import {
   ExplorationChange,
-  ExplorationDraft
+  ExplorationDraft,
 } from 'domain/exploration/exploration-draft.model';
-import { EntityEditorBrowserTabsInfo, EntityEditorBrowserTabsInfoDict } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { WindowRef } from './contextual/window-ref.service';
+import {
+  EntityEditorBrowserTabsInfo,
+  EntityEditorBrowserTabsInfoDict,
+} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {WindowRef} from './contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LocalStorageService {
-  constructor(
-    private windowRef: WindowRef
-  ) {}
+  constructor(private windowRef: WindowRef) {}
 
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
   // else storage is undefined or false.
-  storage = (function() {
+  storage = (function () {
     let test = 'test';
     let result;
     try {
@@ -51,13 +52,15 @@ export class LocalStorageService {
       localStorage.removeItem(test);
       return result && localStorage;
     } catch (exception) {}
-  }());
+  })();
 
-  LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = ('last_selected_translation_lang');
+  LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = 'last_selected_translation_lang';
 
-  LAST_SELECTED_TRANSLATION_TOPIC_NAME = ('last_selected_translation_topic');
+  LAST_SELECTED_TRANSLATION_TOPIC_NAME = 'last_selected_translation_topic';
 
-  HIDE_SIGN_UP_SECTION_PREFERENCE = ('hide_sign_up_section');
+  LAST_SELECTED_LANGUAGE_ACCENT_KEY = 'last_selected_language_accent_key';
+
+  HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
   /**
    * Create the key to access the changeList in localStorage
@@ -85,18 +88,23 @@ export class LocalStorageService {
    * @param {Integer} draftChangeListId - The id of the draft to be saved.
    */
   saveExplorationDraft(
-      explorationId: string, changeList: ExplorationChange[],
-      draftChangeListId: number): void {
+    explorationId: string,
+    changeList: ExplorationChange[],
+    draftChangeListId: number
+  ): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
     if (this.isStorageAvailable()) {
       let draftDict = ExplorationDraft.toLocalStorageDict(
-        changeList, draftChangeListId);
+        changeList,
+        draftChangeListId
+      );
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).setItem(
         localSaveKey,
-        JSON.stringify(draftDict));
+        JSON.stringify(draftDict)
+      );
     }
   }
 
@@ -114,10 +122,11 @@ export class LocalStorageService {
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       let draftDict = (this.storage as Storage).getItem(
-        this._createExplorationDraftKey(explorationId));
+        this._createExplorationDraftKey(explorationId)
+      );
       if (draftDict) {
-        return (
-          ExplorationDraft.createFromLocalStorageDict(JSON.parse(draftDict))
+        return ExplorationDraft.createFromLocalStorageDict(
+          JSON.parse(draftDict)
         );
       }
     }
@@ -136,7 +145,8 @@ export class LocalStorageService {
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).removeItem(
-        this._createExplorationDraftKey(explorationId));
+        this._createExplorationDraftKey(explorationId)
+      );
     }
   }
 
@@ -146,11 +156,15 @@ export class LocalStorageService {
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
     if (this.isStorageAvailable()) {
+      this.setLastSelectedLanguageAccentCode('');
+
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).setItem(
-        this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
+        this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY,
+        languageCode
+      );
     }
   }
 
@@ -166,7 +180,44 @@ export class LocalStorageService {
         // permission to access it but this condition is already being checked
         // by calling 'isStorageAvailable()' so the typecast is safe.
         (this.storage as Storage).getItem(
-          this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY
+        )
+      );
+    }
+    return null;
+  }
+
+  /**
+   * Save the given language accent code to localStorage along.
+   * @param languageAccentCode
+   */
+  setLastSelectedLanguageAccentCode(languageAccentCode: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        this.LAST_SELECTED_LANGUAGE_ACCENT_KEY,
+        languageAccentCode
+      );
+    }
+  }
+
+  /**
+   * Retrieve the local save of the last selected language accent code.
+   * @returns {String} The local save of the last selected language accent for
+   *   voiceover if it exists, else null.
+   */
+  getLastSelectedLanguageAccentCode(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.LAST_SELECTED_LANGUAGE_ACCENT_KEY
+        )
+      );
     }
     return null;
   }
@@ -181,7 +232,9 @@ export class LocalStorageService {
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).setItem(
-        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME, topicName);
+        this.LAST_SELECTED_TRANSLATION_TOPIC_NAME,
+        topicName
+      );
     }
   }
 
@@ -197,7 +250,9 @@ export class LocalStorageService {
         // permission to access it but this condition is already being checked
         // by calling 'isStorageAvailable()' so the typecast is safe.
         (this.storage as Storage).getItem(
-          this.LAST_SELECTED_TRANSLATION_TOPIC_NAME));
+          this.LAST_SELECTED_TRANSLATION_TOPIC_NAME
+        )
+      );
     }
     return null;
   }
@@ -205,7 +260,9 @@ export class LocalStorageService {
   updateUniqueProgressIdOfLoggedOutLearner(uniqueProgressUrlId: string): void {
     if (this.isStorageAvailable()) {
       (this.storage as Storage).setItem(
-        'unique_progress_id', uniqueProgressUrlId);
+        'unique_progress_id',
+        uniqueProgressUrlId
+      );
     }
   }
 
@@ -232,7 +289,9 @@ export class LocalStorageService {
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
       (this.storage as Storage).setItem(
-        this.HIDE_SIGN_UP_SECTION_PREFERENCE, isSectionHidden);
+        this.HIDE_SIGN_UP_SECTION_PREFERENCE,
+        isSectionHidden
+      );
     }
   }
 
@@ -247,8 +306,8 @@ export class LocalStorageService {
         // It is possible that storage does not exist or the user does not have
         // permission to access it but this condition is already being checked
         // by calling 'isStorageAvailable()' so the typecast is safe.
-        (this.storage as Storage).getItem(
-          this.HIDE_SIGN_UP_SECTION_PREFERENCE));
+        (this.storage as Storage).getItem(this.HIDE_SIGN_UP_SECTION_PREFERENCE)
+      );
     }
     return null;
   }
@@ -265,25 +324,30 @@ export class LocalStorageService {
    * storage. Otherwise, returns null.
    */
   getEntityEditorBrowserTabsInfo(
-      entityEditorBrowserTabsInfoConstant: string, entityId: string
+    entityEditorBrowserTabsInfoConstant: string,
+    entityId: string
   ): EntityEditorBrowserTabsInfo | null {
     if (this.isStorageAvailable()) {
-      let allEntityEditorBrowserTabsInfoDicts:
-        EntityEditorBrowserTabsInfoDict = {};
+      let allEntityEditorBrowserTabsInfoDicts: EntityEditorBrowserTabsInfoDict =
+        {};
 
-      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
-        .getItem(entityEditorBrowserTabsInfoConstant);
+      const stringifiedEntityEditorBrowserTabsInfo = (
+        this.storage as Storage
+      ).getItem(entityEditorBrowserTabsInfoConstant);
       if (stringifiedEntityEditorBrowserTabsInfo) {
         allEntityEditorBrowserTabsInfoDicts = JSON.parse(
-          stringifiedEntityEditorBrowserTabsInfo);
+          stringifiedEntityEditorBrowserTabsInfo
+        );
       }
 
-      const requiredEntityEditorBrowserTabsInfoDict = (
-        allEntityEditorBrowserTabsInfoDicts[entityId]);
+      const requiredEntityEditorBrowserTabsInfoDict =
+        allEntityEditorBrowserTabsInfoDicts[entityId];
 
       if (requiredEntityEditorBrowserTabsInfoDict) {
         return EntityEditorBrowserTabsInfo.fromLocalStorageDict(
-          requiredEntityEditorBrowserTabsInfoDict, entityId);
+          requiredEntityEditorBrowserTabsInfoDict,
+          entityId
+        );
       }
     }
     return null;
@@ -297,23 +361,24 @@ export class LocalStorageService {
    * the local storage.
    */
   updateEntityEditorBrowserTabsInfo(
-      entityEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo,
-      entityEditorBrowserTabsInfoConstant: string
+    entityEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo,
+    entityEditorBrowserTabsInfoConstant: string
   ): void {
     if (this.isStorageAvailable()) {
-      const updatedEntityEditorBrowserTabsInfoDict = (
-        entityEditorBrowserTabsInfo.toLocalStorageDict()
-      );
+      const updatedEntityEditorBrowserTabsInfoDict =
+        entityEditorBrowserTabsInfo.toLocalStorageDict();
       const entityId = entityEditorBrowserTabsInfo.getId();
 
-      let allEntityEditorBrowserTabsInfoDicts:
-        EntityEditorBrowserTabsInfoDict = {};
+      let allEntityEditorBrowserTabsInfoDicts: EntityEditorBrowserTabsInfoDict =
+        {};
 
-      const stringifiedEntityEditorBrowserTabsInfo = (this.storage as Storage)
-        .getItem(entityEditorBrowserTabsInfoConstant);
+      const stringifiedEntityEditorBrowserTabsInfo = (
+        this.storage as Storage
+      ).getItem(entityEditorBrowserTabsInfoConstant);
       if (stringifiedEntityEditorBrowserTabsInfo) {
         allEntityEditorBrowserTabsInfoDicts = JSON.parse(
-          stringifiedEntityEditorBrowserTabsInfo);
+          stringifiedEntityEditorBrowserTabsInfo
+        );
       }
 
       if (allEntityEditorBrowserTabsInfoDicts[entityId]) {
@@ -326,22 +391,24 @@ export class LocalStorageService {
           // has become zero.
           if (Object.keys(allEntityEditorBrowserTabsInfoDicts).length === 0) {
             this.removeOpenedEntityEditorBrowserTabsInfo(
-              entityEditorBrowserTabsInfoConstant);
+              entityEditorBrowserTabsInfoConstant
+            );
           }
         } else {
           // If none of the above mentioned edge cases are present, then just
           // update the local storage with the updated info.
-          allEntityEditorBrowserTabsInfoDicts[entityId] = (
-            updatedEntityEditorBrowserTabsInfoDict);
+          allEntityEditorBrowserTabsInfoDicts[entityId] =
+            updatedEntityEditorBrowserTabsInfoDict;
         }
       } else {
-        allEntityEditorBrowserTabsInfoDicts[entityId] = (
-          updatedEntityEditorBrowserTabsInfoDict);
+        allEntityEditorBrowserTabsInfoDicts[entityId] =
+          updatedEntityEditorBrowserTabsInfoDict;
       }
 
       (this.storage as Storage).setItem(
         entityEditorBrowserTabsInfoConstant,
-        JSON.stringify(allEntityEditorBrowserTabsInfoDicts));
+        JSON.stringify(allEntityEditorBrowserTabsInfoDicts)
+      );
     }
   }
 
@@ -352,7 +419,7 @@ export class LocalStorageService {
    * the local storage.
    */
   removeOpenedEntityEditorBrowserTabsInfo(
-      entityEditorBrowserTabsInfoConstant: string
+    entityEditorBrowserTabsInfoConstant: string
   ): void {
     if (this.isStorageAvailable()) {
       (this.storage as Storage).removeItem(entityEditorBrowserTabsInfoConstant);
@@ -365,12 +432,31 @@ export class LocalStorageService {
    * event is triggered.
    */
   registerNewStorageEventListener(callbackFn: Function): void {
-    this.windowRef.nativeWindow.addEventListener('storage', (event) => {
+    this.windowRef.nativeWindow.addEventListener('storage', event => {
       callbackFn(event);
     });
   }
+
+  setLastPageViewTime(lastPageViewTimeKey: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        lastPageViewTimeKey,
+        Date.now().toString()
+      );
+    }
+  }
+
+  getLastPageViewTime(lastPageViewTimeKey: string): number | null {
+    if (this.isStorageAvailable()) {
+      const lastPageViewTime = (this.storage as Storage).getItem(
+        lastPageViewTimeKey
+      );
+      return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
+    }
+    return null;
+  }
 }
 
-angular.module('oppia').factory(
-  'LocalStorageService',
-  downgradeInjectable(LocalStorageService));
+angular
+  .module('oppia')
+  .factory('LocalStorageService', downgradeInjectable(LocalStorageService));

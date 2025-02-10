@@ -17,30 +17,34 @@
  */
 
 export interface SkillBackendDict {
-  'all_questions_merged': boolean;
+  all_questions_merged: boolean;
   description: string;
   id: string;
-  'language_code': string;
+  language_code: string;
   misconceptions: MisconceptionBackendDict[];
-  'next_misconception_id': number;
-  'prerequisite_skill_ids': string[];
+  next_misconception_id: number;
+  prerequisite_skill_ids: string[];
   rubrics: RubricBackendDict[];
-  'skill_contents': ConceptCardBackendDict;
-  'superseding_skill_id': string;
+  skill_contents: ConceptCardBackendDict;
+  superseding_skill_id: string;
   version: number;
 }
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ConceptCard, ConceptCardBackendDict } from
-  'domain/skill/concept-card.model';
-import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
-  from 'domain/skill/MisconceptionObjectFactory';
-import { Rubric, RubricBackendDict } from
-  'domain/skill/rubric.model';
-import { ValidatorsService } from 'services/validators.service';
-import { AppConstants } from 'app.constants';
+import {
+  ConceptCard,
+  ConceptCardBackendDict,
+} from 'domain/skill/concept-card.model';
+import {
+  MisconceptionObjectFactory,
+  Misconception,
+  MisconceptionBackendDict,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
+import {ValidatorsService} from 'services/validators.service';
+import {AppConstants} from 'app.constants';
 
 export class Skill {
   _id: string;
@@ -57,17 +61,18 @@ export class Skill {
   SKILL_DIFFICULTIES: readonly string[] = AppConstants.SKILL_DIFFICULTIES;
 
   constructor(
-      id: string,
-      description: string,
-      misconceptions: Misconception[],
-      rubrics: Rubric[],
-      conceptCard: ConceptCard,
-      languageCode: string,
-      version: number,
-      nextMisconceptionId: number,
-      supersedingSkillId: string,
-      allQuestionsMerged: boolean,
-      prerequisiteSkillIds: string[]) {
+    id: string,
+    description: string,
+    misconceptions: Misconception[],
+    rubrics: Rubric[],
+    conceptCard: ConceptCard,
+    languageCode: string,
+    version: number,
+    nextMisconceptionId: number,
+    supersedingSkillId: string,
+    allQuestionsMerged: boolean,
+    prerequisiteSkillIds: string[]
+  ) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -138,7 +143,8 @@ export class Skill {
   appendMisconception(newMisconception: Misconception): void {
     this._misconceptions.push(newMisconception);
     this._nextMisconceptionId = this.getIncrementedMisconceptionId(
-      newMisconception.getId());
+      newMisconception.getId()
+    );
   }
 
   getLanguageCode(): string {
@@ -154,7 +160,7 @@ export class Skill {
   }
 
   getIncrementedMisconceptionId(id: number): number {
-    return (id + 1);
+    return id + 1;
   }
 
   getSupersedingSkillId(): string {
@@ -194,7 +200,7 @@ export class Skill {
     }
     throw new Error(
       'Unable to get explanation: The given difficulty does ' +
-      'not match any difficulty in the rubrcs'
+        'not match any difficulty in the rubrcs'
     );
   }
 
@@ -222,7 +228,8 @@ export class Skill {
       misconceptions: this._misconceptions.map(
         (misconception: Misconception) => {
           return misconception.toBackendDict();
-        }),
+        }
+      ),
       rubrics: this._rubrics.map((rubric: Rubric) => {
         return rubric.toBackendDict();
       }),
@@ -232,38 +239,41 @@ export class Skill {
       next_misconception_id: this._nextMisconceptionId,
       superseding_skill_id: this._supersedingSkillId,
       all_questions_merged: this._allQuestionsMerged,
-      prerequisite_skill_ids: this._prerequisiteSkillIds
+      prerequisite_skill_ids: this._prerequisiteSkillIds,
     };
   }
 
   getValidationIssues(): string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().html === '') {
-      issues.push(
-        'There should be review material in the concept card.');
+      issues.push('There should be review material in the concept card.');
     }
     if (this.getRubrics().length !== 3) {
       issues.push(
         'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
-        'in rubrics.');
+          'in rubrics.'
+      );
     }
     return issues;
   }
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillObjectFactory {
   constructor(
     private misconceptionObjectFactory: MisconceptionObjectFactory,
-    private validatorService: ValidatorsService) {
-  }
+    private validatorService: ValidatorsService
+  ) {}
 
   hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
     return this.validatorService.isValidEntityName(
-      description, false, allowDescriptionToBeBlank);
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
   }
 
   createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
@@ -271,32 +281,37 @@ export class SkillObjectFactory {
       skillBackendDict.id,
       skillBackendDict.description,
       this.generateMisconceptionsFromBackendDict(
-        skillBackendDict.misconceptions),
+        skillBackendDict.misconceptions
+      ),
       this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
-      ConceptCard.createFromBackendDict(
-        skillBackendDict.skill_contents),
+      ConceptCard.createFromBackendDict(skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,
       skillBackendDict.next_misconception_id,
       skillBackendDict.superseding_skill_id,
       skillBackendDict.all_questions_merged,
-      skillBackendDict.prerequisite_skill_ids);
+      skillBackendDict.prerequisite_skill_ids
+    );
   }
 
   generateMisconceptionsFromBackendDict(
-      misconceptionsBackendDicts: MisconceptionBackendDict[]): Misconception[] {
+    misconceptionsBackendDicts: MisconceptionBackendDict[]
+  ): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
-        misconceptionsBackendDict);
+        misconceptionsBackendDict
+      );
     });
   }
 
   generateRubricsFromBackendDict(
-      rubricBackendDicts: RubricBackendDict[]): Rubric[] {
-    return rubricBackendDicts.map((rubricBackendDict) => {
+    rubricBackendDicts: RubricBackendDict[]
+  ): Rubric[] {
+    return rubricBackendDicts.map(rubricBackendDict => {
       return Rubric.createFromBackendDict(rubricBackendDict);
     });
   }
 }
-angular.module('oppia').factory('SkillObjectFactory',
-  downgradeInjectable(SkillObjectFactory));
+angular
+  .module('oppia')
+  .factory('SkillObjectFactory', downgradeInjectable(SkillObjectFactory));

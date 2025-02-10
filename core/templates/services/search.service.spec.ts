@@ -16,13 +16,19 @@
  * @fileoverview Tests that search service gets correct collections.
  */
 
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { SearchService, SelectionDetails, SelectionList } from 'services/search.service';
-import { Subscription } from 'rxjs';
+import {
+  SearchService,
+  SelectionDetails,
+  SelectionList,
+} from 'services/search.service';
+import {Subscription} from 'rxjs';
 
 describe('Search Service', () => {
   let searchService: SearchService;
@@ -32,7 +38,7 @@ describe('Search Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [SearchService]
+      providers: [SearchService],
     });
     searchService = TestBed.get(SearchService);
   });
@@ -47,7 +53,7 @@ describe('Search Service', () => {
           masterList: [],
           numSelections: 0,
           selections: {},
-          summary: ''
+          summary: '',
         },
         languageCodes: {
           description: '',
@@ -55,141 +61,137 @@ describe('Search Service', () => {
           masterList: [],
           numSelections: 0,
           selections: {},
-          summary: ''
-        }
+          summary: '',
+        },
       };
     });
 
     // eslint-disable-next-line max-len
     it('should identify two categories and two languages given in url search query', () => {
-      urlComponent = '?q=test&category=("Architecture"%20OR%20' +
+      urlComponent =
+        '?q=test&category=("Architecture"%20OR%20' +
         '"Mathematics")&language_code=("en"%20OR%20"ar")';
-      expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe('test');
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
-        en: true
+        en: true,
       });
       expect(results.categories.selections).toEqual({
         Architecture: true,
-        Mathematics: true
+        Mathematics: true,
       });
     });
-    it('should find one category and two languages if given in url search',
-      () => {
-        urlComponent = '?q=test&category=("Mathematics")&' +
-          'language_code=("en"%20OR%20"ar")';
-        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-          urlComponent, results)).toBe('test');
-        expect(results.languageCodes.selections).toEqual({
-          ar: true,
-          en: true
-        });
-        expect(results.categories.selections).toEqual({
-          Mathematics: true
-        });
-      }
-    );
-    it('should find one category and one language if given in url search',
-      () => {
-        urlComponent =
-          '?q=test&category=("Mathematics")&language_code=("en")';
-        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-          urlComponent, results)).toBe('test');
-        expect(results.languageCodes.selections).toEqual({
-          en: true
-        });
-        expect(results.categories.selections).toEqual({
-          Mathematics: true
-        });
-      }
-    );
-    it('should find no categories and one language if given in url search',
-      () => {
-        urlComponent = '?q=test&language_code=("en")';
-        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-          urlComponent, results)).toBe('test');
-        expect(results.languageCodes.selections).toEqual({
-          en: true
-        });
-        expect(results.categories.selections).toEqual({});
-      }
-    );
+    it('should find one category and two languages if given in url search', () => {
+      urlComponent =
+        '?q=test&category=("Mathematics")&' +
+        'language_code=("en"%20OR%20"ar")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('test');
+      expect(results.languageCodes.selections).toEqual({
+        ar: true,
+        en: true,
+      });
+      expect(results.categories.selections).toEqual({
+        Mathematics: true,
+      });
+    });
+    it('should find one category and one language if given in url search', () => {
+      urlComponent = '?q=test&category=("Mathematics")&language_code=("en")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('test');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+      });
+      expect(results.categories.selections).toEqual({
+        Mathematics: true,
+      });
+    });
+    it('should find no categories and one language if given in url search', () => {
+      urlComponent = '?q=test&language_code=("en")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('test');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+      });
+      expect(results.categories.selections).toEqual({});
+    });
 
-    it('should find as many keywords as provided in search query',
-      () => {
-        urlComponent = '?q=protractor%20test&language_code=("en")';
-        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-          urlComponent, results)).toBe('protractor test');
-        expect(results.languageCodes.selections).toEqual({
-          en: true
-        });
-        expect(results.categories.selections).toEqual({});
-      }
-    );
+    it('should find as many keywords as provided in search query', () => {
+      urlComponent = '?q=protractor%20test&language_code=("en")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('protractor test');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+      });
+      expect(results.categories.selections).toEqual({});
+    });
 
-    it('should not find languages nor categories when ampersand is escaped',
-      () => {
-        urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
-          '%26language_code=("en"%20OR%20"ar")';
-        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
-          urlComponent, results)).toBe(
-          'protractor test&category=("Mathematics")' +
-            '&language_code=("en" OR "ar")');
-        expect(results.languageCodes.selections).toEqual({});
-        expect(results.categories.selections).toEqual({});
-      }
-    );
+    it('should not find languages nor categories when ampersand is escaped', () => {
+      urlComponent =
+        '?q=protractor%20test%26category=("Mathematics")' +
+        '%26language_code=("en"%20OR%20"ar")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe(
+        'protractor test&category=("Mathematics")' +
+          '&language_code=("en" OR "ar")'
+      );
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({});
+    });
 
-    it('should only use correct fields when ampersand is not escaped anywhere',
-      () => {
-        urlComponent = '?q=protractor&test&category=("Mathematics")' +
-          '&language_code=("en"%20OR%20"ar")';
-        expect(
-          searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
-        ).toBe('protractor');
-        expect(results.languageCodes.selections).toEqual({
-          en: true,
-          ar: true
-        });
-        expect(results.categories.selections).toEqual({ Mathematics: true });
-      }
-    );
+    it('should only use correct fields when ampersand is not escaped anywhere', () => {
+      urlComponent =
+        '?q=protractor&test&category=("Mathematics")' +
+        '&language_code=("en"%20OR%20"ar")';
+      expect(
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('protractor');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+        ar: true,
+      });
+      expect(results.categories.selections).toEqual({Mathematics: true});
+    });
 
-    it('should omit url component if it is malformed',
-      () => {
-        // In the two cases below, language_code param is not wrapped in
-        // parentheses. However, the category param is defined correctly.
-        // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
-        urlComponent = (
-          '?q=protractor%20test&category=("Mathematics")&' +
-          'language_code="en" OR "ar")');
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-        expect(results.languageCodes.selections).toEqual({});
-        expect(results.categories.selections).toEqual({
-          Mathematics: true
-        });
+    it('should omit url component if it is malformed', () => {
+      // In the two cases below, language_code param is not wrapped in
+      // parentheses. However, the category param is defined correctly.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
+      urlComponent =
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar")';
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({
+        Mathematics: true,
+      });
 
-        urlComponent = (
-          '?q=protractor%20test&category=("Mathematics")&' +
-          'language_code="en" OR "ar"');
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-        expect(results.languageCodes.selections).toEqual({});
-        expect(results.categories.selections).toEqual({
-          Mathematics: true
-        });
+      urlComponent =
+        '?q=protractor%20test&category=("Mathematics")&' +
+        'language_code="en" OR "ar"';
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({
+        Mathematics: true,
+      });
 
-        // In this case, neither of the params are wrapped in parentheses.
-        // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
-        // language_code.
-        urlComponent = (
-          '?q=protractor%20test&category="Mathematics"&' +
-          'language_code="en" OR "ar"');
-        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-        expect(results.languageCodes.selections).toEqual({});
-        expect(results.categories.selections).toEqual({});
-      }
-    );
+      // In this case, neither of the params are wrapped in parentheses.
+      // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
+      // language_code.
+      urlComponent =
+        '?q=protractor%20test&category="Mathematics"&' +
+        'language_code="en" OR "ar"';
+      searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+      expect(results.languageCodes.selections).toEqual({});
+      expect(results.categories.selections).toEqual({});
+    });
   });
 
   describe('getSearchUrlQueryString', () => {
@@ -197,29 +199,42 @@ describe('Search Service', () => {
       const searchQuery = '["1", "2"]';
       const categories: SelectionList = {
         exploration: true,
-        feedback: true
+        feedback: true,
       };
       const languageCodes: SelectionList = {
         en: true,
-        hi: true
+        hi: true,
       };
 
-      expect(searchService.getSearchUrlQueryString(
-        searchQuery, categories, languageCodes)).toBe(
+      expect(
+        searchService.getSearchUrlQueryString(
+          searchQuery,
+          categories,
+          languageCodes
+        )
+      ).toBe(
         '%5B%221%22%2C%20%222%22%5D&category=("exploration" OR "feedback")' +
-        '&language_code=("en" OR "hi")');
+          '&language_code=("en" OR "hi")'
+      );
     });
 
-    it('should successfully get search url query string when there is no' +
-      ' category or language_code query params', () => {
-      const searchQuery = '["1", "2"]';
-      const categories = {};
-      const languageCodes = {};
+    it(
+      'should successfully get search url query string when there is no' +
+        ' category or language_code query params',
+      () => {
+        const searchQuery = '["1", "2"]';
+        const categories = {};
+        const languageCodes = {};
 
-      expect(searchService.getSearchUrlQueryString(
-        searchQuery, categories, languageCodes)).toBe(
-        '%5B%221%22%2C%20%222%22%5D');
-    });
+        expect(
+          searchService.getSearchUrlQueryString(
+            searchQuery,
+            categories,
+            languageCodes
+          )
+        ).toBe('%5B%221%22%2C%20%222%22%5D');
+      }
+    );
   });
 
   describe('executeSearchQuery', () => {
@@ -232,31 +247,33 @@ describe('Search Service', () => {
     let testSubscriptions: Subscription;
     const SAMPLE_RESULTS = {
       search_cursor: 'notempty',
-      activity_list: []
+      activity_list: [],
     };
-    const SAMPLE_QUERY = '/searchhandler/data?q=example&category=' +
-    '("exploration")&language_code=("en" OR "hi")';
+    const SAMPLE_QUERY =
+      '/searchhandler/data?q=example&category=' +
+      '("exploration")&language_code=("en" OR "hi")';
     beforeEach(() => {
       successHandler = jasmine.createSpy('success');
       errorHandler = jasmine.createSpy('error');
       searchQuery = 'example';
       categories = {
-        exploration: true
+        exploration: true,
       };
       languageCodes = {
         en: true,
-        hi: true
+        hi: true,
       };
       initialSearchResultsLoadedSpy = jasmine.createSpy(
-        'initialSearchResultsLoadedSpy');
+        'initialSearchResultsLoadedSpy'
+      );
       testSubscriptions = new Subscription();
       testSubscriptions.add(
         searchService.onInitialSearchResultsLoaded.subscribe(
           initialSearchResultsLoadedSpy
-        ));
+        )
+      );
       httpTestingController = TestBed.get(HttpTestingController);
     });
-
 
     afterEach(() => {
       httpTestingController.verify();
@@ -264,7 +281,11 @@ describe('Search Service', () => {
 
     it('should successfully execute search query', fakeAsync(() => {
       searchService.executeSearchQuery(
-        searchQuery, categories, languageCodes, successHandler);
+        searchQuery,
+        categories,
+        languageCodes,
+        successHandler
+      );
       expect(searchService.isSearchInProgress()).toBe(true);
       const req = httpTestingController.expectOne(SAMPLE_QUERY);
       expect(req.request.method).toEqual('GET');
@@ -276,30 +297,40 @@ describe('Search Service', () => {
       expect(successHandler).toHaveBeenCalled();
     }));
 
-    it('should use reject handler when fetching query url fails',
-      fakeAsync(() => {
-        searchService.executeSearchQuery(
-          searchQuery, categories, languageCodes, successHandler, errorHandler);
-        expect(searchService.isSearchInProgress()).toBe(true);
-        const req = httpTestingController.expectOne(SAMPLE_QUERY);
-        expect(req.request.method).toEqual('GET');
-        req.error(new ErrorEvent('network error'));
-        flushMicrotasks();
+    it('should use reject handler when fetching query url fails', fakeAsync(() => {
+      searchService.executeSearchQuery(
+        searchQuery,
+        categories,
+        languageCodes,
+        successHandler,
+        errorHandler
+      );
+      expect(searchService.isSearchInProgress()).toBe(true);
+      const req = httpTestingController.expectOne(SAMPLE_QUERY);
+      expect(req.request.method).toEqual('GET');
+      req.error(new ErrorEvent('network error'));
+      flushMicrotasks();
 
-        expect(searchService.isSearchInProgress()).toBe(false);
-        expect(errorHandler).toHaveBeenCalled();
-      }));
+      expect(searchService.isSearchInProgress()).toBe(false);
+      expect(errorHandler).toHaveBeenCalled();
+    }));
 
     describe('loadMoreData', () => {
-      const MORE_DATA_REQUEST = '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")&offset=notempty';
+      const MORE_DATA_REQUEST =
+        '/searchhandler/data?q=example&category=' +
+        '("exploration")&language_code=("en" OR "hi")&offset=notempty';
       const MORE_DATA_RESPONSE = {
-        search_cursor: 'newcursor'
+        search_cursor: 'newcursor',
       };
 
       it('should successfully load more data', fakeAsync(() => {
         searchService.executeSearchQuery(
-          searchQuery, categories, languageCodes, successHandler, errorHandler);
+          searchQuery,
+          categories,
+          languageCodes,
+          successHandler,
+          errorHandler
+        );
         const req = httpTestingController.expectOne(SAMPLE_QUERY);
         expect(req.request.method).toEqual('GET');
         req.flush(SAMPLE_RESULTS);
@@ -314,42 +345,54 @@ describe('Search Service', () => {
         expect(errorHandler).not.toHaveBeenCalled();
       }));
 
-      it('should not load more data when a new query is still being sent',
-        fakeAsync(() => {
-          searchService.executeSearchQuery(
-            searchQuery, categories, languageCodes, successHandler);
-          const req = httpTestingController.expectOne(SAMPLE_QUERY);
-          expect(req.request.method).toEqual('GET');
-          req.flush(SAMPLE_RESULTS);
-          flushMicrotasks();
+      it('should not load more data when a new query is still being sent', fakeAsync(() => {
+        searchService.executeSearchQuery(
+          searchQuery,
+          categories,
+          languageCodes,
+          successHandler
+        );
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual('GET');
+        req.flush(SAMPLE_RESULTS);
+        flushMicrotasks();
 
-          searchService.loadMoreData(() => { }, () => { });
-          searchService.loadMoreData(successHandler, errorHandler);
-          const moreDataReq = httpTestingController.expectOne(
-            MORE_DATA_REQUEST);
-          moreDataReq.flush(MORE_DATA_RESPONSE);
-          flushMicrotasks();
-          expect(errorHandler).toHaveBeenCalledWith(false);
-        }));
+        searchService.loadMoreData(
+          () => {},
+          () => {}
+        );
+        searchService.loadMoreData(successHandler, errorHandler);
+        const moreDataReq = httpTestingController.expectOne(MORE_DATA_REQUEST);
+        moreDataReq.flush(MORE_DATA_RESPONSE);
+        flushMicrotasks();
+        expect(errorHandler).toHaveBeenCalledWith(false);
+      }));
 
-      it('should not load more data when the end of page has been reached',
-        fakeAsync(() => {
-          searchService.executeSearchQuery(
-            searchQuery, categories, languageCodes, successHandler);
-          const req = httpTestingController.expectOne(SAMPLE_QUERY);
-          expect(req.request.method).toEqual('GET');
-          req.flush(SAMPLE_RESULTS);
-          flushMicrotasks();
+      it('should not load more data when the end of page has been reached', fakeAsync(() => {
+        searchService.executeSearchQuery(
+          searchQuery,
+          categories,
+          languageCodes,
+          successHandler
+        );
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual('GET');
+        req.flush(SAMPLE_RESULTS);
+        flushMicrotasks();
 
-          searchService.loadMoreData(() => { }, () => { });
-          const moreDataReq = httpTestingController.expectOne(
-            SAMPLE_QUERY + '&offset=notempty');
-          moreDataReq.flush({search_cursor: null});
-          flushMicrotasks();
-          searchService.loadMoreData(successHandler, errorHandler);
+        searchService.loadMoreData(
+          () => {},
+          () => {}
+        );
+        const moreDataReq = httpTestingController.expectOne(
+          SAMPLE_QUERY + '&offset=notempty'
+        );
+        moreDataReq.flush({search_cursor: null});
+        flushMicrotasks();
+        searchService.loadMoreData(successHandler, errorHandler);
 
-          expect(errorHandler).toHaveBeenCalledWith(true);
-        }));
+        expect(errorHandler).toHaveBeenCalledWith(true);
+      }));
     });
   });
 

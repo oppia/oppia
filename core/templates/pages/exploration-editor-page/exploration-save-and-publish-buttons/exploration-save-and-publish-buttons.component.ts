@@ -16,29 +16,30 @@
  * @fileoverview Component for the exploration save & publish buttons.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { EditabilityService } from 'services/editability.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { ExplorationSavePromptModalComponent } from '../modal-templates/exploration-save-prompt-modal.component';
-import { ChangeListService } from '../services/change-list.service';
-import { ExplorationRightsService } from '../services/exploration-rights.service';
-import { ExplorationSaveService } from '../services/exploration-save.service';
-import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {EditabilityService} from 'services/editability.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {ExplorationSavePromptModalComponent} from '../modal-templates/exploration-save-prompt-modal.component';
+import {ChangeListService} from '../services/change-list.service';
+import {ExplorationRightsService} from '../services/exploration-rights.service';
+import {ExplorationSaveService} from '../services/exploration-save.service';
+import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 
 @Component({
   selector: 'exploration-save-and-publish-buttons',
-  templateUrl: './exploration-save-and-publish-buttons.component.html'
+  templateUrl: './exploration-save-and-publish-buttons.component.html',
 })
 export class ExplorationSaveAndPublishButtonsComponent
-   implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   directiveSubscriptions = new Subscription();
 
   isModalDisplayed: boolean = false;
+  autosaveIsInProgress: boolean;
   saveIsInProcess: boolean;
   publishIsInProcess: boolean;
   loadingDotsAreShown: boolean;
@@ -46,17 +47,16 @@ export class ExplorationSaveAndPublishButtonsComponent
   connectedToInternet: boolean;
 
   constructor(
-     private explorationRightsService: ExplorationRightsService,
-     private editabilityService: EditabilityService,
-     private entityTranslationsService: EntityTranslationsService,
-     private changeListService: ChangeListService,
-     private explorationWarningsService: ExplorationWarningsService,
-     private explorationSaveService: ExplorationSaveService,
-     private userExplorationPermissionsService:
-       UserExplorationPermissionsService,
-     private internetConnectivityService: InternetConnectivityService,
-     private ngbModal: NgbModal,
-  ) { }
+    private explorationRightsService: ExplorationRightsService,
+    private editabilityService: EditabilityService,
+    private entityTranslationsService: EntityTranslationsService,
+    private changeListService: ChangeListService,
+    private explorationWarningsService: ExplorationWarningsService,
+    private explorationSaveService: ExplorationSaveService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
+    private internetConnectivityService: InternetConnectivityService,
+    private ngbModal: NgbModal
+  ) {}
 
   isPrivate(): boolean {
     return this.explorationRightsService.isPrivate();
@@ -71,8 +71,10 @@ export class ExplorationSaveAndPublishButtonsComponent
   }
 
   isEditableOutsideTutorialMode(): boolean {
-    return this.editabilityService.isEditableOutsideTutorialMode() ||
-       this.editabilityService.isTranslatable();
+    return (
+      this.editabilityService.isEditableOutsideTutorialMode() ||
+      this.editabilityService.isTranslatable()
+    );
   }
 
   countWarnings(): number {
@@ -88,19 +90,27 @@ export class ExplorationSaveAndPublishButtonsComponent
 
     const MIN_CHANGES_DISPLAY_PROMPT = 50;
 
-    if (countChanges >= MIN_CHANGES_DISPLAY_PROMPT && !this.isModalDisplayed &&
-       !this.saveIsInProcess) {
+    if (
+      countChanges >= MIN_CHANGES_DISPLAY_PROMPT &&
+      !this.isModalDisplayed &&
+      !this.saveIsInProcess
+    ) {
       this.isModalDisplayed = true;
 
-      this.ngbModal.open(ExplorationSavePromptModalComponent, {
-        backdrop: 'static',
-      }).result.then(() => {
-        this.saveChanges();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      this.ngbModal
+        .open(ExplorationSavePromptModalComponent, {
+          backdrop: 'static',
+        })
+        .result.then(
+          () => {
+            this.saveChanges();
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          }
+        );
     }
     return this.changeListService.getChangeList().length;
   }
@@ -139,8 +149,9 @@ export class ExplorationSaveAndPublishButtonsComponent
 
   hideLoadingAndUpdatePermission(): void {
     this.loadingDotsAreShown = false;
-    this.userExplorationPermissionsService.fetchPermissionsAsync()
-      .then((permissions) => {
+    this.userExplorationPermissionsService
+      .fetchPermissionsAsync()
+      .then(permissions => {
         this.explorationCanBePublished = permissions.canPublish;
       });
   }
@@ -149,13 +160,14 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.publishIsInProcess = true;
     this.loadingDotsAreShown = true;
 
-    this.explorationSaveService.showPublishExplorationModal(
-      this.showLoadingDots.bind(this),
-      this.hideLoadingAndUpdatePermission.bind(this))
-      .then(() => {
+    this.explorationSaveService
+      .showPublishExplorationModal(
+        this.showLoadingDots.bind(this),
+        this.hideLoadingAndUpdatePermission.bind(this)
+      )
+      .finally(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
-        this.entityTranslationsService.reset();
       });
   }
 
@@ -163,14 +175,18 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.saveIsInProcess = true;
     this.loadingDotsAreShown = true;
 
-    this.explorationSaveService.saveChangesAsync(
-      this.showLoadingDots.bind(this),
-      this.hideLoadingAndUpdatePermission.bind(this))
-      .then(() => {
-        this.saveIsInProcess = false;
-        this.loadingDotsAreShown = false;
-        this.entityTranslationsService.reset();
-      }, () => {});
+    this.explorationSaveService
+      .saveChangesAsync(
+        this.showLoadingDots.bind(this),
+        this.hideLoadingAndUpdatePermission.bind(this)
+      )
+      .then(
+        () => {
+          this.saveIsInProcess = false;
+          this.loadingDotsAreShown = false;
+        },
+        () => {}
+      );
   }
 
   ngOnInit(): void {
@@ -180,28 +196,38 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.explorationCanBePublished = false;
     this.connectedToInternet = true;
 
-    this.userExplorationPermissionsService.getPermissionsAsync()
-      .then((permissions) => {
+    this.userExplorationPermissionsService
+      .getPermissionsAsync()
+      .then(permissions => {
         this.explorationCanBePublished = permissions.canPublish;
       });
 
     this.directiveSubscriptions.add(
-      this.userExplorationPermissionsService.onUserExplorationPermissionsFetched
-        .subscribe(
-          () => {
-            this.userExplorationPermissionsService.getPermissionsAsync()
-              .then((permissions) => {
-                this.explorationCanBePublished = permissions.canPublish;
-              });
-          }
-        )
+      this.userExplorationPermissionsService.onUserExplorationPermissionsFetched.subscribe(
+        () => {
+          this.userExplorationPermissionsService
+            .getPermissionsAsync()
+            .then(permissions => {
+              this.explorationCanBePublished = permissions.canPublish;
+            });
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
+        }
+      )
     );
 
     this.directiveSubscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           this.connectedToInternet = internetAccessible;
-        })
+        }
+      )
     );
   }
 
@@ -209,9 +235,3 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'explorationSaveAndPublishButtons',
-  downgradeComponent({
-    component: ExplorationSaveAndPublishButtonsComponent
-  }));

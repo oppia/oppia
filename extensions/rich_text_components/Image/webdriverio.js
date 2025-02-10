@@ -19,47 +19,56 @@
 
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 var request = require('request');
 var path = require('path');
 
 const FABRIC_VERSION = '4.6.0';
 const SVGTAGS = {
-  rectangle: (
+  rectangle:
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js ' + FABRIC_VERSION + '</desc><defs></def' +
+    '"><desc>Created with Fabric.js ' +
+    FABRIC_VERSION +
+    '</desc><defs></def' +
     's><rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g' +
     ' transform="matrix(1 0 0 1 50 50)"><rect style="stroke: rgb(0,0,0); str' +
     'oke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dash' +
     'offset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,' +
     '0); fill-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect: non' +
     '-scaling-stroke" x="-30" y="-35" rx="0" ry="0" width="60" height="70"/>' +
-    '</g></svg>'),
-  circle: (
+    '</g></svg>',
+  circle:
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js ' + FABRIC_VERSION + '</desc><defs></def' +
+    '"><desc>Created with Fabric.js ' +
+    FABRIC_VERSION +
+    '</desc><defs></def' +
     's><rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g' +
     ' transform="matrix(1 0 0 1 50 50)"><circle style="stroke: rgb(0,0,0); s' +
     'troke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-da' +
     'shoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,' +
     '0,0); fill-opacity: 0; fill-rule: nonzero; opacity: 1; vector-effect: n' +
-    'on-scaling-stroke" cx="0" cy="0" r="30"/></g></svg>'),
-  line: (
+    'on-scaling-stroke" cx="0" cy="0" r="30"/></g></svg>',
+  line:
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js ' + FABRIC_VERSION + '</desc><defs></def' +
+    '"><desc>Created with Fabric.js ' +
+    FABRIC_VERSION +
+    '</desc><defs></def' +
     's><rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g' +
     ' transform="matrix(1 0 0 1 75 75)"><line style="stroke: rgb(0,0,0); str' +
     'oke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dash' +
     'offset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,' +
     '0); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-stroke" ' +
-    'x1="-25" y1="-25" x2="25" y2="25"/></g></svg>'),
-  text: (
+    'x1="-25" y1="-25" x2="25" y2="25"/></g></svg>',
+  text:
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="338" viewBox="0 0 494 338' +
-    '"><desc>Created with Fabric.js ' + FABRIC_VERSION + '</desc><defs></def' +
+    '"><desc>Created with Fabric.js ' +
+    FABRIC_VERSION +
+    '</desc><defs></def' +
     's><rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g' +
     ' transform="matrix(1 0 0 1 50 50)" style=""><text font-family="Helvetic' +
     'a" font-size="18" font-style="normal" font-weight="normal" style="strok' +
@@ -67,11 +76,13 @@ const SVGTAGS = {
     ' stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fi' +
     'll: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;"><tsp' +
     'an x="-21.51" y="-6.14">Enter</tspan><tspan x="-21.51" y="17.45">Text</' +
-    'tspan></text></g></svg>'),
-  rectangle_bezier_piechart_svgupload: (
+    'tspan></text></g></svg>',
+  rectangle_bezier_piechart_svgupload:
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
-    '"><desc>Created with Fabric.js ' + FABRIC_VERSION + '</desc><defs></def' +
+    '"><desc>Created with Fabric.js ' +
+    FABRIC_VERSION +
+    '</desc><defs></def' +
     's><rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0)"/><g' +
     ' transform="matrix(1 0 0 1 50 50)"><rect style="stroke: rgb(0,0,0); str' +
     'oke-width: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dash' +
@@ -120,10 +131,10 @@ const SVGTAGS = {
     'e="stroke: rgb(0,128,0); stroke-width: 4; stroke-dasharray: none; strok' +
     'e-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-m' +
     'iterlimit: 4; fill: rgb(255,255,0); fill-rule: nonzero; opacity: 1;" cx' +
-    '="0" cy="0" r="40" id="group1"/></g></g></g></svg>')
+    '="0" cy="0" r="40" id="group1"/></g></g></g></svg>',
 };
 
-var customizeComponent = async function(modal, selectedAction, args, altText) {
+var customizeComponent = async function (modal, selectedAction, args, altText) {
   // The arguments for this function are as follows:
   //   - modal: The selector for the customisation arguments modal.
   //   - selectedAction: Represents the user action. Image RTE component
@@ -135,9 +146,7 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
   //       would represent a filepath.
   //   - altText: The alt text for the image.
   if (selectedAction === 'create') {
-    await action.click(
-      'Create button',
-      modal.$('.e2e-test-create-image'));
+    await action.click('Create button', modal.$('.e2e-test-create-image'));
     for (var i = 0; i < args.length; i++) {
       var shapeClass = '.e2e-test-create-' + args[i];
       var shapeTool = modal.$(shapeClass);
@@ -149,39 +158,46 @@ var customizeComponent = async function(modal, selectedAction, args, altText) {
           absPath = path.resolve(__dirname, './circle.svg');
           await waitFor.presenceOf(
             imageUploadInput,
-            'Image upload input element took too long to load');
+            'Image upload input element took too long to load'
+          );
           await imageUploadInput.addValue(absPath);
         }
       }
       await action.click('Shape tool', shapeTool);
     }
-    var altTextInputElement = (
-      $(
-        '[placeholder = "Description of Image (Example : George Handel, ' +
-        '18th century baroque composer)"]'));
+    var altTextInputElement = $(
+      '[placeholder = "Description of Image (Example : George Handel, ' +
+        '18th century baroque composer)"]'
+    );
     var saveDiagram = modal.$('.e2e-test-save-diagram');
     await action.click('Save diagram button', saveDiagram);
     await waitFor.visibilityOf(
       modal.$('.e2e-test-saved-diagram-container'),
-      'Diagram container not visible');
+      'Diagram container not visible'
+    );
     await action.addValue('Alt text input', altTextInputElement, altText);
   }
 };
 
-var expectComponentDetailsToMatch = async function(
-    elem, selectedAction, args, altText) {
+var expectComponentDetailsToMatch = async function (
+  elem,
+  selectedAction,
+  args,
+  altText
+) {
   if (selectedAction === 'create') {
     var svgName = args.join('_');
     var svgDiagramInputElement = elem.$('.e2e-test-image');
     await waitFor.visibilityOf(
       svgDiagramInputElement,
-      'SVG Diagram input element takes too long to load.');
+      'SVG Diagram input element takes too long to load.'
+    );
     var src = await svgDiagramInputElement.getAttribute('src');
     var alt = await svgDiagramInputElement.getAttribute('alt');
-    var pre = 'http://localhost:9001';
+    var pre = 'http://localhost:8181';
     var link = pre + src;
     expect(alt).toEqual(altText);
-    await request(link, function(error, response, body) {
+    await request(link, function (error, response, body) {
       expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
     });
   }

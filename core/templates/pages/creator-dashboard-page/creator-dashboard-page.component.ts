@@ -16,32 +16,31 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { CreatorDashboardConstants } from './creator-dashboard-page.constants';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { AlertsService } from 'services/alerts.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { forkJoin } from 'rxjs';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
-import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import {CreatorDashboardConstants} from './creator-dashboard-page.constants';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
+import {forkJoin} from 'rxjs';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CreatorDashboardData} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {CreatorExplorationSummary} from 'domain/summary/creator-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
+import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
-  templateUrl: './creator-dashboard-page.component.html'
+  templateUrl: './creator-dashboard-page.component.html',
 })
 export class CreatorDashboardPageComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -63,8 +62,7 @@ export class CreatorDashboardPageComponent {
   getLocaleAbbreviatedDatetimeString!: (millisSinceEpoch: number) => string;
   getHumanReadableStatus!: (status: string) => string;
   emptyDashboardImgUrl!: string;
-  getAverageRating!: (
-    (ratingFrequencies: ExplorationRatings) => number | null);
+  getAverageRating!: (ratingFrequencies: ExplorationRatings) => number | null;
 
   isCurrentSortDescending: boolean = false;
   isCurrentSubscriptionSortDescending: boolean = false;
@@ -88,8 +86,7 @@ export class CreatorDashboardPageComponent {
     AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
   constructor(
-    private creatorDashboardBackendApiService:
-      CreatorDashboardBackendApiService,
+    private creatorDashboardBackendApiService: CreatorDashboardBackendApiService,
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
@@ -99,27 +96,25 @@ export class CreatorDashboardPageComponent {
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {}
 
   EXP_PUBLISH_TEXTS = {
-    defaultText: (
-      'This exploration is private. Publish it to receive statistics.'),
-    smText: 'Publish the exploration to receive statistics.'
+    defaultText:
+      'This exploration is private. Publish it to receive statistics.',
+    smText: 'Publish the exploration to receive statistics.',
   };
 
-  userDashboardDisplayPreference = (
-    AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
+  userDashboardDisplayPreference =
+    AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 
@@ -137,12 +132,13 @@ export class CreatorDashboardPageComponent {
 
   setMyExplorationsView(newViewType: string): void {
     this.myExplorationsView = newViewType;
-    this.creatorDashboardBackendApiService.postExplorationViewAsync(
-      newViewType).then(() => {});
+    this.creatorDashboardBackendApiService
+      .postExplorationViewAsync(newViewType)
+      .then(() => {});
   }
 
   checkMobileView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 500);
+    return this.windowRef.nativeWindow.innerWidth < 500;
   }
 
   showUsernamePopover(subscriberUsername: string | string[]): string {
@@ -161,7 +157,7 @@ export class CreatorDashboardPageComponent {
   }
 
   checkTabletView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 768);
+    return this.windowDimensionsService.getWidth() < 768;
   }
 
   updatesGivenScreenWidth(): void {
@@ -169,8 +165,8 @@ export class CreatorDashboardPageComponent {
       // For mobile users, the view of the creators
       // exploration list is shown only in
       // the card view and can't be switched to list view.
-      this.myExplorationsView = (
-        AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
+      this.myExplorationsView =
+        AppConstants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
       this.publishText = this.EXP_PUBLISH_TEXTS.smText;
     } else {
       // For computer users or users operating in larger screen size
@@ -191,8 +187,8 @@ export class CreatorDashboardPageComponent {
 
   setSubscriptionSortingOptions(sortType: string): void {
     if (sortType === this.currentSubscribersSortType) {
-      this.isCurrentSubscriptionSortDescending = (
-        !this.isCurrentSubscriptionSortDescending);
+      this.isCurrentSubscriptionSortDescending =
+        !this.isCurrentSubscriptionSortDescending;
     } else {
       this.currentSubscribersSortType = sortType;
     }
@@ -205,7 +201,8 @@ export class CreatorDashboardPageComponent {
   sortByFunction(): string {
     if (
       this.currentSortType ===
-        CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.RATING) {
+      CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.RATING
+    ) {
       // TODO(sll): Find a better way to sort explorations according to
       // average ratings. Currently there is no parameter as such
       // average ratings in entities received by SortByPipe.
@@ -222,67 +219,65 @@ export class CreatorDashboardPageComponent {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
-    userInfoPromise.then((userInfo) => {
+    userInfoPromise.then(userInfo => {
       this.canCreateCollections = userInfo.canCreateCollections();
     });
 
-    let dashboardDataPromise = (
-      this.creatorDashboardBackendApiService.fetchDashboardDataAsync());
-    dashboardDataPromise.then(
-      (response: CreatorDashboardData) => {
-        // The following condition is required for Karma testing. The
-        // Angular HttpClient returns an Observable which when converted
-        // to a promise does not have the 'data' key but the AngularJS
-        // mocks of services using HttpClient use $http which return
-        // promise and the content is contained in the 'data' key.
-        // Therefore the following condition checks for presence of
-        // 'response.data' which would be the case in AngularJS testing
-        // but assigns 'response' if the former is not present which is
-        // the case with HttpClient.
-        let responseData = response;
-        this.currentSortType = (
-          CreatorDashboardConstants.
-            EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK);
-        this.currentSubscribersSortType =
-          CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
-        this.isCurrentSortDescending = true;
-        this.isCurrentSubscriptionSortDescending = true;
-        this.explorationsList = responseData.explorationsList;
-        this.collectionsList = responseData.collectionsList;
-        this.subscribersList = responseData.subscribersList;
-        this.dashboardStats = responseData.dashboardStats;
-        this.lastWeekStats = responseData.lastWeekStats;
-        this.myExplorationsView = responseData.displayPreference;
+    let dashboardDataPromise =
+      this.creatorDashboardBackendApiService.fetchDashboardDataAsync();
+    dashboardDataPromise.then((response: CreatorDashboardData) => {
+      // The following condition is required for Karma testing. The
+      // Angular HttpClient returns an Observable which when converted
+      // to a promise does not have the 'data' key but the AngularJS
+      // mocks of services using HttpClient use $http which return
+      // promise and the content is contained in the 'data' key.
+      // Therefore the following condition checks for presence of
+      // 'response.data' which would be the case in AngularJS testing
+      // but assigns 'response' if the former is not present which is
+      // the case with HttpClient.
+      let responseData = response;
+      this.currentSortType =
+        CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+      this.currentSubscribersSortType =
+        CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+      this.isCurrentSortDescending = true;
+      this.isCurrentSubscriptionSortDescending = true;
+      this.explorationsList = responseData.explorationsList;
+      this.collectionsList = responseData.collectionsList;
+      this.subscribersList = responseData.subscribersList;
+      this.dashboardStats = responseData.dashboardStats;
+      this.lastWeekStats = responseData.lastWeekStats;
+      this.myExplorationsView = responseData.displayPreference;
 
-        if (this.dashboardStats && this.lastWeekStats) {
-          this.relativeChangeInTotalPlays = (
-            this.dashboardStats.totalPlays - (
-              this.lastWeekStats.totalPlays)
-          );
-        }
-
-        if (this.explorationsList.length === 0 &&
-          this.collectionsList.length > 0) {
-          this.activeTab = 'myCollections';
-        } else {
-          this.activeTab = 'myExplorations';
-        }
+      if (this.dashboardStats && this.lastWeekStats) {
+        this.relativeChangeInTotalPlays =
+          this.dashboardStats.totalPlays - this.lastWeekStats.totalPlays;
       }
-    );
+
+      if (
+        this.explorationsList.length === 0 &&
+        this.collectionsList.length > 0
+      ) {
+        this.activeTab = 'myCollections';
+      } else {
+        this.activeTab = 'myExplorations';
+      }
+    });
 
     forkJoin([userInfoPromise, dashboardDataPromise]).subscribe(() => {
       this.loaderService.hideLoadingScreen();
     });
 
-    this.getAverageRating = this.ratingComputationService
-      .computeAverageRating;
-    this.getLocaleAbbreviatedDatetimeString = (
-      this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-    this.getHumanReadableStatus = (
-      this.threadStatusDisplayService.getHumanReadableStatus);
+    this.getAverageRating = this.ratingComputationService.computeAverageRating;
+    this.getLocaleAbbreviatedDatetimeString =
+      this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString;
+    this.getHumanReadableStatus =
+      this.threadStatusDisplayService.getHumanReadableStatus;
 
-    this.emptyDashboardImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/empty_dashboard.svg');
+    this.emptyDashboardImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/empty_dashboard.svg'
+      );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
     angular.element(this.windowRef.nativeWindow).on('resize', () => {
@@ -302,8 +297,3 @@ export class CreatorDashboardPageComponent {
     return 0;
   }
 }
-
-angular.module('oppia').directive('oppiaCreatorDashboardPage',
-  downgradeComponent({
-    component: CreatorDashboardPageComponent
-  }) as angular.IDirectiveFactory);

@@ -29,6 +29,8 @@ from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -266,7 +268,12 @@ def delete_users_pending_to_be_deleted() -> None:
         )
 
     email_subject = 'User Deletion job result'
-    if feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if server_can_send_emails:
         email_manager.send_mail_to_admin(email_subject, email_message)
 
 
@@ -293,7 +300,12 @@ def check_completion_of_user_deletion() -> None:
         # or 'FAILURE'.
         completion_status = run_user_deletion_completion(
             pending_deletion_request)
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_message += '\n-----------------------------------\n'
             email_message += (
                 'PendingDeletionRequestModel ID: %s\n'
@@ -355,14 +367,24 @@ def run_user_deletion_completion(
         if pending_deletion_request.normalized_long_term_username is not None:
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username)
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_account_deleted_email(
                 pending_deletion_request.user_id,
                 pending_deletion_request.email
             )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        if feconf.CAN_SEND_EMAILS:
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_account_deletion_failed_email(
                 pending_deletion_request.user_id,
                 pending_deletion_request.email
@@ -417,6 +439,41 @@ def _delete_profile_picture(
         )
 
 
+def remove_user_from_user_groups(user_id: str) -> None:
+    """Removes the user from all user groups they are a member of.
+
+    Args:
+        user_id: str. The ID of the user to remove from user groups.
+    """
+    user_group_models: Sequence[user_models.UserGroupModel] = (
+        user_models.UserGroupModel.query(
+            user_models.UserGroupModel.user_ids == user_id).fetch()
+    )
+
+    @transaction_services.run_in_transaction_wrapper
+    def _remove_user_from_groups_transactional(
+        group_models: List[user_models.UserGroupModel]
+    ) -> None:
+        """Remove the user from a batch of user group models transactionally.
+
+        Args:
+            group_models: List[UserGroupModel]. The user group models to update.
+        """
+        for group_model in group_models:
+            if user_id in group_model.user_ids:
+                group_model.user_ids.remove(user_id)
+        user_models.UserGroupModel.update_timestamps_multi(group_models)
+        datastore_services.put_multi(group_models)
+
+    for i in range(
+        0,
+        len(user_group_models),
+        feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION
+    ):
+        batch = user_group_models[i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
+        _remove_user_from_groups_transactional(batch)
+
+
 def delete_user(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest
 ) -> None:
@@ -437,6 +494,7 @@ def delete_user(
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
+    remove_user_from_user_groups(user_id)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
@@ -887,8 +945,7 @@ def _pseudonymize_config_models(
             request object for which to pseudonymize the models.
     """
     snapshot_model_classes = (
-        config_models.ConfigPropertySnapshotMetadataModel,
-        config_models.PlatformParameterSnapshotMetadataModel)
+        config_models.PlatformParameterSnapshotMetadataModel,)
 
     snapshot_metadata_models, _ = (
         _collect_and_save_entity_ids_from_snapshots_and_commits(

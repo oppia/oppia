@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for Review Material Editor Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ReviewMaterialEditorComponent } from './review-material-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ReviewMaterialEditorComponent} from './review-material-editor.component';
 
 describe('Review Material Editor Component', () => {
   let component: ReviewMaterialEditorComponent;
@@ -29,13 +29,9 @@ describe('Review Material Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ReviewMaterialEditorComponent
-      ],
-      providers: [
-        ChangeDetectorRef
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [ReviewMaterialEditorComponent],
+      providers: [ChangeDetectorRef],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -45,36 +41,42 @@ describe('Review Material Editor Component', () => {
 
     component.bindableDict = {
       displayedConceptCardExplanation: 'Explanation',
-      displayedWorkedExamples: 'Examples'
+      displayedWorkedExamples: 'Examples',
     };
     fixture.detectChanges();
   });
 
   it('should set component properties on initialization', () => {
     expect(component.HTML_SCHEMA).toEqual({
-      type: 'html'
+      type: 'html',
     });
     expect(component.editableExplanation).toBe('Explanation');
     expect(component.conceptCardExplanationEditorIsShown).toBe(false);
   });
 
-  it('should open concept card explanation editor when user' +
-    ' clicks to edit concept card', () => {
-    component.conceptCardExplanationEditorIsShown = false;
+  it(
+    'should open concept card explanation editor when user' +
+      ' clicks to edit concept card',
+    () => {
+      component.conceptCardExplanationEditorIsShown = false;
 
-    component.openConceptCardExplanationEditor();
+      component.openConceptCardExplanationEditor();
 
-    expect(component.conceptCardExplanationEditorIsShown).toBe(true);
-  });
+      expect(component.conceptCardExplanationEditorIsShown).toBe(true);
+    }
+  );
 
-  it('should close concept card explanation editor when user' +
-    ' clicks on close', () => {
-    component.conceptCardExplanationEditorIsShown = true;
+  it(
+    'should close concept card explanation editor when user' +
+      ' clicks on close',
+    () => {
+      component.conceptCardExplanationEditorIsShown = true;
 
-    component.closeConceptCardExplanationEditor();
+      component.closeConceptCardExplanationEditor();
 
-    expect(component.conceptCardExplanationEditorIsShown).toBe(false);
-  });
+      expect(component.conceptCardExplanationEditorIsShown).toBe(false);
+    }
+  );
 
   it('should save concept card explanation when user clicks on save', () => {
     spyOn(component.onSaveExplanation, 'emit');
@@ -82,14 +84,13 @@ describe('Review Material Editor Component', () => {
 
     component.saveConceptCardExplanation();
 
-    expect(component.onSaveExplanation.emit)
-      .toHaveBeenCalledWith(SubtitledHtml.createDefault(
-        component.editableExplanation, 'explanation'));
+    expect(component.onSaveExplanation.emit).toHaveBeenCalledWith(
+      SubtitledHtml.createDefault(component.editableExplanation, 'explanation')
+    );
   });
 
   it('should get schema', () => {
-    expect(component.getSchema())
-      .toEqual(component.HTML_SCHEMA);
+    expect(component.getSchema()).toEqual(component.HTML_SCHEMA);
   });
 
   it('should update editableExplanation', () => {

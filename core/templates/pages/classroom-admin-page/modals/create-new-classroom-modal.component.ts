@@ -16,20 +16,18 @@
  * @fileoverview Create new classroom modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ClassroomBackendApiService } from '../../../domain/classroom/classroom-backend-api.service';
-import { NewClassroomData } from '../new-classroom.model';
-import { ClassroomAdminDataService } from '../services/classroom-admin-data.service';
-
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
+import {NewClassroomData} from '../new-classroom.model';
+import {ClassroomAdminDataService} from '../services/classroom-admin-data.service';
 
 @Component({
   selector: 'oppia-create-new-classroom-modal',
-  templateUrl: './create-new-classroom-modal.component.html'
+  templateUrl: './create-new-classroom-modal.component.html',
 })
-export class CreateNewClassroomModalComponent
-  extends ConfirmOrCancelModal {
+export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
     public classroomAdminDataService: ClassroomAdminDataService,
@@ -49,31 +47,27 @@ export class CreateNewClassroomModalComponent
     this.tempClassroom = new NewClassroomData('', '', '');
     this.classroom = new NewClassroomData('', '', '');
 
-    this.classroomAdminDataService.existingClassroomNames = (
-      this.existingClassroomNames);
+    this.classroomAdminDataService.existingClassroomNames =
+      this.existingClassroomNames;
   }
 
   createClassroom(): void {
     this.newClassroomCreationInProgress = true;
     this.classroomUrlFragmentIsDuplicate = false;
 
-    this.classroomBackendApiService.getNewClassroomIdAsync().then(
-      classroomId => {
-        const defaultClassroomDict = {
-          classroom_id: classroomId,
-          name: this.tempClassroom.getClassroomName(),
-          url_fragment: this.tempClassroom.getClassroomUrlFragment(),
-          course_details: '',
-          topic_list_intro: '',
-          topic_id_to_prerequisite_topic_ids: {}
-        };
+    this.classroomBackendApiService;
+    const name = this.tempClassroom.getClassroomName();
+    const urlFragment = this.tempClassroom.getClassroomUrlFragment();
 
-        this.classroomBackendApiService.updateClassroomDataAsync(
-          classroomId, defaultClassroomDict).then(() => {
-          this.ngbActiveModal.close(defaultClassroomDict);
-          this.newClassroomCreationInProgress = false;
+    this.classroomBackendApiService
+      .createNewClassroomAsync(name, urlFragment)
+      .then(res => {
+        this.ngbActiveModal.close({
+          classroom_id: res.new_classroom_id,
+          name: name,
+          url_fragment: urlFragment,
         });
-      }
-    );
+        this.newClassroomCreationInProgress = false;
+      });
   }
 }

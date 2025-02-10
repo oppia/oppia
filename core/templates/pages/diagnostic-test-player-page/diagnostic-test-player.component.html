@@ -1,7 +1,8 @@
-<div class="diagnostic-test-container">
+<background-banner></background-banner>
+<div class="diagnostic-test-container position-relative">
   <div class="oppia-diagnostic-test-page-header">
     <button class="btn oppia-back-to-classroom-button">
-      <a class="oppia-anchor-tag-under-button" href="/learn/math">
+      <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
         <span>
           <i class="fas fa-thin fa-arrow-left oppia-vcenter" aria-hidden="true"></i>
         </span>
@@ -20,8 +21,8 @@
         <img class="oppia-otter-image" [src]="OPPIA_AVATAR_IMAGE_URL" alt="Oppia avatar image">
       </div>
       <div>
-        <p class="oppia-test-introduction-text">
-          <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1"></span>
+        <p class="oppia-test-introduction-text" *ngIf="classroomData">
+          <span>{{ 'I18N_DIAGNOSTIC_TEST_INTRO_TEXT_1' | translate:{ classroomName: classroomData.getName()} }}</span>
         </p>
         <p class="oppia-test-introduction-text">
           <span translate="I18N_DIAGNOSTIC_TEST_INTRO_TEXT_2"></span>
@@ -30,6 +31,7 @@
     </div>
     <button class="btn oppia-diagnostic-test-start-button e2e-test-start-diagnostic-test"
             (click)="startDiagnosticTest()"
+            [disabled]="isStartTestButtonDisabled"
             translate="I18N_DIAGNOSTIC_TEST_START_BUTTON">
     </button>
   </mat-card>
@@ -89,15 +91,15 @@
             {{ 'I18N_DIAGNOSTIC_TEST_RESULT_HEADER_TEXT' | translate }}
           </h3>
         </div>
-        <p class="oppia-recommendation-card-text">
-          {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate }}
+        <p class="oppia-recommendation-card-text" *ngIf="classroomData">
+          {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_1_FOR_NO_TOPIC' | translate:{ classroomName: classroomData.getName()} }}
         </p>
         <p class="oppia-recommendation-card-text">
           {{ 'I18N_DIAGNOSTIC_TEST_RESULT_TEXT_2_FOR_NO_TOPIC' | translate }}
         </p>
         <div class="oppia-classroom-button-container">
           <button class="btn oppia-goto-classroom-button">
-            <a class="oppia-anchor-tag-under-button" href="/learn/math">
+            <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
               {{ 'I18N_DIAGNOSTIC_TEST_RESULT_GO_TO_CLASSROOM_BUTTON_TEXT' | translate }}
             </a>
           </button>
@@ -111,15 +113,16 @@
   .oppia-diagnostic-test-page-header {
     align-items: center;
     display: flex;
-    margin: 3%;
+    justify-content: center;
+    padding: 3% 3% 0 3%;
+    position: relative;
   }
   .oppia-back-to-classroom-button {
-    align-items: center;
     background-color: #00645c;
     color: #fff;
-    display: flex;
-    float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
+    left: 5%;
+    position: absolute;
     text-transform: uppercase;
   }
   .oppia-back-button-text-class {
@@ -217,7 +220,7 @@
   .oppia-image {
     align-items: center;
     display: flex;
-    margin-right: 60px;
+    margin-right: 5%;
   }
   .oppia-result-page-image {
     align-items: center;
@@ -253,13 +256,18 @@
     text-transform: uppercase;
   }
   .oppia-otter-image {
-    max-width: 7em;
+    height: auto;
+    width: 200%;
   }
 
   @media(max-width: 500px) {
     .oppia-introductory-card {
       margin-left: auto;
-      width: 100%;
+      width: 90%;
+    }
+    .oppia-back-to-classroom-button {
+      left: 1%;
+      position: relative;
     }
     .oppia-image {
       align-items: center;
@@ -309,9 +317,6 @@
       font-family: "Capriola", "Roboto", Arial, sans-serif;
       font-size: 1.2em;
       margin-left: 15px;
-    }
-    .oppia-otter-image {
-      max-width: 5em;
     }
     .oppia-recommendation-card-heading {
       color: #00645c;

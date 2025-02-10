@@ -16,28 +16,34 @@
  * @fileoverview Data and component for the blog home page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { AlertsService } from 'services/alerts.service';
-import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
-import { UrlSearchQuery, BlogPostSearchService } from 'services/blog-search.service';
-import { BlogHomePageData, BlogHomePageBackendApiService } from 'domain/blog/blog-homepage-backend-api.service';
-import { SearchResponseData } from 'domain/blog/blog-homepage-backend-api.service';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { UrlService } from 'services/contextual/url.service';
-import { BlogHomePageConstants } from './blog-home-page.constants';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {AlertsService} from 'services/alerts.service';
+import {Subscription} from 'rxjs';
+import {AppConstants} from 'app.constants';
+import {
+  UrlSearchQuery,
+  BlogPostSearchService,
+} from 'services/blog-search.service';
+import {
+  BlogHomePageData,
+  BlogHomePageBackendApiService,
+} from 'domain/blog/blog-homepage-backend-api.service';
+import {SearchResponseData} from 'domain/blog/blog-homepage-backend-api.service';
+import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {UrlService} from 'services/contextual/url.service';
+import {BlogHomePageConstants} from './blog-home-page.constants';
 
 import './blog-home-page.component.css';
 
 @Component({
   selector: 'oppia-blog-home-page',
-  templateUrl: './blog-home-page.component.html'
+  templateUrl: './blog-home-page.component.html',
 })
 export class BlogHomePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -75,25 +81,27 @@ export class BlogHomePageComponent implements OnInit {
     private blogHomePageBackendApiService: BlogHomePageBackendApiService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
-    private urlService: UrlService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.oppiaAvatarImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg');
-    this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = (
-      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE);
-    this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH = (
-      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE
-    );
+    this.oppiaAvatarImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
+    this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE =
+      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
+    this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH =
+      BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
     if (this.urlService.getUrlParams().hasOwnProperty('q')) {
       this.searchPageIsActive = true;
       this.updateSearchFieldsBasedOnUrlQuery();
     } else {
       this.loadInitialBlogHomePageData();
     }
-    this.searchQueryChanged.pipe(debounceTime(1000), distinctUntilChanged())
+    this.searchQueryChanged
+      .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(model => {
         this.searchQuery = model;
         this.onSearchQueryChangeExec();
@@ -124,13 +132,14 @@ export class BlogHomePageComponent implements OnInit {
     );
   }
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticAssetUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 
   loadSearchResultsPageData(data: SearchResponseData): void {
     this.blogPostSummaries = this.blogPostSummaries.concat(
-      data.blogPostSummariesList);
+      data.blogPostSummariesList
+    );
     this.searchOffset = data.searchOffset;
     if (this.searchOffset) {
       // As search offset is not null, there are more search result pages to
@@ -152,50 +161,62 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadInitialBlogHomePageData(): void {
-    this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync(
-      '0').then((data: BlogHomePageData) => {
-      if (data.numOfPublishedBlogPosts) {
-        this.totalBlogPosts = data.numOfPublishedBlogPosts;
-        this.noResultsFound = false;
-        this.blogPostSummaries = data.blogPostSummaryDicts;
-        this.blogPostSummariesToShow = this.blogPostSummaries;
-        this.calculateLastPostOnPageNum(
-          this.page,
-          this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-        );
-      } else {
-        this.noResultsFound = true;
+    this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
+      (data: BlogHomePageData) => {
+        if (data.numOfPublishedBlogPosts) {
+          this.totalBlogPosts = data.numOfPublishedBlogPosts;
+          this.noResultsFound = false;
+          this.blogPostSummaries = data.blogPostSummaryDicts;
+          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.calculateLastPostOnPageNum(
+            this.page,
+            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+          );
+        } else {
+          this.noResultsFound = true;
+        }
+        this.listOfDefaultTags = data.listOfDefaultTags;
+        this.loaderService.hideLoadingScreen();
+      },
+      errorResponse => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+        ) {
+          this.alertsService.addWarning(
+            'Failed to get blog home page data.Error: ' +
+              `${errorResponse.error.error}`
+          );
+        }
       }
-      this.listOfDefaultTags = data.listOfDefaultTags;
-      this.loaderService.hideLoadingScreen();
-    }, (errorResponse) => {
-      if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-        this.alertsService.addWarning(
-          'Failed to get blog home page data.Error: ' +
-          `${errorResponse.error.error}`);
-      }
-    });
+    );
   }
 
   loadMoreBlogPostSummaries(offset: number): void {
-    this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync(
-      String(offset)
-    ).then((data: BlogHomePageData) => {
-      this.blogPostSummaries = this.blogPostSummaries.concat(
-        data.blogPostSummaryDicts);
-      this.selectBlogPostSummariesToShow();
-      this.calculateLastPostOnPageNum(
-        this.page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+    this.blogHomePageBackendApiService
+      .fetchBlogHomePageDataAsync(String(offset))
+      .then(
+        (data: BlogHomePageData) => {
+          this.blogPostSummaries = this.blogPostSummaries.concat(
+            data.blogPostSummaryDicts
+          );
+          this.selectBlogPostSummariesToShow();
+          this.calculateLastPostOnPageNum(
+            this.page,
+            this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+          );
+          this.showBlogPostCardsLoadingScreen = false;
+        },
+        errorResponse => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+          ) {
+            this.alertsService.addWarning(
+              'Failed to get blog home page data.Error:' +
+                ` ${errorResponse.error.error}`
+            );
+          }
+        }
       );
-      this.showBlogPostCardsLoadingScreen = false;
-    }, (errorResponse) => {
-      if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-        this.alertsService.addWarning(
-          'Failed to get blog home page data.Error:' +
-          ` ${errorResponse.error.error}`);
-      }
-    });
   }
 
   loadPage(): void {
@@ -204,36 +225,40 @@ export class BlogHomePageComponent implements OnInit {
       if (!this.searchPageIsActive) {
         this.loadMoreBlogPostSummaries(this.firstPostOnPageNum - 1);
       } else {
-        this.blogPostSearchService.loadMoreData((data) => {
-          this.loadSearchResultsPageData(data);
-        }, (_isCurrentlyFetchingResults) => {
-          this.alertsService.addWarning(
-            'No more search resutls found. End of search results.');
-        });
+        this.blogPostSearchService.loadMoreData(
+          data => {
+            this.loadSearchResultsPageData(data);
+          },
+          _isCurrentlyFetchingResults => {
+            this.alertsService.addWarning(
+              'No more search resutls found. End of search results.'
+            );
+          }
+        );
       }
     } else {
       this.selectBlogPostSummariesToShow();
     }
   }
 
-  onPageChange(): void {
+  onPageChange(page = this.page): void {
     if (!this.searchPageIsActive) {
       this.calculateFirstPostOnPageNum(
-        this.page,
+        page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
       this.calculateLastPostOnPageNum(
-        this.page,
+        page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
       );
       this.loadPage();
     } else {
       this.calculateFirstPostOnPageNum(
-        this.page,
+        page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
       );
       this.calculateLastPostOnPageNum(
-        this.page,
+        page,
         this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
       );
       this.loadPage();
@@ -242,11 +267,13 @@ export class BlogHomePageComponent implements OnInit {
 
   selectBlogPostSummariesToShow(): void {
     this.blogPostSummariesToShow = this.blogPostSummaries.slice(
-      (this.firstPostOnPageNum - 1), this.lastPostOnPageNum);
+      this.firstPostOnPageNum - 1,
+      this.lastPostOnPageNum
+    );
   }
 
   calculateFirstPostOnPageNum(pageNum: number, pageSize: number): void {
-    this.firstPostOnPageNum = ((pageNum - 1) * pageSize) + 1;
+    this.firstPostOnPageNum = (pageNum - 1) * pageSize + 1;
   }
 
   calculateLastPostOnPageNum(pageNum: number, pageSize: number): void {
@@ -265,19 +292,25 @@ export class BlogHomePageComponent implements OnInit {
 
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
+    if (this.searchQuery === '' && this.selectedTags.length === 0) {
+      this.loadInitialBlogHomePageData();
+      this.windowRef.nativeWindow.history.pushState({}, '', '/blog');
+      return;
+    }
     this.blogPostSearchService.executeSearchQuery(
-      this.searchQuery, this.selectedTags, () => {
-        let searchUrlQueryString = (
+      this.searchQuery,
+      this.selectedTags,
+      () => {
+        let searchUrlQueryString =
           this.blogPostSearchService.getSearchUrlQueryString(
-            this.searchQuery, this.selectedTags
-          )
-        );
+            this.searchQuery,
+            this.selectedTags
+          );
         let url = new URL(this.windowRef.nativeWindow.location.toString());
         let siteLangCode: string | null = url.searchParams.get('lang');
         url.search = '?q=' + searchUrlQueryString;
         if (
-          this.windowRef.nativeWindow.location.pathname === (
-            '/blog/search/find')
+          this.windowRef.nativeWindow.location.pathname === '/blog/search/find'
         ) {
           if (siteLangCode) {
             url.searchParams.append('lang', siteLangCode);
@@ -290,10 +323,13 @@ export class BlogHomePageComponent implements OnInit {
           }
           this.windowRef.nativeWindow.location.href = url.toString();
         }
-      }, (errorResponse) => {
+      },
+      errorResponse => {
         this.alertsService.addWarning(
-          `Unable to fetch search results.Error: ${errorResponse}`);
-      });
+          `Unable to fetch search results. Error: ${errorResponse}`
+        );
+      }
+    );
   }
 
   isSmallScreenViewActive(): boolean {
@@ -302,14 +338,14 @@ export class BlogHomePageComponent implements OnInit {
 
   updateSearchFieldsBasedOnUrlQuery(): void {
     let newSearchQuery: UrlSearchQuery;
-    newSearchQuery = (
+    newSearchQuery =
       this.blogPostSearchService.updateSearchFieldsBasedOnUrlQuery(
-        this.windowRef.nativeWindow.location.search)
-    );
+        this.windowRef.nativeWindow.location.search
+      );
 
     if (
-      this.searchQuery !== newSearchQuery.searchQuery || (
-        this.selectedTags !== newSearchQuery.selectedTags)
+      this.searchQuery !== newSearchQuery.searchQuery ||
+      this.selectedTags !== newSearchQuery.selectedTags
     ) {
       this.searchQuery = newSearchQuery.searchQuery;
       this.selectedTags = newSearchQuery.selectedTags;

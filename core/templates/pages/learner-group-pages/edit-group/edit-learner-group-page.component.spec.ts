@@ -16,19 +16,22 @@
  * @fileoverview Unit tests for edit learner group page.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { TranslateService } from '@ngx-translate/core';
-import { PageTitleService } from 'services/page-title.service';
-import { EditLearnerGroupPageComponent } from './edit-learner-group-page.component';
-import { ContextService } from 'services/context.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {TranslateService} from '@ngx-translate/core';
+import {PageTitleService} from 'services/page-title.service';
+import {EditLearnerGroupPageComponent} from './edit-learner-group-page.component';
+import {ContextService} from 'services/context.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -54,31 +57,30 @@ describe('EditLearnerGroupPageComponent', () => {
     learner_usernames: ['username2'],
     invited_learner_usernames: ['username1'],
     subtopic_page_ids: ['subtopic_page_id'],
-    story_ids: []
+    story_ids: [],
   };
   const learnerGroup = LearnerGroupData.createFromBackendDict(
-    learnerGroupBackendDict);
+    learnerGroupBackendDict
+  );
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        EditLearnerGroupPageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [EditLearnerGroupPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
   beforeEach(() => {
     learnerGroupBackendApiService = TestBed.inject(
-      LearnerGroupBackendApiService);
+      LearnerGroupBackendApiService
+    );
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     contextService = TestBed.inject(ContextService);
@@ -91,8 +93,10 @@ describe('EditLearnerGroupPageComponent', () => {
   });
 
   it('should initialize', fakeAsync(() => {
-    spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(
+      learnerGroupBackendApiService,
+      'fetchLearnerGroupInfoAsync'
+    ).and.returnValue(Promise.resolve(learnerGroup));
     spyOn(component, 'subscribeToOnLangChange');
     spyOn(translateService.onLangChange, 'subscribe');
 
@@ -101,25 +105,26 @@ describe('EditLearnerGroupPageComponent', () => {
 
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW
+    );
     expect(component.learnerGroup).toEqual(learnerGroup);
     expect(component.getLearnersCount()).toBe(1);
   }));
 
-  it('should call set page title whenever the language is changed',
-    fakeAsync(() => {
-      spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
-        .and.returnValue(Promise.resolve(learnerGroup));
+  it('should call set page title whenever the language is changed', fakeAsync(() => {
+    spyOn(
+      learnerGroupBackendApiService,
+      'fetchLearnerGroupInfoAsync'
+    ).and.returnValue(Promise.resolve(learnerGroup));
 
-      component.ngOnInit();
-      tick();
-      spyOn(component, 'setPageTitle');
+    component.ngOnInit();
+    tick();
+    spyOn(component, 'setPageTitle');
 
-      translateService.onLangChange.emit();
+    translateService.onLangChange.emit();
 
-      expect(component.setPageTitle).toHaveBeenCalled();
-    })
-  );
+    expect(component.setPageTitle).toHaveBeenCalled();
+  }));
 
   it('should set page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -128,24 +133,30 @@ describe('EditLearnerGroupPageComponent', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE'
+    );
   });
 
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS
+    );
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS
+    );
 
     let tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS
+    );
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.OVERVIEW
+    );
     expect(tabIsActive).toBeFalse();
   });
 });

@@ -16,17 +16,16 @@
  * @fileoverview Unit tests for the review tests.
  */
 
-import { ReviewTestEngineService } from
-  'pages/review-test-page/review-test-engine.service';
+import {ReviewTestEngineService} from 'pages/review-test-page/review-test-engine.service';
 
 describe('Review test engine service', () => {
   let rtes: ReviewTestEngineService;
 
   beforeEach(() => {
-    rtes = new ReviewTestEngineService;
+    rtes = new ReviewTestEngineService();
   });
 
-  it('should return the correct count of review test questions', function() {
+  it('should return the correct count of review test questions', function () {
     expect(rtes.getReviewTestQuestionCount(-2)).toEqual(0);
     expect(rtes.getReviewTestQuestionCount(0)).toEqual(0);
     expect(rtes.getReviewTestQuestionCount(3)).toEqual(9);

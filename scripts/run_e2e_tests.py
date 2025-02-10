@@ -22,17 +22,12 @@ import os
 import subprocess
 import sys
 
+from core.constants import constants
+from scripts import build
+from scripts import common
+from scripts import install_third_party_libs
+from scripts import servers
 from typing import Final, List, Optional, Tuple
-
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
-
-from core.constants import constants  # isort:skip
-from scripts import build  # isort:skip
-from scripts import install_third_party_libs  # isort:skip
-from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT: Final = 3
 

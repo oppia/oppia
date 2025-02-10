@@ -17,53 +17,62 @@
  */
 
 export interface CreatorTopicSummaryBackendDict {
-  'id': string;
-  'name': string;
-  'language_code': string;
-  'description': string;
-  'version': number;
-  'canonical_story_count': number;
-  'additional_story_count': number;
-  'subtopic_count': number;
-  'total_skill_count': number;
-  'total_published_node_count': number;
-  'uncategorized_skill_count': number;
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'topic_model_created_on': number;
-  'topic_model_last_updated': number;
-  'can_edit_topic': boolean;
-  'is_published': boolean;
-  'url_fragment': string;
+  id: string;
+  name: string;
+  language_code: string;
+  description: string;
+  version: number;
+  canonical_story_count: number;
+  additional_story_count: number;
+  subtopic_count: number;
+  total_skill_count: number;
+  total_published_node_count: number;
+  uncategorized_skill_count: number;
+  thumbnail_filename: string;
+  thumbnail_bg_color: string;
+  topic_model_created_on: number;
+  topic_model_last_updated: number;
+  can_edit_topic: boolean;
+  is_published: boolean;
+  total_upcoming_chapters_count: number;
+  total_overdue_chapters_count: number;
+  total_chapter_counts_for_each_story: number[];
+  published_chapter_counts_for_each_story: number[];
+  url_fragment: string;
   // This property is optional because it is only present in the
   // topic summary dict of topic dashboard page.
-  'classroom'?: string | undefined;
+  classroom?: string | null;
 }
 
 export class CreatorTopicSummary {
   constructor(
-      public id: string,
-      public name: string,
-      public canonicalStoryCount: number,
-      public subtopicCount: number,
-      public totalSkillCount: number,
-      public totalPublishedNodeCount: number,
-      public uncategorizedSkillCount: number,
-      public languageCode: string,
-      public description: string,
-      public version: number,
-      public additionalStoryCount: number,
-      public topicModelCreatedOn: number,
-      public topicModelLastUpdated: number,
-      public canEditTopic: boolean,
-      public isPublished: boolean,
-      public classroom: string | undefined,
-      public thumbnailFilename: string,
-      public thumbnailBgColor: string,
-      public urlFragment: string) { }
+    public id: string,
+    public name: string,
+    public canonicalStoryCount: number,
+    public subtopicCount: number,
+    public totalSkillCount: number,
+    public totalPublishedNodeCount: number,
+    public uncategorizedSkillCount: number,
+    public languageCode: string,
+    public description: string,
+    public version: number,
+    public additionalStoryCount: number,
+    public topicModelCreatedOn: number,
+    public topicModelLastUpdated: number,
+    public canEditTopic: boolean,
+    public isPublished: boolean,
+    public classroom: string | null,
+    public thumbnailFilename: string,
+    public thumbnailBgColor: string,
+    public urlFragment: string,
+    public totalUpcomingChaptersCount: number,
+    public totalOverdueChaptersCount: number,
+    public totalChaptersCounts: number[],
+    public publishedChaptersCounts: number[]
+  ) {}
 
   static createFromBackendDict(
-      topicSummaryBackendDict: CreatorTopicSummaryBackendDict
+    topicSummaryBackendDict: CreatorTopicSummaryBackendDict
   ): CreatorTopicSummary {
     return new CreatorTopicSummary(
       topicSummaryBackendDict.id,
@@ -81,10 +90,15 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.can_edit_topic,
       topicSummaryBackendDict.is_published,
-      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.classroom ?? null,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
-      topicSummaryBackendDict.url_fragment);
+      topicSummaryBackendDict.url_fragment,
+      topicSummaryBackendDict.total_upcoming_chapters_count,
+      topicSummaryBackendDict.total_overdue_chapters_count,
+      topicSummaryBackendDict.total_chapter_counts_for_each_story,
+      topicSummaryBackendDict.published_chapter_counts_for_each_story
+    );
   }
 
   getId(): string {
@@ -139,7 +153,7 @@ export class CreatorTopicSummary {
     return this.topicModelLastUpdated;
   }
 
-  getClassroom(): string | undefined {
+  getClassroom(): string | null {
     return this.classroom;
   }
 
@@ -157,5 +171,21 @@ export class CreatorTopicSummary {
 
   isTopicPublished(): boolean {
     return this.isPublished;
+  }
+
+  getTotalUpcomingChaptersCount(): number {
+    return this.totalUpcomingChaptersCount;
+  }
+
+  getTotalOverdueChaptersCount(): number {
+    return this.totalOverdueChaptersCount;
+  }
+
+  getTotalChaptersCounts(): number[] {
+    return this.totalChaptersCounts;
+  }
+
+  getPublishedChaptersCounts(): number[] {
+    return this.publishedChaptersCounts;
   }
 }

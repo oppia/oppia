@@ -16,17 +16,16 @@
  * @fileoverview Component for the topic preview tab.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { Topic } from 'domain/topic/topic-object.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
+import {Component} from '@angular/core';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {Topic} from 'domain/topic/topic-object.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
 
 @Component({
   selector: 'oppia-topic-preview-tab',
-  templateUrl: './topic-preview-tab.component.html'
+  templateUrl: './topic-preview-tab.component.html',
 })
 export class TopicPreviewTabComponent {
   private _TAB_STORY: string = 'story';
@@ -51,11 +50,11 @@ export class TopicPreviewTabComponent {
     this.topic = this.topicEditorStateService.getTopic();
     this.topicName = this.topic.getName();
     this.subtopics = this.topic.getSubtopics();
-    this.cannonicalStorySummaries = (
-      this.topicEditorStateService.getCanonicalStorySummaries());
+    this.cannonicalStorySummaries =
+      this.topicEditorStateService.getCanonicalStorySummaries();
     for (let idx in this.cannonicalStorySummaries) {
-      this.chapterCount += (
-        this.cannonicalStorySummaries[idx].getNodeTitles().length);
+      this.chapterCount +=
+        this.cannonicalStorySummaries[idx].getNodeTitles().length;
     }
   }
 
@@ -77,8 +76,3 @@ export class TopicPreviewTabComponent {
     }
   }
 }
-
-angular.module('oppia').directive('oppiaTopicPreviewTab',
-  downgradeComponent({
-    component: TopicPreviewTabComponent
-  }) as angular.IDirectiveFactory);

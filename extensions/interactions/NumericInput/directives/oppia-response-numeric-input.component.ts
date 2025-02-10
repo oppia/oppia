@@ -20,14 +20,14 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-response-numeric-input',
   templateUrl: './numeric-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseNumericInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -36,9 +36,7 @@ export class ResponseNumericInput implements OnInit {
   @Input() answer!: string;
   displayAnswer!: Object;
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
@@ -49,6 +47,8 @@ export class ResponseNumericInput implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseNumericInput', downgradeComponent(
-    {component: ResponseNumericInput}
-  ) as angular.IDirectiveFactory);
+  'oppiaResponseNumericInput',
+  downgradeComponent({
+    component: ResponseNumericInput,
+  }) as angular.IDirectiveFactory
+);

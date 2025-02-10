@@ -32,13 +32,12 @@ ruleTester.run('no-inner-html', rule, {
           return $temp;
         },
       });
-    }`
+    }`,
   ],
 
   invalid: [
     {
-      code:
-        `if (!('outerHTML' in SVGElement.prototype)) {
+      code: `if (!('outerHTML' in SVGElement.prototype)) {
           Object.defineProperty(SVGElement.prototype, 'outerHTML', {
             get: function() {
               $node = this.cloneNode(true);
@@ -47,9 +46,11 @@ ruleTester.run('no-inner-html', rule, {
             },
           });
         }`,
-      errors: [{
-        message: 'Please do not use innerHTML property.'
-      }]
+      errors: [
+        {
+          message: 'Please do not use innerHTML property.',
+        },
+      ],
     },
-  ]
+  ],
 });

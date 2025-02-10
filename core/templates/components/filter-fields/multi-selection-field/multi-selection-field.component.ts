@@ -16,22 +16,28 @@
  * @fileoverview Component for subject interests form field.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'oppia-multi-selection-field',
-  templateUrl: './multi-selection-field.component.html'
+  templateUrl: './multi-selection-field.component.html',
 })
 export class MultiSelectionFieldComponent {
   @Input() selections: string[] = [];
-  @Output() selectionsChange: EventEmitter<string[]> = (
-    new EventEmitter());
+  @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
 
   @Input() label!: string;
   @Input() placeholder!: string;
@@ -49,14 +55,16 @@ export class MultiSelectionFieldComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
-  @ViewChild('newSelectionInput') newSelectionInput!:
-  ElementRef<HTMLInputElement>;
+  @ViewChild('newSelectionInput')
+  newSelectionInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.filteredSelections = this.formCtrl.valueChanges.pipe(
       startWith(null),
-      map((interest: string | null) => interest ? this.filter(
-        interest) : this.readOnlySelections.slice()));
+      map((interest: string | null) =>
+        interest ? this.filter(interest) : this.readOnlySelections.slice()
+      )
+    );
   }
 
   ngOnInit(): void {
@@ -77,11 +85,14 @@ export class MultiSelectionFieldComponent {
       }
     }
 
-    return this.selections.map(s => s.toLowerCase()).indexOf(
-      value.toLowerCase()) < 0 ? true : false;
+    return this.selections
+      .map(s => s.toLowerCase())
+      .indexOf(value.toLowerCase()) < 0
+      ? true
+      : false;
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -106,7 +117,7 @@ export class MultiSelectionFieldComponent {
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected(event: {option: {value: string}}): void {
     if (this.selections.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -117,7 +128,7 @@ export class MultiSelectionFieldComponent {
   filter(value: string): string[] {
     const filterValue = value.toLocaleLowerCase();
 
-    return this.readOnlySelections.filter((selection) => {
+    return this.readOnlySelections.filter(selection => {
       return selection.toLowerCase().includes(filterValue);
     });
   }

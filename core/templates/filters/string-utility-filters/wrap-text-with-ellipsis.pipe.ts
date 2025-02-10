@@ -16,17 +16,17 @@
  * @fileoverview WrapTextWithEllipsis filter for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { UtilsService } from 'services/utils.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {UtilsService} from 'services/utils.service';
 
 @Pipe({name: 'wrapTextWithEllipsis'})
 export class WrapTextWithEllipsisPipe implements PipeTransform {
   constructor(
     private utilsService: UtilsService,
-    private normalizeWhitespacePipe: NormalizeWhitespacePipe) {}
+    private normalizeWhitespacePipe: NormalizeWhitespacePipe
+  ) {}
 
   transform(input: string, characterCount: number): string {
     if (this.utilsService.isString(input)) {

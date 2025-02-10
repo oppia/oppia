@@ -3,8 +3,11 @@
     <div *ngIf="previewWarning">
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
-    <oppia-conversation-skin></oppia-conversation-skin>
-    <div class="navbar-fixed-bottom oppia-footer"></div>
+    <oppia-loading-message [message]="'Loading'" *ngIf="!voiceoversAreLoaded"></oppia-loading-message>
+    <oppia-conversation-skin *ngIf="voiceoversAreLoaded"></oppia-conversation-skin>
+    <page-footer>
+      <oppia-exploration-footer></oppia-exploration-footer>
+    </page-footer>
   </div>
 
   <div class="oppia-preview-bottom-right-container">
@@ -19,7 +22,7 @@
         </tr>
       </table>
     </div>
-    <button class="btn-lg" (click)="resetPreview()">
+    <button class="btn-lg e2e-test-preview-restart-button" (click)="resetPreview()">
       <i class="fas fa-redo oppia-reload-icon"></i>
       <span class="oppia-restart-text">Restart From Beginning</span>
     </button>
@@ -82,9 +85,9 @@
     left: 6px;
     max-width: 296px;
     padding: 3px;
-    position: absolute;
+    position: fixed;
     text-align: left;
-    top: 63px;
+    top: 130px;
     white-space: normal;
     z-index: 1060;
   }

@@ -17,34 +17,33 @@
  * in editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { HelpModalComponent } from 'pages/exploration-editor-page/modal-templates/help-modal.component';
-import { ContextService } from 'services/context.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { ThreadDataBackendApiService } from '../feedback-tab/services/thread-data-backend-api.service';
-import { ChangeListService } from '../services/change-list.service';
-import { ExplorationRightsService } from '../services/exploration-rights.service';
-import { ExplorationSaveService } from '../services/exploration-save.service';
-import { ExplorationWarningsService } from '../services/exploration-warnings.service';
-import { RouterService } from '../services/router.service';
-import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
-import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {HelpModalComponent} from 'pages/exploration-editor-page/modal-templates/help-modal.component';
+import {ContextService} from 'services/context.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {ThreadDataBackendApiService} from '../feedback-tab/services/thread-data-backend-api.service';
+import {ChangeListService} from '../services/change-list.service';
+import {ExplorationRightsService} from '../services/exploration-rights.service';
+import {ExplorationSaveService} from '../services/exploration-save.service';
+import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {RouterService} from '../services/router.service';
+import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
+import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 
 @Component({
   selector: 'oppia-editor-navigation',
-  templateUrl: './editor-navigation.component.html'
+  templateUrl: './editor-navigation.component.html',
 })
-export class EditorNavigationComponent
-  implements OnInit, OnDestroy {
+export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  autosaveIsInProgress: boolean = false;
   screenIsLarge: boolean = false;
   isPublishButtonEnabled: boolean = false;
   postTutorialHelpPopoverIsShown: boolean = false;
@@ -70,10 +69,9 @@ export class EditorNavigationComponent
     private siteAnalyticsService: SiteAnalyticsService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
-    private userExplorationPermissionsService:
-      UserExplorationPermissionsService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
-    private windowDimensionsService: WindowDimensionsService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   getChangeListLength(): number {
@@ -95,7 +93,8 @@ export class EditorNavigationComponent
   isEditableOutsideTutorialMode(): boolean {
     return (
       this.editabilityService.isEditableOutsideTutorialMode() ||
-      this.editabilityService.isTranslatable());
+      this.editabilityService.isTranslatable()
+    );
   }
 
   discardChanges(): void {
@@ -106,8 +105,11 @@ export class EditorNavigationComponent
     this.publishIsInProcess = true;
     this.loadingDotsAreShown = true;
 
-    this.explorationSaveService.showPublishExplorationModal(
-      this.showLoadingDots.bind(this), this.hideLoadingDots.bind(this))
+    this.explorationSaveService
+      .showPublishExplorationModal(
+        this.showLoadingDots.bind(this),
+        this.hideLoadingDots.bind(this)
+      )
       .then(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
@@ -126,12 +128,18 @@ export class EditorNavigationComponent
     this.saveIsInProcess = true;
     this.loadingDotsAreShown = true;
 
-    this.explorationSaveService.saveChangesAsync(
-      this.showLoadingDots.bind(this), this.hideLoadingDots.bind(this))
-      .then(() => {
-        this.saveIsInProcess = false;
-        this.loadingDotsAreShown = false;
-      }, () => {});
+    this.explorationSaveService
+      .saveChangesAsync(
+        this.showLoadingDots.bind(this),
+        this.hideLoadingDots.bind(this)
+      )
+      .then(
+        () => {
+          this.saveIsInProcess = false;
+          this.loadingDotsAreShown = false;
+        },
+        () => {}
+      );
   }
 
   toggleMobileNavOptions(): void {
@@ -197,20 +205,25 @@ export class EditorNavigationComponent
     const EDITOR_TUTORIAL_MODE = 'editor';
     const TRANSLATION_TUTORIAL_MODE = 'translation';
 
-    this.ngbModal.open(HelpModalComponent, {
-      backdrop: true,
-      windowClass: 'oppia-help-modal'
-    }).result.then(mode => {
-      if (mode === EDITOR_TUTORIAL_MODE) {
-        this.stateTutorialFirstTimeService.onOpenEditorTutorial.emit();
-      } else if (mode === TRANSLATION_TUTORIAL_MODE) {
-        this.stateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
-      }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(HelpModalComponent, {
+        backdrop: true,
+        windowClass: 'oppia-help-modal',
+      })
+      .result.then(
+        mode => {
+          if (mode === EDITOR_TUTORIAL_MODE) {
+            this.stateTutorialFirstTimeService.onOpenEditorTutorial.emit();
+          } else if (mode === TRANSLATION_TUTORIAL_MODE) {
+            this.stateTutorialFirstTimeService.onOpenTranslationTutorial.emit();
+          }
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   isScreenLarge(): boolean {
@@ -231,14 +244,15 @@ export class EditorNavigationComponent
 
   showPublishButton(): boolean {
     return (
-      this.isPublishButtonEnabled && (
-        this.explorationRightsService.isPrivate()));
+      this.isPublishButtonEnabled && this.explorationRightsService.isPrivate()
+    );
   }
 
   ngOnInit(): void {
-    this.userExplorationPermissionsService.getPermissionsAsync()
-      .then((permissions) => {
-        this.isPublishButtonEnabled = (permissions.canPublish);
+    this.userExplorationPermissionsService
+      .getPermissionsAsync()
+      .then(permissions => {
+        this.isPublishButtonEnabled = permissions.canPublish;
       });
 
     this.screenIsLarge = this.windowDimensionsService.getWidth() >= 1024;
@@ -252,51 +266,53 @@ export class EditorNavigationComponent
     this.postTutorialHelpPopoverIsShown = false;
 
     this.directiveSubscriptions.add(
-      this.stateTutorialFirstTimeService
-        .onOpenPostTutorialHelpPopover.subscribe(
-          () => {
-            if (this.screenIsLarge) {
-              this.postTutorialHelpPopoverIsShown = true;
-              setTimeout(() => {
-                this.postTutorialHelpPopoverIsShown = false;
-              }, 4000);
-            } else {
+      this.stateTutorialFirstTimeService.onOpenPostTutorialHelpPopover.subscribe(
+        () => {
+          if (this.screenIsLarge) {
+            this.postTutorialHelpPopoverIsShown = true;
+            setTimeout(() => {
               this.postTutorialHelpPopoverIsShown = false;
-            }
+            }, 4000);
+          } else {
+            this.postTutorialHelpPopoverIsShown = false;
           }
-        )
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
+        }
+      )
     );
 
     this.directiveSubscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           this.connectedToInternet = internetAccessible;
-        })
+        }
+      )
     );
 
     this.connectedToInternet = this.internetConnectivityService.isOnline();
     this.improvementsTabIsEnabled = false;
 
     Promise.resolve(
-      this.explorationImprovementsService.isImprovementsTabEnabledAsync())
-      .then(improvementsTabIsEnabled => {
-        this.improvementsTabIsEnabled = improvementsTabIsEnabled;
-      });
+      this.explorationImprovementsService.isImprovementsTabEnabledAsync()
+    ).then(improvementsTabIsEnabled => {
+      this.improvementsTabIsEnabled = improvementsTabIsEnabled;
+    });
 
     this.userIsLoggedIn = false;
 
-    Promise.resolve(this.userService.getUserInfoAsync())
-      .then(userInfo => {
-        this.userIsLoggedIn = userInfo.isLoggedIn();
-      });
+    Promise.resolve(this.userService.getUserInfoAsync()).then(userInfo => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaEditorNavigation',
-  downgradeComponent({
-    component: EditorNavigationComponent
-  }) as angular.IDirectiveFactory);

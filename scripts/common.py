@@ -33,11 +33,10 @@ import time
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from scripts import servers
 
-from typing import Dict, Final, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -55,15 +54,6 @@ NODE_VERSION = '16.13.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
-
-# Versions of libraries used in backend.
-PILLOW_VERSION = '9.0.1'
-
-# Buf version.
-BUF_VERSION = '0.29.0'
-
-# Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.13.0'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -89,8 +79,15 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk')
+GOOGLE_CLOUD_SDK_HOME = (
+    '/app/vm_deps/google-cloud-sdk'
+    if feconf.OPPIA_IS_DOCKERIZED
+    else os.path.join(
+        OPPIA_TOOLS_DIR_ABS_PATH,
+        'google-cloud-sdk-500.0.0',
+        'google-cloud-sdk'
+    )
+)
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -101,7 +98,8 @@ NG_BIN_PATH = (
 DEV_APPSERVER_PATH = (
     os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+NODE_PATH = '/usr' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
+    OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -121,12 +119,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 # Directory for storing/fetching data related to the Firebase emulator.
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
-
-# By specifying this condition, we are importing the below module only while
-# type checking, not in runtime.
-MYPY = False
-if MYPY:  # pragma: no cover
-    import github
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
@@ -191,7 +183,6 @@ NODEMODULES_WDIO_BIN_PATH = (
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
-    os.path.join(CURR_DIR, 'proto_files'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -200,6 +191,7 @@ CHROME_PATHS = [
     # Unix.
     '/usr/bin/google-chrome',
     '/usr/bin/chromium-browser',
+    '/usr/bin/google-chrome-stable',
     # Arch Linux.
     '/usr/bin/brave',
     '/usr/bin/chromium',
@@ -213,12 +205,84 @@ CHROME_PATHS = [
 ]
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
-    'blog-editor-tests/check-blog-editor-unable-to-publish-' +
-    'duplicate-blog-post.spec.js'
+    'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
+    'blog-editor/create-and-publish-a-blog-post-with-required-details',
+    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
+    'curriculum-admin/create-edit-and-delete-classroom',
+    'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/manage-exploration-misconceptions',
+    'exploration-editor/modify-translations-through-modal',
+    'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'logged-in-user/subscribe-to-creator-and-view-all-'
+    'explorations-by-that-creator',
+    'logged-in-user/create-and-delete-account',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
+    'logged-in-user/edit-profile-preferences-and-export-their-account',
+    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
+    'logged-in-user/give-feedback-rate-and-report-an-exploration',
+    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-out-user/check-all-user-flow-of-donor',
+    'logged-out-user/check-all-user-flow-of-parent-teacher',
+    'logged-out-user/check-all-user-flow-of-partner',
+    'logged-out-user/check-all-user-flow-of-volunteer',
+    'logged-out-user/click-all-buttons-on-about-page',
+    'logged-out-user/click-all-buttons-on-contact-us-page',
+    'logged-out-user/click-all-buttons-on-donation-thanks-page',
+    'logged-out-user/click-all-buttons-on-navbar',
+    'logged-out-user/click-all-buttons-on-partnerships-page',
+    'logged-out-user/click-all-buttons-on-teach-page',
+    'logged-out-user/click-all-buttons-on-volunteer-page',
+    'logged-out-user/click-all-links-in-oppia-footer',
+    'logged-out-user/click-all-links-on-creator-guidelines-page',
+    'logged-out-user/click-all-links-on-get-started-page',
+    'logged-out-user/click-all-links-on-privacy-policy-page',
+    'logged-out-user/click-all-links-on-terms-page',
+    'logged-out-user/click-all-buttons-on-donate-page',
+    'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
+    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
+    'logged-out-user/change-site-language-and-engage-with-original-exploration',
+    'logged-out-user/sign-in-and-save-exploration-progress',
+    'logged-out-user/track-and-resume-exploration-progress-via-url',
+    'logged-out-user/play-lesson-in-different-languages-and-listen-'
+    'to-voiceovers',
+    'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+    'moderator/edit-featured-activities-list',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'practice-question-admin/add-and-remove-contribution-rights',
+    'release-coordinator/run-a-beam-job-and-copy-the-output',
+    'release-coordinator/update-promo-bar-message',
+    'release-coordinator/flush-and-get-profile-of-redis-cache',
+    'release-coordinator/edit-feature-rollout-configuration',
+    'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
+    'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
+    'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-subtopic-and-story',
+    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-preview-and-save-a-chapter',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
-GAE_PORT_FOR_E2E_TESTING: Final = 9001
+GAE_PORT_FOR_E2E_TESTING: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
     GAE_PORT_FOR_E2E_TESTING,
@@ -247,10 +311,8 @@ def is_x64_architecture() -> bool:
     return sys.maxsize > 2**32
 
 
-NODE_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
-NPX_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
+NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
+NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
@@ -579,51 +641,6 @@ def get_personal_access_token() -> str:
     return personal_access_token
 
 
-def check_prs_for_current_release_are_released(
-    repo: github.Repository.Repository
-) -> None:
-    """Checks that all pull requests for current release have a
-    'PR: released' label.
-
-    Args:
-        repo: github.Repository.Repository. The PyGithub object for the repo.
-
-    Raises:
-        Exception. Some pull requests for current release do not have a
-            "PR: released" label.
-    """
-    current_release_label = repo.get_label(
-        constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-    current_release_prs = repo.get_issues(
-        state='all', labels=[current_release_label])
-    for pr in current_release_prs:
-        label_names = [label.name for label in pr.labels]
-        if constants.release_constants.LABEL_FOR_RELEASED_PRS not in (
-                label_names):
-            open_new_tab_in_browser_if_possible(
-                'https://github.com/oppia/oppia/pulls?utf8=%E2%9C%93&q=is%3Apr'
-                '+label%3A%22PR%3A+for+current+release%22+')
-            raise Exception(
-                'There are PRs for current release which do not have '
-                'a \'PR: released\' label. Please ensure that they are '
-                'released before release summary generation.')
-
-
-def convert_to_posixpath(file_path: str) -> str:
-    """Converts a Windows style filepath to posixpath format. If the operating
-    system is not Windows, this function does nothing.
-
-    Args:
-        file_path: str. The path to be converted.
-
-    Returns:
-        str. Returns a posixpath version of the file path.
-    """
-    if not is_windows_os():
-        return file_path
-    return file_path.replace('\\', '/')
-
-
 def create_readme(dir_path: str, readme_content: str) -> None:
     """Creates a readme in a given dir path with the specified
     readme content.
@@ -644,7 +661,8 @@ def inplace_replace_file(
     expected_number_of_replacements: Optional[int] = None
 ) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
-    to replace the file's content line by line.
+    to replace the file's content line by line. The old file is kept as-is until
+    it is replaced.
 
     Note:
         This function should only be used with files that are processed line by
@@ -661,26 +679,26 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    backup_filename = '%s.bak' % filename
-    shutil.copyfile(filename, backup_filename)
+    new_filename = '%s.new' % filename
+    shutil.copyfile(filename, new_filename)
     new_contents = []
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(backup_filename, 'r') as f:
-            for line in f:
+        with utils.open_file(filename, 'r') as old_file:
+            for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(filename, 'w') as f:
+        with utils.open_file(new_filename, 'w') as new_file:
             for line in new_contents:
-                f.write(line)
+                new_file.write(line)
 
         if (
-                expected_number_of_replacements is not None and
-                total_number_of_replacements != expected_number_of_replacements
+            expected_number_of_replacements is not None and
+            total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
                 'Wrong number of replacements. Expected %s. Performed %s.' % (
@@ -689,47 +707,12 @@ def inplace_replace_file(
                 )
             )
 
-        os.remove(backup_filename)
+        os.replace(new_filename, filename)
 
     except Exception:
-        # Restore the content if there was en error.
-        os.remove(filename)
-        shutil.move(backup_filename, filename)
+        # Drop the new file if there was an error.
+        os.remove(new_filename)
         raise
-
-
-@contextlib.contextmanager
-def inplace_replace_file_context(
-    filename: str, regex_pattern: str, replacement_string: str
-) -> Generator[None, None, None]:
-    """Context manager in which the file's content is replaced according to the
-    given regex pattern. This function should only be used with files that are
-    processed line by line.
-
-    Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-
-    Yields:
-        None. Nothing.
-    """
-    backup_filename = '%s.bak' % filename
-    regex = re.compile(regex_pattern)
-
-    shutil.copyfile(filename, backup_filename)
-
-    try:
-        with utils.open_file(backup_filename, 'r') as f:
-            new_contents = [regex.sub(replacement_string, line) for line in f]
-        with utils.open_file(filename, 'w') as f:
-            f.write(''.join(new_contents))
-        yield
-    finally:
-        if os.path.isfile(filename) and os.path.isfile(backup_filename):
-            os.remove(filename)
-        if os.path.isfile(backup_filename):
-            shutil.move(backup_filename, filename)
 
 
 def wait_for_port_to_be_in_use(port_number: int) -> None:
@@ -868,11 +851,29 @@ def url_retrieve(
         Exception. Raised when the provided URL does not use HTTPS but
             enforce_https is True.
     """
-    failures = 0
-    success = False
     if enforce_https and not url.startswith('https://'):
         raise Exception(
             'The URL %s should use HTTPS.' % url)
+
+    # Try downloading using curl initially.
+    print('Downloading %s to %s using curl...' % (url, output_path))
+    curl_task = subprocess.Popen(
+    # The -L flag is for following redirects.
+        ['curl', '-L', url, '--output', output_path],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+    with curl_task:
+        out, err = curl_task.communicate()
+    if curl_task.returncode == 0:
+        # The download was successful.
+        print(out)
+        print(err)
+        return
+
+    # Download with urlopen if curl fails.
+    print('Downloading using curl failed. Trying with urlopen.')
+    print('Error log for curl: %s' % err)
+    failures = 0
+    success = False
     while not success and failures < max_attempts:
         try:
             with urlrequest.urlopen(
@@ -881,11 +882,13 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+            urlerror.URLError, ssl.SSLError,
+            client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
                 failures, max_attempts, url))
+            print('Error in common.url_retrieve: %s' % exception)
             if failures >= max_attempts:
                 raise exception
             print('Error: %s' % exception)
@@ -982,39 +985,40 @@ def modify_constants(
     if feconf.OPPIA_IS_DOCKERIZED:
         return
 
-    branch_name_variable = (
-        '"BRANCH_NAME": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
+    if prod_env or version_info_must_be_set is False:
+        branch_name_variable = (
+            '"BRANCH_NAME": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
         )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"BRANCH_NAME": ".*"',
-        branch_name_variable,
-        expected_number_of_replacements=1
-    )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"BRANCH_NAME": ".*"',
+            branch_name_variable,
+            expected_number_of_replacements=1
+        )
 
-    short_commit_hash_variable = (
-        '"SHORT_COMMIT_HASH": "%s"'
-        % (
-            subprocess.check_output(
-                ['git', 'rev-parse', '--short', 'HEAD'],
-                encoding='utf-8'
-            ).strip().split('\n', maxsplit=1)[0]
-            if version_info_must_be_set else ''
+        short_commit_hash_variable = (
+            '"SHORT_COMMIT_HASH": "%s"'
+            % (
+                subprocess.check_output(
+                    ['git', 'rev-parse', '--short', 'HEAD'],
+                    encoding='utf-8'
+                ).strip().split('\n', maxsplit=1)[0]
+                if version_info_must_be_set else ''
+            )
         )
-    )
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"SHORT_COMMIT_HASH": ".*"',
-        short_commit_hash_variable,
-        expected_number_of_replacements=1
-    )
+        inplace_replace_file(
+            CONSTANTS_FILE_PATH,
+            r'"SHORT_COMMIT_HASH": ".*"',
+            short_commit_hash_variable,
+            expected_number_of_replacements=1
+        )
 
 
 def is_oppia_server_already_running() -> bool:
@@ -1032,3 +1036,11 @@ def is_oppia_server_already_running() -> bool:
                 'Exiting.' % port)
             return True
     return False
+
+
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
+    """Starts subprocess and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    return out, err

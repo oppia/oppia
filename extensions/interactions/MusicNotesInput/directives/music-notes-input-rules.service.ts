@@ -16,20 +16,18 @@
  * @fileoverview Rules service for the interaction.
  */
 
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {MusicNotesAnswer} from 'interactions/answer-defs';
+import {UtilsService} from 'services/utils.service';
 
-import { MusicNotesAnswer } from 'interactions/answer-defs';
-import { UtilsService } from 'services/utils.service';
-
-type ReadableNoteNames = (
-  keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
+type ReadableNoteNames =
+  keyof typeof InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MusicNotesInputRulesService {
   constructor(private utilsService: UtilsService) {}
@@ -37,59 +35,62 @@ export class MusicNotesInputRulesService {
   static _getMidiNoteValue(note: MusicNotesAnswer): number {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
-        note.readableNoteName)) {
+        note.readableNoteName
+      )
+    ) {
       const _readableNoteName = note.readableNoteName as ReadableNoteNames;
       return InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES[
-        _readableNoteName];
+        _readableNoteName
+      ];
     } else {
       throw new Error('Invalid music note ' + note);
     }
   }
 
   static _convertSequenceToMidi(sequence: MusicNotesAnswer[]): number[] {
-    return sequence.map((note) => {
+    return sequence.map(note => {
       return MusicNotesInputRulesService._getMidiNoteValue(note);
     });
   }
 
-  Equals(
-      answer: MusicNotesAnswer[], inputs: {x: MusicNotesAnswer[]}): boolean {
+  Equals(answer: MusicNotesAnswer[], inputs: {x: MusicNotesAnswer[]}): boolean {
     return this.utilsService.isEquivalent(
       MusicNotesInputRulesService._convertSequenceToMidi(answer),
-      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x)
+    );
   }
 
-  IsLongerThan(
-      answer: MusicNotesAnswer[],
-      inputs: {k: number}): boolean {
-    return MusicNotesInputRulesService._convertSequenceToMidi(
-      answer).length > inputs.k;
+  IsLongerThan(answer: MusicNotesAnswer[], inputs: {k: number}): boolean {
+    return (
+      MusicNotesInputRulesService._convertSequenceToMidi(answer).length >
+      inputs.k
+    );
   }
 
-  // TODO(wxy): Validate that inputs.a <= inputs.b.
+  // TODO(#20443): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
-      answer: MusicNotesAnswer[],
-      inputs: { a: number; b: number }
+    answer: MusicNotesAnswer[],
+    inputs: {a: number; b: number}
   ): boolean {
-    var answerLength: number = (
-      MusicNotesInputRulesService._convertSequenceToMidi(answer).length);
+    var answerLength: number =
+      MusicNotesInputRulesService._convertSequenceToMidi(answer).length;
     return answerLength >= inputs.a && answerLength <= inputs.b;
   }
 
   IsEqualToExceptFor(
-      answer: MusicNotesAnswer[],
-      inputs: { x: MusicNotesAnswer[]; k: number }
+    answer: MusicNotesAnswer[],
+    inputs: {x: MusicNotesAnswer[]; k: number}
   ): boolean {
-    var targetSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
-    var userSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    var targetSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x);
+    var userSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(answer);
     if (userSequence.length !== targetSequence.length) {
       return false;
     }
 
     var numWrongNotes: number = 0;
-    userSequence.map(function(noteValue, index) {
+    userSequence.map(function (noteValue, index) {
       if (noteValue !== targetSequence[index]) {
         numWrongNotes++;
       }
@@ -98,13 +99,13 @@ export class MusicNotesInputRulesService {
   }
 
   IsTranspositionOf(
-      answer: MusicNotesAnswer[],
-      inputs: { x: MusicNotesAnswer[]; y: number }
+    answer: MusicNotesAnswer[],
+    inputs: {x: MusicNotesAnswer[]; y: number}
   ): boolean {
-    var targetSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
-    var userSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    var targetSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x);
+    var userSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(answer);
     if (userSequence.length !== targetSequence.length) {
       return false;
     }
@@ -114,13 +115,13 @@ export class MusicNotesInputRulesService {
   }
 
   IsTranspositionOfExceptFor(
-      answer: MusicNotesAnswer[],
-      inputs: { x: MusicNotesAnswer[]; y: number; k: number }
+    answer: MusicNotesAnswer[],
+    inputs: {x: MusicNotesAnswer[]; y: number; k: number}
   ): boolean {
-    var targetSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
-    var userSequence: number[] = (
-      MusicNotesInputRulesService._convertSequenceToMidi(answer));
+    var targetSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(inputs.x);
+    var userSequence: number[] =
+      MusicNotesInputRulesService._convertSequenceToMidi(answer);
     if (userSequence.length !== targetSequence.length) {
       return false;
     }
@@ -135,6 +136,9 @@ export class MusicNotesInputRulesService {
   }
 }
 
-angular.module('oppia').factory(
-  'MusicNotesInputRulesService',
-  downgradeInjectable(MusicNotesInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'MusicNotesInputRulesService',
+    downgradeInjectable(MusicNotesInputRulesService)
+  );

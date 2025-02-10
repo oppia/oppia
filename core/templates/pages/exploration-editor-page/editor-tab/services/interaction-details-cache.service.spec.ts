@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
-import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
+import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 
 describe('Interaction Details Cache Service', () => {
   describe('InteractionDetailsCache', () => {
     var interactionCustomizationArgs = {
       choices: {
-        value: 'SampleChoice'
-      }
+        value: 'SampleChoice',
+      },
     };
 
     var interaction = {
-      customization: interactionCustomizationArgs
+      customization: interactionCustomizationArgs,
     };
 
     var idcs: InteractionDetailsCacheService;

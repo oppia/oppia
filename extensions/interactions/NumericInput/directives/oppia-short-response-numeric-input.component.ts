@@ -20,15 +20,15 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NumberConversionService } from 'services/number-conversion.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NumberConversionService} from 'services/number-conversion.service';
 
 @Component({
   selector: 'oppia-short-response-numeric-input',
   templateUrl: './numeric-input-short-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseNumericInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -45,12 +45,14 @@ export class ShortResponseNumericInput implements OnInit {
   ngOnInit(): void {
     let escapedAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
     let recievedAnswer = escapedAnswer as number;
-    this.displayAnswer = this.numberConversionService.convertToLocalizedNumber(
-      recievedAnswer);
+    this.displayAnswer =
+      this.numberConversionService.convertToLocalizedNumber(recievedAnswer);
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseNumericInput', downgradeComponent(
-    {component: ShortResponseNumericInput}
-  ) as angular.IDirectiveFactory);
+  'oppiaShortResponseNumericInput',
+  downgradeComponent({
+    component: ShortResponseNumericInput,
+  }) as angular.IDirectiveFactory
+);

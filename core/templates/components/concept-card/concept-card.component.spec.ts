@@ -16,15 +16,21 @@
  * @fileoverview Unit test for Concept Card Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
-import { ConceptCard } from 'domain/skill/concept-card.model';
-import { WorkedExample } from 'domain/skill/worked-example.model';
-import { ConceptCardComponent } from './concept-card.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {WorkedExample} from 'domain/skill/worked-example.model';
+import {ConceptCardComponent} from './concept-card.component';
 
 describe('Concept card component', () => {
   let fixture: ComponentFixture<ConceptCardComponent>;
@@ -33,16 +39,15 @@ describe('Concept card component', () => {
   let conceptCard = new ConceptCard(
     new SubtitledHtml('', '1'),
     [new WorkedExample({} as SubtitledHtml, {} as SubtitledHtml)],
-    RecordedVoiceovers.createEmpty());
+    RecordedVoiceovers.createEmpty()
+  );
   let conceptCardObjects = [conceptCard];
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
       declarations: [ConceptCardComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,8 +58,10 @@ describe('Concept card component', () => {
   });
 
   it('should initialize and load concept cards successfully', fakeAsync(() => {
-    spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
-      .and.returnValue(Promise.resolve(conceptCardObjects));
+    spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.resolve(conceptCardObjects));
     componentInstance.index = 0;
 
     componentInstance.ngOnInit();
@@ -64,18 +71,20 @@ describe('Concept card component', () => {
     expect(componentInstance.currentConceptCard).toEqual(conceptCard);
   }));
 
-  it('should initialize and handle error if fails to load concept cards',
-    fakeAsync(() => {
-      spyOn(conceptCardBackendApiService, 'loadConceptCardsAsync')
-        .and.returnValue(Promise.reject({}));
+  it('should initialize and handle error if fails to load concept cards', fakeAsync(() => {
+    spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(Promise.reject({}));
 
-      componentInstance.ngOnInit();
-      tick();
+    componentInstance.ngOnInit();
+    tick();
 
-      expect(componentInstance.loadingMessage).toEqual('');
-      expect(componentInstance.skillDeletedMessage).toEqual(
-        'Oops, it looks like this skill has been deleted.');
-    }));
+    expect(componentInstance.loadingMessage).toEqual('');
+    expect(componentInstance.skillDeletedMessage).toEqual(
+      'Oops, it looks like this skill has been deleted.'
+    );
+  }));
 
   it('should tell if work example is last', () => {
     componentInstance.numberOfWorkedExamplesShown = 1;
@@ -92,6 +101,7 @@ describe('Concept card component', () => {
 
     expect(componentInstance.explanationIsShown).toBeFalse();
     expect(componentInstance.numberOfWorkedExamplesShown).toEqual(
-      numberOfWorkedExamplesShown + 1);
+      numberOfWorkedExamplesShown + 1
+    );
   });
 });

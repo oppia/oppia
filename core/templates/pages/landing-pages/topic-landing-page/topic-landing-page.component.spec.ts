@@ -16,20 +16,21 @@
  * @fileoverview Unit tests for topicLandingPage.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, async, tick, fakeAsync }
-  from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  TestBed,
+  async,
+  tick,
+  fakeAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { TopicLandingPageComponent } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
-import { PageTitleService } from 'services/page-title.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-
-import { AppConstants } from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicLandingPageComponent} from 'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import {PageTitleService} from 'services/page-title.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   _window = {
@@ -47,9 +48,9 @@ class MockWindowRef {
       },
       set href(val) {
         this._href = val;
-      }
+      },
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -85,12 +86,12 @@ describe('Topic Landing Page', () => {
       declarations: [TopicLandingPageComponent],
       providers: [
         PageTitleService,
-        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
+        {provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService},
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef },
-        {provide: TranslateService, useClass: MockTranslateService}
+        {provide: WindowRef, useValue: windowRef},
+        {provide: TranslateService, useClass: MockTranslateService},
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -103,20 +104,24 @@ describe('Topic Landing Page', () => {
     fixture.detectChanges();
   });
 
-  it('should get topic title from topic id in pathname and subscribe to ' +
-    'onLangChange emitterwhen component is initialized', () => {
-    spyOn(translateService.onLangChange, 'subscribe');
-    windowRef.nativeWindow.location.pathname = '/math/ratios';
-    component.ngOnInit();
-    expect(component.topicTitle).toBe('Ratios');
-    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-  });
+  it(
+    'should get topic title from topic id in pathname and subscribe to ' +
+      'onLangChange emitterwhen component is initialized',
+    () => {
+      spyOn(translateService.onLangChange, 'subscribe');
+      windowRef.nativeWindow.location.pathname = '/math/ratios';
+      component.ngOnInit();
+      expect(component.topicTitle).toBe('Ratios');
+      expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
+    }
+  );
 
   it('should click get started button', fakeAsync(() => {
     windowRef.nativeWindow.location.pathname = '/math/ratios';
     let analyticsSpy = spyOn(
-      siteAnalyticsService, 'registerOpenCollectionFromLandingPageEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerOpenCollectionFromLandingPageEvent'
+    ).and.callThrough();
     // Get collection id from ratios.
     component.ngOnInit();
 
@@ -128,8 +133,7 @@ describe('Topic Landing Page', () => {
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/math/ratios');
+    expect(windowRef.nativeWindow.location.href).toBe('/learn/math/ratios');
   }));
 
   it('should click learn more button', fakeAsync(() => {
@@ -138,11 +142,10 @@ describe('Topic Landing Page', () => {
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location.href).toBe(
-      `/learn/${AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
+    expect(windowRef.nativeWindow.location.href).toBe('/learn');
   }));
 
-  it('should return correct lesson quality image src', function() {
+  it('should return correct lesson quality image src', function () {
     let imageSrc = component.getLessonQualityImageSrc('someImage.png');
     expect(imageSrc).toBe('/assets/images/landing/someImage.png');
 
@@ -150,14 +153,17 @@ describe('Topic Landing Page', () => {
     expect(imageSrc).toBe('/assets/images/landing/someOtherImage.png');
   });
 
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
-    component.ngOnInit();
-    spyOn(component, 'setPageTitle');
-    translateService.onLangChange.emit();
+  it(
+    'should obtain translated page title whenever the selected' +
+      'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setPageTitle');
+      translateService.onLangChange.emit();
 
-    expect(component.setPageTitle).toHaveBeenCalled();
-  });
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }
+  );
 
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -167,17 +173,20 @@ describe('Topic Landing Page', () => {
       topicTitle: 'dummy_title',
       topicTagline: 'dummy_tagline',
       collectionId: 'dummy_collectionId',
-      chapters: ['chapter1', 'chapter2']
+      chapters: ['chapter1', 'chapter2'],
     };
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_TOPIC_LANDING_PAGE_TITLE', {
+      'I18N_TOPIC_LANDING_PAGE_TITLE',
+      {
         topicTitle: 'dummy_title',
-        topicTagline: 'dummy_tagline'
-      });
+        topicTagline: 'dummy_tagline',
+      }
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_TOPIC_LANDING_PAGE_TITLE');
+      'I18N_TOPIC_LANDING_PAGE_TITLE'
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

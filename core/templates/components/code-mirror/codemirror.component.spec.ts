@@ -16,11 +16,17 @@
  * @fileoverview Unit tests for angular code mirror wrapper.
  */
 
-import { SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
-import { CodeMirrorComponent } from './codemirror.component';
-import { CodeMirrorModule } from './codemirror.module';
+import {SimpleChanges} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
+import {CodeMirrorComponent} from './codemirror.component';
+import {CodeMirrorModule} from './codemirror.module';
 
 describe('Oppia CodeMirror Component', () => {
   let component: CodeMirrorComponent;
@@ -28,7 +34,7 @@ describe('Oppia CodeMirror Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [CodeMirrorModule]
+      imports: [CodeMirrorModule],
     }).compileComponents();
   }));
 
@@ -37,20 +43,19 @@ describe('Oppia CodeMirror Component', () => {
     component = fixture.componentInstance;
   }));
 
-  it('should throw error if CodeMirrorComponent is undefined', fakeAsync(
-    () => {
-      component.codemirrorComponent = undefined;
-      expect(() => {
-        component.ngAfterViewInit();
-        tick(1);
-      }).toThrowError('CodeMirrorComponent not Found');
-    }));
+  it('should throw error if CodeMirrorComponent is undefined', fakeAsync(() => {
+    component.codemirrorComponent = undefined;
+    expect(() => {
+      component.ngAfterViewInit();
+      tick(1);
+    }).toThrowError('CodeMirrorComponent not Found');
+  }));
 
   it('should notify that it has loaded', fakeAsync(() => {
     const onLoadSpy = jasmine.createSpy('onLoadSpy');
     let subscription = component.onLoad.subscribe(onLoadSpy);
     component.codemirrorComponent = {
-      codemirror: {}
+      codemirror: {},
     } as unknown as CodemirrorComponent;
     component.ngAfterViewInit();
     tick(1);
@@ -66,11 +71,11 @@ describe('Oppia CodeMirror Component', () => {
     subscription.unsubscribe();
   }));
 
-  it ('should refresh codemirror', waitForAsync(() => {
+  it('should refresh codemirror', waitForAsync(() => {
     component.codemirror = {
       refresh: () => {
         return;
-      }
+      },
     } as CodeMirror.Editor;
     const refreshSpy = spyOn(component.codemirror, 'refresh');
     const changes: SimpleChanges = {
@@ -78,8 +83,8 @@ describe('Oppia CodeMirror Component', () => {
         previousValue: false,
         currentValue: true,
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.ngOnChanges(changes);
     expect(refreshSpy).toHaveBeenCalled();

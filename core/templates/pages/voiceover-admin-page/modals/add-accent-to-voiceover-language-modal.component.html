@@ -1,0 +1,74 @@
+<div class="modal-header">
+  <h3>Specify accent for the given language code</h3>
+</div>
+<div class="modal-body">
+  <p><strong>Username:  </strong>{{voiceArtistName}}</p>
+  <p><strong>Language Code:  </strong>{{languageCode}}</p>
+  <p><strong>Sample Voiceovers:</strong></p>
+  <div *ngIf="pageIsInitialized">
+    <ol>
+      <div *ngFor="let element of explorationIdsToFilenames | keyvalue">
+        <div *ngFor="let filename of element.value">
+          <li>
+            <div>
+              <button class="btn btn-secondary audio-button"
+                      (click)="playAudio(filename, element.key)"
+                      *ngIf="currentFilename === '' || currentFilename !== filename">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
+              <button class="btn btn-secondary audio-button"
+                      (click)="pauseAudio()"
+                      *ngIf="currentFilename !== '' && currentFilename === filename">
+                <mat-icon>pause</mat-icon>
+              </button>
+            </div>
+          </li>
+        </div>
+      </div>
+    </ol>
+  </div>
+  <div *ngIf="!pageIsInitialized">
+    <span>Loading Voiceovers...</span>
+  </div>
+  <div *ngIf="languageAccentCode">
+    <strong>Selected Accent: </strong>
+    <span class="selected-language">{{languageAccentCode}}</span>
+    <button (click)="removeSelectedAccent()" mat-button mat-icon-button>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="selecting-accent-container" *ngIf="!languageAccentCode">
+    <p><strong>Select accent:</strong></p>
+    <mat-form-field class="oppia-language-accent-dropdown-selector">
+      <mat-label>Language Accent pair</mat-label>
+      <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+        <mat-option *ngFor="let languageAccentCode of languageAccentCodes | keyvalue"
+                    [value]="languageAccentCode.key">
+          <span>
+            {{languageAccentCode.value}}
+          </span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success" (click)="update()" [disabled]="updateButtonIsDisabled">
+    <span>Update</span>
+  </button>
+</div>
+<style>
+  .selected-language {
+    margin: 40px;
+  }
+  .audio-button {
+    width: 100%;
+  }
+  .oppia-language-accent-dropdown-selector {
+    width: 400px;
+  }
+  .selecting-accent-container {
+    margin-top: 15px;
+  }
+</style>

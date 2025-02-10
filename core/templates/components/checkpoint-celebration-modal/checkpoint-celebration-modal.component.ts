@@ -16,19 +16,28 @@
  * @fileoverview Component for the checkpoint celebration modal.
  */
 
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
+import {Subscription} from 'rxjs';
 
-import { ContextService } from 'services/context.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ContextService} from 'services/context.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  ReadOnlyExplorationBackendApiService,
+  ReadOnlyExplorationBackendDict,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 import './checkpoint-celebration-modal.component.css';
 
@@ -44,11 +53,11 @@ const SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX = 1370;
 @Component({
   selector: 'oppia-checkpoint-celebration-modal',
   templateUrl: './checkpoint-celebration-modal.component.html',
-  styleUrls: ['./checkpoint-celebration-modal.component.css']
+  styleUrls: ['./checkpoint-celebration-modal.component.css'],
 })
 export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
-  @ViewChild('checkpointCelebrationModalTimer') checkpointTimerTemplateRef!:
-    ElementRef<SVGPolylineElement>;
+  @ViewChild('checkpointCelebrationModalTimer')
+  checkpointTimerTemplateRef!: ElementRef<SVGPolylineElement>;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -79,10 +88,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private contextService: ContextService,
-    private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService,
-    private checkpointCelebrationUtilityService:
-      CheckpointCelebrationUtilityService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private playerPositionService: PlayerPositionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
@@ -93,32 +100,39 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
-    this.oppiaAvatarImageUrl = (
-      this.urlInterpolationService
-        .getStaticImageUrl('/avatar/oppia_avatar_100px.svg'));
-    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-      this.explorationId, null).then((response) => {
-      this.exploration = response.exploration;
-      this.hasViewedLessonInfoOnce = response.has_viewed_lesson_info_modal_once;
-      this.mostRecentlyReachedCheckpointStateName = (
-        response.most_recently_reached_checkpoint_state_name);
+    this.oppiaAvatarImageUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null)
+      .then(response => {
+        this.exploration = response.exploration;
+        this.hasViewedLessonInfoOnce =
+          response.has_viewed_lesson_info_modal_once;
+        this.mostRecentlyReachedCheckpointStateName =
+          response.most_recently_reached_checkpoint_state_name;
 
-      this.orderedCheckpointList = this.checkpointCelebrationUtilityService
-        .getStateListForCheckpointMessages(
-          this.exploration.states, this.exploration.init_state_name);
-      this.totalNumberOfCheckpoints = this.orderedCheckpointList.length;
-      this.checkpointStatusArrayPlaceholder = new Array(
-        this.totalNumberOfCheckpoints);
-      this.checkpointStatusArray = new Array(this.totalNumberOfCheckpoints);
-      this.checkpointNodeFadeInDelays = new Array(
-        this.totalNumberOfCheckpoints);
-      this.setFadeInDelaysForCheckpointNodes();
-      this.currentStateName = this.exploration.init_state_name;
-      this.subscribeToCardChangeEmitter();
-    });
-    this.shouldDisplayFullScaleMessage = (
+        this.orderedCheckpointList =
+          this.checkpointCelebrationUtilityService.getStateListForCheckpointMessages(
+            this.exploration.states,
+            this.exploration.init_state_name
+          );
+        this.totalNumberOfCheckpoints = this.orderedCheckpointList.length;
+        this.checkpointStatusArrayPlaceholder = new Array(
+          this.totalNumberOfCheckpoints
+        );
+        this.checkpointStatusArray = new Array(this.totalNumberOfCheckpoints);
+        this.checkpointNodeFadeInDelays = new Array(
+          this.totalNumberOfCheckpoints
+        );
+        this.setFadeInDelaysForCheckpointNodes();
+        this.currentStateName = this.exploration.init_state_name;
+        this.subscribeToCardChangeEmitter();
+      });
+    this.shouldDisplayFullScaleMessage =
       this.windowDimensionsService.getWidth() >
-      SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX);
+      SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX;
     this.subscribeToWindowResizeEmitter();
   }
 
@@ -131,22 +145,26 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       this.playerPositionService.onNewCardOpened.subscribe(
         (nextStateCard: StateCard) => {
           this.checkpointCelebrationUtilityService.setIsOnCheckpointedState(
-            false);
+            false
+          );
           if (this.miniMessageTooltipIsShown) {
             this.dismissMiniMessage();
             setTimeout(() => {
               this.checkIfCheckpointMessageIsToBeTriggered(
-                nextStateCard.getStateName());
+                nextStateCard.getStateName()
+              );
             }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
           } else if (this.messageModalIsShown) {
             this.dismissMessage();
             setTimeout(() => {
               this.checkIfCheckpointMessageIsToBeTriggered(
-                nextStateCard.getStateName());
+                nextStateCard.getStateName()
+              );
             }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
           } else {
             this.checkIfCheckpointMessageIsToBeTriggered(
-              nextStateCard.getStateName());
+              nextStateCard.getStateName()
+            );
           }
         }
       )
@@ -155,13 +173,11 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
 
   subscribeToWindowResizeEmitter(): void {
     this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(
-        () => {
-          this.shouldDisplayFullScaleMessage = (
-            this.windowDimensionsService.getWidth() >
-            SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX);
-        }
-      )
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.shouldDisplayFullScaleMessage =
+          this.windowDimensionsService.getWidth() >
+          SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX;
+      })
     );
   }
 
@@ -176,7 +192,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     }
     this.currentStateName = newStateName;
     let checkpointPos = this.orderedCheckpointList.indexOf(
-      this.currentStateName);
+      this.currentStateName
+    );
     if (checkpointPos === -1 || checkpointPos === 0) {
       return;
     }
@@ -185,11 +202,13 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.translatedCurrentCheckpointMessage = (
+    this.translatedCurrentCheckpointMessage =
       this.checkpointCelebrationUtilityService.getCheckpointMessage(
-        checkpointPos, this.orderedCheckpointList.length));
-    this.translatedCurrentCheckpointMessageTitle = (
-      this.checkpointCelebrationUtilityService.getCheckpointTitle());
+        checkpointPos,
+        this.orderedCheckpointList.length
+      );
+    this.translatedCurrentCheckpointMessageTitle =
+      this.checkpointCelebrationUtilityService.getCheckpointTitle();
     this.currentCheckpointPosition = checkpointPos;
     this.generateCheckpointStatusArray();
 
@@ -206,8 +225,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
     }
     if (this.totalNumberOfCheckpoints > this.currentCheckpointPosition) {
-      this.checkpointStatusArray[this.currentCheckpointPosition] = (
-        CHECKPOINT_STATUS_IN_PROGRESS);
+      this.checkpointStatusArray[this.currentCheckpointPosition] =
+        CHECKPOINT_STATUS_IN_PROGRESS;
     }
     for (
       let i = this.currentCheckpointPosition + 1;
@@ -228,14 +247,15 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     }
     const spaceBetweenEachNode = 100 / (this.totalNumberOfCheckpoints - 1);
     return (
-      ((this.currentCheckpointPosition - 1) * spaceBetweenEachNode) +
-      (spaceBetweenEachNode / 2));
+      (this.currentCheckpointPosition - 1) * spaceBetweenEachNode +
+      spaceBetweenEachNode / 2
+    );
   }
 
   setFadeInDelaysForCheckpointNodes(): void {
     for (let i = 0; i < this.totalNumberOfCheckpoints; i++) {
-      this.checkpointNodeFadeInDelays[i] = (
-        i * (1.5 / this.totalNumberOfCheckpoints) + 2.2);
+      this.checkpointNodeFadeInDelays[i] =
+        i * (1.5 / this.totalNumberOfCheckpoints) + 2.2;
     }
   }
 

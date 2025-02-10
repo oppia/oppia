@@ -17,14 +17,14 @@
  */
 
 export interface SkillSummaryBackendDict {
-  'id': string;
-  'description': string;
-  'language_code': string;
-  'version': number;
-  'misconception_count': number;
-  'worked_examples_count': number;
-  'skill_model_created_on': number;
-  'skill_model_last_updated': number;
+  id: string;
+  description: string;
+  language_code: string;
+  version: number;
+  misconception_count: number;
+  worked_examples_count: number;
+  skill_model_created_on: number;
+  skill_model_last_updated: number;
 }
 
 export class SkillSummary {
@@ -36,10 +36,12 @@ export class SkillSummary {
     public misconceptionCount: number,
     public workedExamplesCount: number,
     public skillModelCreatedOn: number,
-    public skillModelLastUpdated: number) {}
+    public skillModelLastUpdated: number
+  ) {}
 
   static createFromBackendDict(
-      summaryDict: SkillSummaryBackendDict): SkillSummary {
+    summaryDict: SkillSummaryBackendDict
+  ): SkillSummary {
     return new SkillSummary(
       summaryDict.id,
       summaryDict.description,
@@ -48,6 +50,7 @@ export class SkillSummary {
       summaryDict.misconception_count,
       summaryDict.worked_examples_count,
       summaryDict.skill_model_created_on,
-      summaryDict.skill_model_last_updated);
+      summaryDict.skill_model_last_updated
+    );
   }
 }

@@ -16,18 +16,24 @@
  * @fileoverview Unit test for State Editor Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { State } from 'domain/state/StateObjectFactory';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { StateEditorService } from './state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from './state-editor-properties-services/state-interaction-id.service';
-import { StateEditorComponent } from './state-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {State} from 'domain/state/StateObjectFactory';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {StateEditorService} from './state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from './state-editor-properties-services/state-interaction-id.service';
+import {StateEditorComponent} from './state-editor.component';
 
 describe('State Editor Component', () => {
   let component: StateEditorComponent;
@@ -40,15 +46,13 @@ describe('State Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        StateEditorComponent
-      ],
+      declarations: [StateEditorComponent],
       providers: [
         WindowDimensionsService,
         StateEditorService,
         StateInteractionIdService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -59,11 +63,13 @@ describe('State Editor Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    explorationHtmlFormatterService =
-      TestBed.inject(ExplorationHtmlFormatterService);
+    explorationHtmlFormatterService = TestBed.inject(
+      ExplorationHtmlFormatterService
+    );
 
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-      'Introduction');
+      'Introduction'
+    );
   });
 
   afterEach(() => {
@@ -82,8 +88,7 @@ describe('State Editor Component', () => {
     spyOn(component.navigateToState, 'emit').and.stub();
     spyOn(component.onSaveSolution, 'emit').and.stub();
     spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
-    spyOn(component.onSaveInteractionCustomizationArgs, 'emit').and.stub();
-    spyOn(component.onSaveInteractionId, 'emit').and.stub();
+    spyOn(component.onSaveInteractionData, 'emit').and.stub();
     spyOn(component.onSaveStateContent, 'emit').and.stub();
 
     component.sendRecomputeGraph();
@@ -91,29 +96,37 @@ describe('State Editor Component', () => {
     component.sendOnSaveSolicitAnswerDetails(false);
     component.sendOnSaveHints([]);
     component.sendRefreshWarnings();
-    component.sendOnSaveInteractionDefaultOutcome(new Outcome(
-      'Hola',
-      null,
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-      true,
-      [],
-      null,
-      null,
-    ));
+    component.sendOnSaveInteractionDefaultOutcome(
+      new Outcome(
+        'Hola',
+        null,
+        new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+        true,
+        [],
+        null,
+        null
+      )
+    );
     component.sendOnSaveInteractionAnswerGroups([]);
     component.sendOnSaveInapplicableSkillMisconceptionIds([]);
     component.sendNavigateToState('');
-    component.sendOnSaveSolution(new Solution(
-      explorationHtmlFormatterService,
-      true,
-      [],
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
-    ));
+    component.sendOnSaveSolution(
+      new Solution(
+        explorationHtmlFormatterService,
+        true,
+        [],
+        new SubtitledHtml('<p> Previous HTML string </p>', 'Id')
+      )
+    );
     component.sendOnSaveNextContentIdIndex(0);
-    component.sendOnSaveInteractionCustomizationArgs('');
-    component.sendOnSaveInteractionId('');
+    let interactionData = {
+      interactionId: null,
+      customizationArgs: {},
+    };
+    component.sendOnSaveInteractionData(interactionData);
     component.sendOnSaveStateContent(
-      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id')
+    );
 
     expect(component.recomputeGraph.emit).toHaveBeenCalled();
     expect(component.onSaveLinkedSkillId.emit).toHaveBeenCalled();
@@ -122,14 +135,13 @@ describe('State Editor Component', () => {
     expect(component.refreshWarnings.emit).toHaveBeenCalled();
     expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
     expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
-    expect(component.onSaveInapplicableSkillMisconceptionIds.emit)
-      .toHaveBeenCalled();
+    expect(
+      component.onSaveInapplicableSkillMisconceptionIds.emit
+    ).toHaveBeenCalled();
     expect(component.navigateToState.emit).toHaveBeenCalled();
     expect(component.onSaveSolution.emit).toHaveBeenCalled();
     expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
-    expect(component.onSaveInteractionCustomizationArgs.emit)
-      .toHaveBeenCalled();
-    expect(component.onSaveInteractionId.emit).toHaveBeenCalled();
+    expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
     expect(component.onSaveStateContent.emit).toHaveBeenCalled();
   });
 
@@ -145,8 +157,9 @@ describe('State Editor Component', () => {
 
     component.ngOnInit();
 
-    expect(component.oppiaBlackImgUrl)
-      .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
+    expect(component.oppiaBlackImgUrl).toBe(
+      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
+    );
     expect(component.currentStateIsTerminal).toBe(false);
     expect(component.conceptCardIsShown).toBe(true);
     expect(component.windowIsNarrow).toBe(false);
@@ -156,8 +169,10 @@ describe('State Editor Component', () => {
 
   it('should update interaction visibility when interaction is changed', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
-      .and.returnValue(onInteractionIdChangedEmitter);
+    spyOnProperty(
+      stateInteractionIdService,
+      'onInteractionIdChanged'
+    ).and.returnValue(onInteractionIdChangedEmitter);
 
     expect(component.interactionIdIsSet).toBeFalse();
     expect(component.currentInteractionCanHaveSolution).toBeFalse();
@@ -192,7 +207,7 @@ describe('State Editor Component', () => {
         voiceovers_mapping: {
           content: {},
           default_outcome: {},
-        }
+        },
       },
       interaction: {
         id: null,
@@ -202,19 +217,21 @@ describe('State Editor Component', () => {
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
           },
           labelled_as_correct: false,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
         },
-        hints: []
+        hints: [],
       },
       param_changes: [],
-      solicit_answer_details: false
+      solicit_answer_details: false,
     };
-    spyOnProperty(stateEditorService, 'onStateEditorInitialized')
-      .and.returnValue(onStateEditorInitializedEmitter);
+    spyOnProperty(
+      stateEditorService,
+      'onStateEditorInitialized'
+    ).and.returnValue(onStateEditorInitializedEmitter);
 
     component.ngOnInit();
 
@@ -225,20 +242,25 @@ describe('State Editor Component', () => {
     expect(component.servicesInitialized).toBe(true);
   });
 
-  it('should throw error if state data is not defined and' +
-    ' component is reinitialized', fakeAsync(() => {
-    let onStateEditorInitializedEmitter = new EventEmitter<State>();
-    let stateData: State | null = null;
-    spyOnProperty(stateEditorService, 'onStateEditorInitialized')
-      .and.returnValue(onStateEditorInitializedEmitter);
+  it(
+    'should throw error if state data is not defined and' +
+      ' component is reinitialized',
+    fakeAsync(() => {
+      let onStateEditorInitializedEmitter = new EventEmitter<State>();
+      let stateData: State | null = null;
+      spyOnProperty(
+        stateEditorService,
+        'onStateEditorInitialized'
+      ).and.returnValue(onStateEditorInitializedEmitter);
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(() => {
-      onStateEditorInitializedEmitter.emit(stateData as State);
-      tick();
-    }).toThrowError('Expected stateData to be defined but received null');
-  }));
+      expect(() => {
+        onStateEditorInitializedEmitter.emit(stateData as State);
+        tick();
+      }).toThrowError('Expected stateData to be defined but received null');
+    })
+  );
 
   it('should reinitialize editor when responses change', () => {
     spyOn(stateEditorService.onStateEditorInitialized, 'emit').and.stub();

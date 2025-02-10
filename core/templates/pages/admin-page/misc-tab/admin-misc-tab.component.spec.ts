@@ -16,15 +16,20 @@
  * @fileoverview UnitTests for Admin misc tab component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { AdminMiscTabComponent } from './admin-misc-tab.component';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AdminTaskManagerService} from '../services/admin-task-manager.service';
+import {AdminMiscTabComponent} from './admin-misc-tab.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -36,17 +41,17 @@ class MockWindowRef {
       href: 'href',
       pathname: 'pathname',
       search: 'search',
-      hash: 'hash'
+      hash: 'hash',
     },
     open() {
       return;
-    }
+    },
   };
 }
 
 class MockReaderObject {
   result = null;
-  onload: {(arg0: { target: { result: string}}): void; (): string};
+  onload: {(arg0: {target: {result: string}}): void; (): string};
   constructor() {
     this.onload = () => {
       return 'Fake onload executed';
@@ -73,20 +78,17 @@ describe('Admin misc tab component ', () => {
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
       declarations: [AdminMiscTabComponent],
       providers: [
         AdminBackendApiService,
         AdminTaskManagerService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }
+          useValue: mockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminMiscTabComponent);
@@ -97,8 +99,10 @@ describe('Admin misc tab component ', () => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
-    statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.returnValue();
+    statusMessageSpy = spyOn(
+      component.setStatusMessage,
+      'emit'
+    ).and.returnValue();
     spyOn(adminTaskManagerService, 'startTask').and.returnValue();
     spyOn(adminTaskManagerService, 'finishTask').and.returnValue();
     confirmSpy = spyOn(mockWindowRef.nativeWindow, 'confirm');
@@ -114,67 +118,84 @@ describe('Admin misc tab component ', () => {
     it('should clear search index successfully', fakeAsync(() => {
       confirmSpy.and.returnValue(true);
       let clearSearchIndexSpy = spyOn(
-        adminBackendApiService, 'clearSearchIndexAsync')
-        .and.resolveTo();
+        adminBackendApiService,
+        'clearSearchIndexAsync'
+      ).and.resolveTo();
 
       component.clearSearchIndex();
       tick();
 
       expect(clearSearchIndexSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Index successfully cleared.');
+        'Index successfully cleared.'
+      );
     }));
 
-    it('should not clear search index in case of backend ' +
-      'error', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let clearSearchIndexSpy = spyOn(
-        adminBackendApiService, 'clearSearchIndexAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not clear search index in case of backend ' + 'error',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let clearSearchIndexSpy = spyOn(
+          adminBackendApiService,
+          'clearSearchIndexAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.clearSearchIndex();
-      tick();
+        component.clearSearchIndex();
+        tick();
 
-      expect(clearSearchIndexSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(clearSearchIndexSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
-    it('should not request backend to clear search index if ' +
-      'a task is still running in the queue', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let clearSearchIndexSpy = spyOn(
-        adminBackendApiService, 'clearSearchIndexAsync');
+    it(
+      'should not request backend to clear search index if ' +
+        'a task is still running in the queue',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let clearSearchIndexSpy = spyOn(
+          adminBackendApiService,
+          'clearSearchIndexAsync'
+        );
 
-      // Setting task is still running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
-      component.clearSearchIndex();
-      tick();
+        component.clearSearchIndex();
+        tick();
 
-      expect(clearSearchIndexSpy).not.toHaveBeenCalled();
-    }));
+        expect(clearSearchIndexSpy).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not request backend to clear search index if ' +
-      'cancel button is clicked in the alert', fakeAsync(() => {
-      confirmSpy.and.returnValue(false);
-      let clearSearchIndexSpy = spyOn(
-        adminBackendApiService, 'clearSearchIndexAsync');
-      // Setting cancel button clicked to be true.
+    it(
+      'should not request backend to clear search index if ' +
+        'cancel button is clicked in the alert',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(false);
+        let clearSearchIndexSpy = spyOn(
+          adminBackendApiService,
+          'clearSearchIndexAsync'
+        );
+        // Setting cancel button clicked to be true.
 
-      component.clearSearchIndex();
-      tick();
+        component.clearSearchIndex();
+        tick();
 
-      expect(clearSearchIndexSpy).not.toHaveBeenCalled();
-    }));
+        expect(clearSearchIndexSpy).not.toHaveBeenCalled();
+      })
+    );
   });
 
   describe('when clicking on regenerate topic button ', () => {
     it('should regenerate topic successfully', fakeAsync(() => {
       confirmSpy.and.returnValue(true);
       let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'regenerateOpportunitiesRelatedToTopicAsync')
-        .and.returnValue(Promise.resolve(10));
+        adminBackendApiService,
+        'regenerateOpportunitiesRelatedToTopicAsync'
+      ).and.returnValue(Promise.resolve({opportunities_count: 10}));
 
       component.regenerateOpportunitiesRelatedToTopic();
       tick();
@@ -185,114 +206,145 @@ describe('Admin misc tab component ', () => {
       );
     }));
 
-    it('should not regenerate topic in case of backend ' +
-      'error', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'regenerateOpportunitiesRelatedToTopicAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not regenerate topic in case of backend ' + 'error',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'regenerateOpportunitiesRelatedToTopicAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.regenerateOpportunitiesRelatedToTopic();
-      tick();
+        component.regenerateOpportunitiesRelatedToTopic();
+        tick();
 
-      expect(regenerateTopicSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(regenerateTopicSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
-    it('should not request backend to regenerate topic if ' +
-      'a task is still running in the queue', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'regenerateOpportunitiesRelatedToTopicAsync');
+    it(
+      'should not request backend to regenerate topic if ' +
+        'a task is still running in the queue',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'regenerateOpportunitiesRelatedToTopicAsync'
+        );
 
-      // Setting task is still running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
-      component.regenerateOpportunitiesRelatedToTopic();
-      tick();
+        component.regenerateOpportunitiesRelatedToTopic();
+        tick();
 
-      expect(regenerateTopicSpy).not.toHaveBeenCalled();
-    }));
+        expect(regenerateTopicSpy).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not request backend to regenerate topic if ' +
-      'cancel button is clicked in the alert', fakeAsync(() => {
-      confirmSpy.and.returnValue(false);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'regenerateOpportunitiesRelatedToTopicAsync');
-      // Setting cancel button clicked to be true.
+    it(
+      'should not request backend to regenerate topic if ' +
+        'cancel button is clicked in the alert',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(false);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'regenerateOpportunitiesRelatedToTopicAsync'
+        );
+        // Setting cancel button clicked to be true.
 
-      component.regenerateOpportunitiesRelatedToTopic();
-      tick();
+        component.regenerateOpportunitiesRelatedToTopic();
+        tick();
 
-      expect(regenerateTopicSpy).not.toHaveBeenCalled();
-    }));
+        expect(regenerateTopicSpy).not.toHaveBeenCalled();
+      })
+    );
   });
 
   describe('when clicking on rollback exploration button ', () => {
     it('should rollback exploration successfully', fakeAsync(() => {
       confirmSpy.and.returnValue(true);
       let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'rollbackExplorationToSafeState')
-        .and.returnValue(Promise.resolve(10));
+        adminBackendApiService,
+        'rollbackExplorationToSafeState'
+      ).and.returnValue(Promise.resolve(10));
 
       component.rollbackExploration();
       tick();
 
       expect(regenerateTopicSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Exploration rolledback to version: 10');
+        'Exploration rolledback to version: 10'
+      );
     }));
 
-    it('should not rollback exploration in case of backend ' +
-      'error', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'rollbackExplorationToSafeState')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not rollback exploration in case of backend ' + 'error',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'rollbackExplorationToSafeState'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.rollbackExploration();
-      tick();
+        component.rollbackExploration();
+        tick();
 
-      expect(regenerateTopicSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(regenerateTopicSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
-    it('should not request backend to rollback exploration if ' +
-      'a task is still running in the queue', fakeAsync(() => {
-      confirmSpy.and.returnValue(true);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'rollbackExplorationToSafeState');
+    it(
+      'should not request backend to rollback exploration if ' +
+        'a task is still running in the queue',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(true);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'rollbackExplorationToSafeState'
+        );
 
-      // Setting task is still running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
 
-      component.rollbackExploration();
-      tick();
+        component.rollbackExploration();
+        tick();
 
-      expect(regenerateTopicSpy).not.toHaveBeenCalled();
-    }));
+        expect(regenerateTopicSpy).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not request backend to rollback exploration if ' +
-      'cancel button is clicked in the alert', fakeAsync(() => {
-      confirmSpy.and.returnValue(false);
-      let regenerateTopicSpy = spyOn(
-        adminBackendApiService, 'rollbackExplorationToSafeState');
-      // Setting cancel button clicked to be true.
+    it(
+      'should not request backend to rollback exploration if ' +
+        'cancel button is clicked in the alert',
+      fakeAsync(() => {
+        confirmSpy.and.returnValue(false);
+        let regenerateTopicSpy = spyOn(
+          adminBackendApiService,
+          'rollbackExplorationToSafeState'
+        );
+        // Setting cancel button clicked to be true.
 
-      component.rollbackExploration();
-      tick();
+        component.rollbackExploration();
+        tick();
 
-      expect(regenerateTopicSpy).not.toHaveBeenCalled();
-    }));
+        expect(regenerateTopicSpy).not.toHaveBeenCalled();
+      })
+    );
   });
 
   describe('when clicking on upload csv button ', () => {
     it('should upload csv file successfully', fakeAsync(() => {
       let uploadCsvSpy = spyOn(
-        adminBackendApiService, 'uploadTopicSimilaritiesAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'uploadTopicSimilaritiesAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.uploadTopicSimilaritiesFile();
       tick();
@@ -303,19 +355,23 @@ describe('Admin misc tab component ', () => {
       );
     }));
 
-    it('should not upload csv file in case of backend ' +
-      'error', fakeAsync(() => {
-      let uploadCsvSpy = spyOn(
-        adminBackendApiService, 'uploadTopicSimilaritiesAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not upload csv file in case of backend ' + 'error',
+      fakeAsync(() => {
+        let uploadCsvSpy = spyOn(
+          adminBackendApiService,
+          'uploadTopicSimilaritiesAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.uploadTopicSimilaritiesFile();
-      tick();
+        component.uploadTopicSimilaritiesFile();
+        tick();
 
-      expect(uploadCsvSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(uploadCsvSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
     it('should throw error if no label is found for uploading files', () => {
       spyOn(document, 'getElementById').and.returnValue(null);
@@ -334,7 +390,7 @@ describe('Admin misc tab component ', () => {
       // @ts-expect-error
       spyOn(document, 'getElementById').and.callFake(() => {
         return {
-          files: null
+          files: null,
         };
       });
       expect(() => {
@@ -343,54 +399,66 @@ describe('Admin misc tab component ', () => {
     });
   });
 
-  it('should download topic similarities csv file ' +
-    'on clicking download button', () => {
-    let downloadHandler = '/admintopicscsvdownloadhandler';
-    expect(mockWindowRef.nativeWindow.location.href).toEqual('href');
-    component.downloadTopicSimilaritiesFile();
-    expect(mockWindowRef.nativeWindow.location.href).toEqual(downloadHandler);
-  });
+  it(
+    'should download topic similarities csv file ' +
+      'on clicking download button',
+    () => {
+      let downloadHandler = '/admintopicscsvdownloadhandler';
+      expect(mockWindowRef.nativeWindow.location.href).toEqual('href');
+      component.downloadTopicSimilaritiesFile();
+      expect(mockWindowRef.nativeWindow.location.href).toEqual(downloadHandler);
+    }
+  );
 
-  it('should set data extraction query message ' +
-    'on clicking submit query button', () => {
-    let message = 'message';
-    // Pre-checks.
-    expect(component.showDataExtractionQueryStatus).toBeFalse();
-    expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
+  it(
+    'should set data extraction query message ' +
+      'on clicking submit query button',
+    () => {
+      let message = 'message';
+      // Pre-checks.
+      expect(component.showDataExtractionQueryStatus).toBeFalse();
+      expect(component.dataExtractionQueryStatusMessage).toBeUndefined();
 
-    component.setDataExtractionQueryStatusMessage(message);
+      component.setDataExtractionQueryStatusMessage(message);
 
-    expect(component.showDataExtractionQueryStatus).toBeTrue();
-    expect(component.dataExtractionQueryStatusMessage).toBe(message);
-  });
+      expect(component.showDataExtractionQueryStatus).toBeTrue();
+      expect(component.dataExtractionQueryStatusMessage).toBe(message);
+    }
+  );
 
   describe('when clicking on send mail to admin button ', () => {
     it('should send mail successfully', fakeAsync(() => {
       let sendMailSpy = spyOn(
-        adminBackendApiService, 'sendDummyMailToAdminAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'sendDummyMailToAdminAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.sendDummyMailToAdmin();
       tick();
 
       expect(sendMailSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Success! Mail sent to admin.');
+        'Success! Mail sent to admin.'
+      );
     }));
 
-    it('should not send mail to admin in case of backend ' +
-      'error', fakeAsync(() => {
-      let sendMailSpy = spyOn(
-        adminBackendApiService, 'sendDummyMailToAdminAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not send mail to admin in case of backend ' + 'error',
+      fakeAsync(() => {
+        let sendMailSpy = spyOn(
+          adminBackendApiService,
+          'sendDummyMailToAdminAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.sendDummyMailToAdmin();
-      tick();
+        component.sendDummyMailToAdmin();
+        tick();
 
-      expect(sendMailSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(sendMailSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on update username button ', () => {
@@ -398,32 +466,38 @@ describe('Admin misc tab component ', () => {
       component.oldUsername = 'oldUsername';
       component.newUsername = 'newUsername';
       let updateUsernameSpy = spyOn(
-        adminBackendApiService, 'updateUserNameAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'updateUserNameAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.updateUsername();
       tick();
 
       expect(updateUsernameSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Successfully renamed oldUsername to newUsername!');
+        'Successfully renamed oldUsername to newUsername!'
+      );
     }));
 
-    it('should not update username in case of backend ' +
-      'error', fakeAsync(() => {
-      component.oldUsername = 'oldUsername';
-      component.newUsername = 'newUsername';
-      let updateUsernameSpy = spyOn(
-        adminBackendApiService, 'updateUserNameAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not update username in case of backend ' + 'error',
+      fakeAsync(() => {
+        component.oldUsername = 'oldUsername';
+        component.newUsername = 'newUsername';
+        let updateUsernameSpy = spyOn(
+          adminBackendApiService,
+          'updateUserNameAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.updateUsername();
-      tick();
+        component.updateUsername();
+        tick();
 
-      expect(updateUsernameSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(updateUsernameSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on update blog post button ', () => {
@@ -432,70 +506,85 @@ describe('Admin misc tab component ', () => {
       component.publishedOn = '05/09/2001';
       component.blogPostId = '123456sample';
       let updateBlogPostSpy = spyOn(
-        adminBackendApiService, 'updateBlogPostDataAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'updateBlogPostDataAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.updateBlogPostData();
       tick();
 
       expect(updateBlogPostSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Successfully updated blog post data');
+        'Successfully updated blog post data'
+      );
     }));
 
-    it('should not update blog post in case of backend ' +
-      'error', fakeAsync(() => {
-      component.authorUsername = 'username';
-      component.publishedOn = '05/09/2001';
-      component.blogPostId = '123456sample';
-      let updateBlogPostSpy = spyOn(
-        adminBackendApiService, 'updateBlogPostDataAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not update blog post in case of backend ' + 'error',
+      fakeAsync(() => {
+        component.authorUsername = 'username';
+        component.publishedOn = '05/09/2001';
+        component.blogPostId = '123456sample';
+        let updateBlogPostSpy = spyOn(
+          adminBackendApiService,
+          'updateBlogPostDataAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.updateBlogPostData();
-      tick();
+        component.updateBlogPostData();
+        tick();
 
-      expect(updateBlogPostSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(updateBlogPostSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on number of deletion requests button ', () => {
     it('should show number of deletion requests successfully', fakeAsync(() => {
       let updateUsernameSpy = spyOn(
-        adminBackendApiService, 'getNumberOfPendingDeletionRequestAsync')
-        .and.returnValue(Promise.resolve(
-          {number_of_pending_deletion_models: '5'}));
+        adminBackendApiService,
+        'getNumberOfPendingDeletionRequestAsync'
+      ).and.returnValue(
+        Promise.resolve({number_of_pending_deletion_models: '5'})
+      );
 
       component.getNumberOfPendingDeletionRequestModels();
       tick();
 
       expect(updateUsernameSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'The number of users that are being deleted is: 5');
+        'The number of users that are being deleted is: 5'
+      );
     }));
 
-    it('should not show number of deletion requests in case of backend ' +
-      'error', fakeAsync(() => {
-      let updateUsernameSpy = spyOn(
-        adminBackendApiService, 'getNumberOfPendingDeletionRequestAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not show number of deletion requests in case of backend ' +
+        'error',
+      fakeAsync(() => {
+        let updateUsernameSpy = spyOn(
+          adminBackendApiService,
+          'getNumberOfPendingDeletionRequestAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.getNumberOfPendingDeletionRequestModels();
-      tick();
+        component.getNumberOfPendingDeletionRequestModels();
+        tick();
 
-      expect(updateUsernameSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(updateUsernameSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on grant permissions button ', () => {
     it('should grant super admin permissions successfully', fakeAsync(() => {
       let permissionsSpy = spyOn(
-        adminBackendApiService, 'grantSuperAdminPrivilegesAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'grantSuperAdminPrivilegesAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.grantSuperAdminPrivileges();
       tick();
@@ -504,26 +593,31 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith('Success!');
     }));
 
-    it('should not grant super admin permissions in case of backend ' +
-      'error', fakeAsync(() => {
-      let permissionsSpy = spyOn(
-        adminBackendApiService, 'grantSuperAdminPrivilegesAsync')
-        .and.rejectWith({ error: {error: 'Internal Server Error.'}});
+    it(
+      'should not grant super admin permissions in case of backend ' + 'error',
+      fakeAsync(() => {
+        let permissionsSpy = spyOn(
+          adminBackendApiService,
+          'grantSuperAdminPrivilegesAsync'
+        ).and.rejectWith({error: {error: 'Internal Server Error.'}});
 
-      component.grantSuperAdminPrivileges();
-      tick();
+        component.grantSuperAdminPrivileges();
+        tick();
 
-      expect(permissionsSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(permissionsSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on revoke permissions button ', () => {
     it('should revoke super admin permissions successfully', fakeAsync(() => {
       let permissionsSpy = spyOn(
-        adminBackendApiService, 'revokeSuperAdminPrivilegesAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'revokeSuperAdminPrivilegesAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.revokeSuperAdminPrivileges();
       tick();
@@ -532,102 +626,154 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith('Success!');
     }));
 
-    it('should not revoke super admin permissions in case of backend ' +
-      'error', fakeAsync(() => {
-      let permissionsSpy = spyOn(
-        adminBackendApiService, 'revokeSuperAdminPrivilegesAsync')
-        .and.rejectWith({ error: {error: 'Internal Server Error.'}});
+    it(
+      'should not revoke super admin permissions in case of backend ' + 'error',
+      fakeAsync(() => {
+        let permissionsSpy = spyOn(
+          adminBackendApiService,
+          'revokeSuperAdminPrivilegesAsync'
+        ).and.rejectWith({error: {error: 'Internal Server Error.'}});
 
-      component.revokeSuperAdminPrivileges();
-      tick();
+        component.revokeSuperAdminPrivileges();
+        tick();
 
-      expect(permissionsSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(permissionsSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
-
 
   describe('when clicking on get models related to users button ', () => {
     it('should return user models successfully if they exist', fakeAsync(() => {
       let uesrModelSpy = spyOn(
-        adminBackendApiService, 'getModelsRelatedToUserAsync')
-        .and.returnValue(Promise.resolve(true));
+        adminBackendApiService,
+        'getModelsRelatedToUserAsync'
+      ).and.returnValue(Promise.resolve(true));
 
       component.getModelsRelatedToUser();
       tick();
 
       expect(uesrModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Some related models exist, see logs ' +
-        'to find out the exact models');
+        'Some related models exist, see logs ' + 'to find out the exact models'
+      );
     }));
 
     it('should not return user models if they does not exist', fakeAsync(() => {
       let uesrModelSpy = spyOn(
-        adminBackendApiService, 'getModelsRelatedToUserAsync')
-        .and.returnValue(Promise.resolve(false));
+        adminBackendApiService,
+        'getModelsRelatedToUserAsync'
+      ).and.returnValue(Promise.resolve(false));
 
       component.getModelsRelatedToUser();
       tick();
 
       expect(uesrModelSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'No related models exist');
+      expect(statusMessageSpy).toHaveBeenCalledWith('No related models exist');
     }));
 
-    it('should not return user models in case of backend ' +
-      'error', fakeAsync(() => {
-      let uesrModelSpy = spyOn(
-        adminBackendApiService, 'getModelsRelatedToUserAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not return user models in case of backend ' + 'error',
+      fakeAsync(() => {
+        let uesrModelSpy = spyOn(
+          adminBackendApiService,
+          'getModelsRelatedToUserAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.getModelsRelatedToUser();
-      tick();
+        component.getModelsRelatedToUser();
+        tick();
 
-      expect(uesrModelSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(uesrModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
   });
 
   describe('when clicking on delete user button ', () => {
     it('should delete the user account successfully', fakeAsync(() => {
       let uesrModelSpy = spyOn(
-        adminBackendApiService, 'deleteUserAsync')
-        .and.returnValue(Promise.resolve());
+        adminBackendApiService,
+        'deleteUserAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.deleteUser();
       tick();
 
       expect(uesrModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'The deletion process was started.');
+        'The deletion process was started.'
+      );
     }));
 
-    it('should not delete user account in case of backend ' +
-      'error', fakeAsync(() => {
-      let uesrModelSpy = spyOn(
-        adminBackendApiService, 'deleteUserAsync')
-        .and.rejectWith('Internal Server Error.');
+    it(
+      'should not delete user account in case of backend ' + 'error',
+      fakeAsync(() => {
+        let uesrModelSpy = spyOn(
+          adminBackendApiService,
+          'deleteUserAsync'
+        ).and.rejectWith('Internal Server Error.');
 
-      component.deleteUser();
+        component.deleteUser();
+        tick();
+
+        expect(uesrModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
+  });
+
+  describe('when regenerating topic summaries', () => {
+    it('should regenerate all topic summaries successfully', fakeAsync(() => {
+      const topicModelSpy = spyOn(
+        adminBackendApiService,
+        'regenerateTopicSummariesAsync'
+      ).and.returnValue(Promise.resolve());
+
+      component.regenerateTopicSummaries();
       tick();
 
-      expect(uesrModelSpy).toHaveBeenCalled();
+      expect(topicModelSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
+        'Successfully regenerated all topic summaries.'
+      );
     }));
+
+    it(
+      'should not regenerate topic summaries in case of ' + 'server error',
+      fakeAsync(() => {
+        const topicModelSpy = spyOn(
+          adminBackendApiService,
+          'regenerateTopicSummariesAsync'
+        ).and.rejectWith('Internal Server Error');
+
+        component.regenerateTopicSummaries();
+        tick();
+
+        expect(topicModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error'
+        );
+      })
+    );
   });
 
   it('should sumbit query when clicking on submit query button', () => {
     let setQueryDataSpy = spyOn(
-      component, 'setDataExtractionQueryStatusMessage').and.callThrough();
+      component,
+      'setDataExtractionQueryStatusMessage'
+    ).and.callThrough();
 
     component.submitQuery();
 
     expect(setQueryDataSpy).toHaveBeenCalledWith(
-      'Data extraction query has been submitted. Please wait.');
+      'Data extraction query has been submitted. Please wait.'
+    );
   });
 
   it('should reset form data on clicking reset button', () => {
@@ -642,5 +788,125 @@ describe('Admin misc tab component ', () => {
     expect(component.expId).toBe('');
     expect(component.expVersion).toBe(0);
     expect(component.stateName).toBe('');
+  });
+
+  describe('when clicking on the Lookup Exploration Interaction IDs button', () => {
+    it('should return interaction IDs if the exploration exists', fakeAsync(() => {
+      let interactionSpy = spyOn(
+        adminBackendApiService,
+        'retrieveExplorationInteractionIdsAsync'
+      ).and.returnValue(Promise.resolve({interaction_ids: ['EndExploration']}));
+
+      component.retrieveExplorationInteractionIds();
+      tick();
+
+      expect(interactionSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully fetched interactionIds in exploration.'
+      );
+      expect(component.explorationInteractionIds).toEqual(['EndExploration']);
+    }));
+
+    it(
+      'should return empty interaction IDs' +
+        ' if no interactionIds are found in the exploration',
+      fakeAsync(() => {
+        let interactionSpy = spyOn(
+          adminBackendApiService,
+          'retrieveExplorationInteractionIdsAsync'
+        ).and.returnValue(Promise.resolve({interaction_ids: []}));
+
+        component.retrieveExplorationInteractionIds();
+        tick();
+
+        expect(interactionSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'No interactionIds found in exploration.'
+        );
+        expect(component.explorationInteractionIds).toEqual([]);
+      })
+    );
+
+    it('should handle the case when the exploration does not exist', fakeAsync(() => {
+      let intSpy = spyOn(
+        adminBackendApiService,
+        'retrieveExplorationInteractionIdsAsync'
+      ).and.rejectWith('Exploration does not exist');
+
+      component.retrieveExplorationInteractionIds();
+      tick();
+
+      expect(intSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Exploration does not exist'
+      );
+      expect(component.explorationInteractionIds).toEqual([]);
+    }));
+
+    it('should handle the case when expIdToGetInteractionIdsFor is empty', fakeAsync(() => {
+      let intSpy = spyOn(
+        adminBackendApiService,
+        'retrieveExplorationInteractionIdsAsync'
+      ).and.rejectWith('Exploration does not exist');
+
+      component.retrieveExplorationInteractionIds();
+      tick();
+
+      expect(intSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Exploration does not exist'
+      );
+      expect(component.explorationInteractionIds).toEqual([]);
+    }));
+  });
+
+  describe('when controlling azure admin config', () => {
+    it('should be able to get azure admin config data on load', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let getAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'getAdminConfigForAutomaticVoiceoversAsync'
+      ).and.resolveTo(true);
+
+      component.ngOnInit();
+      tick();
+
+      expect(getAzureAdminConfigSpy).toHaveBeenCalled();
+      expect(component.voiceoverAutogenerationIsEnabled).toBeTrue();
+    }));
+
+    it('should be able to update azure admin config data', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let updateAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'updateAutomaticVoiceoverSynthesisConfigAsync'
+      ).and.resolveTo();
+
+      component.updateAutomaticVoiceoverSynthesisUsingAzure();
+      tick();
+
+      expect(updateAzureAdminConfigSpy).toHaveBeenCalledWith(false);
+    }));
+
+    it('should fail to update azure admin config data', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let updateAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'updateAutomaticVoiceoverSynthesisConfigAsync'
+      ).and.rejectWith({
+        error: {error: 'Failed to update Azure admin config.'},
+      });
+
+      component.updateAutomaticVoiceoverSynthesisUsingAzure();
+      tick();
+
+      expect(updateAzureAdminConfigSpy).toHaveBeenCalledWith(false);
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Failed to update Azure admin config.'
+      );
+    }));
   });
 });

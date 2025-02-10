@@ -16,18 +16,18 @@
  * @fileoverview Component for the feedback popup.
  */
 
-import { Component, Output, EventEmitter } from '@angular/core';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { UserService } from 'services/user.service';
-import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
-import { PlayerPositionService } from '../services/player-position.service';
-import { AppConstants } from 'app.constants';
+import {Component, Output, EventEmitter} from '@angular/core';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {UserService} from 'services/user.service';
+import {FeedbackPopupBackendApiService} from '../services/feedback-popup-backend-api.service';
+import {PlayerPositionService} from '../services/player-position.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-feedback-popup',
-  templateUrl: './feedback-popup.component.html'
+  templateUrl: './feedback-popup.component.html',
 })
 export class FeedbackPopupComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -53,14 +53,15 @@ export class FeedbackPopupComponent {
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.isLoggedIn = userInfo.isLoggedIn();
     });
-    this.feedbackPopoverId = (
-      'feedbackPopover' + Math.random().toString(36).slice(2));
-    this.feedbackTitle = (
+    this.feedbackPopoverId =
+      'feedbackPopover' + Math.random().toString(36).slice(2);
+    this.feedbackTitle =
       'Feedback when the user was at card "' +
-        this.playerPositionService.getCurrentStateName() + '"');
+      this.playerPositionService.getCurrentStateName() +
+      '"';
 
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.backgroundMaskService.activateMask();
@@ -71,17 +72,19 @@ export class FeedbackPopupComponent {
 
   saveFeedback(): void {
     if (this.feedbackText) {
-      this.feedbackPopupBackendApiService.submitFeedbackAsync(
-        this.feedbackTitle,
-        this.feedbackText,
-        !this.isSubmitterAnonymized && this.isLoggedIn,
-        this.playerPositionService.getCurrentStateName()
-      ).then(() => {
-        this.feedbackSubmitted = true;
-        setTimeout(() => {
-          this.close();
-        }, 2000);
-      });
+      this.feedbackPopupBackendApiService
+        .submitFeedbackAsync(
+          this.feedbackTitle,
+          this.feedbackText,
+          !this.isSubmitterAnonymized && this.isLoggedIn,
+          this.playerPositionService.getCurrentStateName()
+        )
+        .then(() => {
+          this.feedbackSubmitted = true;
+          setTimeout(() => {
+            this.close();
+          }, 3000);
+        });
     }
   }
 

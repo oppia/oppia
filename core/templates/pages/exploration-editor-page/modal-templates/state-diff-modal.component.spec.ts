@@ -16,13 +16,22 @@
  * @fileoverview Unit tests for StateDiffModalComponent.
  */
 
-import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { headersAndYamlStrs, StateDiffModalComponent } from './state-diff-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
+import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {
+  headersAndYamlStrs,
+  StateDiffModalComponent,
+} from './state-diff-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 
 describe('State Diff Modal Component', () => {
   let stateObjectFactory: StateObjectFactory;
@@ -40,10 +49,7 @@ describe('State Diff Modal Component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [StateDiffModalComponent],
-      providers: [
-        NgbActiveModal,
-        HistoryTabYamlConversionService
-      ],
+      providers: [NgbActiveModal, HistoryTabYamlConversionService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -53,14 +59,21 @@ describe('State Diff Modal Component', () => {
     component = fixture.componentInstance;
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     historyTabYamlConversionService = TestBed.inject(
-      HistoryTabYamlConversionService);
+      HistoryTabYamlConversionService
+    );
   });
 
   beforeEach(() => {
     newState = stateObjectFactory.createDefaultState(
-      newStateName, 'content_0', 'default_outcome_1');
+      newStateName,
+      'content_0',
+      'default_outcome_1'
+    );
     oldState = stateObjectFactory.createDefaultState(
-      oldStateName, 'content_0', 'default_outcome_1');
+      oldStateName,
+      'content_0',
+      'default_outcome_1'
+    );
 
     component.headers = headers;
     component.newState = newState;
@@ -69,35 +82,50 @@ describe('State Diff Modal Component', () => {
     component.oldStateName = oldStateName;
   });
 
-  it('should initialize component properties after component is initialized',
-    fakeAsync(() => {
-      spyOn(
-        historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
-      ).and.resolveTo('Yaml data');
-
-      component.ngOnInit();
-      tick(201);
-
-      fixture.whenStable()
-        .then(() => {
-          expect(component.headers).toBe(headers);
-          expect(component.newStateName).toBe(newStateName);
-          expect(component.oldStateName).toBe(oldStateName);
-        });
-    }));
-
-  it('should evaluate yaml strings object', fakeAsync(() => {
+  it('should initialize component properties after component is initialized', fakeAsync(() => {
     spyOn(
-      historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
-    ).and.resolveTo('Yaml data');
+      historyTabYamlConversionService,
+      'getYamlStringFromStateOrMetadata'
+    ).and.resolveTo('YAML data');
 
     component.ngOnInit();
     tick(201);
 
-    fixture.whenStable()
-      .then(() => {
-        expect(component.yamlStrs.leftPane).toBe('Yaml data');
-        expect(component.yamlStrs.rightPane).toBe('Yaml data');
-      });
+    fixture.whenStable().then(() => {
+      expect(component.headers).toBe(headers);
+      expect(component.newStateName).toBe(newStateName);
+      expect(component.oldStateName).toBe(oldStateName);
+    });
+  }));
+
+  it('should evaluate YAML strings object', fakeAsync(() => {
+    spyOn(
+      historyTabYamlConversionService,
+      'getYamlStringFromStateOrMetadata'
+    ).and.resolveTo('YAML data');
+
+    component.ngOnInit();
+    tick(201);
+
+    fixture.whenStable().then(() => {
+      expect(component.yamlStrs.leftPane).toBe('YAML data');
+      expect(component.yamlStrs.rightPane).toBe('YAML data');
+    });
+  }));
+
+  it('should evaluate YAML string objects for translation changes', fakeAsync(() => {
+    spyOn(
+      historyTabYamlConversionService,
+      'getYamlStringFromTranslations'
+    ).and.resolveTo('YAML data');
+
+    component.showingTranslationChanges = true;
+    component.ngOnInit();
+    tick();
+
+    fixture.whenStable().then(() => {
+      expect(component.yamlStrs.leftPane).toBe('YAML data');
+      expect(component.yamlStrs.rightPane).toBe('YAML data');
+    });
   }));
 });

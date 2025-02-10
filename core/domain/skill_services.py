@@ -23,7 +23,7 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import caching_services
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import html_cleaner
 from core.domain import opportunity_services
 from core.domain import role_services
@@ -209,17 +209,17 @@ def _get_augmented_skill_summaries_in_batches(
                   if topic_model is not None]
 
     topic_classroom_dict = {}
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
 
-    for classroom in all_classrooms_dict:
-        for topic_id in classroom['topic_ids']:
-            topic_classroom_dict[topic_id] = classroom['name']
+    for classroom in classrooms:
+        for topic_id in classroom.get_topic_ids():
+            topic_classroom_dict[topic_id] = classroom.name
 
     for topic in all_topics:
         for skill_id in topic.get_all_skill_ids():
             assigned_skill_ids[skill_id]['topic_names'].append(topic.name)
             assigned_skill_ids[skill_id]['classroom_names'].append(
-                topic_classroom_dict.get(topic.id, None))
+                topic_classroom_dict.get(topic.id, ''))
 
     augmented_skill_summaries = []
     for skill_summary in skill_summaries:

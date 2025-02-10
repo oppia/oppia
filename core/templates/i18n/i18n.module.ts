@@ -16,22 +16,30 @@
  * @fileoverview Module for the Internationalization.
  */
 
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
-import { TranslateCacheModule, TranslateCacheService,
-  TranslateCacheSettings } from 'ngx-translate-cache';
-import { MissingTranslationHandler, TranslateDefaultParser,
-  TranslateLoader, TranslateModule, TranslateParser,
-  TranslateService } from '@ngx-translate/core';
+import {HttpClient} from '@angular/common/http';
+import {
+  TranslateCacheModule,
+  TranslateCacheService,
+  TranslateCacheSettings,
+} from 'ngx-translate-cache';
+import {
+  MissingTranslationHandler,
+  TranslateDefaultParser,
+  TranslateLoader,
+  TranslateModule,
+  TranslateParser,
+  TranslateService,
+} from '@ngx-translate/core';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateLoaderFactory } from 'i18n/translate-loader.factory';
-import { TranslateCacheFactory } from 'i18n/translate-cache.factory';
-import { TranslateCustomParser } from 'i18n/translate-custom-parser';
-import { MissingTranslationCustomHandler } from 'i18n/missing-translation-custom-handler';
-import { AppConstants } from 'app.constants';
-import { I18nService } from './i18n.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {TranslateLoaderFactory} from 'i18n/translate-loader.factory';
+import {TranslateCacheFactory} from 'i18n/translate-cache.factory';
+import {TranslateCustomParser} from 'i18n/translate-custom-parser';
+import {MissingTranslationCustomHandler} from 'i18n/missing-translation-custom-handler';
+import {AppConstants} from 'app.constants';
+import {I18nService} from './i18n.service';
 
 /**
  * The Translate Module will look for translations in the following order:
@@ -48,7 +56,7 @@ import { I18nService } from './i18n.service';
       defaultLanguage: AppConstants.DEFAULT_LANGUAGE_CODE,
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
-        useClass: MissingTranslationCustomHandler
+        useClass: MissingTranslationCustomHandler,
       },
       loader: {
         provide: TranslateLoader,
@@ -58,26 +66,20 @@ import { I18nService } from './i18n.service';
       parser: {
         provide: TranslateParser,
         useClass: TranslateCustomParser,
-        deps: [TranslateDefaultParser, I18nLanguageCodeService]
-      }
+        deps: [TranslateDefaultParser, I18nLanguageCodeService],
+      },
     }),
     TranslateCacheModule.forRoot({
       cacheService: {
         provide: TranslateCacheService,
         useFactory: TranslateCacheFactory.createTranslateCacheService,
-        deps: [TranslateService, TranslateCacheSettings]
-      }
-    })
+        deps: [TranslateService, TranslateCacheSettings],
+      },
+    }),
   ],
 
-  providers: [
-    TranslateDefaultParser,
-    I18nService
-  ],
+  providers: [TranslateDefaultParser, I18nService],
 
-  exports: [
-    TranslateModule,
-    TranslateCacheModule
-  ]
+  exports: [TranslateModule, TranslateCacheModule],
 })
 export class I18nModule {}

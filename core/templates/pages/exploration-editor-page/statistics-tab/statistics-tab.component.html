@@ -2,12 +2,12 @@
   <mat-card class="oppia-editor-card">
     <div *ngIf="explorationHasBeenVisited">
       <div class="oppia-statistics-display">
-        <h3>Exploration Completion Rate</h3>
+        <h3 tabindex="0">Exploration Completion Rate</h3>
         <oppia-pie-chart *ngIf="pieChartData && pieChartOptions"
                          [data]="pieChartData"
                          [options]="pieChartOptions">
         </oppia-pie-chart>
-        <p class="text-center">
+        <p class="text-center" tabindex="0">
           <span *ngIf="numPassersby"
                 class="e2e-test-num-passersby font-weight-bold">
             {{ numPassersby }} learners browsed this exploration. They left before reaching the second card.
@@ -17,7 +17,7 @@
           </span>
         </p>
 
-        <h3>Card statistics</h3>
+        <h3 tabindex="0">Card statistics</h3>
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -30,7 +30,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="!explorationHasBeenVisited">
+    <div *ngIf="!explorationHasBeenVisited" tabindex="0">
       <em>
         This exploration has not been visited by anyone yet, so there are no statistics to display.
       </em>

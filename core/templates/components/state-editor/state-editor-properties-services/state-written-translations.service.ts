@@ -15,28 +15,30 @@
 /**
  * @fileoverview A data service that stores the written translations.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { StatePropertyService } from
+import {AlertsService} from 'services/alerts.service';
+import {
+  StatePropertyService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
-import { WrittenTranslations } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
+import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class StateWrittenTranslationsService extends
-  StatePropertyService<WrittenTranslations> {
+export class StateWrittenTranslationsService extends StatePropertyService<WrittenTranslations> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveWrittenTranslation';
   }
 }
 
-angular.module('oppia').factory(
-  'StateWrittenTranslationsService', downgradeInjectable(
-    StateWrittenTranslationsService));
+angular
+  .module('oppia')
+  .factory(
+    'StateWrittenTranslationsService',
+    downgradeInjectable(StateWrittenTranslationsService)
+  );

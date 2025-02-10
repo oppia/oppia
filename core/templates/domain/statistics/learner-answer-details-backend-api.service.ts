@@ -16,48 +16,60 @@
  * @fileoverview Service to record learner answer info.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {StatisticsDomainConstants} from 'domain/statistics/statistics-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerAnswerDetailsBackendApiService {
   constructor(
     private httpClient: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async recordLearnerAnswerDetailsAsync(
-      explorationId: string, stateName: string, interactionId: string,
-      answer: string, answerDetails: string): Promise<void> {
-    let recordLearnerAnswerDetailsUrl = (
+    explorationId: string,
+    stateName: string,
+    interactionId: string,
+    answer: string,
+    answerDetails: string
+  ): Promise<void> {
+    let recordLearnerAnswerDetailsUrl =
       this.urlInterpolationService.interpolateUrl(
-        StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL, {
+        StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL,
+        {
           entity_type: 'exploration',
-          entity_id: explorationId
-        }));
+          entity_id: explorationId,
+        }
+      );
 
     let payload = {
       state_name: stateName,
       interaction_id: interactionId,
       answer: answer,
-      answer_details: answerDetails
+      answer_details: answerDetails,
     };
 
-    return this.httpClient.put<void>(
-      recordLearnerAnswerDetailsUrl, payload).toPromise().then(
-      () => {}, errorResponse => {
-        throw new Error(errorResponse.error.error);
-      });
+    return this.httpClient
+      .put<void>(recordLearnerAnswerDetailsUrl, payload)
+      .toPromise()
+      .then(
+        () => {},
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'LearnerAnswerDetailsBackendApiService',
-  downgradeInjectable(LearnerAnswerDetailsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'LearnerAnswerDetailsBackendApiService',
+    downgradeInjectable(LearnerAnswerDetailsBackendApiService)
+  );

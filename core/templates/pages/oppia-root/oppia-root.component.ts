@@ -16,10 +16,10 @@
  * @fileoverview Oppia root component.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-root',
-  templateUrl: './oppia-root.component.html'
+  templateUrl: './oppia-root.component.html',
 })
 export class OppiaRootComponent {}

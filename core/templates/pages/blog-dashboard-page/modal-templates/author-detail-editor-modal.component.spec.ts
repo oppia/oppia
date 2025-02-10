@@ -16,13 +16,12 @@
  * @fileoverview Unit tests for blog author details component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BlogAuthorDetailsEditorComponent } from './author-detail-editor-modal.component';
-
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {BlogAuthorDetailsEditorComponent} from './author-detail-editor-modal.component';
 
 describe('Upload Blog Post Thumbnail Modal Component', () => {
   let fixture: ComponentFixture<BlogAuthorDetailsEditorComponent>;
@@ -33,18 +32,10 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModalModule,
-      ],
-      declarations: [
-        MockTranslatePipe,
-        BlogAuthorDetailsEditorComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule, NgbModalModule],
+      declarations: [MockTranslatePipe, BlogAuthorDetailsEditorComponent],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,36 +54,45 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should not dismiss the modal on calling cancel function if author bio' +
-  'is empty', () => {
-    component.prevAuthorBio = '';
-    component.cancel();
+  it(
+    'should not dismiss the modal on calling cancel function if author bio' +
+      'is empty',
+    () => {
+      component.prevAuthorBio = '';
+      component.cancel();
 
-    expect(dismissSpy).not.toHaveBeenCalled();
-  });
+      expect(dismissSpy).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should close the modal on calling save function with valid author' +
-  'details', () => {
-    component.authorName = 'test username';
-    component.authorBio = 'general bio';
-    let expectedAuthorDetails = {
-      authorName: 'test username',
-      authorBio: 'general bio'
-    };
-    component.save();
+  it(
+    'should close the modal on calling save function with valid author' +
+      'details',
+    () => {
+      component.authorName = 'test username';
+      component.authorBio = 'general bio';
+      let expectedAuthorDetails = {
+        authorName: 'test username',
+        authorBio: 'general bio',
+      };
+      component.save();
 
-    expect(confirmSpy).toHaveBeenCalledWith(expectedAuthorDetails);
-  });
+      expect(confirmSpy).toHaveBeenCalledWith(expectedAuthorDetails);
+    }
+  );
 
-  it('should not close the modal on calling save function with invalid author' +
-  'details', () => {
-    component.authorName = '';
-    component.authorBio = '';
+  it(
+    'should not close the modal on calling save function with invalid author' +
+      'details',
+    () => {
+      component.authorName = '';
+      component.authorBio = '';
 
-    component.save();
+      component.save();
 
-    expect(confirmSpy).not.toHaveBeenCalledWith();
-  });
+      expect(confirmSpy).not.toHaveBeenCalledWith();
+    }
+  );
 
   it('should validate author details', () => {
     component.authorName = 'test username';
@@ -103,7 +103,14 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     component.authorBio = 'general bio';
     expect(component.validateAuthorDetails().length).toBe(1);
     expect(component.validateAuthorDetails()).toEqual([
-      'Author Name should not be empty.'
+      'Author Name should not be empty.',
+    ]);
+
+    component.authorName = 'test_username';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name can only have alphanumeric characters and spaces.',
     ]);
 
     component.authorName = '';
@@ -111,16 +118,31 @@ describe('Upload Blog Post Thumbnail Modal Component', () => {
     expect(component.validateAuthorDetails().length).toBe(2);
     expect(component.validateAuthorDetails()).toEqual([
       'Author Name should not be empty.',
-      'Author Bio should not be empty.'
+      'Author Bio should not be empty.',
     ]);
 
-    component.authorName = 'Author name exceeding character limit of 35' +
-    ' characters should raise error.';
+    component.authorName = 'A';
+    component.authorBio = 'general bio';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Name should not be less than 2 characters.',
+    ]);
+
+    component.authorName = 'test username';
+    component.authorBio = 'A';
+    expect(component.validateAuthorDetails().length).toBe(1);
+    expect(component.validateAuthorDetails()).toEqual([
+      'Author Bio should not be less than 5 characters.',
+    ]);
+
+    component.authorName =
+      'Author name exceeding character limit of 35' +
+      ' characters should raise error.';
     component.authorBio = 'Author bio exceeding char limit of 35'.repeat(550);
     expect(component.validateAuthorDetails().length).toBe(2);
     expect(component.validateAuthorDetails()).toEqual([
       'Author Name should not be more than 35 characters.',
-      'Author Bio should not be more than 250 characters.'
+      'Author Bio should not be more than 250 characters.',
     ]);
   });
 });

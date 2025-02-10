@@ -16,15 +16,14 @@
  * @fileoverview Component for the list view of opportunities.
  */
 
-import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, Output, EventEmitter, NgZone} from '@angular/core';
 
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { ExplorationOpportunity } from '../opportunities-list-item/opportunities-list-item.component';
-import { AppConstants } from 'app.constants';
-import { Subscription } from 'rxjs';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
+import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-list-item.component';
+import {AppConstants} from 'app.constants';
+import {Subscription} from 'rxjs';
 
 type ExplorationOpportunitiesFetcherFunction = () => Promise<{
   opportunitiesDicts: ExplorationOpportunity[];
@@ -34,7 +33,7 @@ type ExplorationOpportunitiesFetcherFunction = () => Promise<{
 @Component({
   selector: 'oppia-opportunities-list',
   templateUrl: './opportunities-list.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class OpportunitiesListComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -49,11 +48,19 @@ export class OpportunitiesListComponent {
   @Input() progressBarRequired: boolean = false;
 
   @Input() showOpportunityButton: boolean = true;
+  @Input() showPinUnpinButton: boolean = false;
 
-  @Output() clickActionButton: EventEmitter<string> = (
-    new EventEmitter()
-  );
+  @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
+  @Output() clickPinButton: EventEmitter<{
+    topic_name: string;
+    exploration_id: string;
+  }> = new EventEmitter();
+
+  @Output() clickUnpinButton: EventEmitter<{
+    topic_name: string;
+    exploration_id: string;
+  }> = new EventEmitter();
 
   loadingOpportunityData: boolean = true;
   opportunities: ExplorationOpportunity[] = [];
@@ -67,49 +74,59 @@ export class OpportunitiesListComponent {
 
   constructor(
     private zone: NgZone,
-    private readonly contributionOpportunitiesService:
-      ContributionOpportunitiesService,
+    private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
     private readonly translationLanguageService: TranslationLanguageService,
-    private readonly translationTopicService: TranslationTopicService) {
+    private readonly translationTopicService: TranslationTopicService
+  ) {
     this.init();
   }
 
   init(): void {
     this.directiveSubscriptions.add(
-      this.translationLanguageService.onActiveLanguageChanged.subscribe(
-        () => this.ngOnInit()));
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(() =>
+        this.ngOnInit()
+      )
+    );
 
     this.directiveSubscriptions.add(
-      this.translationTopicService.onActiveTopicChanged.subscribe(
-        () => this.ngOnInit()));
+      this.translationTopicService.onActiveTopicChanged.subscribe(() =>
+        this.ngOnInit()
+      )
+    );
 
     this.directiveSubscriptions.add(
-      this.contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => this.ngOnInit()));
+      this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.subscribe(
+        () => this.ngOnInit()
+      )
+    );
 
     this.directiveSubscriptions.add(
-      this.contributionOpportunitiesService
-        .removeOpportunitiesEventEmitter.subscribe((opportunityIds) => {
+      this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.subscribe(
+        opportunityIds => {
           if (opportunityIds.length === 0) {
             return;
           }
-          this.opportunities = this.opportunities.filter((opportunity) => {
+          this.opportunities = this.opportunities.filter(opportunity => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
-          const currentIndex = (
-            this.activePageNumber * this.OPPORTUNITIES_PAGE_SIZE);
+          const currentIndex =
+            this.activePageNumber * this.OPPORTUNITIES_PAGE_SIZE;
           if (currentIndex > this.opportunities.length) {
             // The active page number is no longer valid. Navigate to the
             // current last page.
-            const lastPage = Math.floor(
-              this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE) + 1;
+            const lastPage =
+              Math.floor(
+                this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE
+              ) + 1;
             this.gotoPage(lastPage);
           } else {
             // Navigate to the active page before opportunities were removed,
             // i.e. when reviewers accept/reject suggestions.
             this.gotoPage(this.activePageNumber);
           }
-        }));
+        }
+      )
+    );
   }
 
   ngOnDestroy(): void {
@@ -120,6 +137,90 @@ export class OpportunitiesListComponent {
     this.loadingOpportunityData = true;
     this.activePageNumber = 1;
     this.fetchAndLoadOpportunities();
+    this.subscribeToPinnedOpportunities();
+  }
+
+  subscribeToPinnedOpportunities(): void {
+    this.contributionOpportunitiesService.pinnedOpportunitiesChanged.subscribe(
+      updatedData => {
+        this.pinOpportunity(updatedData);
+      }
+    );
+    this.contributionOpportunitiesService.unpinnedOpportunitiesChanged.subscribe(
+      updatedData => {
+        this.unpinOpportunity(updatedData);
+      }
+    );
+  }
+
+  pinOpportunity(updatedData: Record<string, string>): void {
+    const indexToModify = this.opportunities.findIndex(
+      opportunity =>
+        opportunity.id === updatedData.explorationId &&
+        opportunity.topicName === updatedData.topicName
+    );
+
+    if (indexToModify !== -1) {
+      const opportunityToModify = this.opportunities[indexToModify];
+
+      const previouslyPinnedIndex = this.opportunities.findIndex(
+        opportunity =>
+          opportunity.isPinned &&
+          (opportunity.id !== updatedData.explorationId ||
+            opportunity.topicName !== updatedData.topicName)
+      );
+
+      if (previouslyPinnedIndex !== -1) {
+        this.opportunities[previouslyPinnedIndex].isPinned = false;
+      }
+
+      opportunityToModify.isPinned = true;
+
+      // Move the pinned item to the top.
+      this.opportunities.splice(indexToModify, 1);
+      this.opportunities.unshift(opportunityToModify);
+
+      // Update the visible opportunities.
+      const indexInVisible = this.visibleOpportunities.findIndex(
+        opportunity =>
+          opportunity.id === updatedData.explorationId &&
+          opportunity.topicName === updatedData.topicName
+      );
+
+      if (indexInVisible !== -1) {
+        this.visibleOpportunities.splice(indexInVisible, 1);
+        this.visibleOpportunities.unshift(opportunityToModify);
+      }
+    }
+  }
+
+  unpinOpportunity(updatedData: Record<string, string>): void {
+    const indexToModify = this.opportunities.findIndex(
+      opportunity =>
+        opportunity.id === updatedData.explorationId &&
+        opportunity.topicName === updatedData.topicName
+    );
+
+    if (indexToModify !== -1) {
+      const opportunityToModify = this.opportunities[indexToModify];
+      opportunityToModify.isPinned = false;
+
+      // Move the unpinned item to the end.
+      this.opportunities.splice(indexToModify, 1);
+      this.opportunities.push(opportunityToModify);
+
+      // Update the visible opportunities.
+      const indexInVisible = this.visibleOpportunities.findIndex(
+        opportunity =>
+          opportunity.id === updatedData.explorationId &&
+          opportunity.topicName === updatedData.topicName
+      );
+
+      if (indexInVisible !== -1) {
+        this.visibleOpportunities.splice(indexInVisible, 1);
+        this.visibleOpportunities.push(opportunityToModify);
+      }
+    }
   }
 
   fetchAndLoadOpportunities(): void {
@@ -133,12 +234,15 @@ export class OpportunitiesListComponent {
         this.opportunities = opportunitiesDicts;
         this.more = more;
         this.visibleOpportunities = this.opportunities.slice(
-          0, this.OPPORTUNITIES_PAGE_SIZE);
+          0,
+          this.OPPORTUNITIES_PAGE_SIZE
+        );
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
           this.opportunities,
           this.OPPORTUNITIES_PAGE_SIZE,
           this.activePageNumber,
-          this.more);
+          this.more
+        );
         this.loadingOpportunityData = false;
       });
     });
@@ -152,36 +256,42 @@ export class OpportunitiesListComponent {
     if (endIndex >= this.opportunities.length && this.more) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
-      this.loadMoreOpportunities().then(
-        ({opportunitiesDicts, more}) => {
-          this.more = more;
-          this.opportunities = this.opportunities.concat(opportunitiesDicts);
-          this.visibleOpportunities = this.opportunities.slice(
-            startIndex, endIndex);
-          this.loadingOpportunityData = false;
-          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-            this.opportunities,
-            this.OPPORTUNITIES_PAGE_SIZE,
-            pageNumber,
-            this.more);
-        });
+      this.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+        this.more = more;
+        this.opportunities = this.opportunities.concat(opportunitiesDicts);
+        this.visibleOpportunities = this.opportunities.slice(
+          startIndex,
+          endIndex
+        );
+        this.loadingOpportunityData = false;
+        this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+          this.opportunities,
+          this.OPPORTUNITIES_PAGE_SIZE,
+          pageNumber,
+          this.more
+        );
+      });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
-        startIndex, endIndex);
+        startIndex,
+        endIndex
+      );
     }
     this.userIsOnLastPage = this.calculateUserIsOnLastPage(
       this.opportunities,
       this.OPPORTUNITIES_PAGE_SIZE,
       pageNumber,
-      this.more);
+      this.more
+    );
     this.activePageNumber = pageNumber;
   }
 
   calculateUserIsOnLastPage(
-      opportunities: ExplorationOpportunity[],
-      pageSize: number,
-      activePageNumber: number,
-      moreResults: boolean): boolean {
+    opportunities: ExplorationOpportunity[],
+    pageSize: number,
+    activePageNumber: number,
+    moreResults: boolean
+  ): boolean {
     const lastPageNumber = Math.ceil(opportunities.length / pageSize);
     return activePageNumber >= lastPageNumber && !moreResults;
   }
@@ -191,7 +301,3 @@ export class OpportunitiesListComponent {
     this.fetchAndLoadOpportunities();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaOpportunitiesList', downgradeComponent(
-    {component: OpportunitiesListComponent}));

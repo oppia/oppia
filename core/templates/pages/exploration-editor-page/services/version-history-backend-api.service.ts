@@ -17,12 +17,20 @@
  * or the exploration metadata at a particular version of the exploration.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { State, StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {
+  ExplorationMetadata,
+  ExplorationMetadataBackendDict,
+  ExplorationMetadataObjectFactory,
+} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {
+  State,
+  StateBackendDict,
+  StateObjectFactory,
+} from 'domain/state/StateObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface StateVersionHistoryBackendResponse {
   last_edited_version_number: number | null;
@@ -51,14 +59,14 @@ export interface MetadataVersionHistoryResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VersionHistoryBackendApiService {
-  STATE_VERSION_HISTORY_URL_TEMPLATE = (
-    '/version_history_handler/state/<exploration_id>/<state_name>/<version>');
+  STATE_VERSION_HISTORY_URL_TEMPLATE =
+    '/version_history_handler/state/<exploration_id>/<state_name>/<version>';
 
-  METADATA_VERSION_HISTORY_URL_TEMPLATE = (
-    '/version_history_handler/metadata/<exploration_id>/<version>');
+  METADATA_VERSION_HISTORY_URL_TEMPLATE =
+    '/version_history_handler/metadata/<exploration_id>/<version>';
 
   constructor(
     private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
@@ -68,54 +76,64 @@ export class VersionHistoryBackendApiService {
   ) {}
 
   async fetchStateVersionHistoryAsync(
-      explorationId: string, stateName: string, version: number
+    explorationId: string,
+    stateName: string,
+    version: number
   ): Promise<StateVersionHistoryResponse | null> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.STATE_VERSION_HISTORY_URL_TEMPLATE, {
+      this.STATE_VERSION_HISTORY_URL_TEMPLATE,
+      {
         exploration_id: explorationId,
         state_name: stateName,
-        version: version.toString()
-      });
+        version: version.toString(),
+      }
+    );
 
-    return this.http.get<StateVersionHistoryBackendResponse>(url)
+    return this.http
+      .get<StateVersionHistoryBackendResponse>(url)
       .toPromise()
-      .then((response) => {
+      .then(response => {
         let stateInPreviousVersion: State | null = null;
         if (response.state_dict_in_previous_version) {
-          stateInPreviousVersion = (
+          stateInPreviousVersion =
             this.stateObjectFactory.createFromBackendDict(
               response.state_name_in_previous_version,
               response.state_dict_in_previous_version
-            )
-          );
+            );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
           stateNameInPreviousVersion: response.state_name_in_previous_version,
           stateInPreviousVersion: stateInPreviousVersion,
-          lastEditedCommitterUsername: response.last_edited_committer_username
+          lastEditedCommitterUsername: response.last_edited_committer_username,
         };
       })
-      .catch((error) => {
+      .catch(error => {
         return null;
       });
   }
 
   async fetchMetadataVersionHistoryAsync(
-      explorationId: string, version: number
+    explorationId: string,
+    version: number
   ): Promise<MetadataVersionHistoryResponse | null> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.METADATA_VERSION_HISTORY_URL_TEMPLATE, {
+      this.METADATA_VERSION_HISTORY_URL_TEMPLATE,
+      {
         exploration_id: explorationId,
-        version: version.toString()
-      });
-    return this.http.get<MetadataVersionHistoryBackendResponse>(url)
+        version: version.toString(),
+      }
+    );
+    return this.http
+      .get<MetadataVersionHistoryBackendResponse>(url)
       .toPromise()
-      .then((response) => {
+      .then(response => {
         let metadataInPreviousVersion: ExplorationMetadata | null = null;
         if (response.metadata_dict_in_previous_version) {
-          metadataInPreviousVersion = this.explorationMetadataObjectFactory
-            .createFromBackendDict(response.metadata_dict_in_previous_version);
+          metadataInPreviousVersion =
+            this.explorationMetadataObjectFactory.createFromBackendDict(
+              response.metadata_dict_in_previous_version
+            );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
@@ -123,12 +141,15 @@ export class VersionHistoryBackendApiService {
           metadataInPreviousVersion: metadataInPreviousVersion,
         };
       })
-      .catch((error) => {
+      .catch(error => {
         return null;
       });
   }
 }
 
-angular.module('oppia').factory(
-  'VersionHistoryBackendApiService',
-  downgradeInjectable(VersionHistoryBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'VersionHistoryBackendApiService',
+    downgradeInjectable(VersionHistoryBackendApiService)
+  );

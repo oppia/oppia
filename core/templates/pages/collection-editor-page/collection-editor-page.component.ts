@@ -16,19 +16,18 @@
  * @fileoverview Primary component for the collection editor page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { UrlService } from 'services/contextual/url.service';
-import { PageTitleService } from 'services/page-title.service';
-import { CollectionEditorRoutingService } from './services/collection-editor-routing.service';
-import { CollectionEditorStateService } from './services/collection-editor-state.service';
+import {UrlService} from 'services/contextual/url.service';
+import {PageTitleService} from 'services/page-title.service';
+import {CollectionEditorRoutingService} from './services/collection-editor-routing.service';
+import {CollectionEditorStateService} from './services/collection-editor-state.service';
 
 @Component({
   selector: 'oppia-collection-editor-page',
-  templateUrl: './collection-editor-page.component.html'
+  templateUrl: './collection-editor-page.component.html',
 })
 export class CollectionEditorPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -56,7 +55,8 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     );
     // Load the collection to be edited.
     this.collectionEditorStateService.loadCollection(
-      this.urlService.getCollectionIdFromEditorUrl());
+      this.urlService.getCollectionIdFromEditorUrl()
+    );
   }
 
   ngOnDestroy(): void {
@@ -72,17 +72,19 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
   }
 
   setTitle(): void {
-    var title = (
-      this.collectionEditorStateService.getCollection().getTitle());
+    var title = this.collectionEditorStateService.getCollection().getTitle();
     let translatedTitle: string;
     if (title) {
       translatedTitle = this.translateService.instant(
-        'I18N_COLLECTION_EDITOR_PAGE_TITLE', {
-          collectionTitle: title
-        });
+        'I18N_COLLECTION_EDITOR_PAGE_TITLE',
+        {
+          collectionTitle: title,
+        }
+      );
     } else {
       translatedTitle = this.translateService.instant(
-        'I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE');
+        'I18N_COLLECTION_EDITOR_UNTITLED_COLLECTION_PAGE_TITLE'
+      );
     }
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
@@ -91,8 +93,3 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     return this.collectionEditorRoutingService.getActiveTabName();
   }
 }
-
-angular.module('oppia').directive('oppiaCollectionEditorPage',
-  downgradeComponent({
-    component: CollectionEditorPageComponent
-  }) as angular.IDirectiveFactory);

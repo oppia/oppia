@@ -15,10 +15,12 @@
  * @fileoverview Unit tests for LearnerViewInfoBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { LearnerViewInfoBackendApiService } from './learner-view-info-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {LearnerViewInfoBackendApiService} from './learner-view-info-backend-api.service';
 
 describe('Learner View Info Backend Api Service', () => {
   let lvibas: LearnerViewInfoBackendApiService;
@@ -29,7 +31,7 @@ describe('Learner View Info Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LearnerViewInfoBackendApiService]
+      providers: [LearnerViewInfoBackendApiService],
     });
     httpTestingController = TestBed.get(HttpTestingController);
     lvibas = TestBed.get(LearnerViewInfoBackendApiService);
@@ -38,28 +40,26 @@ describe('Learner View Info Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should fetch Learner View Info when calling fetchLearnerInfo',
-    fakeAsync(() => {
-      let stringifiedExpIds = '';
-      let includePrivateExplorations = '';
-      let jobOutput = {
-        summaries: ['response1',
-          'response2']
-      };
-      lvibas.fetchLearnerInfoAsync(
-        stringifiedExpIds,
-        includePrivateExplorations).then(successHandler, failHandler);
+  it('should fetch Learner View Info when calling fetchLearnerInfo', fakeAsync(() => {
+    let stringifiedExpIds = '';
+    let includePrivateExplorations = '';
+    let jobOutput = {
+      summaries: ['response1', 'response2'],
+    };
+    lvibas
+      .fetchLearnerInfoAsync(stringifiedExpIds, includePrivateExplorations)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/explorationsummarieshandler/' +
-        'data?stringified_exp_ids=&include_private_explorations=');
-      expect(req.request.method).toEqual('GET');
-      req.flush(jobOutput);
+    let req = httpTestingController.expectOne(
+      '/explorationsummarieshandler/' +
+        'data?stringified_exp_ids=&include_private_explorations='
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

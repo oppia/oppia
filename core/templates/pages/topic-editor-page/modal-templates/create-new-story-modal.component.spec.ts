@@ -16,15 +16,18 @@
  * @fileoverview Unit tests for Create New Story Modal Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
-import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
-import { CreateNewStoryModalComponent } from './create-new-story-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
+import {
+  ImageLocalStorageService,
+  ImagesData,
+} from 'services/image-local-storage.service';
+import {CreateNewStoryModalComponent} from './create-new-story-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -42,7 +45,6 @@ describe('Create New Story Modal Component', () => {
   let imageLocalStorageService: ImageLocalStorageService;
   let storyEditorStateService: StoryEditorStateService;
 
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -51,10 +53,10 @@ describe('Create New Story Modal Component', () => {
         EditableStoryBackendApiService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -64,42 +66,62 @@ describe('Create New Story Modal Component', () => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
 
-    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
-      [{ filename: 'a.png', image: 'faf' } as unknown as ImagesData]);
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
+      {filename: 'a.png', image: 'faf'} as unknown as ImagesData,
+    ]);
   });
 
   it('should check if properties was initialized correctly', () => {
     expect(component.story.title).toBe('');
     expect(component.story.description).toBe('');
     expect(component.MAX_CHARS_IN_STORY_TITLE).toBe(
-      AppConstants.MAX_CHARS_IN_STORY_TITLE);
+      AppConstants.MAX_CHARS_IN_STORY_TITLE
+    );
   });
 
   it('should check if url fragment already exists', () => {
     spyOn(
       storyEditorStateService,
-      'updateExistenceOfStoryUrlFragment').and.callFake(
-      (urlFragment, callback) => callback());
+      'updateExistenceOfStoryUrlFragment'
+    ).and.callFake((urlFragment, callback) => callback());
     spyOn(
       storyEditorStateService,
-      'getStoryWithUrlFragmentExists').and.returnValue(true);
+      'getStoryWithUrlFragmentExists'
+    ).and.returnValue(true);
     expect(component.storyUrlFragmentExists).toBeFalse();
     component.story.urlFragment = 'test-url';
     component.onStoryUrlFragmentChange();
     expect(component.storyUrlFragmentExists).toBeTrue();
   });
 
-  it('should not update story url fragment existence for empty url fragment',
-    () => {
-      spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
-      component.story.urlFragment = '';
-      component.onStoryUrlFragmentChange();
-      component.save();
-      component.cancel();
-      expect(
-        storyEditorStateService.updateExistenceOfStoryUrlFragment
-      ).not.toHaveBeenCalled();
+  it('should not update story url with wrong framgent', () => {
+    component.story.urlFragment = 'not empty';
+    spyOn(
+      storyEditorStateService,
+      'updateExistenceOfStoryUrlFragment'
+    ).and.callFake((urlFragment, successCallback, errorCallback) => {
+      errorCallback();
     });
+    spyOn(storyEditorStateService, 'getStoryWithUrlFragmentExists');
+    component.onStoryUrlFragmentChange();
+    expect(
+      storyEditorStateService.updateExistenceOfStoryUrlFragment
+    ).toHaveBeenCalled();
+    expect(
+      storyEditorStateService.getStoryWithUrlFragmentExists
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should not update story url fragment existence for empty url fragment', () => {
+    spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
+    component.story.urlFragment = '';
+    component.onStoryUrlFragmentChange();
+    component.save();
+    component.cancel();
+    expect(
+      storyEditorStateService.updateExistenceOfStoryUrlFragment
+    ).not.toHaveBeenCalled();
+  });
 
   it('should check if the story is valid', () => {
     expect(component.isValid()).toBe(false);

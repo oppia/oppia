@@ -73,7 +73,10 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             expected_status_int=400)
 
         self.assertEqual(
-            response_dict['error'], 'Missing key in handler args: filename.')
+            response_dict['error'],
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: filename.')
 
         self.logout()
 
@@ -89,6 +92,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_image_upload_with_invalid_filename_raises_error(self) -> None:
+        """Test that filenames starting with dot are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -101,13 +105,17 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             {'filename': '.png'},
             csrf_token=csrf_token,
-            upload_files=[('image', 'unused_filename', raw_image)],
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
 
         error_msg = (
-            'Schema validation for \'filename\' failed: Validation'
-            ' failed: is_regex_matched ({\'regex_pattern\': '
-            '\'\\\\w+[.]\\\\w+\'}) for object .png'
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object .png'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
@@ -416,8 +424,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
 
     def test_bad_filenames_are_detected(self) -> None:
-        # TODO(sll): Add more tests here.
-
+        """Test that filenames with invalid characters are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -436,14 +443,19 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
-            'for object test/a.png')
-        self.assertIn(error_msg, response_dict['error'])
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test/a.png'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
     def test_missing_extensions_are_detected(self) -> None:
+        """Test that filenames without extensions are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with utils.open_file(
@@ -461,14 +473,19 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
-            'for object test')
-        self.assertIn(error_msg, response_dict['error'])
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test'
+        )
+        self.assertEqual(error_msg, response_dict['error'])
 
         self.logout()
 
     def test_bad_extensions_are_detected(self) -> None:
+        """Test that invalid file extensions are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -485,9 +502,16 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=[('image', 'unused_filename', raw_image)],
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn(
-            'Expected a filename ending in .png, received test.pdf',
-            response_dict['error'])
+
+        error_msg = (
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test.pdf'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -609,6 +633,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                 ('raw_audio_file', self.TEST_AUDIO_FILE_FLAC, raw_audio)]
         )
         error_msg = (
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
             'Audio not recognized as a mp3 file\n'
             'Schema validation for \'filename\' failed: Validation failed: '
@@ -641,6 +667,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         )
         self.logout()
         error_msg = (
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
             'Audio not recognized as a mp3 file')
         self.assertEqual(response_dict['error'], error_msg)
@@ -669,6 +697,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
 
         error_msg = (
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
             'Audio not recognized as a mp3 file\n'
             'Schema validation for \'filename\' failed: Validation failed: '
@@ -721,6 +751,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
             '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav')
@@ -742,7 +774,10 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for '
+            response_dict['error'],
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
+            'Schema validation for '
             '\'raw_audio_file\' failed: No audio supplied')
 
     def test_upload_bad_audio(self) -> None:
@@ -761,7 +796,10 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'raw_audio_file\''
+            response_dict['error'],
+            'At \'http://localhost/createhandler/audioupload/0\' '
+            'these errors are happening:\n'
+            'Schema validation for \'raw_audio_file\''
             ' failed: Audio not recognized as a mp3 file')
 
     def test_missing_extensions_are_detected(self) -> None:
@@ -786,6 +824,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         error_msg = (
+            'At \'http://localhost/createhandler/audioupload/0\' these '
+            'errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
             '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test')
@@ -843,7 +883,10 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'raw_audio_file\' '
+            response_dict['error'],
+            'At \'http://localhost/createhandler/audioupload/0\' these '
+            'errors are happening:\n'
+            'Schema validation for \'raw_audio_file\' '
             'failed: Audio not recognized as a mp3 file')
 
     def test_upload_check_for_duration_sec_as_response(self) -> None:
@@ -932,6 +975,45 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
     def test_html_response(self) -> None:
         copier_id = 'Copier'
         response = self.get_html_response(
-            '/value_generator_handler/' + copier_id
+            '/value_generator_handler/%s' % copier_id
         )
         self.assertIn(b'<object-editor [objType]="objType"', response.body)
+
+
+class FaviconHandlerTest(test_utils.GenericTestBase):
+    """Test for the FaviconHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/favicon.ico', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/favicon.ico',
+            response.headers['location']
+        )
+
+
+class RobotsTxtHandlerTest(test_utils.GenericTestBase):
+    """Test for the RobotsTxtHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/robots.txt', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/robots.txt',
+            response.headers['location']
+        )
+
+
+class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
+    """Test for the CopyrightImagesHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/assets/copyrighted-images/general/mascot.svg',
+            expected_status_int=302
+        )
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/copyrighted-images/'
+            'general/mascot.svg',
+            response.headers['location']
+        )

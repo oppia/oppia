@@ -17,13 +17,23 @@
  *  the Oppia moderator page.
  */
 
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync }
-  from '@angular/core/testing';
-import { ActivityIdTypeDict, FeaturedActivityResponse,
-  ModeratorPageBackendApiService, RecentCommitResponse,
-  RecentFeedbackMessages } from './moderator-page-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {
+  ActivityIdTypeDict,
+  FeaturedActivityResponse,
+  ModeratorPageBackendApiService,
+  RecentCommitResponse,
+  RecentFeedbackMessages,
+} from './moderator-page-backend-api.service';
 
 describe('Moderator Page Backend Api Service', () => {
   let moderatorPageBackendApiService: ModeratorPageBackendApiService;
@@ -31,26 +41,26 @@ describe('Moderator Page Backend Api Service', () => {
   let successHandler = jasmine.createSpy('success');
   let failHandler = jasmine.createSpy('fail');
 
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ]
+      imports: [HttpClientTestingModule],
     });
   }));
 
   beforeEach(() => {
-    moderatorPageBackendApiService =
-      TestBed.inject(ModeratorPageBackendApiService);
+    moderatorPageBackendApiService = TestBed.inject(
+      ModeratorPageBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should save featured activity references', fakeAsync(() => {
-    let activityReferences: ActivityIdTypeDict[] = [{
-      id: 'test_id1',
-      type: 'type1'
-    }];
+    let activityReferences: ActivityIdTypeDict[] = [
+      {
+        id: 'test_id1',
+        type: 'type1',
+      },
+    ];
 
     moderatorPageBackendApiService
       .saveFeaturedActivityReferencesAsync(activityReferences)
@@ -69,14 +79,16 @@ describe('Moderator Page Backend Api Service', () => {
       results: [],
       cursor: 'str1',
       more: true,
-      exp_ids_to_exp_data: []
+      exp_ids_to_exp_data: [],
     };
     moderatorPageBackendApiService
-      .getRecentCommitsAsync().then(successHandler, failHandler);
+      .getRecentCommitsAsync()
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/recentcommitshandler/recent_commits' +
-      '?query_type=all_non_private_commits');
+        '?query_type=all_non_private_commits'
+    );
     req.flush(expectedResponseData);
     flushMicrotasks();
 
@@ -88,10 +100,11 @@ describe('Moderator Page Backend Api Service', () => {
     let expectedResponseData: RecentFeedbackMessages = {
       results: [],
       cursor: 'str1',
-      more: true
+      more: true,
     };
     moderatorPageBackendApiService
-      .getRecentFeedbackMessagesAsync().then(successHandler, failHandler);
+      .getRecentFeedbackMessagesAsync()
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/recent_feedback_messages');
     req.flush(expectedResponseData);
@@ -103,10 +116,11 @@ describe('Moderator Page Backend Api Service', () => {
 
   it('should get recent featured activity references', fakeAsync(() => {
     let expectedResponseData: FeaturedActivityResponse = {
-      featured_activity_references: []
+      featured_activity_references: [],
     };
     moderatorPageBackendApiService
-      .getFeaturedActivityReferencesAsync().then(successHandler, failHandler);
+      .getFeaturedActivityReferencesAsync()
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/moderatorhandler/featured');
     req.flush(expectedResponseData);

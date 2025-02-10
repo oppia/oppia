@@ -18,7 +18,7 @@
  * feedback tab of the exploration editor.
  */
 
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 
 describe('Thread Status Display Service', () => {
   let threadStatusDisplayService: ThreadStatusDisplayService;
@@ -32,35 +32,40 @@ describe('Thread Status Display Service', () => {
     for (let i = 0; i < mockStatusChoices.length; i++) {
       let mockStatusID = mockStatusChoices[i].id;
       expect(
-        threadStatusDisplayService.getHumanReadableStatus(
-          mockStatusID)).toBe(mockStatusChoices[i].text);
+        threadStatusDisplayService.getHumanReadableStatus(mockStatusID)
+      ).toBe(mockStatusChoices[i].text);
     }
 
     let mockStatusID = 'INVALID_STATUS';
     expect(
-      threadStatusDisplayService.getHumanReadableStatus(
-        mockStatusID)).toBe('');
+      threadStatusDisplayService.getHumanReadableStatus(mockStatusID)
+    ).toBe('');
   });
 
   it('should give appropriate label class for status id', () => {
     let mockStatusID = 'open';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge badge-info');
+      'badge badge-info'
+    );
 
     mockStatusID = 'fixed';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge badge-secondary');
+      'badge badge-secondary'
+    );
 
     mockStatusID = 'ignored';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge badge-secondary');
+      'badge badge-secondary'
+    );
 
     mockStatusID = 'not_actionable';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge badge-secondary');
+      'badge badge-secondary'
+    );
 
     mockStatusID = 'compliment';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge badge-success');
+      'badge badge-success'
+    );
   });
 });

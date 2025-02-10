@@ -16,11 +16,16 @@
  * @fileoverview Unit tests for BadgeComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BadgeComponent } from './badge.component';
-import { AppConstants } from 'app.constants';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {BadgeComponent} from './badge.component';
+import {AppConstants} from 'app.constants';
 
 describe('Badge component', () => {
   let component: BadgeComponent;
@@ -29,11 +34,9 @@ describe('Badge component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        BadgeComponent
-      ],
+      declarations: [BadgeComponent],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -48,8 +51,8 @@ describe('Badge component', () => {
 
   describe('when a submission badge is passed ', () => {
     it('should show submission badges', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 1;
       component.language = 'Hindi';
 
@@ -60,8 +63,8 @@ describe('Badge component', () => {
     }));
 
     it('should show review badges', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_REVIEW;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
       component.contributionCount = 1;
       component.language = 'Hindi';
 
@@ -72,8 +75,8 @@ describe('Badge component', () => {
     }));
 
     it('should show correction badges', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_CORRECTION;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION;
       component.contributionCount = 1;
       component.language = 'Hindi';
 
@@ -84,8 +87,8 @@ describe('Badge component', () => {
     }));
 
     it('should show the plural form of badge text', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 10;
       component.language = 'Hindi';
 
@@ -98,8 +101,8 @@ describe('Badge component', () => {
 
   describe('when a long language text is given ', () => {
     it('should decrease the font size', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 1;
       component.language = 'Netherlands';
 
@@ -110,8 +113,8 @@ describe('Badge component', () => {
     }));
 
     it('should decrease the line height', fakeAsync(() => {
-      component.contributionSubType = AppConstants
-        .CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
+      component.contributionSubType =
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
       component.contributionCount = 1;
       component.language = 'Bahasa Indonesia';
 

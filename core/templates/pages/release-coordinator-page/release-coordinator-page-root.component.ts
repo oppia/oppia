@@ -16,18 +16,18 @@
  * @fileoverview Root component for Release Coordinator Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-release-coordinator-page-root',
-  templateUrl: './release-coordinator-page-root.component.html'
+  templateUrl: './release-coordinator-page-root.component.html',
 })
 export class ReleaseCoordinatorPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -35,8 +35,7 @@ export class ReleaseCoordinatorPageRootComponent implements OnDestroy {
   pageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private translateService: TranslateService
@@ -46,10 +45,12 @@ export class ReleaseCoordinatorPageRootComponent implements OnDestroy {
     const releaseCoordinatorPage =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE;
     const translatedTitle = this.translateService.instant(
-      releaseCoordinatorPage.TITLE);
+      releaseCoordinatorPage.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      releaseCoordinatorPage.META);
+      releaseCoordinatorPage.META
+    );
   }
 
   ngOnInit(): void {
@@ -62,11 +63,15 @@ export class ReleaseCoordinatorPageRootComponent implements OnDestroy {
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService
       .validateAccessToReleaseCoordinatorPage()
-      .then((resp) => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).then(() => {
+      .then(
+        resp => {
+          this.pageIsShown = true;
+        },
+        err => {
+          this.errorPageIsShown = true;
+        }
+      )
+      .then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

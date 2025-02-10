@@ -16,13 +16,12 @@
  * @fileoverview Component for the collection player navbar
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'collection-navbar',
@@ -35,17 +34,17 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
 
   constructor(
     private urlService: UrlService,
-    private readOnlyCollectionBackendApiService:
-      ReadOnlyCollectionBackendApiService
+    private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService
   ) {}
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
         () => {
-          let title = (
+          let title =
             this.readOnlyCollectionBackendApiService.getCollectionDetails(
-              this.urlService.getCollectionIdFromUrl()).title);
+              this.urlService.getCollectionIdFromUrl()
+            ).title;
           if (title === null) {
             throw new Error('Collection title is null');
           }
@@ -59,5 +58,3 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     return this.directiveSubscriptions.unsubscribe();
   }
 }
-angular.module('oppia').directive('collectionNavbar', downgradeComponent(
-  {component: CollectionNavbarComponent}));

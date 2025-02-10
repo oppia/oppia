@@ -1,0 +1,28 @@
+<button class="align-self-end content-toggle-button" (click)="toggle()">
+  <span class="content-toggle-button-text"> {{ buttonText }} </span>
+  <span aria-hidden="true" class="fas" [ngClass]="isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></span>
+</button>
+
+<style>
+  .content-toggle-button {
+    align-items: center;
+    background-color: #fff;
+    border: none;
+    border-radius: .25em;
+    color: #00645c;
+    display: flex;
+    float: inline-end;
+    font-size: 14px;
+    font-weight: 500;
+    gap: 0 4px;
+    justify-content: center;
+    padding: 8px;
+    transition: all 300ms ease-out;
+    width: fit-content;
+  }
+
+  .content-toggle-button:not(:disabled):hover .content-toggle-button-text {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

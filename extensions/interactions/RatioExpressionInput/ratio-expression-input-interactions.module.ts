@@ -16,20 +16,16 @@
  * @fileoverview Module for the continue extension components.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { InteractiveRatioExpressionInputComponent } from './directives/oppia-interactive-ratio-expression-input.component';
-import { ResponseRatioExpressionInputComponent } from './directives/oppia-response-ratio-expression-input.component';
-import { ShortResponseRatioExpressionInputComponent } from './directives/oppia-short-response-ratio-expression-input.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {InteractiveRatioExpressionInputComponent} from './directives/oppia-interactive-ratio-expression-input.component';
+import {ResponseRatioExpressionInputComponent} from './directives/oppia-response-ratio-expression-input.component';
+import {ShortResponseRatioExpressionInputComponent} from './directives/oppia-short-response-ratio-expression-input.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    SharedComponentsModule
-  ],
+  imports: [CommonModule, FormsModule, SharedComponentsModule],
   declarations: [
     InteractiveRatioExpressionInputComponent,
     ResponseRatioExpressionInputComponent,
@@ -46,5 +42,4 @@ import { SharedComponentsModule } from 'components/shared-component.module';
     ShortResponseRatioExpressionInputComponent,
   ],
 })
-
-export class RatioExpressionInputInteractionModule { }
+export class RatioExpressionInputInteractionModule {}

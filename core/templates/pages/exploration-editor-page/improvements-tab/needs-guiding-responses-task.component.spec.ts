@@ -17,17 +17,17 @@
  * the improvements tab.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
-import { SupportingStateStats } from 'services/exploration-improvements-task-registry.service';
-import { RouterService } from '../services/router.service';
-import { NeedsGuidingResponsesTaskComponent } from './needs-guiding-responses-task.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {SupportingStateStats} from 'services/exploration-improvements-task-registry.service';
+import {RouterService} from '../services/router.service';
+import {NeedsGuidingResponsesTaskComponent} from './needs-guiding-responses-task.component';
 
-describe('NeedsGuidingResponsesTask component', function() {
+describe('NeedsGuidingResponsesTask component', function () {
   let component: NeedsGuidingResponsesTaskComponent;
   let fixture: ComponentFixture<NeedsGuidingResponsesTaskComponent>;
   let routerService: RouterService;
@@ -42,43 +42,37 @@ describe('NeedsGuidingResponsesTask component', function() {
       totalHitCount: 0,
       firstHitCount: 0,
       numTimesSolutionViewed: 0,
-      numCompletions: 0
+      numCompletions: 0,
     },
     cstPlaythroughIssues: [],
     eqPlaythroughIssues: [],
-    misPlaythroughIssues: []
+    misPlaythroughIssues: [],
   } as SupportingStateStats;
 
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-      ],
-      declarations: [
-        NeedsGuidingResponsesTaskComponent
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [NeedsGuidingResponsesTaskComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      NeedsGuidingResponsesTaskComponent);
+    fixture = TestBed.createComponent(NeedsGuidingResponsesTaskComponent);
     component = fixture.componentInstance;
 
     routerService = TestBed.inject(RouterService);
@@ -90,8 +84,10 @@ describe('NeedsGuidingResponsesTask component', function() {
 
   it('should configure sorted tiles viz based on input task and stats', () => {
     expect(component.sortedTilesData).toEqual(stats.answerStats);
-    expect(component.sortedTilesOptions)
-      .toEqual({header: '', use_percentages: true});
+    expect(component.sortedTilesOptions).toEqual({
+      header: '',
+      use_percentages: true,
+    });
     expect(component.sortedTilesTotalFrequency).toEqual(totalAnswersCount);
   });
 

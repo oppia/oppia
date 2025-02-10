@@ -22,16 +22,19 @@ import {
   TranslatedContentBackendDict,
 } from 'domain/exploration/TranslatedContentObjectFactory';
 
-
 interface TranslationMappingDict {
   [contentId: string]: TranslatedContentBackendDict;
 }
 export interface EntityTranslationBackendDict {
-  'entity_id': string;
-  'entity_type': string;
-  'entity_version': number;
-  'language_code': string;
-  'translations': TranslationMappingDict;
+  entity_id: string;
+  entity_type: string;
+  entity_version: number;
+  language_code: string;
+  translations: TranslationMappingDict;
+}
+
+export interface LanguageCodeToEntityTranslationBackendDict {
+  [languageCode: string]: EntityTranslationBackendDict;
 }
 
 interface TranslationMapping {
@@ -55,26 +58,62 @@ export class EntityTranslation {
   }
 
   markTranslationAsNeedingUpdate(contentId: string): void {
+    if (!this.translationMapping.hasOwnProperty(contentId)) {
+      return;
+    }
+
     this.translationMapping[contentId].markAsNeedingUpdate();
+  }
+
+  updateTranslation(
+    contentId: string,
+    translatedContent: TranslatedContent
+  ): void {
+    this.translationMapping[contentId] = translatedContent;
+  }
+
+  removeTranslation(contentId: string): void {
+    delete this.translationMapping[contentId];
   }
 
   hasWrittenTranslation(contentId: string): boolean {
     return this.translationMapping.hasOwnProperty(contentId);
   }
 
+  toBackendDict(): EntityTranslationBackendDict {
+    return {
+      entity_id: this.entityId,
+      entity_type: this.entityType,
+      entity_version: this.entityVersion,
+      language_code: this.languageCode,
+      translations: this.translationMappingToBackendDict(),
+    };
+  }
+
+  translationMappingToBackendDict(): TranslationMappingDict {
+    const translationMappingDict: TranslationMappingDict = {};
+    Object.keys(this.translationMapping).forEach(contentId => {
+      translationMappingDict[contentId] =
+        this.translationMapping[contentId].toBackendDict();
+    });
+    return translationMappingDict;
+  }
+
   static createTranslationMappingFromBackendDict(
-      backendDict: TranslationMappingDict): TranslationMapping {
+    backendDict: TranslationMappingDict
+  ): TranslationMapping {
     const translationsMapping: TranslationMapping = {};
-    Object.keys(backendDict).forEach((contentId) => {
+    Object.keys(backendDict).forEach(contentId => {
       translationsMapping[contentId] = TranslatedContent.createFromBackendDict(
-        backendDict[contentId]);
+        backendDict[contentId]
+      );
     });
 
     return translationsMapping;
   }
 
   static createFromBackendDict(
-      backendDict: EntityTranslationBackendDict
+    backendDict: EntityTranslationBackendDict
   ): EntityTranslation {
     return new EntityTranslation(
       backendDict.entity_id,
@@ -82,7 +121,8 @@ export class EntityTranslation {
       backendDict.entity_version,
       backendDict.language_code,
       EntityTranslation.createTranslationMappingFromBackendDict(
-        backendDict.translations)
+        backendDict.translations
+      )
     );
   }
 }

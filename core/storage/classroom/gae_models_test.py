@@ -43,8 +43,14 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             name='math',
             url_fragment='math',
             course_details='Curated math foundations course.',
+            teaser_text='Learn math through fun stories!',
             topic_list_intro='Start from the basics with our first topic.',
-            topic_id_to_prerequisite_topic_ids={}
+            topic_id_to_prerequisite_topic_ids={},
+            is_published=True, thumbnail_filename='thumbnail.svg',
+            thumbnail_bg_color='transparent', thumbnail_size_in_bytes=1000,
+            banner_filename='banner.png', banner_bg_color='transparent',
+            banner_size_in_bytes=1000,
+            index=0
         )
         self.classroom_model.update_timestamps()
         self.classroom_model.put()
@@ -54,15 +60,36 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             classroom_models.ClassroomModel.generate_new_classroom_id())
         classroom_model_instance = (classroom_models.ClassroomModel.create(
             classroom_id, 'physics', 'physics', 'Curated physics course.',
-            'Start from the basic physics.', {}))
+            'Learn physics through fun stories!', 
+            'Start from the basic physics.', {}, False,
+            'thumbnail.svg', 'transparent', 1000, 'banner.png',
+            'transparent', 1000, 0))
 
         self.assertEqual(classroom_model_instance.name, 'physics')
         self.assertEqual(classroom_model_instance.url_fragment, 'physics')
         self.assertEqual(
             classroom_model_instance.course_details, 'Curated physics course.')
         self.assertEqual(
+            classroom_model_instance.teaser_text,
+                'Learn physics through fun stories!')
+        self.assertEqual(
             classroom_model_instance.topic_list_intro,
-            'Start from the basic physics.')
+                'Start from the basic physics.')
+        self.assertEqual(classroom_model_instance.is_published, False)
+        self.assertEqual(
+            classroom_model_instance.thumbnail_filename, 'thumbnail.svg')
+        self.assertEqual(
+            classroom_model_instance.thumbnail_bg_color, 'transparent')
+        self.assertEqual(
+            classroom_model_instance.thumbnail_size_in_bytes, 1000)
+        self.assertEqual(
+            classroom_model_instance.banner_filename, 'banner.png')
+        self.assertEqual(
+            classroom_model_instance.banner_bg_color, 'transparent')
+        self.assertEqual(
+            classroom_model_instance.banner_size_in_bytes, 1000)
+        self.assertEqual(
+            classroom_model_instance.index, 0)
 
     def test_get_export_policy_not_applicable(self) -> None:
         self.assertEqual(
@@ -74,9 +101,22 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'course_details': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'teaser_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_list_intro': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'topic_id_to_prerequisite_topic_ids': (
-                    base_models.EXPORT_POLICY.NOT_APPLICABLE)
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_filename': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_size_in_bytes': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_size_in_bytes': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'index': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )
 
@@ -138,7 +178,10 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 classroom_model_cls.create(
                     'classroom_id', 'math', 'math',
                     'Curated math foundations course.',
-                    'Start from the basic math.', {}
+                    'Learn math through fun stories!',
+                    'Start from the basic math.', {}, True,
+                    'thumbnail.svg', 'transparent', 1000, 'banner.png',
+                    'transparent', 1000, 0
                 )
 
         # Test generate_new_classroom_id method.

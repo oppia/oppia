@@ -16,18 +16,16 @@
  * @fileoverview Component for warning and alerts.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AlertsService, Message, Warning } from 'services/alerts.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AlertsService, Message, Warning} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-warnings-and-alerts',
-  templateUrl: './warnings-and-alerts.component.html'
+  templateUrl: './warnings-and-alerts.component.html',
 })
 export class WarningsAndAlertsComponent {
-  constructor(
-    private alertsService: AlertsService
-  ) {}
+  constructor(private alertsService: AlertsService) {}
 
   getWarnings(): Warning[] {
     return this.alertsService.warnings;
@@ -42,7 +40,9 @@ export class WarningsAndAlertsComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaWarningsAndAlerts',
+angular.module('oppia').directive(
+  'oppiaWarningsAndAlerts',
   downgradeComponent({
-    component: WarningsAndAlertsComponent
-  }) as angular.IDirectiveFactory);
+    component: WarningsAndAlertsComponent,
+  }) as angular.IDirectiveFactory
+);

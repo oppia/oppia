@@ -16,21 +16,17 @@
  * @fileoverview Service to change the rights of collections in the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { CollectionRights } from
-  'domain/collection/collection-rights.model';
-import { CollectionRightsBackendDict } from
-  'domain/collection/collection-rights.model';
+import {CollectionEditorPageConstants} from 'pages/collection-editor-page/collection-editor-page.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CollectionRights} from 'domain/collection/collection-rights.model';
+import {CollectionRightsBackendDict} from 'domain/collection/collection-rights.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionRightsBackendApiService {
   // Maps previously loaded collection rights to their IDs.
@@ -38,70 +34,82 @@ export class CollectionRightsBackendApiService {
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) { }
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   private _fetchCollectionRights(
-      collectionId: string,
-      successCallback: (value: CollectionRights) => void,
-      errorCallback: (reason: string) => void): void {
-    let collectionRightsUrl = this.urlInterpolationService
-      .interpolateUrl(
-        CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE, {
-          collection_id: collectionId
-        });
-    this.http.get<CollectionRightsBackendDict>(
-      collectionRightsUrl).toPromise().then(
-      response => {
-        if (successCallback) {
-          successCallback(
-            CollectionRights.create(response)
-          );
+    collectionId: string,
+    successCallback: (value: CollectionRights) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    let collectionRightsUrl = this.urlInterpolationService.interpolateUrl(
+      CollectionEditorPageConstants.COLLECTION_RIGHTS_URL_TEMPLATE,
+      {
+        collection_id: collectionId,
+      }
+    );
+    this.http
+      .get<CollectionRightsBackendDict>(collectionRightsUrl)
+      .toPromise()
+      .then(
+        response => {
+          if (successCallback) {
+            successCallback(CollectionRights.create(response));
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      },
-      errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   private _setCollectionStatus(
-      collectionId: string,
-      // Collection version is null for the default collection.
-      collectionVersion: number | null,
-      isPublic: boolean,
-      successCallback: (value: CollectionRights) => void,
-      errorCallback: (reason: string) => void): void {
-    let collectionPublishUrl = this.urlInterpolationService
-      .interpolateUrl('/collection_editor_handler/publish/<collection_id>', {
-        collection_id: collectionId
-      });
+    collectionId: string,
+    // Collection version is null for the default collection.
+    collectionVersion: number | null,
+    isPublic: boolean,
+    successCallback: (value: CollectionRights) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    let collectionPublishUrl = this.urlInterpolationService.interpolateUrl(
+      '/collection_editor_handler/publish/<collection_id>',
+      {
+        collection_id: collectionId,
+      }
+    );
 
-    let collectionUnpublishUrl = this.urlInterpolationService
-      .interpolateUrl('/collection_editor_handler/unpublish/<collection_id>', {
-        collection_id: collectionId
-      });
+    let collectionUnpublishUrl = this.urlInterpolationService.interpolateUrl(
+      '/collection_editor_handler/unpublish/<collection_id>',
+      {
+        collection_id: collectionId,
+      }
+    );
 
     let putParams = {
-      version: collectionVersion
+      version: collectionVersion,
     };
 
-    let requestUrl = (
-      isPublic ? collectionPublishUrl : collectionUnpublishUrl);
-    this.http.put<CollectionRightsBackendDict>(requestUrl, putParams)
-      .toPromise().then(response => {
-        let collectionRights = CollectionRights.create(response);
-        this.collectionRightsCache[collectionId] = collectionRights;
+    let requestUrl = isPublic ? collectionPublishUrl : collectionUnpublishUrl;
+    this.http
+      .put<CollectionRightsBackendDict>(requestUrl, putParams)
+      .toPromise()
+      .then(
+        response => {
+          let collectionRights = CollectionRights.create(response);
+          this.collectionRightsCache[collectionId] = collectionRights;
 
-        if (successCallback) {
-          successCallback(collectionRights);
+          if (successCallback) {
+            successCallback(collectionRights);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      },
-      errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   private _isCached(collectionId: string): boolean {
@@ -111,8 +119,9 @@ export class CollectionRightsBackendApiService {
   /**
    * Gets a collection's rights, given its ID.
    */
-  async fetchCollectionRightsAsync(collectionId: string):
-   Promise<CollectionRights> {
+  async fetchCollectionRightsAsync(
+    collectionId: string
+  ): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._fetchCollectionRights(collectionId, resolve, reject);
     });
@@ -127,8 +136,9 @@ export class CollectionRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  async loadCollectionRightsAsync(collectionId: string):
-   Promise<CollectionRights> {
+  async loadCollectionRightsAsync(
+    collectionId: string
+  ): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
@@ -136,13 +146,16 @@ export class CollectionRightsBackendApiService {
         }
       } else {
         this._fetchCollectionRights(
-          collectionId, (collectionRights) => {
+          collectionId,
+          collectionRights => {
             // Save the fetched collection rights to avoid future fetches.
             this.collectionRightsCache[collectionId] = collectionRights;
             if (resolve) {
               resolve(this.collectionRightsCache[collectionId]);
             }
-          }, reject);
+          },
+          reject
+        );
       }
     });
   }
@@ -161,8 +174,9 @@ export class CollectionRightsBackendApiService {
    * specified collection ID with a new collection rights object.
    */
   cacheCollectionRights(
-      collectionId: string,
-      collectionRights: CollectionRights): void {
+    collectionId: string,
+    collectionRights: CollectionRights
+  ): void {
     this.collectionRightsCache[collectionId] = collectionRights;
   }
 
@@ -171,11 +185,17 @@ export class CollectionRightsBackendApiService {
    * its ID and version.
    */
   async setCollectionPublicAsync(
-      collectionId: string,
-      collectionVersion: number | null): Promise<CollectionRights> {
+    collectionId: string,
+    collectionVersion: number | null
+  ): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
-        collectionId, collectionVersion, true, resolve, reject);
+        collectionId,
+        collectionVersion,
+        true,
+        resolve,
+        reject
+      );
     });
   }
 
@@ -184,14 +204,24 @@ export class CollectionRightsBackendApiService {
    * given its ID and version.
    */
   async setCollectionPrivateAsync(
-      collectionId: string,
-      collectionVersion: number): Promise<CollectionRights> {
+    collectionId: string,
+    collectionVersion: number
+  ): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
-        collectionId, collectionVersion, false, resolve, reject);
+        collectionId,
+        collectionVersion,
+        false,
+        resolve,
+        reject
+      );
     });
   }
 }
 
-angular.module('oppia').factory('CollectionRightsBackendApiService',
-  downgradeInjectable(CollectionRightsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'CollectionRightsBackendApiService',
+    downgradeInjectable(CollectionRightsBackendApiService)
+  );

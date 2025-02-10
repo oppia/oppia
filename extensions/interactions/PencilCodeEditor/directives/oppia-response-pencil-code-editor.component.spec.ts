@@ -16,10 +16,10 @@
  * @fileoverview Unit Tests for the pencil code editor response component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ResponePencilCodeEditor } from './oppia-response-pencil-code-editor.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ResponePencilCodeEditor} from './oppia-response-pencil-code-editor.component';
 
 describe('Response pencil code editor component ', () => {
   let component: ResponePencilCodeEditor;
@@ -37,10 +37,10 @@ describe('Response pencil code editor component ', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: MockHtmlEscaperService
-        }
+          useClass: MockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -48,13 +48,14 @@ describe('Response pencil code editor component ', () => {
     fixture = TestBed.createComponent(ResponePencilCodeEditor);
     component = fixture.componentInstance;
     component.answer = {
-      code: '# Add the initial code snippet here.'
+      code: '# Add the initial code snippet here.',
     } as unknown as string;
   });
 
   it('should initialize the component when submits answer', () => {
     component.ngOnInit();
     expect(component.answerCode).toEqual(
-      '# Add the initial code snippet here.');
+      '# Add the initial code snippet here.'
+    );
   });
 });

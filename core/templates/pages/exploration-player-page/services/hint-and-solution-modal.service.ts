@@ -16,42 +16,43 @@
  * @fileoverview Service for showing the hint and solution modals.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { DisplayHintModalComponent } from '../modals/display-hint-modal.component';
-import { DisplaySolutionInterstititalModalComponent } from '../modals/display-solution-interstitial-modal.component';
-import { DisplaySolutionModalComponent } from '../modals/display-solution-modal.component';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {DisplayHintModalComponent} from '../modals/display-hint-modal.component';
+import {DisplaySolutionInterstititalModalComponent} from '../modals/display-solution-interstitial-modal.component';
+import {DisplaySolutionModalComponent} from '../modals/display-solution-modal.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HintAndSolutionModalService {
-  constructor(
-    private ngbModal: NgbModal
-  ) {}
+  constructor(private ngbModal: NgbModal) {}
 
   displayHintModal(index: number): NgbModalRef {
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      DisplayHintModalComponent, {
-        backdrop: 'static'
-      });
+    let modalRef: NgbModalRef = this.ngbModal.open(DisplayHintModalComponent, {
+      backdrop: 'static',
+    });
     modalRef.componentInstance.index = index;
     return modalRef;
   }
 
   displaySolutionModal(): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionModalComponent, {
-      backdrop: 'static'
+      backdrop: 'static',
     });
   }
 
   displaySolutionInterstitialModal(): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionInterstititalModalComponent, {
-      backdrop: 'static'
+      backdrop: 'static',
     });
   }
 }
 
-angular.module('oppia').factory('HintAndSolutionModalService',
-  downgradeInjectable(HintAndSolutionModalService));
+angular
+  .module('oppia')
+  .factory(
+    'HintAndSolutionModalService',
+    downgradeInjectable(HintAndSolutionModalService)
+  );

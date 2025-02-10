@@ -29,18 +29,18 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowInnerhtml: 'Please do not use innerHTML property.'
-    }
+      disallowInnerhtml: 'Please do not use innerHTML property.',
+    },
   },
-  create: function(context) {
+  create: function (context) {
     var selector = 'MemberExpression[property.name=innerHTML]';
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         context.report({
           node: node.property,
-          messageId: 'disallowInnerhtml'
+          messageId: 'disallowInnerhtml',
         });
-      }
+      },
     };
-  }
+  },
 };

@@ -16,80 +16,28 @@
  * @fileoverview Module for the review tests page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ReviewTestPageRootComponent} from './review-test-page-root.component';
+import {ReviewTestAuthGuard} from './review-test-auth.guard';
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
     InteractionExtensionsModule,
     SharedComponentsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ReviewTestPageRootComponent,
+        canActivate: [ReviewTestAuthGuard],
+      },
+    ]),
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-  ]
+  declarations: [ReviewTestPageRootComponent],
 })
-class ReviewTestPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ReviewTestPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ReviewTestPageModule {}

@@ -17,25 +17,23 @@
  * editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateNameService } from 'components/state-editor/state-editor-properties-services/state-name.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { EditabilityService } from 'services/editability.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {AppConstants} from 'app.constants';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {EditabilityService} from 'services/editability.service';
 
 @Component({
   selector: 'oppia-state-name-editor',
-  templateUrl: './state-name-editor.component.html'
+  templateUrl: './state-name-editor.component.html',
 })
-export class StateNameEditorComponent
-  implements OnInit, OnDestroy {
+export class StateNameEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -52,7 +50,7 @@ export class StateNameEditorComponent
     private normalizeWhitespacePipe: NormalizeWhitespacePipe,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private stateNameService: StateNameService,
+    private stateNameService: StateNameService
   ) {}
 
   openStateNameEditor(): void {
@@ -68,8 +66,7 @@ export class StateNameEditorComponent
   }
 
   saveStateName(newStateName: string): boolean {
-    let normalizedNewName =
-      this._getNormalizedStateName(newStateName);
+    let normalizedNewName = this._getNormalizedStateName(newStateName);
     let savedMemento = this.stateNameService.getStateNameSavedMemento();
     if (!this._isNewStateNameValid(normalizedNewName)) {
       return false;
@@ -80,8 +77,7 @@ export class StateNameEditorComponent
     } else {
       let stateName = this.stateEditorService.getActiveStateName();
       if (stateName) {
-        this.explorationStatesService.renameState(
-          stateName, normalizedNewName);
+        this.explorationStatesService.renameState(stateName, normalizedNewName);
       }
       this.stateNameService.setStateNameEditorVisibility(false);
       // Save the contents of other open fields.
@@ -92,8 +88,7 @@ export class StateNameEditorComponent
   }
 
   saveStateNameAndRefresh(newStateName: string): void {
-    const normalizedStateName = (
-      this._getNormalizedStateName(newStateName));
+    const normalizedStateName = this._getNormalizedStateName(newStateName);
     const valid = this.saveStateName(normalizedStateName);
 
     if (valid) {
@@ -106,8 +101,7 @@ export class StateNameEditorComponent
       return true;
     }
 
-    return this.explorationStatesService.isNewStateNameValid(
-      stateName, true);
+    return this.explorationStatesService.isNewStateNameValid(stateName, true);
   }
 
   initStateNameEditor(): void {
@@ -120,13 +114,16 @@ export class StateNameEditorComponent
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.externalSaveService.onExternalSave.subscribe(
-        () => {
-          if (this.stateNameService.isStateNameEditorShown()) {
-            this.saveStateName(this.tmpStateName);
-          }
+      this.externalSaveService.onExternalSave.subscribe(() => {
+        if (
+          this.stateNameService.isStateNameEditorShown() &&
+          !this.explorationStatesService.isNewStateNameDuplicate(
+            this.tmpStateName
+          )
+        ) {
+          this.saveStateName(this.tmpStateName);
         }
-      )
+      })
     );
 
     this.stateNameService.init();
@@ -137,8 +134,3 @@ export class StateNameEditorComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaStateNameEditor',
-  downgradeComponent({
-    component: StateNameEditorComponent
-  }) as angular.IDirectiveFactory);

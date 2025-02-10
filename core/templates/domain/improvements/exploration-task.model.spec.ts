@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the ExplorationTaskModel.
  */
 
-import { ExplorationTaskBackendDict, ExplorationTaskModel } from 'domain/improvements/exploration-task.model';
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from 'domain/improvements/task-entry.model';
-import { IneffectiveFeedbackLoopTask } from 'domain/improvements/ineffective-feedback-loop-task.model';
-import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
-import { SuccessiveIncorrectAnswersTask } from 'domain/improvements/successive-incorrect-answers-task.model';
+import {
+  ExplorationTaskBackendDict,
+  ExplorationTaskModel,
+} from 'domain/improvements/exploration-task.model';
+import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
+import {TaskEntryBackendDict} from 'domain/improvements/task-entry.model';
+import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedback-loop-task.model';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
 
 describe('Exploration task model', () => {
   let newTaskEntryBackendDict: {
@@ -29,19 +32,18 @@ describe('Exploration task model', () => {
   };
 
   beforeEach(() => {
-    newTaskEntryBackendDict = (
-      (taskType: string): TaskEntryBackendDict => ({
-        entity_type: 'exploration',
-        entity_id: 'eid',
-        entity_version: 1,
-        task_type: taskType,
-        target_type: 'state',
-        target_id: 'Introduction',
-        issue_description: '20% of learners dropped at this state',
-        status: 'resolved',
-        resolver_username: 'test_user',
-        resolved_on_msecs: 123456789,
-      }));
+    newTaskEntryBackendDict = (taskType: string): TaskEntryBackendDict => ({
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: taskType,
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description: '20% of learners dropped at this state',
+      status: 'resolved',
+      resolver_username: 'test_user',
+      resolved_on_msecs: 123456789,
+    });
   });
 
   it('should return a high bounce rate task', () => {
@@ -58,7 +60,9 @@ describe('Exploration task model', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict(
-          'ineffective_feedback_loop') as ExplorationTaskBackendDict)
+          'ineffective_feedback_loop'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(IneffectiveFeedbackLoopTask);
   });
 
@@ -66,7 +70,9 @@ describe('Exploration task model', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict(
-          'needs_guiding_responses') as ExplorationTaskBackendDict)
+          'needs_guiding_responses'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(NeedsGuidingResponsesTask);
   });
 
@@ -74,13 +80,19 @@ describe('Exploration task model', () => {
     expect(
       ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict(
-          'successive_incorrect_answers') as ExplorationTaskBackendDict)
+          'successive_incorrect_answers'
+        ) as ExplorationTaskBackendDict
+      )
     ).toBeInstanceOf(SuccessiveIncorrectAnswersTask);
   });
 
   it('should build a new resolved exloration task', () => {
     const task = ExplorationTaskModel.createNewResolvedTask(
-      'eid', 1, 'high_bounce_rate', 'Introduction');
+      'eid',
+      1,
+      'high_bounce_rate',
+      'Introduction'
+    );
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
     expect(task.taskType).toEqual('high_bounce_rate');
@@ -90,7 +102,11 @@ describe('Exploration task model', () => {
 
   it('should build a new obsolete exloration task', () => {
     const task = ExplorationTaskModel.createNewObsoleteTask(
-      'eid', 1, 'high_bounce_rate', 'Introduction');
+      'eid',
+      1,
+      'high_bounce_rate',
+      'Introduction'
+    );
     expect(task.entityId).toEqual('eid');
     expect(task.entityVersion).toEqual(1);
     expect(task.taskType).toEqual('high_bounce_rate');
@@ -99,12 +115,17 @@ describe('Exploration task model', () => {
   });
 
   it('should throw an error if task type is unknown', () => {
-    expect(
-      () => ExplorationTaskModel.createFromBackendDict(
+    expect(() =>
+      ExplorationTaskModel.createFromBackendDict(
         newTaskEntryBackendDict(
-          'unknown_task_type') as ExplorationTaskBackendDict)
-    ).toThrowError(new RegExp(
-      'Unsupported task type "unknown_task_type" for backend dict: ' +
-      '{.*"task_type":"unknown_task_type".*}'));
+          'unknown_task_type'
+        ) as ExplorationTaskBackendDict
+      )
+    ).toThrowError(
+      new RegExp(
+        'Unsupported task type "unknown_task_type" for backend dict: ' +
+          '{.*"task_type":"unknown_task_type".*}'
+      )
+    );
   });
 });

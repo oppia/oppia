@@ -16,28 +16,29 @@
  * @fileoverview Component for the selection dropdown with HTML content.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'oppia-html-select',
-  templateUrl: './html-select.component.html'
+  templateUrl: './html-select.component.html',
 })
 export class HtmlSelectComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() options!: { id: string; val: string }[];
+  @Input() options!: {id: string; val: string}[];
   @Input() selectionId!: string;
   @Output() onSelectionChange = new EventEmitter();
 
-  selection!: { id: string; val: string };
+  selection!: {id: string; val: string};
 
   ngOnInit(): void {
     if (!this.selectionId) {
       this.selection = this.options[0];
     } else {
       const selectionIndex = this.options.findIndex(
-        option => option.id === this.selectionId);
+        option => option.id === this.selectionId
+      );
       if (selectionIndex === -1) {
         this.selection = this.options[0];
       } else {

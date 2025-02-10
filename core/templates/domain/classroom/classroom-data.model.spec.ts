@@ -16,46 +16,73 @@
  * @fileoverview Unit tests for ClassroomDataModel.
  */
 
-import { ClassroomData} from
-  'domain/classroom/classroom-data.model';
-import { CreatorTopicSummary, CreatorTopicSummaryBackendDict } from
-  'domain/topic/creator-topic-summary.model';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {
+  CreatorTopicSummary,
+  CreatorTopicSummaryBackendDict,
+} from 'domain/topic/creator-topic-summary.model';
 
 describe('Classroom data model', () => {
   let topicSummaryDicts: CreatorTopicSummaryBackendDict[];
 
   beforeEach(() => {
-    topicSummaryDicts = [{
-      id: 'topic1',
-      name: 'Topic name',
-      description: 'Topic description',
-      canonical_story_count: 4,
-      subtopic_count: 5,
-      total_skill_count: 20,
-      uncategorized_skill_count: 5,
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      language_code: 'en',
-      version: 1,
-      additional_story_count: 0,
-      total_published_node_count: 4,
-      topic_model_created_on: 20160101,
-      topic_model_last_updated: 20160110,
-      can_edit_topic: true,
-      is_published: true,
-      url_fragment: 'some-url-fragment',
-      classroom: 'math'
-    }];
+    topicSummaryDicts = [
+      {
+        id: 'topic1',
+        name: 'Topic name',
+        description: 'Topic description',
+        canonical_story_count: 4,
+        subtopic_count: 5,
+        total_skill_count: 20,
+        uncategorized_skill_count: 5,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        language_code: 'en',
+        version: 1,
+        additional_story_count: 0,
+        total_published_node_count: 4,
+        topic_model_created_on: 20160101,
+        topic_model_last_updated: 20160110,
+        can_edit_topic: true,
+        is_published: true,
+        url_fragment: 'some-url-fragment',
+        classroom: 'math',
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4],
+      },
+    ];
   });
 
   it('should create a new classroom object from a backend dictionary', () => {
-    let classroomData = (
-      ClassroomData.createFromBackendData(
-        'Math', topicSummaryDicts, 'Course Details', 'Topics Covered'));
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      topicSummaryDicts,
+      'Course Details',
+      'Topics Covered',
+      'Learn math',
+      true,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
     expect(classroomData.getName()).toEqual('Math');
+    expect(classroomData.getUrlFragment()).toEqual('math');
     expect(classroomData.getCourseDetails()).toEqual('Course Details');
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
-      CreatorTopicSummary.createFromBackendDict(topicSummaryDicts[0]));
+      CreatorTopicSummary.createFromBackendDict(topicSummaryDicts[0])
+    );
+    expect(classroomData.getTeaserText()).toEqual('Learn math');
+    expect(classroomData.getIsPublished()).toBeTrue();
+    expect(classroomData.getThumbnailData().filename).toEqual('thumbnail.svg');
+    expect(classroomData.getThumbnailData().size_in_bytes).toEqual(100);
+    expect(classroomData.getThumbnailData().bg_color).toEqual('transparent');
+    expect(classroomData.getBannerData().filename).toEqual('banner.png');
+    expect(classroomData.getBannerData().size_in_bytes).toEqual(100);
+    expect(classroomData.getBannerData().bg_color).toEqual('transparent');
   });
 });

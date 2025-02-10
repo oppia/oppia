@@ -33,11 +33,6 @@ export const InteractionsExtensionsConstants = {
     F4: 65,
     E4: 64,
     D4: 62,
-    C4: 60
+    C4: 60,
   },
-
-  // Minimum confidence required for a predicted answer group to be shown to
-  // user. Generally a threshold of 0.7-0.8 is assumed to be a good one in
-  // practice, however value need not be in those bounds.
-  TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD: 0.7,
 } as const;

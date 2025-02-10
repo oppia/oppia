@@ -16,16 +16,16 @@
  * @fileoverview A backend api service for handling question suggestions.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ImageData} from 'domain/skill/skill-creation-backend-api.service';
+import {Question} from 'domain/question/QuestionObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QuestionSuggestionBackendApiService {
   constructor(
@@ -34,10 +34,10 @@ export class QuestionSuggestionBackendApiService {
   ) {}
 
   async submitSuggestionAsync(
-      question: Question,
-      associatedSkill: Skill,
-      skillDifficulty: number,
-      imagesData: ImageData[]
+    question: Question,
+    associatedSkill: Skill,
+    skillDifficulty: number,
+    imagesData: ImageData[]
   ): Promise<Object> {
     let url: string = '/suggestionhandler/';
     let postData: Object = {
@@ -46,15 +46,16 @@ export class QuestionSuggestionBackendApiService {
       description: 'Add new question',
       target_id: associatedSkill.getId(),
       target_version_at_submission: associatedSkill.getVersion(),
-      change: {
+      change_cmd: {
         cmd: 'create_new_fully_specified_question',
         question_dict: question.toBackendDict(true),
         skill_id: associatedSkill.getId(),
         skill_difficulty: skillDifficulty,
       },
-      files: (
+      files:
         await this.imageLocalStorageService.getFilenameToBase64MappingAsync(
-          imagesData))
+          imagesData
+        ),
     };
 
     let body: FormData = new FormData();
@@ -63,5 +64,9 @@ export class QuestionSuggestionBackendApiService {
   }
 }
 
-angular.module('oppia').factory('QuestionSuggestionBackendApiService',
-  downgradeInjectable(QuestionSuggestionBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'QuestionSuggestionBackendApiService',
+    downgradeInjectable(QuestionSuggestionBackendApiService)
+  );

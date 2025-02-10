@@ -16,19 +16,25 @@
  * @fileoverview Unit tests for Question Editor Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { QuestionUpdateService } from 'domain/question/question-update.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { EditabilityService } from 'services/editability.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { QuestionEditorComponent } from './question-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {QuestionUpdateService} from 'domain/question/question-update.service';
+import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {EditabilityService} from 'services/editability.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {QuestionEditorComponent} from './question-editor.component';
 
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
@@ -44,18 +50,16 @@ describe('Question Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        QuestionEditorComponent
-      ],
+      declarations: [QuestionEditorComponent],
       providers: [
         QuestionObjectFactory,
         EditabilityService,
         StateEditorService,
         StateInteractionIdService,
         QuestionUpdateService,
-        GenerateContentIdService
+        GenerateContentIdService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -75,66 +79,70 @@ describe('Question Editor Component', () => {
       question_state_data: {
         content: {
           html: 'Question 1',
-          content_id: 'content_1'
+          content_id: 'content_1',
         },
         interaction: {
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'content_5',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'outcome 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'content_5',
+                  html: '',
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
-              labelled_as_correct: true,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: null
-          }],
+          ],
           confirmed_unclassified_answers: [],
           customization_args: {
             placeholder: {
               value: {
                 content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
+                unicode_str: '',
+              },
             },
-            rows: { value: 1 },
+            rows: {value: 1},
             catchMisspellings: {
-              value: false
-            }
+              value: false,
+            },
           },
           default_outcome: {
             dest: 'dest',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
-              content_id: 'content_2'
+              content_id: 'content_2',
             },
             param_changes: [],
             labelled_as_correct: true,
             missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
           },
-          hints: [{
-            hint_content: {
-              html: 'Hint 1',
-              content_id: 'content_3'
-            }
-          }],
+          hints: [
+            {
+              hint_content: {
+                html: 'Hint 1',
+                content_id: 'content_3',
+              },
+            },
+          ],
           solution: {
             correct_answer: 'This is the correct answer',
             answer_is_exclusive: false,
             explanation: {
               html: 'Solution explanation',
-              content_id: 'content_4'
-            }
+              content_id: 'content_4',
+            },
           },
-          id: 'TextInput'
+          id: 'TextInput',
         },
         param_changes: [],
         recorded_voiceovers: {
@@ -144,16 +152,16 @@ describe('Question Editor Component', () => {
                 filename: 'filename1.mp3',
                 file_size_bytes: 100000,
                 needs_update: false,
-                duration_secs: 10.0
+                duration_secs: 10.0,
               },
               hi: {
                 filename: 'filename2.mp3',
                 file_size_bytes: 11000,
                 needs_update: false,
-                duration_secs: 0.11
-              }
-            }
-          }
+                duration_secs: 0.11,
+              },
+            },
+          },
         },
         classifier_model_id: null,
         solicit_answer_details: false,
@@ -165,20 +173,20 @@ describe('Question Editor Component', () => {
       language_code: 'en',
       linked_skill_ids: [],
       question_state_data_schema_version: 44,
-      version: 45
+      version: 45,
     });
     component.question = question;
     component.questionStateData = question.getStateData();
 
-    spyOn(questionUpdateService, 'setQuestionStateData')
-      .and.callFake((question, update) => {
+    spyOn(questionUpdateService, 'setQuestionStateData').and.callFake(
+      (question, update) => {
         update();
-      });
+      }
+    );
 
     component.userCanEditQuestion = true;
     component.misconceptionsBySkill = {};
   });
-
 
   afterEach(() => {
     component.ngOnDestroy();
@@ -191,8 +199,9 @@ describe('Question Editor Component', () => {
 
     component.ngOnInit();
 
-    expect(component.oppiaBlackImgUrl)
-      .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
+    expect(component.oppiaBlackImgUrl).toBe(
+      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
+    );
     expect(component.interactionIsShown).toBe(true);
     expect(component.stateEditorIsInitialized).toBe(true);
   });
@@ -206,106 +215,130 @@ describe('Question Editor Component', () => {
     expect(editabilityService.markEditable).toHaveBeenCalled();
   });
 
-  it('should mark editability service as false if question is not' +
-    ' editable', () => {
-    component.userCanEditQuestion = false;
-    spyOn(editabilityService, 'markNotEditable');
+  it(
+    'should mark editability service as false if question is not' + ' editable',
+    () => {
+      component.userCanEditQuestion = false;
+      spyOn(editabilityService, 'markNotEditable');
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(editabilityService.markNotEditable).toHaveBeenCalled();
-  });
+      expect(editabilityService.markNotEditable).toHaveBeenCalled();
+    }
+  );
 
-  it('should initialize component properties when state editor directive' +
-    ' is initialized', () => {
-    let onStateEditorDirectiveInitializedEmitter = new EventEmitter();
-    spyOnProperty(
-      stateEditorService, 'onStateEditorDirectiveInitialized')
-      .and.returnValue(onStateEditorDirectiveInitializedEmitter);
+  it(
+    'should initialize component properties when state editor directive' +
+      ' is initialized',
+    () => {
+      let onStateEditorDirectiveInitializedEmitter = new EventEmitter();
+      spyOnProperty(
+        stateEditorService,
+        'onStateEditorDirectiveInitialized'
+      ).and.returnValue(onStateEditorDirectiveInitializedEmitter);
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    component.interactionIsShown = false;
-    component.stateEditorIsInitialized = false;
+      component.interactionIsShown = false;
+      component.stateEditorIsInitialized = false;
 
-    onStateEditorDirectiveInitializedEmitter.emit();
+      onStateEditorDirectiveInitializedEmitter.emit();
 
-    expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorIsInitialized).toBe(true);
-  });
+      expect(component.interactionIsShown).toBe(true);
+      expect(component.stateEditorIsInitialized).toBe(true);
+    }
+  );
 
-  it('should initialize component properties when interaction editor' +
-    ' is initialized', fakeAsync(() => {
-    let onInteractionEditorInitializedEmitter = new EventEmitter();
-    spyOnProperty(
-      stateEditorService, 'onInteractionEditorInitialized')
-      .and.returnValue(onInteractionEditorInitializedEmitter);
+  it(
+    'should initialize component properties when interaction editor' +
+      ' is initialized',
+    fakeAsync(() => {
+      let onInteractionEditorInitializedEmitter = new EventEmitter();
+      spyOnProperty(
+        stateEditorService,
+        'onInteractionEditorInitialized'
+      ).and.returnValue(onInteractionEditorInitializedEmitter);
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    component.interactionIsShown = false;
-    component.stateEditorIsInitialized = false;
+      component.interactionIsShown = false;
+      component.stateEditorIsInitialized = false;
 
-    onInteractionEditorInitializedEmitter.emit();
-    tick();
+      onInteractionEditorInitializedEmitter.emit();
+      tick();
 
-    expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorIsInitialized).toBe(true);
-  }));
+      expect(component.interactionIsShown).toBe(true);
+      expect(component.stateEditorIsInitialized).toBe(true);
+    })
+  );
 
-  it('should initialize component properties when interaction id' +
-    ' is changed', () => {
-    let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(
-      stateInteractionIdService, 'onInteractionIdChanged')
-      .and.returnValue(onInteractionIdChangedEmitter);
+  it(
+    'should initialize component properties when interaction id' +
+      ' is changed',
+    () => {
+      let onInteractionIdChangedEmitter = new EventEmitter();
+      spyOnProperty(
+        stateInteractionIdService,
+        'onInteractionIdChanged'
+      ).and.returnValue(onInteractionIdChangedEmitter);
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    component.interactionIsShown = false;
-    component.stateEditorIsInitialized = false;
+      component.interactionIsShown = false;
+      component.stateEditorIsInitialized = false;
 
-    onInteractionIdChangedEmitter.emit();
+      onInteractionIdChangedEmitter.emit();
 
-    expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorIsInitialized).toBe(true);
-  });
+      expect(component.interactionIsShown).toBe(true);
+      expect(component.stateEditorIsInitialized).toBe(true);
+    }
+  );
 
   it('should get state content save button placeholder', () => {
-    expect(component.getStateContentSaveButtonPlaceholder())
-      .toBe('Save Question');
+    expect(component.getStateContentSaveButtonPlaceholder()).toBe(
+      'Save Question'
+    );
   });
 
   it('should get state content placeholder', () => {
-    expect(component.getStateContentPlaceholder())
-      .toBe('Type your question here.');
+    expect(component.getStateContentPlaceholder()).toBe(
+      'Type your question here.'
+    );
   });
 
   it('should save state content when user clicks on save', () => {
     expect(component.interactionIsShown).toBe(undefined);
-    expect(component.questionStateData.content)
-      .toEqual(SubtitledHtml.createFromBackendDict({
+    expect(component.questionStateData.content).toEqual(
+      SubtitledHtml.createFromBackendDict({
         html: 'Question 1',
-        content_id: 'content_1'
-      }));
-
-    component.saveStateContent(
-      new SubtitledHtml('New content', 'New content')
+        content_id: 'content_1',
+      })
     );
+
+    component.saveStateContent(new SubtitledHtml('New content', 'New content'));
 
     expect(component.interactionIsShown).toBe(true);
     expect(component.questionStateData.content).toEqual(
-      new SubtitledHtml('New content', 'New content'));
+      new SubtitledHtml('New content', 'New content')
+    );
   });
 
-  it('should save interaction ID when interaction is saved', () => {
+  it('should save interaction data when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionId');
+    spyOn(stateEditorService, 'setInteractionCustomizationArgs');
 
-    component.saveInteractionId('TextInput');
+    let newInteractionData = {
+      interactionId: 'Text Input',
+      customizationArgs: 'Customization Args',
+    };
+    component.saveInteractionData(newInteractionData);
 
     expect(stateEditorService.setInteractionId).toHaveBeenCalledWith(
-      'TextInput'
+      newInteractionData.interactionId
     );
+    expect(
+      stateEditorService.setInteractionCustomizationArgs
+    ).toHaveBeenCalledWith(newInteractionData.customizationArgs);
   });
 
   it('should save interaction answer groups when interaction is saved', () => {
@@ -318,24 +351,18 @@ describe('Question Editor Component', () => {
     );
   });
 
-  it('should save interaction default outcome when' +
-    ' interaction is saved', () => {
-    spyOn(stateEditorService, 'setInteractionDefaultOutcome');
+  it(
+    'should save interaction default outcome when' + ' interaction is saved',
+    () => {
+      spyOn(stateEditorService, 'setInteractionDefaultOutcome');
 
-    component.saveInteractionDefaultOutcome({dest: 'New outcome'} as Outcome);
+      component.saveInteractionDefaultOutcome({dest: 'New outcome'} as Outcome);
 
-    expect(stateEditorService.setInteractionDefaultOutcome)
-      .toHaveBeenCalledWith({dest: 'New outcome'} as Outcome);
-  });
-
-  it('should save customization args when interaction is saved', () => {
-    spyOn(stateEditorService, 'setInteractionCustomizationArgs');
-
-    component.saveInteractionCustomizationArgs('Customization Args');
-
-    expect(stateEditorService.setInteractionCustomizationArgs)
-      .toHaveBeenCalledWith('Customization Args');
-  });
+      expect(
+        stateEditorService.setInteractionDefaultOutcome
+      ).toHaveBeenCalledWith({dest: 'New outcome'} as Outcome);
+    }
+  );
 
   it('should set interaction solution when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionSolution');
@@ -348,8 +375,9 @@ describe('Question Editor Component', () => {
     let solution = new Solution(null, null, null, null);
     component.saveSolution(solution);
 
-    expect(stateEditorService.setInteractionSolution)
-      .toHaveBeenCalledWith(solution);
+    expect(stateEditorService.setInteractionSolution).toHaveBeenCalledWith(
+      solution
+    );
   });
 
   it('should save hints when interaction is saved', () => {
@@ -357,19 +385,22 @@ describe('Question Editor Component', () => {
 
     component.saveHints([]);
 
-    expect(stateEditorService.setInteractionHints)
-      .toHaveBeenCalledWith([]);
+    expect(stateEditorService.setInteractionHints).toHaveBeenCalledWith([]);
   });
 
-  it('should save inapplicable skill misconception ID when interaction' +
-    ' is saved', () => {
-    spyOn(stateEditorService, 'setInapplicableSkillMisconceptionIds');
+  it(
+    'should save inapplicable skill misconception ID when interaction' +
+      ' is saved',
+    () => {
+      spyOn(stateEditorService, 'setInapplicableSkillMisconceptionIds');
 
-    component.saveInapplicableSkillMisconceptionIds(['InapplicableID']);
+      component.saveInapplicableSkillMisconceptionIds(['InapplicableID']);
 
-    expect(stateEditorService.setInapplicableSkillMisconceptionIds)
-      .toHaveBeenCalledWith(['InapplicableID']);
-  });
+      expect(
+        stateEditorService.setInapplicableSkillMisconceptionIds
+      ).toHaveBeenCalledWith(['InapplicableID']);
+    }
+  );
 
   it('should save next content ID index after generating new id', () => {
     component.ngOnInit();

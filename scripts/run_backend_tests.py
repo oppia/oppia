@@ -53,30 +53,26 @@ import contextlib
 import json
 import multiprocessing
 import os
-import random
 import re
-import socket
-import string
 import subprocess
 import sys
 import threading
 import time
+
 from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import install_third_party_libs
+
+from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, utils).
 install_third_party_libs.main()
 
-from core import utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
-    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
-)
+from . import git_changes_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -94,18 +90,22 @@ SHARDS_WIKI_LINK: Final = (
 _LOAD_TESTS_DIR: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'load_tests'
 )
+TIME_REPORT_PATH: Final = os.path.join(
+    os.getcwd(), 'backend_test_time_report.json'
+)
+AVERAGE_TEST_CASE_TIME: Final = 2
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
-IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
-should be specified.
+IMPORTANT: Only one of --test_path, --test_targets, --run_on_changed_files,
+and --test_shard should be specified.
 """)
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
-    '--test_target',
+    '--test_targets',
     help='optional dotted module name of the test(s) to run',
     type=str)
 _EXCLUSIVE_GROUP.add_argument(
@@ -116,9 +116,20 @@ _EXCLUSIVE_GROUP.add_argument(
     '--test_shard',
     help='optional name of shard to run',
     type=str)
+_EXCLUSIVE_GROUP.add_argument(
+    '--run_on_changed_files_in_branch',
+    help='optional; if specified, runs the backend tests on the files '
+    'that were changed in the current branch',
+    action='store_true'
+)
 _PARSER.add_argument(
     '--generate_coverage_report',
     help='optional; if specified, generates a coverage report',
+    action='store_true')
+_PARSER.add_argument(
+    '--generate_time_report',
+    help='optional; if specified, generates a report which shows the '
+        'time taken by each test',
     action='store_true')
 _PARSER.add_argument(
     '--ignore_coverage',
@@ -184,24 +195,17 @@ class TestingTaskSpec:
 
     def run(self) -> List[concurrent_task_utils.TaskResult]:
         """Runs all tests corresponding to the given test target."""
-        env = os.environ.copy()
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, '-m', 'coverage', 'run',
+                sys.executable, '-m', 'coverage', 'run', '-p',
                 '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
-            data_file = '.coverage.%s.%s.%s' % (
-                socket.gethostname(), os.getpid(), rand)
-            env['COVERAGE_FILE'] = data_file
-            concurrent_task_utils.log('Coverage data for %s is in %s' % (
-                self.test_target, data_file))
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         try:
-            result = run_shell_cmd(exc_list, env=env)
+            result = run_shell_cmd(exc_list)
         except Exception as e:
             # Occasionally, tests fail spuriously because of an issue in grpc
             # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
@@ -209,30 +213,11 @@ class TestingTaskSpec:
             # represent a 'real' test failure, we do a single extra run if we
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
-                result = run_shell_cmd(exc_list, env=env)
+                result = run_shell_cmd(exc_list)
             else:
                 raise e
 
-        messages = [result]
-
-        if self.generate_coverage_report:
-            covered_path = self.test_target.replace('.', '/')
-            covered_path = covered_path[:-len('_test')]
-            covered_path += '.py'
-            if os.path.exists(covered_path):
-                report, coverage = check_coverage(
-                    False, data_file=data_file, include=(covered_path,))
-            else:
-                # Some test files (e.g. scripts/script_import_test.py)
-                # have no corresponding code file, so we treat them as
-                # fully covering their (nonexistent) associated code
-                # file.
-                report = ''
-                coverage = 100.0
-            messages.append(report)
-            messages.append(str(coverage))
-
-        return [concurrent_task_utils.TaskResult('', False, [], messages)]
+        return [concurrent_task_utils.TaskResult('', False, [], [result])]
 
 
 def get_all_test_targets_from_path(
@@ -246,7 +231,8 @@ def get_all_test_targets_from_path(
     paths = []
     excluded_dirs = [
         '.git', 'third_party', 'node_modules', 'venv',
-        'core/tests/data', 'core/tests/build_sources']
+        'core/tests/data', 'core/tests/build_sources',
+        '.direnv']
     for root in os.listdir(base_path):
         if any(s in root for s in excluded_dirs):
             continue
@@ -340,40 +326,16 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
     ).format(test_extra, SHARDS_WIKI_LINK)
 
 
-def load_coverage_exclusion_list(path: str) -> List[str]:
-    """Load modules excluded from per-file coverage checks.
-
-    Args:
-        path: str. Path to file with exclusion list. File should have
-            one dotted module name per line. Blank lines and lines
-            starting with `#` are ignored.
-
-    Returns:
-        list(str). Dotted names of excluded modules.
-    """
-    exclusion_list = []
-    with open(path, 'r', encoding='utf-8') as exclusion_file:
-        for line in exclusion_file:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                exclusion_list.append(line)
-    return exclusion_list
-
-
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-    generate_coverage_report: bool
-) -> Tuple[int, int, int, int]:
+) -> Tuple[int, int, int, Dict[str, Tuple[float, float]]]:
     """Run tests and parse coverage reports."""
-    coverage_exclusions = load_coverage_exclusion_list(
-        COVERAGE_EXCLUSION_LIST_PATH)
-
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
-    incomplete_coverage = 0
+    time_report: Dict[str, Tuple[float, float]] = {}
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -431,6 +393,12 @@ def check_test_results(
                     )
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
+                test_time_by_average_test_case = (
+                    test_count * AVERAGE_TEST_CASE_TIME)
+                time_report[spec.test_target] = (
+                    test_time,
+                    test_time_by_average_test_case
+                )
                 print(
                     'SUCCESS   %s: %d tests (%.1f secs)' %
                     (spec.test_target, test_count, test_time))
@@ -438,37 +406,9 @@ def check_test_results(
                 print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
-            if generate_coverage_report:
-                coverage = task.task_results[0].get_report()[-2]
-                if (
-                        spec.test_target not in coverage_exclusions
-                        and float(coverage) != 100.0):
-                    incomplete_coverage += 1
         total_count += test_count
 
-    return total_count, total_errors, total_failures, incomplete_coverage
-
-
-def print_coverage_report(
-    tasks: List[concurrent_task_utils.TaskThread],
-    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
-    ) -> int:
-    """Run tests and parse coverage reports."""
-    incomplete_coverage = 0
-    coverage_exclusions = load_coverage_exclusion_list(
-    COVERAGE_EXCLUSION_LIST_PATH)
-    for task in tasks:
-        if task.finished and not task.exception:
-            coverage = task.task_results[0].get_report()[-2]
-            spec = task_to_taskspec[task]
-            if (
-                    spec.test_target not in coverage_exclusions
-                    and float(coverage) != 100.0):
-                print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
-                    coverage, spec.test_target))
-                incomplete_coverage += 1
-                print(task.task_results[0].get_report()[-3])
-    return incomplete_coverage
+    return total_count, total_errors, total_failures, time_report
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -492,34 +432,47 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
-    if parsed_args.test_target and '/' in parsed_args.test_target:
-        raise Exception('The delimiter in test_target should be a dot (.)')
 
     with contextlib.ExitStack() as stack:
-        stack.enter_context(
-            servers.managed_cloud_datastore_emulator(clear_datastore=True))
-        stack.enter_context(servers.managed_redis_server())
-        if parsed_args.test_target:
-            # Check if target either ends with '_test' which means a path to
-            # a test file has been provided or has '_test.' in it which means
-            # a path to a particular test class or a method in a test file has
-            # been provided. If the path provided does not exist, error is
-            # raised when we try to execute the tests.
-            if (
-                parsed_args.test_target.endswith('_test')
-                or '_test.' in parsed_args.test_target
-            ):
-                all_test_targets = [parsed_args.test_target]
-            else:
-                print('')
-                print('------------------------------------------------------')
-                print(
-                    'WARNING : test_target flag should point to the test file.')
-                print('------------------------------------------------------')
-                print('')
-                time.sleep(3)
-                print('Redirecting to its corresponding test file...')
-                all_test_targets = [parsed_args.test_target + '_test']
+        # TODO(#18260): Remove this when we permanently move to the
+        # Dockerized Setup.
+        if not feconf.OPPIA_IS_DOCKERIZED: # docker: no cover
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(
+                    clear_datastore=True))
+            stack.enter_context(servers.managed_redis_server())
+        if parsed_args.test_targets:
+            all_test_targets = []
+            test_targets = parsed_args.test_targets.split(',')
+            for test_target in test_targets:
+                if '/' in test_target:
+                    raise Exception(
+                        'The delimiter in each test_target should be a dot (.)')
+                # Check if target either ends with '_test' which means a path to
+                # a test file has been provided or has '_test.' in it which
+                # means a path to a particular test class or a method in a test
+                # file has been provided. If the path provided does not exist,
+                # error is raised when we try to execute the tests.
+                if (
+                    test_target.endswith('_test')
+                    or '_test.' in test_target
+                ):
+                    all_test_targets.append(test_target)
+                else:
+                    print('')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print(
+                        'WARNING : each test_target should point to the '
+                        'test file.')
+                    print(
+                        '-----------------------------------------------'
+                        '-------')
+                    print('')
+                    time.sleep(3)
+                    print('Redirecting to its corresponding test file...')
+                    all_test_targets.append(test_target + '_test')
         elif parsed_args.test_shard:
             validation_error = check_shards_match_tests(
                 include_load_tests=True)
@@ -527,6 +480,25 @@ def main(args: Optional[List[str]] = None) -> None:
                 raise Exception(validation_error)
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard)
+            # TODO(#18260): Remove this when we permanently move to the
+            # Dockerized Setup.
+            if feconf.OPPIA_IS_DOCKERIZED: # docker: no cover
+                # The following tests are excluded from running in the Docker
+                # since they will be removed after the Dockerized setup is
+                # permanently moved to.
+                docker_exclude_tests = [
+                    'scripts.install_third_party_libs_test',
+                    'scripts.install_python_dev_dependencies_test',
+                    'scripts.install_python_prod_dependencies_test',
+                    'scripts.build_test',
+                    'scripts.run_acceptance_tests_test'
+                ]
+                all_test_targets = [
+                    test for test in all_test_targets
+                    if test not in docker_exclude_tests]
+        elif parsed_args.run_on_changed_files_in_branch:
+            all_test_targets = list(
+                git_changes_utils.get_changed_python_test_files())
         else:
             include_load_tests = not parsed_args.exclude_load_tests
             all_test_targets = get_all_test_targets_from_path(
@@ -562,10 +534,8 @@ def main(args: Optional[List[str]] = None) -> None:
     print('+------------------+')
     print('')
 
-    (
-        total_count, total_errors, total_failures, incomplete_coverage
-    ) = check_test_results(
-        tasks, task_to_taskspec, parsed_args.generate_coverage_report)
+    total_count, total_errors, total_failures, time_report = check_test_results(
+        tasks, task_to_taskspec)
 
     print('')
     if total_count == 0:
@@ -590,21 +560,52 @@ def main(args: Optional[List[str]] = None) -> None:
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        print_coverage_report(tasks, task_to_taskspec)
-
-    if incomplete_coverage:
-        raise Exception(
-            '%s tests incompletely cover associated code files.' %
-            incomplete_coverage)
-
-    if parsed_args.generate_coverage_report:
-        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
+        print('')
+        print(
+            '+----------------------------------------------------------------+'
+            )
+        print(
+            '|-------- '
+            'SUMMARY OF THE FILES WITH INCOMPLETE COVERAGE '
+            '---------|'
+            )
+        print(
+            '+----------------------------------------------------------------+'
+            )
+        print('')
         print(report_stdout)
+        if coverage != 100:
+            print('WARNING: Backend test coverage is below 100%.')
+            print('')
+
+            print(
+                'The rightmost "Missing" column above shows lines '
+                'that are still uncovered.'
+            )
+            print(
+                'Please add tests for scenarios that exercise '
+                'those lines of code so that '
+            )
+            print('there are no uncovered lines in each file.')
+            print('')
+
+            print(
+                'For more information, please see our '
+                'backend tests wiki page:'
+            )
+            print(
+                '    https://github.com/oppia/oppia/wiki/Backend-tests'
+                '#coverage-reports'
+            )
 
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')
+
+    if parsed_args.generate_time_report:
+        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
+            time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
     print('Done!')
@@ -645,7 +646,8 @@ def check_coverage(
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
-         % common.OPPIA_TOOLS_DIR, '--show-missing']
+         % common.OPPIA_TOOLS_DIR, '--show-missing',
+         '--skip-covered']
     if include:
         cmd.append('--include=%s' % ','.join(include))
 

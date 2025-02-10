@@ -16,12 +16,11 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from 'domain/state_card/state-card.model';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StateCard} from 'domain/state_card/state-card.model';
 
 export interface HelpCardEventResponse {
   helpCardHtml: string;
@@ -29,7 +28,7 @@ export interface HelpCardEventResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlayerPositionService {
   constructor(private playerTranscriptService: PlayerTranscriptService) {}
@@ -60,9 +59,9 @@ export class PlayerPositionService {
    * @return {string} a string that shows the name of current state.
    */
   getCurrentStateName(): string {
-    return (
-      this.playerTranscriptService.getCard(
-        this.displayedCardIndex).getStateName());
+    return this.playerTranscriptService
+      .getCard(this.displayedCardIndex)
+      .getStateName();
   }
 
   /**
@@ -142,6 +141,6 @@ export class PlayerPositionService {
   }
 }
 
-angular.module('oppia').factory(
-  'PlayerPositionService',
-  downgradeInjectable(PlayerPositionService));
+angular
+  .module('oppia')
+  .factory('PlayerPositionService', downgradeInjectable(PlayerPositionService));

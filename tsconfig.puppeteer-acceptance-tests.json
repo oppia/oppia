@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "downlevelIteration": true,
+    "rootDir": "core/tests",
+    "outDir": "core/tests/puppeteer-acceptance-tests/build",
+    "sourceMap": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "typings"
+    ],
+    "types": [
+      "node",
+      "jest",
+      "jest-image-snapshot",
+      "puppeteer"
+    ],
+    "lib": [
+      "ES2017",
+      "DOM"
+    ]
+  },
+  "include": [
+    "core/tests/puppeteer-acceptance-tests/specs",
+    "core/tests/puppeteer-acceptance-tests/user-utilities",
+    "core/tests/puppeteer-acceptance-tests/functions"
+  ],
+}

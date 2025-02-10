@@ -348,11 +348,17 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             # which causes mypy to throw an error. Thus to avoid the error, we
             # used ignore here.
             mailchimp.lists.members.users_data = None # type: ignore[assignment]
-            with self.assertRaisesRegex(
-                Exception, 'Server Error'):
+            with self.capture_logging(min_level=logging.ERROR) as logs:
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1, {}, 'Web',
                     can_receive_email_updates=True)
+                self.assertItemsEqual(
+                    [
+                        'Mailchimp error prevented email signup: '
+                        '{\'status\': 401, \'detail\': \'Server Error\'}'
+                    ],
+                    logs
+                )
 
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
@@ -396,11 +402,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
 
             # Create user raises exception for other errors.
-            with self.assertRaisesRegex(
-                Exception, 'Server Issue'):
+            with self.capture_logging(min_level=logging.ERROR) as logs:
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'test5@example.com', {}, 'Web',
                     can_receive_email_updates=True)
+                self.assertItemsEqual(
+                    ['Mailchimp error prevented email signup: Server Issue'],
+                    logs
+                )
 
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()

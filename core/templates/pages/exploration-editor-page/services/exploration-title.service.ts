@@ -17,18 +17,18 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ValidatorsService } from 'services/validators.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {ValidatorsService} from 'services/validators.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationTitleService extends ExplorationPropertyService {
   propertyName: string = 'title';
@@ -39,7 +39,7 @@ export class ExplorationTitleService extends ExplorationPropertyService {
     private whitespaceNormalizePipe: NormalizeWhitespacePipe,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
+    protected loggerService: LoggerService
   ) {
     super(alertsService, changeListService, loggerService);
   }
@@ -50,9 +50,16 @@ export class ExplorationTitleService extends ExplorationPropertyService {
 
   _isValid(value: string): boolean {
     return this.validatorService.isValidEntityName(
-      value, true, this.explorationRightsService.isPrivate());
+      value,
+      true,
+      this.explorationRightsService.isPrivate()
+    );
   }
 }
 
-angular.module('oppia').factory('ExplorationTitleService',
-  downgradeInjectable(ExplorationTitleService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationTitleService',
+    downgradeInjectable(ExplorationTitleService)
+  );

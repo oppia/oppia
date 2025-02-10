@@ -20,40 +20,46 @@
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
-var SubscriptionDashboardPage =
-  require('../webdriverio_utils/SubscriptionDashboardPage.js');
+var SubscriptionDashboardPage = require('../webdriverio_utils/SubscriptionDashboardPage.js');
 
-describe('Subscriptions functionality', function() {
+describe('Subscriptions functionality', function () {
   var creatorDashboardPage = null;
   var preferencesPage = null;
   var subscriptionDashboardPage = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     preferencesPage = new PreferencesPage.PreferencesPage();
-    subscriptionDashboardPage = (
-      new SubscriptionDashboardPage.SubscriptionDashboardPage());
+    subscriptionDashboardPage =
+      new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should handle subscriptions to creators correctly', async function() {
+  it('should handle subscriptions to creators correctly', async function () {
     // Create two creators.
     await users.createUser(
-      'creator1Id@subscriptions.com', 'creator1Idsubscriptions');
+      'creator1Id@subscriptions.com',
+      'creator1Idsubscriptions'
+    );
     await users.createUser(
-      'creator2Id@subscriptions.com', 'creator2Idsubscriptions');
+      'creator2Id@subscriptions.com',
+      'creator2Idsubscriptions'
+    );
 
     // Create a learner who subscribes to both the creators.
     await users.createUser(
-      'learner1@subscriptions.com', 'learner1subscriptions');
+      'learner1@subscriptions.com',
+      'learner1subscriptions'
+    );
     await users.login('learner1@subscriptions.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creator1Idsubscriptions');
+      'creator1Idsubscriptions'
+    );
     await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creator2Idsubscriptions');
+      'creator2Idsubscriptions'
+    );
     await subscriptionDashboardPage.clickSubscribeButton();
     await preferencesPage.get();
     await preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
@@ -63,13 +69,17 @@ describe('Subscriptions functionality', function() {
     // Create a learner who subscribes to creator1Id and unsubscribes from the
     // creator2Id.
     await users.createUser(
-      'learner2@subscriptions.com', 'learner2subscriptions');
+      'learner2@subscriptions.com',
+      'learner2subscriptions'
+    );
     await users.login('learner2@subscriptions.com');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creator1Idsubscriptions');
+      'creator1Idsubscriptions'
+    );
     await subscriptionDashboardPage.clickSubscribeButton();
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(
-      'creator2Idsubscriptions');
+      'creator2Idsubscriptions'
+    );
 
     // Subscribe and then unsubscribe from the same user.
     await subscriptionDashboardPage.clickSubscribeButton();
@@ -87,9 +97,11 @@ describe('Subscriptions functionality', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.navigateToSubscriptionDashboard();
     await subscriptionDashboardPage.expectSubscriptionFirstNameToMatch(
-      'learner...');
+      'learner...'
+    );
     await subscriptionDashboardPage.expectSubscriptionLastNameToMatch(
-      'learner...');
+      'learner...'
+    );
     await users.logout();
 
     // Verify there are 1 subscriber.
@@ -101,11 +113,12 @@ describe('Subscriptions functionality', function() {
     await creatorDashboardPage.navigateToSubscriptionDashboard();
     await subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
     await subscriptionDashboardPage.expectSubscriptionLastNameToMatch(
-      'learner...');
+      'learner...'
+    );
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

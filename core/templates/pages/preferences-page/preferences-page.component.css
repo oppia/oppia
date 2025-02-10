@@ -112,3 +112,50 @@ a.export-btn:active {
   color: #fff;
   text-decoration: none;
 }
+.oppia-sticky-footer-container {
+  background-color: #fdfbf1;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: sticky;
+  width: 100vw;
+}
+.oppia-save-btn-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+@media screen and (max-width: 600px) {
+  .oppia-save-btn-container {
+    justify-content: center;
+    padding: 10px;
+    width: 100vw;
+  }
+  .oppia-save-button {
+    width: 100%;
+  }
+}
+@media screen and (min-width: 600px) {
+  .oppia-save-btn-container {
+    justify-content: end;
+    padding: 10px 0;
+    width: 800px;
+  }
+  .oppia-save-button {
+    width: auto;
+  }
+}
+.oppia-save-button {
+  background-color: #01645c;
+  border-radius: 4px;
+  color: #fff;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+}
+.oppia-save-button:hover,
+.oppia-save-button:active {
+  color: #fff;
+}

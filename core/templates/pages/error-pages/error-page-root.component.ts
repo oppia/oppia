@@ -16,55 +16,59 @@
  * @fileoverview Root component for error page.
  */
 
-// This error page is used for status codes 400, 401 and 500.
+import {Component} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PageTitleService } from 'services/page-title.service';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-error-page-root',
-  templateUrl: './error-page-root.component.html'
+  templateUrl: './error-page-root.component.html',
 })
-export class ErrorPageRootComponent implements OnDestroy {
-  // This property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  statusCode!: string;
-  directiveSubscriptions = new Subscription();
+export class ErrorPageRootComponent extends BaseRootComponent {
+  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR
+    .META as unknown as Readonly<MetaTagData>[];
+
+  statusCode: string | null = null;
+  validStatusCodes: string[] = ['400', '401', '404', '500'];
+  windowRef: WindowRef;
+  activatedRoute: ActivatedRoute;
 
   constructor(
-    private pageTitleService: PageTitleService,
-    private windowRef: WindowRef,
-    private translateService: TranslateService
-  ) {}
+    pageHeadService: PageHeadService,
+    translateService: TranslateService,
+    windowRef: WindowRef,
+    activatedRoute: ActivatedRoute
+  ) {
+    super(pageHeadService, translateService);
+    this.windowRef = windowRef;
+    this.activatedRoute = activatedRoute;
+  }
 
   ngOnInit(): void {
-    let bodyTag = (
-      this.windowRef.nativeWindow.document.getElementsByTagName('body'));
-    // Read status code from errorCode attribute on body tag.
-    let errorCode = bodyTag[0].getAttribute('errorCode');
-    this.statusCode = errorCode ? errorCode : '404';
-    // Update the default page title.
-    this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
-        this.setPageTitle();
-      })
-    );
+    this.statusCode = this.activatedRoute.snapshot.paramMap.get('status_code');
+    if (this.statusCode === null) {
+      const bodyTag =
+        this.windowRef.nativeWindow.document.getElementsByTagName('body');
+      this.statusCode = bodyTag[0].getAttribute('errorCode');
+    }
+
+    if (
+      !this.validStatusCodes.includes(String(this.statusCode)) ||
+      this.activatedRoute.snapshot.url.length > 0
+    ) {
+      this.statusCode = '404';
+    }
+
+    super.ngOnInit();
   }
 
-  setPageTitle(): void {
-    let translatedTitle = this.translateService.instant(
-      'I18N_ERROR_PAGE_ROOT_BROWSER_TAB_TITLE', {
-        statusCode: this.statusCode,
-      });
-    this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
-
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+  get titleInterpolationParams(): Object {
+    return {statusCode: this.statusCode};
   }
 }

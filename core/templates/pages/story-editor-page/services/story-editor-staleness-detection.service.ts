@@ -16,22 +16,21 @@
  * @fileoverview Service for emitting events when a story editor tab is stale.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { StalenessDetectionService } from 'services/staleness-detection.service';
-import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
-import { StoryEditorStateService } from './story-editor-state.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { FaviconService } from 'services/favicon.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { StaleTabInfoModalComponent } from 'components/stale-tab-info/stale-tab-info-modal.component';
-import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import {EventEmitter, Injectable} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {StalenessDetectionService} from 'services/staleness-detection.service';
+import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import {StoryEditorStateService} from './story-editor-state.service';
+import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {FaviconService} from 'services/favicon.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {StaleTabInfoModalComponent} from 'components/stale-tab-info/stale-tab-info-modal.component';
+import {UnsavedChangesStatusInfoModalComponent} from 'components/unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StoryEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
@@ -67,25 +66,29 @@ export class StoryEditorStalenessDetectionService {
   showStaleTabInfoModal(): void {
     const story = this.storyEditorStateService.getStory();
     if (story) {
-      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
+      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
         this.localStorageService.getEntityEditorBrowserTabsInfo(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));
+          EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
+          story.getId()
+        );
       if (
         storyEditorBrowserTabsInfo &&
         storyEditorBrowserTabsInfo.getLatestVersion() !== story.getVersion()
       ) {
         this.faviconService.setFavicon(
-          '/assets/images/favicon_alert/favicon_alert.ico');
+          '/assets/images/favicon_alert/favicon_alert.ico'
+        );
         this.ngbModal.dismissAll();
-        const modalRef = this.ngbModal.open(
-          StaleTabInfoModalComponent, {
-            backdrop: 'static',
-          });
+        const modalRef = this.ngbModal.open(StaleTabInfoModalComponent, {
+          backdrop: 'static',
+        });
         modalRef.componentInstance.entity = 'story';
-        modalRef.result.then(() => {
-          this.windowRef.nativeWindow.location.reload();
-        }, () => {});
+        modalRef.result.then(
+          () => {
+            this.windowRef.nativeWindow.location.reload();
+          },
+          () => {}
+        );
       }
     }
   }
@@ -96,18 +99,23 @@ export class StoryEditorStalenessDetectionService {
       return;
     }
     if (
-      this.stalenessDetectionService
-        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId())
+      this.stalenessDetectionService.doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS,
+        story.getId()
+      )
     ) {
       this.ngbModal.dismissAll();
       this.unsavedChangesWarningModalRef = this.ngbModal.open(
-        UnsavedChangesStatusInfoModalComponent, {
+        UnsavedChangesStatusInfoModalComponent,
+        {
           backdrop: 'static',
-        });
+        }
+      );
       this.unsavedChangesWarningModalRef.componentInstance.entity = 'story';
-      this.unsavedChangesWarningModalRef.result.then(() => {}, () => {});
+      this.unsavedChangesWarningModalRef.result.then(
+        () => {},
+        () => {}
+      );
     } else if (this.unsavedChangesWarningModalRef) {
       this.unsavedChangesWarningModalRef.dismiss();
     }
@@ -121,7 +129,3 @@ export class StoryEditorStalenessDetectionService {
     return this._presenceOfUnsavedChangesEventEmitter;
   }
 }
-
-angular.module('oppia').factory(
-  'StoryEditorStalenessDetectionService',
-  downgradeInjectable(StoryEditorStalenessDetectionService));

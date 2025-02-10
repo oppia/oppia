@@ -16,10 +16,9 @@
  * @fileoverview Tests for delete topic from classroom confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteTopicFromClassroomModalComponent } from './delete-topic-from-classroom-modal.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteTopicFromClassroomModalComponent} from './delete-topic-from-classroom-modal.component';
 
 describe('Delete Topic From Classroom Confirmation Modal', () => {
   let fixture: ComponentFixture<DeleteTopicFromClassroomModalComponent>;
@@ -29,12 +28,8 @@ describe('Delete Topic From Classroom Confirmation Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteTopicFromClassroomModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ]
+      declarations: [DeleteTopicFromClassroomModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

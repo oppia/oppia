@@ -20,80 +20,81 @@
  * definition of one.
  */
 
-export type BeamJobRunState = (
+export type BeamJobRunState =
   // The job is currently running.
-  'RUNNING' |
+  | 'RUNNING'
   // The job has been created but is not yet running. Jobs that are pending may
   // only transition to RUNNING, or FAILED.
-  'PENDING' |
+  | 'PENDING'
   // The job has not yet started to run.
-  'STOPPED' |
+  | 'STOPPED'
   // The job has has been explicitly cancelled and is in the process of
   // stopping. Jobs that are cancelling may only transition to CANCELLED or
   // FAILED.
-  'CANCELLING' |
+  | 'CANCELLING'
   // The job has has been explicitly cancelled. This is a terminal job state.
   // This state may only be set via a Cloud Dataflow jobs.update call, and only
   // if the job has not yet reached another terminal state.
-  'CANCELLED' |
+  | 'CANCELLED'
   // The job is in the process of draining. A draining job has stopped pulling
   // from its input sources and is processing any data that remains in-flight.
   // This state may be set via a Cloud Dataflow jobs.update call, but only as a
   // transition from RUNNING. Jobs that are draining may only transition to
   // DRAINED, CANCELLED, or FAILED.
-  'DRAINING' |
+  | 'DRAINING'
   // The job has been drained. A drained job terminated by stopping pulling from
   // its input sources and processing any data that remained in-flight when
   // draining was requested. This state is a terminal state, may only be set by
   // the Cloud Dataflow service, and only as a transition from DRAINING.
-  'DRAINED' |
+  | 'DRAINED'
   // The job was successfully updated, meaning that this job was stopped and
   // another job was started, inheriting state from this one. This is a terminal
   // job state. This state may only be set by the Cloud Dataflow service, and
   // only as a transition from RUNNING.
-  'UPDATED' |
+  | 'UPDATED'
   // The job has successfully completed. This is a terminal job state. This
   // state may be set by the Cloud Dataflow service, as a transition from
   // RUNNING. It may also be set via a Cloud Dataflow jobs.update call, if the
   // job has not yet reached a terminal state.
-  'DONE' |
+  | 'DONE'
   // The job has has failed. This is a terminal job state. This state may only
   // be set by the Cloud Dataflow service, and only as a transition from
   // RUNNING.
-  'FAILED' |
+  | 'FAILED'
   // The job's run state isn't specified.
-  'UNKNOWN'
-);
+  | 'UNKNOWN';
 
 class MatIcon {
   constructor(
-      public readonly tooltip: string,
-      public readonly code: string,
-      // The color is null for the job state 'cancelling', 'cancelled' and
-      // 'drained' since we want their respective icons to use the default
-      // font color of the component and not any of the theme colors.
-      public readonly color: string | null) {}
+    public readonly tooltip: string,
+    public readonly code: string,
+    // The color is null for the job state 'cancelling', 'cancelled' and
+    // 'drained' since we want their respective icons to use the default
+    // font color of the component and not any of the theme colors.
+    public readonly color: string | null
+  ) {}
 }
 
 export interface BeamJobRunBackendDict {
-  'job_id': string;
-  'job_name': string;
-  'job_state': BeamJobRunState;
-  'job_started_on_msecs': number;
-  'job_updated_on_msecs': number;
-  'job_is_synchronous': boolean;
+  job_id: string;
+  job_name: string;
+  job_state: BeamJobRunState;
+  job_started_on_msecs: number;
+  job_updated_on_msecs: number;
+  job_is_synchronous: boolean;
 }
 
 export class BeamJobRun {
   private matIcon: MatIcon;
 
   constructor(
-      public readonly jobId: string,
-      public readonly jobName: string,
-      public readonly jobState: BeamJobRunState,
-      public readonly jobStartedOnMsecs: number,
-      public readonly jobUpdatedOnMsecs: number,
-      public readonly jobIsSynchronous: boolean) {
+    public readonly jobId: string,
+    public readonly jobName: string,
+    public readonly jobState: BeamJobRunState,
+    public readonly jobStartedOnMsecs: number,
+    public readonly jobUpdatedOnMsecs: number,
+    public readonly jobIsSynchronous: boolean
+  ) {
     switch (jobState) {
       case 'RUNNING':
         this.matIcon = new MatIcon('Running...', 'run_circle', 'accent');
@@ -117,8 +118,11 @@ export class BeamJobRun {
         this.matIcon = new MatIcon('Drained', 'hourglass_bottom', null);
         break;
       case 'UPDATED':
-        this.matIcon = (
-          new MatIcon('Updated', 'published_with_changes', 'primary'));
+        this.matIcon = new MatIcon(
+          'Updated',
+          'published_with_changes',
+          'primary'
+        );
         break;
       case 'DONE':
         this.matIcon = new MatIcon('Done!', 'check_circle', 'primary');
@@ -184,8 +188,12 @@ export class BeamJobRun {
 
   static createFromBackendDict(backendDict: BeamJobRunBackendDict): BeamJobRun {
     return new BeamJobRun(
-      backendDict.job_id, backendDict.job_name, backendDict.job_state,
-      backendDict.job_started_on_msecs, backendDict.job_updated_on_msecs,
-      backendDict.job_is_synchronous);
+      backendDict.job_id,
+      backendDict.job_name,
+      backendDict.job_state,
+      backendDict.job_started_on_msecs,
+      backendDict.job_updated_on_msecs,
+      backendDict.job_is_synchronous
+    );
   }
 }

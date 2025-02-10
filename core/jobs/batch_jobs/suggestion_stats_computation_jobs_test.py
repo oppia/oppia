@@ -77,40 +77,42 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_creates_stats_model_from_one_in_review_suggestion(self) -> None:
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'html'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1
-        )
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'html'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1
+            )
+            suggestion_model.update_timestamps()
+            suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -146,7 +148,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_reports_failure_on_broken_model(self) -> None:
@@ -198,39 +200,41 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_stats_model_from_one_suggestion_in_legacy_format(
         self
     ) -> None:
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 a',
-                'translation_html': '111 a'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1
-        )
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 a',
+                    'translation_html': '111 a'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1
+            )
+            suggestion_model.update_timestamps()
+            suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -266,46 +270,49 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_stats_model_from_one_suggestion_in_set_format(
         self
     ) -> None:
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': ['111 a', '222 b', '333 c'],
-                'translation_html': ['111 a', '222 b', '333 c'],
-                'data_format': 'set_of_normalized_string'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1
-        )
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+         # Define a fixed datetime.
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': ['111 a', '222 b', '333 c'],
+                    'translation_html': ['111 a', '222 b', '333 c'],
+                    'data_format': 'set_of_normalized_string'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1
+            )
+            suggestion_model.update_timestamps()
+            suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -341,46 +348,48 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_stats_model_from_one_in_review_suggestion_with_opportunity(
         self
     ) -> None:
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'html'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1
-        )
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'html'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1
+            )
+            suggestion_model.update_timestamps()
+            suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -416,47 +425,49 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
     def test_creates_translation_stats_models_from_one_accepted_suggestion(
         self
     ) -> None:
-        suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
-        )
-        suggestion_model.update_timestamps()
-        suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id='reviewer1'
+            )
+            suggestion_model.update_timestamps()
+            suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -501,7 +512,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -525,11 +536,11 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.accepted_translation_word_count, 3)
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             translation_review_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
     def test_escapes_stats_without_opportunity(
@@ -574,65 +585,67 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_translation_stats_models_from_two_accepted_suggestions(
         self
     ) -> None:
-        first_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id=None
-        )
-        first_suggestion_model.update_timestamps()
-        first_suggestion_model.put()
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            first_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id=None
+            )
+            first_suggestion_model.update_timestamps()
+            first_suggestion_model.put()
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
 
-        second_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id=None
-        )
-        second_suggestion_model.update_timestamps()
-        second_suggestion_model.put()
+            second_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id=None
+            )
+            second_suggestion_model.update_timestamps()
+            second_suggestion_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -677,7 +690,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [first_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -702,75 +715,79 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.accepted_translation_word_count, 6)
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             translation_review_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
     def test_creates_multiple_stats_models_from_multiple_users(
         self
     ) -> None:
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
-        first_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
-        )
-        first_suggestion_model.update_timestamps()
-        first_suggestion_model.put()
+        # Define a fixed datetime.
+        mocked_now = datetime.datetime(2024, 10, 28)
 
-        second_suggestion_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_2,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'unicode'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_ACCEPTED,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            final_reviewer_id='reviewer1'
-        )
-        second_suggestion_model.update_timestamps()
-        second_suggestion_model.put()
+        with self.mock_datetime_utcnow(mocked_now):
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
+            first_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id='reviewer1'
+            )
+            first_suggestion_model.update_timestamps()
+            first_suggestion_model.put()
+
+            second_suggestion_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_2,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'unicode'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_ACCEPTED,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                final_reviewer_id='reviewer1'
+            )
+            second_suggestion_model.update_timestamps()
+            second_suggestion_model.put()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -825,7 +842,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             first_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             first_translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [first_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -855,7 +872,7 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             second_translation_stats_model.rejected_translation_word_count, 0)
         self.assertItemsEqual(
             second_translation_stats_model.contribution_dates,
-            [datetime.datetime.utcnow().date()]
+            [second_suggestion_model.created_on.date()]
         )
 
         self.assertEqual(
@@ -879,11 +896,11 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_review_stats_model.accepted_translation_word_count, 6)
         self.assertEqual(
             translation_review_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             translation_review_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
     def _create_valid_question_data(
@@ -1057,7 +1074,9 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
     def test_creates_question_stats_models_from_one_accepted_suggestion(
         self
     ) -> None:
-        topic_id = self._create_question()
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            topic_id = self._create_question()
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -1104,11 +1123,11 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             question_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             question_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
         self.assertEqual(
@@ -1127,71 +1146,96 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         self.assertEqual(
             question_review_stats_model.first_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
         self.assertEqual(
             question_review_stats_model.last_contribution_date,
-            datetime.datetime.utcnow().date()
+            mocked_now.date()
         )
 
     def test_creates_stats_model_from_multiple_suggestions(self) -> None:
-        opportunity_model = self.create_model(
-            opportunity_models.ExplorationOpportunitySummaryModel,
-            id=self.EXP_1_ID,
-            topic_id=self.TOPIC_1_ID,
-            chapter_title='irelevant',
-            content_count=1,
-            story_id='irelevant',
-            story_title='irelevant',
-            topic_name='irelevant'
-        )
-        opportunity_model.update_timestamps()
-        opportunity_model.put()
-        suggestion_1_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': '111 222 333',
-                'translation_html': '111 222 333',
-                'data_format': 'html'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1
-        )
-        suggestion_1_model.update_timestamps()
-        suggestion_2_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            author_id=self.VALID_USER_ID_1,
-            change_cmd={
-                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                'state_name': 'state',
-                'content_id': 'content_id',
-                'language_code': 'lang',
-                'content_html': ['111', '222', '333', '444', '555'],
-                'translation_html': ['111', '222', '333', '444', '555'],
-                'data_format': 'set_of_unicode_string'
-            },
-            score_category='irelevant',
-            status=suggestion_models.STATUS_IN_REVIEW,
-            target_type='exploration',
-            target_id=self.EXP_1_ID,
-            target_version_at_submission=0,
-            language_code=self.LANG_1,
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        )
-        suggestion_2_model.update_timestamps(update_last_updated_time=False)
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_1_model, suggestion_2_model])
+        mocked_now = datetime.datetime(2025, 1, 7)
+        with self.mock_datetime_utcnow(mocked_now):
+            opportunity_model = self.create_model(
+                opportunity_models.ExplorationOpportunitySummaryModel,
+                id=self.EXP_1_ID,
+                topic_id=self.TOPIC_1_ID,
+                chapter_title='irelevant',
+                content_count=1,
+                story_id='irelevant',
+                story_title='irelevant',
+                topic_name='irelevant'
+            )
+            opportunity_model.update_timestamps()
+            opportunity_model.put()
+            suggestion_1_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': '111 222 333',
+                    'translation_html': '111 222 333',
+                    'data_format': 'html'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                created_on=mocked_now
+            )
+            suggestion_1_model.update_timestamps()
+            suggestion_2_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': ['111', '222', '333', '444', '555'],
+                    'translation_html': ['111', '222', '333', '444', '555'],
+                    'data_format': 'set_of_unicode_string'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                created_on=mocked_now - datetime.timedelta(days=2)
+            )
+            suggestion_2_model.update_timestamps()
+            suggestion_3_model = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                author_id=self.VALID_USER_ID_1,
+                change_cmd={
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'state',
+                    'content_id': 'content_id',
+                    'language_code': 'lang',
+                    'content_html': ['111', '222', '333', '444', '555'],
+                    'translation_html': ['111', '222', '333', '444', '555'],
+                    'data_format': 'set_of_unicode_string'
+                },
+                score_category='irelevant',
+                status=suggestion_models.STATUS_IN_REVIEW,
+                target_type='exploration',
+                target_id=self.EXP_1_ID,
+                target_version_at_submission=0,
+                language_code=self.LANG_1,
+                created_on=mocked_now - datetime.timedelta(days=1)
+            )
+            suggestion_3_model.update_timestamps()
+            suggestion_models.GeneralSuggestionModel.put_multi([
+                suggestion_1_model, suggestion_2_model, suggestion_3_model])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -1211,9 +1255,9 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             translation_stats_model.contributor_user_id, self.VALID_USER_ID_1)
         self.assertEqual(translation_stats_model.topic_id, self.TOPIC_1_ID)
         self.assertEqual(
-            translation_stats_model.submitted_translations_count, 2)
+            translation_stats_model.submitted_translations_count, 3)
         self.assertEqual(
-            translation_stats_model.submitted_translation_word_count, 8)
+            translation_stats_model.submitted_translation_word_count, 13)
         self.assertEqual(translation_stats_model.accepted_translations_count, 0)
         self.assertEqual(
             translation_stats_model
@@ -1225,11 +1269,14 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         self.assertEqual(translation_stats_model.rejected_translations_count, 0)
         self.assertEqual(
             translation_stats_model.rejected_translation_word_count, 0)
-        self.assertItemsEqual(
+        # We are checking whether contribution_dates are added in ascending
+        # order.
+        self.assertListEqual(
             translation_stats_model.contribution_dates,
             [
-                datetime.datetime.utcnow().date(),
-                datetime.datetime.utcnow().date() - datetime.timedelta(days=1)
+                suggestion_2_model.created_on.date(),
+                suggestion_3_model.created_on.date(),
+                suggestion_1_model.created_on.date()
             ]
         )
 

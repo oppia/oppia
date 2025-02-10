@@ -16,30 +16,32 @@
  * @fileoverview Module for Angular Material.
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatListModule } from '@angular/material/list';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatSlideToggleModule} from '@angular/material/slide-toggle';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatMenuModule } from '@angular/material/menu';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NgxMatSelectSearchModule} from 'ngx-mat-select-search';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatListModule} from '@angular/material/list';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatSliderModule} from '@angular/material/slider';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatIconModule} from '@angular/material/icon';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatMenuModule} from '@angular/material/menu';
 
 @NgModule({
   imports: [
@@ -49,6 +51,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatButtonModule,
     MatCardModule,
     MatCheckboxModule,
+    MatDatepickerModule,
     MatIconModule,
     MatListModule,
     MatChipsModule,
@@ -56,6 +59,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatGridListModule,
     MatIconModule,
     MatListModule,
+    MatNativeDateModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
@@ -67,7 +71,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatInputModule,
     MatDividerModule,
     MatTooltipModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   exports: [
     CommonModule,
@@ -77,10 +81,12 @@ import { MatMenuModule } from '@angular/material/menu';
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDatepickerModule,
     MatExpansionModule,
     MatGridListModule,
     MatIconModule,
     MatListModule,
+    MatNativeDateModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatRadioModule,
@@ -92,7 +98,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatInputModule,
     MatDividerModule,
     MatTooltipModule,
-    MatMenuModule
-  ]
+    MatMenuModule,
+  ],
 })
 export class MaterialModule {}

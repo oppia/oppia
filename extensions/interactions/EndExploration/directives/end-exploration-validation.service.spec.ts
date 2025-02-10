@@ -16,18 +16,20 @@
  * @fileoverview Unit tests for end exploration validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { EndExplorationCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { EndExplorationValidationService } from
-  'interactions/EndExploration/directives/end-exploration-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
+import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 describe('EndExplorationValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
@@ -41,7 +43,7 @@ describe('EndExplorationValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [EndExplorationValidationService]
+      providers: [EndExplorationValidationService],
     });
 
     validatorService = TestBed.inject(EndExplorationValidationService);
@@ -56,80 +58,98 @@ describe('EndExplorationValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
 
     customizationArguments = {
       recommendedExplorationIds: {
-        value: ['ExpID0', 'ExpID1', 'ExpID2']
-      }
+        value: ['ExpID0', 'ExpID1', 'ExpID2'],
+      },
     };
 
-    goodAnswerGroups = [agof.createNew(
-      [],
-      oof.createFromBackendDict({
-        dest: 'Second State',
-        dest_if_really_stuck: null,
-        feedback: {
-          html: '',
-          content_id: ''
-        },
-        labelled_as_correct: false,
-        param_changes: [],
-        refresher_exploration_id: null,
-        missing_prerequisite_skill_id: null
-      }),
+    goodAnswerGroups = [
+      agof.createNew(
+        [],
+        oof.createFromBackendDict({
+          dest: 'Second State',
+          dest_if_really_stuck: null,
+          feedback: {
+            html: '',
+            content_id: '',
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        }),
+        [],
+        null
+      ),
+    ];
+  });
+
+  it(
+    'should not have warnings when the EndExploration object does not have ' +
+      'answer groups or a default outcome or empty recommended exp IDs',
+    () => {
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArguments,
+        [],
+        null
+      );
+      expect(warnings).toEqual([]);
+    }
+  );
+
+  it('should have warnings for any answer groups or default outcome', () => {
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      badOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Please make sure end exploration interactions do not ' +
+          'have any Oppia responses.',
+      },
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Please make sure end exploration interactions do not ' +
+          'have a default outcome.',
+      },
+    ]);
+  });
+
+  it('should have warnings if a recommended exploration id is empty', () => {
+    let badCustomizationArguments = {
+      recommendedExplorationIds: {
+        value: ['ExpID0', ''],
+      },
+    };
+    let invalidExplorationIdsWarning = {
+      type: WARNING_TYPES.ERROR,
+      message: 'Recommended exploration ID must be non-empty.',
+    };
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      badCustomizationArguments,
       [],
       null
-    )];
+    );
+
+    expect(warnings).toEqual([invalidExplorationIdsWarning]);
   });
-
-  it('should not have warnings when the EndExploration object does not have ' +
-    'answer groups or a default outcome or empty recommended exp IDs', () => {
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([]);
-  });
-
-  it('should have warnings for any answer groups or default outcome',
-    () => {
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups, badOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.')
-      }, {
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please make sure end exploration interactions do not ' +
-          'have a default outcome.')
-      }]);
-    });
-
-  it('should have warnings if a recommended exploration id is empty',
-    () => {
-      let badCustomizationArguments = {
-        recommendedExplorationIds: {
-          value: ['ExpID0', '']
-        }
-      };
-      let invalidExplorationIdsWarning = {
-        type: WARNING_TYPES.ERROR,
-        message: 'Recommended exploration ID must be non-empty.'
-      };
-
-      var warnings = validatorService.getAllWarnings(
-        currentState, badCustomizationArguments, [], null);
-
-      expect(warnings).toEqual([invalidExplorationIdsWarning]);
-    });
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
@@ -141,51 +161,76 @@ describe('EndExplorationValidationService', () => {
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
       'Expected customization arguments to have property: ' +
-      'recommendedExplorationIds');
+        'recommendedExplorationIds'
+    );
   });
 
   it('should not have warnings for 0 or 8 recommendations', () => {
     customizationArguments.recommendedExplorationIds.value = [];
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
     expect(warnings).toEqual([]);
 
     customizationArguments.recommendedExplorationIds.value = [
-      'ExpID0', 'ExpID1', 'ExpID2', 'ExpID3',
-      'ExpID4', 'ExpID5', 'ExpID6', 'ExpID7'
+      'ExpID0',
+      'ExpID1',
+      'ExpID2',
+      'ExpID3',
+      'ExpID4',
+      'ExpID5',
+      'ExpID6',
+      'ExpID7',
     ];
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
     expect(warnings).toEqual([]);
   });
 
-  it('should catch non-string value for recommended exploration ID',
-    () => {
-      // This throws "Type 'number'. We need to suppress this error because is
-      // not assignable to type 'string'." Here we are assigning the wrong type
-      // of value to "customizationArguments" in order to test validations.
-      // @ts-expect-error
-      customizationArguments.recommendedExplorationIds.value = [1];
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
+  it('should catch non-string value for recommended exploration ID', () => {
+    // This throws "Type 'number'. We need to suppress this error because is
+    // not assignable to type 'string'." Here we are assigning the wrong type
+    // of value to "customizationArguments" in order to test validations.
+    // @ts-expect-error
+    customizationArguments.recommendedExplorationIds.value = [1];
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
         type: WARNING_TYPES.ERROR,
-        message: 'Recommended exploration ID must be a string.'
-      }]);
-    });
+        message: 'Recommended exploration ID must be a string.',
+      },
+    ]);
+  });
 
-  it('should have warnings for non-list format of recommended exploration IDs',
-    () => {
-      // This throws "Type '"ExpID0"'. We need to suppress this error because is
-      // not assignable to type 'string[]'." Here we are assigning the wrong
-      // type of value to "customizationArguments" in order to test validations.
-      // @ts-expect-error
-      customizationArguments.recommendedExplorationIds.value = 'ExpID0';
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, [], null);
-      expect(warnings).toEqual([{
+  it('should have warnings for non-list format of recommended exploration IDs', () => {
+    // This throws "Type '"ExpID0"'. We need to suppress this error because is
+    // not assignable to type 'string[]'." Here we are assigning the wrong
+    // type of value to "customizationArguments" in order to test validations.
+    // @ts-expect-error
+    customizationArguments.recommendedExplorationIds.value = 'ExpID0';
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
         type: WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.'
-      }]);
-    });
+        message: 'Set of recommended exploration IDs must be list.',
+      },
+    ]);
+  });
 });

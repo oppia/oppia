@@ -22,10 +22,9 @@ import collections
 
 from core import utils
 from core.constants import constants
-from core.domain import classroom_services
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import learner_goals_services
@@ -74,6 +73,7 @@ class DisplayableStorySummaryDict(TypedDict):
     topic_name: str
     topic_url_fragment: str
     classroom_url_fragment: str
+    classroom_name: str
 
 
 class DisplayableTopicSummaryDict(TypedDict):
@@ -89,8 +89,9 @@ class DisplayableTopicSummaryDict(TypedDict):
     thumbnail_bg_color: Optional[str]
     thumbnail_filename: Optional[str]
     canonical_story_summary_dict: List[topic_fetchers.CannonicalStoryDict]
-    url_fragment: str
-    classroom: str
+    url_fragment: Optional[str]
+    classroom_name: str
+    classroom_url_fragment: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]
     skill_descriptions: Tuple[Dict[str, str], List[str]]
@@ -1581,10 +1582,10 @@ def get_all_and_untracked_topic_ids_for_user(
         list(str). The ids of all the topics not tracked for the user.
     """
 
-    all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
+    classrooms = classroom_config_services.get_all_classrooms()
     all_topic_ids = []
-    for classroom in all_classrooms_dict:
-        for topic_id in classroom['topic_ids']:
+    for classroom in classrooms:
+        for topic_id in classroom.get_topic_ids():
             all_topic_ids.append(topic_id)
     tracked_topic_ids = (
         partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn)
@@ -1700,7 +1701,12 @@ def get_displayable_story_summary_dicts(
             'topic_name': topic.name,
             'topic_url_fragment': topic.url_fragment,
             'classroom_url_fragment': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
+                classroom_config_services
+                .get_classroom_url_fragment_for_topic_id(
+                    story.corresponding_topic_id)),
+            'classroom_name': (
+                classroom_config_services
+                .get_classroom_name_for_topic_id(
                     story.corresponding_topic_id))
         })
 
@@ -1728,14 +1734,24 @@ def get_displayable_untracked_topic_summary_dicts(
     ] = collections.defaultdict(list)
     topic_ids = [topic.id for topic in untracked_topic_summaries]
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
+    classrooms = classroom_config_services.get_all_classrooms()
+    published_classroom_topic_ids = [
+        topic_id
+        for classroom in classrooms if classroom.is_published
+        for topic_id in classroom.topic_id_to_prerequisite_topic_ids.keys()
+    ]
+
     for index, topic in enumerate(topics):
+        if topic.id not in published_classroom_topic_ids:
+            continue
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
             skill_services.get_descriptions_of_skills(
                 all_skill_ids))
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, all_skill_ids)
-        summary_dict[classroom_services.get_classroom_url_fragment_for_topic_id(
+        summary_dict[
+            classroom_config_services.get_classroom_url_fragment_for_topic_id(
             topic.id)].append({
                 'id': topic.id,
                 'name': topic.name,
@@ -1751,9 +1767,12 @@ def get_displayable_untracked_topic_summary_dicts(
                 'canonical_story_summary_dict': (
                     topic_fetchers.get_canonical_story_dicts(user_id, topic)),
                 'url_fragment': topic.url_fragment,
-                'classroom': (
-                    classroom_services.get_classroom_url_fragment_for_topic_id(
-                        topic.id)),
+                'classroom_name': (
+                    classroom_config_services.
+                    get_classroom_name_for_topic_id(topic.id)),
+                'classroom_url_fragment': (
+                    classroom_config_services.
+                    get_classroom_url_fragment_for_topic_id(topic.id)),
                 'practice_tab_is_displayed': topic.practice_tab_is_displayed,
                 'degrees_of_mastery': degrees_of_mastery,
                 'skill_descriptions': skill_descriptions,
@@ -1802,9 +1821,12 @@ def get_displayable_topic_summary_dicts(
             'canonical_story_summary_dict': (
                 topic_fetchers.get_canonical_story_dicts(user_id, topic)),
             'url_fragment': topic.url_fragment,
-            'classroom': (
-                classroom_services.get_classroom_url_fragment_for_topic_id(
-                    topic.id)),
+            'classroom_name': (
+                classroom_config_services.
+                get_classroom_name_for_topic_id(topic.id)),
+            'classroom_url_fragment': (
+                classroom_config_services.
+                get_classroom_url_fragment_for_topic_id(topic.id)),
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,

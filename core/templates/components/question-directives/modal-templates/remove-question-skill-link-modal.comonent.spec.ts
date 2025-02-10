@@ -16,13 +16,22 @@
  * @fileoverview Unit tests for Remove Question Modal.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { RemoveQuestionSkillLinkModalComponent } from './remove-question-skill-link-modal.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  AssignedSkillBackendDict,
+  AssignedSkill,
+} from 'domain/skill/assigned-skill.model';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {RemoveQuestionSkillLinkModalComponent} from './remove-question-skill-link-modal.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 
 describe('Question deletion modal', () => {
   let fixture: ComponentFixture<RemoveQuestionSkillLinkModalComponent>;
@@ -33,17 +42,17 @@ describe('Question deletion modal', () => {
     topic_id: 'test_id_1',
     topic_name: 'Addition',
     topic_version: 1,
-    subtopic_id: 2
+    subtopic_id: 2,
   };
   let skillBackendDictForFractions: AssignedSkillBackendDict = {
     topic_id: 'test_id_2',
     topic_name: 'Fractions',
     topic_version: 1,
-    subtopic_id: 2
+    subtopic_id: 2,
   };
   const testSkills: AssignedSkill[] = [
     AssignedSkill.createFromBackendDict(skillBackendDictForAddition),
-    AssignedSkill.createFromBackendDict(skillBackendDictForFractions)
+    AssignedSkill.createFromBackendDict(skillBackendDictForFractions),
   ];
   const topicNames: string[] = ['Fractions'];
   class MockTopicsAndSkillsDashboardBackendApiService {
@@ -51,7 +60,7 @@ describe('Question deletion modal', () => {
       return {
         then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
-        }
+        },
       };
     }
   }
@@ -61,30 +70,26 @@ describe('Question deletion modal', () => {
       return {
         then: (callback: (resp: string[]) => void) => {
           callback(topicNames);
-        }
+        },
       };
     }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MatProgressSpinnerModule
-      ],
-      declarations: [
-        RemoveQuestionSkillLinkModalComponent
-      ],
+      imports: [MatProgressSpinnerModule],
+      declarations: [RemoveQuestionSkillLinkModalComponent],
       providers: [
         NgbActiveModal,
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
-          useClass: MockTopicsAndSkillsDashboardBackendApiService
+          useClass: MockTopicsAndSkillsDashboardBackendApiService,
         },
         {
           provide: SkillBackendApiService,
-          useClass: MockSkillBackendApiService
-        }
-      ]
+          useClass: MockSkillBackendApiService,
+        },
+      ],
     }).compileComponents();
   }));
   beforeEach(() => {
@@ -112,22 +117,21 @@ describe('Question deletion modal', () => {
 
   it('should get topic editor url', () => {
     expect(componentInstance.getTopicEditorUrl('topicID')).toEqual(
-      '/topic_editor/topicID#/');
+      '/topic_editor/topicID#/'
+    );
   });
 
-  it(
-    'should not be able to remove questions when user have not enough rights',
-    fakeAsync(() => {
-      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
-      componentInstance.canEditQuestion = false;
-      componentInstance.fetchTopicAssignmentsForSkill();
-      tick();
-      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
-    }));
+  it('should not be able to remove questions when user have not enough rights', fakeAsync(() => {
+    expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
+    componentInstance.canEditQuestion = false;
+    componentInstance.fetchTopicAssignmentsForSkill();
+    tick();
+    expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
+  }));
 
   it(
     'should not be able to remove questions when skill is assigned to ' +
-    'the diagnostic test and question count is less than equal to 2',
+      'the diagnostic test and question count is less than equal to 2',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.canEditQuestion = true;
@@ -145,11 +149,12 @@ describe('Question deletion modal', () => {
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
-    }));
+    })
+  );
 
   it(
     'should be able to remove questions when skill is assigned to ' +
-    'the diagnostic test and question count is greater than 3',
+      'the diagnostic test and question count is greater than 3',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.canEditQuestion = true;
@@ -172,11 +177,12 @@ describe('Question deletion modal', () => {
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
-    }));
+    })
+  );
 
   it(
     'should be able to remove questions when skill is not assigned to ' +
-    'the diagnostic test',
+      'the diagnostic test',
     fakeAsync(() => {
       componentInstance.canEditQuestion = true;
       componentInstance.numberOfQuestions = 2;
@@ -204,5 +210,6 @@ describe('Question deletion modal', () => {
       tick();
 
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
-    }));
+    })
+  );
 });

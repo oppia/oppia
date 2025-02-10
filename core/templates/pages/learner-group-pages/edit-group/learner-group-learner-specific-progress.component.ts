@@ -16,24 +16,20 @@
  * @fileoverview Component for the learner group learner specific progress.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ChapterProgressSummary } from
-  'domain/exploration/chapter-progress-summary.model';
-import { LearnerGroupSyllabusBackendApiService }
-  from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserProgress } from
-  'domain/learner_group/learner-group-user-progress.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
 import './learner-group-learner-specific-progress.component.css';
-
 
 @Component({
   selector: 'oppia-learner-group-learner-specific-progress',
   templateUrl: './learner-group-learner-specific-progress.component.html',
-  styleUrls: ['./learner-group-learner-specific-progress.component.css']
+  styleUrls: ['./learner-group-learner-specific-progress.component.css'],
 })
 export class LearnerGroupLearnerSpecificProgressComponent {
   @Input() learnerProgress!: LearnerGroupUserProgress;
@@ -43,12 +39,11 @@ export class LearnerGroupLearnerSpecificProgressComponent {
   storyIds: string[] = [];
   latestChapterProgressIndex = 0;
   cummulativeStoryChaptersCount: number[] = [];
-  EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
-    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS);
+  EDIT_OVERVIEW_SECTIONS_I18N_IDS =
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS;
 
   constructor(
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService,
+    private learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService
   ) {}
 
@@ -62,22 +57,28 @@ export class LearnerGroupLearnerSpecificProgressComponent {
       });
       this.learnerProgress.storiesProgress.forEach(storyProgress => {
         this.storyIds.push(storyProgress.getId());
-        let previousChaptersCount = (
-          this.cummulativeStoryChaptersCount.slice(-1).pop());
+        let previousChaptersCount = this.cummulativeStoryChaptersCount
+          .slice(-1)
+          .pop();
         if (previousChaptersCount) {
           this.cummulativeStoryChaptersCount.push(
-            previousChaptersCount + storyProgress.getNodeTitles().length);
+            previousChaptersCount + storyProgress.getNodeTitles().length
+          );
         } else {
           this.cummulativeStoryChaptersCount.push(
-            storyProgress.getNodeTitles().length);
+            storyProgress.getNodeTitles().length
+          );
         }
       });
 
-      this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
-        this.learnerProgress.username, this.storyIds
-      ).then(storiesChaptersProgress => {
-        this.storiesChaptersProgress = storiesChaptersProgress;
-      });
+      this.storyViewerBackendApiService
+        .fetchProgressInStoriesChapters(
+          this.learnerProgress.username,
+          this.storyIds
+        )
+        .then(storiesChaptersProgress => {
+          this.storiesChaptersProgress = storiesChaptersProgress;
+        });
     }
   }
 
@@ -94,13 +95,13 @@ export class LearnerGroupLearnerSpecificProgressComponent {
   }
 
   getAllCheckpointsProgressOfChapter(
-      storyIndex: number, chapterIndex: number
+    storyIndex: number,
+    chapterIndex: number
   ): number[] {
     let chapterProgressIndex = chapterIndex;
     if (storyIndex !== 0) {
-      chapterProgressIndex += (
-        this.cummulativeStoryChaptersCount[storyIndex - 1]
-      );
+      chapterProgressIndex +=
+        this.cummulativeStoryChaptersCount[storyIndex - 1];
     }
     const chapterProgress = this.storiesChaptersProgress[chapterProgressIndex];
     if (this.isChapterCompleted(storyIndex, chapterIndex)) {
@@ -108,9 +109,9 @@ export class LearnerGroupLearnerSpecificProgressComponent {
     }
     let allCheckpointsProgress: number[] = [];
     for (let i = 0; i < chapterProgress.totalCheckpoints; i++) {
-      if (i < (chapterProgress.visitedCheckpoints - 1)) {
+      if (i < chapterProgress.visitedCheckpoints - 1) {
         allCheckpointsProgress.push(1);
-      } else if (i === (chapterProgress.visitedCheckpoints - 1)) {
+      } else if (i === chapterProgress.visitedCheckpoints - 1) {
         allCheckpointsProgress.push(2);
       } else {
         allCheckpointsProgress.push(0);
@@ -129,45 +130,46 @@ export class LearnerGroupLearnerSpecificProgressComponent {
   }
 
   getCompletedProgressBarWidth(
-      storyIndex: number, chapterIndex: number
+    storyIndex: number,
+    chapterIndex: number
   ): number {
     const checkpointsProgress = this.getAllCheckpointsProgressOfChapter(
-      storyIndex, chapterIndex);
+      storyIndex,
+      chapterIndex
+    );
     const completedCheckpoints = checkpointsProgress.filter(
       checkpointProgress => checkpointProgress === 1
     ).length;
     const spaceBetweenEachNode = 100 / (checkpointsProgress.length - 1);
     return (
-      ((completedCheckpoints - 1) * spaceBetweenEachNode) +
-      (spaceBetweenEachNode / 2));
+      (completedCheckpoints - 1) * spaceBetweenEachNode +
+      spaceBetweenEachNode / 2
+    );
   }
 
-  getVisitedCheckpointsCount(
-      storyIndex: number, chapterIndex: number
-  ): number {
+  getVisitedCheckpointsCount(storyIndex: number, chapterIndex: number): number {
     const checkpointsProgress = this.getAllCheckpointsProgressOfChapter(
-      storyIndex, chapterIndex);
+      storyIndex,
+      chapterIndex
+    );
     return checkpointsProgress.filter(
-      checkpointProgress => (
-        checkpointProgress === 1 || checkpointProgress === 2
-      )
+      checkpointProgress => checkpointProgress === 1 || checkpointProgress === 2
     ).length;
   }
 
   getStrugglingWithSubtopicsCount(topicName: string): number {
     return this.learnerProgress.subtopicsProgress.filter(
-      subtopicProgress => (
+      subtopicProgress =>
         subtopicProgress.parentTopicName === topicName &&
         subtopicProgress.subtopicMastery &&
         subtopicProgress.subtopicMastery < 0.6
-      )
     ).length;
   }
 }
 
 angular.module('oppia').directive(
   'oppiaLearnerGroupLearnerSpecificProgress',
-  downgradeComponent(
-    {component: LearnerGroupLearnerSpecificProgressComponent}
-  )
+  downgradeComponent({
+    component: LearnerGroupLearnerSpecificProgressComponent,
+  })
 );

@@ -26,22 +26,6 @@ from core.domain import story_fetchers
 from typing import Dict
 
 
-class ReviewTestsPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Renders the review tests page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_story_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-        self.render_template('review-test-page.mainpage.html')
-
-
 class ReviewTestsPageDataHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -67,7 +51,7 @@ class ReviewTestsPageDataHandler(
         ) if self.user_id else []
 
         if len(latest_completed_node_ids) == 0:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         try:
             skills = skill_fetchers.get_multi_skills(
@@ -75,7 +59,7 @@ class ReviewTestsPageDataHandler(
                     latest_completed_node_ids
                 ))
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
         skill_descriptions = {}
         for skill in skills:
             skill_descriptions[skill.id] = skill.description

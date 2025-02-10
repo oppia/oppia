@@ -16,9 +16,9 @@
  * @fileoverview Service for fetching improvement tasks from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   ExplorationImprovementsConfig,
@@ -27,113 +27,145 @@ import {
 import {
   ExplorationTask,
   ExplorationTaskBackendDict,
-  ExplorationTaskModel
+  ExplorationTaskModel,
 } from 'domain/improvements/exploration-task.model';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface ExplorationImprovementsResponseBackendDict {
-  'open_tasks': ExplorationTaskBackendDict[];
-  'resolved_task_types_by_state_name': {
+  open_tasks: ExplorationTaskBackendDict[];
+  resolved_task_types_by_state_name: {
     [stateName: string]: string[];
   };
 }
 
 export interface ExplorationImprovementsHistoryResponseBackendDict {
-  'results': ExplorationTaskBackendDict[];
-  'cursor': string;
-  'more': boolean;
+  results: ExplorationTaskBackendDict[];
+  cursor: string;
+  more: boolean;
 }
 
 export class ExplorationImprovementsResponse {
   constructor(
-      public readonly openTasks: ExplorationTask[],
-      public readonly resolvedTaskTypesByStateName: Map<string, string[]>) {}
+    public readonly openTasks: ExplorationTask[],
+    public readonly resolvedTaskTypesByStateName: Map<string, string[]>
+  ) {}
 }
 
 export class ExplorationImprovementsHistoryResponse {
   constructor(
-      public readonly results: ExplorationTask[],
-      public readonly cursor: string,
-      public readonly more: boolean) {}
+    public readonly results: ExplorationTask[],
+    public readonly cursor: string,
+    public readonly more: boolean
+  ) {}
 }
 
 @Injectable({providedIn: 'root'})
 export class ExplorationImprovementsBackendApiService {
   constructor(
-      private http: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async getTasksAsync(expId: string): Promise<ExplorationImprovementsResponse> {
-    const explorationImprovementsUrl = (
+    const explorationImprovementsUrl =
       this.urlInterpolationService.interpolateUrl(
-        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
-          exploration_id: expId
-        }));
-    return this.http.get<ExplorationImprovementsResponseBackendDict>(
-      explorationImprovementsUrl
-    ).toPromise().then(
-      backendDict => new ExplorationImprovementsResponse(
-        backendDict.open_tasks.map(
-          d => ExplorationTaskModel.createFromBackendDict(d)),
-        new Map(Object.entries(backendDict.resolved_task_types_by_state_name)))
-    );
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL,
+        {
+          exploration_id: expId,
+        }
+      );
+    return this.http
+      .get<ExplorationImprovementsResponseBackendDict>(
+        explorationImprovementsUrl
+      )
+      .toPromise()
+      .then(
+        backendDict =>
+          new ExplorationImprovementsResponse(
+            backendDict.open_tasks.map(d =>
+              ExplorationTaskModel.createFromBackendDict(d)
+            ),
+            new Map(
+              Object.entries(backendDict.resolved_task_types_by_state_name)
+            )
+          )
+      );
   }
 
   async postTasksAsync(expId: string, tasks: ExplorationTask[]): Promise<void> {
     if (tasks.length === 0) {
       return;
     }
-    const explorationImprovementsUrl = (
+    const explorationImprovementsUrl =
       this.urlInterpolationService.interpolateUrl(
-        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL, {
-          exploration_id: expId
-        }));
-    return this.http.post<void>(explorationImprovementsUrl, {
-      task_entries: tasks.map(t => t.toPayloadDict())
-    }).toPromise();
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_URL,
+        {
+          exploration_id: expId,
+        }
+      );
+    return this.http
+      .post<void>(explorationImprovementsUrl, {
+        task_entries: tasks.map(t => t.toPayloadDict()),
+      })
+      .toPromise();
   }
 
   async getHistoryPageAsync(
-      expId: string,
-      cursor?: string): Promise<ExplorationImprovementsHistoryResponse> {
-    const explorationImprovementsHistoryUrl = (
+    expId: string,
+    cursor?: string
+  ): Promise<ExplorationImprovementsHistoryResponse> {
+    const explorationImprovementsHistoryUrl =
       this.urlInterpolationService.interpolateUrl(
-        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_HISTORY_URL, {
-          exploration_id: expId
-        }));
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_HISTORY_URL,
+        {
+          exploration_id: expId,
+        }
+      );
     let params = new HttpParams();
     if (cursor) {
       params = params.append('cursor', cursor);
     }
-    return this.http.get<ExplorationImprovementsHistoryResponseBackendDict>(
-      explorationImprovementsHistoryUrl, {params}
-    ).toPromise().then(
-      backendDict => new ExplorationImprovementsHistoryResponse(
-        backendDict.results.map(
-          d => ExplorationTaskModel.createFromBackendDict(d)),
-        backendDict.cursor,
-        backendDict.more));
+    return this.http
+      .get<ExplorationImprovementsHistoryResponseBackendDict>(
+        explorationImprovementsHistoryUrl,
+        {params}
+      )
+      .toPromise()
+      .then(
+        backendDict =>
+          new ExplorationImprovementsHistoryResponse(
+            backendDict.results.map(d =>
+              ExplorationTaskModel.createFromBackendDict(d)
+            ),
+            backendDict.cursor,
+            backendDict.more
+          )
+      );
   }
 
-  async getConfigAsync(
-      expId: string): Promise<ExplorationImprovementsConfig> {
-    const explorationImprovementsConfigUrl = (
+  async getConfigAsync(expId: string): Promise<ExplorationImprovementsConfig> {
+    const explorationImprovementsConfigUrl =
       this.urlInterpolationService.interpolateUrl(
-        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_CONFIG_URL, {
-          exploration_id: expId
-        }));
-    return this.http.get<ExplorationImprovementsConfigBackendDict>(
-      explorationImprovementsConfigUrl
-    ).toPromise().then(
-      backendDict =>
-        ExplorationImprovementsConfig.createFromBackendDict(
-          backendDict));
+        ImprovementsConstants.EXPLORATION_IMPROVEMENTS_CONFIG_URL,
+        {
+          exploration_id: expId,
+        }
+      );
+    return this.http
+      .get<ExplorationImprovementsConfigBackendDict>(
+        explorationImprovementsConfigUrl
+      )
+      .toPromise()
+      .then(backendDict =>
+        ExplorationImprovementsConfig.createFromBackendDict(backendDict)
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationImprovementsBackendApiService',
-  downgradeInjectable(ExplorationImprovementsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationImprovementsBackendApiService',
+    downgradeInjectable(ExplorationImprovementsBackendApiService)
+  );

@@ -38,20 +38,6 @@ class UserQueryDict(TypedDict):
     num_qualified_users: int
 
 
-class EmailDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page to submit query and show past queries."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_manage_email_dashboard
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template('email-dashboard-page.mainpage.html')
-
-
 def _generate_user_query_dicts(
     user_queries: List[user_query_domain.UserQuery]
 ) -> List[UserQueryDict]:
@@ -219,96 +205,6 @@ class QueryStatusCheckHandler(
             'query': _generate_user_query_dicts([user_query])[0]
         }
         self.render_json(data)
-
-
-class EmailDashboardResultPageNormalizedPayloadDict(TypedDict):
-    """Dict representation of EmailDashboardResultPage's
-    normalized_payload dictionary.
-    """
-
-    email_subject: str
-    email_body: str
-    email_intent: str
-    max_recipients: Optional[int]
-
-
-class EmailDashboardResultPage(
-    base.BaseHandler[
-        EmailDashboardResultPageNormalizedPayloadDict, Dict[str, str]
-    ]
-):
-    """Handler for email dashboard result page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'query_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'POST': {
-            'email_subject': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'email_body': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'email_intent': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'max_recipients': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
-            }
-        }
-    }
-
-    @acl_decorators.can_manage_email_dashboard
-    def get(self, query_id: str) -> None:
-        user_query = user_query_services.get_user_query(query_id)
-        if (
-                user_query is None or
-                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
-        ):
-            raise self.InvalidInputException('400 Invalid query id.')
-
-        if user_query.submitter_id != self.user_id:
-            raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.username)
-
-        self.render_template('email-dashboard-result.mainpage.html')
-
-    @acl_decorators.can_manage_email_dashboard
-    def post(self, query_id: str) -> None:
-        assert self.normalized_payload is not None
-        user_query = user_query_services.get_user_query(query_id)
-        if (
-                user_query is None or
-                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
-        ):
-            raise self.InvalidInputException('400 Invalid query id.')
-
-        if user_query.submitter_id != self.user_id:
-            raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.' % self.username)
-
-        email_subject = self.normalized_payload['email_subject']
-        email_body = self.normalized_payload['email_body']
-        max_recipients = self.normalized_payload.get('max_recipients')
-        email_intent = self.normalized_payload['email_intent']
-        user_query_services.send_email_to_qualified_users(
-            query_id, email_subject, email_body, email_intent, max_recipients)
-        self.render_json({})
 
 
 class EmailDashboardCancelEmailHandler(

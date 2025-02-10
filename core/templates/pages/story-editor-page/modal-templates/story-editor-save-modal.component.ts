@@ -16,21 +16,19 @@
  * @fileoverview Component for the Story Editor Save Modal Component.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-story-editor-save-modal',
-  templateUrl: './story-editor-save-modal.component.html'
+  templateUrl: './story-editor-save-modal.component.html',
 })
 export class StoryEditorSaveModalComponent {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   bindedMessage!: string;
-  constructor(
-     private activeModal: NgbActiveModal
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
   cancel(): void {
     this.activeModal.dismiss();

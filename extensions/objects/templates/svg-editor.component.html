@@ -22,10 +22,11 @@
         Note: The uploaded svg may not be rendered exactly.
       </div>
       <div *ngIf="!isFileUploaded()">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+        <oppia-image-receiver (fileChanged)="onFileChanged($event)"
                               [allowedImageFormats]="allowedImageFormats"
-                              [isBlogPostThumbnailUploader]="false">
-        </oppia-image-uploader>
+                              [maxImageSizeInKB]="100"
+                              >
+        </oppia-image-receiver>
       </div>
       <div *ngIf="isFileUploaded()">
         <img [src]="uploadedSvgDataUrl.safeUrl" class="uploaded-svg-image">
@@ -283,7 +284,8 @@
   <div *ngIf="isDiagramSaved()">
     <div class="diagram-editor-saved-image-container e2e-test-saved-diagram-container">
       <i class="fas fa-pen diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
-         title="Continue editing the diagram">s
+         title="Continue editing the diagram">
+        <span class="edit-text">SVG</span>
       </i>
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
@@ -291,13 +293,12 @@
   <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box mt-4 d-flex justify-content-end">
     <button type="button"
             class="btn btn-secondary mr-3"
-            (click)="discardSvgFile()"
-            [disabled]="isUserDrawing()">
+            (click)="discardSvgFile()">
       Discard
     </button>
     <button class="btn btn-success e2e-test-save-diagram"
             (click)="saveSvgFile()"
-            [disabled]="isUserDrawing() || loadingIndicatorIsShown">
+            [disabled]="loadingIndicatorIsShown">
       <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
       <span *ngIf="loadingIndicatorIsShown">
         <mat-progress-spinner [diameter]="25"
@@ -327,6 +328,15 @@
     right: 6px;
     text-shadow: 0 0 1px #fff;
     top: 6px;
+  }
+
+  .edit-icon {
+    font-size: 16px;
+  }
+
+  .edit-text {
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 10px;
   }
 
   .svg-editor .svg-editor {

@@ -19,34 +19,14 @@ from __future__ import annotations
 import collections
 
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import platform_feature_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import topic_fetchers
 
 from typing import Dict, List, TypedDict, cast
-
-
-class DiagnosticTestPlayerPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Renders the diagnostic test player page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests."""
-        if platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.DIAGNOSTIC_TEST.value):
-            self.render_template('diagnostic-test-player-page.mainpage.html')
-        else:
-            raise self.PageNotFoundException
 
 
 def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
@@ -129,7 +109,7 @@ class DiagnosticTestQuestionsHandler(
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No corresponding topic exists for the given topic ID.')
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test

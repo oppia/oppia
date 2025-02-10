@@ -18,39 +18,86 @@
 
 import {
   CreatorTopicSummary,
-  CreatorTopicSummaryBackendDict
+  CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
+import {ImageData} from 'pages/classroom-admin-page/existing-classroom.model';
 
 export class ClassroomData {
+  _classroom_id: string;
   _name: string;
+  _urlFragment: string;
   _topicSummaries: CreatorTopicSummary[];
   _courseDetails: string;
   _topicListIntro: string;
+  _teaserText: string;
+  _isPublished: boolean;
+  _thumbnailData: ImageData;
+  _bannerData: ImageData;
+  _publicClassroomsCount: number;
 
   constructor(
-      name: string, topicSummaries: CreatorTopicSummary[],
-      courseDetails: string, topicListIntro: string) {
+    classroomId: string,
+    name: string,
+    urlFragment: string,
+    topicSummaries: CreatorTopicSummary[],
+    courseDetails: string,
+    topicListIntro: string,
+    teaserText: string,
+    isPublished: boolean,
+    thumbnailData: ImageData,
+    bannerData: ImageData,
+    publicClassroomsCount: number
+  ) {
+    this._classroom_id = classroomId;
     this._name = name;
+    this._urlFragment = urlFragment;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
     this._topicListIntro = topicListIntro;
+    this._teaserText = teaserText;
+    this._isPublished = isPublished;
+    this._thumbnailData = thumbnailData;
+    this._bannerData = bannerData;
+    this._publicClassroomsCount = publicClassroomsCount;
   }
 
   static createFromBackendData(
-      name: string, topicSummaryDicts: CreatorTopicSummaryBackendDict[],
-      courseDetails: string, topicListIntro: string): ClassroomData {
-    let topicSummaries = topicSummaryDicts.map(
-      (summaryDict) => {
-        return CreatorTopicSummary.createFromBackendDict(
-          summaryDict);
-      }
-    );
+    classroomId: string,
+    name: string,
+    urlFragment: string,
+    topicSummaryDicts: CreatorTopicSummaryBackendDict[],
+    courseDetails: string,
+    topicListIntro: string,
+    teaserText: string,
+    isPublished: boolean,
+    thumbnailData: ImageData,
+    bannerData: ImageData,
+    publicClassroomsCount: number
+  ): ClassroomData {
+    let topicSummaries = topicSummaryDicts.map(summaryDict => {
+      return CreatorTopicSummary.createFromBackendDict(summaryDict);
+    });
     return new ClassroomData(
-      name, topicSummaries, courseDetails, topicListIntro);
+      classroomId,
+      name,
+      urlFragment,
+      topicSummaries,
+      courseDetails,
+      topicListIntro,
+      teaserText,
+      isPublished,
+      thumbnailData,
+      bannerData,
+      publicClassroomsCount
+    );
   }
 
   getName(): string {
     return this._name;
+  }
+
+  getUrlFragment(): string {
+    return this._urlFragment;
   }
 
   getTopicSummaries(): CreatorTopicSummary[] {
@@ -61,7 +108,31 @@ export class ClassroomData {
     return this._courseDetails;
   }
 
+  getTeaserText(): string {
+    return this._teaserText;
+  }
+
   getTopicListIntro(): string {
     return this._topicListIntro;
+  }
+
+  getThumbnailData(): ImageData {
+    return this._thumbnailData;
+  }
+
+  getBannerData(): ImageData {
+    return this._bannerData;
+  }
+
+  getIsPublished(): boolean {
+    return this._isPublished;
+  }
+
+  getPublicClassroomsCount(): number {
+    return this._publicClassroomsCount;
+  }
+
+  getClassroomId(): string {
+    return this._classroom_id;
   }
 }

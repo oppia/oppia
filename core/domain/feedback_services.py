@@ -24,6 +24,8 @@ import itertools
 from core import feconf
 from core.domain import email_manager
 from core.domain import feedback_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import taskqueue_services
@@ -379,14 +381,24 @@ def create_messages(
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
-    if (feconf.CAN_SEND_EMAILS and (
-            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            author_id is not None and
-            user_services.is_user_registered(author_id)) and
-            # TODO(#12079): Figure out a better way to avoid sending feedback
-            # thread emails for contributor dashboard suggestions.
-            (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
-            should_send_email):
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    # TODO(#12079): Figure out a better way to avoid sending feedback
+    # thread emails for contributor dashboard suggestions.
+    message_changed = (
+        len(text) > 0 or old_statuses[index] != new_statuses[index]
+    )
+    if (
+        server_can_send_emails and
+        feconf.CAN_SEND_TRANSACTIONAL_EMAILS and
+        author_id is not None and
+        user_services.is_user_registered(author_id) and
+        message_changed and
+        should_send_email
+    ):
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],

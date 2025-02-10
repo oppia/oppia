@@ -16,18 +16,20 @@
  * @fileoverview Unit tests for code repl input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { CodeReplValidationService } from
-  'interactions/CodeRepl/directives/code-repl-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
-import { CodeReplCustomizationArgs } from
-  'interactions/customization-args-defs';
+import {AppConstants} from 'app.constants';
+import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
 
 describe('CodeReplValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
@@ -38,7 +40,7 @@ describe('CodeReplValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CodeReplValidationService]
+      providers: [CodeReplValidationService],
     });
 
     validatorService = TestBed.get(CodeReplValidationService);
@@ -52,27 +54,27 @@ describe('CodeReplValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
 
     customizationArguments = {
       language: {
-        value: ''
+        value: '',
       },
       placeholder: {
-        value: ''
+        value: '',
       },
       preCode: {
-        value: ''
+        value: '',
       },
       postCode: {
-        value: ''
-      }
+        value: '',
+      },
     };
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
@@ -80,8 +82,11 @@ describe('CodeReplValidationService', () => {
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
   });
 
@@ -92,11 +97,17 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Programming language name must be a string.'
-    }]);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message: 'Programming language name must be a string.',
+      },
+    ]);
   });
 
   it('should catch non-string value for placeholder text', () => {
@@ -106,11 +117,17 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Placeholder text must be a string.'
-    }]);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message: 'Placeholder text must be a string.',
+      },
+    ]);
   });
 
   it('should catch non-string value for preCode text', () => {
@@ -120,11 +137,17 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'The pre-code text must be a string.'
-    }]);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message: 'The pre-code text must be a string.',
+      },
+    ]);
   });
 
   it('should catch non-string value for postCode text', () => {
@@ -134,10 +157,16 @@ describe('CodeReplValidationService', () => {
     // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, [], null);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'The post-code text must be a string.'
-    }]);
+      currentState,
+      customizationArguments,
+      [],
+      null
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message: 'The post-code text must be a string.',
+      },
+    ]);
   });
 });

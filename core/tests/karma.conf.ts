@@ -1,21 +1,59 @@
 var argv = require('yargs').positional('terminalEnabled', {
   type: 'boolean',
-  'default': false
+  default: false,
 }).argv;
 var path = require('path');
+var webpack = require('webpack');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
-  generatedJs = (
-    'third_party/generated/js/third_party.min.js');
+  generatedJs = 'third_party/generated/js/third_party.min.js';
 }
 
+// Here we are checking if the specs_to_run flag is provided or not. If it is
+// provided, we are splitting the comma separated string into an array of
+// strings. We are then creating a regex pattern to match the spec files
+// provided in the specs_to_run flag. We are then using this pattern to create
+// a context object which will be used in the webpack.ContextReplacementPlugin
+// to only run the spec files provided in the specs_to_run flag.
+var specsToRun = [];
+if (argv.specs_to_run !== undefined) {
+  specsToRun = argv.specs_to_run.split(',');
+}
+
+const SPECS_PATTERN =
+  /^(?!.*(puppeteer-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts|@bcoe)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
+
+let context = SPECS_PATTERN;
+if (argv.specs_to_run !== undefined) {
+  context = specsToRun.reduce((context, file) => {
+    if (!SPECS_PATTERN.test(file)) {
+      return context;
+    }
+    const relativeFile = `./${file}`;
+    context[relativeFile] = relativeFile;
+    return context;
+  }, {});
+}
+
+const webpackPlugins = [];
+if (argv.specs_to_run !== undefined) {
+  webpackPlugins.push(
+    new webpack.ContextReplacementPlugin(
+      /(:?)/,
+      path.resolve(__dirname, '..', '..'),
+      context
+    )
+  );
+} else {
+  webpackPlugins.push(new webpack.ContextReplacementPlugin(/(:?)/, context));
+}
 // Generate a random number between 0 and 999 to use as the seed for the
 // frontend test execution order.
 let jasmineSeed = Math.floor(Math.random() * 1000);
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
@@ -27,7 +65,6 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.8.2/angular-mocks.js',
-      '/third_party/static/lamejs-1.2.0/worker-example/worker-realtime.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -45,31 +82,30 @@ module.exports = function(config) {
         pattern: 'assets/**',
         watched: false,
         served: true,
-        included: false
+        included: false,
       },
       {
         pattern: 'extensions/**/*.png',
         watched: false,
         served: true,
-        included: false
+        included: false,
       },
-      'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
       'extensions/interactions/*.json',
-      'core/tests/data/*.json'
+      'core/tests/data/*.json',
     ],
     exclude: [
       'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      'extensions/classifiers/proto/*'
+      'core/tests/puppeteer-acceptance-tests/*',
     ],
     proxies: {
       // Karma serves files under the /base directory.
       // We access files directly in our code, for example /folder/,
       // so we need to proxy the requests from /folder/ to /base/folder/.
       '/assets/': '/base/assets/',
-      '/extensions/': '/base/extensions/'
+      '/extensions/': '/base/extensions/',
     },
     preprocessors: {
       'core/templates/*.ts': ['webpack'],
@@ -85,7 +121,7 @@ module.exports = function(config) {
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/*.json': ['json_fixtures'],
-      'core/tests/data/*.json': ['json_fixtures']
+      'core/tests/data/*.json': ['json_fixtures'],
     },
     client: {
       jasmine: {
@@ -100,8 +136,8 @@ module.exports = function(config) {
       dir: '../karma_coverage_reports/',
       fixWebpackSourcePaths: true,
       'report-config': {
-        html: { outdir: 'html' }
-      }
+        html: {outdir: 'html'},
+      },
     },
     autoWatch: true,
     browsers: ['CI_Chrome'],
@@ -113,7 +149,7 @@ module.exports = function(config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: argv.terminalEnabled
+      terminal: argv.terminalEnabled,
     },
     // Continue running in the background after running tests.
     singleRun: true,
@@ -127,9 +163,9 @@ module.exports = function(config) {
           '--no-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage',
-          '--js-flags=--max-old-space-size=4096'
-        ]
-      }
+          '--js-flags=--max-old-space-size=4096',
+        ],
+      },
     },
 
     plugins: [
@@ -139,7 +175,7 @@ module.exports = function(config) {
       'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
       'karma-coverage',
-      'karma-webpack'
+      'karma-webpack',
     ],
     ngHtml2JsPreprocessor: {
       moduleName: 'directiveTemplates',
@@ -153,7 +189,7 @@ module.exports = function(config) {
       prependPrefix: '/',
     },
     jsonFixturesPreprocessor: {
-      variableName: '__fixtures__'
+      variableName: '__fixtures__',
     },
 
     webpack: {
@@ -173,8 +209,8 @@ module.exports = function(config) {
           // their full path: 'assets/{{filename}}'.
           'assets/constants': 'constants.ts',
           'assets/rich_text_components_definitions':
-            'rich_text_components_definitions.ts'
-        }
+            'rich_text_components_definitions.ts',
+        },
       },
       devtool: 'inline-cheap-source-map',
       module: {
@@ -187,19 +223,20 @@ module.exports = function(config) {
                 loader: 'ts-loader',
                 options: {
                   // Typescript checks do the type checking.
-                  transpileOnly: true
-                }
+                  transpileOnly: true,
+                },
               },
               {
                 loader: path.resolve(
-                  'angular-template-style-url-replacer.webpack-loader')
-              }
-            ]
+                  'angular-template-style-url-replacer.webpack-loader'
+                ),
+              },
+            ],
           },
           {
             test: /\.html$/,
             exclude: /(directive|component)\.html$/,
-            loader: 'underscore-template-loader'
+            loader: 'underscore-template-loader',
           },
           {
             test: /(directive|component)\.html$/,
@@ -214,8 +251,8 @@ module.exports = function(config) {
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
+              options: {esModules: true},
+            },
           },
           {
             test: /\.css$/,
@@ -223,19 +260,20 @@ module.exports = function(config) {
               {
                 loader: 'style-loader',
                 options: {
-                  esModule: false
-                }
+                  esModule: false,
+                },
               },
               {
                 loader: 'css-loader',
                 options: {
                   url: false,
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
+                },
+              },
+            ],
+          },
+        ],
+      },
+      plugins: webpackPlugins,
+    },
   });
 };

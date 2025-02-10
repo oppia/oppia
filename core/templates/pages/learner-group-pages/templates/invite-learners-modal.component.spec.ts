@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the invite learners modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { InviteLearnersModalComponent } from './invite-learners-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {InviteLearnersModalComponent} from './invite-learners-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,22 +33,21 @@ class MockActiveModal {
   }
 }
 
-describe('Invite Learners Modal Component', function() {
+describe('Invite Learners Modal Component', function () {
   let component: InviteLearnersModalComponent;
   let fixture: ComponentFixture<InviteLearnersModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        InviteLearnersModalComponent,
-        MockTranslatePipe
+      declarations: [InviteLearnersModalComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -70,14 +68,14 @@ describe('Invite Learners Modal Component', function() {
     component.confirm();
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       invitedLearners: component.invitedLearners,
-      invitedLearnersInfo: component.invitedLearnersInfo
+      invitedLearnersInfo: component.invitedLearnersInfo,
     });
   });
 
   it('should update newly invited learners and their info', () => {
     const learnerInfo = LearnerGroupUserInfo.createFromBackendDict({
       username: 'user1',
-      error: ''
+      error: '',
     });
 
     expect(component.invitedLearners).toEqual([]);

@@ -16,13 +16,18 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
-import { UserInfo } from 'domain/user/user-info.model';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {
+  PreferencesBackendDict,
+  UserBackendApiService,
+} from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
@@ -37,13 +42,11 @@ describe('User Backend Api Service', () => {
     userBackendApiService = TestBed.inject(UserBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
 
-
-    spyOn(csrfService, 'getTokenAsync').and.callFake(
-      async() => {
-        return new Promise((resolve, reject) => {
-          resolve('sample-csrf-token');
-        });
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
+      return new Promise((resolve, reject) => {
+        resolve('sample-csrf-token');
       });
+    });
   });
 
   afterEach(() => {
@@ -62,25 +65,28 @@ describe('User Backend Api Service', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
     const sampleUserInfo = UserInfo.createFromBackendDict(
-      sampleUserInfoBackendObject);
+      sampleUserInfoBackendObject
+    );
 
-    userBackendApiService.getUserInfoAsync().then((userInfo) => {
+    userBackendApiService.getUserInfoAsync().then(userInfo => {
       expect(userInfo.isCurriculumAdmin()).toBe(
-        sampleUserInfo.isCurriculumAdmin());
+        sampleUserInfo.isCurriculumAdmin()
+      );
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());
-      expect(userInfo.isLoggedIn()).toBe(
-        sampleUserInfo.isLoggedIn());
+      expect(userInfo.isLoggedIn()).toBe(sampleUserInfo.isLoggedIn());
       expect(userInfo.canCreateCollections()).toBe(
-        sampleUserInfo.canCreateCollections());
+        sampleUserInfo.canCreateCollections()
+      );
       expect(userInfo.getUsername()).toBe(sampleUserInfo.getUsername());
       expect(userInfo.getEmail()).toBe(sampleUserInfo.getEmail());
       expect(userInfo.getPreferredSiteLanguageCode()).toBe(
-        sampleUserInfo.getPreferredSiteLanguageCode());
+        sampleUserInfo.getPreferredSiteLanguageCode()
+      );
     });
 
     const req = httpTestingController.expectOne('/userinfohandler');
@@ -102,11 +108,11 @@ describe('User Backend Api Service', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: false
+      user_is_logged_in: false,
     };
     const sampleUserInfo = UserInfo.createDefault();
 
-    userBackendApiService.getUserInfoAsync().then((userInfo) => {
+    userBackendApiService.getUserInfoAsync().then(userInfo => {
       expect(userInfo).toEqual(sampleUserInfo);
     });
     const req = httpTestingController.expectOne('/userinfohandler');
@@ -120,43 +126,46 @@ describe('User Backend Api Service', () => {
     const loginUrl = '/login';
     const currentUrl = 'dummy';
 
-    userBackendApiService.getLoginUrlAsync(currentUrl).then((dataUrl) => {
+    userBackendApiService.getLoginUrlAsync(currentUrl).then(dataUrl => {
       expect(dataUrl).toBe(loginUrl);
     });
     const req = httpTestingController.expectOne(
-      '/url_handler?current_url=' + currentUrl);
+      '/url_handler?current_url=' + currentUrl
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({login_url: loginUrl});
 
     flushMicrotasks();
   }));
 
-  it('should handle when set profile image data url is reject',
-    fakeAsync(() => {
-      const newProfileImageDataurl = '/avatar/x.png';
-      const errorMessage = 'It\'s not possible to set a new profile image data';
-      userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl);
-      const req = httpTestingController.expectOne('/preferenceshandler/data');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(errorMessage);
+  it('should handle when set profile image data url is reject', fakeAsync(() => {
+    const newProfileImageDataurl = '/avatar/x.png';
+    const errorMessage = "It's not possible to set a new profile image data";
+    userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl);
+    const req = httpTestingController.expectOne('/preferenceshandler/data');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(errorMessage);
 
-      flushMicrotasks();
-    }));
+    flushMicrotasks();
+  }));
 
   it('should return user contribution rights data', fakeAsync(() => {
     const sampleUserContributionRightsDict = {
       translation: ['hi'],
       voiceover: [],
-      question: true
+      question: true,
     };
 
-    userBackendApiService.getUserContributionRightsDataAsync().then(
-      (userContributionRights) => {
-        expect(userContributionRights).
-          toEqual(sampleUserContributionRightsDict);
+    userBackendApiService
+      .getUserContributionRightsDataAsync()
+      .then(userContributionRights => {
+        expect(userContributionRights).toEqual(
+          sampleUserContributionRightsDict
+        );
       });
     const req = httpTestingController.expectOne(
-      '/usercontributionrightsdatahandler');
+      '/usercontributionrightsdatahandler'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(sampleUserContributionRightsDict);
 
@@ -175,9 +184,9 @@ describe('User Backend Api Service', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: true,
       can_receive_subscription_email: true,
-      subscription_list: []
+      subscription_list: [],
     };
-    userBackendApiService.getPreferencesAsync().then((preferencesData) => {
+    userBackendApiService.getPreferencesAsync().then(preferencesData => {
       expect(preferencesData).toEqual(samplePreferencesData);
     });
 
@@ -193,7 +202,8 @@ describe('User Backend Api Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    userBackendApiService.updatePreferredSiteLanguageAsync('en')
+    userBackendApiService
+      .updatePreferredSiteLanguageAsync('en')
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(siteLanguageUrl);

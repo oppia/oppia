@@ -1,5 +1,5 @@
 <mat-card class="oppia-editor-card-with-avatar">
-  <mat-card-header class=" oppia-mobile-collapsible-card-header"
+  <mat-card-header class=" oppia-mobile-collapsible-card-header e2e-test-toggle-skill-card"
                    (click)="toggleSkillEditor()">
     <mat-card-title class="oppia-exp-skill-card-header">
       Skill
@@ -11,7 +11,7 @@
   </mat-card-header>
   <mat-card-actions class="oppia-skill-button-container" *ngIf="skillEditorIsShown && !stateLinkedSkillIdService.displayed">
     <button type="button"
-            class="btn btn-primary oppia-add-skill-button"
+            class="btn btn-primary oppia-add-skill-button e2e-test-add-skill-button"
             (click)="addSkill()">
       + ADD SKILL
     </button>

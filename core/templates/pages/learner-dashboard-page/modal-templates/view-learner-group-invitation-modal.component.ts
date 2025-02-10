@@ -16,23 +16,20 @@
  * @fileoverview Component for view learner group invitation modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
 
 @Component({
   selector: 'oppia-view-learner-group-invitation-modal',
-  templateUrl: './view-learner-group-invitation-modal.component.html'
+  templateUrl: './view-learner-group-invitation-modal.component.html',
 })
-export class ViewLearnerGroupInvitationModalComponent
-  extends ConfirmOrCancelModal {
+export class ViewLearnerGroupInvitationModalComponent extends ConfirmOrCancelModal {
   learnerGroup!: ShortLearnerGroupSummary;
   progressSharingPermission: boolean = true;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

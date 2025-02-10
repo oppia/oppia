@@ -16,19 +16,20 @@
  * @fileoverview Unit tests for StoryViewerBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {LearnerExplorationSummary} from
-  'domain/summary/learner-exploration-summary.model';
-import { StoryPlaythrough } from
-  'domain/story_viewer/story-playthrough.model';
-import { StoryDataDict, StoryViewerBackendApiService } from
-  'domain/story_viewer/story-viewer-backend-api.service';
-import { ChapterProgressSummary } from
-  'domain/exploration/chapter-progress-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {
+  StoryDataDict,
+  StoryViewerBackendApiService,
+} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -36,7 +37,7 @@ describe('Story viewer backend API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
@@ -47,64 +48,64 @@ describe('Story viewer backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing story from the backend',
-    fakeAsync(() => {
-      let sampleDataResults = {
-        story_id: 'qwerty',
-        story_title: 'Story title',
-        story_description: 'Story description',
-        story_nodes: [],
-        topic_name: 'Topic name',
-        meta_tag_content: 'Story meta tag content'
-      };
+  it('should successfully fetch an existing story from the backend', fakeAsync(() => {
+    let sampleDataResults = {
+      story_id: 'qwerty',
+      story_title: 'Story title',
+      story_description: 'Story description',
+      story_nodes: [],
+      topic_name: 'Topic name',
+      meta_tag_content: 'Story meta tag content',
+    };
 
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryDataAsync(
-        'abbrev', 'staging', '0').then(successHandler, failHandler);
+    storyViewerBackendApiService
+      .fetchStoryDataAsync('abbrev', 'staging', '0')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/story_data_handler/staging/abbrev/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    let req = httpTestingController.expectOne(
+      '/story_data_handler/staging/abbrev/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        StoryPlaythrough.createFromBackendDict(
-          sampleDataResults));
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(
+      StoryPlaythrough.createFromBackendDict(sampleDataResults)
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should handle errorCallback for fetching an existing story',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should handle errorCallback for fetching an existing story', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.fetchStoryDataAsync(
-        'abbrev', 'staging', '0').then(successHandler, failHandler);
+    storyViewerBackendApiService
+      .fetchStoryDataAsync('abbrev', 'staging', '0')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/story_data_handler/staging/abbrev/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    let req = httpTestingController.expectOne(
+      '/story_data_handler/staging/abbrev/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
-  it('should successfully record a chapter as completed from the backend',
-    fakeAsync(() => {
-      let sampleDataResults = {
-        summaries: [{
+  it('should successfully record a chapter as completed from the backend', fakeAsync(() => {
+    let sampleDataResults = {
+      summaries: [
+        {
           last_updated_msec: 1591296737470.528,
           community_owned: false,
           objective: 'Test Objective',
@@ -120,112 +121,115 @@ describe('Story viewer backend API service', () => {
             2: 0,
             3: 0,
             4: 0,
-            5: 0
+            5: 0,
           },
           status: 'public',
           tags: [],
           activity_type: 'exploration',
           category: 'Algebra',
-          title: 'Test Title'
-        }],
-        next_node_id: 'node_2',
-        ready_for_review_test: true,
-      };
+          title: 'Test Title',
+        },
+      ],
+      next_node_id: 'node_2',
+      ready_for_review_test: true,
+    };
 
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.recordChapterCompletionAsync(
-        'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
+    storyViewerBackendApiService
+      .recordChapterCompletionAsync('abbrev', 'staging', '0', 'node_1')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/story_progress_handler/staging/abbrev/0/node_1');
-      expect(req.request.method).toEqual('POST');
-      req.flush(sampleDataResults);
+    let req = httpTestingController.expectOne(
+      '/story_progress_handler/staging/abbrev/0/node_1'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith({
-        summaries: sampleDataResults.summaries.map(
-          expSummary => LearnerExplorationSummary.createFromBackendDict(
-            expSummary)),
-        nextNodeId: sampleDataResults.next_node_id,
-        readyForReviewTest: sampleDataResults.ready_for_review_test});
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith({
+      summaries: sampleDataResults.summaries.map(expSummary =>
+        LearnerExplorationSummary.createFromBackendDict(expSummary)
+      ),
+      nextNodeId: sampleDataResults.next_node_id,
+      readyForReviewTest: sampleDataResults.ready_for_review_test,
+    });
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should handle errorCallback for recording a chapter as completed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should handle errorCallback for recording a chapter as completed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      storyViewerBackendApiService.recordChapterCompletionAsync(
-        'abbrev', 'staging', '0', 'node_1').then(successHandler, failHandler);
+    storyViewerBackendApiService
+      .recordChapterCompletionAsync('abbrev', 'staging', '0', 'node_1')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/story_progress_handler/staging/abbrev/0/node_1');
-      expect(req.request.method).toEqual('POST');
+    let req = httpTestingController.expectOne(
+      '/story_progress_handler/staging/abbrev/0/node_1'
+    );
+    expect(req.request.method).toEqual('POST');
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
-  it('should emit the story data event correctly', function() {
+  it('should emit the story data event correctly', function () {
     let storyDataEventEmitter = new EventEmitter<StoryDataDict>();
     expect(storyViewerBackendApiService.onSendStoryData).toEqual(
-      storyDataEventEmitter);
+      storyDataEventEmitter
+    );
   });
 
-  it('should successfully fetch learners progress in stories chapters',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch learners progress in stories chapters', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      const CHAPTERS_PROGRESS_SUMMARY_URL = (
-        '/user_progress_in_stories_chapters_handler/user1');
+    const CHAPTERS_PROGRESS_SUMMARY_URL =
+      '/user_progress_in_stories_chapters_handler/user1';
 
-      const chapterProgressSummaryDicts = [
-        {
-          total_checkpoints_count: 6,
-          visited_checkpoints_count: 5
-        },
-        {
-          total_checkpoints_count: 3,
-          visited_checkpoints_count: 0
-        },
-        {
-          total_checkpoints_count: 4,
-          visited_checkpoints_count: 4
-        },
-      ];
+    const chapterProgressSummaryDicts = [
+      {
+        total_checkpoints_count: 6,
+        visited_checkpoints_count: 5,
+      },
+      {
+        total_checkpoints_count: 3,
+        visited_checkpoints_count: 0,
+      },
+      {
+        total_checkpoints_count: 4,
+        visited_checkpoints_count: 4,
+      },
+    ];
 
-      storyViewerBackendApiService
-        .fetchProgressInStoriesChapters('user1', ['story_id_1', 'story_id_2'])
-        .then(successHandler, failHandler);
+    storyViewerBackendApiService
+      .fetchProgressInStoriesChapters('user1', ['story_id_1', 'story_id_2'])
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        CHAPTERS_PROGRESS_SUMMARY_URL +
-        '?story_ids=%5B%22story_id_1%22,%22story_id_2%22%5D');
-      expect(req.request.method).toEqual('GET');
-      req.flush(chapterProgressSummaryDicts);
+    var req = httpTestingController.expectOne(
+      CHAPTERS_PROGRESS_SUMMARY_URL +
+        '?story_ids=%5B%22story_id_1%22,%22story_id_2%22%5D'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(chapterProgressSummaryDicts);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        chapterProgressSummaryDicts.map(
-          progressInfoDict => ChapterProgressSummary.createFromBackendDict(
-            progressInfoDict)
-        ));
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(
+      chapterProgressSummaryDicts.map(progressInfoDict =>
+        ChapterProgressSummary.createFromBackendDict(progressInfoDict)
+      )
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

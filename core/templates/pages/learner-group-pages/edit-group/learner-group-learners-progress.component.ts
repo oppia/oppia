@@ -16,23 +16,21 @@
  * @fileoverview Component for the learner group all learners progress.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { NavigationService } from 'services/navigation.service';
-import { UserService } from 'services/user.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {NavigationService} from 'services/navigation.service';
+import {UserService} from 'services/user.service';
 
 import './learner-group-learners-progress.component.css';
-
 
 @Component({
   selector: 'oppia-learner-group-learners-progress',
   templateUrl: './learner-group-learners-progress.component.html',
-  styleUrls: ['./learner-group-learners-progress.component.css']
+  styleUrls: ['./learner-group-learners-progress.component.css'],
 })
 export class LearnerGroupLearnersProgressComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
@@ -44,8 +42,7 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   storiesChaptersProgress: ChapterProgressSummary[] = [];
 
   constructor(
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService,
+    private learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService,
     private navigationService: NavigationService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private userService: UserService
@@ -55,8 +52,10 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
     if (this.learnerGroup.learnerUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
         .fetchLearnersProgressInAssignedSyllabus(
-          this.learnerGroup.id, this.learnerGroup.learnerUsernames
-        ).then(learnersProgress => {
+          this.learnerGroup.id,
+          this.learnerGroup.learnerUsernames
+        )
+        .then(learnersProgress => {
           this.learnersProgress = learnersProgress;
           this.matchingUsersProgress = this.learnersProgress;
         });
@@ -79,10 +78,11 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
 
   getStrugglingSubtopicsCountOfLearner(index: number): number {
     let strugglingSubtopicsCount = 0;
-    const subtopicsProgress = (
-      this.matchingUsersProgress[index].subtopicsProgress);
+    const subtopicsProgress =
+      this.matchingUsersProgress[index].subtopicsProgress;
     subtopicsProgress.forEach(subtopicProgress => {
-      if (subtopicProgress.subtopicMastery &&
+      if (
+        subtopicProgress.subtopicMastery &&
         subtopicProgress.subtopicMastery < 0.6
       ) {
         strugglingSubtopicsCount += 1;
@@ -92,20 +92,16 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 
-  activateLearnerSpecificView(
-      learnerProgress: LearnerGroupUserProgress
-  ): void {
+  activateLearnerSpecificView(learnerProgress: LearnerGroupUserProgress): void {
     this.learnerSpecificProgressViewIsActive = true;
     this.specificLearnerProgress = learnerProgress;
   }
@@ -119,7 +115,7 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
   }
 
   updateLearnerSpecificProgress(
-      learnerProgress: LearnerGroupUserProgress
+    learnerProgress: LearnerGroupUserProgress
   ): void {
     this.specificLearnerProgress = learnerProgress;
     let syllabusStoryIds: string[] = [];
@@ -127,20 +123,24 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
       syllabusStoryIds.push(storyProgress.getId());
     });
 
-    this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
-      learnerProgress.username, syllabusStoryIds
-    ).then(storiesChaptersProgress => {
-      this.storiesChaptersProgress = storiesChaptersProgress;
-    });
+    this.storyViewerBackendApiService
+      .fetchProgressInStoriesChapters(
+        learnerProgress.username,
+        syllabusStoryIds
+      )
+      .then(storiesChaptersProgress => {
+        this.storiesChaptersProgress = storiesChaptersProgress;
+      });
   }
 
   getSearchUsernameResults(): LearnerGroupUserProgress[] {
     if (this.searchUsernameQuery === '') {
       this.matchingUsersProgress = this.learnersProgress;
     }
-    this.matchingUsersProgress = this.learnersProgress.filter(
-      learnerProgress => learnerProgress.username.toLowerCase().includes(
-        this.searchUsernameQuery.toLocaleLowerCase())
+    this.matchingUsersProgress = this.learnersProgress.filter(learnerProgress =>
+      learnerProgress.username
+        .toLowerCase()
+        .includes(this.searchUsernameQuery.toLocaleLowerCase())
     );
     return this.matchingUsersProgress;
   }
@@ -155,7 +155,3 @@ export class LearnerGroupLearnersProgressComponent implements OnInit {
     this.navigationService.openSubmenu(evt, menuName);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerGroupLearnersProgress',
-  downgradeComponent({component: LearnerGroupLearnersProgressComponent}));

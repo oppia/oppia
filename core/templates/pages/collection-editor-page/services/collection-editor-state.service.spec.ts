@@ -16,21 +16,26 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
-import { CollectionRights, CollectionRightsBackendDict } from 'domain/collection/collection-rights.model';
-import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorStateService } from './collection-editor-state.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {CollectionRightsBackendApiService} from 'domain/collection/collection-rights-backend-api.service';
+import {
+  CollectionRights,
+  CollectionRightsBackendDict,
+} from 'domain/collection/collection-rights.model';
+import {
+  Collection,
+  CollectionBackendDict,
+} from 'domain/collection/collection.model';
+import {EditableCollectionBackendApiService} from 'domain/collection/editable-collection-backend-api.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorStateService} from './collection-editor-state.service';
 
 describe('Collection editor state service', () => {
   let collectionEditorStateService: CollectionEditorStateService;
-  let collectionRightsBackendApiService:
-    CollectionRightsBackendApiService;
+  let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let undoRedoService: UndoRedoService;
   let alertsService: AlertsService;
   let editableCollectionBackendApiService: EditableCollectionBackendApiService;
@@ -50,16 +55,18 @@ describe('Collection editor state service', () => {
       providers: [
         EditableCollectionBackendApiService,
         CollectionRightsBackendApiService,
-        AlertsService
-      ]
+        AlertsService,
+      ],
     });
 
     collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     editableCollectionBackendApiService = TestBed.inject(
-      EditableCollectionBackendApiService);
+      EditableCollectionBackendApiService
+    );
     collectionRightsBackendApiService = TestBed.inject(
-      CollectionRightsBackendApiService);
+      CollectionRightsBackendApiService
+    );
     alertsService = TestBed.inject(AlertsService);
 
     sampleCollectionBackendDict = {
@@ -74,8 +81,8 @@ describe('Collection editor state service', () => {
       tags: null,
       playthrough_dict: {
         next_exploration_id: 'expId',
-        completed_exploration_ids: ['expId2']
-      }
+        completed_exploration_ids: ['expId2'],
+      },
     };
 
     sampleCollection = Collection.create(sampleCollectionBackendDict);
@@ -85,18 +92,21 @@ describe('Collection editor state service', () => {
       can_edit: true,
       can_unpublish: false,
       is_private: true,
-      owner_names: ['A']
+      owner_names: ['A'],
     };
 
     sampleCollectionRights = CollectionRights.create(
-      sampleCollectionRightsDict);
+      sampleCollectionRightsDict
+    );
   }));
 
   beforeEach(() => {
     testSubscriptions = new Subscription();
     testSubscriptions.add(
       collectionEditorStateService.onCollectionInitialized.subscribe(
-        collectionInitializedSpy));
+        collectionInitializedSpy
+      )
+    );
 
     alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
   });
@@ -107,8 +117,7 @@ describe('Collection editor state service', () => {
 
   it('should fire an init event after loading the first collection', () => {
     collectionEditorStateService.loadCollection('5');
-  }
-  );
+  });
 
   it('should fire an update event after loading more collections', () => {
     // Load initial collection.
@@ -122,14 +131,12 @@ describe('Collection editor state service', () => {
     expect(collectionEditorStateService.isLoadingCollection()).toBe(true);
   });
 
-  it('should report that a collection has loaded through loadCollection()',
-    () => {
-      expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
+  it('should report that a collection has loaded through loadCollection()', () => {
+    expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      collectionEditorStateService.loadCollection('5');
-      expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
-    }
-  );
+    collectionEditorStateService.loadCollection('5');
+    expect(collectionEditorStateService.hasLoadedCollection()).toBe(false);
+  });
 
   it('should initially return an empty collection', () => {
     let collection = collectionEditorStateService.getCollection();
@@ -151,8 +158,9 @@ describe('Collection editor state service', () => {
 
   it('should load a collection successfully', fakeAsync(() => {
     let fetchCollectionSpy = spyOn(
-      editableCollectionBackendApiService, 'fetchCollectionAsync')
-      .and.resolveTo(sampleCollection);
+      editableCollectionBackendApiService,
+      'fetchCollectionAsync'
+    ).and.resolveTo(sampleCollection);
 
     // Load initial collection.
     collectionEditorStateService.loadCollection('sample_collection_id');
@@ -161,27 +169,32 @@ describe('Collection editor state service', () => {
     expect(fetchCollectionSpy).toHaveBeenCalled();
   }));
 
-  it('should throw error if there was an error while ' +
-    'loading collection', fakeAsync(() => {
-    let fetchCollectionSpy = spyOn(
-      editableCollectionBackendApiService, 'fetchCollectionAsync')
-      .and.rejectWith();
-    const loadCollectionSuccessCb = jasmine.createSpy('success');
+  it(
+    'should throw error if there was an error while ' + 'loading collection',
+    fakeAsync(() => {
+      let fetchCollectionSpy = spyOn(
+        editableCollectionBackendApiService,
+        'fetchCollectionAsync'
+      ).and.rejectWith();
+      const loadCollectionSuccessCb = jasmine.createSpy('success');
 
-    // Load initial collection.
-    collectionEditorStateService.loadCollection('sample_collection_id');
-    tick();
+      // Load initial collection.
+      collectionEditorStateService.loadCollection('sample_collection_id');
+      tick();
 
-    expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionSuccessCb).not.toHaveBeenCalled();
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'There was an error when loading the collection.');
-  }));
+      expect(fetchCollectionSpy).toHaveBeenCalled();
+      expect(loadCollectionSuccessCb).not.toHaveBeenCalled();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'There was an error when loading the collection.'
+      );
+    })
+  );
 
   it('should load a collection rights successfully', fakeAsync(() => {
     let fetchCollectionSpy = spyOn(
-      collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
-      .and.resolveTo(sampleCollectionRights);
+      collectionRightsBackendApiService,
+      'fetchCollectionRightsAsync'
+    ).and.resolveTo(sampleCollectionRights);
 
     // Load initial collection.
     collectionEditorStateService.loadCollection('sample_collection_id');
@@ -191,50 +204,54 @@ describe('Collection editor state service', () => {
     expect(fetchCollectionSpy).toHaveBeenCalled();
   }));
 
-  it('should throw error if there was an error while ' +
-    'loading collection rights', fakeAsync(() => {
-    let fetchCollectionSpy = spyOn(
-      collectionRightsBackendApiService, 'fetchCollectionRightsAsync')
-      .and.rejectWith();
-    const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
-
-    // Load initial collection.
-    collectionEditorStateService.loadCollection('sample_collection_id');
-    tick();
-
-    expect(fetchCollectionSpy).toHaveBeenCalled();
-    expect(loadCollectionRightsSuccessCb).not.toHaveBeenCalled();
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'There was an error when loading the collection rights.');
-  }));
-
-  it('should not save the collection if there are no pending changes',
+  it(
+    'should throw error if there was an error while ' +
+      'loading collection rights',
     fakeAsync(() => {
-      // Setting pending changes to be false.
-      spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
-      const saveCollectionsuccessCb = jasmine.createSpy('success');
+      let fetchCollectionSpy = spyOn(
+        collectionRightsBackendApiService,
+        'fetchCollectionRightsAsync'
+      ).and.rejectWith();
+      const loadCollectionRightsSuccessCb = jasmine.createSpy('success');
 
       // Load initial collection.
       collectionEditorStateService.loadCollection('sample_collection_id');
       tick();
 
-      collectionEditorStateService.setCollection(sampleCollection);
+      expect(fetchCollectionSpy).toHaveBeenCalled();
+      expect(loadCollectionRightsSuccessCb).not.toHaveBeenCalled();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'There was an error when loading the collection rights.'
+      );
+    })
+  );
 
-      let savedChanges = collectionEditorStateService.saveCollection(
-        'commit message');
+  it('should not save the collection if there are no pending changes', fakeAsync(() => {
+    // Setting pending changes to be false.
+    spyOn(undoRedoService, 'hasChanges').and.returnValue(false);
+    const saveCollectionsuccessCb = jasmine.createSpy('success');
 
-      expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
-      expect(savedChanges).toBe(false);
-    }
-    ));
+    // Load initial collection.
+    collectionEditorStateService.loadCollection('sample_collection_id');
+    tick();
+
+    collectionEditorStateService.setCollection(sampleCollection);
+
+    let savedChanges =
+      collectionEditorStateService.saveCollection('commit message');
+
+    expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
+    expect(savedChanges).toBe(false);
+  }));
 
   it('should save pending changes of a collection', fakeAsync(() => {
     // Setting pending changes to be true.
     spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
-    spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
-      .and.resolveTo(sampleCollection);
+    spyOn(
+      editableCollectionBackendApiService,
+      'updateCollectionAsync'
+    ).and.resolveTo(sampleCollection);
     const saveCollectionsuccessCb = jasmine.createSpy('success');
-
 
     // Load initial collection.
     collectionEditorStateService.loadCollection('sample_collection_id');
@@ -243,44 +260,48 @@ describe('Collection editor state service', () => {
     collectionEditorStateService.setCollection(sampleCollection);
 
     let savedChanges = collectionEditorStateService.saveCollection(
-      'commit message', saveCollectionsuccessCb);
+      'commit message',
+      saveCollectionsuccessCb
+    );
     tick();
 
     expect(saveCollectionsuccessCb).toHaveBeenCalled();
     expect(savedChanges).toBe(true);
   }));
 
-  it('should fail to save collection in case of backend ' +
-    'error', fakeAsync(() => {
-    // Setting pending changes to be true.
-    spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
-    spyOn(editableCollectionBackendApiService, 'updateCollectionAsync')
-      .and.rejectWith();
-    const saveCollectionsuccessCb = jasmine.createSpy('success');
-
-
-    // Load initial collection.
-    collectionEditorStateService.loadCollection('sample_collection_id');
-    tick();
-
-    collectionEditorStateService.setCollection(sampleCollection);
-
-    collectionEditorStateService.saveCollection(
-      'commit message');
-    tick();
-
-    expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'There was an error when saving the collection.');
-  }));
-
-  it('should fail to save the collection without first loading one',
+  it(
+    'should fail to save collection in case of backend ' + 'error',
     fakeAsync(() => {
-      let savedChanges = collectionEditorStateService.saveCollection(
-        'Commit message');
+      // Setting pending changes to be true.
+      spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
+      spyOn(
+        editableCollectionBackendApiService,
+        'updateCollectionAsync'
+      ).and.rejectWith();
+      const saveCollectionsuccessCb = jasmine.createSpy('success');
+
+      // Load initial collection.
+      collectionEditorStateService.loadCollection('sample_collection_id');
       tick();
-      expect(savedChanges).toBeFalse();
-    }));
+
+      collectionEditorStateService.setCollection(sampleCollection);
+
+      collectionEditorStateService.saveCollection('commit message');
+      tick();
+
+      expect(saveCollectionsuccessCb).not.toHaveBeenCalled();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'There was an error when saving the collection.'
+      );
+    })
+  );
+
+  it('should fail to save the collection without first loading one', fakeAsync(() => {
+    let savedChanges =
+      collectionEditorStateService.saveCollection('Commit message');
+    tick();
+    expect(savedChanges).toBeFalse();
+  }));
 
   it('should check whether a collection is being saved', () => {
     let result = collectionEditorStateService.isSavingCollection();

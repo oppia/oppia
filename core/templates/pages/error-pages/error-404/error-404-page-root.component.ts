@@ -18,13 +18,13 @@
 
 // This page is used as error page for 404 status code.
 
-import { Component } from '@angular/core';
-import { LoggerService } from 'services/contextual/logger.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {Component} from '@angular/core';
+import {LoggerService} from 'services/contextual/logger.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-error-page-root',
-  templateUrl: './error-404-page-root.component.html'
+  templateUrl: './error-404-page-root.component.html',
 })
 export class Error404PageRootComponent {
   constructor(

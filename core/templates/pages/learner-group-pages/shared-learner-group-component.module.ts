@@ -16,40 +16,37 @@
  * @fileoverview Module for the shared learner group components.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { CommonModule } from '@angular/common';
-import { AddSyllabusItemsComponent } from './create-group/add-syllabus-items.component';
-import { InviteLearnersComponent } from './create-group/invite-learners.component';
-import { LearnerGroupDetailsComponent } from './create-group/learner-group-details.component';
-import { LearnerGroupOverviewComponent } from './edit-group/learner-group-overview.component';
-import { LearnerGroupLearnerSpecificProgressComponent } from './edit-group/learner-group-learner-specific-progress.component';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {CommonModule} from '@angular/common';
+import {AddSyllabusItemsComponent} from './create-group/add-syllabus-items.component';
+import {InviteLearnersComponent} from './create-group/invite-learners.component';
+import {LearnerGroupDetailsComponent} from './create-group/learner-group-details.component';
+import {LearnerGroupOverviewComponent} from './edit-group/learner-group-overview.component';
+import {LearnerGroupLearnerSpecificProgressComponent} from './edit-group/learner-group-learner-specific-progress.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule
-  ],
+  imports: [CommonModule, SharedComponentsModule],
   declarations: [
     LearnerGroupDetailsComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
-    InviteLearnersComponent
+    InviteLearnersComponent,
   ],
   entryComponents: [
     LearnerGroupDetailsComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
-    InviteLearnersComponent
+    InviteLearnersComponent,
   ],
   exports: [
     LearnerGroupDetailsComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupLearnerSpecificProgressComponent,
     AddSyllabusItemsComponent,
-    InviteLearnersComponent
-  ]
+    InviteLearnersComponent,
+  ],
 })
 export class SharedLearnerGroupComponentsModule {}

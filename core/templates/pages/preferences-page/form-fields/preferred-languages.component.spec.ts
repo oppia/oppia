@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the preferred languages component.
  */
 
-import { ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'modules/material.module';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PreferredLanguagesComponent } from './preferred-languages.component';
+import {ElementRef} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from 'modules/material.module';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PreferredLanguagesComponent} from './preferred-languages.component';
 
 describe('Preferred Languages Component', () => {
   let componentInstance: PreferredLanguagesComponent;
@@ -34,12 +34,9 @@ describe('Preferred Languages Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
       ],
-      declarations: [
-        MockTranslatePipe,
-        PreferredLanguagesComponent
-      ]
+      declarations: [MockTranslatePipe, PreferredLanguagesComponent],
     }).compileComponents();
   }));
 
@@ -56,64 +53,102 @@ describe('Preferred Languages Component', () => {
     fixture.detectChanges();
     let value = 'en';
     componentInstance.preferredLanguages = [];
-    componentInstance.choices = [{
-      id: 'en',
-      text: 'English'
-    }];
-    componentInstance.formCtrl = {
-      valueChanges: {
-        subscribe(callb: (val: string) => void) {
-          callb(value);
-        }
-      }
-    } as FormControl;
-    componentInstance.ngOnInit();
+    componentInstance.choices = [
+      {
+        id: 'en',
+        text: 'English',
+        ariaLabelInEnglish: 'English',
+      },
+    ];
+    componentInstance.formCtrl = new FormControl(value);
+    componentInstance.ngAfterViewInit();
+    fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeFalse();
-    value = '';
-    componentInstance.formCtrl = {
-      valueChanges: {
-        subscribe(callb: (val: string) => void) {
-          callb(value);
-        }
-      }
-    } as FormControl;
-    componentInstance.ngOnInit();
+    componentInstance.formCtrl.setValue('fr');
+    componentInstance.ngAfterViewInit();
+    fixture.detectChanges();
     expect(componentInstance.chipList.errorState).toBeTrue();
+    componentInstance.formCtrl.setValue('en');
+    componentInstance.ngAfterViewInit();
+    fixture.detectChanges();
+    expect(componentInstance.chipList.errorState).toBeFalse();
   });
 
   it('should validate input', () => {
     componentInstance.preferredLanguages = [];
-    componentInstance.choices = [{
-      id: 'en',
-      text: 'English'
-    }];
+    componentInstance.choices = [
+      {
+        id: 'en',
+        text: 'English',
+        ariaLabelInEnglish: 'English',
+      },
+    ];
+    componentInstance.filteredChoices = [
+      {
+        id: 'en',
+        text: 'English',
+        ariaLabelInEnglish: 'English',
+      },
+    ];
     expect(componentInstance.validInput('en')).toBeTrue();
   });
 
+  it('should filter choices when search query is non-empty', () => {
+    const mockChoices = [
+      {id: 'en', text: 'English', ariaLabelInEnglish: 'English'},
+      {id: 'fr', text: 'French', ariaLabelInEnglish: 'French'},
+      {id: 'de', text: 'German', ariaLabelInEnglish: 'German'},
+    ];
+    componentInstance.choices = [...mockChoices];
+    componentInstance.searchQuery = 'en';
+    componentInstance.onSearchInputChange();
+    const expectedFilteredChoice = [
+      {id: 'en', text: 'English', ariaLabelInEnglish: 'English'},
+      {id: 'fr', text: 'French', ariaLabelInEnglish: 'French'},
+    ];
+    expect(componentInstance.filteredChoices).toEqual(expectedFilteredChoice);
+  });
+
+  it('should not show any choices when search query does not match', () => {
+    const mockChoices = [
+      {id: 'en', text: 'English', ariaLabelInEnglish: 'English'},
+      {id: 'fr', text: 'French', ariaLabelInEnglish: 'French'},
+    ];
+    componentInstance.choices = [...mockChoices];
+    componentInstance.searchQuery = 'de';
+    expect(componentInstance.filteredChoices).toEqual([]);
+  });
+
   it('should add language', () => {
-    spyOn(componentInstance.preferredLanguagesChange, 'emit');
+    spyOn(componentInstance, 'onChange');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
     componentInstance.preferredLanguages = [];
-    componentInstance.choices = [{
-      id: 'en',
-      text: 'English'
-    }];
+    componentInstance.choices = [
+      {
+        id: 'en',
+        text: 'English',
+        ariaLabelInEnglish: 'English',
+      },
+    ];
     componentInstance.languageInput = {
       nativeElement: {
-        value: ''
-      }
+        value: '',
+      },
     } as ElementRef;
     componentInstance.add({value: 'en'});
     componentInstance.add({value: ''});
-    expect(componentInstance.preferredLanguagesChange.emit).toHaveBeenCalled();
+    expect(componentInstance.onChange).toHaveBeenCalled();
   });
 
   it('should remove language', () => {
     componentInstance.preferredLanguages = ['en'];
-    let choices = [{
-      id: 'en',
-      text: 'English'
-    }];
+    let choices = [
+      {
+        id: 'en',
+        text: 'English',
+        ariaLabelInEnglish: 'English',
+      },
+    ];
     componentInstance.choices = choices;
     componentInstance.remove('en');
     expect(componentInstance.preferredLanguages).toEqual([]);
@@ -124,13 +159,29 @@ describe('Preferred Languages Component', () => {
     spyOn(componentInstance, 'add');
     spyOn(componentInstance, 'remove');
     componentInstance.preferredLanguages = ['en'];
-    componentInstance.selected(
-      { option: { value: 'en' }});
+    componentInstance.selected({option: {value: 'en'}});
     expect(componentInstance.remove).toHaveBeenCalled();
     expect(componentInstance.add).not.toHaveBeenCalled();
     componentInstance.preferredLanguages = [];
-    componentInstance.selected(
-      { option: { value: 'en' }});
+    componentInstance.selected({option: {value: 'en'}});
     expect(componentInstance.add).toHaveBeenCalled();
+  });
+
+  it('should write value', () => {
+    const codes = ['en', 'hi'];
+    componentInstance.writeValue(codes);
+    expect(componentInstance.preferredLanguages).toEqual(codes);
+  });
+
+  it('should register onChange function', () => {
+    const fn = (value: string[]) => {};
+    componentInstance.registerOnChange(fn);
+    expect(componentInstance.onChange).toBe(fn);
+  });
+
+  it('should register onTouched function', () => {
+    const fn = () => {};
+    componentInstance.registerOnTouched(fn);
+    expect(componentInstance.onTouched).toBe(fn);
   });
 });

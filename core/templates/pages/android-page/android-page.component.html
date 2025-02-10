@@ -30,6 +30,34 @@
       </div>
     </div>
 
+    <div class="oppia-android-learners-review">
+      <div class="oppia-android-main-text oppia-android-text-color oppia-android-learners-review-text">
+        {{ 'I18N_ANDROID_PAGE_REVIEWS_SECTION_HEADER' | translate }}
+      </div>
+      <div class="oppia-android-review-section-5-star-container">
+        <img class="oppia-android-5-star-image" src="/assets/images/android/android-reviews-5-star.svg" alt="Image of 5 stars">
+      </div>
+      <div class="oppia-android-review-section">
+        <div class="oppia-android-review-component">
+          <div class="oppia-android-review-text">
+            {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_1' | translate }}
+          </div>
+          <div class="oppia-android-reviewer">{{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEWER_1' | translate }}</div>
+        </div>
+        <div class="oppia-android-review-component">
+          <div class="oppia-android-review-text">
+            {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_2' | translate }}
+          </div>
+          <div class="oppia-android-reviewer">{{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEWER_2' | translate }}</div>
+        </div>
+        <div class="oppia-android-review-component">
+          <div class="oppia-android-review-text">
+            {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_3' | translate }}
+          </div>
+          <div class="oppia-android-reviewer">{{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEWER_3' | translate }}</div>
+        </div>
+      </div>
+    </div>
     <div class="oppia-android-features oppia-android-features-tablet">
       <p class="oppia-android-features-main-text"
          [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
@@ -108,9 +136,9 @@
         </div>
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
           <div class="row oppia-android-carousel-direction">
-            <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right"></i>
-            </div>
+            <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right "></i>
+            </button>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
               <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="Image showing a lesson being played">
@@ -177,11 +205,11 @@
               Please confirm before subscribing.
             </div>
             <div class="oppia-android-updates-input-padding text-center">
-              <button [disabled]="!userCanSubscribe || !validateEmailAddress()"
-                      (click)="subscribeToAndroidList()"
-                      class="btn oppia-android-updates-button w-100">
-                {{ 'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate }}
-              </button>
+              <oppia-primary-button (onClickPrimaryButton)="subscribeToAndroidList()"
+                                    [disabled]="!userCanSubscribe || !validateEmailAddress()"
+                                    [customClasses]="'btn oppia-android-updates-button w-100'"
+                                    [buttonText]="'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate">
+              </oppia-primary-button>
             </div>
           </div>
           <div *ngIf="userHasSubscribed"

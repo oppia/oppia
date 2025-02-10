@@ -16,25 +16,32 @@
  * @fileoverview Component for RearrangeSkillsInSubtopicsModal.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { SubtopicValidationService } from '../services/subtopic-validation.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { Topic } from 'domain/topic/topic-object.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {TopicUpdateService} from 'domain/topic/topic-update.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {SubtopicValidationService} from '../services/subtopic-validation.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {Topic} from 'domain/topic/topic-object.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-rearrange-skills-in-subtopics-modal',
-  templateUrl: './rearrange-skills-in-subtopics-modal.component.html'
+  templateUrl: './rearrange-skills-in-subtopics-modal.component.html',
 })
 export class RearrangeSkillsInSubtopicsModalComponent
- extends ConfirmOrCancelModal implements OnInit, OnDestroy {
+  extends ConfirmOrCancelModal
+  implements OnInit, OnDestroy
+{
   topic: Topic;
   subtopics: Subtopic[];
   uncategorizedSkillSummaries: ShortSkillSummary[];
@@ -43,6 +50,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   errorMsg: string;
   editableName: string;
   selectedSubtopicId: number;
+  maxCharsInSubtopicTitle: number = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
 
   SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
   directiveSubscriptions = new Subscription();
@@ -52,7 +60,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
     private topicEditorStateService: TopicEditorStateService,
     private topicUpdateService: TopicUpdateService,
     private urlInterpolationService: UrlInterpolationService,
-    private ngbActiveModal: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
@@ -60,14 +68,15 @@ export class RearrangeSkillsInSubtopicsModalComponent
   initEditor(): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.subtopics = this.topic.getSubtopics();
-    this.uncategorizedSkillSummaries = (
-      this.topic.getUncategorizedSkillSummaries());
+    this.uncategorizedSkillSummaries =
+      this.topic.getUncategorizedSkillSummaries();
   }
 
   getSkillEditorUrl(skillId: string): string {
     return this.urlInterpolationService.interpolateUrl(
-      this.SKILL_EDITOR_URL_TEMPLATE, {
-        skillId: skillId
+      this.SKILL_EDITOR_URL_TEMPLATE,
+      {
+        skillId: skillId,
       }
     );
   }
@@ -80,7 +89,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    is to be moved.
    */
   onMoveSkillStart(
-      oldSubtopicId: number | null, skillSummary: ShortSkillSummary): void {
+    oldSubtopicId: number | null,
+    skillSummary: ShortSkillSummary
+  ): void {
     this.skillSummaryToMove = skillSummary;
     this.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
   }
@@ -91,17 +102,21 @@ export class RearrangeSkillsInSubtopicsModalComponent
    *    uncategorized section.
    */
   onMoveSkillEnd(
-      event: CdkDragDrop<ShortSkillSummary[]>,
-      newSubtopicId: number | null): void {
+    event: CdkDragDrop<ShortSkillSummary[]>,
+    newSubtopicId: number | null
+  ): void {
     if (event.previousContainer === event.container) {
       moveItemInArray(
-        event.container.data, event.previousIndex, event.currentIndex);
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
     } else {
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
-        event.currentIndex,
+        event.currentIndex
       );
       if (newSubtopicId === this.oldSubtopicId) {
         return;
@@ -109,25 +124,35 @@ export class RearrangeSkillsInSubtopicsModalComponent
 
       if (newSubtopicId === null) {
         this.topicUpdateService.removeSkillFromSubtopic(
-          this.topic, this.oldSubtopicId, this.skillSummaryToMove);
+          this.topic,
+          this.oldSubtopicId,
+          this.skillSummaryToMove
+        );
       } else {
         this.topicUpdateService.moveSkillToSubtopic(
-          this.topic, this.oldSubtopicId, newSubtopicId,
-          this.skillSummaryToMove);
+          this.topic,
+          this.oldSubtopicId,
+          newSubtopicId,
+          this.skillSummaryToMove
+        );
       }
     }
     this.initEditor();
   }
 
   updateSubtopicTitle(subtopicId: number): void {
-    if (!this.subtopicValidationService.checkValidSubtopicName(
-      this.editableName)) {
+    if (
+      !this.subtopicValidationService.checkValidSubtopicName(this.editableName)
+    ) {
       this.errorMsg = 'A subtopic with this title already exists';
       return;
     }
 
     this.topicUpdateService.setSubtopicTitle(
-      this.topic, subtopicId, this.editableName);
+      this.topic,
+      subtopicId,
+      this.editableName
+    );
     this.editNameOfSubtopicWithId(null);
   }
 
@@ -145,13 +170,15 @@ export class RearrangeSkillsInSubtopicsModalComponent
   ngOnInit(): void {
     this.editableName = '';
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this.initEditor()
-      ));
+      this.topicEditorStateService.onTopicInitialized.subscribe(() =>
+        this.initEditor()
+      )
+    );
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this.initEditor()
-      ));
+      this.topicEditorStateService.onTopicReinitialized.subscribe(() =>
+        this.initEditor()
+      )
+    );
     this.initEditor();
   }
 

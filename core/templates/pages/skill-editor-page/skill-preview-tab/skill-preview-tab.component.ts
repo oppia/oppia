@@ -16,26 +16,27 @@
  * @fileoverview Component for the skill preview tab.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {
+  QuestionBackendDict,
+  QuestionObjectFactory,
+} from 'domain/question/QuestionObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
 @Component({
   selector: 'oppia-skill-preview-tab',
-  templateUrl: './skill-preview-tab.component.html'
+  templateUrl: './skill-preview-tab.component.html',
 })
 export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   constructor(
@@ -70,7 +71,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     TEXT_INPUT: 'Text Input',
     MULTIPLE_CHOICE: 'Multiple Choice',
     NUMERIC_INPUT: 'Numeric Input',
-    ITEM_SELECTION: 'Item Selection'
+    ITEM_SELECTION: 'Item Selection',
   };
 
   directiveSubscriptions = new Subscription();
@@ -78,34 +79,34 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const that = this;
     this.skillId = this.urlService.getSkillIdFromUrl();
-    this.skillEditorStateService.loadSkill(this.skillId);
     this.questionTextFilter = '';
     this.interactionFilter = this.INTERACTION_TYPES.ALL;
     this.questionsFetched = false;
     for (let interaction in this.INTERACTION_TYPES) {
       this.ALLOWED_QUESTION_INTERACTIONS.push(
         this.INTERACTION_TYPES[
-          interaction as keyof typeof that.INTERACTION_TYPES]);
+          interaction as keyof typeof that.INTERACTION_TYPES
+        ]
+      );
     }
     this.skill = this.skillEditorStateService.getSkill();
-    this.htmlData = (
-      this.skill ?
-      this.skill.getConceptCard().getExplanation().html :
-      'loading review material'
-    );
+    this.htmlData = this.skill
+      ? this.skill.getConceptCard().getExplanation().html
+      : 'loading review material';
 
-    this.questionBackendApiService.fetchQuestionsAsync(
-      [this.skillId], this.QUESTION_COUNT, false).then((response) => {
-      this.questionsFetched = true;
-      this.questionDicts = response;
-      this.displayedQuestions = response;
-      if (this.questionDicts.length) {
-        this.selectQuestionToPreview(0);
-      }
-    });
+    this.questionBackendApiService
+      .fetchQuestionsAsync([this.skillId], this.QUESTION_COUNT, false)
+      .then(response => {
+        this.questionsFetched = true;
+        this.questionDicts = response;
+        this.displayedQuestions = response;
+        if (this.questionDicts.length) {
+          this.selectQuestionToPreview(0);
+        }
+      });
     this.directiveSubscriptions.add(
-      this.skillEditorStateService.onSkillChange.subscribe(
-        () => {}));
+      this.skillEditorStateService.onSkillChange.subscribe(() => {})
+    );
     this.currentInteractionService.setOnSubmitFn(() => {
       this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
     });
@@ -117,40 +118,46 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    this.displayedQuestions = this.questionDicts.filter(
-      questionDict => {
-        var contentData = questionDict.question_state_data.content.html;
-        var interactionType = (
-          questionDict.question_state_data.interaction.id);
-        var htmlContentIsMatching = Boolean(
-          contentData.toLowerCase().includes(
-            this.questionTextFilter.toLowerCase()));
-        if (this.interactionFilter === this.INTERACTION_TYPES.ALL) {
-          return htmlContentIsMatching;
-        } else if (
-          this.interactionFilter === this.INTERACTION_TYPES.TEXT_INPUT &&
-              interactionType !== 'TextInput') {
-          return false;
-        } else if (
-          this.interactionFilter === this.INTERACTION_TYPES.MULTIPLE_CHOICE &&
-              interactionType !== 'MultipleChoiceInput') {
-          return false;
-        } else if (
-          this.interactionFilter === this.INTERACTION_TYPES.ITEM_SELECTION &&
-              interactionType !== 'ItemSelectionInput') {
-          return false;
-        } else if (
-          this.interactionFilter === this.INTERACTION_TYPES.NUMERIC_INPUT &&
-              interactionType !== 'NumericInput') {
-          return false;
-        }
+    this.displayedQuestions = this.questionDicts.filter(questionDict => {
+      var contentData = questionDict.question_state_data.content.html;
+      var interactionType = questionDict.question_state_data.interaction.id;
+      var htmlContentIsMatching = Boolean(
+        contentData
+          .toLowerCase()
+          .includes(this.questionTextFilter.toLowerCase())
+      );
+      if (this.interactionFilter === this.INTERACTION_TYPES.ALL) {
         return htmlContentIsMatching;
-      });
+      } else if (
+        this.interactionFilter === this.INTERACTION_TYPES.TEXT_INPUT &&
+        interactionType !== 'TextInput'
+      ) {
+        return false;
+      } else if (
+        this.interactionFilter === this.INTERACTION_TYPES.MULTIPLE_CHOICE &&
+        interactionType !== 'MultipleChoiceInput'
+      ) {
+        return false;
+      } else if (
+        this.interactionFilter === this.INTERACTION_TYPES.ITEM_SELECTION &&
+        interactionType !== 'ItemSelectionInput'
+      ) {
+        return false;
+      } else if (
+        this.interactionFilter === this.INTERACTION_TYPES.NUMERIC_INPUT &&
+        interactionType !== 'NumericInput'
+      ) {
+        return false;
+      }
+      return htmlContentIsMatching;
+    });
   }
 
   canWindowShowTwoCards(): boolean {
-    return this.windowDimensionsService.getWidth() >
-    ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
+    return (
+      this.windowDimensionsService.getWidth() >
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
+    );
   }
 
   isCurrentSupplementalCardNonEmpty(): boolean {
@@ -164,9 +171,10 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       [
         this.questionObjectFactory.createFromBackendDict(
           this.displayedQuestions[index]
-        )
+        ),
       ],
-      this.initializeQuestionCard.bind(this), () => {}
+      this.initializeQuestionCard.bind(this),
+      () => {}
     );
   }
 
@@ -174,8 +182,3 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.contextService.clearQuestionPlayerIsOpen();
   }
 }
-
-angular.module('oppia').directive('oppiaSkillPreviewTab',
-  downgradeComponent({
-    component: SkillPreviewTabComponent
-  }) as angular.IDirectiveFactory);

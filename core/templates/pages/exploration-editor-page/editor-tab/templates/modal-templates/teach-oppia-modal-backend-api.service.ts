@@ -17,10 +17,10 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 export interface TeachOppiaModalData {
   data: {
@@ -29,23 +29,22 @@ export interface TeachOppiaModalData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TeachOppiaModalBackendApiService {
-  constructor(
-     private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async fetchTeachOppiaModalDataAsync(
-      urlFragment: string, params: object):
-     Promise<TeachOppiaModalData> {
-    return this.http.get<TeachOppiaModalData>(
-      urlFragment,
-      params
-    ).toPromise();
+    urlFragment: string,
+    params: object
+  ): Promise<TeachOppiaModalData> {
+    return this.http.get<TeachOppiaModalData>(urlFragment, params).toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'TeachOppiaModalBackendApiService',
-  downgradeInjectable(TeachOppiaModalBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'TeachOppiaModalBackendApiService',
+    downgradeInjectable(TeachOppiaModalBackendApiService)
+  );

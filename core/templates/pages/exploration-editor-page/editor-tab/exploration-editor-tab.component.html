@@ -1,11 +1,11 @@
 <ng-template #EditorTabTourContainer>
-  <h3 class="e2e-test-joyride-title">Creating in Oppia</h3>
-  <p>Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Creating in Oppia</h3>
+  <p tabindex="0">Explorations are learning experiences that you create using Oppia. Think of explorations as a conversation between a student and a tutor.</p>
 </ng-template>
 
 <ng-template #EditorTabTourTutorialComplete>
-  <h3 class="e2e-test-joyride-title">Tutorial Complete</h3>
-  <div>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Tutorial Complete</h3>
+  <div tabindex="0">
     <h4>Now for the fun part...</h4>
       That's the end of the tour! To finish up, here are some things we suggest:
     <ul>
@@ -48,12 +48,12 @@
                           [interactionIsShown]="interactionIsShown"
                           [explorationIsLinkedToStory]="explorationIsLinkedToStory"
                           (onSaveStateContent)="saveStateContent($event)"
-                          (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
                           (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
-                          (onSaveInteractionId)="saveInteractionId($event)"
+                          (onSaveInteractionData)="saveInteractionData($event)"
                           (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
                           (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
                           (onSaveLinkedSkillId)="saveLinkedSkillId($event)"
+                          (onSaveInapplicableSkillMisconceptionIds)="saveInapplicableSkillMisconceptionIds($event)"
                           (onSaveSolution)="saveSolution($event)"
                           (onSaveHints)="saveHints($event)"
                           (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
@@ -70,7 +70,7 @@
       <oppia-unresolved-answers-overview></oppia-unresolved-answers-overview>
     </div>
     <div class="exp-state-version-history">
-      <div><strong>Version History</strong></div>
+      <div tabindex="0"><strong>Version History</strong></div>
       <oppia-state-version-history [validationErrorIsShown]="validationErrorIsShown"></oppia-state-version-history>
     </div>
   </div>

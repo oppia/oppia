@@ -16,27 +16,26 @@
  * @fileoverview Component for the exploration editor feedback tab.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { CreateFeedbackThreadModalComponent } from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
-import { AlertsService } from 'services/alerts.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { EditabilityService } from 'services/editability.service';
-import { LoaderService } from 'services/loader.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { UserService } from 'services/user.service';
-import { ChangeListService } from '../services/change-list.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { ThreadDataBackendApiService } from './services/thread-data-backend-api.service';
-import { ThreadStatusDisplayService } from './services/thread-status-display.service';
-import { FeedbackThread } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {CreateFeedbackThreadModalComponent} from 'pages/exploration-editor-page/feedback-tab/templates/create-feedback-thread-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {EditabilityService} from 'services/editability.service';
+import {LoaderService} from 'services/loader.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {UserService} from 'services/user.service';
+import {ChangeListService} from '../services/change-list.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {ThreadDataBackendApiService} from './services/thread-data-backend-api.service';
+import {ThreadStatusDisplayService} from './services/thread-status-display.service';
+import {FeedbackThread} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 
 @Component({
   selector: 'oppia-feedback-tab',
-  templateUrl: './feedback-tab.component.html'
+  templateUrl: './feedback-tab.component.html',
 })
 export class FeedbackTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -62,12 +61,11 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private threadDataBackendApiService: ThreadDataBackendApiService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
-    private userService: UserService,
-  ) { }
+    private userService: UserService
+  ) {}
 
   _resetFeedbackMessageFields(): void {
-    this.feedbackMessage.status =
-       this.activeThread && this.activeThread.status;
+    this.feedbackMessage.status = this.activeThread && this.activeThread.status;
     this.feedbackMessage.text = '';
   }
 
@@ -78,17 +76,18 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   // Fetches the threads again if any thread is updated.
   fetchUpdatedThreads(): Promise<void> {
-    let activeThreadId =
-       this.activeThread && this.activeThread.threadId;
-    return this.threadDataBackendApiService.getFeedbackThreadsAsync().then(
-      data => {
+    let activeThreadId = this.activeThread && this.activeThread.threadId;
+    return this.threadDataBackendApiService
+      .getFeedbackThreadsAsync()
+      .then(data => {
         this.threadData = data;
         this.threadIsStale = false;
         if (activeThreadId !== null) {
           // Fetching threads invalidates old thread domain objects, so we
           // need to update our reference to the active thread afterwards.
           this.activeThread = this.threadDataBackendApiService.getThread(
-            activeThreadId) as SuggestionThread;
+            activeThreadId
+          ) as SuggestionThread;
         }
         this.loaderService.hideLoadingScreen();
       });
@@ -103,15 +102,17 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   _isSuggestionHandled(): boolean {
     return (
-      this.activeThread !== null &&
-       this.activeThread.isSuggestionHandled());
+      this.activeThread !== null && this.activeThread.isSuggestionHandled()
+    );
   }
 
   _isSuggestionValid(): boolean {
     return (
       this.activeThread !== null &&
-       this.explorationStatesService.hasState(
-         this.activeThread.getSuggestionStateName()));
+      this.explorationStatesService.hasState(
+        this.activeThread.getSuggestionStateName()
+      )
+    );
   }
 
   _hasUnsavedChanges(): boolean {
@@ -119,33 +120,44 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
   }
 
   showCreateThreadModal(): void {
-    this.ngbModal.open(CreateFeedbackThreadModalComponent, {
-      backdrop: 'static'
-    }).result.then(
-      (result) => this.threadDataBackendApiService.createNewThreadAsync(
-        result.newThreadSubject, result.newThreadText).then(() => {
-        this.clearActiveThread();
-        this.alertsService.addSuccessMessage('Feedback thread created.');
-      },
-      () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      }),
-      () => {}
-    );
+    this.ngbModal
+      .open(CreateFeedbackThreadModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        result =>
+          this.threadDataBackendApiService
+            .createNewThreadAsync(result.newThreadSubject, result.newThreadText)
+            .then(
+              () => {
+                this.clearActiveThread();
+                this.alertsService.addSuccessMessage(
+                  'Feedback thread created.'
+                );
+              },
+              () => {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              }
+            ),
+        () => {}
+      );
   }
 
   getSuggestionButtonType(): string {
-    return (
-       !this._isSuggestionHandled() && this._isSuggestionValid() &&
-       !this._hasUnsavedChanges()) ? 'primary' : 'default';
+    return !this._isSuggestionHandled() &&
+      this._isSuggestionValid() &&
+      !this._hasUnsavedChanges()
+      ? 'primary'
+      : 'default';
   }
 
   addNewMessage(threadId: string, tmpText: string, tmpStatus: string): void {
     if (threadId === null) {
       this.alertsService.addWarning(
-        'Cannot add message to thread with ID: null.');
+        'Cannot add message to thread with ID: null.'
+      );
       return;
     }
 
@@ -160,19 +172,21 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     let thread = this.threadDataBackendApiService.getThread(threadId);
 
     if (thread === null) {
-      throw new Error(
-        'Trying to add message to a non-existent thread.');
+      throw new Error('Trying to add message to a non-existent thread.');
     }
 
-    this.threadDataBackendApiService.addNewMessageAsync(
-      thread, tmpText, tmpStatus).then((messages) => {
-      this._resetFeedbackMessageFields();
-      this.activeThread.messages = messages;
-      this.messageSendingInProgress = false;
-    },
-    () => {
-      this.messageSendingInProgress = false;
-    });
+    this.threadDataBackendApiService
+      .addNewMessageAsync(thread, tmpText, tmpStatus)
+      .then(
+        messages => {
+          this._resetFeedbackMessageFields();
+          this.activeThread.messages = messages;
+          this.messageSendingInProgress = false;
+        },
+        () => {
+          this.messageSendingInProgress = false;
+        }
+      );
   }
 
   setActiveThread(threadId: string): void {
@@ -199,7 +213,8 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
 
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
+      millisSinceEpoch
+    );
   }
 
   isExplorationEditable(): boolean {
@@ -215,7 +230,7 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
     // Initial load of the thread list on page load.
     this.feedbackMessage = {
       status: null,
-      text: ''
+      text: '',
     };
 
     this.clearActiveThread();
@@ -224,23 +239,19 @@ export class FeedbackTabComponent implements OnInit, OnDestroy {
         () => {
           this.fetchUpdatedThreads();
         }
-      ));
+      )
+    );
 
     Promise.all([
-      this.userService.getUserInfoAsync().then(
-        userInfo => this.userIsLoggedIn = userInfo.isLoggedIn()),
-    ]).then(
-      () => {
-        this.loaderService.hideLoadingScreen();
-      });
+      this.userService
+        .getUserInfoAsync()
+        .then(userInfo => (this.userIsLoggedIn = userInfo.isLoggedIn())),
+    ]).then(() => {
+      this.loaderService.hideLoadingScreen();
+    });
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaFeedbackTab',
-   downgradeComponent({
-     component: FeedbackTabComponent
-   }) as angular.IDirectiveFactory);

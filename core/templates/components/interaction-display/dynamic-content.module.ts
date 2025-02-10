@@ -18,22 +18,14 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { InteractionDisplayComponent } from './interaction-display.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {InteractionDisplayComponent} from './interaction-display.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
-  declarations: [
-    InteractionDisplayComponent
-  ],
-  entryComponents: [
-  ],
-  exports: [
-    InteractionDisplayComponent
-  ],
+  imports: [CommonModule],
+  declarations: [InteractionDisplayComponent],
+  entryComponents: [],
+  exports: [InteractionDisplayComponent],
 })
-
-export class DynamicContentModule { }
+export class DynamicContentModule {}

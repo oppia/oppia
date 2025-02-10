@@ -24,66 +24,68 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2016,
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  parser: require.resolve('@typescript-eslint/parser')
+  parser: require.resolve('@typescript-eslint/parser'),
 });
 
 ruleTester.run('constant-declaration', rule, {
-  valid: [{
-    code:
-    `angular.module('oppia').constant(
+  valid: [
+    {
+      code: `angular.module('oppia').constant(
     'DEFAULT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);
     angular.module('oppia').constant(
     'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_SKILL);`,
-    filename: 'foo/bar.constants.ajs.ts'
-  },
-  {
-    code:
-    `export const ClassifiersExtensionConstants = {
+      filename: 'foo/bar.constants.ajs.ts',
+    },
+    {
+      code: `export const SampleConstants = {
       PythonProgramTokenType: {
         COMMENT: 'COMMENT',
         NL: 'NL',
         STRING: 'STRING',
       }
     } as const;`,
-    filename: 'foo/bar.constants.ts'
-  }
+      filename: 'foo/bar.constants.ts',
+    },
   ],
 
   invalid: [
     {
-      code:
-      `angular.module('oppia').constant(
+      code: `angular.module('oppia').constant(
       'DEFAULT_SKILL_DIFFICULTY', QuestionListConstants.DEFAULT_SKILL_DIFFIC);`,
       filename: 'foo/bar.js',
-      errors: [{
-        message: 'Constant is used in non constant file.',
-      }],
+      errors: [
+        {
+          message: 'Constant is used in non constant file.',
+        },
+      ],
     },
     {
-      code:
-      `angular.module('oppia').constant(
+      code: `angular.module('oppia').constant(
       'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULT);
       angular.module('oppia').constant(
       'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULT);`,
       filename: 'foo/bar.constants.ajs.ts',
-      errors: [{
-        message: 'There are mutliple constants in this file.',
-      }],
+      errors: [
+        {
+          message: 'There are mutliple constants in this file.',
+        },
+      ],
     },
     {
-      code:
-      `export const InteractionSpecsConstants = {
+      code: `export const InteractionSpecsConstants = {
         INTERACTION_SPECS: INTERACTION_SPECS
       } ;`,
       filename: 'foo/bar.constants.ts',
-      errors: [{
-        message: (
-          'Please add \'as const\' at the end of the constant ' +
-          'declaration. A constants file should have the following ' +
-          'structure:\n export const SomeConstants = { ... } as const;'),
-      }],
+      errors: [
+        {
+          message:
+            "Please add 'as const' at the end of the constant " +
+            'declaration. A constants file should have the following ' +
+            'structure:\n export const SomeConstants = { ... } as const;',
+        },
+      ],
     },
-  ]
+  ],
 });

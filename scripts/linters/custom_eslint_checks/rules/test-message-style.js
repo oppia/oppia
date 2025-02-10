@@ -25,56 +25,56 @@ module.exports = {
     docs: {
       description: 'There should not be any unused dependency',
       category: 'Stylistic Issues',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      useShould: 'Test message should start with \'should\'',
-      singleSpace: (
-        'Please remove multiple consecutive spaces in the test message'),
-      noSpaceAtEnd: 'Please remove space from the end of the test message'
-    }
+      useShould: "Test message should start with 'should'",
+      singleSpace:
+        'Please remove multiple consecutive spaces in the test message',
+      noSpaceAtEnd: 'Please remove space from the end of the test message',
+    },
   },
 
-  create: function(context) {
-    var checkMessageStartsWithShould = function(testMessageNode, testMessage) {
+  create: function (context) {
+    var checkMessageStartsWithShould = function (testMessageNode, testMessage) {
       if (!testMessage.startsWith('should ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
-          messageId: 'useShould'
+          messageId: 'useShould',
         });
       }
     };
 
-    var checkSpacesInMessage = function(testMessageNode, testMessage) {
+    var checkSpacesInMessage = function (testMessageNode, testMessage) {
       if (testMessage.includes('  ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
-          messageId: 'singleSpace'
+          messageId: 'singleSpace',
         });
       }
     };
 
-    var checkNoSpaceAtEndOfMessage = function(testMessageNode, testMessage) {
+    var checkNoSpaceAtEndOfMessage = function (testMessageNode, testMessage) {
       if (testMessage.endsWith(' ')) {
         context.report({
           testMessageNode,
           loc: testMessageNode.loc,
-          messageId: 'noSpaceAtEnd'
+          messageId: 'noSpaceAtEnd',
         });
       }
     };
 
-    var checkMessage = function(node, testMessage) {
+    var checkMessage = function (node, testMessage) {
       checkMessageStartsWithShould(node, testMessage);
       checkNoSpaceAtEndOfMessage(node, testMessage);
       checkSpacesInMessage(node, testMessage);
     };
 
-    var extractMessage = function(node) {
+    var extractMessage = function (node) {
       if (node.type === 'BinaryExpression') {
         return extractMessage(node.left) + extractMessage(node.right);
       } else {
@@ -89,7 +89,7 @@ module.exports = {
           var testMessage = extractMessage(testMessageNode);
           checkMessage(testMessageNode, testMessage);
         }
-      }
+      },
     };
-  }
+  },
 };

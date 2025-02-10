@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for int editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { IntEditorComponent } from './int-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {IntEditorComponent} from './int-editor.component';
 
 describe('IntEditorComponent', () => {
   let component: IntEditorComponent;
@@ -27,7 +27,7 @@ describe('IntEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [IntEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -49,9 +49,11 @@ describe('IntEditorComponent', () => {
   it('should return SCHEMA when called', () => {
     expect(component.getSchema()).toEqual({
       type: 'int',
-      validators: [{
-        id: 'is_integer'
-      }]
+      validators: [
+        {
+          id: 'is_integer',
+        },
+      ],
     });
   });
 

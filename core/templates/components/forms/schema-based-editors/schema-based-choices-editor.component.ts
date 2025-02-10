@@ -16,10 +16,17 @@
  * @fileoverview Component for a schema-based editor for multiple choice.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Schema } from 'services/schema-default-value.service';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {
+  NG_VALUE_ACCESSOR,
+  NG_VALIDATORS,
+  ControlValueAccessor,
+  Validator,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Schema} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-choices-editor',
@@ -28,17 +35,18 @@ import { Schema } from 'services/schema-default-value.service';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       useExisting: forwardRef(() => SchemaBasedChoicesEditorComponent),
-      multi: true
+      multi: true,
     },
-  ]
+  ],
 })
 export class SchemaBasedChoicesEditorComponent
-implements ControlValueAccessor, OnInit, Validator {
+  implements ControlValueAccessor, OnInit, Validator
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -61,8 +69,7 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(): void {
-  }
+  registerOnTouched(): void {}
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
@@ -78,12 +85,12 @@ implements ControlValueAccessor, OnInit, Validator {
     this.onChange(val);
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 }
 
 angular.module('oppia').directive(
   'schemaBasedChoicesEditor',
   downgradeComponent({
-    component: SchemaBasedChoicesEditorComponent
+    component: SchemaBasedChoicesEditorComponent,
   })
 );

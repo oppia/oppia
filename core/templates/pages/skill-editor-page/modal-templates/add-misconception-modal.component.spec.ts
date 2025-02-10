@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for AddMisconceptionModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { AddMisconceptionModalComponent } from './add-misconception-modal.component';
+import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {AddMisconceptionModalComponent} from './add-misconception-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -37,7 +36,7 @@ class MockActiveModal {
   }
 }
 
-describe('Add Misconception Modal Component', function() {
+describe('Add Misconception Modal Component', function () {
   let component: AddMisconceptionModalComponent;
   let fixture: ComponentFixture<AddMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -49,18 +48,16 @@ describe('Add Misconception Modal Component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        AddMisconceptionModalComponent
-      ],
+      declarations: [AddMisconceptionModalComponent],
       providers: [
         SkillEditorStateService,
         ChangeDetectorRef,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -77,18 +74,18 @@ describe('Add Misconception Modal Component', function() {
       name: 'test name 2',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
     let misconceptionDict2 = {
       id: 3,
       name: 'test name 3',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
     let rubricDict = {
       difficulty: 'easy',
-      explanations: ['explanation']
+      explanations: ['explanation'],
     };
     let skillContentsDict = {
       explanation: {
@@ -97,8 +94,8 @@ describe('Add Misconception Modal Component', function() {
       },
       worked_examples: [],
       recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
+        voiceovers_mapping: {},
+      },
     };
     skillObject = skillObjectFactory.createFromBackendDict({
       id: 'skill1',
@@ -118,18 +115,18 @@ describe('Add Misconception Modal Component', function() {
     fixture.detectChanges();
   });
 
-  it('should initialize properties after component is initialized',
-    () => {
-      expect(component.skill).toEqual(skillObject);
-      expect(component.misconceptionName).toBe('');
-      expect(component.misconceptionNotes).toBe('');
-      expect(component.misconceptionFeedback).toBe('');
-      expect(component.misconceptionMustBeAddressed).toBe(true);
-      expect(component.misconceptionNameIsDuplicate).toBe(false);
-      expect(component.existingMisconceptionNames).toEqual(
-        ['test name 2', 'test name 3']
-      );
-    });
+  it('should initialize properties after component is initialized', () => {
+    expect(component.skill).toEqual(skillObject);
+    expect(component.misconceptionName).toBe('');
+    expect(component.misconceptionNotes).toBe('');
+    expect(component.misconceptionFeedback).toBe('');
+    expect(component.misconceptionMustBeAddressed).toBe(true);
+    expect(component.misconceptionNameIsDuplicate).toBe(false);
+    expect(component.existingMisconceptionNames).toEqual([
+      'test name 2',
+      'test name 3',
+    ]);
+  });
 
   it('should save misconception when closing the modal', () => {
     spyOn(ngbActiveModal, 'close');
@@ -137,8 +134,7 @@ describe('Add Misconception Modal Component', function() {
     component.saveMisconception();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      misconception: misconceptionObjectFactory.create(
-        3, '', '', '', true)
+      misconception: misconceptionObjectFactory.create(3, '', '', '', true),
     });
   });
 
@@ -157,13 +153,15 @@ describe('Add Misconception Modal Component', function() {
   });
 
   it('should get schema for form', () => {
-    expect(component.getSchemaForm())
-      .toEqual(component.MISCONCEPTION_PROPERTY_FORM_SCHEMA);
+    expect(component.getSchemaForm()).toEqual(
+      component.MISCONCEPTION_PROPERTY_FORM_SCHEMA
+    );
   });
 
   it('should get schema for feedback', () => {
-    expect(component.getSchemaFeedback())
-      .toEqual(component.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA);
+    expect(component.getSchemaFeedback()).toEqual(
+      component.MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA
+    );
   });
 
   it('should update misconceptionNotes', () => {

@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for PlaythroughIssuesService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { PlaythroughIssuesService } from './playthrough-issues.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
+import {TestBed} from '@angular/core/testing';
+import {PlaythroughIssuesService} from './playthrough-issues.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {PlaythroughIssuesBackendApiService} from 'services/playthrough-issues-backend-api.service';
 
 describe('Playthrough Issues Service', () => {
   let playthroughIssuesService: PlaythroughIssuesService;
@@ -28,18 +28,15 @@ describe('Playthrough Issues Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        PlaythroughIssuesService,
-        PlaythroughIssuesBackendApiService
-      ]
+      providers: [PlaythroughIssuesService, PlaythroughIssuesBackendApiService],
     });
 
     playthroughIssuesService = TestBed.inject(PlaythroughIssuesService);
-    playthroughIssuesBackendApiService = (
-      TestBed.inject(PlaythroughIssuesBackendApiService));
+    playthroughIssuesBackendApiService = TestBed.inject(
+      PlaythroughIssuesBackendApiService
+    );
 
-    spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync')
-      .and.stub();
+    spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync').and.stub();
   });
 
   it('should be defined', () => {
@@ -50,7 +47,8 @@ describe('Playthrough Issues Service', () => {
 
     playthroughIssuesService.getIssues();
 
-    expect(playthroughIssuesBackendApiService.fetchIssuesAsync)
-      .toHaveBeenCalled();
+    expect(
+      playthroughIssuesBackendApiService.fetchIssuesAsync
+    ).toHaveBeenCalled();
   });
 });

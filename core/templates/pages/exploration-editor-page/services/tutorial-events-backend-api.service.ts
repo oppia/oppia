@@ -16,35 +16,51 @@
  * @fileoverview Backend api service for all tutorials events.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TutorialEventsBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async recordStartedEditorTutorialEventAsync(expId: string): Promise<Object> {
-    return this.http.post(
-      this.urlInterpolationService.interpolateUrl(
-        '/createhandler/started_tutorial_event/<expId>', { expId: expId }), {}
-    ).toPromise();
+    return this.http
+      .post(
+        this.urlInterpolationService.interpolateUrl(
+          '/createhandler/started_tutorial_event/<expId>',
+          {expId: expId}
+        ),
+        {}
+      )
+      .toPromise();
   }
 
   async recordStartedTranslationTutorialEventAsync(
-      expId: string): Promise<Object> {
-    return this.http.post(this.urlInterpolationService.interpolateUrl(
-      '/createhandler/started_translation_tutorial_event/<expId>',
-      { expId: expId }), {}).toPromise();
+    expId: string
+  ): Promise<Object> {
+    return this.http
+      .post(
+        this.urlInterpolationService.interpolateUrl(
+          '/createhandler/started_translation_tutorial_event/<expId>',
+          {expId: expId}
+        ),
+        {}
+      )
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'TutorialEventsBackendApiService',
-  downgradeInjectable(TutorialEventsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'TutorialEventsBackendApiService',
+    downgradeInjectable(TutorialEventsBackendApiService)
+  );

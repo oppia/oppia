@@ -20,13 +20,13 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-interactive-map',
-  templateUrl: './interactive-map-short-response.component.html'
+  templateUrl: './interactive-map-short-response.component.html',
 })
 export class ShortResponseInteractiveMapComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -35,21 +35,23 @@ export class ShortResponseInteractiveMapComponent implements OnInit {
   @Input() answer!: string;
   formattedCoords!: string;
 
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as Record<number, number>;
+      this.answer
+    ) as Record<number, number>;
     this.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
-    this.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+    this.formattedCoords += _answer[0] >= 0 ? 'N' : 'S';
     this.formattedCoords += ', ';
     this.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
-    this.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+    this.formattedCoords += _answer[1] >= 0 ? 'E' : 'W';
   }
 }
 
 angular.module('oppia').directive(
   'oppiaShortResponseInteractiveMap',
   downgradeComponent({
-    component: ShortResponseInteractiveMapComponent
-  }) as angular.IDirectiveFactory);
+    component: ShortResponseInteractiveMapComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,27 +16,17 @@
  * @fileoverview Module for the logout page.
  */
 
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { LogoutPageComponent } from 'pages/logout-page/logout-page.component';
-import { LogoutPageRootComponent } from './logout-page-root.component';
-import { CommonModule } from '@angular/common';
-import { LogoutPageRoutingModule } from './logout-page-routing.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {LogoutPageComponent} from 'pages/logout-page/logout-page.component';
+import {LogoutPageRootComponent} from './logout-page-root.component';
+import {CommonModule} from '@angular/common';
+import {LogoutPageRoutingModule} from './logout-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    LogoutPageRoutingModule
-  ],
-  declarations: [
-    LogoutPageComponent,
-    LogoutPageRootComponent
-  ],
-  entryComponents: [
-    LogoutPageComponent,
-    LogoutPageRootComponent,
-  ]
+  imports: [CommonModule, SharedComponentsModule, LogoutPageRoutingModule],
+  declarations: [LogoutPageComponent, LogoutPageRootComponent],
+  entryComponents: [LogoutPageComponent, LogoutPageRootComponent],
 })
 export class LogoutPageModule {}

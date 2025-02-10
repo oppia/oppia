@@ -16,16 +16,11 @@
  * @fileoverview Component for the activities tab in the admin panel when Oppia
  * is in production mode.
  */
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-admin-prod-mode-activities-tab',
   templateUrl: './admin-prod-mode-activities-tab.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class OppiaAdminProdModeActivitiesTabComponent {}
-
-angular.module('oppia').directive(
-  'oppiaAdminProdModeActivitiesTab', downgradeComponent(
-    {component: OppiaAdminProdModeActivitiesTabComponent}));

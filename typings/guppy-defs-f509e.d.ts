@@ -97,13 +97,20 @@ declare namespace Guppy {
   export let Symbols: GuppySymbols;
   export let Doc: Function;
   export function add_global_symbol(
-    name: string, symbol: Object, template?: string): void;
+    name: string,
+    symbol: Object,
+    template?: string
+  ): void;
   export function get_loc(
-    x: number, y: number, current_node?: Object, current_caret?: Object): {
-      current: Object;
-      caret: number;
-      pos: string;
-    };
+    x: number,
+    y: number,
+    current_node?: Object,
+    current_caret?: Object
+  ): {
+    current: Object;
+    caret: number;
+    pos: string;
+  };
   export let kb: Object;
   export function make_button(url: string, cb: Function): HTMLImageElement;
   export function mouse_down(e: Object): void;

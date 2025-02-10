@@ -5,14 +5,17 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview oppia-transition-200">
-        <div class="oppia-click-to-start-editing"
+        <div class="oppia-click-to-start-editing e2e-test-edit-solution-explanation"
              *ngIf="isEditable" (click)="openExplanationEditor()">
           <i class="material-icons oppia-editor-edit-icon float-right"
+             (keydown.enter)="openExplanationEditor()"
+             tabindex="0"
+             aria-label="Edit Explanation"
              title="Edit Explanation">&#xE254;
           </i>
         </div>
-        <strong>Explanation:</strong>
-        <span>
+        <strong tabindex="0">Explanation:</strong>
+        <span tabindex="0">
           <oppia-rte-output-display class="oppia-rte-editor" [rteString]="stateSolutionService.savedMemento.explanation.html">
           </oppia-rte-output-display>
         </span>
@@ -22,7 +25,7 @@
 
   <div *ngIf="isEditable && explanationEditorIsOpen">
     <div class="oppia-rule-details-header">
-      <strong>Explanation:</strong>
+      <strong tabindex="0">Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor [schema]="getSchema()"
                            [localValue]="stateSolutionService.displayed.explanation._html"
@@ -30,8 +33,8 @@
       </schema-based-editor>
     </div>
 
-    <div *ngIf="isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error">
-      The solution explanation is too long. Please use at most 1000 characters.
+    <div *ngIf="isSolutionExplanationLengthExceeded()" class="oppia-length-validation-error" tabindex="0">
+      The solution explanation is too long. Please use at most 3000 characters.
     </div>
 
     <div class="oppia-rule-save-cancel-buttons">
@@ -42,7 +45,7 @@
           Cancel
         </button>
         <button type="button"
-                class="btn btn-success"
+                class="btn btn-success e2e-test-save-solution-explanation-edit"
                 [disabled]="!stateSolutionService.displayed.explanation.html || isSolutionExplanationLengthExceeded()"
                 (click)="saveThisExplanation()">
           Save

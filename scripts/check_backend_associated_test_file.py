@@ -50,8 +50,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/failing_tests.py',
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
-    'proto_files/text_classifier_pb2.py',
-    'proto_files/training_job_response_payload_pb2.py',
+    'docker/fix_google_module.py',
 ]
 
 
@@ -100,8 +99,7 @@ def main() -> None:
         with open(file, 'r', encoding='utf8') as f:
             line_count = len(f.readlines())
         if line_count > 0:
-            non_empty_files.append(file[2:])
-
+            non_empty_files.append(os.path.relpath(file, TOPMOST_LEVEL_PATH))
     errors = ''
     for file in non_empty_files:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:

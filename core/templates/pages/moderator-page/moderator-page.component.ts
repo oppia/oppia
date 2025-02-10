@@ -16,22 +16,24 @@
  * @fileoverview Component for the Oppia moderator page.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import isEqual from 'lodash/isEqual';
-import { AlertsService } from 'services/alerts.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { LoaderService } from 'services/loader.service';
-import { Schema } from 'services/schema-default-value.service';
-import { ActivityIdTypeDict, CommitMessage,
-  ExplorationDict, ModeratorPageBackendApiService }
-  from './services/moderator-page-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {LoaderService} from 'services/loader.service';
+import {Schema} from 'services/schema-default-value.service';
+import {
+  ActivityIdTypeDict,
+  CommitMessage,
+  ExplorationDict,
+  ModeratorPageBackendApiService,
+} from './services/moderator-page-backend-api.service';
 
 @Component({
   selector: 'oppia-moderator-page',
-  templateUrl: './moderator-page.component.html'
+  templateUrl: './moderator-page.component.html',
 })
 export class ModeratorPageComponent {
   allCommits: CommitMessage[] = [];
@@ -46,20 +48,25 @@ export class ModeratorPageComponent {
     type: 'list',
     items: {
       type: 'dict',
-      properties: [{
-        name: 'type',
-        schema: {
-          type: 'unicode',
-          choices: [AppConstants.ENTITY_TYPE.EXPLORATION,
-            AppConstants.ENTITY_TYPE.COLLECTION]
-        }
-      }, {
-        name: 'id',
-        schema: {
-          type: 'unicode'
-        }
-      }]
-    }
+      properties: [
+        {
+          name: 'type',
+          schema: {
+            type: 'unicode',
+            choices: [
+              AppConstants.ENTITY_TYPE.EXPLORATION,
+              AppConstants.ENTITY_TYPE.COLLECTION,
+            ],
+          },
+        },
+        {
+          name: 'id',
+          schema: {
+            type: 'unicode',
+          },
+        },
+      ],
+    },
   };
 
   constructor(
@@ -71,7 +78,8 @@ export class ModeratorPageComponent {
   ) {}
 
   updateDisplayedFeaturedActivityReferences(
-      newValue: ActivityIdTypeDict[]): void {
+    newValue: ActivityIdTypeDict[]
+  ): void {
     if (this.displayedFeaturedActivityReferences !== newValue) {
       this.displayedFeaturedActivityReferences = newValue;
       this.changeDetectorRef.detectChanges();
@@ -80,39 +88,45 @@ export class ModeratorPageComponent {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.moderatorPageBackendApiService.getRecentCommitsAsync()
-      .then((response) => {
+    this.moderatorPageBackendApiService
+      .getRecentCommitsAsync()
+      .then(response => {
         // Update the explorationData object with information about newly-
         // discovered explorations.
         let explorationIdsToExplorationData = response.exp_ids_to_exp_data;
         for (let expId in explorationIdsToExplorationData) {
           if (!this.explorationData.hasOwnProperty(expId)) {
-            this.explorationData[expId] = (
-              explorationIdsToExplorationData[expId]);
+            this.explorationData[expId] =
+              explorationIdsToExplorationData[expId];
           }
         }
         this.allCommits = response.results;
         this.loaderService.hideLoadingScreen();
       });
 
-    this.moderatorPageBackendApiService.getRecentFeedbackMessagesAsync()
-      .then((response) => {
-        this.allFeedbackMessages = response.results.map(
-          d => ThreadMessage.createFromBackendDict(d));
+    this.moderatorPageBackendApiService
+      .getRecentFeedbackMessagesAsync()
+      .then(response => {
+        this.allFeedbackMessages = response.results.map(d =>
+          ThreadMessage.createFromBackendDict(d)
+        );
       });
 
-    this.moderatorPageBackendApiService.getFeaturedActivityReferencesAsync()
-      .then((response) => {
-        this.displayedFeaturedActivityReferences = response
-          .featured_activity_references;
-        this.lastSavedFeaturedActivityReferences =
-          [...this.displayedFeaturedActivityReferences];
+    this.moderatorPageBackendApiService
+      .getFeaturedActivityReferencesAsync()
+      .then(response => {
+        this.displayedFeaturedActivityReferences =
+          response.featured_activity_references;
+        this.lastSavedFeaturedActivityReferences = [
+          ...this.displayedFeaturedActivityReferences,
+        ];
       });
   }
 
   getDatetimeAsString(millisSinceEpoch: number): string {
-    return this.dateTimeFormatService
-      .getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
+    return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch
+    );
   }
 
   isMessageFromExploration(message: ThreadMessage): boolean {
@@ -124,24 +138,26 @@ export class ModeratorPageComponent {
   }
 
   getActivityCreateUrl(reference: ActivityIdTypeDict): string {
-    let path: string = (
-          reference.type === AppConstants.ENTITY_TYPE.EXPLORATION ?
-          '/create' :
-          '/create_collection');
+    let path: string =
+      reference.type === AppConstants.ENTITY_TYPE.EXPLORATION
+        ? '/create'
+        : '/create_collection';
     return path + '/' + reference.id;
   }
 
   isSaveFeaturedActivitiesButtonDisabled(): boolean {
     return isEqual(
       this.displayedFeaturedActivityReferences,
-      this.lastSavedFeaturedActivityReferences);
+      this.lastSavedFeaturedActivityReferences
+    );
   }
 
   saveFeaturedActivityReferences(): void {
     this.alertsService.clearWarnings();
 
-    let activityReferencesToSave =
-      [...this.displayedFeaturedActivityReferences];
+    let activityReferencesToSave = [
+      ...this.displayedFeaturedActivityReferences,
+    ];
 
     this.moderatorPageBackendApiService
       .saveFeaturedActivityReferencesAsync(activityReferencesToSave)
@@ -155,6 +171,3 @@ export class ModeratorPageComponent {
     return this.FEATURED_ACTIVITY_REFERENCES_SCHEMA;
   }
 }
-
-angular.module('oppia').directive('oppiaModeratorPage',
-  downgradeComponent({ component: ModeratorPageComponent }));

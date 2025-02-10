@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for EntityTranslationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { EntityTranslationBackendApiService } from './entity-translation-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
+import {EntityTranslationBackendApiService} from './entity-translation-backend-api.service';
 
 describe('Entity Translation Backend Api Service', () => {
   let translationApiService: EntityTranslationBackendApiService;
@@ -29,7 +31,7 @@ describe('Entity Translation Backend Api Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     translationApiService = TestBed.inject(EntityTranslationBackendApiService);
@@ -44,27 +46,37 @@ describe('Entity Translation Backend Api Service', () => {
     let entityType: string = 'exploration';
     let entityVersion: number = 5;
     let languageCode: string = 'hi';
-    translationApiService.fetchEntityTranslationAsync(
-      entityId, entityType, entityVersion, languageCode
-    ).then(successHandler, failHandler);
+    translationApiService
+      .fetchEntityTranslationAsync(
+        entityId,
+        entityType,
+        entityVersion,
+        languageCode
+      )
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/entity_translations_handler/exploration/entity1/5/hi');
+      '/entity_translations_handler/exploration/entity1/5/hi'
+    );
     expect(req.request.method).toEqual('GET');
-    req.flush({
-      entity_id: 'entity1',
-      entity_type: 'exploration',
-      entity_version: 5,
-      language_code: 'hi',
-      translations: {
-        feedback_3: {
-          content_format: 'html',
-          content_value: '<p>This is feedback 1.</p>',
-          needs_update: false
-        }
+    req.flush(
+      {
+        entity_id: 'entity1',
+        entity_type: 'exploration',
+        entity_version: 5,
+        language_code: 'hi',
+        translations: {
+          feedback_3: {
+            content_format: 'html',
+            content_value: '<p>This is feedback 1.</p>',
+            needs_update: false,
+          },
+        },
+      },
+      {
+        status: 200,
+        statusText: 'Success.',
       }
-    }, {
-      status: 200, statusText: 'Success.'
-    });
+    );
     tick();
     flushMicrotasks();
 
@@ -76,17 +88,27 @@ describe('Entity Translation Backend Api Service', () => {
     let entityType: string = 'exploration';
     let entityVersion: number = 5;
     let languageCode: string = 'hi';
-    translationApiService.fetchEntityTranslationAsync(
-      entityId, entityType, entityVersion, languageCode
-    ).then(successHandler, failHandler);
+    translationApiService
+      .fetchEntityTranslationAsync(
+        entityId,
+        entityType,
+        entityVersion,
+        languageCode
+      )
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      '/entity_translations_handler/exploration/entity1/5/hi');
+      '/entity_translations_handler/exploration/entity1/5/hi'
+    );
     expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
     flushMicrotasks();
 

@@ -16,19 +16,16 @@
  * @fileoverview Component for the Exploration save prompt modal.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-exploration-save-prompt-modal',
-  templateUrl: './exploration-save-prompt-modal.component.html'
+  templateUrl: './exploration-save-prompt-modal.component.html',
 })
 export class ExplorationSavePromptModalComponent extends ConfirmOrCancelModal {
-  constructor(
-     private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
@@ -36,8 +33,3 @@ export class ExplorationSavePromptModalComponent extends ConfirmOrCancelModal {
     this.ngbActiveModal.close();
   }
 }
-
-angular.module('oppia').directive('oppiaExplorationSavePromptModal',
-   downgradeComponent({
-     component: ExplorationSavePromptModalComponent
-   }) as angular.IDirectiveFactory);

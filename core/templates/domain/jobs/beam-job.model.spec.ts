@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for BeamJob.
  */
 
-import { BeamJob } from 'domain/jobs/beam-job.model';
+import {BeamJob} from 'domain/jobs/beam-job.model';
 
 describe('BeamJob model', () => {
   it('should copy arguments', () => {
@@ -25,7 +25,7 @@ describe('BeamJob model', () => {
   });
 
   it('should copy values from backend dict', () => {
-    const job = BeamJob.createFromBackendDict({ name: 'FooJob' });
+    const job = BeamJob.createFromBackendDict({name: 'FooJob'});
     expect(job.name).toEqual('FooJob');
   });
 });

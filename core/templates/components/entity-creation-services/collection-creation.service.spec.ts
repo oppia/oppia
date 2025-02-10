@@ -16,16 +16,16 @@
  * @fileoverview Unit test for CollectionCreationService.
  */
 
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks, tick }
-  from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 
-import { CollectionCreationService } from
-  'components/entity-creation-services/collection-creation.service';
-import { LoaderService } from 'services/loader.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {CollectionCreationService} from 'components/entity-creation-services/collection-creation.service';
+import {LoaderService} from 'services/loader.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Collection Creation service', () => {
   let collectionCreationService: CollectionCreationService;
@@ -38,9 +38,7 @@ describe('Collection Creation service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule],
     });
 
     collectionCreationService = TestBed.inject(CollectionCreationService);
@@ -54,92 +52,100 @@ describe('Collection Creation service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a collection and navigate to collection',
-    fakeAsync(() => {
-      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      spyOn(analyticsService, 'registerCreateNewCollectionEvent')
-        .and.callThrough();
+  it('should successfully create a collection and navigate to collection', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+    spyOn(
+      analyticsService,
+      'registerCreateNewCollectionEvent'
+    ).and.callThrough();
 
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {
-          href: ''
-        },
-        gtag: () => {}
-      } as unknown as Window);
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        href: '',
+      },
+      gtag: () => {},
+    } as unknown as Window);
 
-      collectionCreationService.createNewCollection();
+    collectionCreationService.createNewCollection();
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({collection_id: SAMPLE_COLLECTION_ID});
+    let req = httpTestingController.expectOne(
+      '/collection_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
-      flushMicrotasks();
-      tick(150);
+    flushMicrotasks();
+    tick(150);
 
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledWith('Creating collection');
-      expect(analyticsService.registerCreateNewCollectionEvent)
-        .toHaveBeenCalledWith(SAMPLE_COLLECTION_ID);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
+      'Creating collection'
+    );
+    expect(
+      analyticsService.registerCreateNewCollectionEvent
+    ).toHaveBeenCalledWith(SAMPLE_COLLECTION_ID);
 
-      expect(windowRef.nativeWindow.location.href).toEqual(
-        '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
-    })
-  );
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      '/collection_editor/create/' + SAMPLE_COLLECTION_ID
+    );
+  }));
 
-  it('should fail to create a collection and hide the loading screen',
-    fakeAsync(() => {
-      spyOn(loaderService, 'hideLoadingScreen').and.callThrough();
+  it('should fail to create a collection and hide the loading screen', fakeAsync(() => {
+    spyOn(loaderService, 'hideLoadingScreen').and.callThrough();
 
-      collectionCreationService.createNewCollection();
+    collectionCreationService.createNewCollection();
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({
-        error: 'Error creating a new collection.'
-      }, {
+    let req = httpTestingController.expectOne(
+      '/collection_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Error creating a new collection.',
+      },
+      {
         status: ERROR_STATUS_CODE,
-        statusText: 'Error creating a new collection.'
-      });
+        statusText: 'Error creating a new collection.',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    })
-  );
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
-  it('should not be able to be used while in progress',
-    fakeAsync(() => {
-      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      spyOn(analyticsService, 'registerCreateNewCollectionEvent')
-        .and.callThrough();
+  it('should not be able to be used while in progress', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+    spyOn(
+      analyticsService,
+      'registerCreateNewCollectionEvent'
+    ).and.callThrough();
 
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {
-          href: ''
-        },
-        gtag: () => {}
-      } as unknown as Window);
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        href: '',
+      },
+      gtag: () => {},
+    } as unknown as Window);
 
-      collectionCreationService.createNewCollection();
-      collectionCreationService.createNewCollection();
+    collectionCreationService.createNewCollection();
+    collectionCreationService.createNewCollection();
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({collection_id: SAMPLE_COLLECTION_ID});
+    let req = httpTestingController.expectOne(
+      '/collection_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
-      flushMicrotasks();
-      tick(150);
+    flushMicrotasks();
+    tick(150);
 
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledTimes(1);
-      expect(analyticsService.registerCreateNewCollectionEvent)
-        .toHaveBeenCalledTimes(1);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledTimes(1);
+    expect(
+      analyticsService.registerCreateNewCollectionEvent
+    ).toHaveBeenCalledTimes(1);
 
-      expect(windowRef.nativeWindow.location.href).toEqual(
-        '/collection_editor/create/' + SAMPLE_COLLECTION_ID);
-    })
-  );
+    expect(windowRef.nativeWindow.location.href).toEqual(
+      '/collection_editor/create/' + SAMPLE_COLLECTION_ID
+    );
+  }));
 });

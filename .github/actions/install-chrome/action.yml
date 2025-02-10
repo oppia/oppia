@@ -1,0 +1,26 @@
+name: 'Install Chrome'
+description: 'Installs Chrome for use in tests'
+
+runs:
+  using: 'composite'
+  steps:
+    - id: install-chrome
+      name: Install Chrome (retries on error)
+      uses: nick-fields/retry@v3
+      env:
+        # This must be one of the versions available from
+        # github.com/webnicer/chrome-downloads.
+        CHROME_VERSION: "102.0.5005.61-1"
+      with:
+        max_attempts: 3
+        retry_on: error
+        shell: bash
+        timeout_minutes: 10
+        command: |
+          sudo apt-get update
+          sudo apt-get install libappindicator3-1
+          curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_${{ env.CHROME_VERSION }}_amd64.deb
+          sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
+          sudo dpkg -i google-chrome.deb
+          chrome_version=$(google-chrome --version 2>&1 | tr -cd '[:digit:].')
+          [[ "${{ env.CHROME_VERSION }}" == "$chrome_version"* ]] || { echo "Error: Desired version does not start with Chrome version."; exit 1;}

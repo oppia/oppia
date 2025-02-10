@@ -22,9 +22,14 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');

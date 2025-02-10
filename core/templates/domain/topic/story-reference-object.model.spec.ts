@@ -16,8 +16,7 @@
  * @fileoverview Tests for StoryReference.
  */
 
-import { StoryReference } from
-  'domain/topic/story-reference-object.model';
+import {StoryReference} from 'domain/topic/story-reference-object.model';
 
 describe('Story reference model', () => {
   let _sampleStoryReference: StoryReference;
@@ -25,11 +24,12 @@ describe('Story reference model', () => {
   beforeEach(() => {
     var sampleStoryReferenceBackendObject = {
       story_id: 'story_id',
-      story_is_published: true
+      story_is_published: true,
     };
 
     _sampleStoryReference = StoryReference.createFromBackendDict(
-      sampleStoryReferenceBackendObject);
+      sampleStoryReferenceBackendObject
+    );
   });
 
   it('should get all story reference fields', () => {
@@ -38,8 +38,7 @@ describe('Story reference model', () => {
   });
 
   it('should correctly create default story reference', () => {
-    var storyReference = StoryReference.createFromStoryId(
-      'story_id_2');
+    var storyReference = StoryReference.createFromStoryId('story_id_2');
     expect(storyReference.getStoryId()).toEqual('story_id_2');
     expect(storyReference.isStoryPublished()).toEqual(false);
   });

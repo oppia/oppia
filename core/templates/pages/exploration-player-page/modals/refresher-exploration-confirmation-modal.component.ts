@@ -16,31 +16,30 @@
  * @fileoverview Component for refresher exploration confirmation modal.
  */
 
-import { Component, EventEmitter } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
+import {Component, EventEmitter} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
 
 @Component({
   selector: 'oppia-refresher-confirmation-modal',
-  templateUrl: './refresher-exploration-confirmation-modal.component.html'
+  templateUrl: './refresher-exploration-confirmation-modal.component.html',
 })
-export class RefresherExplorationConfirmationModal
-  extends ConfirmOrCancelModal {
+export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal {
   confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   refresherExplorationId!: string;
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private windowRef: WindowRef,
-      private explorationEngineService: ExplorationEngineService,
-      private urlInterpolationService: UrlInterpolationService,
-      private urlService: UrlService
+    private ngbActiveModal: NgbActiveModal,
+    private windowRef: WindowRef,
+    private explorationEngineService: ExplorationEngineService,
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService
   ) {
     super(ngbActiveModal);
   }
@@ -49,13 +48,15 @@ export class RefresherExplorationConfirmationModal
     this.confirmRedirectEventEmitter.emit();
 
     let collectionId: string = this.urlService.getUrlParams().collection_id;
-    let parentIdList: string[] = this.urlService.getQueryFieldValuesAsList(
-      'parent');
+    let parentIdList: string[] =
+      this.urlService.getQueryFieldValuesAsList('parent');
     let EXPLORATION_URL_TEMPLATE: string = '/explore/<exploration_id>';
     let url = this.urlInterpolationService.interpolateUrl(
-      EXPLORATION_URL_TEMPLATE, {
-        exploration_id: this.refresherExplorationId
-      });
+      EXPLORATION_URL_TEMPLATE,
+      {
+        exploration_id: this.refresherExplorationId,
+      }
+    );
 
     if (collectionId) {
       url = this.urlService.addField(url, 'collection_id', collectionId);
@@ -65,12 +66,15 @@ export class RefresherExplorationConfirmationModal
       url = this.urlService.addField(url, 'parent', parentIdList[i]);
     }
     url = this.urlService.addField(
-      url, 'parent', this.explorationEngineService.getExplorationId());
+      url,
+      'parent',
+      this.explorationEngineService.getExplorationId()
+    );
 
     // Wait a little before redirecting the page to ensure other
     // tasks started here (e.g. event recording) have sufficient
     // time to complete.
-    // TODO(bhenning): Find a reliable way to send events that
+    // TODO(#20446): Find a reliable way to send events that
     // does not get interrupted with browser redirection.
     setTimeout(() => {
       this.windowRef.nativeWindow.open(url, '_self');

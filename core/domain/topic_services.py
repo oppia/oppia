@@ -19,13 +19,16 @@
 from __future__ import annotations
 
 import collections
+import itertools
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
+from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
 from core.domain import opportunity_services
@@ -802,15 +805,12 @@ def publish_story(
             story_nodes: list(dict(str, *)). The list of story nodes dicts.
 
         Raises:
-            Exception. The story node doesn't contain any exploration id or the
-                exploration id is invalid or isn't published yet.
+            Exception. The exploration id is invalid or corresponds to an
+                exploration which isn't published yet.
         """
         exploration_id_list = []
         for node in story_nodes:
-            if not node.exploration_id:
-                raise Exception(
-                    'Story node with id %s does not contain an '
-                    'exploration id.' % node.id)
+            assert node.exploration_id is not None
             exploration_id_list.append(node.exploration_id)
         story_services.validate_explorations_for_story(
             exploration_id_list, True)
@@ -827,6 +827,29 @@ def publish_story(
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])
+
+    serial_chapter_curriculum_admin_view_feature_is_enabled = (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+            None)
+    )
+    if not serial_chapter_curriculum_admin_view_feature_is_enabled:
+        chapters_change_list = []
+        for node in story.story_contents.nodes:
+            chapters_change_list.append(story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'node_id': node.id,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'old_value': node.status,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            }))
+
+        if chapters_change_list:
+            update_story_and_topic_summary(
+                committer_id, story_id, chapters_change_list,
+                'Published the story.', topic.id)
 
     topic.publish_story(story_id)
     change_list = [topic_domain.TopicChange({
@@ -869,6 +892,30 @@ def unpublish_story(
     story = story_fetchers.get_story_by_id(story_id, strict=False)
     if story is None:
         raise Exception('A story with the given ID doesn\'t exist')
+
+    serial_chapter_curriculum_admin_view_feature_is_enabled = (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+            None)
+    )
+    if not serial_chapter_curriculum_admin_view_feature_is_enabled:
+        chapters_change_list = []
+        for node in story.story_contents.nodes:
+            chapters_change_list.append(story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'node_id': node.id,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'old_value': node.status,
+                'new_value': constants.STORY_NODE_STATUS_DRAFT
+            }))
+
+        if chapters_change_list:
+            update_story_and_topic_summary(
+                committer_id, story_id, chapters_change_list,
+                'Unpublished the story.', topic.id)
+
     topic.unpublish_story(story_id)
     change_list = [topic_domain.TopicChange({
         'cmd': topic_domain.CMD_UNPUBLISH_STORY,
@@ -1088,25 +1135,46 @@ def compute_summary_of_topic(
     """
     canonical_story_count = 0
     additional_story_count = 0
-    published_node_count = 0
+    published_canonical_story_ids = []
     for reference in topic.canonical_story_references:
         if reference.story_is_published:
             canonical_story_count += 1
-            story_summary = story_fetchers.get_story_summary_by_id(
-                reference.story_id)
-            published_node_count += len(story_summary.node_titles)
+            published_canonical_story_ids.append(reference.story_id)
+
+    published_additional_story_ids = []
     for reference in topic.additional_story_references:
         if reference.story_is_published:
             additional_story_count += 1
+            published_additional_story_ids.append(reference.story_id)
     topic_model_canonical_story_count = canonical_story_count
     topic_model_additional_story_count = additional_story_count
-    total_model_published_node_count = published_node_count
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
+    published_stories_query_result = story_fetchers.get_stories_by_ids(
+        published_canonical_story_ids + published_additional_story_ids,
+        strict=False)
+    published_stories = [
+        story for story in published_stories_query_result
+        if story is not None]
+    topic_model_published_story_exploration_mapping: Dict[str, List[str]] = (
+        _compute_story_exploration_mapping(published_stories))
+
+    total_published_node_count = 0
+    for story in published_stories:
+        if story.id in published_canonical_story_ids:
+            total_published_node_count += (
+                story.story_contents.get_published_node_count()
+                if feature_flag_services.is_feature_flag_enabled(
+                    feature_flag_list.FeatureNames
+                    .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                    None)
+                else len(story.story_contents.nodes))
+    topic_model_published_node_count = total_published_node_count
+
     total_skill_count = topic_model_uncategorized_skill_count
     for subtopic in topic.subtopics:
-        total_skill_count = total_skill_count + len(subtopic.skill_ids)
+        total_skill_count += len(subtopic.skill_ids)
 
     if topic.created_on is None or topic.last_updated is None:
         raise Exception(
@@ -1117,12 +1185,38 @@ def compute_summary_of_topic(
         topic.description, topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        total_skill_count, total_model_published_node_count,
+        total_skill_count, topic_model_published_node_count,
         topic.thumbnail_filename, topic.thumbnail_bg_color, topic.url_fragment,
-        topic.created_on, topic.last_updated
+        topic_model_published_story_exploration_mapping, topic.created_on,
+        topic.last_updated
     )
 
     return topic_summary
+
+
+def _compute_story_exploration_mapping(
+    stories: List[story_domain.Story]
+) -> Dict[str, List[str]]:
+    """Returns a mapping from each story id to a list of its linked
+    exploration ids.
+
+    Args:
+        stories: list(Story). A list of stories to reference in the mapping.
+
+    Returns:
+        dict(str, list(str)). A mapping whose keys are story ids and whose
+        values are lists of exploration ids linked to the corresponding story.
+    """
+    mapping: Dict[str, List[str]] = {}
+    for story in stories:
+        mapping[story.id] = (
+            story.story_contents.get_linked_exp_ids_of_published_nodes()
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
+                None)
+            else story.story_contents.get_all_linked_exp_ids())
+    return mapping
 
 
 def save_topic_summary(topic_summary: topic_domain.TopicSummary) -> None:
@@ -1638,7 +1732,9 @@ def populate_topic_summary_model_fields(
         'thumbnail_bg_color': topic_summary.thumbnail_bg_color,
         'topic_model_last_updated': topic_summary.topic_model_last_updated,
         'topic_model_created_on': topic_summary.topic_model_created_on,
-        'url_fragment': topic_summary.url_fragment
+        'url_fragment': topic_summary.url_fragment,
+        'published_story_exploration_mapping': (
+            topic_summary.published_story_exploration_mapping)
     }
 
     if topic_summary_model is not None:
@@ -1686,3 +1782,167 @@ def get_topic_id_to_topic_name_dict(topic_ids: List[str]) -> Dict[str, str]:
         )
         raise Exception(error_msg)
     return topic_id_to_topic_name
+
+
+def get_chapter_counts_in_topic_summaries(
+    topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict]
+) -> Dict[str, topic_domain.TopicChapterCounts]:
+    """Returns topic chapter counts for each topic summary dict.
+
+    Args:
+        topic_summary_dicts: List[FrontendTopicSummaryDict]. A list of
+            topic summary dicts.
+
+    Returns:
+        Dict[str, TopicChapterCounts]. Dict of topic id and topic chapter
+        counts domain object.
+    """
+
+    topic_summary_id_mapping: Dict[
+        str, topic_domain.FrontendTopicSummaryDict] = {}
+    for topic_summary in topic_summary_dicts:
+        topic_summary_id_mapping.update({
+            topic_summary['id']: topic_summary})
+
+    topic_ids = [summary['id'] for summary in topic_summary_dicts]
+    all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    all_valid_topics = [topic for topic in all_topics if topic is not None]
+    all_story_ids: List[str] = []
+    topic_chapter_counts_dict: Dict[str, topic_domain.TopicChapterCounts] = {}
+    for topic in all_valid_topics:
+        story_ids = [story_reference.story_id for
+            story_reference in topic.canonical_story_references]
+        all_story_ids = all_story_ids + story_ids
+
+    all_stories = story_fetchers.get_stories_by_ids(all_story_ids)
+    all_valid_stories = [story for story in all_stories if story is not None]
+    story_id_mapping: Dict[str, story_domain.Story] = {}
+    for story in all_valid_stories:
+        story_id_mapping.update({story.id: story})
+
+    for topic in all_valid_topics:
+        topic_summary_dict = topic_summary_id_mapping[topic.id]
+        upcoming_chapters_count = 0
+        overdue_chapters_count = 0
+        total_chapter_counts = []
+        published_chapter_counts = []
+        stories = []
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id in story_id_mapping:
+                stories.append(story_id_mapping[story_reference.story_id])
+            else:
+                logging.error(
+                    'Topic %s has an invalid story reference ID %s' % (
+                        topic.id, story_reference.story_id))
+        for story in stories:
+            nodes = story.story_contents.nodes
+            total_chapters_count = len(nodes)
+            published_chapters_count = 0
+            for node in nodes:
+                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                    published_chapters_count += 1
+                else:
+                    if node.is_node_upcoming():
+                        upcoming_chapters_count += 1
+                    elif node.is_node_behind_schedule():
+                        overdue_chapters_count += 1
+
+            total_chapter_counts.append(total_chapters_count)
+            published_chapter_counts.append(published_chapters_count)
+
+        topic_chapter_counts = topic_domain.TopicChapterCounts(
+            upcoming_chapters_count, overdue_chapters_count,
+            total_chapter_counts, published_chapter_counts)
+
+        topic_chapter_counts_dict.update({
+            topic_summary_dict['id']: topic_chapter_counts
+        })
+
+    return topic_chapter_counts_dict
+
+
+def get_all_published_story_exploration_ids(
+    topic_id: Optional[str] = None
+) -> List[str]:
+    """Returns a list of each exploration id linked to each published story
+    chapter that belongs to topic(s).
+
+    Args:
+        topic_id: str|None. The id of a topic. If topic_id is provided, the
+            result includes exploration ids only from the corresponding
+            topic. If no topic_id is provided, the result includes
+            exploration ids in all topics.
+
+    Returns:
+        list(str). A list of all exploration ids linked to the topic(s)'
+        published stories' chapters.
+    """
+    fetched_topic_summaries = (
+        [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
+        else topic_fetchers.get_all_topic_summaries()
+    )
+
+    # Keep each summary's mapping. For those without a mapping,
+    # record their ids, fetch their corresponding topics with them, and then
+    # use the topic to compute the mapping. Add each computed mapping to
+    # the list of persisted mappings.
+    mappings = []
+    ids_of_topic_summaries_without_mapping: List[str] = []
+    for summary in fetched_topic_summaries:
+        if summary.published_story_exploration_mapping is None:
+            ids_of_topic_summaries_without_mapping.append(summary.id)
+        else:
+            mappings.append(
+                summary.published_story_exploration_mapping)
+    if len(ids_of_topic_summaries_without_mapping) > 0:
+        topics_without_mapping = topic_fetchers.get_topics_by_ids(
+            ids_of_topic_summaries_without_mapping
+        )
+
+        published_story_ids_grouped_by_topic = [
+            [
+                story_ref.story_id for story_ref
+                in topic.canonical_story_references +
+                    topic.additional_story_references
+                if story_ref.story_is_published
+            ]
+            for topic in topics_without_mapping if topic is not None
+        ]
+        cumulative_published_story_counts_by_topic = list(
+            itertools.accumulate([0] + [
+                len(topic_published_story_ids)
+                for topic_published_story_ids
+                in published_story_ids_grouped_by_topic[:-1]
+            ])
+        )
+
+        published_stories_in_all_topics_without_mapping = [
+            story for story in story_fetchers.get_stories_by_ids(
+                list(itertools.chain.from_iterable(
+                    published_story_ids_grouped_by_topic
+                )),
+                strict=False
+            )
+            if story is not None
+        ]
+        published_stories_grouped_by_topic = [
+            [
+                published_stories_in_all_topics_without_mapping[
+                    cumulative_published_story_counts_by_topic[i] + j
+                ]
+                for j in range(len(published_story_ids_grouped_by_topic[i]))
+            ]
+            for i in range(len(published_story_ids_grouped_by_topic))
+        ]
+
+        for published_stories_in_topic in published_stories_grouped_by_topic:
+            mappings.append(_compute_story_exploration_mapping(
+                published_stories_in_topic
+            ))
+
+    exp_ids = itertools.chain.from_iterable(
+        itertools.chain.from_iterable(mapping.values())
+        for mapping in mappings
+    )
+
+    return list(set(exp_ids))

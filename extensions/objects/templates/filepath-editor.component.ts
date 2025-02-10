@@ -16,13 +16,20 @@
  * @fileoverview Component for filepath editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'filepath-editor',
   templateUrl: './filepath-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class FilepathEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -37,7 +44,7 @@ export class FilepathEditorComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.value) {
-      this.validityChange.emit({ empty: false });
+      this.validityChange.emit({empty: false});
       return;
     }
     if (this.value.endsWith('.svg')) {
@@ -53,7 +60,7 @@ export class FilepathEditorComponent implements OnInit {
     this.svgEditorIsShown = false;
     this.imageEditorIsShown = false;
     this.value = '';
-    this.validityChange.emit({ empty: false });
+    this.validityChange.emit({empty: false});
     return;
   }
 
@@ -86,6 +93,8 @@ export class FilepathEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'filepathEditor', downgradeComponent({
-    component: FilepathEditorComponent
-  }) as angular.IDirectiveFactory);
+  'filepathEditor',
+  downgradeComponent({
+    component: FilepathEditorComponent,
+  }) as angular.IDirectiveFactory
+);

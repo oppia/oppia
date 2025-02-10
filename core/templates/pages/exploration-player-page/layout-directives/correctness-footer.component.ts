@@ -16,14 +16,10 @@
  * @fileoverview Component for the correctness footer in the exploration player.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-correctness-footer',
-  templateUrl: './correctness-footer.component.html'
+  templateUrl: './correctness-footer.component.html',
 })
 export class CorrectnessFooterComponent {}
-
-angular.module('oppia').directive('oppiaCorrectnessFooter',
-  downgradeComponent({ component: CorrectnessFooterComponent }));

@@ -32,10 +32,10 @@ import esprima
 from typing import Final, List, Tuple
 
 from . import js_ts_linter
-from . import pre_commit_linter
+from . import run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
-NAME_SPACE.files = pre_commit_linter.FileCache()
+NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
 LINTER_TESTS_DIR: Final = os.path.join(
@@ -125,11 +125,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_check_constants_declaration(self) -> None:
         def mock_compile_all_ts_files() -> None:
             cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                './node_modules/typescript/bin/tsc -outDir %s'
+                'scripts/linters/test_files/ -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
+                    'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
                     INVALID_CONSTANT_AJS_FILEPATH,
                     INVALID_CONSTANT_FILEPATH)
@@ -157,11 +158,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
     ) -> None:
         def mock_compile_all_ts_files() -> None:
             cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                './node_modules/typescript/bin/tsc -outDir %s'
+                'scripts/linters/test_files/ -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
+                    'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
                     INVALID_CONSTANT_IN_TS_FILEPATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -252,11 +254,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_angular_services_index_error(self) -> None:
         def mock_compile_all_ts_files() -> None:
             cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                './node_modules/typescript/bin/tsc -outDir %s'
+                'scripts/linters/test_files/ -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
+                    'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
                     VALID_UNLISTED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -291,11 +294,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_angular_services_index_success(self) -> None:
         def mock_compile_all_ts_files() -> None:
             cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                './node_modules/typescript/bin/tsc -outDir %s' 
+                'scripts/linters/test_files/ -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
+                    'true', 'es2017,dom', 'true',
                     'true', 'es5', './node_modules/@types',
                     VALID_IGNORED_SERVICE_PATH)
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)

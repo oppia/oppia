@@ -18,22 +18,24 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import {UpgradedServices} from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require(
-  'filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
 
-describe('HTML to text', function() {
+describe('HTML to text', function () {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia',
-    function($provide: { value: (arg0: string, arg1: string) => void }) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value as string);
+  beforeEach(
+    angular.mock.module(
+      'oppia',
+      function ($provide: {value: (arg0: string, arg1: string) => void}) {
+        var ugs = new UpgradedServices();
+        for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+          $provide.value(key, value as string);
+        }
       }
-    }));
+    )
+  );
 
   var htmlUnicodeHtmlPairings = [
     ['abc', 'abc', 'abc'],
@@ -42,14 +44,15 @@ describe('HTML to text', function() {
     ['<br>a', 'a', 'a'],
     ['<br/>a', 'a', 'a'],
     ['<br></br>a', 'a', 'a'],
-    ['abc  a', 'abc  a', 'abc  a']
+    ['abc  a', 'abc  a', 'abc  a'],
   ];
 
-  it('should convert HTML to and from raw text correctly', angular.mock.inject(
-    function($filter) {
-      htmlUnicodeHtmlPairings.forEach(function(pairing) {
+  it(
+    'should convert HTML to and from raw text correctly',
+    angular.mock.inject(function ($filter) {
+      htmlUnicodeHtmlPairings.forEach(function (pairing) {
         expect($filter('convertHtmlToUnicode')(pairing[0])).toEqual(pairing[1]);
       });
-    }
-  ));
+    })
+  );
 });

@@ -18,12 +18,15 @@
  */
 
 export interface ShortSkillSummaryBackendDict {
-  'skill_id': string;
-  'skill_description': string;
+  skill_id: string;
+  skill_description: string;
 }
 
 export class ShortSkillSummary {
-  constructor(public id: string, public description: string) {}
+  constructor(
+    public id: string,
+    public description: string
+  ) {}
 
   getId(): string {
     return this.id;
@@ -38,9 +41,11 @@ export class ShortSkillSummary {
   }
 
   static createFromBackendDict(
-      backendDict: ShortSkillSummaryBackendDict): ShortSkillSummary {
+    backendDict: ShortSkillSummaryBackendDict
+  ): ShortSkillSummary {
     return new ShortSkillSummary(
       backendDict.skill_id,
-      backendDict.skill_description);
+      backendDict.skill_description
+    );
   }
 }

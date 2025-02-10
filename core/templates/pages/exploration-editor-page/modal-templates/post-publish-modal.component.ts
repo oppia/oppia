@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for the Post Publish Modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-post-publish-modal',
-  templateUrl: './post-publish-modal.component.html'
+  templateUrl: './post-publish-modal.component.html',
 })
-
 export class PostPublishModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   number = '1';
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -44,28 +43,27 @@ export class PostPublishModalComponent
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
     private contextService: ContextService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.congratsImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/congrats.svg');
-    this.explorationId = (this.contextService.getExplorationId());
+    this.congratsImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/congrats.svg'
+      );
+    this.explorationId = this.contextService.getExplorationId();
     this.explorationLinkCopied = false;
     this.explorationLink =
-     this.windowRef.nativeWindow.location.protocol + '//' +
+      this.windowRef.nativeWindow.location.protocol +
+      '//' +
       this.windowRef.nativeWindow.location.host +
-       '/explore/' + this.explorationId;
+      '/explore/' +
+      this.explorationId;
   }
 
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
 }
-
-angular.module('oppia').factory('oppiaPostPublishModal',
-  downgradeComponent({
-    component: PostPublishModalComponent
-  }) as angular.IDirectiveFactory);

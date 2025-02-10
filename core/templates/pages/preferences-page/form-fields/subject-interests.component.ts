@@ -16,22 +16,37 @@
  * @fileoverview Component for subject interests form field.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  Input,
+  ViewChild,
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'oppia-subject-interests',
-  templateUrl: './subject-interests.component.html'
+  templateUrl: './subject-interests.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SubjectInterestsComponent),
+      multi: true,
+    },
+  ],
 })
-export class SubjectInterestsComponent {
+export class SubjectInterestsComponent implements ControlValueAccessor {
   @Input() subjectInterests: string[] = [];
-  @Output() subjectInterestsChange: EventEmitter<string[]> = (
-    new EventEmitter());
 
   selectable = true;
   removable = true;
@@ -43,19 +58,40 @@ export class SubjectInterestsComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
-  @ViewChild('subjectInterestInput') subjectInterestInput!:
-  ElementRef<HTMLInputElement>;
+  @ViewChild('subjectInterestInput')
+  subjectInterestInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.filteredSubjectInterests = this.formCtrl.valueChanges.pipe(
       startWith(null),
-      map((interest: string | null) => interest ? this.filter(
-        interest) : this.allSubjectInterests.slice()));
+      map((interest: string | null) =>
+        interest ? this.filter(interest) : this.allSubjectInterests.slice()
+      )
+    );
+  }
+
+  // Implementing the ControlValueAccessor interface through the following
+  // 5 methods to make the component work as a form field.
+  onChange: (value: string[]) => void = () => {};
+  onTouched: () => void = () => {};
+
+  writeValue(value: string[]): void {
+    if (value !== undefined) {
+      this.subjectInterests = value;
+    }
+  }
+
+  registerOnChange(fn: (value: string[]) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
   }
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
-      if (!this.validInput(value)) {
+      if (!this.isValidInput(value)) {
         this.chipList.errorState = true;
       } else {
         this.chipList.errorState = false;
@@ -64,23 +100,26 @@ export class SubjectInterestsComponent {
     this.allSubjectInterests = cloneDeep(this.subjectInterests);
   }
 
-  validInput(value: string): boolean {
-    return value === value.toLowerCase() &&
-      this.subjectInterests.indexOf(value) < 0 ? true : false;
+  isValidInput(value: string): boolean {
+    // The following regex matches only lowercase
+    // alphabetic characters and spaces.
+    let validRegex = new RegExp('^[a-z\\s]*$');
+
+    return validRegex.test(value) && !this.subjectInterests.includes(value);
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
     }
 
-    if (this.validInput(value)) {
+    if (this.isValidInput(value)) {
       this.subjectInterests.push(value);
       if (this.allSubjectInterests.indexOf(value) < 0) {
         this.allSubjectInterests.push(value);
       }
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
       this.subjectInterestInput.nativeElement.value = '';
     }
   }
@@ -90,11 +129,11 @@ export class SubjectInterestsComponent {
 
     if (index >= 0) {
       this.subjectInterests.splice(index, 1);
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected(event: {option: {value: string}}): void {
     if (this.subjectInterests.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -105,7 +144,33 @@ export class SubjectInterestsComponent {
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allSubjectInterests.filter(
-      interest => interest.toLowerCase().includes(filterValue));
+    return this.allSubjectInterests.filter(interest =>
+      interest.toLowerCase().includes(filterValue)
+    );
+  }
+  onBlur(): void {
+    // `nativeElement.value` represents the current value of the input field in the DOM.
+    const value = this.subjectInterestInput.nativeElement.value.trim();
+
+    if (value && this.isValidInput(value)) {
+      this.subjectInterests.push(value);
+      this.subjectInterestInput.nativeElement.value = '';
+      this.onChange(this.subjectInterests);
+    }
+  }
+
+  onInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const inputValue = inputElement.value.trim();
+
+    if (!inputValue) {
+      this.formCtrl.markAsPristine();
+      return;
+    }
+
+    if (this.isValidInput(inputValue)) {
+      this.formCtrl.markAsDirty();
+      this.onChange(this.subjectInterests);
+    }
   }
 }

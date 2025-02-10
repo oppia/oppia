@@ -2,17 +2,19 @@
   <mat-label class="text-capitalize">
     {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
   </mat-label>
-  <mat-chip-list #chipList aria-label="Preferred Exploration Languages">
+  <mat-chip-list #chipList aria-label="Preferred Exploration Languages" tabindex="0">
     <mat-chip *ngFor="let language of preferredLanguages"
               [selectable]="selectable"
               [removable]="removable"
               (removed)="remove(language)">
       <ng-container *ngFor="let choice of choices">
         <ng-container *ngIf="choice.id === language">
-          {{ choice.text }}
+          <span tabindex="0" [attr.aria-label]="choice.text+', selected'">{{ choice.text }}</span>
         </ng-container>
       </ng-container>
-      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+      <button class="oppia-cancel-button" role="button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
+        <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
+      </button>
     </mat-chip>
     <input placeholder="{{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_SELECT' | translate }}"
            #languageInput
@@ -20,11 +22,13 @@
            [matAutocomplete]="auto"
            [matChipInputFor]="chipList"
            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-           (matChipInputTokenEnd)="add($event)">
+           (matChipInputTokenEnd)="add($event)"
+           [(ngModel)]="searchQuery" (ngModelChange)="onSearchInputChange()" (click)="resetLanguageSearch()"
+           class="e2e-test-preferred-exploration-language-input">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-    <mat-option *ngFor="let language of choices" [value]="language.id">
-      {{ language.text }}
+    <mat-option *ngFor="let choice of filteredChoices" [value]="choice.id">
+      {{ choice.text }}
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>

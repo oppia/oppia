@@ -16,16 +16,17 @@
  * @fileoverview Component for the blog admin page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
-import { BlogAdminBackendApiService, ConfigPropertiesBackendResponse, ConfigPropertyValues }
-  from 'domain/blog-admin/blog-admin-backend-api.service';
-import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
-import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
-import { Schema } from 'services/schema-default-value.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { RoleToActionsBackendResponse } from 'domain/admin/admin-backend-api.service';
+import {Component, OnInit} from '@angular/core';
+import {
+  BlogAdminBackendApiService,
+  PlatformParameterBackendResponse,
+  PlatformParameterValues,
+} from 'domain/blog-admin/blog-admin-backend-api.service';
+import {BlogAdminDataService} from 'pages/blog-admin-page/services/blog-admin-data.service';
+import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
+import {Schema} from 'services/schema-default-value.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {RoleToActionsBackendResponse} from 'domain/admin/admin-backend-api.service';
 
 interface UpdateRoleAction {
   // 'newRole' is 'null' when the form is refreshed.
@@ -44,8 +45,10 @@ interface FormData {
   removeEditorRole: RemoveEditorRole;
 }
 
-type ConfigPropertyValuesRecord = (
-  Record<keyof ConfigPropertyValues, string[] | number>);
+type PlatformParameterValuesRecord = Record<
+  keyof PlatformParameterValues,
+  string[] | number
+>;
 
 @Component({
   selector: 'oppia-blog-admin-page',
@@ -59,21 +62,21 @@ export class BlogAdminPageComponent implements OnInit {
   formData!: FormData;
   UPDATABLE_ROLES = {};
   statusMessage: string = '';
-  configProperties: ConfigPropertiesBackendResponse = {};
+  platformParameters: PlatformParameterBackendResponse = {};
   constructor(
     private backendApiService: BlogAdminBackendApiService,
     private blogAdminDataService: BlogAdminDataService,
     private adminTaskManagerService: AdminTaskManagerService,
-    private windowRef: WindowRef,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
     this.refreshFormData();
-    this.blogAdminDataService.getDataAsync().then((DataObject) => {
+    this.blogAdminDataService.getDataAsync().then(DataObject => {
       this.UPDATABLE_ROLES = DataObject.updatableRoles;
       this.roleToActions = DataObject.roleToActions;
     });
-    this.reloadConfigProperties();
+    this.reloadPlatformParameters();
   }
 
   refreshFormData(): void {
@@ -88,7 +91,7 @@ export class BlogAdminPageComponent implements OnInit {
             return Boolean(this.username);
           }
           return false;
-        }
+        },
       },
       removeEditorRole: {
         username: '',
@@ -97,8 +100,8 @@ export class BlogAdminPageComponent implements OnInit {
             return false;
           }
           return true;
-        }
-      }
+        },
+      },
     };
   }
 
@@ -108,43 +111,51 @@ export class BlogAdminPageComponent implements OnInit {
     }
     this.statusMessage = 'Updating User Role';
     this.adminTaskManagerService.startTask();
-    this.backendApiService.updateUserRoleAsync(
-      // Update role button will not be enabled if 'newRole' is 'null'.
-      // hence whenever this method is called 'newRole' will exist and
-      // we can safely typecast it to a 'string'.
-      formResponse.newRole as string, formResponse.username,
-    ).then(() => {
-      this.statusMessage = (
-        'Role of ' + formResponse.username + ' successfully updated to ' +
-        formResponse.newRole);
-      this.refreshFormData();
-    }, errorResponse => {
-      this.statusMessage = errorResponse;
-    });
+    this.backendApiService
+      .updateUserRoleAsync(
+        // Update role button will not be enabled if 'newRole' is 'null'.
+        // hence whenever this method is called 'newRole' will exist and
+        // we can safely typecast it to a 'string'.
+        formResponse.newRole as string,
+        formResponse.username
+      )
+      .then(
+        () => {
+          this.statusMessage =
+            'Role of ' +
+            formResponse.username +
+            ' successfully updated to ' +
+            formResponse.newRole;
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = errorResponse;
+        }
+      );
     this.adminTaskManagerService.finishTask();
   }
 
-  submitRemoveEditorRoleForm(
-      formResponse: RemoveEditorRole): void {
+  submitRemoveEditorRoleForm(formResponse: RemoveEditorRole): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
     this.statusMessage = 'Processing query...';
     this.adminTaskManagerService.startTask();
-    this.backendApiService.removeBlogEditorAsync(
-      formResponse.username
-    ).then(() => {
-      this.statusMessage = 'Success.';
-      this.refreshFormData();
-    }, error => {
-      this.statusMessage = 'Server error: ' + error.error.error;
-    });
+    this.backendApiService.removeBlogEditorAsync(formResponse.username).then(
+      () => {
+        this.statusMessage = 'Success.';
+        this.refreshFormData();
+      },
+      error => {
+        this.statusMessage = 'Server error: ' + error.error.error;
+      }
+    );
     this.adminTaskManagerService.finishTask();
   }
 
-  reloadConfigProperties(): void {
-    this.blogAdminDataService.getDataAsync().then((DataObject) => {
-      this.configProperties = DataObject.configProperties;
+  reloadPlatformParameters(): void {
+    this.blogAdminDataService.getDataAsync().then(DataObject => {
+      this.platformParameters = DataObject.platformParameters;
     });
   }
 
@@ -154,50 +165,40 @@ export class BlogAdminPageComponent implements OnInit {
     };
   }
 
-  revertToDefaultConfigPropertyValue(configPropertyId: string): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
-      return;
-    }
-
-    this.backendApiService.revertConfigPropertyAsync(configPropertyId)
-      .then(() => {
-        this.statusMessage = 'Config property reverted successfully.';
-        this.reloadConfigProperties();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
-  }
-
-  saveConfigProperties(): void {
+  savePlatformParameters(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
     this.statusMessage = 'Saving...';
 
     this.adminTaskManagerService.startTask();
-    let newConfigPropertyValues = {} as ConfigPropertyValuesRecord;
-    for (let property in this.configProperties) {
-      const prop = property as keyof ConfigPropertyValues;
-      newConfigPropertyValues[prop] = this.configProperties[prop].value;
+    let newPlatformParameterValues = {} as PlatformParameterValuesRecord;
+    for (let property in this.platformParameters) {
+      const prop = property as keyof PlatformParameterValues;
+      newPlatformParameterValues[prop] = this.platformParameters[prop].value;
     }
 
-    this.backendApiService.saveConfigPropertiesAsync(
-      newConfigPropertyValues as ConfigPropertyValues).then(() => {
-      this.statusMessage = 'Data saved successfully.';
-      this.adminTaskManagerService.finishTask();
-    }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
-      this.adminTaskManagerService.finishTask();
-    });
+    this.backendApiService
+      .savePlatformParametersAsync(
+        newPlatformParameterValues as PlatformParameterValues
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Data saved successfully.';
+          this.adminTaskManagerService.finishTask();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+          this.adminTaskManagerService.finishTask();
+        }
+      );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogAdminPage', downgradeComponent(
-    {component: BlogAdminPageComponent}));

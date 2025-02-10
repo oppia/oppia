@@ -16,30 +16,30 @@
  * @fileoverview Component for the navbar of the topic editor.
  */
 
-import { Subscription } from 'rxjs';
-import { TopicEditorSendMailComponent } from '../modal-templates/topic-editor-send-mail-modal.component';
-import { TopicEditorSaveModalComponent } from '../modal-templates/topic-editor-save-modal.component';
-import { AfterContentChecked, Component, OnDestroy, OnInit } from '@angular/core';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { Topic } from 'domain/topic/topic-object.model';
-import { TopicRights } from 'domain/topic/topic-rights.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {TopicEditorSendMailComponent} from '../modal-templates/topic-editor-send-mail-modal.component';
+import {TopicEditorSaveModalComponent} from '../modal-templates/topic-editor-save-modal.component';
+import {AfterContentChecked, Component, OnDestroy, OnInit} from '@angular/core';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {Topic} from 'domain/topic/topic-object.model';
+import {TopicRights} from 'domain/topic/topic-rights.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',
-  templateUrl: './topic-editor-navbar.component.html'
+  templateUrl: './topic-editor-navbar.component.html',
 })
-export class TopicEditorNavbarComponent implements OnInit,
-  OnDestroy, AfterContentChecked {
+export class TopicEditorNavbarComponent
+  implements OnInit, OnDestroy, AfterContentChecked
+{
   validationIssues: string[];
   topic: Topic;
   prepublishValidationIssues: string[];
@@ -78,59 +78,62 @@ export class TopicEditorNavbarComponent implements OnInit,
   _validateTopic(): void {
     this.validationIssues = this.topic.validate();
     if (this.topicEditorStateService.getTopicWithNameExists()) {
-      this.validationIssues.push(
-        'A topic with this name already exists.');
+      this.validationIssues.push('A topic with this name already exists.');
     }
     if (this.topicEditorStateService.getTopicWithUrlFragmentExists()) {
-      this.validationIssues.push(
-        'Topic URL fragment already exists.');
+      this.validationIssues.push('Topic URL fragment already exists.');
     }
-    let prepublishTopicValidationIssues = (
-      this.topic.prepublishValidate());
-    let subtopicPrepublishValidationIssues = (
-      [].concat.apply([], this.topic.getSubtopics().map(
-        (subtopic) => subtopic.prepublishValidate())));
-    this.prepublishValidationIssues = (
-      prepublishTopicValidationIssues.concat(
-        subtopicPrepublishValidationIssues));
+    let prepublishTopicValidationIssues = this.topic.prepublishValidate();
+    let subtopicPrepublishValidationIssues = [].concat.apply(
+      [],
+      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
+    );
+    this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
+      subtopicPrepublishValidationIssues
+    );
   }
 
   publishTopic(): void {
     if (!this.topicRights.canPublishTopic()) {
-      this.ngbModal.open(TopicEditorSendMailComponent, {
-        backdrop: true
-      }).result.then(() => {
-        this.topicRightsBackendApiService.sendMailAsync(
-          this.topicId, this.topicName).then(() => {
-          let successToast = 'Mail Sent.';
-          this.alertsService.addSuccessMessage(
-            successToast, 1000);
-        });
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      this.ngbModal
+        .open(TopicEditorSendMailComponent, {
+          backdrop: true,
+        })
+        .result.then(
+          () => {
+            this.topicRightsBackendApiService
+              .sendMailAsync(this.topicId, this.topicName)
+              .then(() => {
+                let successToast = 'Mail Sent.';
+                this.alertsService.addSuccessMessage(successToast, 1000);
+              });
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          }
+        );
       return;
     }
     let redirectToDashboard = false;
-    this.topicRightsBackendApiService.publishTopicAsync(this.topicId).then(
-      () => {
+    this.topicRightsBackendApiService
+      .publishTopicAsync(this.topicId)
+      .then(() => {
         if (!this.topicRights.isPublished()) {
           redirectToDashboard = true;
         }
         this.topicRights.markTopicAsPublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
-      }
-    ).then(() => {
-      let successToast = 'Topic published.';
-      if (redirectToDashboard) {
-        this.windowRef.nativeWindow.location.href = (
-          '/topics-and-skills-dashboard');
-      }
-      this.alertsService.addSuccessMessage(
-        successToast, 1000);
-    });
+      })
+      .then(() => {
+        let successToast = 'Topic published.';
+        if (redirectToDashboard) {
+          this.windowRef.nativeWindow.location.href =
+            '/topics-and-skills-dashboard';
+        }
+        this.alertsService.addSuccessMessage(successToast, 1000);
+      });
   }
 
   discardChanges(): void {
@@ -146,10 +149,9 @@ export class TopicEditorNavbarComponent implements OnInit,
   isTopicSaveable(): boolean {
     return (
       this.getChangeListLength() > 0 &&
-          this.getWarningsCount() === 0 && (
-        !this.topicRights.isPublished() ||
-            this.prepublishValidationIssues.length === 0
-      )
+      this.getWarningsCount() === 0 &&
+      (!this.topicRights.isPublished() ||
+        this.prepublishValidationIssues.length === 0)
     );
   }
 
@@ -158,14 +160,15 @@ export class TopicEditorNavbarComponent implements OnInit,
   }
 
   getAllTopicWarnings(): string {
-    return this.validationIssues.concat(
-    ).concat(this.prepublishValidationIssues).join('\n');
+    return this.validationIssues
+      .concat()
+      .concat(this.prepublishValidationIssues)
+      .join('\n');
   }
 
   toggleDiscardChangeButton(): void {
     this.showTopicEditOptions = false;
-    this.discardChangesButtonIsShown = (
-      !this.discardChangesButtonIsShown);
+    this.discardChangesButtonIsShown = !this.discardChangesButtonIsShown;
   }
 
   saveChanges(): void {
@@ -174,27 +177,39 @@ export class TopicEditorNavbarComponent implements OnInit,
       backdrop: 'static',
     });
     modelRef.componentInstance.topicIsPublished = isTopicPublished;
-    modelRef.result.then((commitMessage: string) => {
-      this.topicEditorStateService.saveTopic(commitMessage, () => {
-        this.alertsService.addSuccessMessage('Changes Saved.');
-      });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modelRef.result.then(
+      (commitMessage: string) => {
+        this.topicEditorStateService.saveTopic(commitMessage, () => {
+          this.alertsService.addSuccessMessage('Changes Saved.');
+        });
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   unpublishTopic(): boolean {
+    const classroomName = this.topicEditorStateService.getClassroomName();
+    if (classroomName) {
+      const errorMessage =
+        `The topic is assigned to the ${classroomName} ` +
+        'classroom. Contact the curriculum admins to remove it from the classroom first.';
+      this.alertsService.addWarning(errorMessage);
+      return false;
+    }
     this.showTopicEditOptions = false;
     if (!this.topicRights.canPublishTopic()) {
       return false;
     }
-    this.topicRightsBackendApiService.unpublishTopicAsync(
-      this.topicId).then(() => {
-      this.topicRights.markTopicAsUnpublished();
-      this.topicEditorStateService.setTopicRights(this.topicRights);
-    });
+    this.topicRightsBackendApiService
+      .unpublishTopicAsync(this.topicId)
+      .then(() => {
+        this.topicRights.markTopicAsUnpublished();
+        this.topicEditorStateService.setTopicRights(this.topicRights);
+      });
   }
 
   toggleNavigationOptions(): void {
@@ -215,49 +230,75 @@ export class TopicEditorNavbarComponent implements OnInit,
 
   getTotalWarningsCount(): number {
     let validationIssuesCount = this.validationIssues.length;
-    let prepublishValidationIssuesCount = (
-      this.prepublishValidationIssues.length);
+    let prepublishValidationIssuesCount =
+      this.prepublishValidationIssues.length;
     return validationIssuesCount + prepublishValidationIssuesCount;
+  }
+
+  getMobileNavigatorText(): string {
+    const activeTab = this.getActiveTabName();
+    if (activeTab === 'main') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_editor') {
+      return 'Editor';
+    } else if (activeTab === 'subtopic_preview') {
+      return 'Preview';
+    } else if (activeTab === 'questions') {
+      return 'Questions';
+    } else if (activeTab === 'topic_preview') {
+      return 'Preview';
+    }
   }
 
   openTopicViewer(): void {
     this.showNavigationOptions = false;
     let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (activeTab !== 'subtopic_editor') {
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
       if (this.getChangeListLength() > 0) {
         this.alertsService.addInfoMessage(
           'Please save all pending changes to preview the topic ' +
-                'with the changes', 2000);
+            'with the changes',
+          2000
+        );
         return;
       }
       let topicUrlFragment = this.topic.getUrlFragment();
-      let classroomUrlFragment = (
-        this.topicEditorStateService.getClassroomUrlFragment());
+      let classroomUrlFragment =
+        this.topicEditorStateService.getClassroomUrlFragment();
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
-          ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+          ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+          {
             topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment
+            classroom_url_fragment: classroomUrlFragment,
           }
-        ), 'blank');
+        ),
+        'blank'
+      );
     } else {
-      this.activeTab = 'Preview';
       let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
-      this.topicEditorRoutingService.navigateToSubtopicPreviewTab(
-        subtopicId);
+      this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
+      this.activeTab = 'Preview';
     }
   }
 
   selectMainTab(): void {
-    this.activeTab = 'Editor';
     this.showNavigationOptions = false;
-    this.topicEditorRoutingService.navigateToMainTab();
+    let activeTab = this.topicEditorRoutingService.getActiveTabName();
+    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
+      this.topicEditorRoutingService.navigateToMainTab();
+      this.activeTab = 'Editor';
+    } else {
+      let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      this.topicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
+      this.activeTab = 'Editor';
+    }
   }
 
   selectQuestionsTab(): void {
-    this.activeTab = 'Question';
     this.showNavigationOptions = false;
     this.topicEditorRoutingService.navigateToQuestionsTab();
+    this.activeTab = 'Questions';
   }
 
   getActiveTabName(): string {
@@ -266,22 +307,20 @@ export class TopicEditorNavbarComponent implements OnInit,
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => {
-          this.topic = this.topicEditorStateService.getTopic();
-          this._validateTopic();
-        }
-      ));
+      this.topicEditorStateService.onTopicInitialized.subscribe(() => {
+        this.topic = this.topicEditorStateService.getTopic();
+        this._validateTopic();
+      })
+    );
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => {
-          this.topic = this.topicEditorStateService.getTopic();
-          this._validateTopic();
-        }
-      ));
+      this.topicEditorStateService.onTopicReinitialized.subscribe(() => {
+        this.topic = this.topicEditorStateService.getTopic();
+        this._validateTopic();
+      })
+    );
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
-    this.activeTab = 'Editor';
+    this.activeTab = this.getMobileNavigatorText();
     this.showNavigationOptions = false;
     this.warningsAreShown = false;
     this.showTopicEditOptions = false;
@@ -291,12 +330,10 @@ export class TopicEditorNavbarComponent implements OnInit,
     this.prepublishValidationIssues = [];
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.directiveSubscriptions.add(
-      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => {
-          this.topic = this.topicEditorStateService.getTopic();
-          this._validateTopic();
-        }
-      )
+      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(() => {
+        this.topic = this.topicEditorStateService.getTopic();
+        this._validateTopic();
+      })
     );
   }
 
@@ -310,8 +347,3 @@ export class TopicEditorNavbarComponent implements OnInit,
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaTopicEditorNavbar',
-  downgradeComponent({
-    component: TopicEditorNavbarComponent
-  }) as angular.IDirectiveFactory);

@@ -23,33 +23,33 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
-        'Lint check to disallow the use of bypassSecurity identifier phrase.'),
+      description:
+        'Lint check to disallow the use of bypassSecurity identifier phrase.',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowBypassSecurity: 'Please do not use phrase "bypassSecurity"'
+      disallowBypassSecurity: 'Please do not use phrase "bypassSecurity"',
     },
   },
 
-  create: function(context) {
-    var checkAndReportBypassSecurity = function(node) {
+  create: function (context) {
+    var checkAndReportBypassSecurity = function (node) {
       var identifierName = node.name;
       if (identifierName.includes('bypassSecurity')) {
         context.report({
           node: node,
-          messageId: 'disallowBypassSecurity'
+          messageId: 'disallowBypassSecurity',
         });
       }
     };
 
     return {
-      Identifier: function(node) {
+      Identifier: function (node) {
         checkAndReportBypassSecurity(node);
-      }
+      },
     };
-  }
+  },
 };

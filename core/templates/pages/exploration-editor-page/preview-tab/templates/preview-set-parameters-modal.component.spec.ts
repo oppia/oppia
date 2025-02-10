@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the PreviewSetParametersModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { PreviewSetParametersModalComponent } from './preview-set-parameters-modal.component';
+import {PreviewSetParametersModalComponent} from './preview-set-parameters-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,20 +32,20 @@ class MockActiveModal {
   }
 }
 
-describe('Preview Set Parameters Modal Component', function() {
+describe('Preview Set Parameters Modal Component', function () {
   let component: PreviewSetParametersModalComponent;
   let fixture: ComponentFixture<PreviewSetParametersModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        PreviewSetParametersModalComponent,
+      declarations: [PreviewSetParametersModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

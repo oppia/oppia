@@ -1,23 +1,29 @@
 # CSS
+
 ## Overview
+
 This folder contains all the global style sheets for the oppia frontend.
 
 ## Files:
+
 1. oppia.css — Custom css styles written by the oppia-devs for the frontend.
 2. oppia-material.css — Material CSS for the oppia-codebase. This css file is generated and shouldn't be modified at all.
 
 ## Modification procedure:
+
 1. oppia.css can be modified with proper reasoning in the pr that modifies the file.
 2. oppia-material.css shouldn't be changed at any cost. No changes are accepted in this file.
    If, at any time, the oppia-material.css is overriding the styles in oppia.css, create a style tag in the directive and make the selectors more specific.
 
 ## Oppia Material
+
 **If at any time the css file is regenerated please update the pr number here**
 
 - Introduced in: #9577
 - Updated in: N/A (Comma separated pr numbers).
 
 ### Info
+
 More info regarding the oppia-material.css can be found in this doc:
 Material CSS doc: https://docs.google.com/document/d/1UoCOC7XNhCZrWIMPAoR5Xex28OYWzteqXrqCU9gRUHQ/edit?usp=sharing
 

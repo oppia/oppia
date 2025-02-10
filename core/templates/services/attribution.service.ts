@@ -16,15 +16,15 @@
  * @fileoverview Service to handle the attribution experience.
  */
 
-import { ApplicationRef, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {ApplicationRef, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
-import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
-import { ContextService } from 'services/context.service';
+import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
+import {ContextService} from 'services/context.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AttributionService {
   attributionModalIsShown: boolean = false;
@@ -33,33 +33,34 @@ export class AttributionService {
   constructor(
     private applicationRef: ApplicationRef,
     private contextService: ContextService,
-    private explorationSummaryBackendApiService: (
-      ExplorationSummaryBackendApiService)
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService
   ) {}
 
   init(): void {
     this.explorationSummaryBackendApiService
-      .loadPublicAndPrivateExplorationSummariesAsync(
-        [this.contextService.getExplorationId()]).then(responseObject => {
-        let summaries = responseObject.summaries;
-        let contributorSummary = (
-          summaries.length ?
-          summaries[0].human_readable_contributors_summary :
-          {} as HumanReadableContributorsSummary
-        );
-        this.authors = (
-          Object.keys(contributorSummary).sort(
+      .loadPublicAndPrivateExplorationSummariesAsync([
+        this.contextService.getExplorationId(),
+      ])
+      .then(
+        responseObject => {
+          let summaries = responseObject.summaries;
+          let contributorSummary = summaries.length
+            ? summaries[0].human_readable_contributors_summary
+            : ({} as HumanReadableContributorsSummary);
+          this.authors = Object.keys(contributorSummary).sort(
             (contributorUsername1, contributorUsername2) => {
-              let { num_commits: commitsOfContributor1 } = contributorSummary[
-                contributorUsername1];
-              let { num_commits: commitsOfContributor2 } = contributorSummary[
-                contributorUsername2];
+              let {num_commits: commitsOfContributor1} =
+                contributorSummary[contributorUsername1];
+              let {num_commits: commitsOfContributor2} =
+                contributorSummary[contributorUsername2];
               return commitsOfContributor2 - commitsOfContributor1;
-            })
-        );
-        this.explorationTitle = summaries.length ? summaries[0].title : '';
-        this.applicationRef.tick();
-      }, () => {});
+            }
+          );
+          this.explorationTitle = summaries.length ? summaries[0].title : '';
+          this.applicationRef.tick();
+        },
+        () => {}
+      );
   }
 
   isGenerateAttributionAllowed(): boolean {
@@ -87,5 +88,6 @@ export class AttributionService {
   }
 }
 
-angular.module('oppia').factory(
-  'AttributionService', downgradeInjectable(AttributionService));
+angular
+  .module('oppia')
+  .factory('AttributionService', downgradeInjectable(AttributionService));

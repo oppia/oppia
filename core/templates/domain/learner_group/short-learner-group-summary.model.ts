@@ -33,11 +33,11 @@ export class ShortLearnerGroupSummary {
   _learnersCount: number;
 
   constructor(
-      id: string,
-      title: string,
-      description: string,
-      facilitatorUsernames: string[],
-      learnersCount: number
+    id: string,
+    title: string,
+    description: string,
+    facilitatorUsernames: string[],
+    learnersCount: number
   ) {
     this._id = id;
     this._title = title;
@@ -67,7 +67,7 @@ export class ShortLearnerGroupSummary {
   }
 
   static createFromBackendDict(
-      shortLearnerGroupBackendDict: ShortLearnerGroupSummaryBackendDict
+    shortLearnerGroupBackendDict: ShortLearnerGroupSummaryBackendDict
   ): ShortLearnerGroupSummary {
     return new ShortLearnerGroupSummary(
       shortLearnerGroupBackendDict.id,

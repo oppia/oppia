@@ -18,33 +18,53 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { ClassroomDomainConstants } from
-  'domain/classroom/classroom-domain.constants';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
-angular.module('oppia').constant(
-  'CLASSROOOM_DATA_URL_TEMPLATE',
-  ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'CLASSROOOM_DATA_URL_TEMPLATE',
+    ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'TOPIC_VIEWER_URL_TEMPLATE',
-  ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_VIEWER_URL_TEMPLATE',
+    ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'TOPIC_VIEWER_REVISION_URL_TEMPLATE',
-  ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_VIEWER_REVISION_URL_TEMPLATE',
+    ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'TOPIC_VIEWER_STORY_URL_TEMPLATE',
-  ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_VIEWER_STORY_URL_TEMPLATE',
+    ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'CLASSROOM_HANDLER_URL_TEMPLATE',
-  ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'CLASSROOM_HANDLER_URL_TEMPLATE',
+    ClassroomDomainConstants.CLASSROOM_HANDLER_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE',
-  ClassroomDomainConstants.NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE',
+    ClassroomDomainConstants.NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE',
-  ClassroomDomainConstants.CLASSROOM_ADMIN_DATA_HANDLER_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'CLASSROOM_DISPLAY_INFO_HANDLER_URL_TEMPLATE',
+    ClassroomDomainConstants.CLASSROOM_DISPLAY_INFO_HANDLER_URL_TEMPLATE
+  );

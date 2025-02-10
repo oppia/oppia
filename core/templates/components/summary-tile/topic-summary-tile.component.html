@@ -10,7 +10,7 @@
         <img [src]="thumbnailUrl" alt="" class="img-thumbnail" [ngStyle]="{background: topicSummary.getThumbnailBgColor()}">
       </picture>
     </div>
-    <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
+    <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor(), 'text-align': isLanguageRTL() ? 'right' : 'left'}" ng-class="{'mask-effect': !isPublished}">
       <span class="topic-name e2e-test-topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
         {{ topicSummary.getName() }}
       </span>
@@ -54,7 +54,7 @@
   }
 
   .topic-card .topic-coming-soon {
-    background-image: linear-gradient(to right, #7659b6, #674172);
+    background-color: #00645c;
     border-radius: 0 0.2em 0 0.6em;
     color: #fff;
     display: block;

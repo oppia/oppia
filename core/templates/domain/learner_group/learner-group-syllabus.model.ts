@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { StorySummary, StorySummaryBackendDict }
-  from 'domain/story/story-summary.model';
-import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
-  from './learner-group-subtopic-summary.model';
+import {
+  StorySummary,
+  StorySummaryBackendDict,
+} from 'domain/story/story-summary.model';
+import {
+  LearnerGroupSubtopicSummary,
+  LearnerGroupSubtopicSummaryBackendDict,
+} from './learner-group-subtopic-summary.model';
 
 /**
  * @fileoverview Model for displaying short summaries of learner group
@@ -34,9 +38,9 @@ export class LearnerGroupSyllabus {
   _subtopicPageSummaries: LearnerGroupSubtopicSummary[];
 
   constructor(
-      learnerGroupId: string,
-      storySummaries: StorySummary[],
-      subtopicPageSummaries: LearnerGroupSubtopicSummary[]
+    learnerGroupId: string,
+    storySummaries: StorySummary[],
+    subtopicPageSummaries: LearnerGroupSubtopicSummary[]
   ) {
     this._learnerGroupId = learnerGroupId;
     this._storySummaries = storySummaries;
@@ -56,25 +60,22 @@ export class LearnerGroupSyllabus {
   }
 
   static createFromBackendDict(
-      backendDict: LearnerGroupSyllabusBackendDict
+    backendDict: LearnerGroupSyllabusBackendDict
   ): LearnerGroupSyllabus {
     let storiesSummaries: StorySummary[] = [];
     if (backendDict.story_summary_dicts.length > 0) {
-      storiesSummaries = backendDict.story_summary_dicts.map(
-        (storySummaryDict) => StorySummary.createFromBackendDict(
-          storySummaryDict
-        )
+      storiesSummaries = backendDict.story_summary_dicts.map(storySummaryDict =>
+        StorySummary.createFromBackendDict(storySummaryDict)
       );
     }
 
     let subtopicsSummaries: LearnerGroupSubtopicSummary[] = [];
     if (backendDict.subtopic_summary_dicts.length > 0) {
       subtopicsSummaries = backendDict.subtopic_summary_dicts.map(
-        (learnerGroupSubtopicSummaryDict) => (
+        learnerGroupSubtopicSummaryDict =>
           LearnerGroupSubtopicSummary.createFromBackendDict(
             learnerGroupSubtopicSummaryDict
           )
-        )
       );
     }
     return new LearnerGroupSyllabus(

@@ -15,20 +15,19 @@
 /**
  * @fileoverview Unit tests for Validators Service.
  */
-import { TestBed } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { AlertsService } from 'services/alerts.service';
-import { ValidatorsService } from 'services/validators.service';
+import {TestBed} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {AlertsService} from 'services/alerts.service';
+import {ValidatorsService} from 'services/validators.service';
 
 describe('Validators service', () => {
   let vs: ValidatorsService;
-  const INVALID_NAME_CHARS_COPY = (
-    Array.from(AppConstants.INVALID_NAME_CHARS));
+  const INVALID_NAME_CHARS_COPY = Array.from(AppConstants.INVALID_NAME_CHARS);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AlertsService, NormalizeWhitespacePipe]
+      providers: [AlertsService, NormalizeWhitespacePipe],
     });
     vs = TestBed.inject(ValidatorsService);
     // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
@@ -38,7 +37,6 @@ describe('Validators service', () => {
     // @ts-expect-error
     AppConstants.INVALID_NAME_CHARS = ['#', 'x', 'y', 'z'];
   });
-
 
   afterAll(() => {
     // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
@@ -68,11 +66,15 @@ describe('Validators service', () => {
 
     expect(vs.isValidExplorationTitle('', false)).toBe(false);
     expect(vs.isValidExplorationTitle('', false)).toBe(false);
-    expect(vs.isValidExplorationTitle(
-      'A title with invalid characters #', false)).toBe(false);
-    expect(vs.isValidExplorationTitle(
-      'A title that is toooooooooooooooooooooooooo too long.', true)).toBe(
-      false);
+    expect(
+      vs.isValidExplorationTitle('A title with invalid characters #', false)
+    ).toBe(false);
+    expect(
+      vs.isValidExplorationTitle(
+        'A title that is toooooooooooooooooooooooooo too long.',
+        true
+      )
+    ).toBe(false);
   });
 
   it('should correctly validate non-emptiness', () => {
@@ -98,11 +100,15 @@ describe('Validators service', () => {
     expect(vs.isValidStateName('abc def', false)).toBe(true);
 
     expect(vs.isValidStateName('', false)).toBe(false);
-    expect(vs.isValidStateName(
-      'A state name with invalid character x', false)).toBe(false);
-    expect(vs.isValidStateName(
-      'A state name that is toooooooooooooooooooooooo long', true))
-      .toBe(false);
+    expect(
+      vs.isValidStateName('A state name with invalid character x', false)
+    ).toBe(false);
+    expect(
+      vs.isValidStateName(
+        'A state name that is toooooooooooooooooooooooo long',
+        true
+      )
+    ).toBe(false);
   });
 
   it('should correctly validate review message', () => {

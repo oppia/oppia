@@ -16,24 +16,23 @@
  * @fileoverview Component for the concept card editor.
  */
 
-import { CdkDragSortEvent, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { WorkedExample } from 'domain/skill/worked-example.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AddWorkedExampleModalComponent } from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
-import { DeleteWorkedExampleComponent } from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { SkillPreviewModalComponent } from '../skill-preview-modal.component';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { AppConstants } from 'app.constants';
+import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Subscription} from 'rxjs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {WorkedExample} from 'domain/skill/worked-example.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AddWorkedExampleModalComponent} from 'pages/skill-editor-page/modal-templates/add-worked-example.component';
+import {DeleteWorkedExampleComponent} from 'pages/skill-editor-page/modal-templates/delete-worked-example-modal.component';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {SkillPreviewModalComponent} from '../skill-preview-modal.component';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {AppConstants} from 'app.constants';
 
 interface BindableFieldDict {
   displayedConceptCardExplanation: string;
@@ -42,7 +41,7 @@ interface BindableFieldDict {
 
 @Component({
   selector: 'oppia-skill-concept-card-editor',
-  templateUrl: './skill-concept-card-editor.component.html'
+  templateUrl: './skill-concept-card-editor.component.html',
 })
 export class SkillConceptCardEditorComponent implements OnInit {
   @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();
@@ -59,8 +58,7 @@ export class SkillConceptCardEditorComponent implements OnInit {
   skillEditorCardIsShown: boolean = false;
   workedExamplesListIsShown: boolean = false;
   windowIsNarrow!: boolean;
-  COMPONENT_NAME_WORKED_EXAMPLE = (
-    AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
+  COMPONENT_NAME_WORKED_EXAMPLE = AppConstants.COMPONENT_NAME_WORKED_EXAMPLE;
 
   constructor(
     private formatRtePreviewPipe: FormatRtePreviewPipe,
@@ -74,10 +72,14 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   drop(event: CdkDragSortEvent<WorkedExample[]>): void {
     moveItemInArray(
-      this.bindableFieldsDict.displayedWorkedExamples, event.previousIndex,
-      event.currentIndex);
+      this.bindableFieldsDict.displayedWorkedExamples,
+      event.previousIndex,
+      event.currentIndex
+    );
     this.skillUpdateService.updateWorkedExamples(
-      this.skill, this.bindableFieldsDict.displayedWorkedExamples);
+      this.skill,
+      this.bindableFieldsDict.displayedWorkedExamples
+    );
     this.getConceptCardChange.emit();
   }
 
@@ -87,16 +89,22 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   initBindableFieldsDict(): void {
     this.bindableFieldsDict = {
-      displayedConceptCardExplanation:
-        this.skill.getConceptCard().getExplanation().html,
-      displayedWorkedExamples:
-        this.skill.getConceptCard().getWorkedExamples()
+      displayedConceptCardExplanation: this.skill
+        .getConceptCard()
+        .getExplanation().html,
+      displayedWorkedExamples: this.skill.getConceptCard().getWorkedExamples(),
     };
   }
 
   onSaveExplanation(explanationObject: SubtitledHtml): void {
     this.skillUpdateService.setConceptCardExplanation(
-      this.skill, explanationObject);
+      this.skill,
+      explanationObject
+    );
+    this.bindableFieldsDict.displayedConceptCardExplanation = this.skill
+      .getConceptCard()
+      .getExplanation().html;
+    this.getConceptCardChange.emit();
   }
 
   onSaveDescription(): void {
@@ -105,8 +113,9 @@ export class SkillConceptCardEditorComponent implements OnInit {
 
   changeActiveWorkedExampleIndex(idx: number): void {
     if (idx === this.activeWorkedExampleIndex) {
-      this.bindableFieldsDict.displayedWorkedExamples = (
-        this.skill.getConceptCard().getWorkedExamples());
+      this.bindableFieldsDict.displayedWorkedExamples = this.skill
+        .getConceptCard()
+        .getWorkedExamples();
       this.activeWorkedExampleIndex = null;
     } else {
       this.activeWorkedExampleIndex = idx;
@@ -114,82 +123,104 @@ export class SkillConceptCardEditorComponent implements OnInit {
   }
 
   deleteWorkedExample(index: number, evt: string): void {
-    this.ngbModal.open(DeleteWorkedExampleComponent, {
-      backdrop: 'static'
-    }).result.then(() => {
-      this.skillUpdateService.deleteWorkedExample(this.skill, index);
-      this.bindableFieldsDict.displayedWorkedExamples =
-        this.skill.getConceptCard().getWorkedExamples();
-      this.activeWorkedExampleIndex = null;
-      this.getConceptCardChange.emit();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(DeleteWorkedExampleComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {
+          this.skillUpdateService.deleteWorkedExample(this.skill, index);
+          this.bindableFieldsDict.displayedWorkedExamples = this.skill
+            .getConceptCard()
+            .getWorkedExamples();
+          this.activeWorkedExampleIndex = null;
+          this.getConceptCardChange.emit();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   getWorkedExampleSummary(workedExampleQuestion: string): string {
-    const summary = this.formatRtePreviewPipe.transform(
-      workedExampleQuestion);
+    const summary = this.formatRtePreviewPipe.transform(workedExampleQuestion);
     return summary;
   }
 
   openAddWorkedExampleModal(): void {
-    this.ngbModal.open(AddWorkedExampleModalComponent, {
-      backdrop: 'static'
-    }).result.then((result) => {
-      let newExample = WorkedExample.create(
-        SubtitledHtml.createDefault(
-          result.workedExampleQuestionHtml,
-          this.generateContentIdService.getNextId(
-            this.skill.getConceptCard().getRecordedVoiceovers(
-            ).getAllContentIds(),
-            this.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
-        SubtitledHtml.createDefault(
-          result.workedExampleExplanationHtml,
-          this.generateContentIdService.getNextId(
-            this.skill.getConceptCard().getRecordedVoiceovers(
-            ).getAllContentIds(),
-            this.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
+    this.ngbModal
+      .open(AddWorkedExampleModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        result => {
+          let newExample = WorkedExample.create(
+            SubtitledHtml.createDefault(
+              result.workedExampleQuestionHtml,
+              this.generateContentIdService.getNextId(
+                this.skill
+                  .getConceptCard()
+                  .getRecordedVoiceovers()
+                  .getAllContentIds(),
+                this.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION
+              )
+            ),
+            SubtitledHtml.createDefault(
+              result.workedExampleExplanationHtml,
+              this.generateContentIdService.getNextId(
+                this.skill
+                  .getConceptCard()
+                  .getRecordedVoiceovers()
+                  .getAllContentIds(),
+                this.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION
+              )
+            )
+          );
+          this.skillUpdateService.addWorkedExample(this.skill, newExample);
+          this.bindableFieldsDict.displayedWorkedExamples = this.skill
+            .getConceptCard()
+            .getWorkedExamples();
+          this.getConceptCardChange.emit();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
       );
-      this.skillUpdateService.addWorkedExample(
-        this.skill, newExample);
-      this.bindableFieldsDict.displayedWorkedExamples = (
-        this.skill.getConceptCard().getWorkedExamples());
-      this.getConceptCardChange.emit();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
   }
 
   showSkillPreview(): void {
-    let skillDescription = (
-      this.skillEditorStateService.getSkill().getDescription());
-    let skillExplanation = (
-      this.bindableFieldsDict.displayedConceptCardExplanation);
-    let skillWorkedExamples = (
-      this.bindableFieldsDict.displayedWorkedExamples);
+    let skillDescription = this.skillEditorStateService
+      .getSkill()
+      .getDescription();
+    let skillExplanation =
+      this.bindableFieldsDict.displayedConceptCardExplanation;
+    let skillWorkedExamples = this.bindableFieldsDict.displayedWorkedExamples;
     const modalInstance: NgbModalRef = this.ngbModal.open(
-      SkillPreviewModalComponent, {
+      SkillPreviewModalComponent,
+      {
         backdrop: true,
-      });
+      }
+    );
     modalInstance.componentInstance.skillDescription = skillDescription;
     modalInstance.componentInstance.skillExplanation = skillExplanation;
     modalInstance.componentInstance.skillWorkedExamples = skillWorkedExamples;
-    modalInstance.result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modalInstance.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   toggleWorkedExampleList(): void {
     if (this.windowDimensionsService.isWindowNarrow()) {
-      this.workedExamplesListIsShown = (
-        !this.workedExamplesListIsShown);
+      this.workedExamplesListIsShown = !this.workedExamplesListIsShown;
     }
   }
 
@@ -202,35 +233,28 @@ export class SkillConceptCardEditorComponent implements OnInit {
   ngOnInit(): void {
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(
-        () => {
-          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-          this.workedExamplesListIsShown = (
-            !this.windowIsNarrow);
-        }
-      ));
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+        this.workedExamplesListIsShown = !this.windowIsNarrow;
+      })
+    );
 
     this.isEditable = true;
     this.skill = this.skillEditorStateService.getSkill();
     this.initBindableFieldsDict();
     this.skillEditorCardIsShown = true;
-    this.workedExamplesListIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.workedExamplesListIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
-      this.skillEditorStateService.onSkillChange.subscribe(
-        () => {
-          this.initBindableFieldsDict();
-        }
-      )
+      this.skillEditorStateService.onSkillChange.subscribe(() => {
+        this.initBindableFieldsDict();
+      })
     );
     this.directiveSubscriptions.add(
-      this.windowDimensionsService.getResizeEvent().subscribe(
-        () => {
-          this.workedExamplesListIsShown = (
-            !this.windowDimensionsService.isWindowNarrow()
-          );
-        }
-      )
+      this.windowDimensionsService.getResizeEvent().subscribe(() => {
+        this.workedExamplesListIsShown =
+          !this.windowDimensionsService.isWindowNarrow();
+      })
     );
   }
 
@@ -238,8 +262,3 @@ export class SkillConceptCardEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaSkillConceptCardEditor',
-downgradeComponent({
-  component: SkillConceptCardEditorComponent
-}) as angular.IDirectiveFactory);

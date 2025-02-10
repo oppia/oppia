@@ -16,29 +16,22 @@
  * @fileoverview Module for the volunteer page.
  */
 
-import { NgModule } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { VolunteerPageComponent } from './volunteer-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { VolunteerPageRootComponent } from
-  './volunteer-page-root.component';
-import { CommonModule } from '@angular/common';
-import { VolunteerPageRoutingModule } from './volunteer-page-routing.module';
+import {NgModule} from '@angular/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {VolunteerPageComponent} from './volunteer-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {VolunteerPageRootComponent} from './volunteer-page-root.component';
+import {CommonModule} from '@angular/common';
+import {VolunteerPageRoutingModule} from './volunteer-page-routing.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     VolunteerPageRoutingModule,
-    NgbModule
+    NgbModule,
   ],
-  declarations: [
-    VolunteerPageComponent,
-    VolunteerPageRootComponent
-  ],
-  entryComponents: [
-    VolunteerPageComponent,
-    VolunteerPageRootComponent
-  ]
+  declarations: [VolunteerPageComponent, VolunteerPageRootComponent],
+  entryComponents: [VolunteerPageComponent, VolunteerPageRootComponent],
 })
 export class VolunteerPageModule {}

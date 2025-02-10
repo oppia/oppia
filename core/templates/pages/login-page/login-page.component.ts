@@ -16,30 +16,33 @@
  * @fileoverview Component for the login page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 
-import { AppConstants } from 'app.constants';
-import { AlertsService } from 'services/alerts.service';
-import { AuthService } from 'services/auth.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {AlertsService} from 'services/alerts.service';
+import {AuthService} from 'services/auth.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'login-page',
-  templateUrl: './login-page.component.html'
+  templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
   formGroup = new FormGroup({email: this.email});
 
   constructor(
-      private alertsService: AlertsService, private authService: AuthService,
-      private loaderService: LoaderService, private userService: UserService,
-      private windowRef: WindowRef) {}
+    private alertsService: AlertsService,
+    private authService: AuthService,
+    private loaderService: LoaderService,
+    private userService: UserService,
+    private windowRef: WindowRef
+  ) {}
 
   get emulatorModeIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
@@ -48,47 +51,49 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
 
-    this.userService.getUserInfoAsync().then(async(userInfo) => {
-      if (userInfo.isLoggedIn()) {
-        this.redirectToPath('/');
-        return;
-      }
+    this.userService.getUserInfoAsync().then(
+      async userInfo => {
+        if (userInfo.isLoggedIn()) {
+          this.redirectToPath('/');
+          return;
+        }
 
-      if (this.emulatorModeIsEnabled) {
-        this.loaderService.hideLoadingScreen();
-        return;
-      }
+        if (this.emulatorModeIsEnabled) {
+          this.loaderService.hideLoadingScreen();
+          return;
+        }
 
-      let authSucceeded = false;
-      try {
-        authSucceeded = await this.authService.handleRedirectResultAsync();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-      } catch (error: unknown) {
-        this.onSignInError(error as firebase.auth.Error);
-        return;
-      }
+        let authSucceeded = false;
+        try {
+          authSucceeded = await this.authService.handleRedirectResultAsync();
+          // We use unknown type because we are unsure of the type of error
+          // that was thrown. Since the catch block cannot identify the
+          // specific type of error, we are unable to further optimise the
+          // code by introducing more types of errors.
+        } catch (error: unknown) {
+          this.onSignInError(error as firebase.auth.Error);
+          return;
+        }
 
-      if (authSucceeded) {
-        this.redirectToSignUp();
-        return;
-      }
+        if (authSucceeded) {
+          this.redirectToSignUp();
+          return;
+        }
 
-      try {
-        await this.authService.signInWithRedirectAsync();
-      // We use unknown type because we are unsure of the type of error
-      // that was thrown. Since the catch block cannot identify the
-      // specific type of error, we are unable to further optimise the
-      // code by introducing more types of errors.
-      } catch (error: unknown) {
-        this.onSignInError(error as firebase.auth.Error);
+        try {
+          await this.authService.signInWithRedirectAsync();
+          // We use unknown type because we are unsure of the type of error
+          // that was thrown. Since the catch block cannot identify the
+          // specific type of error, we are unable to further optimise the
+          // code by introducing more types of errors.
+        } catch (error: unknown) {
+          this.onSignInError(error as firebase.auth.Error);
+        }
+      },
+      error => {
+        this.onSignInError(error);
       }
-    },
-    error => {
-      this.onSignInError(error);
-    });
+    );
   }
 
   async onClickSignInButtonAsync(email: string): Promise<void> {
@@ -96,10 +101,10 @@ export class LoginPageComponent implements OnInit {
 
     try {
       await this.authService.signInWithEmail(email);
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (error: unknown) {
       this.onSignInError(error as firebase.auth.Error);
       return;
@@ -135,5 +140,6 @@ export class LoginPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'loginPage', downgradeComponent({component: LoginPageComponent}));
+angular
+  .module('oppia')
+  .directive('loginPage', downgradeComponent({component: LoginPageComponent}));

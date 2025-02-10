@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the library page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { LibraryPageRootComponent } from './library-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {LibraryPageRootComponent} from './library-page-root.component';
 
 describe('Library Page Root', () => {
   let fixture: ComponentFixture<LibraryPageRootComponent>;
@@ -32,14 +32,9 @@ describe('Library Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LibraryPageRootComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        PageHeadService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [LibraryPageRootComponent, MockTranslatePipe],
+      providers: [PageHeadService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -49,10 +44,9 @@ describe('Library Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
@@ -61,6 +55,7 @@ describe('Library Page Root', () => {
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.META
+    );
   });
 });

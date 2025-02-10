@@ -16,8 +16,8 @@
  * @fileoverview Component for the preferred language selector.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-
+import {Component, forwardRef, Input} from '@angular/core';
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 interface Language {
   id: string;
   text: string;
@@ -26,19 +26,46 @@ interface Language {
 
 @Component({
   selector: 'oppia-preferred-language-selector',
-  templateUrl: './preferred-language-selector.component.html'
+  templateUrl: './preferred-language-selector.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => PreferredSiteLanguageSelectorComponent),
+      multi: true,
+    },
+  ],
 })
-export class PreferredSiteLanguageSelectorComponent {
+export class PreferredSiteLanguageSelectorComponent
+  implements ControlValueAccessor
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() preferredLanguageCode!: string;
   @Input() choices!: Language[];
+  @Input() e2eTestClass!: string;
   @Input() entity!: string;
-  @Output() preferredLanguageCodeChange: EventEmitter<string> = (
-    new EventEmitter());
 
   filteredChoices!: Language[];
+
+  // Implementing the ControlValueAccessor interface through the following
+  // 5 methods to make the component work as a form field.
+  onChange: (value: string) => void = () => {};
+  onTouched: () => void = () => {};
+
+  writeValue(value: string): void {
+    if (value !== undefined) {
+      this.preferredLanguageCode = value;
+    }
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
 
   ngOnInit(): void {
     this.filteredChoices = this.choices;
@@ -46,11 +73,12 @@ export class PreferredSiteLanguageSelectorComponent {
 
   filterChoices(searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
-      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    );
   }
 
   updateLanguage(code: string): void {
     this.preferredLanguageCode = code;
-    this.preferredLanguageCodeChange.emit(this.preferredLanguageCode);
+    this.onChange(this.preferredLanguageCode);
   }
 }

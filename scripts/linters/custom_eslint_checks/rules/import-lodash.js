@@ -29,30 +29,32 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      validImportLodash: (
+      validImportLodash:
         'Please do not use "import { someFunction } from \'lodash\'" and' +
         ' "import _ from \'lodash\'". Use "import someFunction from' +
-        ' \'lodash/someFunction\'" instead.')
-    }
+        " 'lodash/someFunction'\" instead.",
+    },
   },
 
-  create: function(context) {
+  create: function (context) {
     var importSelector = 'ImportDeclaration[source.value=/^lodash/]';
 
-    var catchAndReportInvalidImportLodash = function(node) {
-      if (node.specifiers[0].type !== 'ImportDefaultSpecifier' ||
-       node.specifiers[0].local.name === '_') {
+    var catchAndReportInvalidImportLodash = function (node) {
+      if (
+        node.specifiers[0].type !== 'ImportDefaultSpecifier' ||
+        node.specifiers[0].local.name === '_'
+      ) {
         context.report({
           node: node,
-          messageId: 'validImportLodash'
+          messageId: 'validImportLodash',
         });
       }
     };
 
     return {
-      [importSelector]: function(node) {
+      [importSelector]: function (node) {
         catchAndReportInvalidImportLodash(node);
-      }
+      },
     };
-  }
+  },
 };

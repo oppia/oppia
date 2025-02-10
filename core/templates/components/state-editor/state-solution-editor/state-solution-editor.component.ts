@@ -17,29 +17,29 @@
  * state editor.
  */
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { AddOrUpdateSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
-import { DeleteSolutionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
-import { AlertsService } from 'services/alerts.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
-import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
-import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
-import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { AppConstants } from 'app.constants';
-import { StateEditorConstants } from '../state-editor.constants';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import {AddOrUpdateSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
+import {DeleteSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
+import {StateEditorService} from '../state-editor-properties-services/state-editor.service';
+import {StateHintsService} from '../state-editor-properties-services/state-hints.service';
+import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {AppConstants} from 'app.constants';
+import {StateEditorConstants} from '../state-editor.constants';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
   index: number;
@@ -48,7 +48,7 @@ interface DeleteValue {
 
 @Component({
   selector: 'oppia-state-solution-editor',
-  templateUrl: './state-solution-editor.component.html'
+  templateUrl: './state-solution-editor.component.html',
 })
 export class StateSolutionEditorComponent implements OnInit {
   // The state property is null until a solution is specified or removed.
@@ -63,11 +63,11 @@ export class StateSolutionEditorComponent implements OnInit {
   correctAnswerEditorHtml!: string;
   inlineSolutionEditorIsActive: boolean = false;
   solutionCardIsShown: boolean = false;
-  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION: string = (
-    StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION);
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION: string =
+    StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION;
 
-  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: string = (
-    AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: string =
+    AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION;
 
   constructor(
     private alertsService: AlertsService,
@@ -83,21 +83,23 @@ export class StateSolutionEditorComponent implements OnInit {
     private stateEditorService: StateEditorService,
     private stateHintsService: StateHintsService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService,
+    private stateSolutionService: StateSolutionService
   ) {}
 
   ngOnInit(): void {
     this.solutionCardIsShown = true;
     this.inlineSolutionEditorIsActive = false;
-    this.SOLUTION_EDITOR_FOCUS_LABEL = (
-      'currentCorrectAnswerEditorHtmlForSolutionEditor');
+    this.SOLUTION_EDITOR_FOCUS_LABEL =
+      'currentCorrectAnswerEditorHtmlForSolutionEditor';
     this.stateEditorService.updateStateSolutionEditorInitialised();
-    this.correctAnswerEditorHtml = (
+    this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
         this.stateInteractionIdService.savedMemento,
         this.stateCustomizationArgsService.savedMemento,
         false,
-        this.SOLUTION_EDITOR_FOCUS_LABEL, null));
+        this.SOLUTION_EDITOR_FOCUS_LABEL,
+        null
+      );
   }
 
   displayedHintsLength(): number {
@@ -106,12 +108,16 @@ export class StateSolutionEditorComponent implements OnInit {
 
   getInvalidSolutionTooltip(): string {
     if (this.stateEditorService.isInQuestionMode()) {
-      return 'This solution doesn\'t correspond to an answer ' +
+      return (
+        "This solution doesn't correspond to an answer " +
         'marked as correct. Verify the rules specified for the ' +
-        'answers or change the solution.';
+        'answers or change the solution.'
+      );
     }
-    return 'This solution does not lead to another card. Verify the ' +
-      'responses specified or change the solution.';
+    return (
+      'This solution does not lead to another card. Verify the ' +
+      'responses specified or change the solution.'
+    );
   }
 
   isSolutionValid(): boolean {
@@ -121,12 +127,12 @@ export class StateSolutionEditorComponent implements OnInit {
   isEditable(): boolean {
     return (
       this.editabilityService.isEditable() &&
-      this.editabilityService.isEditableOutsideTutorialMode());
+      this.editabilityService.isEditableOutsideTutorialMode()
+    );
   }
 
   toggleInlineSolutionEditorIsActive(): void {
-    this.inlineSolutionEditorIsActive = (
-      !this.inlineSolutionEditorIsActive);
+    this.inlineSolutionEditorIsActive = !this.inlineSolutionEditorIsActive;
   }
 
   getSolutionSummary(): string {
@@ -135,11 +141,12 @@ export class StateSolutionEditorComponent implements OnInit {
     if (solution === null) {
       throw new Error('Expected solution to be non-null.');
     }
-    const solutionSummary = (
-      solution.getSummary(
-        interactionId, this.stateCustomizationArgsService.savedMemento));
-    const solutionAsPlainText = (
-      this.convertToPlainText.transform(solutionSummary));
+    const solutionSummary = solution.getSummary(
+      interactionId,
+      this.stateCustomizationArgsService.savedMemento
+    );
+    const solutionAsPlainText =
+      this.convertToPlainText.transform(solutionSummary);
     return solutionAsPlainText;
   }
 
@@ -151,8 +158,10 @@ export class StateSolutionEditorComponent implements OnInit {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let savedMemento = this.stateInteractionIdService.savedMemento;
-    return (Boolean(savedMemento) && INTERACTION_SPECS[
-      savedMemento as InteractionSpecsKey].is_linear);
+    return (
+      Boolean(savedMemento) &&
+      INTERACTION_SPECS[savedMemento as InteractionSpecsKey].is_linear
+    );
   }
 
   onSaveSolution(value: Solution | null): void {
@@ -163,63 +172,79 @@ export class StateSolutionEditorComponent implements OnInit {
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
     this.inlineSolutionEditorIsActive = false;
-    this.ngbModal.open(AddOrUpdateSolutionModalComponent, {
-      backdrop: 'static'
-    }).result.then((result) => {
-      this.stateSolutionService.displayed = result.solution;
-      this.stateSolutionService.saveDisplayedValue();
-      this.onSaveSolution(this.stateSolutionService.displayed);
-      let activeStateName = this.stateEditorService.getActiveStateName();
-      if (activeStateName === null) {
-        throw new Error('Expected active state name to be non-null.');
-      }
-      let solutionIsValid = this.solutionVerificationService.verifySolution(
-        activeStateName,
-        this.stateEditorService.getInteraction(),
-        result.solution.correctAnswer
-      );
+    this.ngbModal
+      .open(AddOrUpdateSolutionModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        result => {
+          this.stateSolutionService.displayed = result.solution;
+          this.stateSolutionService.saveDisplayedValue();
+          this.onSaveSolution(this.stateSolutionService.displayed);
+          let activeStateName = this.stateEditorService.getActiveStateName();
+          if (activeStateName === null) {
+            throw new Error('Expected active state name to be non-null.');
+          }
+          let solutionIsValid = this.solutionVerificationService.verifySolution(
+            activeStateName,
+            this.stateEditorService.getInteraction(),
+            result.solution.correctAnswer
+          );
 
-      this.solutionValidityService.updateValidity(
-        activeStateName, solutionIsValid);
-      this.refreshWarnings.emit();
-      this.getSolutionChange.emit();
-      if (!solutionIsValid) {
-        if (this.stateEditorService.isInQuestionMode()) {
-          this.alertsService.addInfoMessage(
-            this.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION, 4000);
-        } else {
-          this.alertsService.addInfoMessage(
-            this.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
+          this.solutionValidityService.updateValidity(
+            activeStateName,
+            solutionIsValid
+          );
+          this.refreshWarnings.emit();
+          this.getSolutionChange.emit();
+          if (!solutionIsValid) {
+            if (this.stateEditorService.isInQuestionMode()) {
+              this.alertsService.addInfoMessage(
+                this.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
+                4000
+              );
+            } else {
+              this.alertsService.addInfoMessage(
+                this.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
+                4000
+              );
+            }
+          }
+        },
+        () => {
+          this.generateContentIdService.revertUnusedContentIdIndex();
+          this.alertsService.clearWarnings();
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         }
-      }
-    }, () => {
-      this.generateContentIdService.revertUnusedContentIdIndex();
-      this.alertsService.clearWarnings();
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+      );
   }
 
   deleteSolution(value: DeleteValue): void {
     value.evt.stopPropagation();
 
     this.alertsService.clearWarnings();
-    this.ngbModal.open(DeleteSolutionModalComponent, {
-      backdrop: true,
-    }).result.then(() => {
-      this.stateSolutionService.displayed = null;
-      this.stateSolutionService.saveDisplayedValue();
-      this.onSaveSolution(this.stateSolutionService.displayed);
-      this.stateEditorService.deleteCurrentSolutionValidity();
-      this.refreshWarnings.emit();
-      this.getSolutionChange.emit();
-    }, () => {
-      this.alertsService.clearWarnings();
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(DeleteSolutionModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.stateSolutionService.displayed = null;
+          this.stateSolutionService.saveDisplayedValue();
+          this.onSaveSolution(this.stateSolutionService.displayed);
+          this.stateEditorService.deleteCurrentSolutionValidity();
+          this.refreshWarnings.emit();
+          this.getSolutionChange.emit();
+        },
+        () => {
+          this.alertsService.clearWarnings();
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   toggleSolutionCard(): void {
@@ -227,7 +252,9 @@ export class StateSolutionEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaStateSolutionEditor',
-downgradeComponent({
-  component: StateSolutionEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaStateSolutionEditor',
+  downgradeComponent({
+    component: StateSolutionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

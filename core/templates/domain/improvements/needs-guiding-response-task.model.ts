@@ -16,38 +16,48 @@
  * @fileoverview Frontend Model for needs guiding responses improvements task.
  */
 
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/task-entry.model';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {
+  TaskEntryBackendDict,
+  TaskEntry,
+} from 'domain/improvements/task-entry.model';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 
-export class NeedsGuidingResponsesTask extends TaskEntry<
-    'needs_guiding_responses'> {
+export class NeedsGuidingResponsesTask extends TaskEntry<'needs_guiding_responses'> {
   constructor(backendDict: TaskEntryBackendDict<'needs_guiding_responses'>) {
-    if (backendDict.entity_type !==
-            ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
+    if (
+      backendDict.entity_type !==
+      ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION
+    ) {
       throw new Error(
         `backend dict has entity_type "${backendDict.entity_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
+          `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`
+      );
     }
-    if (backendDict.task_type !==
-            ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES) {
+    if (
+      backendDict.task_type !==
+      ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES
+    ) {
       throw new Error(
         `backend dict has task_type "${backendDict.task_type}" but expected ` +
-        `"${ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES}"`);
+          `"${ImprovementsConstants.TASK_TYPE_NEEDS_GUIDING_RESPONSES}"`
+      );
     }
-    if (backendDict.target_type !==
-            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+    if (
+      backendDict.target_type !== ImprovementsConstants.TASK_TARGET_TYPE_STATE
+    ) {
       throw new Error(
         `backend dict has target_type "${backendDict.target_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
+          `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`
+      );
     }
     super(backendDict);
   }
 
   private static createNewObsoleteTask(
-      expId: string, expVersion: number, stateName: string
+    expId: string,
+    expVersion: number,
+    stateName: string
   ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -64,23 +74,30 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
   }
 
   static createFromAnswerStats(
-      expId: string, expVersion: number, stateName: string,
-      answerStats: AnswerStats[]): NeedsGuidingResponsesTask {
+    expId: string,
+    expVersion: number,
+    stateName: string,
+    answerStats: AnswerStats[]
+  ): NeedsGuidingResponsesTask {
     const task = NeedsGuidingResponsesTask.createNewObsoleteTask(
-      expId, expVersion, stateName);
+      expId,
+      expVersion,
+      stateName
+    );
     task.refreshStatus(answerStats);
     return task;
   }
 
   static createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
+    backendDict: TaskEntryBackendDict<'needs_guiding_responses'>
   ): NeedsGuidingResponsesTask {
     return new NeedsGuidingResponsesTask(backendDict);
   }
 
   public refreshStatus(topStateAnswersStats: readonly AnswerStats[]): void {
-    const numUnaddressedTopStateAnswers = (
-      topStateAnswersStats.filter(a => !a.isAddressed).length);
+    const numUnaddressedTopStateAnswers = topStateAnswersStats.filter(
+      a => !a.isAddressed
+    ).length;
     if (numUnaddressedTopStateAnswers === 0) {
       if (this.isOpen()) {
         this.markAsResolved();
@@ -94,9 +111,10 @@ export class NeedsGuidingResponsesTask extends TaskEntry<
   }
 
   private generateIssueDescription(
-      numUnaddressedTopStateAnswers: number): void {
-    this.issueDescription = (
+    numUnaddressedTopStateAnswers: number
+  ): void {
+    this.issueDescription =
       `${numUnaddressedTopStateAnswers} of the top 10 answers for this card ` +
-      'did not have explicit feedback from Oppia.');
+      'did not have explicit feedback from Oppia.';
   }
 }

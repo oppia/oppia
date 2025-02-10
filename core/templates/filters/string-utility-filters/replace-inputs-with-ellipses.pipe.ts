@@ -16,7 +16,7 @@
  * @fileoverview ReplaceInputsWithEllipses pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 // Filter that replaces all {{...}} in a string with '...'.
 @Pipe({name: 'replaceInputsWithEllipses'})

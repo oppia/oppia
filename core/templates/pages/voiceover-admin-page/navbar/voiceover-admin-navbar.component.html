@@ -1,0 +1,126 @@
+<div>
+  <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-voiceover-admin" role="navigation">
+    <div class="navbar-container oppia-navbar-container">
+      <div class="navbar-header e2e-test-navbar-header float-left">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+           href="/community-library"
+           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+          <picture>
+            <source type="image/webp" [srcset]="logoWebpImageSrc">
+            <source type="image/png" [srcset]="logoPngImageSrc">
+            <img [src]="logoPngImageSrc"
+                 class="oppia-logo oppia-logo-wide"
+                 alt="Oppia Logo">
+          </picture>
+          Return to Oppia Library Page
+        </a>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Voiceover Admin
+          </li>
+        </ul>
+      </div>
+      <div class="navbar-header float-right">
+        <ul class="nav oppia-navbar-nav oppia-navbar-profile-voiceover-admin">
+          <li>
+            <ul class="nav oppia-navbar-tabs-voiceover-admin">
+              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
+                   data-toggle="dropdown"
+                   (mouseenter)="activateProfileDropdown()"
+                   (mouseleave)="deactivateProfileDropdown()">
+                  <picture *ngIf="profilePicturePngDataUrl">
+                    <source type="image/webp" [srcset]="profilePictureWebpDataUrl">
+                    <source type="image/png" [srcset]="profilePicturePngDataUrl">
+                    <img [src]="profilePicturePngDataUrl"
+                         class="oppia-navbar-profile-picture rounded-circle"
+                         alt="User profile picture">
+                  </picture>
+                  <div *ngIf="!profilePicturePngDataUrl" class="dropdown-toggle">
+                    <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
+                  </div>
+                </a>
+                <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+                    role="menu"
+                    (mouseenter)="activateProfileDropdown()"
+                    (mouseleave)="deactivateProfileDropdown()">
+                  <li>
+                    <a [href]="profileUrl"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      <strong>{{ username }}</strong>
+                    </a>
+                  </li>
+                  <hr class="oppia-top-right-menu-item-separator">
+                  <li>
+                    <a href="/preferences"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Preferences
+                    </a>
+                  </li>
+                  <hr class="oppia-top-right-menu-item-separator">
+                  <li>
+                    <a [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+                       class="dropdown-item oppia-dropdown-item-text">
+                      Logout
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+<style>
+  .oppia-navbar-profile-voiceover-admin .open > a,
+  .nav > li > a:focus,
+  .oppia-navbar-profile-voiceover-admin > li > a:hover,
+  .oppia-navbar-profile-voiceover-admin > li > a:focus,
+  .oppia-navbar-tabs-voiceover-admin > li > a:hover,
+  .oppia-navbar-profile-voiceover-admin .open > a:hover,
+  .oppia-navbar-profile-voiceover-admin .open > a:focus,
+  .oppia-navbar-tabs-voiceover-admin > li > a.active,
+  .oppia-voiceover-admin-page-dropdown-icon {
+    background-color: #fff;
+    color: #00376d;
+  }
+  .oppia-navbar-tabs-voiceover-admin .dropdown-toggle::after {
+    color: #fff;
+  }
+  .oppia-navbar-voiceover-admin {
+    top: 0;
+  }
+  .oppia-navbar-tabs-voiceover-admin:hover .dropdown-toggle::after,
+  .oppia-navbar-tabs-voiceover-admin:focus .dropdown-toggle::after {
+    color: #00376d;
+  }
+  .navbar-container.oppia-navbar-container {
+    background-color: #00376d;
+  }
+  .nav .dropdown:hover > .dropdown-menu > li > a.oppia-dropdown-item-text {
+    color: #00376d;
+  }
+  .oppia-dropdown-toggle-icon {
+    margin-top: -1px;
+  }
+  @media screen and (max-width: 710px) {
+    .oppia-voiceover-admin-page-dropdown {
+      display: block;
+    }
+    .oppia-hide-in-small-width-screens {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 711px) {
+    .oppia-voiceover-admin-page-dropdown,
+    .oppia-voiceover-admin-page-dropdown-icon,
+    .oppia-voiceover-admin-page-dropdown-menu {
+      display: none;
+    }
+  }
+</style>

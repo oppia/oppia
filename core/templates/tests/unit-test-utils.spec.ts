@@ -16,15 +16,15 @@
  * @fileoverview Unit Tests for utility functions used in Angular.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { MockTranslatePipe } from './unit-test-utils';
-import { MockCapitalizePipe } from './unit-test-utils';
+import {TestBed} from '@angular/core/testing';
+import {MockTranslatePipe} from './unit-test-utils';
+import {MockCapitalizePipe} from './unit-test-utils';
 
 describe('Testing MockTranslatePipe', () => {
   let mtp: MockTranslatePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MockTranslatePipe]
+      providers: [MockTranslatePipe],
     });
     mtp = TestBed.inject(MockTranslatePipe);
   });
@@ -43,7 +43,7 @@ describe('Testing MockCapitalizePipe', () => {
   let mcp: MockCapitalizePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MockCapitalizePipe]
+      providers: [MockCapitalizePipe],
     });
     mcp = TestBed.inject(MockCapitalizePipe);
   });

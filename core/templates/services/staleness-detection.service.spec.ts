@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for staleness detection service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { StalenessDetectionService } from './staleness-detection.service';
-import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
-import { LocalStorageService } from './local-storage.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {TestBed} from '@angular/core/testing';
+import {StalenessDetectionService} from './staleness-detection.service';
+import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import {LocalStorageService} from './local-storage.service';
+import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 
 describe('Staleness Detection Service', () => {
   let stalenessDetectionService: StalenessDetectionService;
@@ -33,49 +33,54 @@ describe('Staleness Detection Service', () => {
 
   it('should find whether an entity editor tab is stale', () => {
     localStorageService.updateEntityEditorBrowserTabsInfo(
-      EntityEditorBrowserTabsInfo.create(
-        'topic', 'topic_1', 2, 1, false),
-      EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_TOPIC_EDITOR_BROWSER_TABS
-    );
-
-    expect(stalenessDetectionService.isEntityEditorTabStale(
-      EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-      'topic_1', 1
-    )).toBeTrue();
-    expect(stalenessDetectionService.isEntityEditorTabStale(
-      EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_TOPIC_EDITOR_BROWSER_TABS,
-      'topic_1', 2
-    )).toBeFalse();
-    expect(stalenessDetectionService.isEntityEditorTabStale(
-      EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_SKILL_EDITOR_BROWSER_TABS,
-      'skill_2', 1
-    )).toBeFalse();
-  });
-
-  it('should find whether some other editor tab of the same url has ' +
-  'unsaved changes', () => {
-    localStorageService.updateEntityEditorBrowserTabsInfo(
-      EntityEditorBrowserTabsInfo.create(
-        'skill', 'skill_1', 2, 2, true),
-      EntityEditorBrowserTabsInfoDomainConstants
-        .OPENED_SKILL_EDITOR_BROWSER_TABS
+      EntityEditorBrowserTabsInfo.create('topic', 'topic_1', 2, 1, false),
+      EntityEditorBrowserTabsInfoDomainConstants.OPENED_TOPIC_EDITOR_BROWSER_TABS
     );
 
     expect(
-      stalenessDetectionService
-        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS, 'skill_1'
-        )).toBeTrue();
+      stalenessDetectionService.isEntityEditorTabStale(
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_TOPIC_EDITOR_BROWSER_TABS,
+        'topic_1',
+        1
+      )
+    ).toBeTrue();
     expect(
-      stalenessDetectionService
-        .doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS, 'skill_2'
-        )).toBeFalse();
+      stalenessDetectionService.isEntityEditorTabStale(
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_TOPIC_EDITOR_BROWSER_TABS,
+        'topic_1',
+        2
+      )
+    ).toBeFalse();
+    expect(
+      stalenessDetectionService.isEntityEditorTabStale(
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
+        'skill_2',
+        1
+      )
+    ).toBeFalse();
   });
+
+  it(
+    'should find whether some other editor tab of the same url has ' +
+      'unsaved changes',
+    () => {
+      localStorageService.updateEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfo.create('skill', 'skill_1', 2, 2, true),
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
+      );
+
+      expect(
+        stalenessDetectionService.doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+          EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
+          'skill_1'
+        )
+      ).toBeTrue();
+      expect(
+        stalenessDetectionService.doesSomeOtherEntityEditorPageHaveUnsavedChanges(
+          EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
+          'skill_2'
+        )
+      ).toBeFalse();
+    }
+  );
 });

@@ -16,33 +16,33 @@
  * @fileoverview Backend api service for fetching the data signup page.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 export interface SignupPageBackendDict {
-  'can_send_emails': boolean;
-  'has_agreed_to_latest_terms': boolean;
-  'has_ever_registered': boolean;
-  'username': string;
+  server_can_send_emails: boolean;
+  has_agreed_to_latest_terms: boolean;
+  has_ever_registered: boolean;
+  username: string;
 }
 
 export interface UsernameAvailabilityResponse {
-  'username_is_taken': boolean;
+  username_is_taken: boolean;
 }
 
 export interface UpdateUsernameResponseAsync {
-  'bulk_email_signup_message_should_be_shown': boolean;
+  bulk_email_signup_message_should_be_shown: boolean;
 }
 
 export interface UpdateUsernameRequestParams {
-  'agreed_to_terms': boolean;
-  'can_receive_email_updates': boolean;
-  'default_dashboard': string;
+  agreed_to_terms: boolean;
+  can_receive_email_updates: boolean;
+  default_dashboard: string;
   username: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SignupPageBackendApiService {
   SIGNUP_DATA_URL = '/signuphandler/data';
@@ -51,23 +51,26 @@ export class SignupPageBackendApiService {
   constructor(private http: HttpClient) {}
 
   async fetchSignupPageDataAsync(): Promise<SignupPageBackendDict> {
-    return this.http.get<SignupPageBackendDict>(
-      this.SIGNUP_DATA_URL).toPromise();
+    return this.http
+      .get<SignupPageBackendDict>(this.SIGNUP_DATA_URL)
+      .toPromise();
   }
 
   async checkUsernameAvailableAsync(
-      username: string
+    username: string
   ): Promise<UsernameAvailabilityResponse> {
-    return this.http.post<UsernameAvailabilityResponse>(
-      this.USERNAME_HANDLER, {
-        username: username
-      }).toPromise();
+    return this.http
+      .post<UsernameAvailabilityResponse>(this.USERNAME_HANDLER, {
+        username: username,
+      })
+      .toPromise();
   }
 
   async updateUsernameAsync(
-      requestParams: UpdateUsernameRequestParams
+    requestParams: UpdateUsernameRequestParams
   ): Promise<UpdateUsernameResponseAsync> {
-    return this.http.post<UpdateUsernameResponseAsync>(
-      this.SIGNUP_DATA_URL, requestParams).toPromise();
+    return this.http
+      .post<UpdateUsernameResponseAsync>(this.SIGNUP_DATA_URL, requestParams)
+      .toPromise();
   }
 }

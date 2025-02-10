@@ -16,36 +16,38 @@
  * @fileoverview Service that handles routing for the exploration editor page.
  */
 
-import { PlatformLocation } from '@angular/common';
-import { Injectable, EventEmitter, NgZone } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
-import { ExternalSaveService } from 'services/external-save.service';
+import {PlatformLocation} from '@angular/common';
+import {Injectable, EventEmitter, NgZone} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RouterService {
   TABS = {
-    MAIN: { name: 'main', path: '/main' },
-    TRANSLATION: { name: 'translation', path: '/translation' },
-    PREVIEW: { name: 'preview', path: '/preview' },
-    SETTINGS: { name: 'settings', path: '/settings' },
-    STATS: { name: 'stats', path: '/stats' },
-    IMPROVEMENTS: { name: 'improvements', path: '/improvements' },
-    HISTORY: { name: 'history', path: '/history' },
-    FEEDBACK: { name: 'feedback', path: '/feedback' },
+    MAIN: {name: 'main', path: '/main'},
+    TRANSLATION: {name: 'translation', path: '/translation'},
+    PREVIEW: {name: 'preview', path: '/preview'},
+    SETTINGS: {name: 'settings', path: '/settings'},
+    STATS: {name: 'stats', path: '/stats'},
+    IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
+    HISTORY: {name: 'history', path: '/history'},
+    FEEDBACK: {name: 'feedback', path: '/feedback'},
   };
 
   /** @private */
   private centerGraphEventEmitter = new EventEmitter();
   private SLUG_GUI = 'gui';
   private SLUG_PREVIEW = 'preview';
+  private SLUG_TRANSLATION = 'translation';
   private PREVIEW_TAB_WAIT_TIME_MSEC = 200;
   private _activeTabName = this.TABS.MAIN.name;
   private refreshSettingsTabEventEmitter = new EventEmitter();
@@ -59,6 +61,7 @@ export class RouterService {
     private stateEditorRefreshService: StateEditorRefreshService,
     private explorationStatesService: ExplorationStatesService,
     private explorationImprovementsService: ExplorationImprovementsService,
+    private translationLanguagesService: TranslationLanguageService,
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private location: PlatformLocation,
@@ -68,7 +71,12 @@ export class RouterService {
 
     this.location.onPopState(() => {
       if (window.location.hash === '') {
-        window.history.go(-1);
+        // We use setTimeout() here so that window.history.go(-1)
+        // can go back one page and set the hash before being
+        // interrupted by the next call in the stack.
+        setTimeout(() => {
+          window.history.go(-1);
+        });
       }
     });
   }
@@ -88,6 +96,21 @@ export class RouterService {
 
     if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
       this._activeTabName = this.TABS.TRANSLATION.name;
+      const [stateName, contentId, languageCode] = newPath
+        .substring(this.TABS.TRANSLATION.path.length + 1)
+        .split('/');
+      if (stateName) {
+        this.stateEditorService.setActiveStateName(stateName);
+      }
+      if (contentId) {
+        this.stateEditorService.setInitActiveContentId(contentId);
+      }
+      if (languageCode) {
+        this.translationLanguagesService.setActiveLanguageCode(languageCode);
+      }
+      this.windowRef.nativeWindow.location.hash =
+        this.TABS.TRANSLATION.path + '/' + stateName;
+      this.refreshTranslationTabEventEmitter.emit();
       this.ngZone.runOutsideAngular(() => {
         let waitForStatesToLoad = setInterval(() => {
           this.ngZone.run(() => {
@@ -95,7 +118,8 @@ export class RouterService {
               clearInterval(waitForStatesToLoad);
               if (!this.stateEditorService.getActiveStateName()) {
                 this.stateEditorService.setActiveStateName(
-                  this.explorationInitStateNameService.savedMemento);
+                  this.explorationInitStateNameService.savedMemento
+                );
               }
               this.refreshTranslationTabEventEmitter.emit();
             }
@@ -117,16 +141,18 @@ export class RouterService {
       Promise.resolve(
         this.explorationImprovementsService.isImprovementsTabEnabledAsync()
       ).then(improvementsTabIsEnabled => {
-        if (this._activeTabName === this.TABS.IMPROVEMENTS.name &&
-          !improvementsTabIsEnabled) {
+        if (
+          this._activeTabName === this.TABS.IMPROVEMENTS.name &&
+          !improvementsTabIsEnabled
+        ) {
           // Redirect to the main tab.
           this._actuallyNavigate(this.SLUG_GUI, null);
         }
       });
     } else if (newPath === this.TABS.HISTORY.path) {
-      // TODO(sll): Do this on-hover rather than on-click.
+      // TODO(#20449): Do this on-hover rather than on-click.
       this.refreshVersionHistoryEventEmitter.emit({
-        forceRefresh: false
+        forceRefresh: false,
       });
       this._activeTabName = this.TABS.HISTORY.name;
     } else if (newPath === this.TABS.FEEDBACK.path) {
@@ -137,7 +163,8 @@ export class RouterService {
     } else {
       if (this.explorationInitStateNameService.savedMemento) {
         this._changeTab(
-          '/gui/' + this.explorationInitStateNameService.savedMemento);
+          '/gui/' + this.explorationInitStateNameService.savedMemento
+        );
       }
     }
 
@@ -161,14 +188,17 @@ export class RouterService {
               // navigated to a different tab before the states finish loading.
               // In such a case, we should not switch back to the editor main
               // tab.
-              if (pathType === this.SLUG_GUI &&
-                  this._activeTabName === this.TABS.MAIN.name) {
+              if (
+                pathType === this.SLUG_GUI &&
+                this._activeTabName === this.TABS.MAIN.name
+              ) {
                 this.windowRef.nativeWindow.location.hash = path;
                 this.stateEditorRefreshService.onRefreshStateEditor.emit();
               }
             } else {
               this._changeTab(
-                pathBase + this.explorationInitStateNameService.savedMemento);
+                pathBase + this.explorationInitStateNameService.savedMemento
+              );
             }
           }
         });
@@ -196,7 +226,8 @@ export class RouterService {
     }
 
     this._changeTab(
-      '/' + pathType + '/' + this.stateEditorService.getActiveStateName());
+      '/' + pathType + '/' + this.stateEditorService.getActiveStateName()
+    );
     this.windowRef.nativeWindow.scrollTo(0, 0);
   }
 
@@ -209,9 +240,11 @@ export class RouterService {
   }
 
   isLocationSetToNonStateEditorTab(): boolean {
-    let currentPath = (
+    let currentPath =
       '/' +
-      this.windowRef.nativeWindow.location.hash.split('#')[1].split('/')[1]);
+        this.windowRef.nativeWindow.location.hash
+          ?.split('#')[1]
+          ?.split('/')[1] ?? '';
 
     return (
       currentPath === this.TABS.MAIN.path ||
@@ -221,7 +254,8 @@ export class RouterService {
       currentPath === this.TABS.IMPROVEMENTS.path ||
       currentPath === this.TABS.SETTINGS.path ||
       currentPath === this.TABS.HISTORY.path ||
-      currentPath === this.TABS.FEEDBACK.path);
+      currentPath === this.TABS.FEEDBACK.path
+    );
   }
 
   getCurrentStateFromLocationPath(): string | null {
@@ -230,10 +264,9 @@ export class RouterService {
 
   navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
-    let oldState = decodeURI(
-      this._getCurrentStateFromLocationPath());
+    let oldState = decodeURI(this._getCurrentStateFromLocationPath());
 
-    if (oldState === ('/' + stateName)) {
+    if (oldState === '/' + stateName) {
       return;
     }
 
@@ -257,9 +290,10 @@ export class RouterService {
     }
   }
 
-  navigateToTranslationTab(): void {
+  navigateToTranslationTab(stateName: string = null): void {
     this._savePendingChanges();
-    this._changeTab(this.TABS.TRANSLATION.path);
+    this.stateEditorService.setActiveStateName(stateName);
+    this._actuallyNavigate(this.SLUG_TRANSLATION, stateName);
   }
 
   navigateToPreviewTab(): void {
@@ -317,5 +351,6 @@ export class RouterService {
   }
 }
 
-angular.module('oppia').factory('RouterService',
-  downgradeInjectable(RouterService));
+angular
+  .module('oppia')
+  .factory('RouterService', downgradeInjectable(RouterService));

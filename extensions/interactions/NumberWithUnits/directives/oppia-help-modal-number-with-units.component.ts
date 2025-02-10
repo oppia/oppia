@@ -16,16 +16,15 @@
  * @fileoverview Component for Number With Units Help Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-help-modal-number-with-units',
   templateUrl: './number-with-units-help-modal.component.html',
 })
-export class HelpModalNumberWithUnitsComponent
-  extends ConfirmOrCancelModal {
+export class HelpModalNumberWithUnitsComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

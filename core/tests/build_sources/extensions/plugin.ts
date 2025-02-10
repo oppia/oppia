@@ -19,22 +19,24 @@
 CKEDITOR.plugins.add('pre', {
   icons: 'pre',
 
-  init: function(editor) {
+  init: function (editor) {
     var tag = 'pre';
     var style = new CKEDITOR.style({element: 'pre'}, null);
 
     editor.addCommand(
-      'pre', <CKEDITOR.commandDefinition> new CKEDITOR.styleCommand(style));
+      'pre',
+      <CKEDITOR.commandDefinition>new CKEDITOR.styleCommand(style)
+    );
 
     // This part will provide toolbar button highlighting in editor.
-    editor.attachStyleStateChange(style, function(state) {
+    editor.attachStyleStateChange(style, function (state) {
       !editor.readOnly && editor.getCommand('pre').setState(state);
     });
 
-    editor.ui.addButton( 'Pre', {
+    editor.ui.addButton('Pre', {
       label: 'Pre',
       command: 'pre',
-      toolbar: 'insert'
+      toolbar: 'insert',
     });
-  }
+  },
 });

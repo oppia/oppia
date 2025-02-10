@@ -71,7 +71,7 @@ class QuestionCreationHandler(
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -80,7 +80,7 @@ class QuestionCreationHandler(
                 ('language_code' not in question_dict) or
                 (question_dict['version'] != 0)):
             raise self.InvalidInputException(
-                'Question Data should contain id, state data, language code, ' +
+                'Question Data should contain id, state data, language code, '
                 'and its version should be set as 0')
 
         question_dict['question_state_data_schema_version'] = (
@@ -364,7 +364,7 @@ class EditableQuestionDataHandler(
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The question with the given id doesn\'t exist.')
         question_services.delete_question(self.user_id, question_id)
         self.render_json(self.values)

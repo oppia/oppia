@@ -1,4 +1,4 @@
-<div class="modal-header">
+<div class="modal-header e2e-test-topic-dependency-graph-container">
   <h3>Graph visualization</h3>
 </div>
 <div class="modal-body">
@@ -8,7 +8,7 @@
         <path class="link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)">
         </path>
       </g>
-      <g class="node" *ngFor="let node of nodeList">
+      <g class="node e2e-test-topic-node" *ngFor="let node of nodeList">
         <rect [attr.rx]="2" [attr.ry]="2" [attr.height]="node.height" [attr.width]="node.width"
               [attr.x]="node.x0" [attr.y]="node.y0"
               [ngClass]="{'clickable': false}"
@@ -30,7 +30,7 @@
   </svg>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-secondary"
+  <button class="btn btn-secondary e2e-test-close-topic-dependency-modal"
           (click)="cancel()">
     Cancel
   </button>

@@ -16,50 +16,26 @@
  * @fileoverview Unit tests for SocialButtonsComponent
  */
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SocialButtonsComponent } from './social-buttons.component';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-class MockPlatformFeatureService {
-  status = {
-    AndroidBetaLandingPage: {
-      isEnabled: false
-    }
-  };
-}
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SocialButtonsComponent} from './social-buttons.component';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('SocialButtonsComponent', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
-
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SocialButtonsComponent, MockTranslatePipe],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
-      ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-  });
-
-  it('should show android app button', () => {
-    mockPlatformFeatureService.status.AndroidBetaLandingPage.isEnabled = true;
-
-    const component = TestBed.createComponent(SocialButtonsComponent);
-
-    expect(component.componentInstance.androidAppButtonIsShown).toBeTrue();
+      true
+    );
   });
 });

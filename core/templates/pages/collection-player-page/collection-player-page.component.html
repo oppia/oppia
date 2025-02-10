@@ -62,7 +62,7 @@
         </text>
       </svg>
 
-      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+      <img [src]="getStaticCopyrightedImageUrl('/general/collection_mascot.svg')"
            class="collection-mascot">
       <a *ngFor="let node of collection.getCollectionNodes();let index = index"
          [href]="getExplorationUrl(node?.getExplorationId())"
@@ -121,7 +121,7 @@
 
     <div *ngIf="collection && collection.getCollectionNodes().length !== 0"
          class="oppia-collection-table">
-      <img [src]="getStaticImageUrl('/general/collection_mascot.svg')"
+      <img [src]="getStaticCopyrightedImageUrl('/general/collection_mascot.svg')"
            class="mobile-lesson-icon">
       <div class="mobile-path-segment"
            *ngFor="let node of collection.getCollectionNodes();let index = index"

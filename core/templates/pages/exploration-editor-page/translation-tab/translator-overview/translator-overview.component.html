@@ -1,6 +1,6 @@
 <div class="oppia-translator-overview">
   <div>
-    <div id="tutorialTranslationLanguage">
+    <div id="tutorialTranslationLanguage" *ngIf="inTranslationMode || !isVoiceoverContributionWithAccentEnabled()">
       <span class="e2e-test-language-selector-label oppia-language-selector-label">
         <strong>
           <span *ngIf="inVoiceoverMode">Voiceovers</span>
@@ -9,12 +9,49 @@
       </span>
       <select id="audioTranslationLanguageCodeField"
               class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus"
+              [attr.aria-label]="inVoiceoverMode ? 'Voiceover language selector' : 'Translation language selector'"
               (change)="changeTranslationLanguage()"
               [(ngModel)]="languageCode">
         <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
           {{ language.description }}
         </option>
       </select>
+    </div>
+    <div *ngIf="isVoiceoverContributionWithAccentEnabled() && inVoiceoverMode">
+      <div class="language-selector-container">
+        <span class="language-selector-text">
+          <strong>Voiceover Language Code: </strong>
+        </span>
+        <mat-form-field class="language-selector-form">
+          <mat-select (selectionChange)="changeTranslationLanguage()" [(ngModel)]="languageCode">
+            <mat-option *ngFor="let language of languageCodesAndDescriptions"
+                        [value]="language.id">
+              <span>
+                {{language.description}}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="language-selector-container">
+        <span class="language-selector-text">
+          <strong>Language Accent Code: </strong>
+        </span>
+        <span *ngIf="selectedLanguageAccentCode === ''"><i>No Accent Selection Available</i></span>
+        <mat-form-field class="language-selector-form" *ngIf="selectedLanguageAccentCode !== ''">
+          <mat-select [(value)]="selectedLanguageAccentCode" (selectionChange)="updateLanguageAccentCode($event.value)">
+            <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
+                        [value]="languageAccentCodeToDescription.key">
+              <span>
+                {{languageAccentCodeToDescription.value}}
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div>
+
     </div>
     <div *ngIf="canShowTabModeSwitcher()" class="oppia-mode-change-section">
       <label class="oppia-mode-change-label">Mode: </label>
@@ -41,11 +78,26 @@
     <div class="progress oppia-translation-progress-bar">
       <div class="progress-bar bg-success" role="progressbar" [ngStyle]="getTranslationProgressStyle()"></div>
     </div>
-    <span [attr.aria-label]="getTranslationProgressAriaLabel()" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">({{ numberOfRequiredAudio - numberOfAudioNotAvailable }}/{{ numberOfRequiredAudio }})</span>
+    <span tabindex="0" [attr.aria-label]="getTranslationProgressAriaLabel()" role="status" class="oppia-numerical-progress-status e2e-test-translation-numerical-status">({{ numberOfRequiredAudio - numberOfAudioNotAvailable }}/{{ numberOfRequiredAudio }})</span>
   </div>
 </div>
 
 <style>
+  .language-selector-text {
+    float: left;
+    width: 50%;
+  }
+  .language-selector-form {
+    width: 210px;
+  }
+  .language-selector-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    margin: auto;
+    text-align: center;
+    width: 500px;
+  }
   .oppia-translator-overview {
     display: -webkit-flex;
     display: flex;

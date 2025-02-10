@@ -16,22 +16,26 @@
  * @fileoverview NormalizeWhitespacePunctuationAndCase pipe for Oppia.
  */
 
-import { Injectable, Pipe, PipeTransform } from '@angular/core';
+import {Injectable, Pipe, PipeTransform} from '@angular/core';
 
 // Filter that takes a string, trims and normalizes spaces within each
 // line, and removes blank lines. Note that any spaces whose removal does not
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 @Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
 export class NormalizeWhitespacePunctuationAndCasePipe
-implements PipeTransform {
+  implements PipeTransform
+{
   transform(input: string): string {
-    let isAlphanumeric = function(character: string) {
-      return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
-        character.toLowerCase()) !== -1;
+    let isAlphanumeric = function (character: string) {
+      return (
+        'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+          character.toLowerCase()
+        ) !== -1
+      );
     };
 
     input = input.trim();
@@ -44,9 +48,12 @@ implements PipeTransform {
       for (let j: number = 0; j < inputLine.length; j++) {
         let currentChar: string = inputLine.charAt(j).toLowerCase();
         if (currentChar === ' ') {
-          if (j > 0 && j < inputLine.length - 1 &&
-                              isAlphanumeric(inputLine.charAt(j - 1)) &&
-                              isAlphanumeric(inputLine.charAt(j + 1))) {
+          if (
+            j > 0 &&
+            j < inputLine.length - 1 &&
+            isAlphanumeric(inputLine.charAt(j - 1)) &&
+            isAlphanumeric(inputLine.charAt(j + 1))
+          ) {
             result += currentChar;
           }
         } else {

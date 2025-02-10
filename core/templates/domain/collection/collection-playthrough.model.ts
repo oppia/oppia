@@ -19,8 +19,8 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CollectionPlaythroughBackendDict {
-  'next_exploration_id': string | null;
-  'completed_exploration_ids': string[];
+  next_exploration_id: string | null;
+  completed_exploration_ids: string[];
 }
 
 export class CollectionPlaythrough {
@@ -30,24 +30,30 @@ export class CollectionPlaythrough {
   // Stores information about a current playthrough of a collection for a
   // user.
   constructor(
-      nextExplorationId: string | null, completedExplorationIds: string[]) {
+    nextExplorationId: string | null,
+    completedExplorationIds: string[]
+  ) {
     this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   }
 
   static createFromBackendObject(
-      collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict):
-      CollectionPlaythrough {
+    collectionPlaythroughBackendObject: CollectionPlaythroughBackendDict
+  ): CollectionPlaythrough {
     return new CollectionPlaythrough(
       collectionPlaythroughBackendObject.next_exploration_id,
-      collectionPlaythroughBackendObject.completed_exploration_ids);
+      collectionPlaythroughBackendObject.completed_exploration_ids
+    );
   }
 
   static create(
-      nextExplorationId: string | null,
-      completedExplorationIds: string[]): CollectionPlaythrough {
+    nextExplorationId: string | null,
+    completedExplorationIds: string[]
+  ): CollectionPlaythrough {
     return new CollectionPlaythrough(
-      nextExplorationId, cloneDeep(completedExplorationIds));
+      nextExplorationId,
+      cloneDeep(completedExplorationIds)
+    );
   }
 
   // Returns the upcoming exploration ID. Changes to this are not
@@ -76,11 +82,6 @@ export class CollectionPlaythrough {
     return this._completedExplorationIds.length !== 0;
   }
 
-  // TODO(bhenning): Add setters for some of these properties. Setters allow
-  // the collection editor to setup specifically configured playthrough
-  // sessions of the collection player through this object (for example, the
-  // editor would be able to fake which explorations were completed to see how
-  // that particular configuration would look for a learner).
   hasFinishedCollection(): boolean {
     return this._nextExplorationId === null;
   }

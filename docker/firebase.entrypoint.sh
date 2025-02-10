@@ -17,6 +17,6 @@
 emulators:start \
 --only auth \
 --project=dev-project-id \
---config=/app/oppia/.firebase.json \
+--config=/app/oppia/.firebase_docker.json \
 $([ "$save_datastore" = "true" ] && echo "--import=/app/firebase_emulator_cache") \
 --export-on-exit=/app/firebase_emulator_cache

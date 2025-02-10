@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview End-to-end testing utilities for Numeric Expression Input
  * interaction in webdriverio.
@@ -20,53 +19,62 @@
 
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 
-var customizeInteraction = async function(elem, placeholderText) {
-  await objects.UnicodeStringEditor(
-    elem.$('<schema-based-unicode-editor>')
-  ).setValue(placeholderText);
+var customizeInteraction = async function (elem, placeholderText) {
+  await objects
+    .UnicodeStringEditor(elem.$('<schema-based-unicode-editor>'))
+    .setValue(placeholderText);
 };
 
-var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
+var expectInteractionDetailsToMatch = async function (elem, placeholderText) {
   await waitFor.presenceOf(
     elem.$('<oppia-interactive-numeric-expression-input>'),
-    'The numeric expression input editor took too long to load.');
+    'The numeric expression input editor took too long to load.'
+  );
   if (placeholderText) {
     expect(
-      await objects.MathEditor(elem.$(
-        '<oppia-interactive-numeric-expression-input>')).getValue()
-    ).toBe(
-      '\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
+      await objects
+        .MathEditor(elem.$('<oppia-interactive-numeric-expression-input>'))
+        .getValue()
+    ).toBe('\\color{grey}{\\text{\\small{' + placeholderText + '}}}');
   }
 };
 
-var submitAnswer = async function(elem, answer) {
-  await objects.MathEditor(elem.$(
-    '<oppia-interactive-numeric-expression-input>')).setValue(answer);
+var submitAnswer = async function (elem, answer) {
+  await objects
+    .MathEditor(elem.$('<oppia-interactive-numeric-expression-input>'))
+    .setValue(answer);
   var submitAnswerBtn = $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 
 var answerObjectType = 'NumericExpression';
 
-var testSuite = [{
-  interactionArguments: ['Type an expression here, using only numbers.'],
-  ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
-  expectedInteractionDetails: ['Type an expression here, using only numbers.'],
-  wrongAnswers: ['10', '3*2-(-4)', '-(-4)+6', '6+4'],
-  correctAnswers: ['6-(-4)']
-}, {
-  interactionArguments: [
-    'Type an expression here, using numbers and the addition sign.'],
-  ruleArguments: ['IsEquivalentTo', '3*10^(-5)'],
-  expectedInteractionDetails: [
-    'Type an expression here, using numbers and the addition sign.'],
-  wrongAnswers: ['3*10^5', '2*10^(-5)', '5*10^(-3)'],
-  correctAnswers: ['3*10^(-5)', '0.00003']
-}];
+var testSuite = [
+  {
+    interactionArguments: ['Type an expression here, using only numbers.'],
+    ruleArguments: ['MatchesExactlyWith', '6-(-4)'],
+    expectedInteractionDetails: [
+      'Type an expression here, using only numbers.',
+    ],
+    wrongAnswers: ['10', '3*2-(-4)', '-(-4)+6', '6+4'],
+    correctAnswers: ['6-(-4)'],
+  },
+  {
+    interactionArguments: [
+      'Type an expression here, using numbers and the addition sign.',
+    ],
+    ruleArguments: ['IsEquivalentTo', '3*10^(-5)'],
+    expectedInteractionDetails: [
+      'Type an expression here, using numbers and the addition sign.',
+    ],
+    wrongAnswers: ['3*10^5', '2*10^(-5)', '5*10^(-3)'],
+    correctAnswers: ['3*10^(-5)', '0.00003'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

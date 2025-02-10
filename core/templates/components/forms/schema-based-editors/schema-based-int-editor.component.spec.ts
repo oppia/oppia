@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for Schema Based Int Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule } from '@angular/forms';
-import { SchemaBasedIntEditorComponent } from './schema-based-int-editor.component';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FormControl, FormsModule} from '@angular/forms';
+import {SchemaBasedIntEditorComponent} from './schema-based-int-editor.component';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 
 describe('Schema Based Int Editor Component', () => {
   let component: SchemaBasedIntEditorComponent;
@@ -32,14 +38,9 @@ describe('Schema Based Int Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedIntEditorComponent
-      ],
-      providers: [
-        FocusManagerService,
-        SchemaFormSubmittedService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedIntEditorComponent],
+      providers: [FocusManagerService, SchemaFormSubmittedService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,7 +54,7 @@ describe('Schema Based Int Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function (value: number) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -63,17 +64,20 @@ describe('Schema Based Int Editor Component', () => {
     expect(component.onChange).toEqual(mockFunction);
   }));
 
-  it('should set local value on initialization and set focus' +
-    ' on the input field', fakeAsync(() => {
-    spyOn(focusManagerService, 'setFocusWithoutScroll');
-    expect(component.localValue).toBe(undefined);
+  it(
+    'should set local value on initialization and set focus' +
+      ' on the input field',
+    fakeAsync(() => {
+      spyOn(focusManagerService, 'setFocusWithoutScroll');
+      expect(component.localValue).toBe(undefined);
 
-    component.ngOnInit();
-    tick(50);
+      component.ngOnInit();
+      tick(50);
 
-    expect(component.localValue).toBe(0);
-    expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
-  }));
+      expect(component.localValue).toBe(0);
+      expect(focusManagerService.setFocusWithoutScroll).toHaveBeenCalled();
+    })
+  );
 
   it('should write value', () => {
     component.localValue = 10;
@@ -94,7 +98,7 @@ describe('Schema Based Int Editor Component', () => {
     expect(component.localValue).toBe(1);
   });
 
-  it('should not update value when local value doesn\'t change', () => {
+  it("should not update value when local value doesn't change", () => {
     component.localValue = 1;
 
     expect(component.localValue).toBe(1);
@@ -107,22 +111,23 @@ describe('Schema Based Int Editor Component', () => {
   it('should submit form on key press', () => {
     spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit');
     let evt = new KeyboardEvent('', {
-      keyCode: 13
+      keyCode: 13,
     });
 
     component.onKeypress(evt);
 
-    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
-      .toHaveBeenCalled();
+    expect(
+      schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit
+    ).toHaveBeenCalled();
   });
 
   it('should return errors for invalid value type', () => {
-    expect(
-      component.validate(new FormControl(false))
-    ).toEqual({invalidType: 'boolean'});
-    expect(
-      component.validate(new FormControl('4'))
-    ).toEqual({invalidType: 'string'});
+    expect(component.validate(new FormControl(false))).toEqual({
+      invalidType: 'boolean',
+    });
+    expect(component.validate(new FormControl('4'))).toEqual({
+      invalidType: 'string',
+    });
     expect(component.validate(new FormControl(3))).toEqual(null);
   });
 });

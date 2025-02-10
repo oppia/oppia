@@ -15,17 +15,17 @@
 /**
  * @fileoverview Unit tests for LearnerAnswerDetailsBackendApiService
  */
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
-import { LearnerAnswerDetailsBackendApiService } from
-  'domain/statistics/learner-answer-details-backend-api.service';
+import {LearnerAnswerDetailsBackendApiService} from 'domain/statistics/learner-answer-details-backend-api.service';
 
 describe('Learner answer info backend Api service', () => {
   let httpTestingController: HttpTestingController;
-  let learnerAnswerDetailsBackendApiService:
-    LearnerAnswerDetailsBackendApiService;
+  let learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService;
   let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
@@ -34,55 +34,66 @@ describe('Learner answer info backend Api service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     learnerAnswerDetailsBackendApiService = TestBed.get(
-      LearnerAnswerDetailsBackendApiService);
+      LearnerAnswerDetailsBackendApiService
+    );
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully record the learner answer details',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully record the learner answer details', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
-        'exp123', 'Introduction', 'TextInput', 'sample answer',
-        'sample answer details').then(
-        successHandler, failHandler);
+    learnerAnswerDetailsBackendApiService
+      .recordLearnerAnswerDetailsAsync(
+        'exp123',
+        'Introduction',
+        'TextInput',
+        'sample answer',
+        'sample answer details'
+      )
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/learneranswerdetailshandler/exploration/exp123');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(
+      '/learneranswerdetailshandler/exploration/exp123'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use rejection handler if learner answer backend request failed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use rejection handler if learner answer backend request failed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
-        'exp123', 'Introduction', 'TextInput', 'sample answer',
-        'sample answer details').then(
-        successHandler, failHandler);
+    learnerAnswerDetailsBackendApiService
+      .recordLearnerAnswerDetailsAsync(
+        'exp123',
+        'Introduction',
+        'TextInput',
+        'sample answer',
+        'sample answer details'
+      )
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/learneranswerdetailshandler/exploration/exp123');
-      expect(req.request.method).toEqual('PUT');
+    let req = httpTestingController.expectOne(
+      '/learneranswerdetailshandler/exploration/exp123'
+    );
+    expect(req.request.method).toEqual('PUT');
 
-      req.flush('Error loading learner answer details data.', {
-        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-      });
+    req.flush('Error loading learner answer details data.', {
+      status: ERROR_STATUS_CODE,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

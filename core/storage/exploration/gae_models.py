@@ -230,16 +230,17 @@ class ExplorationModel(base_models.VersionedModel):
     # this exploration.
     auto_tts_enabled = (
         datastore_services.BooleanProperty(default=True, indexed=True))
-    # A boolean indicating whether correctness feedback is enabled in this
-    # exploration.
-    correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=False, indexed=True)
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
         required=True, default=0, indexed=True)
     # An boolean indicating whether further edits can be made to the
     # exploration.
     edits_allowed = datastore_services.BooleanProperty(
+        default=True, indexed=True)
+    # A boolean indicating whether correctness feedback is enabled in this
+    # exploration.
+    # DEPRECATED. Do not use.
+    correctness_feedback_enabled = datastore_services.BooleanProperty(
         default=True, indexed=True)
 
     @staticmethod

@@ -1,11 +1,11 @@
 <ng-template #EditorTabTourSaveDraft>
-  <h3 class="e2e-test-joyride-title">Save</h3>
-  <p>When you're done making changes, be sure to save your work.</p>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Save</h3>
+  <p tabindex="0">When you're done making changes, be sure to save your work.</p>
 </ng-template>
 
 <ul class="nav navbar-nav oppia-navbar-nav float-right">
   <!-- Start of html for large screens. -->
-  <li class="nav-item d-none d-sm-block" *ngIf="explorationCanBePublished">
+  <li class="nav-item d-sm-block" *ngIf="explorationCanBePublished">
     <div class="btn-group oppia-publish-button-container"
          ngbTooltip="{{ getPublishExplorationButtonTooltip() }}"
          placement="bottom"
@@ -34,7 +34,7 @@
     </div>
   </li>
 
-  <li class="nav-item d-none d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
+  <li class="nav-item d-sm-block" *ngIf="isEditableOutsideTutorialMode()">
     <div class="btn-group oppia-publish-button-container"
          title="{{ getSaveButtonTooltip() }}" [ngClass]="{'disable-save-button': !connectedToInternet || !isExplorationSaveable() || isLockedByAdmin()}">
       <button id="tutorialSaveButton"
@@ -67,13 +67,12 @@
           <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-
       <button [matMenuTriggerFor]="discardButton" type="button" class="btn btn-light oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
-              [disabled]="!connectedToInternet || !getChangeListLength()" aria-label="Discard Draft">
+              [disabled]="!connectedToInternet || !getChangeListLength() || autosaveIsInProgress" aria-label="Discard Draft">
       </button>
 
       <mat-menu #discardButton="matMenu" [ngStyle]="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
-        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength()}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
+        <button mat-menu-item title="Discard all pending changes"><a (click)="discardChanges()" [ngClass]="{'oppia-disabled-link': !connectedToInternet || !getChangeListLength() || autosaveIsInProgress}" class="dropdown-item nav-item e2e-test-discard-changes">Discard Draft</a></button>
       </mat-menu>
     </div>
   </li>

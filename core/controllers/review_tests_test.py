@@ -53,7 +53,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.story_url_fragment_2 = 'private-story-title'
 
         self.save_new_valid_exploration(
-            self.exp_id, self.owner_id, correctness_feedback_enabled=True)
+            self.exp_id, self.owner_id)
         self.publish_exploration(self.owner_id, self.exp_id)
 
         self.node_1: story_domain.StoryNodeDict = {
@@ -71,8 +71,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.exp_id,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -109,28 +109,6 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id_1, self.admin_id)
 
         self.login(self.VIEWER_EMAIL)
-
-
-class ReviewTestsPageTests(BaseReviewTestsControllerTests):
-
-    def test_any_user_can_access_review_tests_page(self) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_1)
-
-    def test_no_user_can_access_unpublished_story_review_sessions_page(
-        self
-    ) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_2,
-            expected_status_int=404)
-
-    def test_get_fails_when_story_doesnt_exist(self) -> None:
-        self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % 'non-existent-story',
-            expected_status_int=302)
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
@@ -176,8 +154,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'outline_is_finalized': False,
             'exploration_id': self.exp_id,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }

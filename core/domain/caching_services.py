@@ -22,7 +22,6 @@ import json
 
 from core.domain import caching_domain
 from core.domain import collection_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
 from core.domain import skill_domain
@@ -44,7 +43,6 @@ if MYPY: # pragma: no cover
 
     AllowedCacheableObjectTypes = Union[
         AllowedDefaultTypes,
-        config_domain.AllowedDefaultValueTypes,
         collection_domain.Collection,
         exp_domain.Exploration,
         skill_domain.Skill,
@@ -90,15 +88,9 @@ CACHE_NAMESPACE_STORY: Final = 'story'
 # Topic. There is also a special sub-namespace represented by the empty
 # string; this sub-namespace stores the latest version of the topic.
 CACHE_NAMESPACE_TOPIC: Final = 'topic'
-# This namespace supports sub-namespaces which are identified by the stringified
-# version number of the topics within the sub-namespace. The value for
-# each key in this namespace should be a serialized representation of a
-# Platform Parameter. This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
 # The value for each key in this namespace should be a serialized representation
-# of a ConfigPropertyModel value (the 'value' attribute of a ConfigPropertyModel
-# object). This namespace does not support sub-namespaces.
-CACHE_NAMESPACE_CONFIG: Final = 'config'
+# of a Platform Parameter. This namespace does not support sub-namespaces.
+CACHE_NAMESPACE_PLATFORM_PARAMETER: Final = 'platform'
 # The sub-namespace is not necessary for the default namespace. The namespace
 # handles default datatypes allowed by Redis including Strings, Lists, Sets,
 # and Hashes. More details can be found at: https://redis.io/topics/data-types.
@@ -114,7 +106,6 @@ class DeserializationFunctionsDict(TypedDict):
     story: Callable[[str], story_domain.Story]
     topic: Callable[[str], topic_domain.Topic]
     platform: Callable[[str], platform_parameter_domain.PlatformParameter]
-    config: Callable[[str], config_domain.AllowedDefaultValueTypes]
     default: Callable[[str], str]
 
 
@@ -127,7 +118,6 @@ class SerializationFunctionsDict(TypedDict):
     story: Callable[[story_domain.Story], str]
     topic: Callable[[topic_domain.Topic], str]
     platform: Callable[[platform_parameter_domain.PlatformParameter], str]
-    config: Callable[[config_domain.AllowedDefaultValueTypes], str]
     default: Callable[[str], str]
 
 
@@ -140,7 +130,6 @@ NamespaceType = Literal[
     'story',
     'topic',
     'platform',
-    'config',
     'default'
 ]
 
@@ -153,7 +142,6 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
     CACHE_NAMESPACE_TOPIC: topic_domain.Topic.deserialize,
     CACHE_NAMESPACE_PLATFORM_PARAMETER: (
         platform_parameter_domain.PlatformParameter.deserialize),
-    CACHE_NAMESPACE_CONFIG: json.loads,
     CACHE_NAMESPACE_DEFAULT: json.loads
 }
 
@@ -165,7 +153,6 @@ SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),
-    CACHE_NAMESPACE_CONFIG: json.dumps,
     CACHE_NAMESPACE_DEFAULT: json.dumps
 }
 
@@ -255,14 +242,6 @@ def get_multi(
     sub_namespace: str | None,
     obj_ids: List[str]
 ) -> Dict[str, platform_parameter_domain.PlatformParameter]: ...
-
-
-@overload
-def get_multi(
-    namespace: Literal['config'],
-    sub_namespace: str | None,
-    obj_ids: List[str]
-) -> Dict[str, config_domain.AllowedDefaultValueTypes]: ...
 
 
 @overload
@@ -367,14 +346,6 @@ def set_multi(
         str,
         platform_parameter_domain.PlatformParameter
     ]
-) -> bool: ...
-
-
-@overload
-def set_multi(
-    namespace: Literal['config'],
-    sub_namespace: str | None,
-    id_value_mapping: Dict[str, config_domain.AllowedDefaultValueTypes]
 ) -> bool: ...
 
 

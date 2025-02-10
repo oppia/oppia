@@ -19,30 +19,36 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { Collection } from 'domain/collection/collection.model';
+import {AppConstants} from 'app.constants';
+import {Collection} from 'domain/collection/collection.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionValidationService {
   _getNonexistentExplorationIds(collection: Collection): string[] {
-    return collection.getCollectionNodes().filter((collectionNode) => {
-      return !collectionNode.doesExplorationExist();
-    }).map((collectionNode) => {
-      return collectionNode.getExplorationId();
-    });
+    return collection
+      .getCollectionNodes()
+      .filter(collectionNode => {
+        return !collectionNode.doesExplorationExist();
+      })
+      .map(collectionNode => {
+        return collectionNode.getExplorationId();
+      });
   }
 
   _getPrivateExplorationIds(collection: Collection): string[] {
-    return collection.getCollectionNodes().filter((collectionNode) => {
-      return collectionNode.isExplorationPrivate();
-    }).map((collectionNode) => {
-      return collectionNode.getExplorationId();
-    });
+    return collection
+      .getCollectionNodes()
+      .filter(collectionNode => {
+        return collectionNode.isExplorationPrivate();
+      })
+      .map(collectionNode => {
+        return collectionNode.getExplorationId();
+      });
   }
 
   // Validates that the tags for the collection are in the proper format,
@@ -51,7 +57,7 @@ export class CollectionValidationService {
     // Check to ensure that all tags follow the format specified in
     // TAG_REGEX.
     var tagRegex = new RegExp(AppConstants.TAG_REGEX);
-    return tags.every((tag) => {
+    return tags.every(tag => {
       return tag.match(tagRegex);
     });
   }
@@ -79,16 +85,16 @@ export class CollectionValidationService {
 
     var collectionHasNodes = collection.getCollectionNodeCount() > 0;
     if (!collectionHasNodes) {
-      issues.push(
-        'There should be at least 1 exploration in the collection.');
+      issues.push('There should be at least 1 exploration in the collection.');
     }
 
     var nonexistentExpIds = this._getNonexistentExplorationIds(collection);
     if (nonexistentExpIds.length !== 0) {
       issues.push(
         'The following exploration(s) either do not exist, or you do not ' +
-        'have edit access to add them to this collection: ' +
-        nonexistentExpIds.join(', '));
+          'have edit access to add them to this collection: ' +
+          nonexistentExpIds.join(', ')
+      );
     }
 
     if (isPublic) {
@@ -96,7 +102,8 @@ export class CollectionValidationService {
       if (privateExpIds.length !== 0) {
         issues.push(
           'Private explorations cannot be added to a public collection: ' +
-          privateExpIds.join(', '));
+            privateExpIds.join(', ')
+        );
       }
     }
 
@@ -127,11 +134,17 @@ export class CollectionValidationService {
    * Returns false if the tags are not validate.
    */
   isTagValid(tags: string[]): boolean {
-    return this.validateTagFormat(tags) && this.validateDuplicateTags(tags) &&
-    this.validateTagsNormalized(tags);
+    return (
+      this.validateTagFormat(tags) &&
+      this.validateDuplicateTags(tags) &&
+      this.validateTagsNormalized(tags)
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'CollectionValidationService',
-  downgradeInjectable(CollectionValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'CollectionValidationService',
+    downgradeInjectable(CollectionValidationService)
+  );

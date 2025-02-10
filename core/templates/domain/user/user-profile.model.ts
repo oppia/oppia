@@ -18,23 +18,23 @@
 
 import {
   LearnerExplorationSummary,
-  LearnerExplorationSummaryBackendDict
+  LearnerExplorationSummaryBackendDict,
 } from 'domain/summary/learner-exploration-summary.model';
 
 export interface UserProfileBackendDict {
-  'username': string;
-  'profile_is_of_current_user': boolean;
-  'username_of_viewed_profile': string;
-  'user_bio': string;
-  'subject_interests': string[];
+  username: string;
+  profile_is_of_current_user: boolean;
+  username_of_viewed_profile: string;
+  user_bio: string;
+  subject_interests: string[];
   // The time in milliseconds when the user first contributed to Oppia.
   // This property is initially set as null for a new user .
-  'first_contribution_msec': number | null;
-  'user_impact_score': number;
-  'is_already_subscribed': boolean;
-  'is_user_visiting_own_profile': boolean;
-  'created_exp_summary_dicts': LearnerExplorationSummaryBackendDict[];
-  'edited_exp_summary_dicts': LearnerExplorationSummaryBackendDict[];
+  first_contribution_msec: number | null;
+  user_impact_score: number;
+  is_already_subscribed: boolean;
+  is_user_visiting_own_profile: boolean;
+  created_exp_summary_dicts: LearnerExplorationSummaryBackendDict[];
+  edited_exp_summary_dicts: LearnerExplorationSummaryBackendDict[];
 }
 
 export class UserProfile {
@@ -53,7 +53,8 @@ export class UserProfile {
   ) {}
 
   static createFromBackendDict(
-      backendDict: UserProfileBackendDict): UserProfile {
+    backendDict: UserProfileBackendDict
+  ): UserProfile {
     return new UserProfile(
       backendDict.username,
       backendDict.profile_is_of_current_user,
@@ -64,10 +65,12 @@ export class UserProfile {
       backendDict.user_impact_score,
       backendDict.is_already_subscribed,
       backendDict.is_user_visiting_own_profile,
-      backendDict.created_exp_summary_dicts.map(
-        dict => LearnerExplorationSummary.createFromBackendDict(dict)),
-      backendDict.edited_exp_summary_dicts.map(
-        dict => LearnerExplorationSummary.createFromBackendDict(dict))
+      backendDict.created_exp_summary_dicts.map(dict =>
+        LearnerExplorationSummary.createFromBackendDict(dict)
+      ),
+      backendDict.edited_exp_summary_dicts.map(dict =>
+        LearnerExplorationSummary.createFromBackendDict(dict)
+      )
     );
   }
 }

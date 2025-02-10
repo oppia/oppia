@@ -18,21 +18,19 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 
-angular.module('oppia').constant(
-  'GRAPH_INPUT_LEFT_MARGIN',
-  InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
+angular
+  .module('oppia')
+  .constant(
+    'GRAPH_INPUT_LEFT_MARGIN',
+    InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN
+  );
 
 // Gives the staff-lines human readable values.
-angular.module('oppia').constant(
-  'NOTE_NAMES_TO_MIDI_VALUES',
-  InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
-
-// Minimum confidence required for a predicted answer group to be shown to user.
-// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
-// however value need not be in those bounds.
-angular.module('oppia').constant(
-  'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD',
-  InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
+angular
+  .module('oppia')
+  .constant(
+    'NOTE_NAMES_TO_MIDI_VALUES',
+    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES
+  );

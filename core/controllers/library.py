@@ -405,7 +405,7 @@ class ExplorationSummariesHandler(
                 not isinstance(exp_ids, list) or
                 not all(isinstance(exp_id, str) for exp_id in exp_ids)
         ):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if include_private_exps:
             summaries = (

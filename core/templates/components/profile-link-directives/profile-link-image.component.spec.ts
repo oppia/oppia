@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
 
-import { UserService } from 'services/user.service';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ProfileLinkImageComponent } from './profile-link-image.component';
+import {UserService} from 'services/user.service';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {ProfileLinkImageComponent} from './profile-link-image.component';
 
 /**
  * @fileoverview Unit tests for ProfileLinkImageComponent.
@@ -37,15 +43,15 @@ describe('ProfileLinkImageComponent', () => {
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         SmartRouterModule,
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
       ],
-      declarations: [
-        ProfileLinkImageComponent
+      declarations: [ProfileLinkImageComponent],
+      providers: [
+        {
+          provide: APP_BASE_HREF,
+          useValue: '/',
+        },
       ],
-      providers: [{
-        provide: APP_BASE_HREF,
-        useValue: '/'
-      }]
     }).compileComponents();
   }));
 
@@ -57,8 +63,10 @@ describe('ProfileLinkImageComponent', () => {
 
   it('should show profile picture on initialisation', fakeAsync(() => {
     component.username = 'user1';
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
 
     component.ngOnInit();
     tick();

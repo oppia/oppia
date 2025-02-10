@@ -16,15 +16,15 @@
  * @fileoverview Component for the main tab of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { CollectionNode } from 'domain/collection/collection-node.model';
-import { Collection } from 'domain/collection/collection.model';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionLinearizerService } from '../services/collection-linearizer.service';
+import {Component} from '@angular/core';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {Collection} from 'domain/collection/collection.model';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionLinearizerService} from '../services/collection-linearizer.service';
 
 @Component({
   selector: 'oppia-collection-editor-tab',
-  templateUrl: './collection-editor-tab.component.html'
+  templateUrl: './collection-editor-tab.component.html',
 })
 export class CollectionEditorTabComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -43,7 +43,8 @@ export class CollectionEditorTabComponent {
 
   getLinearlySortedNodes(): CollectionNode[] {
     return this.collectionLinearizerService.getCollectionNodesInPlayableOrder(
-      this.collection);
+      this.collection
+    );
   }
 
   hasLoadedCollection(): boolean {

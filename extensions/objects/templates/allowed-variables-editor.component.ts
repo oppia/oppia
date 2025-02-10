@@ -20,16 +20,16 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
 @Component({
   selector: 'allowed-variables-editor',
   templateUrl: './allowed-variables-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class AllowedVariablesEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -38,11 +38,15 @@ export class AllowedVariablesEditorComponent implements OnInit {
   @Input() value!: string[];
   @Output() valueChanged = new EventEmitter();
   latinLowerCase = [
-    'qwertyuiop'.split(''), 'asdfghjkl'.split(''), 'zxcvbnm'.split('')];
+    'qwertyuiop'.split(''),
+    'asdfghjkl'.split(''),
+    'zxcvbnm'.split(''),
+  ];
 
-  latinUpperCase = this.latinLowerCase.map((x) => x.map(y => y.toUpperCase()));
+  latinUpperCase = this.latinLowerCase.map(x => x.map(y => y.toUpperCase()));
   private greekSymbolsLowercase = Object.values(
-    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(0, 23);
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
+  ).slice(0, 23);
 
   greekLowerCase = [
     this.greekSymbolsLowercase.slice(0, 8),
@@ -51,11 +55,12 @@ export class AllowedVariablesEditorComponent implements OnInit {
   ];
 
   private greekSymbolsUppercase = Object.values(
-    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS).slice(23, 33);
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
+  ).slice(23, 33);
 
   greekUpperCase = [
     this.greekSymbolsUppercase.slice(0, 5),
-    this.greekSymbolsUppercase.slice(5, 10)
+    this.greekSymbolsUppercase.slice(5, 10),
   ];
 
   latinTab = AppConstants.CUSTOM_LETTERS_LATIN_TAB;
@@ -64,10 +69,9 @@ export class AllowedVariablesEditorComponent implements OnInit {
   alwaysEditable = true;
   lettersAreLowercase = true;
 
-  currentTab: (
-    typeof AppConstants.CUSTOM_LETTERS_LATIN_TAB |
-    typeof AppConstants.CUSTOM_LETTERS_GREEK_TAB
-  ) = this.latinTab;
+  currentTab:
+    | typeof AppConstants.CUSTOM_LETTERS_LATIN_TAB
+    | typeof AppConstants.CUSTOM_LETTERS_GREEK_TAB = this.latinTab;
 
   constructor(
     private guppyInitializationService: GuppyInitializationService,
@@ -86,12 +90,13 @@ export class AllowedVariablesEditorComponent implements OnInit {
 
   getRemainingLettersCount(): number {
     return Math.max(
-      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value?.length, 0);
+      AppConstants.MAX_CUSTOM_LETTERS_FOR_OSK - this.value?.length,
+      0
+    );
   }
 
   isCustomizationArgOpen(): boolean {
-    return document.getElementsByClassName(
-      'custom-letters-div')?.length !== 0;
+    return document.getElementsByClassName('custom-letters-div')?.length !== 0;
   }
 
   keyDownCallBack(e: KeyboardEvent): void {
@@ -102,9 +107,12 @@ export class AllowedVariablesEditorComponent implements OnInit {
       } else if (keyPressed === 'Backspace') {
         this.value.pop();
       } else if (
-        this.latinLowerCase.join('').replace(/,/g, '').indexOf(
-          keyPressed.toLowerCase()) !== -1 &&
-        this.value.indexOf(keyPressed) === -1) {
+        this.latinLowerCase
+          .join('')
+          .replace(/,/g, '')
+          .indexOf(keyPressed.toLowerCase()) !== -1 &&
+        this.value.indexOf(keyPressed) === -1
+      ) {
         this.updateLettersList(keyPressed);
       }
     }
@@ -120,16 +128,20 @@ export class AllowedVariablesEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.windowRef.nativeWindow.addEventListener(
-      'keydown', (e) => this.keyDownCallBack(e));
-    this.windowRef.nativeWindow.addEventListener(
-      'keyup', (e) => this.keyUpCallBack(e));
+    this.windowRef.nativeWindow.addEventListener('keydown', e =>
+      this.keyDownCallBack(e)
+    );
+    this.windowRef.nativeWindow.addEventListener('keyup', e =>
+      this.keyUpCallBack(e)
+    );
   }
 }
 
 require('services/guppy-initialization.service.ts');
 
 angular.module('oppia').directive(
-  'allowedVariablesEditor', downgradeComponent({
-    component: AllowedVariablesEditorComponent
-  }));
+  'allowedVariablesEditor',
+  downgradeComponent({
+    component: AllowedVariablesEditorComponent,
+  })
+);

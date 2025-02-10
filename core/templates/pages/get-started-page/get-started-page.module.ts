@@ -16,20 +16,14 @@
  * @fileoverview Module for the get started page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { GetStartedPageRootComponent } from './get-started-page-root.component';
-import { CommonModule } from '@angular/common';
-import { GetStartedPageRoutingModule } from './get-started-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {GetStartedPageRootComponent} from './get-started-page-root.component';
+import {CommonModule} from '@angular/common';
+import {GetStartedPageRoutingModule} from './get-started-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    GetStartedPageRoutingModule
-  ],
-  declarations: [
-    GetStartedPageRootComponent
-  ]
+  imports: [CommonModule, SharedComponentsModule, GetStartedPageRoutingModule],
+  declarations: [GetStartedPageRootComponent],
 })
 export class GetStartedPageModule {}

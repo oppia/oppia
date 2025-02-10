@@ -16,10 +16,10 @@
  * @fileoverview A pipe to limit the number of elements in an array.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({
-  name: 'limitTo'
+  name: 'limitTo',
 })
 export class LimitToPipe implements PipeTransform {
   transform<T>(value: T[], limit: number): T[] {

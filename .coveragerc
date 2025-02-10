@@ -8,13 +8,24 @@ omit =
     *core/tests/*
     *scripts/linters/test_files/*
     *__init__.py
+    */vm_deps/*
+    */scripts/build.py
+    */scripts/install_python_dev_dependencies.py
+    */scripts/install_python_prod_dependencies.py
+    */scripts/install_third_party_libs.py
+    */scripts/run_acceptance_tests.py
+# The above files in the scripts folder will be deleted once the migration to Docker is complete.
+# Currently, the backend tests for these files are failing when runnning within the Docker container.
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option
 # provided by the coverage library.
+# We exclude any line with a comment of “docker: no cover” as this is used to skip
+# lines that will be removed after the migration to Docker.
 # We also exclude @overload, because it is used for defining multiple MyPy definitions 
 # of a function and cannot be tested by Python tests.
 [report]
 exclude_lines =
     pragma: no cover
     @overload
+    docker: no cover

@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the Translate Cache Factory.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
-import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheFactory } from './translate-cache.factory';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  TranslateCacheService,
+  TranslateCacheSettings,
+} from 'ngx-translate-cache';
+import {TranslateService} from '@ngx-translate/core';
+import {TranslateCacheFactory} from './translate-cache.factory';
 
 describe('Translate Cache Factory', () => {
   class MockTranslateCacheService {
@@ -29,21 +32,27 @@ describe('Translate Cache Factory', () => {
     ) {}
   }
   let mockTranslateCacheService = new MockTranslateCacheService(
-    {} as TranslateService, {} as TranslateCacheSettings);
+    {} as TranslateService,
+    {} as TranslateCacheSettings
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         {
           provide: TranslateCacheService,
-          useValue: mockTranslateCacheService
-        }
-      ]
+          useValue: mockTranslateCacheService,
+        },
+      ],
     }).compileComponents();
   }));
 
   it('should create translate cache service', () => {
-    expect(TranslateCacheFactory.createTranslateCacheService(
-      {} as TranslateService, {} as TranslateCacheSettings)).toBeDefined();
+    expect(
+      TranslateCacheFactory.createTranslateCacheService(
+        {} as TranslateService,
+        {} as TranslateCacheSettings
+      )
+    ).toBeDefined();
   });
 });

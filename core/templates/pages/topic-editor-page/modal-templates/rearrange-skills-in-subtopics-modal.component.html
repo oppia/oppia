@@ -54,7 +54,7 @@
             <strong [ngbTooltip]="subtopic.getTitle()"
                     placement="bottom"
                     *ngIf="subtopic?.getTitle()?.length < 25">
-              {{ subtopic.getTitle() }}
+              {{ subtopic.getTitle() }} <mat-icon class="edit-icon-style">edit</mat-icon>
             </strong>
             <strong [ngbTooltip]="subtopic?.getTitle()"
                     placement="bottom"
@@ -73,12 +73,12 @@
             </div>
           </div>
           <div *ngIf="subtopic.getId() === selectedSubtopicId">
-            <input type="text" [(ngModel)]="editableName">
+            <input type="text" class="e2e-test-rename-subtopic-field" [(ngModel)]="editableName" maxlength="{{maxCharsInSubtopicTitle}}">
             <button class="btn btn-secondary"
                     (click)="editNameOfSubtopicWithId(null)">
               Cancel
             </button>
-            <button class="btn btn-primary"
+            <button class="btn btn-primary e2e-test-save-reassignments"
                     (click)="updateSubtopicTitle(subtopic.getId())">
               Save
             </button>
@@ -169,6 +169,10 @@
   }
   .item-flex-container {
     min-height: 200px;
+  }
+  .edit-icon-style {
+    font-size: 17px;
+    margin-top: 2px;
   }
   .skill-id {
     background: #fff;

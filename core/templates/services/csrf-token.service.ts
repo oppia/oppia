@@ -20,13 +20,13 @@
 // because Angular doesn't support global definitions and every library used
 // needs to be imported explicitly.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient, HttpBackend } from '@angular/common/http';
+import {HttpClient, HttpBackend} from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CsrfTokenService {
   // 'tokenPromise' will be null when token is not initialized.
@@ -43,14 +43,18 @@ export class CsrfTokenService {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
-    this.tokenPromise = this.http.get(
-      '/csrfhandler', { responseType: 'text' }
-    ).toPromise().then((responseText: string) => {
-      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-      return JSON.parse(responseText.substring(5)).token;
-    }, (err) => {
-      throw err;
-    });
+    this.tokenPromise = this.http
+      .get('/csrfhandler', {responseType: 'text'})
+      .toPromise()
+      .then(
+        (responseText: string) => {
+          // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+          return JSON.parse(responseText.substring(5)).token;
+        },
+        err => {
+          throw err;
+        }
+      );
   }
 
   getTokenAsync(): PromiseLike<string> {
@@ -61,5 +65,6 @@ export class CsrfTokenService {
   }
 }
 
-angular.module('oppia').factory(
-  'CsrfTokenService', downgradeInjectable(CsrfTokenService));
+angular
+  .module('oppia')
+  .factory('CsrfTokenService', downgradeInjectable(CsrfTokenService));

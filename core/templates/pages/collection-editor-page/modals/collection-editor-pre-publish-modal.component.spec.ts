@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for collection editor pre publish modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-import { CollectionUpdateService } from 'domain/collection/collection-update.service';
-import { Collection } from 'domain/collection/collection.model';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionEditorPrePublishModalComponent } from './collection-editor-pre-publish-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
+import {CollectionUpdateService} from 'domain/collection/collection-update.service';
+import {Collection} from 'domain/collection/collection.model';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionEditorPrePublishModalComponent} from './collection-editor-pre-publish-modal.component';
 
 describe('Collection editor pre publish modal component', () => {
   let fixture: ComponentFixture<CollectionEditorPrePublishModalComponent>;
@@ -37,20 +37,15 @@ describe('Collection editor pre publish modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModalModule
-      ],
-      declarations: [
-        CollectionEditorPrePublishModalComponent
-      ],
+      imports: [HttpClientTestingModule, NgbModalModule],
+      declarations: [CollectionEditorPrePublishModalComponent],
       providers: [
         AlertsService,
         CollectionEditorStateService,
         CollectionUpdateService,
-        NgbActiveModal
+        NgbActiveModal,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -67,10 +62,20 @@ describe('Collection editor pre publish modal component', () => {
     let collectionTitle = 'collection_title';
     let collectionObjective = 'collection_objective';
     let mockCollection = new Collection(
-      'collection_id', collectionTitle, collectionObjective, 'en', [],
-      new CollectionPlaythrough(null, []), '', 2, 3, []);
-    spyOn(collectionEditorStateService, 'getCollection')
-      .and.returnValue(mockCollection);
+      'collection_id',
+      collectionTitle,
+      collectionObjective,
+      'en',
+      [],
+      new CollectionPlaythrough(null, []),
+      '',
+      2,
+      3,
+      []
+    );
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      mockCollection
+    );
     componentInstance.ngOnInit();
     expect(componentInstance.newTitle).toEqual(collectionTitle);
     expect(componentInstance.newObjective).toEqual(collectionObjective);
@@ -93,26 +98,39 @@ describe('Collection editor pre publish modal component', () => {
     let collectionTitle = 'collection_title';
     let collectionObjective = 'collection_objective';
     let mockCollection = new Collection(
-      'collection_id', collectionTitle, collectionObjective, 'en', [],
-      new CollectionPlaythrough(null, []), '', 2, 3, []);
-    spyOn(collectionEditorStateService, 'getCollection')
-      .and.returnValue(mockCollection);
+      'collection_id',
+      collectionTitle,
+      collectionObjective,
+      'en',
+      [],
+      new CollectionPlaythrough(null, []),
+      '',
+      2,
+      3,
+      []
+    );
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      mockCollection
+    );
     componentInstance.ngOnInit();
 
     spyOn(alertsService, 'addWarning');
     componentInstance.newTitle = '';
     componentInstance.save();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a title');
+      'Please specify a title'
+    );
     componentInstance.newTitle = 'valid title';
     componentInstance.newObjective = '';
     componentInstance.save();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify an objective');
+      'Please specify an objective'
+    );
     componentInstance.newObjective = 'learn';
     componentInstance.save();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a category');
+      'Please specify a category'
+    );
     componentInstance.newCategory = 'ALGEBRA';
 
     spyOn(collectionUpdateService, 'setCollectionObjective');

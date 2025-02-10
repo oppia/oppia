@@ -455,10 +455,10 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'html': ''
         }
-        self.assertEqual(suggestions['change'], change_dict)
+        self.assertEqual(suggestions['change_cmd'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions['change']['old_value']['content_id'], 'content_0')
+            suggestions['change_cmd']['old_value']['content_id'], 'content_0')
         self.logout()
 
     def test_get_suggestions_to_review_list(self) -> None:
@@ -501,18 +501,11 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             feconf.CREATOR_DASHBOARD_DATA_URL)['suggestions_to_review_list']
 
         self.assertEqual(len(suggestions), 1)
-        self.assertEqual(suggestions[0]['change'], change_dict)
+        self.assertEqual(suggestions[0]['change_cmd'], change_dict)
         # Test to check if suggestions populate old value of the change.
         self.assertEqual(
-            suggestions[0]['change']['old_value']['content_id'], 'content_0')
-
-        self.logout()
-
-    def test_creator_dashboard_page(self) -> None:
-        self.login(self.OWNER_EMAIL)
-
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        self.assertIn(b'Creator Dashboard | Oppia', response.body)
+            suggestions[0]['change_cmd']['old_value']['content_id'],
+            'content_0')
 
         self.logout()
 

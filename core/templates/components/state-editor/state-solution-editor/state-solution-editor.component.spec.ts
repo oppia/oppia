@@ -16,27 +16,36 @@
  * @fileoverview Unit test for state solution editor component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
-import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
-import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
-import { StateSolutionEditorComponent } from './state-solution-editor.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {
+  Solution,
+  SolutionObjectFactory,
+} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import {AlertsService} from 'services/alerts.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {StateEditorService} from '../state-editor-properties-services/state-editor.service';
+import {StateHintsService} from '../state-editor-properties-services/state-hints.service';
+import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
+import {StateSolutionEditorComponent} from './state-solution-editor.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('State Solution Editor Component', () => {
   let component: StateSolutionEditorComponent;
@@ -61,10 +70,7 @@ describe('State Solution Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        StateSolutionEditorComponent,
-        MockTranslatePipe
-      ],
+      declarations: [StateSolutionEditorComponent, MockTranslatePipe],
       providers: [
         AlertsService,
         EditabilityService,
@@ -76,9 +82,9 @@ describe('State Solution Editor Component', () => {
         StateSolutionService,
         ConvertToPlainTextPipe,
         StateInteractionIdService,
-        WindowDimensionsService
+        WindowDimensionsService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -89,7 +95,8 @@ describe('State Solution Editor Component', () => {
 
     convertToPlainTextPipe = TestBed.inject(ConvertToPlainTextPipe);
     explorationHtmlFormatterService = TestBed.inject(
-      ExplorationHtmlFormatterService);
+      ExplorationHtmlFormatterService
+    );
     editabilityService = TestBed.inject(EditabilityService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -101,19 +108,24 @@ describe('State Solution Editor Component', () => {
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => { });
+    generateContentIdService.init(
+      () => 0,
+      () => {}
+    );
 
     solution = solutionObjectFactory.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {
         content_id: 'solution',
-        html: 'This is the explanation to the answer'
-      }
+        html: 'This is the explanation to the answer',
+      },
     });
 
-    spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
-      .and.returnValue('answerEditorHtml');
+    spyOn(
+      explorationHtmlFormatterService,
+      'getInteractionHtml'
+    ).and.returnValue('answerEditorHtml');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
   });
 
@@ -123,7 +135,8 @@ describe('State Solution Editor Component', () => {
     expect(component.solutionCardIsShown).toBeTrue();
     expect(component.inlineSolutionEditorIsActive).toBeFalse();
     expect(component.SOLUTION_EDITOR_FOCUS_LABEL).toBe(
-      'currentCorrectAnswerEditorHtmlForSolutionEditor');
+      'currentCorrectAnswerEditorHtmlForSolutionEditor'
+    );
     expect(component.correctAnswerEditorHtml).toEqual('answerEditorHtml');
   });
 
@@ -139,62 +152,55 @@ describe('State Solution Editor Component', () => {
     expect(component.solutionCardIsShown).toBeTrue();
   });
 
-  it('should open delete solution modal when user clicks on delete',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          result: Promise.resolve()
-        } as NgbModalRef
-      );
-      spyOn(stateEditorService, 'deleteCurrentSolutionValidity');
-      spyOn(stateSolutionService, 'saveDisplayedValue');
+  it('should open delete solution modal when user clicks on delete', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve(),
+    } as NgbModalRef);
+    spyOn(stateEditorService, 'deleteCurrentSolutionValidity');
+    spyOn(stateSolutionService, 'saveDisplayedValue');
 
-      const value = {
-        index: 0,
-        evt: new Event('')
-      };
+    const value = {
+      index: 0,
+      evt: new Event(''),
+    };
 
-      component.deleteSolution(value);
-      tick();
+    component.deleteSolution(value);
+    tick();
 
-      expect(
-        stateEditorService.deleteCurrentSolutionValidity).toHaveBeenCalled();
-      expect(stateSolutionService.saveDisplayedValue).toHaveBeenCalled();
-    }));
+    expect(stateEditorService.deleteCurrentSolutionValidity).toHaveBeenCalled();
+    expect(stateSolutionService.saveDisplayedValue).toHaveBeenCalled();
+  }));
 
-  it('should close delete solution modal when user clicks cancel',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue(
-        {
-          result: Promise.reject()
-        } as NgbModalRef
-      );
+  it('should close delete solution modal when user clicks cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
 
-      const value = {
-        index: 0,
-        evt: new Event('')
-      };
+    const value = {
+      index: 0,
+      evt: new Event(''),
+    };
 
-      component.deleteSolution(value);
-      tick();
+    component.deleteSolution(value);
+    tick();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should inject invalid solution tooltip text', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
 
     // When in question mode.
     expect(component.getInvalidSolutionTooltip()).toBe(
-      'This solution doesn\'t correspond to an answer ' +
-      'marked as correct. Verify the rules specified for the ' +
-      'answers or change the solution.'
+      "This solution doesn't correspond to an answer " +
+        'marked as correct. Verify the rules specified for the ' +
+        'answers or change the solution.'
     );
 
     // When not in question mode.
     expect(component.getInvalidSolutionTooltip()).toBe(
       'This solution does not lead to another card. Verify the ' +
-      'responses specified or change the solution.'
+        'responses specified or change the solution.'
     );
   });
 
@@ -207,17 +213,17 @@ describe('State Solution Editor Component', () => {
   it('should return the number of displayed hints', () => {
     stateHintsService.displayed = [
       new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0')),
-      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0'))
+      new Hint(SubtitledHtml.createDefault('<h1>work</h1>', '0')),
     ];
 
     expect(component.displayedHintsLength()).toBe(2);
   });
 
   it('should check if in editable tutorial mode or not', () => {
-    spyOn(editabilityService, 'isEditableOutsideTutorialMode')
-      .and.returnValue(true);
-    spyOn(editabilityService, 'isEditable')
-      .and.returnValue(true);
+    spyOn(editabilityService, 'isEditableOutsideTutorialMode').and.returnValue(
+      true
+    );
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
     expect(component.isEditable()).toBeTrue();
   });
@@ -242,13 +248,14 @@ describe('State Solution Editor Component', () => {
 
   it('should inject summary of solution', () => {
     stateSolutionService.savedMemento = solution;
-    spyOn(convertToPlainTextPipe, 'transform').and.callFake((response) => {
+    spyOn(convertToPlainTextPipe, 'transform').and.callFake(response => {
       return response;
     });
 
     expect(component.getSolutionSummary()).toBe(
       'One solution is "&quot;This is a correct answer!&quot;".' +
-      ' This is the explanation to the answer.');
+        ' This is the explanation to the answer.'
+    );
   });
 
   it('should throw error if solution is not saved yet', () => {
@@ -265,47 +272,60 @@ describe('State Solution Editor Component', () => {
     expect(component.isCurrentInteractionLinear()).toBeFalse();
   });
 
-  it('should open add or update solution modal when user clicks on' +
-    ' \'+ ADD SOLUTION\'', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve({
-        solution: solution
-      })
-    } as NgbModalRef);
-    spyOn(solutionVerificationService, 'verifySolution').and.returnValue(false);
-    spyOn(solutionValidityService, 'updateValidity').and.stub();
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(true, false);
-    spyOn(alertsService, 'addInfoMessage');
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('State 1');
+  it(
+    'should open add or update solution modal when user clicks on' +
+      " '+ ADD SOLUTION'",
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({
+          solution: solution,
+        }),
+      } as NgbModalRef);
+      spyOn(solutionVerificationService, 'verifySolution').and.returnValue(
+        false
+      );
+      spyOn(solutionValidityService, 'updateValidity').and.stub();
+      spyOn(stateEditorService, 'isInQuestionMode').and.returnValues(
+        true,
+        false
+      );
+      spyOn(alertsService, 'addInfoMessage');
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        'State 1'
+      );
 
-    // In question mode.
-    component.openAddOrUpdateSolutionModal();
-    tick();
+      // In question mode.
+      component.openAddOrUpdateSolutionModal();
+      tick();
 
-    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-      'The current solution does not correspond to a correct answer.', 4000
-    );
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'The current solution does not correspond to a correct answer.',
+        4000
+      );
 
-    // Not in question mode.
-    component.openAddOrUpdateSolutionModal();
-    tick();
+      // Not in question mode.
+      component.openAddOrUpdateSolutionModal();
+      tick();
 
-    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-      'The current solution does not lead to another card.', 4000
-    );
-  }));
+      expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
+        'The current solution does not lead to another card.',
+        4000
+      );
+    })
+  );
 
   it('should throw error if active state name is invalid', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
-        then: (successCallback: (
-          arg: {solution: Solution}
-        ) => void, errorCallback) => {
+        then: (
+          successCallback: (arg: {solution: Solution}) => void,
+          errorCallback
+        ) => {
           successCallback({
-            solution: solution
+            solution: solution,
           });
-        }
-      }
+        },
+      },
     } as NgbModalRef);
     spyOn(solutionVerificationService, 'verifySolution').and.returnValue(false);
     spyOn(solutionValidityService, 'updateValidity').and.stub();
@@ -313,23 +333,22 @@ describe('State Solution Editor Component', () => {
     spyOn(alertsService, 'addInfoMessage');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
 
-    expect(function() {
+    expect(function () {
       component.openAddOrUpdateSolutionModal();
       tick();
     }).toThrowError('Expected active state name to be non-null.');
   }));
 
-  it('should close add or update solution modal if user clicks cancel',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
+  it('should close add or update solution modal if user clicks cancel', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
 
-      component.openAddOrUpdateSolutionModal();
-      tick();
+    component.openAddOrUpdateSolutionModal();
+    tick();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should save solution when user click', () => {
     spyOn(component.saveSolution, 'emit');

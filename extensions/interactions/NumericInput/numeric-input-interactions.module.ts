@@ -18,39 +18,32 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
 
-import { MaterialModule } from 'modules/material.module';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { InteractiveNumericInput } from './directives/oppia-interactive-numeric-input.component';
-import { ResponseNumericInput } from './directives/oppia-response-numeric-input.component';
-import { ShortResponseNumericInput } from './directives/oppia-short-response-numeric-input.component';
-import { TranslateModule } from '@ngx-translate/core';
-
+import {MaterialModule} from 'modules/material.module';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {InteractiveNumericInput} from './directives/oppia-interactive-numeric-input.component';
+import {ResponseNumericInput} from './directives/oppia-response-numeric-input.component';
+import {ShortResponseNumericInput} from './directives/oppia-short-response-numeric-input.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule,
-    SharedFormsModule,
-    TranslateModule
-  ],
+  imports: [CommonModule, MaterialModule, SharedFormsModule, TranslateModule],
   declarations: [
     InteractiveNumericInput,
     ResponseNumericInput,
-    ShortResponseNumericInput
+    ShortResponseNumericInput,
   ],
   entryComponents: [
     InteractiveNumericInput,
     ResponseNumericInput,
-    ShortResponseNumericInput
+    ShortResponseNumericInput,
   ],
   exports: [
     InteractiveNumericInput,
     ResponseNumericInput,
-    ShortResponseNumericInput
+    ShortResponseNumericInput,
   ],
 })
-
 export class NumericInputModule {}

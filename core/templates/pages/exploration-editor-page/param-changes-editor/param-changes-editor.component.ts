@@ -17,26 +17,28 @@
  * both the exploration settings tab and the state editor page).
  */
 
-import { Component, Injector, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { ExplorationParamSpecsService } from '../services/exploration-param-specs.service';
-import { ParamChange, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
-import { EditabilityService } from 'services/editability.service';
-import { AlertsService } from 'services/alerts.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { AppConstants } from 'app.constants';
-import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
+import {Component, Injector, Input, OnDestroy, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
+import {
+  ParamChange,
+  ParamChangeObjectFactory,
+} from 'domain/exploration/ParamChangeObjectFactory';
+import {EditabilityService} from 'services/editability.service';
+import {AlertsService} from 'services/alerts.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {AppConstants} from 'app.constants';
+import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
-import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'param-changes-editor',
-  templateUrl: './param-changes-editor.component.html'
+  templateUrl: './param-changes-editor.component.html',
 })
 export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   @Input() paramChangesServiceName: string;
@@ -50,7 +52,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   directiveSubscriptions = new Subscription();
   isParamChangesEditorOpen: boolean;
-  paramNameChoices: { id: string; text: string }[];
+  paramNameChoices: {id: string; text: string}[];
   warningText: string;
   HUMAN_READABLE_ARGS_RENDERERS: {
     Copier: (value) => void;
@@ -59,27 +61,30 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
   PREAMBLE_TEXT = {
     Copier: 'to',
-    RandomSelector: 'to one of'
+    RandomSelector: 'to one of',
   };
 
-  paramChangesService: (
-     ExplorationParamChangesService | StateParamChangesService);
+  paramChangesService:
+    | ExplorationParamChangesService
+    | StateParamChangesService;
 
   constructor(
-     private alertsService: AlertsService,
-     private externalSaveService: ExternalSaveService,
-     private explorationStatesService: ExplorationStatesService,
-     private explorationParamSpecsService: ExplorationParamSpecsService,
-     private paramChangeObjectFactory: ParamChangeObjectFactory,
-     public editabilityService: EditabilityService,
-     private urlInterpolationService: UrlInterpolationService,
-     private injector: Injector,
+    private alertsService: AlertsService,
+    private externalSaveService: ExternalSaveService,
+    private explorationStatesService: ExplorationStatesService,
+    private explorationParamSpecsService: ExplorationParamSpecsService,
+    private paramChangeObjectFactory: ParamChangeObjectFactory,
+    public editabilityService: EditabilityService,
+    private urlInterpolationService: UrlInterpolationService,
+    private injector: Injector
   ) {}
 
   drop(event: CdkDragSortEvent<ParamChange[]>): void {
     moveItemInArray(
-       this.paramChangesService.displayed as ParamChange[], event.previousIndex,
-       event.currentIndex);
+      this.paramChangesService.displayed as ParamChange[],
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
   openParamChangesEditor(): void {
@@ -96,29 +101,31 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   addParamChange(): void {
-    let newParamName = (
-       this.paramNameChoices.length > 0 ?
-         this.paramNameChoices[0].id : 'x');
-    let newParamChange = this.paramChangeObjectFactory.createDefault(
-      newParamName);
+    let newParamName =
+      this.paramNameChoices.length > 0 ? this.paramNameChoices[0].id : 'x';
+    let newParamChange =
+      this.paramChangeObjectFactory.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
-    if ((
-       this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(
-      newParamChange.name, null)) {
+    if (
+      (this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(
+        newParamChange.name,
+        null
+      )
+    ) {
       this.paramNameChoices = this.generateParamNameChoices();
     }
     (this.paramChangesService.displayed as ParamChange[]).push(newParamChange);
   }
 
   generateParamNameChoices(): {id: string; text: string}[] {
-    return (
-      this.explorationParamSpecsService.displayed as ParamSpecs
-    ).getParamNames().sort()
-      .map((paramName) => {
+    return (this.explorationParamSpecsService.displayed as ParamSpecs)
+      .getParamNames()
+      .sort()
+      .map(paramName => {
         return {
           id: paramName,
-          text: paramName
+          text: paramName,
         };
       });
   }
@@ -139,15 +146,15 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
         }
 
         if (AppConstants.INVALID_PARAMETER_NAMES.indexOf(paramName) !== -1) {
-          this.warningText = (
-            'The parameter name \'' + paramName + '\' is reserved.');
+          this.warningText =
+            "The parameter name '" + paramName + "' is reserved.";
           return false;
         }
 
         let ALPHA_CHARS_REGEX = /^[A-Za-z]+$/;
         if (!ALPHA_CHARS_REGEX.test(paramName)) {
-          this.warningText = (
-            'Parameter names should use only alphabetic characters.');
+          this.warningText =
+            'Parameter names should use only alphabetic characters.';
           return false;
         }
 
@@ -155,15 +162,16 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
         let customizationArgs = paramChanges[i].customizationArgs;
 
         if (!this.PREAMBLE_TEXT.hasOwnProperty(generatorId)) {
-          this.warningText =
-             'Each parameter should have a generator id.';
+          this.warningText = 'Each parameter should have a generator id.';
           return false;
         }
 
-        if (generatorId === 'RandomSelector' &&
-             customizationArgs.list_of_values.length === 0) {
-          this.warningText = (
-            'Each parameter should have at least one possible value.');
+        if (
+          generatorId === 'RandomSelector' &&
+          customizationArgs.list_of_values.length === 0
+        ) {
+          this.warningText =
+            'Each parameter should have at least one possible value.';
           return false;
         }
       }
@@ -184,11 +192,13 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
 
     // Update paramSpecs manually with newly-added param names.
     this.explorationParamSpecsService.restoreFromMemento();
-    (this.paramChangesService.displayed as ParamChange[]).forEach((
-        paramChange) => {
-      (this.explorationParamSpecsService.displayed as ParamSpecs).addParamIfNew(
-        paramChange.name, null);
-    });
+    (this.paramChangesService.displayed as ParamChange[]).forEach(
+      paramChange => {
+        (
+          this.explorationParamSpecsService.displayed as ParamSpecs
+        ).addParamIfNew(paramChange.name, null);
+      }
+    );
 
     this.explorationParamSpecsService.saveDisplayedValue();
 
@@ -196,7 +206,8 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     if (!this.currentlyInSettingsTab) {
       this.explorationStatesService.saveStateParamChanges(
         (this.paramChangesService as StateParamChangesService).stateName,
-        cloneDeep(this.paramChangesService.displayed as ParamChange[]));
+        cloneDeep(this.paramChangesService.displayed as ParamChange[])
+      );
     }
     if (this.postSaveHook) {
       this.postSaveHook();
@@ -204,11 +215,15 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   deleteParamChange(index: number): void {
-    if (index < 0 ||
-         index >= (this.paramChangesService.displayed as []).length) {
+    if (
+      index < 0 ||
+      index >= (this.paramChangesService.displayed as []).length
+    ) {
       this.alertsService.addWarning(
-        'Cannot delete parameter change at position ' + index +
-         ': index out of range');
+        'Cannot delete parameter change at position ' +
+          index +
+          ': index out of range'
+      );
     }
 
     // This ensures that any new parameter names that have been added
@@ -216,11 +231,12 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     // the select2 dropdowns. Otherwise, after the deletion, the
     // dropdowns may turn blank.
     (this.paramChangesService.displayed as ParamChange[]).forEach(
-      (paramChange) => {
+      paramChange => {
         (
           this.explorationParamSpecsService.displayed as ParamSpecs
         ).addParamIfNew(paramChange.name, null);
-      });
+      }
+    );
     this.paramNameChoices = this.generateParamNameChoices();
 
     (this.paramChangesService.displayed as []).splice(index, 1);
@@ -236,18 +252,19 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.paramChangesService = (
-      this.injector.get(this.SERVICE_MAPPING[this.paramChangesServiceName]));
+    this.paramChangesService = this.injector.get(
+      this.SERVICE_MAPPING[this.paramChangesServiceName]
+    );
 
     this.isParamChangesEditorOpen = false;
     this.warningText = '';
     this.directiveSubscriptions.add(
-      this.externalSaveService.onExternalSave.subscribe(
-        () => {
-          if (this.isParamChangesEditorOpen) {
-            this.saveParamChanges();
-          }
-        }));
+      this.externalSaveService.onExternalSave.subscribe(() => {
+        if (this.isParamChangesEditorOpen) {
+          this.saveParamChanges();
+        }
+      })
+    );
 
     // This is a local letiable that is used by the select2 dropdowns
     // for choosing parameter names. It may not accurately reflect the
@@ -256,13 +273,12 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     // the course of a single "parameter changes" edit.
     this.paramNameChoices = [];
     this.HUMAN_READABLE_ARGS_RENDERERS = {
-      Copier: (customizationArgs) => {
+      Copier: customizationArgs => {
         return 'to ' + customizationArgs.value;
       },
-      RandomSelector: (customizationArgs) => {
+      RandomSelector: customizationArgs => {
         let result = 'to one of [';
-        for (
-          let i = 0; i < customizationArgs.list_of_values.length; i++) {
+        for (let i = 0; i < customizationArgs.list_of_values.length; i++) {
           if (i !== 0) {
             result += ', ';
           }
@@ -270,7 +286,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
         }
         result += '] at random';
         return result;
-      }
+      },
     };
   }
 
@@ -278,8 +294,3 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('paramChangesEditor',
-   downgradeComponent({
-     component: ParamChangesEditorComponent
-   }) as angular.IDirectiveFactory);

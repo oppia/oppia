@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for ReassignRoleConfirmationModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ReassignRoleConfirmationModalComponent } from './reassign-role-confirmation-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ReassignRoleConfirmationModalComponent} from './reassign-role-confirmation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -31,20 +31,20 @@ class MockActiveModal {
   }
 }
 
-describe('Remove Role confirmation modal ', function() {
+describe('Remove Role confirmation modal ', function () {
   let component: ReassignRoleConfirmationModalComponent;
   let fixture: ComponentFixture<ReassignRoleConfirmationModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ReassignRoleConfirmationModalComponent
+      declarations: [ReassignRoleConfirmationModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -16,10 +16,29 @@
  * @fileoverview Component for a schema-based editor for custom values.
  */
 
-import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output, ViewChild } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, NgForm, NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, Validator } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.service';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  NgForm,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  CustomSchema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-custom-editor',
@@ -28,17 +47,18 @@ import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       multi: true,
       useExisting: forwardRef(() => SchemaBasedCustomEditorComponent),
     },
-  ]
+  ],
 })
 export class SchemaBasedCustomEditorComponent
-implements ControlValueAccessor, Validator, AfterViewInit {
+  implements ControlValueAccessor, Validator, AfterViewInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -80,7 +100,7 @@ implements ControlValueAccessor, Validator, AfterViewInit {
     // object. However, when we move to reactive forms, that validation should
     // be moved here instead (see the Todo below).
     // TODO(#15458): Move template driven validation into code.
-    return this.hybridForm.valid ? null : { invalid: true };
+    return this.hybridForm.valid ? null : {invalid: true};
   }
 
   updateValue(value: SchemaDefaultValue): void {
@@ -114,6 +134,6 @@ implements ControlValueAccessor, Validator, AfterViewInit {
 angular.module('oppia').directive(
   'schemaBasedCustomEditor',
   downgradeComponent({
-    component: SchemaBasedCustomEditorComponent
+    component: SchemaBasedCustomEditorComponent,
   })
 );

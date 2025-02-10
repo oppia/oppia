@@ -16,19 +16,18 @@
  * @fileoverview Service that handles validation for the classroom data.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ClassroomData, ExistingClassroomData } from '../existing-classroom.model';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-
+import {Injectable} from '@angular/core';
+import {
+  ClassroomData,
+  ExistingClassroomData,
+} from '../existing-classroom.model';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ClassroomAdminDataService {
-  constructor(
-    private classroomBackendApiService: ClassroomBackendApiService
-  ) {}
+  constructor(private classroomBackendApiService: ClassroomBackendApiService) {}
 
   classroom!: ClassroomData;
   existingClassroomNames: string[] = [];
@@ -36,6 +35,7 @@ export class ClassroomAdminDataService {
   nameValidationError: string = '';
   urlValidationError: string = '';
   topicsGraphValidationError: string = '';
+  classroomValidationErrors: string[] = [];
 
   onClassroomNameChange(classroom: ClassroomData): void {
     this.nameValidationError = classroom.getClassroomNameValidationErrors();
@@ -45,17 +45,15 @@ export class ClassroomAdminDataService {
     }
 
     if (
-      this.existingClassroomNames.indexOf(
-        classroom.getClassroomName()) !== -1
+      this.existingClassroomNames.indexOf(classroom.getClassroomName()) !== -1
     ) {
-      this.nameValidationError = (
-        'A classroom with this name already exists.');
+      this.nameValidationError = 'A classroom with this name already exists.';
     }
   }
 
   onClassroomUrlChange(
-      classroom: ClassroomData,
-      existingClassroomUrl: string
+    classroom: ClassroomData,
+    existingClassroomUrl: string
   ): void {
     this.urlValidationError = classroom.getClassroomUrlValidationErrors();
 
@@ -63,49 +61,60 @@ export class ClassroomAdminDataService {
       return;
     }
 
-    this.classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-      classroom.getClassroomUrlFragment()
-    ).then((response: boolean) => {
-      if (
-        response && (
-          classroom.getClassroomUrlFragment() !==
-            existingClassroomUrl)
-      ) {
-        this.urlValidationError = (
-          'A classroom with this name already exists.');
-      }
-    });
+    this.classroomBackendApiService
+      .doesClassroomWithUrlFragmentExistAsync(
+        classroom.getClassroomUrlFragment()
+      )
+      .then((response: boolean) => {
+        if (
+          response &&
+          classroom.getClassroomUrlFragment() !== existingClassroomUrl
+        ) {
+          this.urlValidationError =
+            'A classroom with this name already exists.';
+        }
+      });
   }
 
   onTopicDependencyChange(classroom: ExistingClassroomData): void {
-    this.topicsGraphValidationError = (
-      classroom.validateDependencyGraph());
+    this.topicsGraphValidationError = classroom.validateDependencyGraph();
   }
 
   validateClassroom(
-      tempClassroom: ClassroomData,
-      existingClassroom: ClassroomData
+    tempClassroom: ClassroomData,
+    existingClassroom: ClassroomData
   ): void {
     this.onClassroomNameChange(tempClassroom);
     this.onClassroomUrlChange(
-      tempClassroom, existingClassroom.getClassroomUrlFragment());
+      tempClassroom,
+      existingClassroom.getClassroomUrlFragment()
+    );
     if (tempClassroom instanceof ExistingClassroomData) {
       this.onTopicDependencyChange(tempClassroom);
+      this.classroomValidationErrors = tempClassroom.getAllValidationErrors();
     }
 
     tempClassroom.setClassroomValidityFlag(
       this.nameValidationError === '' &&
-      this.urlValidationError === '' &&
-      this.topicsGraphValidationError === ''
+        this.urlValidationError === '' &&
+        this.topicsGraphValidationError === ''
+    );
+  }
+
+  getAllClassroomValidationErrors(): string[] {
+    return this.classroomValidationErrors;
+  }
+
+  getSaveClassroomValidationErrors(): string[] {
+    return [this.nameValidationError, this.urlValidationError].filter(
+      error => error !== ''
     );
   }
 
   reinitializeErrorMsgs(): void {
+    this.classroomValidationErrors = [];
     this.nameValidationError = '';
     this.urlValidationError = '';
     this.topicsGraphValidationError = '';
   }
 }
-
-angular.module('oppia').factory('ClassroomAdminDataService',
-  downgradeInjectable(ClassroomAdminDataService));

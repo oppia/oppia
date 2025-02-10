@@ -16,31 +16,82 @@
  * @fileoverview Unit tests for Delete State Skill Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteStateSkillModalComponent } from './delete-state-skill-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteStateSkillModalComponent} from './delete-state-skill-modal.component';
+import {ResponsesService} from '../../services/responses.service';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Delete Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteStateSkillModalComponent>;
   let componentInstance: DeleteStateSkillModalComponent;
+  let responsesService: ResponsesService;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteStateSkillModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      imports: [HttpClientTestingModule],
+      declarations: [DeleteStateSkillModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DeleteStateSkillModalComponent);
     componentInstance = fixture.componentInstance;
+
+    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    responsesService = TestBed.inject(ResponsesService);
   });
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  it('should determine if any misconception is tagged', () => {
+    let answerGroups: AnswerGroup[] = [
+      answerGroupObjectFactory.createFromBackendDict(
+        {
+          rule_specs: [
+            {
+              rule_type: 'Contains',
+              inputs: {
+                x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['abc'],
+                },
+              },
+            },
+          ],
+          outcome: {
+            dest: 'State',
+            dest_if_really_stuck: null,
+            feedback: {
+              html: '',
+              content_id: 'This is a new feedback text',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
+          },
+          training_data: [],
+          tagged_skill_misconception_id: 'misconception1',
+        },
+        'TextInput'
+      ),
+    ];
+
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    expect(componentInstance.isAnyMisconceptionTagged()).toBeTrue();
+  });
+
+  it('should determine if no misconception is tagged', () => {
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
+    expect(componentInstance.isAnyMisconceptionTagged()).toBeFalse();
   });
 });

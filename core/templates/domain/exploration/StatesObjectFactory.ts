@@ -16,20 +16,19 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects given a list of backend state dictionaries.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 import {
   StateBackendDict,
   StateObjectFactory,
-  State
+  State,
 } from 'domain/state/StateObjectFactory';
-import { Voiceover } from 'domain/exploration/voiceover.model';
-import { WrittenTranslation } from
-  'domain/exploration/WrittenTranslationObjectFactory';
+import {Voiceover} from 'domain/exploration/voiceover.model';
+import {WrittenTranslation} from 'domain/exploration/WrittenTranslationObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 export interface StateObjectsDict {
   [state: string]: State;
@@ -57,7 +56,7 @@ export class States {
     return this._states[stateName];
   }
 
-  // TODO(tjiang11): Remove getStateObjects() and replace calls
+  // TODO(#20441): Remove getStateObjects() and replace calls
   // with an object to represent data to be manipulated inside
   // ExplorationDiffService.
 
@@ -66,11 +65,15 @@ export class States {
   }
 
   addState(
-      newStateName: string,
-      contentIdForContent: string,
-      contentIdForDefaultOutcome: string): void {
+    newStateName: string,
+    contentIdForContent: string,
+    contentIdForDefaultOutcome: string
+  ): void {
     this._states[newStateName] = this._stateObject.createDefaultState(
-      newStateName, contentIdForContent, contentIdForDefaultOutcome);
+      newStateName,
+      contentIdForContent,
+      contentIdForDefaultOutcome
+    );
   }
 
   setState(stateName: string, stateData: State): void {
@@ -157,11 +160,9 @@ export class States {
     const allLanguageCodes = new Set<string>();
     Object.values(this._states).forEach(state => {
       state.recordedVoiceovers.getAllContentIds().forEach(contentId => {
-        const contentLanguageCodes = (
-          state.recordedVoiceovers.getLanguageCodes(contentId));
-        contentLanguageCodes.forEach(
-          allLanguageCodes.add,
-          allLanguageCodes);
+        const contentLanguageCodes =
+          state.recordedVoiceovers.getLanguageCodes(contentId);
+        contentLanguageCodes.forEach(allLanguageCodes.add, allLanguageCodes);
       });
     });
     return [...allLanguageCodes];
@@ -173,12 +174,11 @@ export class States {
       let state = this._states[stateName];
       allAudioTranslations[stateName] = [];
       let contentIdsList = state.recordedVoiceovers.getAllContentIds();
-      contentIdsList.forEach((contentId) => {
-        let audioTranslations = (
-          state.recordedVoiceovers.getBindableVoiceovers(contentId));
+      contentIdsList.forEach(contentId => {
+        let audioTranslations =
+          state.recordedVoiceovers.getBindableVoiceovers(contentId);
         if (audioTranslations.hasOwnProperty(languageCode)) {
-          allAudioTranslations[stateName].push(
-            audioTranslations[languageCode]);
+          allAudioTranslations[stateName].push(audioTranslations[languageCode]);
         }
       });
     }
@@ -187,7 +187,7 @@ export class States {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StatesObjectFactory {
   constructor(private stateObject: StateObjectFactory) {}
@@ -195,12 +195,14 @@ export class StatesObjectFactory {
     let stateObjectsDict: StateObjectsDict = {};
     for (let stateName in statesBackendDict) {
       stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(
-        stateName, statesBackendDict[stateName]);
+        stateName,
+        statesBackendDict[stateName]
+      );
     }
     return new States(this.stateObject, stateObjectsDict);
   }
 }
 
-angular.module('oppia').factory(
-  'StatesObjectFactory',
-  downgradeInjectable(StatesObjectFactory));
+angular
+  .module('oppia')
+  .factory('StatesObjectFactory', downgradeInjectable(StatesObjectFactory));

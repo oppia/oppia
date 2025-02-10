@@ -3,13 +3,13 @@
   <span class="pt-3 mobile-navbar-blog-dashboard" *ngIf="activeTab === 'main'">
     Blog Dashboard
   </span>
-  <div class="d-flex flex-column pt-2" *ngIf="activeTab === 'editor_tab'">
+  <div class="d-flex flex-column pt-2 blog-title" *ngIf="activeTab === 'editor_tab'">
     <p class="oppia-blog-dashboard-title"
        role="button"
        (click)="blogDashboardPageService.navigateToMainTab()">
       Blog Dashboard
     </p>
-    <p class="oppia-blog-post-title pt-1">{{ title }}</p>
+    <p class="oppia-blog-post-title pt-1 blog-title-p">{{ title }}</p>
   </div>
 </div>
 <style>
@@ -19,6 +19,23 @@
     content: "";
     font-size: 30px;
   }
+  /* stylelint-disable order/properties-alphabetical-order */
+  :lang(ar) .blog-title {
+    position: relative;
+  }
+  :lang(ar) .blog-title-p {
+    position: relative;
+    right: 28px;
+  }
+  :lang(en) .blog-title {
+    position: relative;
+    left: 2px;
+  }
+  :lang(en).blog-title-p {
+    position: relative;
+    left: 6px;
+  }
+  /* stylelint-enable order/properties-alphabetical-order */
 
   .oppia-navbar-breadcrumb {
     display: -webkit-inline-box;
@@ -49,6 +66,14 @@
 
     .oppia-blog-dashboard-title {
       font-size: 1.2rem;
+    }
+   :lang(en) .blog-title-p {
+      left: 3px;
+    }
+
+    :lang(ar) .blog-title-p {
+      left: 3px;
+      right: 0;
     }
   }
 

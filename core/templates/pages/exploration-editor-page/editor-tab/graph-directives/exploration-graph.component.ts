@@ -16,23 +16,22 @@
  * @fileoverview Component for the exploration graph.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { AlertsService } from 'services/alerts.service';
-import { GraphData } from 'services/compute-graph.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationGraphModalComponent } from '../templates/modal-templates/exploration-graph-modal.component';
+import {Component} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {AlertsService} from 'services/alerts.service';
+import {GraphData} from 'services/compute-graph.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationGraphModalComponent} from '../templates/modal-templates/exploration-graph-modal.component';
 
 @Component({
   selector: 'oppia-exploration-graph',
-  templateUrl: './exploration-graph.component.html'
+  templateUrl: './exploration-graph.component.html',
 })
 export class ExplorationGraphComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -49,8 +48,8 @@ export class ExplorationGraphComponent {
     private loggerService: LoggerService,
     private ngbModal: NgbModal,
     private routerService: RouterService,
-    private stateEditorService: StateEditorService,
-  ) { }
+    private stateEditorService: StateEditorService
+  ) {}
 
   // We hide the graph at the outset in order not to confuse new
   // exploration creators.
@@ -79,25 +78,31 @@ export class ExplorationGraphComponent {
     this.alertsService.clearWarnings();
 
     const modalRef: NgbModalRef = this.ngbModal.open(
-      ExplorationGraphModalComponent, {
+      ExplorationGraphModalComponent,
+      {
         backdrop: true,
         windowClass: 'oppia-large-modal-window exploration-graph-modal',
-      });
+      }
+    );
 
     modalRef.componentInstance.isEditable = this.isEditable;
 
-    modalRef.result.then((closeDict) => {
-      if (closeDict.action === 'delete') {
-        this.deleteState(closeDict.stateName);
-      } else if (closeDict.action === 'navigate') {
-        this.onClickStateInMinimap(closeDict.stateName);
-      } else {
-        this.loggerService.error(
-          'Invalid closeDict action: ' + closeDict.action);
+    modalRef.result.then(
+      closeDict => {
+        if (closeDict.action === 'delete') {
+          this.deleteState(closeDict.stateName);
+        } else if (closeDict.action === 'navigate') {
+          this.onClickStateInMinimap(closeDict.stateName);
+        } else {
+          this.loggerService.error(
+            'Invalid closeDict action: ' + closeDict.action
+          );
+        }
+      },
+      () => {
+        this.alertsService.clearWarnings();
       }
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    );
   }
 
   getGraphData(): GraphData {
@@ -109,14 +114,9 @@ export class ExplorationGraphComponent {
   }
 
   showCheckpointCountWarningSign(): string {
-    this.checkpointCountWarning = (
-      this.explorationWarningsService.getCheckpointCountWarning());
+    this.checkpointCountWarning =
+      this.explorationWarningsService.getCheckpointCountWarning();
 
     return this.checkpointCountWarning;
   }
 }
-
-angular.module('oppia').directive('oppiaExplorationGraph',
-  downgradeComponent({
-    component: ExplorationGraphComponent
-  }) as angular.IDirectiveFactory);

@@ -16,18 +16,21 @@
  * @fileoverview Component for a topic tile.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-topic-summary-tile',
-  templateUrl: './topic-summary-tile.component.html'
+  templateUrl: './topic-summary-tile.component.html',
 })
 export class TopicSummaryTileComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -47,31 +50,36 @@ export class TopicSummaryTileComponent {
 
   ngOnInit(): void {
     if (this.topicSummary.getThumbnailFilename()) {
-      this.thumbnailUrl = this.assetsBackendApiService
-        .getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.TOPIC, this.topicSummary.getId(),
-          this.topicSummary.getThumbnailFilename());
+      this.thumbnailUrl =
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.TOPIC,
+          this.topicSummary.getId(),
+          this.topicSummary.getThumbnailFilename()
+        );
     }
-    this.topicNameTranslationKey = (
+    this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
-        this.topicSummary.getId(), TranslationKeyType.TITLE));
+        this.topicSummary.getId(),
+        TranslationKeyType.TITLE
+      );
   }
 
   getTopicPageUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+      {
         topic_url_fragment: this.topicSummary.getUrlFragment(),
-        classroom_url_fragment: this.classroomUrlFragment
+        classroom_url_fragment: this.classroomUrlFragment,
       }
     );
   }
 
   getColorValueInHexForm(colorValue: number): string {
-    colorValue = (colorValue < 0) ? 0 : colorValue;
+    colorValue = colorValue < 0 ? 0 : colorValue;
     let colorValueString = colorValue.toString(16);
-    return (
-      (colorValueString.length === 1) ?
-      '0' + colorValueString : colorValueString);
+    return colorValueString.length === 1
+      ? '0' + colorValueString
+      : colorValueString;
   }
 
   getDarkerThumbnailBgColor(): string {
@@ -81,11 +89,14 @@ export class TopicSummaryTileComponent {
 
     // Get RGB values of new darker color.
     let newRValue = this.getColorValueInHexForm(
-      parseInt(bgColor.substring(0, 2), 16) - 100);
+      parseInt(bgColor.substring(0, 2), 16) - 100
+    );
     let newGValue = this.getColorValueInHexForm(
-      parseInt(bgColor.substring(2, 4), 16) - 100);
+      parseInt(bgColor.substring(2, 4), 16) - 100
+    );
     let newBValue = this.getColorValueInHexForm(
-      parseInt(bgColor.substring(4, 6), 16) - 100);
+      parseInt(bgColor.substring(4, 6), 16) - 100
+    );
 
     return '#' + newRValue + newGValue + newBValue;
   }
@@ -97,9 +108,15 @@ export class TopicSummaryTileComponent {
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
+
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
 }
 
-angular.module('oppia').directive('oppiaTopicSummaryTile',
+angular.module('oppia').directive(
+  'oppiaTopicSummaryTile',
   downgradeComponent({
-    component: TopicSummaryTileComponent
-  }) as angular.IDirectiveFactory);
+    component: TopicSummaryTileComponent,
+  }) as angular.IDirectiveFactory
+);

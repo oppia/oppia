@@ -16,13 +16,13 @@
  * @fileoverview Component for preview summary tile modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
-import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
-import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ExplorationCategoryService} from 'pages/exploration-editor-page/services/exploration-category.service';
+import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
+import {ExplorationTitleService} from 'pages/exploration-editor-page/services/exploration-title.service';
 
 @Component({
   selector: 'oppia-preview-summary-tile-modal',
@@ -65,8 +65,10 @@ export class PreviewSummaryTileModalComponent extends ConfirmOrCancelModal {
     if (!AppConstants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
       color = AppConstants.DEFAULT_COLOR;
     } else {
-      color = AppConstants.CATEGORIES_TO_COLORS[
-        category as keyof typeof AppConstants.CATEGORIES_TO_COLORS];
+      color =
+        AppConstants.CATEGORIES_TO_COLORS[
+          category as keyof typeof AppConstants.CATEGORIES_TO_COLORS
+        ];
     }
     return color;
   }

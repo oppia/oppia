@@ -17,37 +17,37 @@
  * WrittenTranslation domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
-export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING = (
-  'set_of_normalized_string');
-export const TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING = (
-  'set_of_unicode_string');
+export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING =
+  'set_of_normalized_string';
+export const TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING =
+  'set_of_unicode_string';
 export const DATA_FORMAT_TO_DEFAULT_VALUES = {
   [TRANSLATION_DATA_FORMAT_HTML]: '',
   [TRANSLATION_DATA_FORMAT_UNICODE]: '',
   [TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING]: [],
-  [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: []
+  [TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING]: [],
 };
 
-export type DataFormatToDefaultValuesKey = (
-  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES);
+export type DataFormatToDefaultValuesKey =
+  keyof typeof DATA_FORMAT_TO_DEFAULT_VALUES;
 
 export interface TranslationBackendDict {
-  'data_format': string;
-  'translation': string|string[];
-  'needs_update': boolean;
+  data_format: string;
+  translation: string | string[];
+  needs_update: boolean;
 }
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: DataFormatToDefaultValuesKey,
-      public translation: string|string[],
-      public needsUpdate: boolean
+    public dataFormat: DataFormatToDefaultValuesKey,
+    public translation: string | string[],
+    public needsUpdate: boolean
   ) {}
 
   markAsNeedingUpdate(): void {
@@ -67,23 +67,29 @@ export class WrittenTranslation {
   }
 
   isSetOfStrings(): boolean {
-    return [
-      TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-      TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING
-    ].indexOf(this.dataFormat) !== -1;
+    return (
+      [
+        TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+      ].indexOf(this.dataFormat) !== -1
+    );
   }
 
-  getTranslation(): string|string[] {
+  getTranslation(): string | string[] {
     return this.translation;
   }
 
-  setTranslation(translation: string|string[]): void {
-    if (typeof translation !==
-        typeof DATA_FORMAT_TO_DEFAULT_VALUES[
-          this.dataFormat as DataFormatToDefaultValuesKey]) {
+  setTranslation(translation: string | string[]): void {
+    if (
+      typeof translation !==
+      typeof DATA_FORMAT_TO_DEFAULT_VALUES[
+        this.dataFormat as DataFormatToDefaultValuesKey
+      ]
+    ) {
       throw new Error(
         'This translation is not of the correct type for data format ' +
-        this.dataFormat);
+          this.dataFormat
+      );
     }
     this.translation = translation;
   }
@@ -92,13 +98,13 @@ export class WrittenTranslation {
     return {
       data_format: this.dataFormat,
       translation: this.translation,
-      needs_update: this.needsUpdate
+      needs_update: this.needsUpdate,
     };
   }
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WrittenTranslationObjectFactory {
   createNew(dataFormat: string): WrittenTranslation {
@@ -118,14 +124,19 @@ export class WrittenTranslationObjectFactory {
   }
 
   createFromBackendDict(
-      translationBackendDict: TranslationBackendDict): WrittenTranslation {
+    translationBackendDict: TranslationBackendDict
+  ): WrittenTranslation {
     return new WrittenTranslation(
       translationBackendDict.data_format as DataFormatToDefaultValuesKey,
       translationBackendDict.translation,
-      translationBackendDict.needs_update);
+      translationBackendDict.needs_update
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'WrittenTranslationObjectFactory',
-  downgradeInjectable(WrittenTranslationObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'WrittenTranslationObjectFactory',
+    downgradeInjectable(WrittenTranslationObjectFactory)
+  );

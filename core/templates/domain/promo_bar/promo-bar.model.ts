@@ -17,8 +17,8 @@
  */
 
 export interface PromoBarBackendDict {
-  'promo_bar_enabled': boolean;
-  'promo_bar_message': string;
+  promo_bar_enabled: boolean;
+  promo_bar_message: string;
 }
 
 export class PromoBar {

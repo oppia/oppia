@@ -16,33 +16,37 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConstructTranslationIdsService {
   // Construct a translation id for library from name and a prefix.
   // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'.
   getLibraryId(prefix: string, name: string): string {
     return (
-      'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-        name.toUpperCase().split(' ').join('_'));
+      'I18N_LIBRARY_' +
+      prefix.toUpperCase() +
+      '_' +
+      name.toUpperCase().split(' ').join('_')
+    );
   }
 
   // Construct a translation id for a classroom title from name.
   getClassroomTitleId(name: string): string {
-    return (
-      'I18N_CLASSROOM_' + name.toUpperCase() + '_TITLE');
+    return 'I18N_CLASSROOM_' + name.toUpperCase() + '_NAME';
   }
 
   getSyllabusTypeTitleId(name: string): string {
-    return (
-      'I18N_SYLLABUS_' + name.toUpperCase() + '_TITLE');
+    return 'I18N_SYLLABUS_' + name.toUpperCase() + '_TITLE';
   }
 }
 
-angular.module('oppia').factory(
-  'ConstructTranslationIdsService',
-  downgradeInjectable(ConstructTranslationIdsService));
+angular
+  .module('oppia')
+  .factory(
+    'ConstructTranslationIdsService',
+    downgradeInjectable(ConstructTranslationIdsService)
+  );

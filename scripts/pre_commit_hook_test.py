@@ -22,11 +22,8 @@ import builtins
 import os
 import shutil
 import subprocess
-import tempfile
 
-from core import utils
 from core.tests import test_utils
-from scripts import common
 
 import psutil
 from typing import List, Tuple
@@ -65,31 +62,6 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertIn(
-            'pre-commit hook file is now executable!', self.print_arr)
-
-    def test_install_hook_with_existing_symlink_in_windows_os(self) -> None:
-        oppia_dir = os.getcwd()
-        hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
-        pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
-        def mock_islink(unused_file: str) -> bool:
-            return True
-        def mock_exists(unused_file: str) -> bool:
-            return True
-        def mock_is_windows() -> bool:
-            return True
-
-        islink_swap = self.swap_with_checks(
-            os.path, 'islink', mock_islink,
-            expected_args=((pre_commit_file,),))
-        exists_swap = self.swap_with_checks(
-            os.path, 'exists', mock_exists,
-            expected_args=((pre_commit_file,),))
-        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
-
-        with islink_swap, exists_swap, self.print_swap, is_windows_swap:
-            pre_commit_hook.install_hook()
-        self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertNotIn(
             'pre-commit hook file is now executable!', self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(
@@ -293,8 +265,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
                 b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
@@ -329,8 +301,8 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
-                    b'-CLASSIFIERS_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+CLASSIFIERS_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
             return (
                 b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
                 b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n')
@@ -380,12 +352,19 @@ class PreCommitHookTests(test_utils.GenericTestBase):
 
     def test_main_without_install_arg_and_errors(self) -> None:
         check_function_calls = {
-            'check_changes_in_config_is_called': False
+            'check_changes_in_config_is_called': False,
+            'check_npx_subprocess_is_called': False
         }
         def mock_func() -> bool:
             return False
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
+        def mock_npx_subprocess(  # pylint: disable=unused-argument
+                cmds: List[str], check: bool) -> None:
+            self.assertTrue(cmds[0].endswith('npx'))
+            self.assertEqual(cmds[1], 'lint-staged')
+            check_function_calls['check_npx_subprocess_is_called'] = True
+
         package_lock_swap = self.swap(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
         package_lock_in_current_folder_swap = self.swap(
@@ -395,50 +374,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         check_config_swap = self.swap(
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
+        npx_subprocess_swap = self.swap(
+            subprocess, 'run', mock_npx_subprocess)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap:
+            with check_config_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             check_function_calls['check_changes_in_config_is_called'])
-
-    def test_check_changes_in_gcloud_path_without_mismatch(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because we are assigning value to
-        # the read-only 'name' attribute which causes MyPy to throw an error.
-        # Thus, to avoid the error, we used ignore here.
-        temp_file.name = temp_file_name  # type: ignore[misc]
-        with utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
-        with self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
-
-    def test_check_changes_in_gcloud_path_with_mismatch(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because we are assigning value to
-        # the read-only 'name' attribute which causes MyPy to throw an error.
-        # Thus, to avoid the error, we used ignore here.
-        temp_file.name = temp_file_name  # type: ignore[misc]
-        incorrect_gcloud_path = (
-            '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
-            'bin/gcloud')
-        with utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
-        constants_file_swap = self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
-        with constants_file_swap, self.assertRaisesRegex(
-            Exception, (
-                'The gcloud path in common.py: %s should match the path in '
-                'release_constants.json: %s. Please fix.' % (
-                    common.GCLOUD_PATH, incorrect_gcloud_path))):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
+        self.assertTrue(
+            check_function_calls['check_npx_subprocess_is_called'])

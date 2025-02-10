@@ -16,19 +16,25 @@
  * @fileoverview Unit tests for searchResults.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { SearchResultsComponent } from './search-results.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
-import { SearchService } from 'services/search.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UserInfo } from 'domain/user/user-info.model';
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {SearchResultsComponent} from './search-results.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {SearchService} from 'services/search.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserService} from 'services/user.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {UserInfo} from 'domain/user/user-info.model';
+import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
 
 describe('Search Results component', () => {
   let fixture: ComponentFixture<SearchResultsComponent>;
@@ -38,39 +44,35 @@ describe('Search Results component', () => {
   let userService: UserService;
   let loaderService: LoaderService;
   let urlInterpolationService: UrlInterpolationService;
-  let mockOnInitialSearchResultsLoaded = (
-    new EventEmitter<ExplorationSummaryDict[]>());
+  let mockOnInitialSearchResultsLoaded = new EventEmitter<
+    ExplorationSummaryDict[]
+  >();
 
   class MockWindowRef {
     nativeWindow = {
       location: {
-        href: ''
+        href: '',
       },
-      gtag: () => {}
+      gtag: () => {},
     };
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        SearchResultsComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [SearchResultsComponent, MockTranslatePipe],
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         LoaderService,
         SearchService,
         SiteAnalyticsService,
         UrlInterpolationService,
-        UserService
+        UserService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -97,11 +99,25 @@ describe('Search Results component', () => {
     spyOn(loaderService, 'hideLoadingScreen');
     let userIsLoggedIn = true;
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(new UserInfo(
-        ['admin'], true, true,
-        true, true, true, 'en', 'test', null, userIsLoggedIn)));
-    spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
-      .and.returnValue(mockOnInitialSearchResultsLoaded);
+      Promise.resolve(
+        new UserInfo(
+          ['admin'],
+          true,
+          true,
+          true,
+          true,
+          true,
+          'en',
+          'test',
+          null,
+          userIsLoggedIn
+        )
+      )
+    );
+    spyOnProperty(
+      searchService,
+      'onInitialSearchResultsLoaded'
+    ).and.returnValue(mockOnInitialSearchResultsLoaded);
     componentInstance.ngOnInit();
     mockOnInitialSearchResultsLoaded.emit([]);
     tick();
@@ -120,8 +136,12 @@ describe('Search Results component', () => {
 
   it('should get static image url', () => {
     let staticUrl = 'test_url';
-    spyOn(urlInterpolationService, 'getStaticAssetUrl')
-      .and.returnValue(staticUrl);
-    expect(componentInstance.getStaticImageUrl('path')).toEqual(staticUrl);
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue(staticUrl);
+    expect(componentInstance.getStaticCopyrightedImageUrl('path')).toEqual(
+      staticUrl
+    );
   });
 });

@@ -717,6 +717,8 @@ class BlogAuthorDetails:
 
         Raises:
             ValidationError. An empty author name is supplied.
+            ValidationError. The given author name falls short of the minimum
+                allowed number of characters.
             ValidationError. The given author name exceeds the maximum allowed
                 number of characters.
             ValidationError. The given author name contains non-alphanumeric
@@ -725,9 +727,13 @@ class BlogAuthorDetails:
         """
         if not author_name:
             raise utils.ValidationError('Empty author name supplied.')
+        if len(author_name) < constants.MIN_AUTHOR_NAME_LENGTH:
+            raise utils.ValidationError(
+                'Author name should have at least %s characters.'
+                % constants.MIN_AUTHOR_NAME_LENGTH)
         if len(author_name) > constants.MAX_AUTHOR_NAME_LENGTH:
             raise utils.ValidationError(
-                'A author name can have at most %s characters.'
+                'Author name can have at most %s characters.'
                 % constants.MAX_AUTHOR_NAME_LENGTH)
         if not re.match(constants.VALID_AUTHOR_NAME_REGEX, author_name):
             raise utils.ValidationError(
@@ -741,7 +747,7 @@ class BlogAuthorDetails:
         for reserved_username in reserved_usernames:
             if reserved_username in author_name.lower().strip():
                 raise utils.ValidationError(
-                    'This name contains reserved username. Please use some ' +
+                    'This name contains reserved username. Please use some '
                     'other name')
 
     def to_dict(self) -> BlogAuthorDetailsDict:

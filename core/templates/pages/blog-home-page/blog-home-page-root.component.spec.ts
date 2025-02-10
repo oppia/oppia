@@ -16,35 +16,32 @@
  * @fileoverview Unit tests for the blog home page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { LoaderService } from 'services/loader.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { BlogHomePageRootComponent } from './blog-home-page-root.component';
-import { UserService } from 'services/user.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {BlogHomePageRootComponent} from './blog-home-page-root.component';
+import {UserService} from 'services/user.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string): string {
     return key;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    BlogPages: {
-      isEnabled: true
-    }
-  };
 }
 
 describe('Blog Home Page Root', () => {
@@ -55,31 +52,21 @@ describe('Blog Home Page Root', () => {
   let loaderService: LoaderService;
   let userService: UserService;
   let translateService: TranslateService;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        BlogHomePageRootComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [BlogHomePageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         UserService,
         MetaTagCustomizationService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
+          useClass: MockTranslateService,
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
-        }
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -89,90 +76,23 @@ describe('Blog Home Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
     loaderService = TestBed.inject(LoaderService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
-    mockPlatformFeatureService.status.BlogPages.isEnabled = true;
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
-  it('should initialize and show page when access is valid and blog project' +
-  ' feature is enabled', fakeAsync(() => {
+  it('should initialize and show page when access is valid', fakeAsync(() => {
     spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
+      Promise.resolve(false)
+    );
     spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage')
-      .and.returnValue(Promise.resolve());
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
-      .toHaveBeenCalled();
-    expect(component.pageIsShown).toBeTrue();
-    expect(component.errorPageIsShown).toBeFalse();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and show error page when server respond with error',
-    fakeAsync(() => {
-      spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-        Promise.resolve(false));
-      spyOn(
-        accessValidationBackendApiService, 'validateAccessToBlogHomePage')
-        .and.returnValue(Promise.reject());
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(loaderService, 'hideLoadingScreen');
-
-      component.ngOnInit();
-      tick();
-      tick();
-
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
-        .toHaveBeenCalled();
-      expect(component.pageIsShown).toBeFalse();
-      expect(component.errorPageIsShown).toBeTrue();
-      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    }));
-
-  it('should initialize and show error page when blog project feature is' +
-  ' disabled and user can not edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(false));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage');
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(loaderService, 'hideLoadingScreen');
-
-    component.ngOnInit();
-    tick();
-    tick();
-
-    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(accessValidationBackendApiService.validateAccessToBlogHomePage)
-      .not.toHaveBeenCalled();
-    expect(component.pageIsShown).toBeFalse();
-    expect(component.errorPageIsShown).toBeTrue();
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should initialize and validate access when blog project feature is ' +
-  'disabled and user can edit blog posts', fakeAsync(() => {
-    mockPlatformFeatureService.status.BlogPages.isEnabled = false;
-    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
-      Promise.resolve(true));
-    spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage'
+      accessValidationBackendApiService,
+      'validateAccessToBlogHomePage'
     ).and.returnValue(Promise.resolve());
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
@@ -183,16 +103,40 @@ describe('Blog Home Page Root', () => {
 
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(
-      accessValidationBackendApiService.validateAccessToBlogHomePage)
-      .toHaveBeenCalled();
-    expect(component.errorPageIsShown).toBeFalse();
+      accessValidationBackendApiService.validateAccessToBlogHomePage
+    ).toHaveBeenCalled();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should initialize and show error page when server respond with error', fakeAsync(() => {
+    spyOn(userService, 'canUserEditBlogPosts').and.returnValue(
+      Promise.resolve(false)
+    );
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToBlogHomePage'
+    ).and.returnValue(Promise.reject());
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+    tick();
+    tick();
+
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      accessValidationBackendApiService.validateAccessToBlogHomePage
+    ).toHaveBeenCalled();
+    expect(component.pageIsShown).toBeFalse();
+    expect(component.errorPageIsShown).toBeTrue();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
 
   it('should initialize and subscribe to onLangChange', fakeAsync(() => {
     spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage')
-      .and.returnValue(Promise.resolve());
+      accessValidationBackendApiService,
+      'validateAccessToBlogHomePage'
+    ).and.returnValue(Promise.resolve());
     spyOn(component.directiveSubscriptions, 'add');
     spyOn(translateService.onLangChange, 'subscribe');
 
@@ -205,8 +149,9 @@ describe('Blog Home Page Root', () => {
 
   it('should update page title whenever the language changes', () => {
     spyOn(
-      accessValidationBackendApiService, 'validateAccessToBlogHomePage')
-      .and.returnValue(Promise.resolve());
+      accessValidationBackendApiService,
+      'validateAccessToBlogHomePage'
+    ).and.returnValue(Promise.resolve());
     component.ngOnInit();
     spyOn(component, 'setPageTitleAndMetaTags');
 
@@ -222,7 +167,8 @@ describe('Blog Home Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.TITLE,
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.META

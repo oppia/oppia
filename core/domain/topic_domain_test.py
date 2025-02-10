@@ -82,7 +82,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'page_title_fragment_for_web': 'fragm',
             'skill_ids_for_diagnostic_test': []
         }
-        self.assertEqual(topic.to_dict(), expected_topic_dict)
+        self.assertDictEqual(topic.to_dict(), expected_topic_dict)
 
     def test_get_all_skill_ids(self) -> None:
         self.topic.uncategorized_skill_ids = ['skill_id_2', 'skill_id_3']
@@ -132,7 +132,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_2')
         ]
+
         self.topic.delete_canonical_story('story_id_1')
+
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
             canonical_story_ids, ['story_id', 'story_id_2'])
@@ -181,8 +183,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_3')
         ]
-        canonical_story_ids = self.topic.get_canonical_story_ids()
 
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(canonical_story_ids[0], 'story_id_1')
         self.assertEqual(canonical_story_ids[1], 'story_id_2')
         self.assertEqual(canonical_story_ids[2], 'story_id_3')
@@ -341,7 +343,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
+
         self.topic.add_canonical_story('story_id_2')
+
         canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
             canonical_story_ids,
@@ -360,7 +364,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_2')
         ]
+
         self.topic.delete_additional_story('story_id_1')
+
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(
             additional_story_ids, ['story_id', 'story_id_2'])
@@ -377,7 +383,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 'story_id_1')
         ]
+
         self.topic.add_additional_story('story_id_2')
+
         additional_story_ids = self.topic.get_additional_story_ids()
         self.assertEqual(
             additional_story_ids,
@@ -1790,6 +1798,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
             'total_published_node_count': 1,
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': '#C6DCDA',
+            'published_story_exploration_mapping': {'story': ['exp']},
             'topic_model_created_on': time_in_millisecs,
             'topic_model_last_updated': time_in_millisecs,
         }
@@ -1797,7 +1806,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary = topic_domain.TopicSummary(
             'topic_id', 'name', 'name', 'en', 'topic description',
             1, 1, 1, 1, 1, 1, 1, 'image.svg', '#C6DCDA', 'url-frag',
-            current_time, current_time)
+            {'story': ['exp']}, current_time, current_time)
 
     # Here we use MyPy ignore because we override the definition of the function
     # from the parent class, but that is fine as _assert_validation_error is
@@ -1936,3 +1945,18 @@ class TopicRightsTests(test_utils.GenericTestBase):
     def test_is_manager(self) -> None:
         self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
         self.assertFalse(self.topic_summary.is_manager(self.user_id_b))
+
+
+class TopicChapterCountsTests(test_utils.GenericTestBase):
+    """Tests for Topic Chapter Counts domain object."""
+
+    def test_topic_chapter_counts_object_is_created(self) -> None:
+        topic_chapter_counts = topic_domain.TopicChapterCounts(
+            2, 3, [4, 5], [2, 2])
+        self.assertEqual(topic_chapter_counts.total_upcoming_chapters_count, 2)
+        self.assertEqual(topic_chapter_counts.total_overdue_chapters_count, 3)
+        self.assertEqual(
+            topic_chapter_counts.total_chapter_counts_for_each_story, [4, 5])
+        self.assertEqual(
+            topic_chapter_counts.published_chapter_counts_for_each_story,
+            [2, 2])

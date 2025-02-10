@@ -16,17 +16,16 @@
  * @fileoverview Unit tests for promo bar model.
  */
 
-import { PromoBar } from 'domain/promo_bar/promo-bar.model';
+import {PromoBar} from 'domain/promo_bar/promo-bar.model';
 
 describe('Promo bar model', () => {
   var samplePromoBarBackendObject = {
     promo_bar_enabled: true,
-    promo_bar_message: 'hello'
+    promo_bar_message: 'hello',
   };
 
   it('should create correct PromoBar object from backend dict', () => {
-    var promoBar = PromoBar.createFromBackendDict(
-      samplePromoBarBackendObject);
+    var promoBar = PromoBar.createFromBackendDict(samplePromoBarBackendObject);
 
     expect(promoBar.promoBarEnabled).toBe(true);
     expect(promoBar.promoBarMessage).toBe('hello');

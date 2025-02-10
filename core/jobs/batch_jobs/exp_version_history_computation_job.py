@@ -846,9 +846,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'param_specs': old_exploration.param_specs,
                         'param_changes': old_exploration.param_changes,
                         'auto_tts_enabled': old_exploration.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            old_exploration.correctness_feedback_enabled
-                        ),
                         'edits_allowed': old_exploration.edits_allowed
                     }
                     new_metadata_dict: exp_domain.ExplorationMetadataDict = {
@@ -866,9 +863,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'param_specs': new_exploration.param_specs,
                         'param_changes': new_exploration.param_changes,
                         'auto_tts_enabled': new_exploration.auto_tts_enabled,
-                        'correctness_feedback_enabled': (
-                            new_exploration.correctness_feedback_enabled
-                        ),
                         'edits_allowed': new_exploration.edits_allowed
                     }
 

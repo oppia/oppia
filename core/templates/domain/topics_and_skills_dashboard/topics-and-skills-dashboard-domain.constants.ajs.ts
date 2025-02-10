@@ -18,8 +18,11 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { TopicsAndSkillsDashboardDomainConstants } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
+import {TopicsAndSkillsDashboardDomainConstants} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
 
-angular.module('oppia').constant(
-  'MERGE_SKILLS_URL',
-  TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL);
+angular
+  .module('oppia')
+  .constant(
+    'MERGE_SKILLS_URL',
+    TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL
+  );

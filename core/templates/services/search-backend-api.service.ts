@@ -16,31 +16,37 @@
  * @fileoverview Service for executing searches.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { ServicesConstants } from './services.constants';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
+import {ServicesConstants} from './services.constants';
 
 export class SearchResponseBackendDict {
   'search_cursor': number | null;
   'activity_list': ExplorationSummaryDict[];
 }
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SearchBackendApiService {
   constructor(private http: HttpClient) {}
 
   async fetchExplorationSearchResultAsync(
-      searchQuery: string): Promise<SearchResponseBackendDict> {
-    return this.http.get<SearchResponseBackendDict>(
-      ServicesConstants.SEARCH_DATA_URL + searchQuery).toPromise();
+    searchQuery: string
+  ): Promise<SearchResponseBackendDict> {
+    return this.http
+      .get<SearchResponseBackendDict>(
+        ServicesConstants.SEARCH_DATA_URL + searchQuery
+      )
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'SearchBackendApiService',
-  downgradeInjectable(SearchBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'SearchBackendApiService',
+    downgradeInjectable(SearchBackendApiService)
+  );

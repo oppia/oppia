@@ -20,11 +20,11 @@ export const FeedbackUpdatesPageConstants = {
   FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS: {
     LAST_UPDATED: {
       key: 'lastUpdatedMsecs',
-      i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
+      i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED',
     },
     EXPLORATION: {
       key: 'explorationTitle',
-      i18nId: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION'
-    }
-  }
+      i18nId: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION',
+    },
+  },
 } as const;

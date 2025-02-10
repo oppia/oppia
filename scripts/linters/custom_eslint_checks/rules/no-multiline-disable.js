@@ -23,28 +23,28 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that there are no multiline eslint disable ' +
-        'statements'),
+        'statements',
       category: 'Possible Errors',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      noMultilineDisable: 'Do not use disable statement for multilines'
-    }
+      noMultilineDisable: 'Do not use disable statement for multilines',
+    },
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
 
-    var _checkNotMultilineDisableComment = function(comment) {
+    var _checkNotMultilineDisableComment = function (comment) {
       if (comment.value.includes('eslint-disable ')) {
         context.report({
           comment,
           loc: comment.loc,
-          messageId: 'noMultilineDisable'
+          messageId: 'noMultilineDisable',
         });
       }
     };
@@ -52,10 +52,10 @@ module.exports = {
     return {
       Program() {
         const comments = sourceCode.getAllComments();
-        comments.filter(
-          token => token.type !== 'Shebang').forEach(
-          _checkNotMultilineDisableComment);
-      }
+        comments
+          .filter(token => token.type !== 'Shebang')
+          .forEach(_checkNotMultilineDisableComment);
+      },
     };
-  }
+  },
 };

@@ -16,21 +16,20 @@
  * @fileoverview Component for question opportunities.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
-import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
+import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import {QuestionSuggestionEditorModalComponent} from '../modal-templates/question-suggestion-editor-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
 
 interface Opportunity {
   id: string;
@@ -52,7 +51,7 @@ interface GetPresentableOpportunitiesResponse {
 
 @Component({
   selector: 'oppia-question-opportunities',
-  templateUrl: './question-opportunities.component.html'
+  templateUrl: './question-opportunities.component.html',
 })
 export class QuestionOpportunitiesComponent implements OnInit {
   userIsLoggedIn: boolean = false;
@@ -66,11 +65,11 @@ export class QuestionOpportunitiesComponent implements OnInit {
     private questionObjectFactory: QuestionObjectFactory,
     private questionUndoRedoService: QuestionUndoRedoService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   getPresentableOpportunitiesData(
-      opportunitiesObject: GetSkillOpportunitiesResponse
+    opportunitiesObject: GetSkillOpportunitiesResponse
   ): GetPresentableOpportunitiesResponse {
     const opportunitiesDicts: Opportunity[] = [];
     const more = opportunitiesObject.more;
@@ -81,7 +80,8 @@ export class QuestionOpportunitiesComponent implements OnInit {
       const subheading = opportunity.getOpportunitySubheading();
       let maxQuestionsPerSkill = AppConstants.MAX_QUESTIONS_PER_SKILL;
       const progressPercentage = (
-        (opportunity.getQuestionCount() / maxQuestionsPerSkill) * 100
+        (opportunity.getQuestionCount() / maxQuestionsPerSkill) *
+        100
       ).toFixed(2);
       const opportunityDict: Opportunity = {
         id: opportunity.id,
@@ -98,21 +98,23 @@ export class QuestionOpportunitiesComponent implements OnInit {
     return {opportunitiesDicts, more};
   }
 
-  createQuestion(
-      skill: Skill, skillDifficulty: number): void {
+  createQuestion(skill: Skill, skillDifficulty: number): void {
     const skillId = skill.getId();
-    const question = (
-      this.questionObjectFactory.createDefaultQuestion([skillId]));
+    const question = this.questionObjectFactory.createDefaultQuestion([
+      skillId,
+    ]);
     const questionId = question.getId();
     const questionStateData = question.getStateData();
     this.questionUndoRedoService.clearChanges();
 
     const modalRef = this.ngbModal.open(
-      QuestionSuggestionEditorModalComponent, {
+      QuestionSuggestionEditorModalComponent,
+      {
         size: 'lg',
         backdrop: 'static',
         keyboard: false,
-      });
+      }
+    );
 
     modalRef.componentInstance.suggestionId = '';
     modalRef.componentInstance.question = question;
@@ -121,29 +123,30 @@ export class QuestionOpportunitiesComponent implements OnInit {
     modalRef.componentInstance.skill = skill;
     modalRef.componentInstance.skillDifficulty = skillDifficulty;
 
-    modalRef.result.then(() => {}, () => {
-      this.contextService.resetImageSaveDestination();
-    });
+    modalRef.result.then(
+      () => {},
+      () => {
+        this.contextService.resetImageSaveDestination();
+      }
+    );
   }
 
   loadMoreOpportunities(): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
-    return (
-      this.contributionOpportunitiesService
-        .getMoreSkillOpportunitiesAsync().then(
-          this.getPresentableOpportunitiesData.bind(this)));
+    return this.contributionOpportunitiesService
+      .getMoreSkillOpportunitiesAsync()
+      .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
   loadOpportunities(): Promise<{
     opportunitiesDicts: Opportunity[];
     more: boolean;
   }> {
-    return (
-      this.contributionOpportunitiesService
-        .getSkillOpportunitiesAsync().then(
-          this.getPresentableOpportunitiesData.bind(this)));
+    return this.contributionOpportunitiesService
+      .getSkillOpportunitiesAsync()
+      .then(this.getPresentableOpportunitiesData.bind(this));
   }
 
   onClickSuggestQuestionButton(skillId: string): void {
@@ -153,34 +156,35 @@ export class QuestionOpportunitiesComponent implements OnInit {
     }
 
     this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
-      'Question');
+      'Question'
+    );
 
     const modalRef: NgbModalRef = this.ngbModal.open(
-      QuestionsOpportunitiesSelectDifficultyModalComponent, {
+      QuestionsOpportunitiesSelectDifficultyModalComponent,
+      {
         backdrop: true,
-      });
+      }
+    );
 
     modalRef.componentInstance.skillId = skillId;
 
-    modalRef.result.then((result) => {
-      if (this.alertsService.warnings.length === 0) {
-        this.createQuestion(result.skill, result.skillDifficulty);
+    modalRef.result.then(
+      result => {
+        if (this.alertsService.warnings.length === 0) {
+          this.createQuestion(result.skill, result.skillDifficulty);
+        }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    );
   }
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
   }
 }
-
-angular.module('oppia').directive('oppiaQuestionOpportunities',
-  downgradeComponent({
-    component: QuestionOpportunitiesComponent
-  }) as angular.IDirectiveFactory);

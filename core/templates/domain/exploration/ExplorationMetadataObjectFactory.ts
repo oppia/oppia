@@ -16,27 +16,30 @@
  * @fileoverview Factory for creating instances of exploration metadata objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ParamChange, ParamChangeBackendDict } from './ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from './ParamChangesObjectFactory';
-import { ParamSpecs, ParamSpecsBackendDict, ParamSpecsObjectFactory } from './ParamSpecsObjectFactory';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ParamChange, ParamChangeBackendDict} from './ParamChangeObjectFactory';
+import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
+import {
+  ParamSpecs,
+  ParamSpecsBackendDict,
+  ParamSpecsObjectFactory,
+} from './ParamSpecsObjectFactory';
 
 export interface ExplorationMetadataBackendDict {
-  'title': string;
-  'category': string;
-  'objective': string;
-  'language_code': string;
-  'tags': string[];
-  'blurb': string;
-  'author_notes': string;
-  'states_schema_version': number;
-  'init_state_name': string;
-  'param_specs': ParamSpecsBackendDict;
-  'param_changes': ParamChangeBackendDict[];
-  'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
-  'edits_allowed': boolean;
+  title: string;
+  category: string;
+  objective: string;
+  language_code: string;
+  tags: string[];
+  blurb: string;
+  author_notes: string;
+  states_schema_version: number;
+  init_state_name: string;
+  param_specs: ParamSpecsBackendDict;
+  param_changes: ParamChangeBackendDict[];
+  auto_tts_enabled: boolean;
+  edits_allowed: boolean;
 }
 
 export class ExplorationMetadata {
@@ -58,16 +61,22 @@ export class ExplorationMetadata {
   _paramSpecs: ParamSpecs;
   _paramChanges: ParamChange[];
   _autoTtsEnabled: boolean;
-  _correctnessFeedbackEnabled: boolean;
   _editsAllowed: boolean;
 
   constructor(
-      title: string, category: string, objective: string, languageCode: string,
-      tags: string[], blurb: string, authorNotes: string,
-      statesSchemaVersion: number, initStateName: string,
-      paramSpecs: ParamSpecs, paramChanges: ParamChange[],
-      autoTtsEnabled: boolean, correctnessFeedbackEnabled: boolean,
-      editsAllowed: boolean
+    title: string,
+    category: string,
+    objective: string,
+    languageCode: string,
+    tags: string[],
+    blurb: string,
+    authorNotes: string,
+    statesSchemaVersion: number,
+    initStateName: string,
+    paramSpecs: ParamSpecs,
+    paramChanges: ParamChange[],
+    autoTtsEnabled: boolean,
+    editsAllowed: boolean
   ) {
     this._title = title;
     this._category = category;
@@ -81,7 +90,6 @@ export class ExplorationMetadata {
     this._paramSpecs = paramSpecs;
     this._paramChanges = paramChanges;
     this._autoTtsEnabled = autoTtsEnabled;
-    this._correctnessFeedbackEnabled = correctnessFeedbackEnabled;
     this._editsAllowed = editsAllowed;
   }
 
@@ -97,11 +105,11 @@ export class ExplorationMetadata {
       states_schema_version: this._statesSchemaVersion,
       init_state_name: this._initStateName,
       param_specs: this._paramSpecs.toBackendDict(),
-      param_changes: this._paramChanges.map(
-        (paramChange) => paramChange.toBackendDict()),
+      param_changes: this._paramChanges.map(paramChange =>
+        paramChange.toBackendDict()
+      ),
       auto_tts_enabled: this._autoTtsEnabled,
-      correctness_feedback_enabled: this._correctnessFeedbackEnabled,
-      edits_allowed: this._editsAllowed
+      edits_allowed: this._editsAllowed,
     };
   }
 }
@@ -110,7 +118,7 @@ export class ExplorationMetadata {
 // ParamSpecsObjectFactory and ParamChangesObjectFactory are refactored
 // into model.ts files.
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationMetadataObjectFactory {
   constructor(
@@ -119,12 +127,14 @@ export class ExplorationMetadataObjectFactory {
   ) {}
 
   createFromBackendDict(
-      explorationMetadataBackendDict: ExplorationMetadataBackendDict
+    explorationMetadataBackendDict: ExplorationMetadataBackendDict
   ): ExplorationMetadata {
     const paramChanges = this.paramChangesObjectFactory.createFromBackendList(
-      explorationMetadataBackendDict.param_changes);
+      explorationMetadataBackendDict.param_changes
+    );
     const paramSpecs = this.paramSpecsObjectFactory.createFromBackendDict(
-      explorationMetadataBackendDict.param_specs);
+      explorationMetadataBackendDict.param_specs
+    );
 
     return new ExplorationMetadata(
       explorationMetadataBackendDict.title,
@@ -136,14 +146,17 @@ export class ExplorationMetadataObjectFactory {
       explorationMetadataBackendDict.author_notes,
       explorationMetadataBackendDict.states_schema_version,
       explorationMetadataBackendDict.init_state_name,
-      paramSpecs, paramChanges,
+      paramSpecs,
+      paramChanges,
       explorationMetadataBackendDict.auto_tts_enabled,
-      explorationMetadataBackendDict.correctness_feedback_enabled,
       explorationMetadataBackendDict.edits_allowed
     );
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationMetadataObjectFactory',
-  downgradeInjectable(ExplorationMetadataObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationMetadataObjectFactory',
+    downgradeInjectable(ExplorationMetadataObjectFactory)
+  );

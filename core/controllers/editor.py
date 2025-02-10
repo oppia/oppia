@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -31,6 +32,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
@@ -39,6 +41,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import translation_fetchers
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
@@ -47,7 +50,16 @@ from typing import Dict, List, Optional, TypedDict
 def _require_valid_version(
     version_from_payload: Optional[int], exploration_version: int
 ) -> None:
-    """Check that the payload version matches the given exploration version."""
+    """Check that the payload version matches the given exploration version.
+
+        Args:
+            version_from_payload: Optional[int]. The payload version.
+            exploration_version: int. The exploration version to compare with.
+
+        Raises:
+            InvalidInputException. The version_from_payload does not match
+                the exploration_version.
+    """
 
     if version_from_payload != exploration_version:
         raise base.BaseHandler.InvalidInputException(
@@ -72,27 +84,6 @@ SCHEMA_FOR_VERSION = {
         'min_value': 1
     }]
 }
-
-
-class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single exploration."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id: str) -> None:
-        """Renders an exploration editor page.
-
-        Args:
-            unused_exploration_id: str. The unused exploration ID.
-        """
-
-        self.render_template('exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandlerNormalizedRequestDict(TypedDict):
@@ -176,7 +167,7 @@ class ExplorationHandler(
             exploration_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -212,7 +203,7 @@ class ExplorationHandler(
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
         except Exception as e:
-            raise self.PageNotFoundException from e
+            raise self.NotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
@@ -301,6 +292,74 @@ class ExplorationHandler(
             self.roles, self.user_id, exploration_id)
         logging.info(log_info_string)
         self.render_json(self.values)
+
+
+class EntityTranslationsBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles fetching all available translations for a given entity."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_QUESTION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    # Version must be greater than zero.
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+    ) -> None:
+        exploration_editor_can_modify_translations = (
+            feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
+                self.user_id))
+
+        if exploration_editor_can_modify_translations:
+            translations = {}
+            entity_translations = (
+                translation_fetchers.get_all_entity_translations_for_entity(
+                    feconf.TranslatableEntityType(entity_type), entity_id,
+                    entity_version))
+
+            for translation in entity_translations:
+                translations[translation.language_code] = translation.to_dict()
+
+            self.render_json(translations)
+        else:
+            raise self.NotFoundException
 
 
 class UserExplorationPermissionsHandler(
@@ -650,27 +709,24 @@ class ExplorationModeratorRightsHandler(
         version = self.normalized_payload['version']
         _require_valid_version(version, exploration.version)
 
-        # If moderator emails can be sent, check that all the prerequisites are
-        # satisfied, otherwise do nothing.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            if not email_body:
-                raise self.InvalidInputException(
-                    'Moderator actions should include an email to the '
-                    'recipient.')
-            email_manager.require_moderator_email_prereqs_are_satisfied()
+        # Check that all the prerequisites are satisfied, otherwise do nothing.
+        if not email_body:
+            raise self.InvalidInputException(
+                'Moderator actions should include an email to the '
+                'recipient.')
+        email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
         search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
-        # If moderator emails can be sent, send an email to the all owners of
-        # the exploration notifying them of the change.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            for owner_id in exp_rights.owner_ids:
-                email_manager.send_moderator_action_email(
-                    self.user_id, owner_id, 'unpublish_exploration',
-                    exploration.title, email_body)
+        # Send an email to the all owners of the exploration notifying them
+        # of the change.
+        for owner_id in exp_rights.owner_ids:
+            email_manager.send_moderator_action_email(
+                self.user_id, owner_id, 'unpublish_exploration',
+                exploration.title, email_body)
 
         self.render_json({
             'rights': exp_rights.to_dict(),
@@ -1074,7 +1130,7 @@ class StateInteractionStatsHandler(
             state_name: str. The state name.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1083,7 +1139,7 @@ class StateInteractionStatsHandler(
             logging.exception('Could not find state: %s' % state_name)
             logging.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'visualizations_info': []})
@@ -1127,7 +1183,7 @@ class FetchIssuesHandler(
             exp_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. Invalid version for exploration ID.
+            NotFoundException. Invalid version for exploration ID.
         """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
@@ -1135,7 +1191,7 @@ class FetchIssuesHandler(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid version %s for exploration ID %s'
                 % (exp_version, exp_id))
         unresolved_issues = []
@@ -1174,11 +1230,11 @@ class FetchPlaythroughHandler(
             playthrough_id: str. The playthrough ID.
 
         Raises:
-            PageNotFoundException. Invalid playthrough ID.
+            NotFoundException. Invalid playthrough ID.
         """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid playthrough ID %s' % (playthrough_id))
         self.render_json(playthrough.to_dict())
 
@@ -1233,8 +1289,8 @@ class ResolveIssueHandler(
             exp_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. Invalid exploration ID.
-            PageNotFoundException. Exploration issue does not exist in the
+            NotFoundException. Invalid exploration ID.
+            NotFoundException. Exploration issue does not exist in the
                 list of issues for the exploration.
         """
         assert self.normalized_payload is not None
@@ -1245,7 +1301,7 @@ class ResolveIssueHandler(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
 
         # Check that the passed in issue actually exists in the exploration
@@ -1257,7 +1313,7 @@ class ResolveIssueHandler(
                 break
 
         if not issue_to_remove:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Exploration issue does not exist in the list of issues for '
                 'the exploration with ID %s' % exp_id)
 
@@ -1323,7 +1379,9 @@ class ImageUploadHandler(
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': r'\w+[.]\w+'
+                        'regex_pattern': (
+                            utils.get_image_filename_regex_pattern()
+                        ),
                     }]
                 }
             },
@@ -1655,10 +1713,10 @@ class LearnerAnswerInfoHandler(
             entity_id: str. The ID of the entity.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         learner_answer_info_data = []
         learner_answer_info_data_dict = {}
@@ -1719,12 +1777,12 @@ class LearnerAnswerInfoHandler(
             entity_id: str. The ID of the entity.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
             InvalidInputException. Invalid input.
         """
         assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')

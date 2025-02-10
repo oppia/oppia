@@ -16,12 +16,12 @@
  * @fileoverview Component to get changes in human readable form.
  */
 
-import { Component, Input } from '@angular/core';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+import {Component, Input} from '@angular/core';
+import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  templateUrl: './changes-in-human-readable-form.component.html'
+  templateUrl: './changes-in-human-readable-form.component.html',
 })
 export class ChangesInHumanReadableFormComponent {
   // This property is initialized using Angular lifecycle hooks

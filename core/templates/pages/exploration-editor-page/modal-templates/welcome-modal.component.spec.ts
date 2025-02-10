@@ -16,21 +16,19 @@
  * @fileoverview Unit tests for WelcomeModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WelcomeModalComponent } from './welcome-modal.component';
+import {Component, NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WelcomeModalComponent} from './welcome-modal.component';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  template: ''
+  template: '',
 })
-class ChangesInHumanReadableFormComponentStub {
-}
+class ChangesInHumanReadableFormComponentStub {}
 
 class MockActiveModal {
   close(): void {
@@ -55,17 +53,18 @@ describe('Welcome Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [
         WelcomeModalComponent,
-        ChangesInHumanReadableFormComponentStub
+        ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
         ContextService,
         SiteAnalyticsService,
-        UrlInterpolationService, {
+        UrlInterpolationService,
+        {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -77,20 +76,26 @@ describe('Welcome Modal Component', () => {
     contextService = TestBed.inject(ContextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     siteAnalyticsServiceSpy = spyOn(
-      siteAnalyticsService, 'registerTutorialModalOpenEvent');
+      siteAnalyticsService,
+      'registerTutorialModalOpenEvent'
+    );
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     fixture.detectChanges();
   });
 
-  it ('should evaluate exploration id when component is initialized', () => {
+  it('should evaluate exploration id when component is initialized', () => {
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
+    component.welcomeHeading = welcomeModalRef;
     expect(component.explorationId).toBe(explorationId);
     expect(component.editorWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg');
-    expect(siteAnalyticsServiceSpy)
-      .toHaveBeenCalled();
+      '/assets/copyrighted-images/general/editor_welcome.svg'
+    );
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalled();
   });
 
-  it ('should close the modal', () => {
+  it('should close the modal', () => {
+    const welcomeModalRef = new ElementRef(document.createElement('h1'));
+    component.welcomeHeading = welcomeModalRef;
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     component.cancel();
     expect(dismissSpy).toHaveBeenCalledWith();

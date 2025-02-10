@@ -15,30 +15,33 @@
 /**
  * @fileoverview Component for welcome modal.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ContextService } from 'services/context.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ContextService} from 'services/context.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-welcome-modal',
-  templateUrl: './welcome-modal.component.html'
+  templateUrl: './welcome-modal.component.html',
 })
 export class WelcomeModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() explorationId!: string;
   @Input() editorWelcomeImgUrl!: string;
+  @ViewChild('welcome') welcomeHeading!: ElementRef;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private contextService: ContextService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
   }
@@ -46,9 +49,13 @@ export class WelcomeModalComponent
   ngOnInit(): void {
     this.explorationId = this.contextService.getExplorationId();
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
-      this.explorationId);
-    this.editorWelcomeImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/editor_welcome.svg');
+      this.explorationId
+    );
+    this.editorWelcomeImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/general/editor_welcome.svg'
+      );
+    this.welcomeHeading?.nativeElement.focus();
   }
 
   cancel(): void {

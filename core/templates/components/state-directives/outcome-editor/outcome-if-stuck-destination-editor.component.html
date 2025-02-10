@@ -1,7 +1,9 @@
 <div class="form-inline oppia-form-inline protractor-test-dest-if-stuck-bubble">
   <div class="oppia-rule-details-header">
-    <strong>(Optional) If the learner is really stuck, direct them to</strong>
+    <strong tabindex="0">(Optional) If the learner is really stuck, direct them to ...</strong>
     <div ngbTooltip="{{ 'I18N_DEST_IF_STUCK_INFO_TOOLTIP' | translate }}"
+         tabindex="0"
+         data-container="body"
          placement="right"
          class="dest-if-stuck-tooltip">
       <strong>&#x24D8;</strong>
@@ -9,10 +11,10 @@
   </div>
   <div class="form-group oppia-form-group">
     <span>
-      <select class="form-control oppia-form-control"
+      <select class="form-control oppia-form-control e2e-test-destination-when-stuck-selector-dropdown"
               [(ngModel)]="outcome.destIfReallyStuck"
               (ngModelChange)="onDestIfStuckSelectorChange()">
-        <option *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+        <option *ngFor="let choice of destinationChoices" [ngValue]="choice.id">{{ choice.text }}</option>
       </select>
     </span>
   </div>
@@ -30,7 +32,7 @@
              [attr.aria-invalid]="false" required>
     </span>
   </form>
-  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
+  <p [hidden]="newStateNameForm.form.valid ||  outcomeNewStateName === undefined" class="form-text oppia-form-error oppia-form-error-text" tabindex="0">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
 </div>
 
 <style>

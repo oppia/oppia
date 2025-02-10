@@ -1,8 +1,8 @@
 <ng-template #popContent>
   <div class="oppia-answer-popup-container">
     <div class="oppia-answer-popup">
-      <oppia-rte-output-display [rteString]="getAnswerHtml()">
-      </oppia-rte-output-display>
+      <oppia-interaction-display [htmlData]="getAnswerHtml()">
+      </oppia-interaction-display>
     </div>
   </div>
 </ng-template>
@@ -16,10 +16,10 @@
          alt="User profile picture">
   </picture>
   <div *ngIf="!data.isHint">
-    <div dir="auto" *ngIf="getShortAnswerHtml()"
-         [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
-         class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
-      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+    <div dir="auto" *ngIf="getShortAnswerHtml()">
+      <oppia-interaction-display [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
+                                 class="oppia-popover" #popover="ngbPopover" [autoClose]="false"
+                                 classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
       </oppia-interaction-display>
     </div>

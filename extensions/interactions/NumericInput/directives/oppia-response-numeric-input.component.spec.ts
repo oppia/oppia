@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the NumericInput response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseNumericInput } from './oppia-response-numeric-input.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseNumericInput} from './oppia-response-numeric-input.component';
 
 describe('ResponseNumericInput', () => {
   let component: ResponseNumericInput;
@@ -36,8 +36,8 @@ describe('ResponseNumericInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
     }).compileComponents();
   }));

@@ -16,33 +16,31 @@
  * @fileoverview Component for the topic viewer practice tab.
  */
 
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { PracticeSessionPageConstants } from
-  'pages/practice-session-page/practice-session-page.constants';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
-import { LoaderService } from 'services/loader.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {PracticeSessionConfirmationModal} from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
+import {LoaderService} from 'services/loader.service';
 
 import './practice-tab.component.css';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'practice-tab',
   templateUrl: './practice-tab.component.html',
-  styleUrls: ['./practice-tab.component.css']
+  styleUrls: ['./practice-tab.component.css'],
 })
 export class PracticeTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -92,24 +90,27 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     }
     for (let item of this.subtopicIds) {
       if (this.subtopicMastery[item] !== undefined) {
-        this.subtopicMasteryArray.push(Math.floor(
-          this.subtopicMastery[item] * 100));
+        this.subtopicMasteryArray.push(
+          Math.floor(this.subtopicMastery[item] * 100)
+        );
       } else {
         this.subtopicMasteryArray.push(0);
       }
     }
-    this.selectedSubtopicIndices = Array(
-      this.availableSubtopics.length).fill(false);
+    this.selectedSubtopicIndices = Array(this.availableSubtopics.length).fill(
+      false
+    );
     this.clientWidth = window.innerWidth;
     if (this.displayArea === 'topicViewer' && !this.previewMode) {
-      this.topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      this.classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+      this.topicUrlFragment =
+        this.urlService.getTopicUrlFragmentFromLearnerUrl();
+      this.classroomUrlFragment =
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     }
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
-        this.topicId, TranslationKeyType.TITLE
+        this.topicId,
+        TranslationKeyType.TITLE
       );
     this.getTranslatedTopicName();
     this.subscribeToOnLangChange();
@@ -130,7 +131,8 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   getTranslatedTopicName(): void {
     if (this.isTopicNameTranslationAvailable()) {
       this.translatedTopicName = this.translateService.instant(
-        this.topicNameTranslationKey);
+        this.topicNameTranslationKey
+      );
     } else {
       this.translatedTopicName = this.topicName;
     }
@@ -165,11 +167,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       }
     }
     if (skillIds.length > 0) {
-      this.questionBackendApiService.fetchTotalQuestionCountForSkillIdsAsync(
-        skillIds).then(questionCount => {
-        this.questionsAreAvailable = questionCount > 0;
-        this.questionsStatusCallIsComplete = true;
-      });
+      this.questionBackendApiService
+        .fetchTotalQuestionCountForSkillIdsAsync(skillIds)
+        .then(questionCount => {
+          this.questionsAreAvailable = questionCount > 0;
+          this.questionsStatusCallIsComplete = true;
+        });
     } else {
       this.questionsAreAvailable = false;
       this.questionsStatusCallIsComplete = true;
@@ -181,28 +184,34 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       this.openNewPracticeSession();
       return;
     }
-    this.ngbModal.open(PracticeSessionConfirmationModal, {
-      centered: true,
-      backdrop: 'static'
-    }).result.then(() => {
-      this.openNewPracticeSession();
-    }, () => { });
+    this.ngbModal
+      .open(PracticeSessionConfirmationModal, {
+        centered: true,
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {
+          this.openNewPracticeSession();
+        },
+        () => {}
+      );
   }
 
   openNewPracticeSession(): void {
     const selectedSubtopicIds = [];
     for (let idx in this.selectedSubtopicIndices) {
       if (this.selectedSubtopicIndices[idx]) {
-        selectedSubtopicIds.push(
-          this.availableSubtopics[idx].getId());
+        selectedSubtopicIds.push(this.availableSubtopics[idx].getId());
       }
     }
     let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment: this.classroomUrlFragment,
-        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds)
-      });
+        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds),
+      }
+    );
     this.siteAnalyticsService.registerPracticeSessionStartEvent(
       this.classroomUrlFragment,
       this.topicName,
@@ -227,12 +236,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       if (this.subtopicMasteryArray[i] <= 89) {
         return 225 - this.subtopicMasteryArray[i] * 2.5;
       }
-      return 225 - (this.subtopicMasteryArray[i] * 2) - 15;
+      return 225 - this.subtopicMasteryArray[i] * 2 - 15;
     } else {
       if (this.subtopicMasteryArray[i] <= 89) {
-        return 215 - (this.subtopicMasteryArray[i] * 2) - 25;
+        return 215 - this.subtopicMasteryArray[i] * 2 - 25;
       }
-      return 215 - (this.subtopicMasteryArray[i] * 2) - 10;
+      return 215 - this.subtopicMasteryArray[i] * 2 - 10;
     }
   }
 
@@ -243,7 +252,3 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     return 'white';
   }
 }
-
-angular.module('oppia').directive(
-  'practiceTab', downgradeComponent(
-    {component: PracticeTabComponent}));

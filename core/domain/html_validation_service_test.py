@@ -483,7 +483,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-video>'
             )],
             (
-                u'Invalid URL: Sanitized URL should start with \'http://\' or '
+                'Invalid URL: Sanitized URL should start with \'http://\' or '
                 '\'https://\'; received htt://link.com'
             ): [(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;'

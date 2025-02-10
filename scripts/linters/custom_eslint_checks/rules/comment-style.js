@@ -22,34 +22,51 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
-        'Lint check to ensure that comments follow valid style'),
+      description: 'Lint check to ensure that comments follow valid style',
       category: 'Stylistic Issues',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
       invalidPunctuation: 'Invalid punctuation used at the end of the comment',
-      tsIgnoreFormat: (
+      tsIgnoreFormat:
         'Please add a comment above the @ts-ignore explaining the @ts-ignore.' +
         ' The format of comment should be -> This throws "...".' +
-        ' We need to suppress this error because ...'),
-      tsExpectErrorFormat: (
+        ' We need to suppress this error because ...',
+      tsExpectErrorFormat:
         'Please add a comment above the @ts-expect-error explaining the' +
         ' @ts-expect-error. The format of comment should be ->' +
-        ' This throws "...". We need to suppress this error because ...')
-    }
+        ' This throws "...". We need to suppress this error because ...',
+    },
   },
 
-  create: function(context) {
-    var allowedTerminatingPunctuations = ['.', '?', ';', ',', '{', '^', ')',
-      '}', '>', '/>'];
+  create: function (context) {
+    var allowedTerminatingPunctuations = [
+      '.',
+      '?',
+      ';',
+      ',',
+      '{',
+      '^',
+      ')',
+      '}',
+      '>',
+      '/>',
+    ];
     var allowedPhrases = [
-      '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
-      'eslint-enable', 'http://', 'https://', 'disable', '----'];
+      '@ts-expect-error',
+      '@ts-ignore',
+      '--params',
+      'eslint-disable',
+      'eslint-enable',
+      'http://',
+      'https://',
+      'disable',
+      '----',
+    ];
 
-    var getGroupComments = function() {
+    var getGroupComments = function () {
       var sourceCode = context.getSourceCode();
       var comments = sourceCode.getAllComments();
       comments = comments.filter(token => token.type === 'Line');
@@ -72,7 +89,7 @@ module.exports = {
       return groupComments;
     };
 
-    var checkPunctuation = function(comment) {
+    var checkPunctuation = function (comment) {
       var validComment = false;
       for (var i = 0; i < allowedTerminatingPunctuations.length - 1; i++) {
         if (comment.value.endsWith(allowedTerminatingPunctuations[i])) {
@@ -83,14 +100,14 @@ module.exports = {
         context.report({
           comment: comment,
           loc: comment.loc,
-          messageId: 'invalidPunctuation'
+          messageId: 'invalidPunctuation',
         });
       }
     };
 
-    var checkTsIgnore = function(multiLineComment) {
-      var expectedFormatRegex = (
-        /^ This throws .* We need to suppress this error because .*\.$/);
+    var checkTsIgnore = function (multiLineComment) {
+      var expectedFormatRegex =
+        /^ This throws .* We need to suppress this error because .*\.$/;
       var comment = '';
       for (var i = 0; i < multiLineComment.length - 1; i++) {
         comment += multiLineComment[i].value;
@@ -99,14 +116,14 @@ module.exports = {
         context.report({
           comment: multiLineComment[0],
           loc: multiLineComment[0].loc,
-          messageId: 'tsIgnoreFormat'
+          messageId: 'tsIgnoreFormat',
         });
       }
     };
 
-    var checkTsExpectError = function(multiLineComment) {
-      var expectedFormatRegex = (
-        /^ This throws .* We need to suppress this error because .*\.$/);
+    var checkTsExpectError = function (multiLineComment) {
+      var expectedFormatRegex =
+        /^ This throws .* We need to suppress this error because .*\.$/;
       var comment = '';
       for (var i = 0; i < multiLineComment.length - 1; i++) {
         comment += multiLineComment[i].value;
@@ -115,12 +132,12 @@ module.exports = {
         context.report({
           comment: multiLineComment[0],
           loc: multiLineComment[0].loc,
-          messageId: 'tsExpectErrorFormat'
+          messageId: 'tsExpectErrorFormat',
         });
       }
     };
 
-    var checkComment = function(multLineComment) {
+    var checkComment = function (multLineComment) {
       var allowedPhrasesPresent = false;
       var lastLineComment = multLineComment[multLineComment.length - 1];
       for (var i = 0; i < allowedPhrases.length; i++) {
@@ -143,12 +160,12 @@ module.exports = {
     };
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         var groupedComments = getGroupComments();
         for (var i = 0; i < groupedComments.length; i++) {
           checkComment(groupedComments[i]);
         }
-      }
+      },
     };
-  }
+  },
 };

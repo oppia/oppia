@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for Set Input rules.
  */
 
-import { SetInputRulesService } from
-  'interactions/SetInput/directives/set-input-rules.service';
+import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 
 describe('Set Input rules service', () => {
   let sirs: SetInputRulesService;
@@ -28,29 +27,33 @@ describe('Set Input rules service', () => {
   let RULE_INPUT = {
     x: {
       contentId: 'rule_input',
-      unicodeStrSet: ['a', 'b']
-    }
+      unicodeStrSet: ['a', 'b'],
+    },
   };
 
-  it('should have a correct \'equals\' rule', () => {
+  it("should have a correct 'equals' rule", () => {
     expect(sirs.Equals(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['b', 'a'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
-    expect(sirs.Equals(['b'], {
-      x: {
-        contentId: '',
-        unicodeStrSet: ['b', 'a']
-      }
-    })).toBe(false);
-    expect(sirs.Equals(['b', 'c'], {
-      x: {
-        contentId: '',
-        unicodeStrSet: ['c', 'd']
-      }
-    })).toBe(false);
+    expect(
+      sirs.Equals(['b'], {
+        x: {
+          contentId: '',
+          unicodeStrSet: ['b', 'a'],
+        },
+      })
+    ).toBe(false);
+    expect(
+      sirs.Equals(['b', 'c'], {
+        x: {
+          contentId: '',
+          unicodeStrSet: ['c', 'd'],
+        },
+      })
+    ).toBe(false);
   });
 
-  it('should have a correct \'is subset of\' rule', () => {
+  it("should have a correct 'is subset of' rule", () => {
     expect(sirs.IsSubsetOf(['a'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSubsetOf(['b'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSubsetOf([], RULE_INPUT)).toBe(true);
@@ -59,7 +62,7 @@ describe('Set Input rules service', () => {
     expect(sirs.IsSubsetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'is superset of\' rule', () => {
+  it("should have a correct 'is superset of' rule", () => {
     expect(sirs.IsSupersetOf(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSupersetOf(['a', 'b', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.IsSupersetOf(['a', 'c'], RULE_INPUT)).toBe(false);
@@ -68,7 +71,7 @@ describe('Set Input rules service', () => {
     expect(sirs.IsSupersetOf([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has elements in\' rule', () => {
+  it("should have a correct 'has elements in' rule", () => {
     expect(sirs.HasElementsIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsIn(['a', 'b'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsIn(['a'], RULE_INPUT)).toBe(true);
@@ -76,7 +79,7 @@ describe('Set Input rules service', () => {
     expect(sirs.HasElementsIn([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has elements not in\' rule', () => {
+  it("should have a correct 'has elements not in' rule", () => {
     expect(sirs.HasElementsNotIn(['a', 'b', 'c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsNotIn(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.HasElementsNotIn(['a', 'b'], RULE_INPUT)).toBe(false);
@@ -84,7 +87,7 @@ describe('Set Input rules service', () => {
     expect(sirs.HasElementsNotIn([], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'omits elements in\' rule', () => {
+  it("should have a correct 'omits elements in' rule", () => {
     expect(sirs.OmitsElementsIn(['c', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.OmitsElementsIn(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.OmitsElementsIn(['a'], RULE_INPUT)).toBe(true);
@@ -93,7 +96,7 @@ describe('Set Input rules service', () => {
     expect(sirs.OmitsElementsIn(['a', 'b'], RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'is disjoint\' rule', () => {
+  it("should have a correct 'is disjoint' rule", () => {
     expect(sirs.IsDisjointFrom(['c', 'ab'], RULE_INPUT)).toBe(true);
     expect(sirs.IsDisjointFrom(['c'], RULE_INPUT)).toBe(true);
     expect(sirs.IsDisjointFrom([], RULE_INPUT)).toBe(true);

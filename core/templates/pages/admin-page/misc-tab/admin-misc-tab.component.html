@@ -67,11 +67,26 @@
         <input type="text"
                [(ngModel)]="topicIdForRegeneratingOpportunities"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-topic-id-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Regenerate">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-opportunities-button">
         <input type="reset" value="reset">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Regenerate topic summaries:</h3>
+  <p>
+    Creates new topic summaries to replace the old topic summaries with.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="regenerateTopicSummaries()">
+      <div class="form-group row">
+        <input type="submit" value="Regenerate" class="e2e-test-regenerate-topic-summaries-button">
       </div>
     </form>
   </div>
@@ -90,10 +105,11 @@
         <input type="text"
                [(ngModel)]="expIdToRollback"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Rollback Exploration">
+        <input type="submit" value="Rollback Exploration" class="e2e-test-rollback-exploration-button">
         <input type="reset" value="reset">
       </div>
     </form>
@@ -105,7 +121,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="sendDummyMailToAdmin()">
       <div class="form-group row">
-        <input type="submit" value="Send">
+        <input type="submit" value="Send" class="e2e-test-send-test-mail-button">
       </div>
     </form>
   </div>
@@ -120,6 +136,7 @@
         <input type="text"
                [(ngModel)]="oldUsername"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-old-username-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -128,10 +145,11 @@
                [(ngModel)]="newUsername"
                [ngModelOptions]="{standalone: true}"
                required="true"
+               class="e2e-test-new-username-input"
                [maxlength]="MAX_USERNAME_LENGTH">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Update">
+        <input type="submit" value="Update" class="e2e-test-update-username-button">
       </div>
     </form>
   </div>
@@ -144,7 +162,8 @@
           (submit)="getNumberOfPendingDeletionRequestModels()">
       <div class="form-group row">
         <input type="submit"
-               value="Get number of users whose deletion is currently in-progress">
+               value="Get number of users whose deletion is currently in-progress"
+               class="e2e-test-get-deletion-request-button">
       </div>
     </form>
   </div>
@@ -204,10 +223,11 @@
         <input type="text"
                [(ngModel)]="usernameToGrant"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-grant-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Grant">
+        <input type="submit" value="Grant" class="e2e-test-grant-super-admin-button">
       </div>
     </form>
   </div>
@@ -223,6 +243,7 @@
         <input type="text"
                [(ngModel)]="blogPostId"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-id-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -230,6 +251,7 @@
         <input type="text"
                [(ngModel)]="authorUsername"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-blog-author-name-input"
                required="true">
       </div>
       <div class="form-group row">
@@ -238,10 +260,11 @@
                [(ngModel)]="publishedOn"
                [ngModelOptions]="{standalone: true}"
                required="true"
+               class="e2e-test-blog-published-on-input"
                placeholder="Enter in mm/dd/yyyy">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Update">
+        <input type="submit" value="Update" class="e2e-test-update-blog-post-button">
       </div>
     </form>
   </div>
@@ -258,10 +281,61 @@
         <input type="text"
                [(ngModel)]="usernameToRevoke"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-username-to-revoke-input"
                required="true">
       </div>
       <div class="form-group row">
-        <input type="submit" value="Revoke">
+        <input type="submit" value="Revoke" class="e2e-test-revoke-super-admin-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Lookup exploration interactions</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="retrieveExplorationInteractionIds()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToGetInteractionIdsFor"
+               [ngModelOptions]="{standalone: true}"
+               class="e2e-test-exploration-id-to-get-interactions-input"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Get" class="e2e-test-get-interactions-button">
+      </div>
+    </form>
+  </div>
+
+  <div>
+    <p *ngIf="explorationInteractionIds.length > 0">Interaction IDs:</p>
+    <ul>
+      <li *ngFor="let interactionId of explorationInteractionIds" [innerHTML]="interactionId"></li>
+    </ul>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text azure-controls-card">
+  <h3>Azure Text-to-Speech service</h3>
+  <p class="oppia-azure-controls-text-container">
+    <span *ngIf="voiceoverAutogenerationIsEnabled">
+      Autogenerated voiceover using Azure is curently enabled.
+    </span>
+    <span *ngIf="!voiceoverAutogenerationIsEnabled">
+        Autogenerated voiceover using Azure is curently disabled.
+    </span>
+    <span>
+      <mat-slide-toggle [color]="'primary'" [(ngModel)]="voiceoverAutogenerationIsEnabled">
+      </mat-slide-toggle>
+    </span>
+  </p>
+
+  <div class="oppia-query-form">
+    <form class="form" (submit)="updateAutomaticVoiceoverSynthesisUsingAzure()">
+      <div class="form-group row">
+        <input type="submit" value="Save">
       </div>
     </form>
   </div>
@@ -296,5 +370,9 @@
   .oppia-page-card.mat-card {
     margin-top: 40px;
     padding: 30px 55px 30px 45px;
+  }
+  .oppia-azure-controls-text-container {
+    display: flex;
+    justify-content: space-between;
   }
 </style>

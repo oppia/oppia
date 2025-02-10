@@ -17,29 +17,28 @@
  * on conversation skin.
  */
 
-import { Component, Input, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserService } from 'services/user.service';
-import { LearnerViewRatingService } from '../services/learner-view-rating.service';
-import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {Component, Input, ViewChild} from '@angular/core';
+import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UserService} from 'services/user.service';
+import {LearnerViewRatingService} from '../services/learner-view-rating.service';
+import {ExplorationPlayerStateService} from './../services/exploration-player-state.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface ResultActionButton {
   type: string;
@@ -61,7 +60,7 @@ export interface QuestionPlayerConfig {
 
 @Component({
   selector: 'oppia-ratings-and-recommendations',
-  templateUrl: './ratings-and-recommendations.component.html'
+  templateUrl: './ratings-and-recommendations.component.html',
 })
 export class RatingsAndRecommendationsComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -107,43 +106,51 @@ export class RatingsAndRecommendationsComponent {
   ) {}
 
   ngOnInit(): void {
-    this.inStoryMode = (
-      this.explorationPlayerStateService.isInStoryChapterMode());
+    this.inStoryMode =
+      this.explorationPlayerStateService.isInStoryChapterMode();
     if (this.inStoryMode) {
       let topicUrlFragment = this.urlService.getUrlParams().topic_url_fragment;
       let storyUrlFragment = this.urlService.getUrlParams().story_url_fragment;
-      let classroomUrlFragment = (
-        this.urlService.getUrlParams().classroom_url_fragment);
+      let classroomUrlFragment =
+        this.urlService.getUrlParams().classroom_url_fragment;
       let nodeId = this.urlService.getUrlParams().node_id;
-      this.storyViewerBackendApiService.fetchStoryDataAsync(
-        topicUrlFragment, classroomUrlFragment,
-        storyUrlFragment
-      ).then((storyData) => {
-        this.storyId = storyData.id;
-        for (let i = 0; i < storyData.nodes.length; i++) {
-          if (
-            storyData.nodes[i].id === nodeId && (i + 1) < storyData.nodes.length
-          ) {
-            this.nextStoryNode = storyData.nodes[i + 1];
-            this.nextStoryNodeIconUrl = this.getIconUrl(
-              this.storyId, this.nextStoryNode.thumbnailFilename);
-            break;
+      this.storyViewerBackendApiService
+        .fetchStoryDataAsync(
+          topicUrlFragment,
+          classroomUrlFragment,
+          storyUrlFragment
+        )
+        .then(storyData => {
+          this.storyId = storyData.id;
+          for (let i = 0; i < storyData.nodes.length; i++) {
+            if (
+              storyData.nodes[i].id === nodeId &&
+              i + 1 < storyData.nodes.length
+            ) {
+              this.nextStoryNode = storyData.nodes[i + 1];
+              this.nextStoryNodeIconUrl = this.getIconUrl(
+                this.storyId,
+                this.nextStoryNode.thumbnailFilename
+              );
+              break;
+            }
           }
-        }
-      });
+        });
       this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
-        TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+        TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
+        {
           topic_url_fragment: topicUrlFragment,
           classroom_url_fragment: classroomUrlFragment,
-          story_url_fragment: storyUrlFragment
-        });
+          story_url_fragment: storyUrlFragment,
+        }
+      );
 
-      this.topicViewerBackendApiService.fetchTopicDataAsync(
-        topicUrlFragment, classroomUrlFragment
-      ).then((topicData: ReadOnlyTopic) => {
-        this.practiceQuestionsAreEnabled = (
-          topicData.getPracticeTabIsDisplayed());
-      });
+      this.topicViewerBackendApiService
+        .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
+        .then((topicData: ReadOnlyTopic) => {
+          this.practiceQuestionsAreEnabled =
+            topicData.getPracticeTabIsDisplayed();
+        });
     }
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 
@@ -155,7 +162,7 @@ export class RatingsAndRecommendationsComponent {
     );
 
     if (!this.questionPlayerConfig) {
-      this.learnerViewRatingService.init((userRating) => {
+      this.learnerViewRatingService.init(userRating => {
         this.userRating = userRating;
       });
     }
@@ -163,7 +170,10 @@ export class RatingsAndRecommendationsComponent {
 
   getIconUrl(storyId: string, thumbnailFilename: string): string {
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
-      AppConstants.ENTITY_TYPE.STORY, storyId, thumbnailFilename);
+      AppConstants.ENTITY_TYPE.STORY,
+      storyId,
+      thumbnailFilename
+    );
   }
 
   togglePopover(): void {
@@ -180,7 +190,7 @@ export class RatingsAndRecommendationsComponent {
 
   signIn(srcElement: string): void {
     this.siteAnalyticsService.registerNewSignupEvent(srcElement);
-    this.userService.getLoginUrlAsync().then((loginUrl) => {
+    this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         (
           this.windowRef.nativeWindow as {location: string | Location}
@@ -192,21 +202,19 @@ export class RatingsAndRecommendationsComponent {
   }
 
   hideSignUpSection(): void {
-    this.localStorageService
-      .updateEndChapterSignUpSectionHiddenPreference('true');
+    this.localStorageService.updateEndChapterSignUpSectionHiddenPreference(
+      'true'
+    );
   }
 
   isSignUpSectionHidden(): boolean {
-    return this.localStorageService
-      .getEndChapterSignUpSectionHiddenPreference() === 'true';
+    return (
+      this.localStorageService.getEndChapterSignUpSectionHiddenPreference() ===
+      'true'
+    );
   }
 
   isEndChapterFeatureEnabled(): boolean {
     return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 }
-
-angular.module('oppia').directive('oppiaRatingsAndRecommendations',
-  downgradeComponent({
-    component: RatingsAndRecommendationsComponent
-  }) as angular.IDirectiveFactory);

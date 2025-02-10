@@ -14,11 +14,10 @@
 
 /**
  * @fileoverview Unit tests for SchemaUndefinedLastElementService.
-*/
+ */
 
-import { TestBed } from '@angular/core/testing';
-import { SchemaUndefinedLastElementService } from
-  'services/schema-undefined-last-element.service';
+import {TestBed} from '@angular/core/testing';
+import {SchemaUndefinedLastElementService} from 'services/schema-undefined-last-element.service';
 
 describe('Schema Undefined Last Element Service', () => {
   let sules: SchemaUndefinedLastElementService;

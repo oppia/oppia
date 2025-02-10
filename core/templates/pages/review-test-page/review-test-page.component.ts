@@ -16,23 +16,22 @@
  * @fileoverview Component for the review tests page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
-import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PageTitleService } from 'services/page-title.service';
-import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
-import { ReviewTestPageConstants } from './review-test-page.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { ReviewTestEngineService } from './review-test-engine.service';
-import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
+import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PageTitleService} from 'services/page-title.service';
+import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
+import {ReviewTestPageConstants} from './review-test-page.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {ReviewTestEngineService} from './review-test-engine.service';
+import {QuestionPlayerConfig} from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 
 @Component({
   selector: 'review-test-page',
-  templateUrl: './review-test-page.component.html'
+  templateUrl: './review-test-page.component.html',
 })
 export class ReviewTestPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -53,30 +52,34 @@ export class ReviewTestPageComponent implements OnInit, OnDestroy {
   ) {}
 
   _fetchSkillDetails(): void {
-    const topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    const storyUrlFragment = (
-      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    const topicUrlFragment =
+      this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    const storyUrlFragment =
+      this.urlService.getStoryUrlFragmentFromLearnerUrl();
     if (storyUrlFragment === null) {
       throw new Error('Story url fragment cannot be null.');
     }
-    const classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    const classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     const reviewTestsUrl = this.urlInterpolationService.interpolateUrl(
-      ReviewTestPageConstants.REVIEW_TESTS_URL, {
+      ReviewTestPageConstants.REVIEW_TESTS_URL,
+      {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        story_url_fragment: storyUrlFragment
-      });
+        story_url_fragment: storyUrlFragment,
+      }
+    );
     const storyViewerUrl = this.urlInterpolationService.interpolateUrl(
-      ReviewTestPageConstants.STORY_VIEWER_PAGE, {
+      ReviewTestPageConstants.STORY_VIEWER_PAGE,
+      {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        story_url_fragment: storyUrlFragment
-      });
-    this.reviewTestBackendApiService.fetchReviewTestDataAsync(
-      storyUrlFragment).then(
-      (result) => {
+        story_url_fragment: storyUrlFragment,
+      }
+    );
+    this.reviewTestBackendApiService
+      .fetchReviewTestDataAsync(storyUrlFragment)
+      .then(result => {
         const skillIdList = [];
         const skillDescriptions = [];
         this.storyName = result.storyName;
@@ -84,48 +87,51 @@ export class ReviewTestPageComponent implements OnInit, OnDestroy {
         this.subscribeToOnLanguageCodeChange();
         for (let skillId in result.skillDescriptions) {
           skillIdList.push(skillId);
-          skillDescriptions.push(
-            result.skillDescriptions[skillId]);
+          skillDescriptions.push(result.skillDescriptions[skillId]);
         }
         this.questionPlayerConfig = {
           resultActionButtons: [
             {
               type: 'REVIEW_LOWEST_SCORED_SKILL',
-              i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
+              i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL',
             },
             {
               type: 'RETRY_SESSION',
               i18nId: 'I18N_QUESTION_PLAYER_RETRY_TEST',
-              url: reviewTestsUrl
+              url: reviewTestsUrl,
             },
             {
               type: 'DASHBOARD',
               i18nId: 'I18N_QUESTION_PLAYER_RETURN_TO_STORY',
-              url: storyViewerUrl
-            }
+              url: storyViewerUrl,
+            },
           ],
           skillList: skillIdList,
           skillDescriptions: skillDescriptions,
-          questionCount: (
-            this.reviewTestEngineService
-              .getReviewTestQuestionCount(skillIdList.length)),
+          questionCount:
+            this.reviewTestEngineService.getReviewTestQuestionCount(
+              skillIdList.length
+            ),
           questionPlayerMode: {
-            modeType: (
-              QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE),
-            passCutoff: 0.75
+            modeType:
+              QuestionPlayerConstants.QUESTION_PLAYER_MODE.PASS_FAIL_MODE,
+            passCutoff: 0.75,
           },
-          questionsSortedByDifficulty: true
+          questionsSortedByDifficulty: true,
         };
       });
   }
 
   setPageTitle(): void {
     this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
+    );
     const translatedTitle = this.translateService.instant(
-      'I18N_REVIEW_TEST_PAGE_TITLE', {
-        storyName: this.storyName
-      });
+      'I18N_REVIEW_TEST_PAGE_TITLE',
+      {
+        storyName: this.storyName,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -145,8 +151,3 @@ export class ReviewTestPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('reviewTestPage',
-  downgradeComponent({
-    component: ReviewTestPageComponent
-  }) as angular.IDirectiveFactory);

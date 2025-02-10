@@ -29,6 +29,11 @@
              [ngClass]="{'is-invalid': editableUrlFragment && (!isUrlFragmentValid() || subtopicUrlFragmentExists)}"
              placeholder="Enter a url fragment for the subtopic."
              [(ngModel)]="editableUrlFragment" (change)="checkSubtopicExistence()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}">
+      <div class="oppia-input-box-subtitle text-danger" [hidden]="editableUrlFragment === '' || (isUrlFragmentValid() || subtopicUrlFragmentExists)">
+        <b>
+          Please use only lowercase letters, optionally separated by hyphen.
+        </b>
+      </div>
       <span class="oppia-input-box-subtitle">
         <em>
           The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
@@ -63,7 +68,7 @@
       </div>
 
       <div class="thumbnail-editor e2e-test-subtopic-thumbnail e2e-test-photo-button create-new-subtopic-input-field">
-        <strong>Thubmnail Image*</strong>
+        <strong>Thumbnail Image*</strong>
         <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
                                   [useLocalStorage]="false"
                                   [bgColor]="editableThumbnailBgColor"

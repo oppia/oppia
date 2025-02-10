@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for explorationObjectiveEditor component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor.component';
-import { ExplorationObjectiveService } from '../services/exploration-objective.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ExplorationObjectiveEditorComponent} from './exploration-objective-editor.component';
+import {ExplorationObjectiveService} from '../services/exploration-objective.service';
 
 describe('Exploration Objective Editor Component', () => {
   let component: ExplorationObjectiveEditorComponent;
@@ -29,18 +35,10 @@ describe('Exploration Objective Editor Component', () => {
   let explorationObjectiveService: ExplorationObjectiveService;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule
-      ],
-      declarations: [
-        ExplorationObjectiveEditorComponent
-      ],
-      providers: [
-        ExplorationObjectiveService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      declarations: [ExplorationObjectiveEditorComponent],
+      providers: [ExplorationObjectiveService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,15 +51,13 @@ describe('Exploration Objective Editor Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize controller properties after its initialization',
-    fakeAsync(() => {
-      spyOn(
-        component.onInputFieldBlur, 'emit').and.stub();
+  it('should initialize controller properties after its initialization', fakeAsync(() => {
+    spyOn(component.onInputFieldBlur, 'emit').and.stub();
 
-      component.inputFieldBlur();
-      tick();
+    component.inputFieldBlur();
+    tick();
 
-      expect(component.onInputFieldBlur.emit).toHaveBeenCalled();
-      expect(component).toBeDefined();
-    }));
+    expect(component.onInputFieldBlur.emit).toHaveBeenCalled();
+    expect(component).toBeDefined();
+  }));
 });

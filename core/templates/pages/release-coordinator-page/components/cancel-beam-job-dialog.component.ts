@@ -16,14 +16,14 @@
  * @fileoverview Component for managing an Apache Beam job.
  */
 
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { catchError, take } from 'rxjs/operators';
+import {Component, Inject} from '@angular/core';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {catchError, take} from 'rxjs/operators';
 
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { of } from 'rxjs';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'cancel-beam-job-dialog',
@@ -33,23 +33,26 @@ export class CancelBeamJobDialogComponent {
   isRunning = false;
 
   constructor(
-      @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
-      private matDialogRef:
-        // JobRun may be null if the job failed to cancel.
-        MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun | null>,
-      private alertsService: AlertsService,
-      private backendApiService: ReleaseCoordinatorBackendApiService) {}
+    @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
+    private matDialogRef: // JobRun may be null if the job failed to cancel.
+    MatDialogRef<CancelBeamJobDialogComponent, BeamJobRun | null>,
+    private alertsService: AlertsService,
+    private backendApiService: ReleaseCoordinatorBackendApiService
+  ) {}
 
   onActionClick(): void {
     this.isRunning = true;
     this.matDialogRef.disableClose = true;
 
-    this.backendApiService.cancelBeamJobRun(this.beamJobRun).pipe(
-      take(1),
-      catchError(error => {
-        this.alertsService.addWarning(error.message);
-        return of(null);
-      })
-    ).subscribe(cancelledJobRun => this.matDialogRef.close(cancelledJobRun));
+    this.backendApiService
+      .cancelBeamJobRun(this.beamJobRun)
+      .pipe(
+        take(1),
+        catchError(error => {
+          this.alertsService.addWarning(error.message);
+          return of(null);
+        })
+      )
+      .subscribe(cancelledJobRun => this.matDialogRef.close(cancelledJobRun));
   }
 }

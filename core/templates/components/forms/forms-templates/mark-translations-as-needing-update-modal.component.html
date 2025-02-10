@@ -20,10 +20,14 @@
       </p>
     </li>
     <li>
-      <p>
+      <p *ngIf="!modifyTranslationsFeatureFlagIsEnabled">
         <strong>Mark translations as stale:</strong>
         Mark the existing translations for the given content as stale. Select this if your changes will require the translations
         to be updated, but the previous translations can still be used.
+      </p>
+      <p *ngIf="modifyTranslationsFeatureFlagIsEnabled">
+        <strong>Modify existing translations:</strong>
+        Select this if your changes mean that existing translations will need to be modified slightly.
       </p>
     </li>
     <li>
@@ -41,6 +45,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="removeTranslations()">Remove existing translations</button>
-  <button class="btn btn-secondary" (click)="markNeedsUpdate()">Mark translations as stale</button>
+  <button *ngIf="!modifyTranslationsFeatureFlagIsEnabled"class="btn btn-secondary" (click)="markNeedsUpdate()">Mark translations as stale</button>
+  <button *ngIf="modifyTranslationsFeatureFlagIsEnabled" class="btn btn-secondary e2e-test-modify-translations-button" (click)="openModifyTranslationsModal()">Modify existing translations</button>
   <button class="btn btn-secondary e2e-test-leave-translations-as-is" (click)="cancel()">Leave as is</button>
 </div>

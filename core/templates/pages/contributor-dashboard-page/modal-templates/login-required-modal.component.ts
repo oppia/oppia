@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 /**
  * @fileoverview Component for login required modal.
@@ -22,12 +21,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'login-required-modal',
-  templateUrl: './login-required-modal.component.html'
+  templateUrl: './login-required-modal.component.html',
 })
 export class LoginRequiredModalContent {
   constructor(public readonly activeModal: NgbActiveModal) {}
 }
-
-angular.module('oppia').directive(
-  'loginRequiredModalContent', downgradeComponent(
-    {component: LoginRequiredModalContent}));

@@ -16,18 +16,22 @@
  * @fileoverview Unit tests for CurrentInteractionService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CurrentInteractionService, OnSubmitFn, ValidityCheckFn } from 'pages/exploration-player-page/services/current-interaction.service';
-import { UrlService } from 'services/contextual/url.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ContextService } from 'services/context.service';
-import { InteractionRulesService } from './answer-classification.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import {
+  CurrentInteractionService,
+  OnSubmitFn,
+  ValidityCheckFn,
+} from 'pages/exploration-player-page/services/current-interaction.service';
+import {UrlService} from 'services/contextual/url.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ContextService} from 'services/context.service';
+import {InteractionRulesService} from './answer-classification.service';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {AudioTranslationLanguageService} from './audio-translation-language.service';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -39,8 +43,15 @@ describe('Current Interaction Service', () => {
   let interactionRulesService: InteractionRulesService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   const displayedCard = new StateCard(
-    '', '', '', {} as Interaction, [],
-    {} as RecordedVoiceovers, '', {} as AudioTranslationLanguageService);
+    '',
+    '',
+    '',
+    {} as Interaction,
+    [],
+    {} as RecordedVoiceovers,
+    '',
+    {} as AudioTranslationLanguageService
+  );
 
   // This mock is required since ContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
@@ -57,7 +68,6 @@ describe('Current Interaction Service', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     contextService = TestBed.inject(ContextService);
   });
-
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
@@ -77,7 +87,9 @@ describe('Current Interaction Service', () => {
       currentInteractionService.onSubmit(DUMMY_ANSWER, interactionRulesService);
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, dummyValidityCheckFn);
+      dummySubmitAnswerFn,
+      dummyValidityCheckFn
+    );
     currentInteractionService.submitAnswer();
     expect(answerState).toEqual(DUMMY_ANSWER);
   });
@@ -90,9 +102,12 @@ describe('Current Interaction Service', () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, dummyValidityCheckFn);
+      dummySubmitAnswerFn,
+      dummyValidityCheckFn
+    );
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(
-      !dummyValidityCheckFn());
+      !dummyValidityCheckFn()
+    );
   });
 
   it('should handle case where validityCheckFn is null', () => {
@@ -100,13 +115,14 @@ describe('Current Interaction Service', () => {
       return false;
     };
     currentInteractionService.registerCurrentInteraction(
-      dummySubmitAnswerFn, null);
+      dummySubmitAnswerFn,
+      null
+    );
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(false);
   });
 
   it('should handle case where submitAnswerFn is null', () => {
-    currentInteractionService.registerCurrentInteraction(
-      null, null);
+    currentInteractionService.registerCurrentInteraction(null, null);
     expect(currentInteractionService.isSubmitButtonDisabled()).toBe(true);
   });
 
@@ -142,25 +158,33 @@ describe('Current Interaction Service', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(
       StateCard.createNewCard(
-        'First State', 'Content HTML',
+        'First State',
+        'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
-        interaction, recordedVoiceovers, '', audioTranslationLanguageService));
+        interaction,
+        recordedVoiceovers,
+        '',
+        audioTranslationLanguageService
+      )
+    );
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
     spyOn(contextService, 'getPageContext').and.returnValue('learner');
 
-    let additionalInfo = (
+    let additionalInfo =
       '\nUndefined submit answer debug logs:' +
       '\nInteraction ID: null' +
       '\nExploration ID: abc' +
       '\nState Name: First State' +
       '\nContext: learner' +
-      '\nErrored at index: 1');
+      '\nErrored at index: 1';
 
     currentInteractionService.registerCurrentInteraction(null, null);
 
     expect(() => currentInteractionService.submitAnswer()).toThrowError(
-      'The current interaction did not ' + 'register a _submitAnswerFn.' +
-        additionalInfo);
+      'The current interaction did not ' +
+        'register a _submitAnswerFn.' +
+        additionalInfo
+    );
   });
 
   it('should update view with new answer', () => {
@@ -178,8 +202,7 @@ describe('Current Interaction Service', () => {
   });
 
   it('should return display card', () => {
-    spyOn(
-      playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
 
     expect(currentInteractionService.getDisplayedCard()).toEqual(displayedCard);
@@ -187,20 +210,21 @@ describe('Current Interaction Service', () => {
 
   it('should update current answer', () => {
     spyOn(displayedCard, 'updateCurrentAnswer');
-    spyOn(
-      currentInteractionService,
-      'getDisplayedCard').and.returnValue(displayedCard);
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
 
     currentInteractionService.updateCurrentAnswer('answer');
 
-    expect(
-      displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith('answer');
+    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(
+      'answer'
+    );
   });
 
   it('should check if "no response error" should be displayed', () => {
-    spyOn(
-      currentInteractionService,
-      'getDisplayedCard').and.returnValue(displayedCard);
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
     expect(currentInteractionService.showNoResponseError()).toBeTrue();

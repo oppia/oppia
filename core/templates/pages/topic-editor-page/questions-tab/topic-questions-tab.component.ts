@@ -16,30 +16,36 @@
  * @fileoverview Component for the questions tab.
  */
 
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { Topic } from 'domain/topic/topic-object.model';
-import { TopicRights } from 'domain/topic/topic-rights.model';
-import { CategorizedSkills, TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { Subscription } from 'rxjs';
-import { QuestionsListService } from 'services/questions-list.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {Topic} from 'domain/topic/topic-object.model';
+import {TopicRights} from 'domain/topic/topic-rights.model';
+import {
+  CategorizedSkills,
+  TopicsAndSkillsDashboardBackendApiService,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {Subscription} from 'rxjs';
+import {QuestionsListService} from 'services/questions-list.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 @Component({
   selector: 'oppia-topic-questions-tab',
-  templateUrl: './topic-questions-tab.component.html'
+  templateUrl: './topic-questions-tab.component.html',
 })
-export class TopicQuestionsTabComponent implements OnInit,
- AfterViewInit, OnDestroy {
+export class TopicQuestionsTabComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   topic!: Topic;
   topicRights!: TopicRights;
   groupedSkillSummaries!: object;
   skillIdToRubricsObject!: object;
   allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
+  questionEditorOpened: boolean = false;
+  newQuestionEditor: boolean = false;
+  selectedSkillName!: string;
   selectedSkillId!: string;
   getSkillsCategorizedByTopics!: CategorizedSkills;
   getUntriagedSkillSummaries!: SkillSummary[];
@@ -47,9 +53,8 @@ export class TopicQuestionsTabComponent implements OnInit,
   constructor(
     private focusManagerService: FocusManagerService,
     private questionsListService: QuestionsListService,
-    private topicsAndSkillsDashboardBackendApiService:
-      TopicsAndSkillsDashboardBackendApiService,
-    private topicEditorStateService: TopicEditorStateService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
+    private topicEditorStateService: TopicEditorStateService
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -57,34 +62,44 @@ export class TopicQuestionsTabComponent implements OnInit,
   _initTab(): void {
     this.topic = this.topicEditorStateService.getTopic();
     this.topicRights = this.topicEditorStateService.getTopicRights();
-    this.groupedSkillSummaries = (
-      this.topicEditorStateService.getGroupedSkillSummaries());
-    this.skillIdToRubricsObject = (
-      this.topicEditorStateService.getSkillIdToRubricsObject());
+    this.groupedSkillSummaries =
+      this.topicEditorStateService.getGroupedSkillSummaries();
+    this.skillIdToRubricsObject =
+      this.topicEditorStateService.getSkillIdToRubricsObject();
     this.allSkillSummaries = [];
     this.allSkillSummaries = this.allSkillSummaries.concat(
-      this.topic.getUncategorizedSkillSummaries());
+      this.topic.getUncategorizedSkillSummaries()
+    );
     for (let i = 0; i < this.topic.getSubtopics().length; i++) {
       let subtopic = this.topic.getSubtopics()[i];
       this.allSkillSummaries = this.allSkillSummaries.concat(
-        subtopic.getSkillSummaries());
+        subtopic.getSkillSummaries()
+      );
     }
-    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-      .then((response) => {
-        this.getSkillsCategorizedByTopics = (
-          response.categorizedSkillsDict);
-        this.getUntriagedSkillSummaries = (
-          response.untriagedSkillSummaries);
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then(response => {
+        this.getSkillsCategorizedByTopics = response.categorizedSkillsDict;
+        this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
     this.canEditQuestion = this.topicRights.canEditTopic();
+    this.questionEditorOpened =
+      this.topicEditorStateService.isQuestionEditorOpened();
+    this.newQuestionEditor = this.topicEditorStateService.isNewQuestionEditor();
+    this.selectedSkillName = this.topicEditorStateService.getSelectedSkillName(
+      this.selectedSkillId,
+      this.allSkillSummaries
+    );
+  }
+
+  getEditorAction(): string {
+    return this.newQuestionEditor ? 'Creating new' : 'Editing';
   }
 
   reinitializeQuestionsList(skillId: string): void {
     this.selectedSkillId = skillId;
     this.questionsListService.resetPageNumber();
-    this.questionsListService.getQuestionSummariesAsync(
-      skillId, true, true
-    );
+    this.questionsListService.getQuestionSummariesAsync(skillId, true, true);
   }
 
   ngAfterViewInit(): void {
@@ -97,22 +112,25 @@ export class TopicQuestionsTabComponent implements OnInit,
     // question-editor-tab.
     this.focusManagerService.setFocus('selectSkillField');
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => this._initTab()
-      ));
+      this.topicEditorStateService.onTopicInitialized.subscribe(() =>
+        this._initTab()
+      )
+    );
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => this._initTab()
-      ));
+      this.topicEditorStateService.onTopicReinitialized.subscribe(() =>
+        this._initTab()
+      )
+    );
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onQuestionEditorOpened.subscribe(() =>
+        this._initTab()
+      )
+    );
     this._initTab();
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.topicEditorStateService.toggleQuestionEditor(false);
   }
 }
-
-angular.module('oppia').directive('oppiaTopicQuestionsTab',
-  downgradeComponent({
-    component: TopicQuestionsTabComponent
-  }) as angular.IDirectiveFactory);

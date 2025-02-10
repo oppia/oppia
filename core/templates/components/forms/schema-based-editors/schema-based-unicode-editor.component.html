@@ -1,6 +1,6 @@
 <span>
   <textarea *ngIf="!getCodingMode() && getRows()"
-            class="form-control"
+            class="form-control e2e-test-description-box"
             [(ngModel)]="localValue"
             (input)="updateLocalValue($event)"
             [disabled]="disabled"
@@ -15,7 +15,7 @@
 
   <span *ngIf="!getCodingMode() && !getRows()">
     <input type="text"
-           class="form-control display-inline"
+           class="form-control display-inline e2e-test-text-input"
            [(ngModel)]="localValue"
            (input)="updateLocalValue($event)"
            [disabled]="disabled"

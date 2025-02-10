@@ -16,24 +16,29 @@
  * @fileoverview Component for exploration save modal.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AppConstants } from 'app.constants';
-import { DiffNodeData } from 'components/version-diff-visualization/version-diff-visualization.component';
+import {Component, Input} from '@angular/core';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
+import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
+import {StateDiffModalComponent} from './state-diff-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-exploration-save-modal',
-  templateUrl: './exploration-save-modal.component.html'
+  templateUrl: './exploration-save-modal.component.html',
 })
-export class ExplorationSaveModalComponent
-  extends ConfirmOrCancelModal {
+export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
   earlierVersionHeader: string = 'Last saved';
   laterVersionHeader: string = 'New changes';
   commitMessage: string = '';
   showDiff: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = String(AppConstants.MAX_COMMIT_MESSAGE_LENGTH);
+  modifyTranslationsFeatureFlagIsEnabled: boolean = false;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -42,17 +47,38 @@ export class ExplorationSaveModalComponent
   @Input() diffData!: DiffNodeData;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private ngbModal: NgbModal,
+    private platformFeatureService: PlatformFeatureService
   ) {
     super(ngbActiveModal);
+  }
+
+  ngOnInit(): void {
+    this.modifyTranslationsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled;
   }
 
   onClickToggleDiffButton(): void {
     this.showDiff = !this.showDiff;
   }
-}
 
-angular.module('oppia').directive('oppiaExplorationSaveModal',
-  downgradeComponent({
-    component: ExplorationSaveModalComponent
-  }) as angular.IDirectiveFactory);
+  showStateDiffModalForTranslations(): void {
+    let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
+      backdrop: true,
+      windowClass: 'state-diff-modal',
+      size: 'xl',
+    });
+
+    modalRef.componentInstance.showingTranslationChanges = true;
+    modalRef.componentInstance.headers = {
+      leftPane: this.earlierVersionHeader,
+      rightPane: this.laterVersionHeader,
+    };
+
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
+  }
+}

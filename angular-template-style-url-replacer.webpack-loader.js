@@ -66,14 +66,14 @@ const VALUE_REGEX = /(['`"])((?:[^\\]\\\1|.)*?)\1/g;
  * @param {string} str
  * @returns Relative url
  */
-const replaceStringsWithRequiresStatement = (str) => {
-  return str.replace(VALUE_REGEX, function(_, __, url) {
+const replaceStringsWithRequiresStatement = str => {
+  return str.replace(VALUE_REGEX, function (_, __, url) {
     return "require('" + url + "')";
   });
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const loader = (sourceString) => {
+const loader = sourceString => {
   // https://webpack.js.org/api/loaders/#thiscacheable
   // Cacheable is an interface provided by webpack and is used to speed up
   // the build by caching results.
@@ -82,24 +82,23 @@ const loader = (sourceString) => {
    * The templateURL regex will match something like:
    * "templateUrl: './base-content.component.html',"
    */
-  const newSourceString = sourceString.replace(
-    TEMPLATE_URL_REGEX, (_, url) => {
+  const newSourceString = sourceString
+    .replace(TEMPLATE_URL_REGEX, (_, url) => {
       return 'template:' + replaceStringsWithRequiresStatement(url);
-    }
-  ).replace(STYLES_URL_REGEX, () => {
-    /**
-     * For the style urls, the angular compiler
-     * uses styleUrls while webpack uses imports. Hence, currently we put the
-     * stylesheet as import and as a styleUrl in the component. Once we have
-     * moved away from separate rtl css files, we will remove the import
-     * statements and just keep styleUrls. Until then, for webpack, we need
-     * remove styleUrls property for webpack compilation.
-     */
-    return 'styleUrl: []';
-  });
+    })
+    .replace(STYLES_URL_REGEX, () => {
+      /**
+       * For the style urls, the angular compiler
+       * uses styleUrls while webpack uses imports. Hence, currently we put the
+       * stylesheet as import and as a styleUrl in the component. Once we have
+       * moved away from separate rtl css files, we will remove the import
+       * statements and just keep styleUrls. Until then, for webpack, we need
+       * remove styleUrls property for webpack compilation.
+       */
+      return 'styleUrl: []';
+    });
 
   return newSourceString;
 };
-
 
 module.exports = loader;

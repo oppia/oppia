@@ -23,8 +23,9 @@ from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
-from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain as parameter_domain
+from core.domain import feature_flag_domain
+from core.domain import feature_flag_services as feature_services
+from core.domain import user_services
 
 from typing import Dict, List, TypedDict
 
@@ -58,16 +59,127 @@ class MemoryCacheHandler(
         self.render_json({})
 
 
+class UserGroupHandlerNormalizePayloadDict(TypedDict):
+    """Dict representation of UserGroupHandler's normalized_payload
+    dictionary.
+    """
+
+    user_group_id: str
+    name: str
+    member_usernames: List[str]
+
+
+class UserGroupHandler(
+    base.BaseHandler[
+        UserGroupHandlerNormalizePayloadDict,
+        Dict[str, str]
+    ]
+):
+    """Handler for user groups."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'member_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        },
+        'PUT': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'member_usernames': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'basestring'
+                    }
+                }
+            }
+        },
+        'DELETE': {
+            'user_group_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_release_coordinator_page
+    def get(self) -> None:
+        """Populates the data for user groups."""
+        user_groups = user_services.get_all_user_groups()
+        user_groups_dict_list = []
+        for user_group in user_groups:
+            user_groups_dict_list.append(user_group.to_dict())
+
+        self.render_json({
+            'user_group_dicts': user_groups_dict_list
+        })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def post(self) -> None:
+        """Performs series of action based on action parameter for user
+        groups.
+        """
+        assert self.normalized_payload is not None
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_group = user_services.create_new_user_group(
+            name, member_usernames)
+        self.render_json({'user_group_dict': user_group.to_dict()})
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self) -> None:
+        """Updates the specified user group."""
+        assert self.normalized_payload is not None
+
+        user_group_id = self.normalized_payload['user_group_id']
+        name = self.normalized_payload['name']
+        member_usernames = self.normalized_payload['member_usernames']
+        user_services.update_user_group(
+            user_group_id, name, member_usernames)
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_release_coordinator_page
+    def delete(self) -> None:
+        """Performs deletion on the specified user group."""
+        assert self.normalized_request is not None
+        user_group_id = self.normalized_request['user_group_id']
+        user_services.delete_user_group(user_group_id)
+        self.render_json(self.values)
+
+
 class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of FeatureFlag's normalized_payload
     dictionary.
     """
 
     action: str
-    feature_name: str
-    commit_message: str
-    new_rules: List[parameter_domain.PlatformParameterRule]
-    default_value: bool
+    feature_flag_name: str
+    force_enable_for_all_users: bool
+    rollout_percentage: int
+    user_group_ids: List[str]
 
 
 class FeatureFlagsHandler(
@@ -80,7 +192,7 @@ class FeatureFlagsHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'POST': {
+        'PUT': {
             'action': {
                 'schema': {
                     'type': 'basestring',
@@ -90,49 +202,63 @@ class FeatureFlagsHandler(
                 },
                 'default_value': None
             },
-            'feature_name': {
+            'feature_flag_name': {
                 'schema': {
                     'type': 'basestring'
                 },
                 'default_value': None
             },
-            'commit_message': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'new_rules': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'object_dict',
-                        'object_class': parameter_domain.PlatformParameterRule
-                    }
-                },
-                'default_value': None
-            },
-            'default_value': {
+            'force_enable_for_all_users': {
                 'schema': {
                     'type': 'bool'
                 },
                 'default_value': None
             },
+            'rollout_percentage': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }, {
+                        'id': 'is_at_most',
+                        'max_value': 100
+                    }]
+                },
+                'default_value': None
+            },
+            'user_group_ids': {
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'unicode'
+                    }
+                },
+                'default_value': None
+            }
         }
     }
 
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
         """Handles GET requests."""
-        feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
+        feature_flags = feature_services.get_all_feature_flags()
+        feature_flags_dict = []
+        for feature_flag in feature_flags:
+            feature_flags_dict.append(feature_flag.to_dict())
+        user_groups = user_services.get_all_user_groups()
+        user_group_dicts = []
+        for user_group in user_groups:
+            user_group_dicts.append(user_group.to_dict())
         self.render_json({
-            'feature_flags': feature_flag_dicts,
-            'server_stage': feature_services.get_server_mode().value
+            'feature_flags': feature_flags_dict,
+            'server_stage': feature_flag_domain.get_server_mode().value,
+            'user_group_dicts': user_group_dicts
         })
 
     @acl_decorators.can_access_release_coordinator_page
-    def post(self) -> None:
-        """Handles POST requests."""
+    def put(self) -> None:
+        """Handles PUT requests."""
         assert self.normalized_payload is not None
         action = self.normalized_payload.get('action')
         try:
@@ -142,41 +268,48 @@ class FeatureFlagsHandler(
             # must be 'update_feature_flag' if this branch is
             # executed.
             assert action == 'update_feature_flag'
-            feature_name = self.normalized_payload.get('feature_name')
-            if feature_name is None:
+            feature_flag_name = self.normalized_payload.get('feature_flag_name')
+            if feature_flag_name is None:
                 raise Exception(
-                    'The \'feature_name\' must be provided when the action'
+                    'The \'feature_flag_name\' must be provided when the action'
                     ' is update_feature_flag.'
                 )
-            new_rules = self.normalized_payload.get('new_rules')
-            if new_rules is None:
-                raise Exception(
-                    'The \'new_rules\' must be provided when the action'
-                    ' is update_feature_flag.'
-                )
-            commit_message = self.normalized_payload.get('commit_message')
-            if commit_message is None:
-                raise Exception(
-                    'The \'commit_message\' must be provided when the '
-                    'action is update_feature_flag.'
-                )
-            default_value = self.normalized_payload.get('default_value')
-            assert default_value is not None
 
-            assert self.user_id is not None
+            force_enable_for_all_users = self.normalized_payload.get(
+                'force_enable_for_all_users')
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
+            assert force_enable_for_all_users is not None
+            rollout_percentage = self.normalized_payload.get(
+                'rollout_percentage')
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
+            assert rollout_percentage is not None
+            user_group_ids = self.normalized_payload.get('user_group_ids')
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
+            assert user_group_ids is not None
             try:
                 feature_services.update_feature_flag(
-                    feature_name, self.user_id, commit_message,
-                    new_rules, default_value)
+                    feature_flag_name,
+                    force_enable_for_all_users,
+                    rollout_percentage,
+                    user_group_ids
+                )
             except (
                     utils.ValidationError,
                     feature_services.FeatureFlagNotFoundException) as e:
                 raise self.InvalidInputException(e)
 
-            new_rule_dicts = [rule.to_dict() for rule in new_rules]
             logging.info(
-                '[RELEASE-COORDINATOR] %s updated feature %s with new rules: '
-                '%s.' % (self.user_id, feature_name, new_rule_dicts))
+                '[RELEASE-COORDINATOR] %s updated feature %s with new values: '
+                'rollout_percentage - %d, force_enable_for_all_users - %s, '
+                'user_group_ids - %s.' % (
+                    self.user_id, feature_flag_name,
+                    rollout_percentage,
+                    force_enable_for_all_users,
+                    user_group_ids)
+                )
             self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)

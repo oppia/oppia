@@ -31,6 +31,7 @@ import threading
 import time
 from urllib import request as urlrequest
 
+from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -512,23 +513,6 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertTrue(check_function_calls['shutil_rmtree_is_called'])
-
-    def test_managed_redis_server_throws_exception_when_on_windows_os(
-        self
-    ) -> None:
-        self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'is_windows_os', value=True))
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            common, 'wait_for_port_to_be_in_use'))
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The redis command line interface is not installed because '
-            'your machine is on the Windows operating system. The redis '
-            'server cannot start.'
-        ):
-            self.exit_stack.enter_context(servers.managed_redis_server())
 
     def test_managed_redis_server(self) -> None:
         original_os_remove = os.remove
@@ -1076,7 +1060,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        test_file_path = 'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js' # pylint: disable=line-too-long
+        test_file_path = (
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
 
         self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name=test_file_path,
@@ -1088,6 +1073,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         self.assertIn(test_file_path, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), test_file_path)
 
     def test_managed_acceptance_test_server_with_invalid_suite(self) -> None:
         suite_name = 'invalid_suite'
@@ -1098,3 +1084,81 @@ class ManagedProcessTests(test_utils.TestBase):
                 servers.managed_acceptance_tests_server(
                     suite_name=suite_name,
                     stdout=subprocess.PIPE))
+
+    def test_managed_acceptance_test_server_headless(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        suite_name = (
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
+
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=suite_name,
+            headless=True,
+            stdout=subprocess.PIPE))
+        self.exit_stack.close()
+
+        self.assertEqual(os.getenv('HEADLESS'), 'true')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
+
+    def test_managed_acceptance_test_server_mobile(self) -> None:
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+        suite_name = (
+            'blog-admin/assign-roles-to-users-and-change-tag-properties')
+
+        self.exit_stack.enter_context(servers.managed_acceptance_tests_server(
+            suite_name=suite_name,
+            mobile=True,
+            stdout=subprocess.PIPE))
+
+        self.assertEqual(os.getenv('MOBILE'), 'true')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
+        program_args = popen_calls[0].program_args
+        self.assertIn(suite_name, program_args)
+        self.assertEqual(os.getenv('SPEC_NAME'), suite_name)
+
+        self.exit_stack.close()
+
+
+class GetChromedriverVersionTests(test_utils.TestBase):
+
+    def test_chrome_before_115_queries_api(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            return b'Google Chrome 72.0.3626.123\n'
+        def mock_url_open(_: str) -> io.BytesIO:
+            return io.BytesIO(b'72.0.3626.69')
+        expected_url = (
+            'https://chromedriver.storage.googleapis.com/'
+            'LATEST_RELEASE_72.0.3626')
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        url_open_swap = self.swap_with_checks(
+            utils, 'url_open', mock_url_open, expected_args=[(expected_url,)])
+
+        with check_output_swap, url_open_swap:
+            self.assertEqual(
+                servers.get_chromedriver_version(),
+                '72.0.3626.69',
+            )
+
+    def test_chrome_115_and_later_returns_chrome_version(self) -> None:
+        def mock_check_output(_: List[str]) -> bytes:
+            return b'Google Chrome 115.0.3626.123\n'
+        def mock_url_open(_: str) -> None:
+            raise AssertionError('url_open should not be called.')
+
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+
+        with check_output_swap, url_open_swap:
+            self.assertEqual(
+                servers.get_chromedriver_version(),
+                '115.0.3626.123',
+            )

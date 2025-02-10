@@ -16,26 +16,30 @@
  * @fileoverview Component for a canonical story tile.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { Input } from '@angular/core';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { StoryNode } from 'domain/story/story-node.model';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {Input} from '@angular/core';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {StoryNode} from 'domain/story/story-node.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './story-summary-tile.component.css';
-
+import constants from 'assets/constants';
 
 @Component({
   selector: 'oppia-story-summary-tile',
   templateUrl: './story-summary-tile.component.html',
-  styleUrls: ['./story-summary-tile.component.css']
+  styleUrls: ['./story-summary-tile.component.css'],
 })
 export class StorySummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -57,13 +61,16 @@ export class StorySummaryTileComponent implements OnInit {
   completedStrokeDashArrayValues!: string;
   thumbnailBgColor!: string;
   nodeTitles!: string[];
+  nodes!: StoryNode[];
   nodeTitlesTranslationKeys: string[] = [];
   storyLink!: string;
   thumbnailUrl: string | null = null;
   showButton: boolean = false;
-  circumference = (20 * 2 * Math.PI);
+  circumference = 20 * 2 * Math.PI;
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
+  availableNodeCount = 0;
+  comingSoonNodeCount = 0;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -71,10 +78,16 @@ export class StorySummaryTileComponent implements OnInit {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
+  }
+
+  isSerialChapterFeatureFlagEnabled(): boolean {
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   getStoryLink(): string {
@@ -84,11 +97,13 @@ export class StorySummaryTileComponent implements OnInit {
       return '#';
     }
     let storyLink = this.urlInterpolationService.interpolateUrl(
-      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
+      {
         classroom_url_fragment: this.classroomUrlFragment,
         story_url_fragment: this.storySummary.getUrlFragment(),
-        topic_url_fragment: this.topicUrlFragment
-      });
+        topic_url_fragment: this.topicUrlFragment,
+      }
+    );
     return storyLink;
   }
 
@@ -110,8 +125,7 @@ export class StorySummaryTileComponent implements OnInit {
     if (index === 0) {
       return true;
     }
-    let previousNodeTitle = (
-      this.storySummary.getNodeTitles()[index - 1]);
+    let previousNodeTitle = this.storySummary.getNodeTitles()[index - 1];
     return this.storySummary.isNodeCompleted(previousNodeTitle);
   }
 
@@ -128,10 +142,9 @@ export class StorySummaryTileComponent implements OnInit {
     if (this.nodeCount === 1) {
       return '';
     }
-    let segmentLength = (
-      (
-        this.circumference -
-        (this.nodeCount * this.gapLength)) / this.nodeCount);
+    let segmentLength =
+      (this.circumference - this.availableNodeCount * this.gapLength) /
+      this.availableNodeCount;
     return segmentLength.toString() + ' ' + this.gapLength.toString();
   }
 
@@ -144,15 +157,22 @@ export class StorySummaryTileComponent implements OnInit {
       return '';
     }
     let urlParams = this.urlService.addField(
-      '', 'story_url_fragment', this.storySummary.getUrlFragment());
+      '',
+      'story_url_fragment',
+      this.storySummary.getUrlFragment()
+    );
     urlParams = this.urlService.addField(
-      urlParams, 'topic_url_fragment', this.topicUrlFragment);
+      urlParams,
+      'topic_url_fragment',
+      this.topicUrlFragment
+    );
     urlParams = this.urlService.addField(
-      urlParams, 'classroom_url_fragment', this.classroomUrlFragment);
-    urlParams = this.urlService.addField(
-      urlParams, 'node_id', node.getId());
-    return (
-      `${this.EXPLORE_PAGE_PREFIX}${node.getExplorationId()}${urlParams}`);
+      urlParams,
+      'classroom_url_fragment',
+      this.classroomUrlFragment
+    );
+    urlParams = this.urlService.addField(urlParams, 'node_id', node.getId());
+    return `${this.EXPLORE_PAGE_PREFIX}${node.getExplorationId()}${urlParams}`;
   }
 
   getCompletedStrokeDashArrayValues(): string {
@@ -164,18 +184,18 @@ export class StorySummaryTileComponent implements OnInit {
     if (this.completedStoriesCount === 1 && this.nodeCount === 1) {
       return '';
     }
-    let segmentLength = (
-      (
-        this.circumference -
-        (this.nodeCount * this.gapLength)) / this.nodeCount);
+    let segmentLength =
+      (this.circumference - this.availableNodeCount * this.gapLength) /
+      this.availableNodeCount;
     for (let i = 1; i <= this.completedStoriesCount - 1; i++) {
-      completedStrokeValues += (
-        segmentLength.toString() + ' ' + this.gapLength.toString() + ' ');
-      remainingCircumference -= (segmentLength + this.gapLength);
+      completedStrokeValues +=
+        segmentLength.toString() + ' ' + this.gapLength.toString() + ' ';
+      remainingCircumference -= segmentLength + this.gapLength;
     }
-    completedStrokeValues += (
-      segmentLength.toString() + ' ' +
-      (remainingCircumference - segmentLength).toString());
+    completedStrokeValues +=
+      segmentLength.toString() +
+      ' ' +
+      (remainingCircumference - segmentLength).toString();
     return completedStrokeValues;
   }
 
@@ -185,53 +205,79 @@ export class StorySummaryTileComponent implements OnInit {
     for (let idx in this.storySummary.getNodeTitles()) {
       if (
         this.storySummary.isNodeCompleted(
-          this.storySummary.getNodeTitles()[idx])) {
+          this.storySummary.getNodeTitles()[idx]
+        )
+      ) {
         this.completedStoriesCount++;
       }
     }
+    this.availableNodeCount = 0;
+    this.comingSoonNodeCount = 0;
+    for (let idx in this.storySummary.getAllNodes()) {
+      let nodeStatus = this.storySummary.getAllNodes()[idx].getStatus();
+      if (nodeStatus === constants.STORY_NODE_STATUS_PUBLISHED) {
+        this.availableNodeCount++;
+      } else if (nodeStatus === constants.STORY_NODE_STATUS_READY_TO_PUBLISH) {
+        this.comingSoonNodeCount++;
+      }
+    }
     this.storyProgress = Math.floor(
-      (this.completedStoriesCount / this.nodeCount) * 100);
+      (this.completedStoriesCount / this.availableNodeCount) * 100
+    );
 
     this.chaptersDisplayed = this.allChaptersAreShown ? this.nodeCount : 3;
-    if (this.windowDimensionsService.getWidth() <= 768 &&
+    if (
+      this.windowDimensionsService.getWidth() <= 768 &&
       this.windowDimensionsService.getWidth() > 500 &&
-      !this.allChaptersAreShown) {
+      !this.allChaptersAreShown
+    ) {
       this.chaptersDisplayed = 2;
     }
-    if (this.windowDimensionsService.getWidth() <= 500 &&
-      !this.allChaptersAreShown) {
+    if (
+      this.windowDimensionsService.getWidth() <= 500 &&
+      !this.allChaptersAreShown
+    ) {
       this.chaptersDisplayed = 1;
     }
     this.showButton = false;
-    if (!this.allChaptersAreShown &&
-      this.chaptersDisplayed !== this.nodeCount) {
+    if (
+      !this.allChaptersAreShown &&
+      this.chaptersDisplayed !== this.nodeCount
+    ) {
       this.showButton = true;
     }
 
     if (this.storySummary.getThumbnailFilename()) {
-      this.thumbnailUrl = (
+      this.thumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storySummary.getId(),
-          this.storySummary.getThumbnailFilename()));
+          AppConstants.ENTITY_TYPE.STORY,
+          this.storySummary.getId(),
+          this.storySummary.getThumbnailFilename()
+        );
     } else {
       this.thumbnailUrl = null;
     }
     this.getStrokeDashArrayValues();
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
-    this.storyTitleTranslationKey = this.i18nLanguageCodeService
-      .getStoryTranslationKey(
-        this.storySummary.getId(), TranslationKeyType.TITLE);
+    this.storyTitleTranslationKey =
+      this.i18nLanguageCodeService.getStoryTranslationKey(
+        this.storySummary.getId(),
+        TranslationKeyType.TITLE
+      );
     this.strokeDashArrayValues = this.getStrokeDashArrayValues();
     this.completedStrokeDashArrayValues =
       this.getCompletedStrokeDashArrayValues();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
     this.nodeTitles = this.storySummary.getNodeTitles();
+    this.nodes = this.storySummary.getAllNodes();
     for (let idx in this.storySummary.getAllNodes()) {
       let storyNode: StoryNode = this.storySummary.getAllNodes()[idx];
-      let storyNodeTranslationKey = this.i18nLanguageCodeService.
-        getExplorationTranslationKey(
-          storyNode.getExplorationId() as string, TranslationKeyType.TITLE);
+      let storyNodeTranslationKey =
+        this.i18nLanguageCodeService.getExplorationTranslationKey(
+          storyNode.getExplorationId() as string,
+          TranslationKeyType.TITLE
+        );
       this.nodeTitlesTranslationKeys.push(storyNodeTranslationKey);
     }
     this.getStoryStatus();
@@ -254,6 +300,9 @@ export class StorySummaryTileComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaStorySummaryTile', downgradeComponent(
-    {component: StorySummaryTileComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaStorySummaryTile',
+    downgradeComponent({component: StorySummaryTileComponent})
+  );

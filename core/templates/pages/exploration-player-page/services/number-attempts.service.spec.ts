@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the number attempts service.
  */
 
-import { NumberAttemptsService } from
-  'pages/exploration-player-page/services/number-attempts.service';
+import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 
 describe('Number attempts service', () => {
   let numberAttemptsService: NumberAttemptsService;

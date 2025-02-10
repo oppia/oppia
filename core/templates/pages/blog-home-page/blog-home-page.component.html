@@ -14,21 +14,19 @@
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                             [rotate]="true"
-                            (pageChange)="onPageChange()"
+                            (pageChange)="onPageChange($event)"
                             class="ml-auto e2e-test-pagination">
               <ng-template ngbPaginationPrevious >
                 <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()">
+                   aria-hidden="true">
                 </i>
               </ng-template>
               <ng-template ngbPaginationNumber let-p>
-                <button disabled class="pagination-button">{{ p }}</button>
+                <button class="pagination-button">{{ p }}</button>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right text-center w-100 e2e-test-pagination-next-button align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()">
+                   aria-hidden="true">
                 </i>
               </ng-template>
             </ngb-pagination>
@@ -51,20 +49,16 @@
                             [(page)]="page"
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
-                            (pageChange)="onPageChange()"
+                            (pageChange)="onPageChange($event)"
                             class="ml-auto text-center">
               <ng-template ngbPaginationPrevious>
                 <i class="fa fa-angle-left  align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()"
-                   (disabled)="false">
+                   aria-hidden="true">
                 </i>
               </ng-template>
               <ng-template ngbPaginationNext>
                 <i class="fa fa-angle-right  align-middle"
-                   aria-hidden="true"
-                   (click)="onPageChange()"
-                   (disabled)="false">
+                   aria-hidden="true">
                 </i>
               </ng-template>
             </ngb-pagination>
@@ -84,11 +78,13 @@
            class="posts-display-heading text-center e2e-test-no-results-found"
            [ngClass]="{'col-8': !isSmallScreenViewActive()}">
         <picture>
-          <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
-          <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-          <img [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+          <source type="image/webp"
+                  [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
+          <source type="image/png"
+                  [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+          <img [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
         </picture>
-        <p class="text-center">
+        <p class="text-center no-result-found">
           {{ 'I18N_BLOG_HOME_PAGE_NO_RESULTS_FOUND' | translate }}
         </p>
       </div>
@@ -113,21 +109,16 @@
             {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
           </h4>
           <form class="navbar-form oppia-search-bar-form pl-0 e2e-test-search-field" role="search">
-            <div class="form-group d-flex"
-                 [ngClass]="{'flex-row-reverse': isSmallScreenViewActive()}">
+            <div class="form-group d-flex">
               <input type="text"
                      class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                      [(ngModel)]="searchQuery"
-                     (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
-                     [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
+                     [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
                      aria-label="Search bar"
-                     (keydown.enter)="$event.target.blur()"
-                     (input)="searchToBeExec($event)">
+                     (keydown.enter)="onSearchQueryChangeExec()">
               <div class="input-group oppia-input-group">
-                <div class="input-group-addon oppia-search-bar-icon"
-                     [ngClass]="{'d-block': isSmallScreenViewActive()}">
-                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18"
-                     *ngIf="!isSearchInProgress()">
+                <div class="input-group-addon oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
+                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
                   </i>
                   <span *ngIf="isSearchInProgress()">
                     <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
@@ -137,14 +128,15 @@
             </div>
           </form>
           <h4 class="d-flex flex-grow-1 search-heading">
-            {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
+          {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
           </h4>
-          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0"
-                            [(listOfDefaultTags)]="listOfDefaultTags"
-                            [(selectedTags)]="selectedTags"
-                            [smallScreenViewIsActive]="isSmallScreenViewActive()"
-                            (selectionsChange)="onSearchQueryChangeExec()">
+          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0" [(listOfDefaultTags)]="listOfDefaultTags"
+          [(selectedTags)]="selectedTags" [smallScreenViewIsActive]="isSmallScreenViewActive()"
+          >
           </oppia-tag-filter>
+          <button class="btn primary-button" (click)="onSearchQueryChangeExec()">
+            <span>Search</span>
+          </button>
         </div>
       </div>
     </div>
@@ -155,16 +147,16 @@
                       [maxSize]="2"
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
                       [rotate]="true"
-                      (pageChange)="onPageChange()"
+                      (pageChange)="onPageChange($event)"
                       class="ml-auto mr-auto">
         <ng-template ngbPaginationPrevious >
-          <i class="fa fa-angle-left text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
-          <button disabled class="pagination-button">{{ p }}</button>
+          <button class="pagination-button">{{ p }}</button>
         </ng-template>
         <ng-template ngbPaginationNext>
-          <i class="fa fa-angle-right text-center w-100" aria-hidden="true" (click)="onPageChange()"></i>
+          <i class="fa fa-angle-right text-center w-100" aria-hidden="true"></i>
         </ng-template>
       </ngb-pagination>
       <ngb-pagination *ngIf="searchPageIsActive"
@@ -172,7 +164,7 @@
                       [(page)]="page"
                       [maxSize]="2"
                       [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH"
-                      (pageChange)="onPageChange()"
+                      (pageChange)="onPageChange($event)"
                       class="ml-auto mr-auto text-center">
         <ng-template ngbPaginationPrevious>
           <i class="fa fa-angle-left align-middle" aria-hidden="true"></i>

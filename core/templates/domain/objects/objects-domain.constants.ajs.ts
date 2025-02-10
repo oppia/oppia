@@ -18,20 +18,43 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 
-angular.module('oppia').constant(
-  'FRACTION_PARSING_ERROR_I18N_KEYS',
-  ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS);
+angular
+  .module('oppia')
+  .constant(
+    'FRACTION_PARSING_ERROR_I18N_KEYS',
+    ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
+  );
 
-angular.module('oppia').constant(
-  'NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS',
-  ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS);
+angular
+  .module('oppia')
+  .constant(
+    'NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS',
+    ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS
+  );
 
-angular.module('oppia').constant(
-  'CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
+angular
+  .module('oppia')
+  .constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
 
-angular.module('oppia').constant(
-  'RATIO_PARSING_ERROR_I18N_KEYS',
-  ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS);
+angular
+  .module('oppia')
+  .constant(
+    'UNIT_TO_NORMALIZED_UNIT_MAPPING',
+    ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+  );
+
+angular
+  .module('oppia')
+  .constant(
+    'PREFIX_TO_NORMALIZED_PREFIX_MAPPING',
+    ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+  );
+
+angular
+  .module('oppia')
+  .constant(
+    'RATIO_PARSING_ERROR_I18N_KEYS',
+    ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS
+  );

@@ -16,27 +16,44 @@
  * @fileoverview Component for the partnerships page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { PageTitleService } from 'services/page-title.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
+import {PageTitleService} from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'partnerships-page',
   templateUrl: './partnerships-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class PartnershipsPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  formLink: string = '';
   partnershipsImgUrl: string = '';
   formIconUrl: string = '';
   callIconUrl: string = '';
   changeIconUrl: string = '';
+  peopleIconUrl: string = '';
+  agreeIconUrl: string = '';
+  serviceIconUrl: string = '';
+  partneringImgUrl: string = '';
+  org1Url: string = '';
+  org2Url: string = '';
+  org3Url: string = '';
+  org4Url: string = '';
+  org5Url: string = '';
+  org6Url: string = '';
+  partner1: string = '';
+  partner2: string = '';
+  partner3: string = '';
+  learner1: string = '';
+  learner2: string = '';
+  learner3: string = '';
+  panelOpenState: boolean = false;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -46,24 +63,92 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_PARTNERSHIPS_PAGE_TITLE');
+      'I18N_PARTNERSHIPS_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  setFormLink(): void {
+    let userLang = this.translateService.currentLang;
+
+    if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
+      this.formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
+    } else {
+      let interpolatedLanguage = userLang === 'pt-br' ? 'pt' : userLang;
+      this.formLink =
+        AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+        interpolatedLanguage +
+        AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
+    }
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
+        this.setFormLink();
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partnerships_hero_image.png');
+      '/general/partnerships_hero_image.png'
+    );
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_form.png');
+      '/icons/icon_form.png'
+    );
     this.callIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_call.png');
+      '/icons/icon_call.png'
+    );
     this.changeIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_change.png');
+      '/icons/icon_change.png'
+    );
+    this.peopleIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_people.png'
+    );
+    this.agreeIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_agree.png'
+    );
+    this.serviceIconUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/icons/icon_service.png'
+    );
+    this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partnering_image.png'
+    );
+    this.org1Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/movimentoAmplia.png'
+    );
+    this.org2Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/digitalCitizen.png'
+    );
+    this.org3Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/injazPalestine.png'
+    );
+    this.org4Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/nairobits.png'
+    );
+    this.org5Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/edri.png'
+    );
+    this.org6Url = this.urlInterpolationService.getStaticImageUrl(
+      '/partner_logos/globalCommunities.png'
+    );
+    this.partner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner1.png'
+    );
+    this.partner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner2.png'
+    );
+    this.partner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/partner3.png'
+    );
+    this.learner1 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner1.png'
+    );
+    this.learner2 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner2.png'
+    );
+    this.learner3 = this.urlInterpolationService.getStaticImageUrl(
+      '/general/learner3.png'
+    );
   }
 
   ngOnDestroy(): void {
@@ -71,6 +156,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'partnershipsPage',
-  downgradeComponent({component: PartnershipsPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'partnershipsPage',
+    downgradeComponent({component: PartnershipsPageComponent})
+  );

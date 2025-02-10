@@ -16,16 +16,21 @@
  * @fileoverview Component for the question misconception editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception, MisconceptionSkillMap, TaggedMisconception } from 'domain/skill/MisconceptionObjectFactory';
-import { ExternalSaveService } from 'services/external-save.service';
-import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
-import { SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { Rule } from 'domain/exploration/rule.model';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  Misconception,
+  MisconceptionSkillMap,
+  TaggedMisconception,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {ExternalSaveService} from 'services/external-save.service';
+import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
+import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
+import {Rule} from 'domain/exploration/rule.model';
+import {Subscription} from 'rxjs';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
@@ -40,14 +45,13 @@ export interface Outcome {
 
 @Component({
   selector: 'oppia-question-misconception-editor',
-  templateUrl: './question-misconception-editor.component.html'
+  templateUrl: './question-misconception-editor.component.html',
 })
 export class QuestionMisconceptionEditorComponent implements OnInit {
-  @Output() saveAnswerGroupFeedback:
-    EventEmitter<Outcome> = (new EventEmitter());
+  @Output() saveAnswerGroupFeedback: EventEmitter<Outcome> = new EventEmitter();
 
-  @Output() saveTaggedMisconception:
-    EventEmitter<TaggedMisconception> = (new EventEmitter());
+  @Output() saveTaggedMisconception: EventEmitter<TaggedMisconception> =
+    new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -55,13 +59,14 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() outcome!: Outcome;
   @Input() isEditable!: boolean;
   @Input() rules!: Rule;
-  @Input() taggedSkillMisconceptionId!: string;
+  @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
   selectedMisconception!: Misconception;
   selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -70,20 +75,44 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.misconceptionsBySkill = (
-      this.stateEditorService.getMisconceptionsBySkill());
+    this.misconceptionsBySkill =
+      this.stateEditorService.getMisconceptionsBySkill();
     this.misconceptionEditorIsOpen = false;
+    this.initValues();
+    if (!this.stateEditorService.isInQuestionMode()) {
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.initValues();
+        })
+      );
+
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onChangeLinkedSkillId.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.taggedSkillMisconceptionId = null;
+          this.initValues();
+        })
+      );
+    }
+    this.feedbackIsUsed = true;
+  }
+
+  initValues(): void {
     let skillMisconceptionId = this.taggedSkillMisconceptionId;
     if (skillMisconceptionId) {
-      if (typeof skillMisconceptionId === 'string' &&
-          skillMisconceptionId.split('-').length === 2) {
+      if (
+        typeof skillMisconceptionId === 'string' &&
+        skillMisconceptionId.split('-').length === 2
+      ) {
         let skillId = skillMisconceptionId.split('-')[0];
         let misconceptionId = skillMisconceptionId.split('-')[1];
         let misconceptions = this.misconceptionsBySkill[skillId];
 
         for (let i = 0; i < misconceptions.length; i++) {
-          if (misconceptions[i].getId().toString() ===
-            misconceptionId) {
+          if (misconceptions[i].getId().toString() === misconceptionId) {
             this.misconceptionName = misconceptions[i].getName();
             this.selectedMisconception = misconceptions[i];
             this.selectedMisconceptionSkillId = skillId;
@@ -92,63 +121,76 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
       } else {
         throw new Error(
           'Expected skillMisconceptionId to be ' +
-              '<skillId>-<misconceptionId>.');
+            '<skillId>-<misconceptionId>.'
+        );
       }
     }
-    this.feedbackIsUsed = true;
   }
 
   containsMisconceptions(): boolean {
     let containsMisconceptions = false;
-    Object.keys(this.misconceptionsBySkill).forEach((skillId) => {
-      if (this.misconceptionsBySkill[skillId].length > 0) {
-        containsMisconceptions = true;
-      }
-    });
+    if (this.stateEditorService.isInQuestionMode()) {
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (this.misconceptionsBySkill[skillId].length > 0) {
+          containsMisconceptions = true;
+        }
+      });
+    } else {
+      let linkedSkillId = this.stateEditorService.getLinkedSkillId();
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (
+          skillId === linkedSkillId &&
+          this.misconceptionsBySkill[skillId].length > 0
+        ) {
+          containsMisconceptions = true;
+        }
+      });
+    }
     return containsMisconceptions;
   }
 
   updateValues(newValues: MisconceptionUpdatedValues): void {
-    this.selectedMisconception = (
-      newValues.misconception);
-    this.selectedMisconceptionSkillId = (
-      newValues.skillId);
-    this.feedbackIsUsed = (
-      newValues.feedbackIsUsed);
+    this.selectedMisconception = newValues.misconception;
+    this.selectedMisconceptionSkillId = newValues.skillId;
+    this.feedbackIsUsed = newValues.feedbackIsUsed;
   }
 
   tagAnswerGroupWithMisconception(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
-      TagMisconceptionModalComponent, {
+      TagMisconceptionModalComponent,
+      {
         backdrop: 'static',
         backdropClass: 'forced-modal-backdrop-stack-over',
-        windowClass: 'forced-modal-stack-over'
-      });
-    modalRef.componentInstance.taggedSkillMisconceptionId = (
-      this.taggedSkillMisconceptionId);
-    modalRef.result.then((returnObject) => {
-      this.selectedMisconception = returnObject.misconception;
-      this.selectedMisconceptionSkillId = returnObject.misconceptionSkillId;
-      this.feedbackIsUsed = returnObject.feedbackIsUsed;
-      this.updateMisconception();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+        windowClass: 'forced-modal-stack-over',
+      }
+    );
+    modalRef.componentInstance.taggedSkillMisconceptionId =
+      this.taggedSkillMisconceptionId;
+    modalRef.result.then(
+      returnObject => {
+        this.selectedMisconception = returnObject.misconception;
+        this.selectedMisconceptionSkillId = returnObject.misconceptionSkillId;
+        this.feedbackIsUsed = returnObject.feedbackIsUsed;
+        this.updateMisconception();
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   updateMisconception(): void {
     let taggedMisconception = {
       skillId: this.selectedMisconceptionSkillId,
-      misconceptionId: this.selectedMisconception.getId()
+      misconceptionId: this.selectedMisconception.getId(),
     };
     this.saveTaggedMisconception.emit(taggedMisconception);
     this.misconceptionName = this.selectedMisconception.getName();
     let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
-      outcome.feedback.html = (
-        this.selectedMisconception.getFeedback());
+      outcome.feedback.html = this.selectedMisconception.getFeedback();
       this.saveAnswerGroupFeedback.emit(outcome);
       this.externalSaveService.onExternalSave.emit();
     }
@@ -158,7 +200,15 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   editMisconception(): void {
     this.misconceptionEditorIsOpen = true;
   }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
 }
 
-angular.module('oppia').directive('oppiaQuestionMisconceptionEditor',
-  downgradeComponent({component: QuestionMisconceptionEditorComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaQuestionMisconceptionEditor',
+    downgradeComponent({component: QuestionMisconceptionEditorComponent})
+  );

@@ -18,20 +18,26 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { SvgEditorConstants } from './svg-editor.constants';
+import {SvgEditorConstants} from './svg-editor.constants';
 
-angular.module('oppia').constant(
-  'MAX_SVG_DIAGRAM_WIDTH',
-  SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+angular
+  .module('oppia')
+  .constant('MAX_SVG_DIAGRAM_WIDTH', SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
 
-angular.module('oppia').constant(
-  'MAX_SVG_DIAGRAM_HEIGHT',
-  SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+angular
+  .module('oppia')
+  .constant(
+    'MAX_SVG_DIAGRAM_HEIGHT',
+    SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT
+  );
 
-angular.module('oppia').constant(
-  'MIN_SVG_DIAGRAM_WIDTH',
-  SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+angular
+  .module('oppia')
+  .constant('MIN_SVG_DIAGRAM_WIDTH', SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
 
-angular.module('oppia').constant(
-  'MIN_SVG_DIAGRAM_HEIGHT',
-  SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+angular
+  .module('oppia')
+  .constant(
+    'MIN_SVG_DIAGRAM_HEIGHT',
+    SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT
+  );

@@ -16,27 +16,38 @@
  * @fileoverview Unit tests for learner view info component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { StatsReportingService } from '../services/stats-reporting.service';
-import { LearnerViewInfoComponent } from './learner-view-info.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  ReadOnlyTopicBackendDict,
+  ReadOnlyTopicObjectFactory,
+} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {StatsReportingService} from '../services/stats-reporting.service';
+import {LearnerViewInfoComponent} from './learner-view-info.component';
 
 describe('Learner view info component', () => {
   let fixture: ComponentFixture<LearnerViewInfoComponent>;
   let componentInstance: LearnerViewInfoComponent;
   let contextService: ContextService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
   let statsReportingService: StatsReportingService;
   let urlInterpolationService: UrlInterpolationService;
@@ -47,13 +58,8 @@ describe('Learner view info component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        LearnerViewInfoComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [LearnerViewInfoComponent, MockTranslatePipe],
       providers: [
         ContextService,
         ReadOnlyExplorationBackendApiService,
@@ -62,9 +68,9 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
-        ReadOnlyTopicObjectFactory
+        ReadOnlyTopicObjectFactory,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -73,15 +79,15 @@ describe('Learner view info component', () => {
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
+      ReadOnlyExplorationBackendApiService
+    );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
-    topicViewerBackendApiService = TestBed.inject(
-      TopicViewerBackendApiService);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
       readOnlyTopicObjectFactory.createFromBackendDict({
@@ -97,11 +103,13 @@ describe('Learner view info component', () => {
         practice_tab_is_displayed: false,
         meta_tag_content: 'content',
         page_title_fragment_for_web: 'title',
+        classroom_name: 'math',
       } as ReadOnlyTopicBackendDict)
     );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   afterEach(() => {
@@ -115,17 +123,22 @@ describe('Learner view info component', () => {
 
     spyOn(urlService, 'getPathname').and.returnValue('/explore/');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-      .and.returnValue(Promise.resolve({
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(
+      Promise.resolve({
         exploration: {
-          title: explorationTitle
-        }
-      } as FetchExplorationBackendResponse));
+          title: explorationTitle,
+        },
+      } as FetchExplorationBackendResponse)
+    );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(componentInstance, 'getTopicUrl').and.returnValue(topicUrl);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      ''
+    );
     spyOn(statsReportingService, 'setTopicName');
     spyOn(siteAnalyticsService, 'registerCuratedLessonStarted');
 
@@ -135,15 +148,17 @@ describe('Learner view info component', () => {
 
     expect(urlService.getPathname).toHaveBeenCalled();
     expect(contextService.getExplorationId).toHaveBeenCalled();
-    expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
-      .toHaveBeenCalled();
+    expect(
+      readOnlyExplorationBackendApiService.fetchExplorationAsync
+    ).toHaveBeenCalled();
     expect(urlService.getExplorationVersionFromUrl).toHaveBeenCalled();
     expect(componentInstance.getTopicUrl).toHaveBeenCalled();
     expect(urlService.getTopicUrlFragmentFromLearnerUrl).toHaveBeenCalled();
     expect(topicViewerBackendApiService.fetchTopicDataAsync).toHaveBeenCalled();
     expect(statsReportingService.setTopicName).toHaveBeenCalled();
-    expect(siteAnalyticsService.registerCuratedLessonStarted)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerCuratedLessonStarted
+    ).toHaveBeenCalled();
   }));
 
   it('should register community lesson start event', fakeAsync(() => {
@@ -152,17 +167,22 @@ describe('Learner view info component', () => {
 
     spyOn(urlService, 'getPathname').and.returnValue('/explore/');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-      .and.returnValue(Promise.resolve({
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(
+      Promise.resolve({
         exploration: {
-          title: explorationTitle
-        }
-      } as FetchExplorationBackendResponse));
+          title: explorationTitle,
+        },
+      } as FetchExplorationBackendResponse)
+    );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(componentInstance, 'getTopicUrl').and.returnValue('');
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue('');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('');
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      ''
+    );
     spyOn(statsReportingService, 'setTopicName');
     spyOn(siteAnalyticsService, 'registerCommunityLessonStarted');
 
@@ -170,52 +190,66 @@ describe('Learner view info component', () => {
     tick();
     tick();
 
-    expect(siteAnalyticsService.registerCommunityLessonStarted)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerCommunityLessonStarted
+    ).toHaveBeenCalled();
   }));
 
   it('should get topic url from fragment correctly', () => {
     let topicUrl = 'topic_url';
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'topic_url_fragment');
+      'topic_url_fragment'
+    );
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'classroom_url_fragment');
+      'classroom_url_fragment'
+    );
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(topicUrl);
 
     expect(componentInstance.getTopicUrl()).toEqual(topicUrl);
   });
 
-  it('should set topic name and subtopic title translation key and ' +
-  'check whether hacky translations are displayed or not correctly',
-  waitForAsync(() => {
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
-      .and.returnValue('topic_url_fragment');
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')
-      .and.returnValue('classroom_url_fragment');
-    spyOn(componentInstance, 'getTopicUrl').and.returnValue('topic_url');
+  it(
+    'should set topic name and subtopic title translation key and ' +
+      'check whether hacky translations are displayed or not correctly',
+    waitForAsync(() => {
+      spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+        'topic_url_fragment'
+      );
+      spyOn(
+        urlService,
+        'getClassroomUrlFragmentFromLearnerUrl'
+      ).and.returnValue('classroom_url_fragment');
+      spyOn(componentInstance, 'getTopicUrl').and.returnValue('topic_url');
 
-    componentInstance.ngOnInit();
-    fixture.whenStable().then(() => {
-      fixture.detectChanges();
+      componentInstance.ngOnInit();
+      fixture.whenStable().then(() => {
+        fixture.detectChanges();
 
-      expect(componentInstance.topicNameTranslationKey)
-        .toBe('I18N_TOPIC_topic1_TITLE');
-      expect(componentInstance.explorationTitleTranslationKey)
-        .toBe('I18N_EXPLORATION_test_id_TITLE');
+        expect(componentInstance.topicNameTranslationKey).toBe(
+          'I18N_TOPIC_topic1_TITLE'
+        );
+        expect(componentInstance.explorationTitleTranslationKey).toBe(
+          'I18N_EXPLORATION_test_id_TITLE'
+        );
 
-      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValues(true, false);
-      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValues(false, false);
+        spyOn(
+          i18nLanguageCodeService,
+          'isHackyTranslationAvailable'
+        ).and.returnValues(true, false);
+        spyOn(
+          i18nLanguageCodeService,
+          'isCurrentLanguageEnglish'
+        ).and.returnValues(false, false);
 
-      let hackyTopicNameTranslationIsDisplayed =
-        componentInstance.isHackyTopicNameTranslationDisplayed();
-      expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
+        let hackyTopicNameTranslationIsDisplayed =
+          componentInstance.isHackyTopicNameTranslationDisplayed();
+        expect(hackyTopicNameTranslationIsDisplayed).toBe(true);
 
-      let hackyExpTitleTranslationIsDisplayed =
-        componentInstance.isHackyExpTitleTranslationDisplayed();
-      expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
-    });
-  }));
+        let hackyExpTitleTranslationIsDisplayed =
+          componentInstance.isHackyExpTitleTranslationDisplayed();
+        expect(hackyExpTitleTranslationIsDisplayed).toBe(false);
+      });
+    })
+  );
 });

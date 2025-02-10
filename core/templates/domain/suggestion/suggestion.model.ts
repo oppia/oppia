@@ -21,21 +21,22 @@ interface SuggestionChangeValue {
 }
 
 interface SuggestionChangeBackendDict {
-  'state_name': string;
-  'new_value': SuggestionChangeValue;
-  'old_value': SuggestionChangeValue;
-  'skill_id': string;
+  state_name: string;
+  new_value: SuggestionChangeValue;
+  old_value: SuggestionChangeValue;
+  skill_id: string;
+  content_id: string;
 }
 
 export interface SuggestionBackendDict {
-  'suggestion_type': string;
-  'suggestion_id': string;
-  'target_type': string;
-  'target_id': string;
-  'status': string;
-  'author_name': string;
-  'change': SuggestionChangeBackendDict;
-  'last_updated_msecs': number;
+  suggestion_type: string;
+  suggestion_id: string;
+  target_type: string;
+  target_id: string;
+  status: string;
+  author_name: string;
+  change_cmd: SuggestionChangeBackendDict;
+  last_updated_msecs: number;
 }
 
 export class Suggestion {
@@ -52,10 +53,18 @@ export class Suggestion {
   lastUpdatedMsecs: number;
 
   constructor(
-      suggestionType: string, suggestionId: string, threadId: string,
-      targetType: string, targetId: string, status: string, authorName: string,
-      stateName: string, newValue: SuggestionChangeValue,
-      oldValue: SuggestionChangeValue, lastUpdatedMsecs: number) {
+    suggestionType: string,
+    suggestionId: string,
+    threadId: string,
+    targetType: string,
+    targetId: string,
+    status: string,
+    authorName: string,
+    stateName: string,
+    newValue: SuggestionChangeValue,
+    oldValue: SuggestionChangeValue,
+    lastUpdatedMsecs: number
+  ) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.threadId = threadId;
@@ -70,7 +79,8 @@ export class Suggestion {
   }
 
   static createFromBackendDict(
-      suggestionBackendDict: SuggestionBackendDict): Suggestion {
+    suggestionBackendDict: SuggestionBackendDict
+  ): Suggestion {
     let threadId = suggestionBackendDict.suggestion_id;
     return new Suggestion(
       suggestionBackendDict.suggestion_type,
@@ -80,10 +90,11 @@ export class Suggestion {
       suggestionBackendDict.target_id,
       suggestionBackendDict.status,
       suggestionBackendDict.author_name,
-      suggestionBackendDict.change.state_name,
-      suggestionBackendDict.change.new_value,
-      suggestionBackendDict.change.old_value,
-      suggestionBackendDict.last_updated_msecs);
+      suggestionBackendDict.change_cmd.state_name,
+      suggestionBackendDict.change_cmd.new_value,
+      suggestionBackendDict.change_cmd.old_value,
+      suggestionBackendDict.last_updated_msecs
+    );
   }
 
   getThreadId(): string {

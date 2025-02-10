@@ -16,33 +16,29 @@
  * @fileoverview Unit tests for SkillDifficultyModel.
  */
 
-import { SkillDifficulty } from
-  'domain/skill/skill-difficulty.model';
+import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 
 describe('Skill Difficulty model', () => {
   describe('SkillDifficultyModel', () => {
     it('should create a new skill difficulty instance', () => {
-      var skillDifficulty =
-        SkillDifficulty.create('1', 'test skill', 0.3);
+      var skillDifficulty = SkillDifficulty.create('1', 'test skill', 0.3);
       expect(skillDifficulty.getId()).toEqual('1');
       expect(skillDifficulty.getDescription()).toEqual('test skill');
       expect(skillDifficulty.getDifficulty()).toEqual(0.3);
     });
 
     it('should convert to a backend dictionary', () => {
-      var skillDifficulty =
-        SkillDifficulty.create('1', 'test skill', 0.3);
+      var skillDifficulty = SkillDifficulty.create('1', 'test skill', 0.3);
       var skillDifficultyDict = {
         id: '1',
         description: 'test skill',
-        difficulty: 0.3
+        difficulty: 0.3,
       };
       expect(skillDifficulty.toBackendDict()).toEqual(skillDifficultyDict);
     });
 
     it('should set the description of the skill difficulty instance', () => {
-      var skillDifficulty = SkillDifficulty.create(
-        '1', 'test skill', 0.3);
+      var skillDifficulty = SkillDifficulty.create('1', 'test skill', 0.3);
 
       expect(skillDifficulty.getId()).toEqual('1');
       expect(skillDifficulty.getDescription()).toEqual('test skill');
@@ -54,8 +50,7 @@ describe('Skill Difficulty model', () => {
     });
 
     it('should set the difficulty of the skill difficulty instance', () => {
-      var skillDifficulty = SkillDifficulty.create(
-        '1', 'test skill', 0.3);
+      var skillDifficulty = SkillDifficulty.create('1', 'test skill', 0.3);
 
       expect(skillDifficulty.getId()).toEqual('1');
       expect(skillDifficulty.getDescription()).toEqual('test skill');

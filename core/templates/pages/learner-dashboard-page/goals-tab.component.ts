@@ -16,35 +16,43 @@
  * @fileoverview Component for goals tab in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
+import {AppConstants} from 'app.constants';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
+import {AddGoalsModalComponent} from './add-goals-modal/add-goals-modal.component';
 import './goals-tab.component.css';
 
 @Component({
   selector: 'oppia-goals-tab',
   templateUrl: './goals-tab.component.html',
-  styleUrls: ['./goals-tab.component.css']
+  styleUrls: ['./goals-tab.component.css'],
 })
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerDashboardActivityBackendApiService:
-      LearnerDashboardActivityBackendApiService,
-    private deviceInfoService: DeviceInfoService) {
-  }
+    private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
+    private deviceInfoService: DeviceInfoService,
+    private dialog: MatDialog
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -55,10 +63,10 @@ export class GoalsTabComponent implements OnInit {
   @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
-
+  @Input() learnerDashboardRedesignFeatureFlag!: boolean;
   // Child dropdown is undefined because initially it is in closed state using
   // the following property: {'static' = false}.
-  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
+  @ViewChild('dropdown', {static: false}) dropdownRef: ElementRef | undefined;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
@@ -71,10 +79,12 @@ export class GoalsTabComponent implements OnInit {
   topicIdsInCurrentGoals: string[] = [];
   topicIdsInEditGoals: string[] = [];
   topicIdsInPartiallyLearntTopics: string[] = [];
+  checkedTopics: Set<string> = new Set();
+  completedTopics: Set<string> = new Set();
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
-    NEITHER: 2
+    NEITHER: 2,
   };
 
   indexOfSelectedTopic: number = -1;
@@ -93,25 +103,33 @@ export class GoalsTabComponent implements OnInit {
     this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/book_icon.png');
+      '/learner_dashboard/book_icon.png'
+    );
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
     let topic: LearnerTopicSummary;
+
     for (topic of this.currentGoals) {
       this.topicIdsInCurrentGoals.push(topic.id);
+      this.checkedTopics.add(topic.id);
     }
     for (topic of this.completedGoals) {
       this.topicIdsInCompletedGoals.push(topic.id);
-      this.completedGoalsTopicPageUrl.push(this.getTopicPageUrl(
-        topic.urlFragment, topic.classroom));
+      this.completedGoalsTopicPageUrl.push(
+        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
+      );
+      this.completedTopics.add(topic.id);
     }
     for (topic of this.editGoals) {
       this.topicIdsInEditGoals.push(topic.id);
-      this.editGoalsTopicPageUrl.push(this.getTopicPageUrl(
-        topic.urlFragment, topic.classroom));
+      this.editGoalsTopicPageUrl.push(
+        this.getTopicPageUrl(topic.urlFragment, topic.classroomUrlFragment)
+      );
       this.editGoalsTopicClassification.push(
-        this.getTopicClassification(topic.id));
+        this.getTopicClassification(topic.id)
+      );
       this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
-        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name));
+        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name)
+      );
     }
     for (topic of this.partiallyLearntTopicsList) {
       this.topicIdsInPartiallyLearntTopics.push(topic.id);
@@ -120,16 +138,21 @@ export class GoalsTabComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
+      })
+    );
   }
 
   getTopicPageUrl(
-      topicUrlFragment: string, classroomUrlFragment: string): string {
+    topicUrlFragment: string,
+    classroomUrlFragment: string
+  ): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+      {
         topic_url_fragment: topicUrlFragment,
-        classroom_url_fragment: classroomUrlFragment
-      });
+        classroom_url_fragment: classroomUrlFragment,
+      }
+    );
   }
 
   getTopicClassification(topicId: string): number {
@@ -154,39 +177,54 @@ export class GoalsTabComponent implements OnInit {
   }
 
   toggleStory(index: number): void {
-    this.currentGoalsStoryIsShown[index] = !(
-      this.currentGoalsStoryIsShown[index]);
+    this.currentGoalsStoryIsShown[index] =
+      !this.currentGoalsStoryIsShown[index];
   }
 
   async addToLearnerGoals(
-      topic: LearnerTopicSummary, topicId: string,
-      index: number): Promise<void> {
+    topic: LearnerTopicSummary,
+    topicId: string,
+    index: number
+  ): Promise<void> {
     var activityId = topicId;
     var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {
-      var isSuccessfullyAdded = (
+      var isSuccessfullyAdded =
         await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
-          activityId, activityType));
-      if (isSuccessfullyAdded &&
+          activityId,
+          activityType
+        );
+      if (
+        isSuccessfullyAdded &&
         this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&
-        !this.topicIdsInCompletedGoals.includes(activityId)) {
+        !this.topicIdsInCompletedGoals.includes(activityId)
+      ) {
         this.currentGoalsStoryIsShown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
         this.editGoalsTopicClassification.splice(
-          index, 1, this.getTopicClassification(topic.id));
-        if (this.untrackedTopics[topic.classroom]) {
+          index,
+          1,
+          this.getTopicClassification(topic.id)
+        );
+        if (this.untrackedTopics[topic.classroomUrlFragment]) {
           let indexInNewTopics = this.untrackedTopics[
-            topic.classroom].findIndex(
-            topic => topic.id === topicId);
+            topic.classroomUrlFragment
+          ].findIndex(topic => topic.id === topicId);
           if (indexInNewTopics !== -1) {
-            this.untrackedTopics[topic.classroom].splice(indexInNewTopics, 1);
-            if (this.untrackedTopics[topic.classroom].length === 0) {
-              delete this.untrackedTopics[topic.classroom];
+            this.untrackedTopics[topic.classroomUrlFragment].splice(
+              indexInNewTopics,
+              1
+            );
+            if (this.untrackedTopics[topic.classroomUrlFragment].length === 0) {
+              delete this.untrackedTopics[topic.classroomUrlFragment];
             }
           }
         }
       }
+    } else {
+      const goalIndex = this.topicIdsInCurrentGoals.indexOf(activityId);
+      this.removeFromLearnerGoals(topic, topicId, topic.name, goalIndex);
     }
   }
 
@@ -208,41 +246,127 @@ export class GoalsTabComponent implements OnInit {
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
     for (let i = 0; i < this.currentGoals.length; i++) {
-      if (targetElement &&
-          this.showThreeDotsDropdown[i]) {
+      if (targetElement && this.showThreeDotsDropdown[i]) {
         this.showThreeDotsDropdown[i] = false;
       }
     }
   }
 
   removeFromLearnerGoals(
-      topic: LearnerTopicSummary, topicId: string,
-      topicName: string, index: number): void {
+    topic: LearnerTopicSummary,
+    topicId: string,
+    topicName: string,
+    index: number
+  ): void {
     var activityId = topicId;
     var activityTitle = topicName;
     this.learnerDashboardActivityBackendApiService
       .removeActivityModalAsync(
-        LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SECTION_I18N_IDS.CURRENT_GOALS
-        , LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LEARN_TOPIC,
-        activityId, activityTitle)
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .CURRENT_GOALS,
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+          .LEARN_TOPIC,
+        activityId,
+        activityTitle
+      )
       .then(() => {
         this.currentGoalsStoryIsShown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
         let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
         this.editGoalsTopicClassification.splice(
-          indexOfTopic, 1, this.getTopicClassification(topicId));
-        if (!this.topicIdsInCompletedGoals.includes(topicId) &&
+          indexOfTopic,
+          1,
+          this.getTopicClassification(topicId)
+        );
+        if (
+          !this.topicIdsInCompletedGoals.includes(topicId) &&
           !this.topicIdsInCurrentGoals.includes(topicId) &&
-          !this.topicIdsInPartiallyLearntTopics.includes(topicId)) {
-          if (this.untrackedTopics[topic.classroom]) {
-            this.untrackedTopics[topic.classroom].push(topic);
+          !this.topicIdsInPartiallyLearntTopics.includes(topicId)
+        ) {
+          if (this.untrackedTopics[topic.classroomUrlFragment]) {
+            this.untrackedTopics[topic.classroomUrlFragment].push(topic);
           } else {
-            this.untrackedTopics[topic.classroom] = [topic];
+            this.untrackedTopics[topic.classroomUrlFragment] = [topic];
           }
         }
       });
+  }
+
+  // TODO(#18384): Change how current goals is being modified with event emitter, currently directly modfiying parent input (original implementation).
+  openModal(): void {
+    const dialogConfig = new MatDialogConfig();
+    const allTopics: {[id: string]: string} = this.editGoals.reduce(
+      (obj: {[id: string]: string}, item) => ((obj[item.id] = item.name), obj),
+      {} as {[id: string]: string}
+    );
+    dialogConfig.data = {
+      checkedTopics: this.checkedTopics,
+      completedTopics: this.completedTopics,
+      topics: allTopics,
+    };
+
+    dialogConfig.panelClass = 'oppia-learner-dash-goals-modal';
+    const dialogRef = this.dialog.open(AddGoalsModalComponent, dialogConfig);
+
+    const allTopicSummarys: {[id: string]: LearnerTopicSummary} =
+      this.editGoals.reduce(
+        (obj: {[id: string]: LearnerTopicSummary}, item) => (
+          (obj[item.id] = item), obj
+        ),
+        {} as {[id: string]: LearnerTopicSummary}
+      );
+    dialogRef.afterClosed().subscribe(async newGoalTopics => {
+      if (newGoalTopics) {
+        for (const topicId of newGoalTopics) {
+          if (!this.checkedTopics.has(topicId)) {
+            await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
+              topicId,
+              AppConstants.ACTIVITY_TYPE_LEARN_TOPIC
+            );
+            this.currentGoals.push(allTopicSummarys[topicId]);
+          }
+        }
+        const removedIds: Set<string> = new Set();
+        for (const topicId of this.checkedTopics) {
+          if (!newGoalTopics.has(topicId)) {
+            await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
+              LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+                .CURRENT_GOALS,
+              LearnerDashboardPageConstants
+                .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LEARN_TOPIC,
+              topicId,
+              allTopics[topicId]
+            );
+            removedIds.add(topicId);
+          }
+        }
+        this.checkedTopics = new Set(newGoalTopics);
+        this.currentGoals.forEach((g, index) => {
+          if (removedIds.has(g.id)) {
+            this.currentGoals.splice(index, 1);
+          }
+        });
+      }
+    });
+  }
+
+  async removeGoal(topicId: string, topicName: string): Promise<void> {
+    await this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+        .CURRENT_GOALS,
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+        .LEARN_TOPIC,
+      topicId,
+      topicName
+    );
+
+    for (let i = 0; i < this.currentGoals.length; i++) {
+      if (this.currentGoals[i].id === topicId) {
+        this.currentGoals.splice(i, 1);
+        this.checkedTopics.delete(topicId);
+        break;
+      }
+    }
   }
 }

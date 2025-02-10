@@ -16,10 +16,10 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { LoggerService } from 'services/contextual/logger.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 export interface Warning {
   type: string;
@@ -27,13 +27,13 @@ export interface Warning {
 }
 
 export interface Message {
-    type: string;
-    content: string;
-    timeout: number;
+  type: string;
+  content: string;
+  timeout: number;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AlertsService {
   /**
@@ -79,7 +79,7 @@ export class AlertsService {
     }
     this.warnings.push({
       type: 'warning',
-      content: warning
+      content: warning,
     });
   }
 
@@ -98,8 +98,9 @@ export class AlertsService {
    * @param {Object} warningToDelete - The warning message to be deleted.
    */
   deleteWarning(warningToDelete: Warning): void {
-    const filteredWarnings = (
-      this.warnings.filter(w => w.content !== warningToDelete.content));
+    const filteredWarnings = this.warnings.filter(
+      w => w.content !== warningToDelete.content
+    );
     this.warnings.splice(0, this.warnings.length, ...filteredWarnings);
   }
 
@@ -123,7 +124,7 @@ export class AlertsService {
     this.messages.push({
       type: type,
       content: message,
-      timeout: timeoutMilliseconds
+      timeout: timeoutMilliseconds,
     });
   }
 
@@ -132,8 +133,8 @@ export class AlertsService {
    * @param {Object} messageToDelete - Message to be deleted.
    */
   deleteMessage(messageToDelete: Message): void {
-    const isMessageToKeep = (m: Message) => (
-      m.type !== messageToDelete.type || m.content !== messageToDelete.content);
+    const isMessageToKeep = (m: Message) =>
+      m.type !== messageToDelete.type || m.content !== messageToDelete.content;
     const filteredMessages = this.messages.filter(isMessageToKeep);
     this.messages.splice(0, this.messages.length, ...filteredMessages);
   }
@@ -157,7 +158,7 @@ export class AlertsService {
    */
   addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
-      timeoutMilliseconds = 1500;
+      timeoutMilliseconds = 3000;
     }
     this.addMessage('success', message, timeoutMilliseconds);
   }
@@ -170,5 +171,6 @@ export class AlertsService {
   }
 }
 
-angular.module('oppia').factory(
-  'AlertsService', downgradeInjectable(AlertsService));
+angular
+  .module('oppia')
+  .factory('AlertsService', downgradeInjectable(AlertsService));

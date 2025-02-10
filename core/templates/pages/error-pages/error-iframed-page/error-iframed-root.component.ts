@@ -16,10 +16,17 @@
  * @fileoverview Root component for error iframed page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-error-iframed-page-root',
-  templateUrl: './error-iframed-root.component.html'
+  templateUrl: './error-iframed-root.component.html',
 })
-export class ErrorIframedPageRootComponent {}
+export class ErrorIframedPageRootComponent {
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.TITLE;
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .ERROR_IFRAMED.META as unknown as Readonly<MetaTagData>[];
+}

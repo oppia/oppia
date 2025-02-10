@@ -2,14 +2,14 @@
   <div class="oppia-response-header">
     <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
-      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
-      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross e2e-test-incorrect-response-icon" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick e2e-test-correct-tick-mark" *ngIf="isCorrect() && isResponse && !isCurrentInteractionLinear()"></i>
     </div>
     <div class="oppia-responses-mobile">
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isResponse && !isCurrentInteractionLinear()">
         Incorrect
       </div>
-      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
+      <div class="oppia-response-mobile-item oppia-response-mobile-item-correct" *ngIf="isCorrect() && isResponse && !isCurrentInteractionLinear()">
         Correct
       </div>
     </div>
@@ -22,7 +22,7 @@
   </div>
 
   <br class="break-in-mobile">
-  <span *ngIf="outcome"> →</span>
+  <span class="oppia-outcome-arrow" *ngIf="outcome">→</span>
   <span *ngIf="isCorrect() && isInQuestionMode()">
     Correct
   </span>
@@ -44,6 +44,10 @@
 
 <span class="oppia-delete-response-button oppia-transition-200 e2e-test-delete-response"
       *ngIf="editabilityService.isEditable() && !defaultOutcome && !outcome"
+      (keydown.enter)="deleteResponse($event)"
+      tabindex="0"
+      role="button"
+      aria-label="delete response"
       (click)="deleteResponse($event)">
   <i class="material-icons md-18">&#xE5CD;</i>
 </span>
@@ -63,6 +67,13 @@
 
   .oppia-response-header-block {
     margin-left: 39px;
+  }
+
+  @media screen and (min-width: 769px) {
+    .oppia-response-header-block {
+      align-items: flex-end;
+      display: flex;
+    }
   }
 
   .oppia-nested-link {
@@ -102,6 +113,9 @@
   .oppia-response-short-summary {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  .oppia-outcome-arrow {
+    margin-right: 5px;
   }
   .badge {
     vertical-align: bottom;

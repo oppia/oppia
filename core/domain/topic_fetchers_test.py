@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for topic domain objects."""
+"""Tests the methods defined in topic fetchers."""
 
 from __future__ import annotations
 
@@ -182,6 +182,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'title',
             'topic_url_fragment': 'name-one',
             'classroom_url_fragment': 'staging',
+            'classroom_name': 'staging',
             'story_is_published': True,
             'completed_node_titles': [], 'all_node_dicts': []}
 
@@ -195,6 +196,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'url_fragment': 'title',
             'topic_url_fragment': 'name-one',
             'classroom_url_fragment': 'staging',
+            'classroom_name': 'staging',
             'story_is_published': True,
             'completed_node_titles': [], 'all_node_dicts': []}
 

@@ -28,8 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
-from typing_extensions import Final
+from typing import Final, Sequence
 
 MYPY = False
 if MYPY:
@@ -216,7 +215,6 @@ class EntityTranslationsModelGenerationOneOffJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            correctness_feedback_enabled=False,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({
@@ -328,7 +326,6 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
             param_specs={},
             param_changes=[],
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
-            correctness_feedback_enabled=False,
             states={feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V52},
         )
         commit_cmd = exp_domain.ExplorationChange({

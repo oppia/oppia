@@ -16,8 +16,10 @@
  * @fileoverview Description of this file.
  */
 
-import { ParamTypeObjectFactory, ParamType } from
-  'domain/exploration/ParamTypeObjectFactory';
+import {
+  ParamTypeObjectFactory,
+  ParamType,
+} from 'domain/exploration/ParamTypeObjectFactory';
 
 describe('ParamType objects', () => {
   let paramType: ParamTypeObjectFactory;
@@ -43,15 +45,14 @@ describe('ParamType objects', () => {
   it('should throw for non-existant types', () => {
     expect(() => {
       paramType.getTypeFromBackendName('MissingType');
-    })
-      .toThrowError(/not a registered parameter type/);
+    }).toThrowError(/not a registered parameter type/);
   });
 
   it('should not allow invalid default values', () => {
     expect(() => {
       // Defines a "Natural Number" type but gives it a negative default value.
       new ParamType({
-        validate: function(v) {
+        validate: function (v) {
           return v >= 0;
         },
         default_value: -1,

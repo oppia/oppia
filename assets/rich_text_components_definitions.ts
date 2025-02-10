@@ -35,6 +35,7 @@ export default {
       "schema": {
         "type": "unicode"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": "Sample Header"
     }, {
       "name": "content",
@@ -45,6 +46,7 @@ export default {
           "hide_complex_extensions": true
         }
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": "You have opened the collapsible block."
     }]
   },
@@ -66,6 +68,7 @@ export default {
         "type": "custom",
         "obj_type": "Filepath"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }, {
       "name": "caption",
@@ -77,6 +80,7 @@ export default {
           "max_value": 500
         }]
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }, {
       "name": "alt",
@@ -92,6 +96,7 @@ export default {
           "rows": 3
         }
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }]
   },
@@ -113,6 +118,7 @@ export default {
         "type": "custom",
         "obj_type": "SanitizedUrl"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }, {
       "name": "text",
@@ -120,6 +126,7 @@ export default {
       "schema": {
         "type": "unicode"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }]
   },
@@ -141,6 +148,7 @@ export default {
         "type": "custom",
         "obj_type": "MathExpressionContent"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": {
         "raw_latex": "",
         "svg_filename": ""
@@ -167,6 +175,7 @@ export default {
           "id": "is_nonempty"
         }]
       },
+      "default_value_obtainable_from_highlight": true,
       "default_value": "concept card"
     }, {
       "name": "skill_id",
@@ -175,6 +184,7 @@ export default {
         "type": "custom",
         "obj_type": "SkillSelector"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }]
   },
@@ -196,6 +206,7 @@ export default {
         "type": "custom",
         "obj_type": "ListOfTabs"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": [{
         "title": "Hint introduction",
         "content": "This set of tabs shows some hints. Click on the other tabs to display the relevant hints."
@@ -222,6 +233,7 @@ export default {
       "schema": {
         "type": "unicode"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": ""
     }, {
       "name": "start",
@@ -233,6 +245,7 @@ export default {
           "min_value": 0
         }]
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": 0
     }, {
       "name": "end",
@@ -244,6 +257,7 @@ export default {
             "min_value": 0
           }]
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": 0
     }, {
       "name": "autoplay",
@@ -251,6 +265,7 @@ export default {
       "schema": {
         "type": "bool"
       },
+      "default_value_obtainable_from_highlight": false,
       "default_value": false
     }]
   }

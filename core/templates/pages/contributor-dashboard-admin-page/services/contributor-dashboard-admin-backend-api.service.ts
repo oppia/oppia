@@ -17,150 +17,241 @@
  * calls.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContributorDashboardAdminPageConstants as PageConstants } from '../contributor-dashboard-admin-page.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
+import {AppConstants} from 'app.constants';
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
 }
 
 export interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean;
-  'can_review_translation_for_language_codes': string[];
-  'can_review_voiceover_for_language_codes': string[];
-  'can_submit_questions': boolean;
+  can_review_questions: boolean;
+  can_review_translation_for_language_codes: string[];
+  can_review_voiceover_for_language_codes: string[];
+  can_submit_questions: boolean;
 }
 
 export interface TranslationContributionStatsBackendResponse {
-  'translation_contribution_stats': TranslationContributionStats[];
+  translation_contribution_stats: TranslationContributionStats[];
 }
 
 interface TranslationContributionStats {
-  'language': string;
-  'topic_name': string;
-  'submitted_translations_count': number;
-  'submitted_translation_word_count': number;
-  'accepted_translations_count': number;
-  'accepted_translations_without_reviewer_edits_count': number;
-  'accepted_translation_word_count': number;
-  'rejected_translations_count': number;
-  'rejected_translation_word_count': number;
-  'contribution_months': string[];
+  language: string;
+  topic_name: string;
+  submitted_translations_count: number;
+  submitted_translation_word_count: number;
+  accepted_translations_count: number;
+  accepted_translations_without_reviewer_edits_count: number;
+  accepted_translation_word_count: number;
+  rejected_translations_count: number;
+  rejected_translation_word_count: number;
+  contribution_months: string[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContributorDashboardAdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string | null
+    category: string,
+    username: string,
+    languageCode: string | null
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        this.urlInterpolationService.interpolateUrl(
-          PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category }), {
-          username: username,
-          language_code: languageCode
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .post<void>(
+          this.urlInterpolationService.interpolateUrl(
+            PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL,
+            {category}
+          ),
+          {
+            username: username,
+            language_code: languageCode,
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async viewContributionReviewersAsync(
-      category: string, languageCode: string | null
+    category: string,
+    languageCode: string | null
   ): Promise<ViewContributionBackendResponse> {
     let params = {};
     if (languageCode !== null) {
       params = {
-        language_code: languageCode
+        language_code: languageCode,
       };
     }
     var url = this.urlInterpolationService.interpolateUrl(
-      PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL, { category });
+      PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL,
+      {category}
+    );
     return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionBackendResponse>(url, {
-        params
-      }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<ViewContributionBackendResponse>(url, {
+          params,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async contributionReviewerRightsAsync(
-      username: string): Promise<ContributionRightsBackendResponse> {
+    username: string
+  ): Promise<ContributionRightsBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsBackendResponse>(
-        PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL, {
-          params: {
-            username: username
+      this.http
+        .get<ContributionRightsBackendResponse>(
+          PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL,
+          {
+            params: {
+              username: username,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async removeContributionReviewerAsync(
-      username: string, category: string, languageCode: string | null
+    category: string,
+    username: string,
+    languageCode: string | null
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
-      PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL, { category });
+      PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL,
+      {category}
+    );
     const params: {
       username: string;
       language_code?: string;
     } = {
-      username: username
+      username: username,
     };
     if (languageCode !== null) {
       params.language_code = languageCode;
     }
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(
-        url, { params } as Object
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .delete<void>(url, {params} as Object)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async viewTranslationContributionStatsAsync(
-      username: string): Promise<TranslationContributionStatsBackendResponse> {
+    username: string
+  ): Promise<TranslationContributionStatsBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<TranslationContributionStatsBackendResponse>(
-        PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL, {
-          params: {
-            username: username
+      this.http
+        .get<TranslationContributionStatsBackendResponse>(
+          PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL,
+          {
+            params: {
+              username: username,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
+  }
+
+  async updateQuestionRightsAsync(
+    username: string,
+    userWasGrantedQuestionSubmissionRights: boolean,
+    userWasGrantedQuestionReviewRights: boolean,
+    userCanCurrentlySubmitQuestions: boolean,
+    userCanCurrentlyReviewQuestions: boolean
+  ): Promise<void> {
+    if (
+      userWasGrantedQuestionSubmissionRights !== userCanCurrentlySubmitQuestions
+    ) {
+      if (userWasGrantedQuestionSubmissionRights) {
+        await this.addContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+          username,
+          null
+        );
+      } else {
+        await this.removeContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+          username,
+          null
+        );
+      }
+    }
+    if (
+      userWasGrantedQuestionReviewRights !== userCanCurrentlyReviewQuestions
+    ) {
+      if (userWasGrantedQuestionReviewRights) {
+        await this.addContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          username,
+          null
+        );
+      } else {
+        await this.removeContributionReviewerAsync(
+          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          username,
+          null
+        );
+      }
+    }
   }
 }
 
-angular.module('oppia').factory(
-  'ContributorDashboardAdminBackendApiService',
-  downgradeInjectable(ContributorDashboardAdminBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ContributorDashboardAdminBackendApiService',
+    downgradeInjectable(ContributorDashboardAdminBackendApiService)
+  );

@@ -16,18 +16,25 @@
  * @fileoverview Unit tests for topic questions tab.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { QuestionsListService } from 'services/questions-list.service';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TopicRights } from 'domain/topic/topic-rights.model';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TopicQuestionsTabComponent } from './topic-questions-tab.component';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { Topic } from 'domain/topic/topic-object.model';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {QuestionsListService} from 'services/questions-list.service';
+import {
+  SkillSummary,
+  SkillSummaryBackendDict,
+} from 'domain/skill/skill-summary.model';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TopicRights} from 'domain/topic/topic-rights.model';
+import {
+  TopicsAndSkillsDashboardBackendApiService,
+  TopicsAndSkillDashboardData,
+} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TopicQuestionsTabComponent} from './topic-questions-tab.component';
+import {QuestionsListComponent} from '../../../components/question-directives/questions-list/questions-list.component';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {Topic} from 'domain/topic/topic-object.model';
 
 let skillSummaryBackendDict: SkillSummaryBackendDict = {
   id: 'test_id',
@@ -37,7 +44,7 @@ let skillSummaryBackendDict: SkillSummaryBackendDict = {
   misconception_count: 0,
   worked_examples_count: 1,
   skill_model_created_on: 2,
-  skill_model_last_updated: 3
+  skill_model_last_updated: 3,
 };
 
 let categorizedSkillsDictData: {
@@ -49,13 +56,12 @@ let categorizedSkillsDictData: {
 
 let skillIdToRubricsObject = {};
 
-let untriagedSkillSummariesData: SkillSummary[] = (
-  [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
+let untriagedSkillSummariesData: SkillSummary[] = [
+  SkillSummary.createFromBackendDict(skillSummaryBackendDict),
+];
 
 const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-  allClassroomNames: [
-    'math'
-  ],
+  allClassroomNames: ['math'],
   canDeleteTopic: true,
   canCreateTopic: true,
   canDeleteSkill: true,
@@ -70,8 +76,8 @@ const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
       misconceptionCount: 0,
       workedExamplesCount: 0,
       skillModelCreatedOn: 1622827020924.104,
-      skillModelLastUpdated: 1622827020924.109
-    }
+      skillModelLastUpdated: 1622827020924.109,
+    },
   ],
   totalSkillCount: 1,
   topicSummaries: [],
@@ -89,13 +95,14 @@ class MockTopicsAndSkillsDashboardBackendApiService {
     return {
       then: (callback: (resp: TopicsAndSkillDashboardData) => void) => {
         callback(topicsAndSkillsDashboardData);
-      }
+      },
     };
   }
 }
 
 describe('Topic questions tab', () => {
   let component: TopicQuestionsTabComponent;
+  let questionsListComponent: QuestionsListComponent;
   let fixture: ComponentFixture<TopicQuestionsTabComponent>;
   let topicEditorStateService: TopicEditorStateService;
   let focusManagerService: FocusManagerService;
@@ -108,21 +115,25 @@ describe('Topic questions tab', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [TopicQuestionsTabComponent],
+      declarations: [TopicQuestionsTabComponent, QuestionsListComponent],
       providers: [
         TopicsAndSkillsDashboardBackendApiService,
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
-          useClass: MockTopicsAndSkillsDashboardBackendApiService
-        }
+          useClass: MockTopicsAndSkillsDashboardBackendApiService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicQuestionsTabComponent);
     component = fixture.componentInstance;
+    const questionsListFixture = TestBed.createComponent(
+      QuestionsListComponent
+    );
+    questionsListComponent = questionsListFixture.componentInstance;
     qls = TestBed.inject(QuestionsListService);
     focusManagerService = TestBed.inject(FocusManagerService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
@@ -130,9 +141,25 @@ describe('Topic questions tab', () => {
     topicReinitializedEventEmitter = new EventEmitter();
 
     topic = new Topic(
-      '', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], '', '', {}, false, '', '', []
+      '',
+      'Topic name loading',
+      'Abbrev. name loading',
+      'Url Fragment loading',
+      'Topic description loading',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      '',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
     );
     subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic1.addSkill('skill1', 'subtopic1 skill');
@@ -145,12 +172,13 @@ describe('Topic questions tab', () => {
     spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
       () => {
         return topicInitializedEventEmitter;
-      });
-    spyOnProperty(
-      topicEditorStateService, 'onTopicReinitialized').and.callFake(
+      }
+    );
+    spyOnProperty(topicEditorStateService, 'onTopicReinitialized').and.callFake(
       () => {
         return topicReinitializedEventEmitter;
-      });
+      }
+    );
     component.ngOnInit();
   });
 
@@ -161,20 +189,24 @@ describe('Topic questions tab', () => {
   it('should initialize the variables when topic is initialized', () => {
     const topicRights = new TopicRights(false, false, false);
     const allSkillSummaries = subtopic1.getSkillSummaries();
-    spyOn(topicEditorStateService, 'getSkillIdToRubricsObject').and
-      .returnValue(skillIdToRubricsObject);
+    spyOn(topicEditorStateService, 'getSkillIdToRubricsObject').and.returnValue(
+      skillIdToRubricsObject
+    );
 
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'selectSkillField');
+      'selectSkillField'
+    );
     expect(component.selectedSkillId).toBeUndefined();
     expect(component.topic).toBe(topic);
     expect(component.topicRights).toEqual(topicRights);
     expect(component.skillIdToRubricsObject).toEqual(skillIdToRubricsObject);
     expect(component.allSkillSummaries).toEqual(allSkillSummaries);
-    expect(
-      component.getSkillsCategorizedByTopics).toBe(categorizedSkillsDictData);
-    expect(component.getUntriagedSkillSummaries)
-      .toBe(untriagedSkillSummariesData);
+    expect(component.getSkillsCategorizedByTopics).toBe(
+      categorizedSkillsDictData
+    );
+    expect(component.getUntriagedSkillSummaries).toBe(
+      untriagedSkillSummariesData
+    );
     expect(component.canEditQuestion).toBe(false);
   });
 
@@ -182,7 +214,8 @@ describe('Topic questions tab', () => {
     component.ngAfterViewInit();
 
     expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'selectSkillField');
+      'selectSkillField'
+    );
   });
 
   it('should unsubscribe when component is destroyed', () => {
@@ -240,5 +273,30 @@ describe('Topic questions tab', () => {
     expect(component.allSkillSummaries).toEqual(allSkillSummaries);
     expect(component.topicRights).toEqual(topicRights);
     expect(component.topic).toBe(topic);
+  });
+
+  describe('should change drop-down to a heading when the questionEditor is opened', () => {
+    it('should return "Creating new" when creating a new question', () => {
+      spyOn(questionsListComponent, 'createQuestion').and.callThrough();
+      spyOn(topicEditorStateService, 'toggleQuestionEditor').and.callThrough();
+
+      questionsListComponent.createQuestion();
+      expect(topicEditorStateService.toggleQuestionEditor).toHaveBeenCalledWith(
+        true,
+        true
+      );
+      expect(component.getEditorAction()).toBe('Creating new');
+    });
+
+    it('should return "Editing" when editing a question', () => {
+      spyOn(questionsListComponent, 'openQuestionEditor').and.callThrough();
+      spyOn(topicEditorStateService, 'toggleQuestionEditor').and.callThrough();
+
+      questionsListComponent.openQuestionEditor();
+      expect(topicEditorStateService.toggleQuestionEditor).toHaveBeenCalledWith(
+        true
+      );
+      expect(component.getEditorAction()).toBe('Editing');
+    });
   });
 });

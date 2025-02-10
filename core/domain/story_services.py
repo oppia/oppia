@@ -289,6 +289,77 @@ def apply_change_list(
                         update_node_exploration_id_cmd.node_id,
                         update_node_exploration_id_cmd.new_value
                     )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_STATUS):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyStatusCmd.
+                    update_node_status_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyStatusCmd,
+                        change
+                    )
+                    story.update_node_status(
+                        update_node_status_cmd.node_id,
+                        update_node_status_cmd.new_value
+                    )
+
+                elif (change.property_name ==
+                        story_domain.
+                        STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyPlannedPublicationDateCmd.
+                    update_node_planned_publication_date_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyPlannedPublicationDateCmd,
+                        change
+                    )
+                    story.update_node_planned_publication_date(
+                        update_node_planned_publication_date_cmd.node_id,
+                        update_node_planned_publication_date_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyLastModifiedCmd.
+                    update_node_last_modified_cmd = cast(
+                        story_domain.UpdateStoryNodePropertyLastModifiedCmd,
+                        change
+                    )
+                    story.update_node_last_modified(
+                        update_node_last_modified_cmd.node_id,
+                        update_node_last_modified_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.
+                        STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyFirstPublicationDateCmd.
+                    update_node_first_publication_date_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyFirstPublicationDateCmd,
+                        change
+                    )
+                    story.update_node_first_publication_date(
+                        update_node_first_publication_date_cmd.node_id,
+                        update_node_first_publication_date_cmd.new_value
+                    )
+                elif (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_UNPUBLISHING_REASON):
+                    # Here we use cast because this 'elif'
+                    # condition forces change to have type
+                    # UpdateStoryNodePropertyUnpublishingReasonCmd.
+                    update_node_unpublishing_reason_cmd = cast(
+                        story_domain.
+                        UpdateStoryNodePropertyUnpublishingReasonCmd,
+                        change
+                    )
+                    story.update_node_unpublishing_reason(
+                        update_node_unpublishing_reason_cmd.node_id,
+                        update_node_unpublishing_reason_cmd.new_value
+                    )
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 # Here we use cast because we are narrowing down the type from
                 # StoryChange to a specific change command.
@@ -463,13 +534,15 @@ def validate_prerequisite_skills_in_story_contents(
                         topic_relevant_skill_ids
                     ).issubset(simulated_skill_ids)):
                 raise utils.ValidationError(
-                    'The skills with ids ' +
-                    ' '.join(
-                        set(topic_relevant_skill_ids) -
-                        set(simulated_skill_ids)) +
-                    ' were specified as prerequisites for Chapter %s,'
+                    'The skills with ids %s' 
+                    ' were specified as prerequisites for Chapter %s,' 
                     ' but were not taught in any chapter before it.'
-                    % destination_node.title)
+                    % (' '.join(
+                        set(topic_relevant_skill_ids) -
+                        set(simulated_skill_ids)),
+                        destination_node.title
+                    )
+                )
             nodes_queue.append(node_id)
 
 
@@ -639,10 +712,7 @@ def _save_story(
     if story_is_published:
         exp_ids = []
         for node in story.story_contents.nodes:
-            if not node.exploration_id:
-                raise Exception(
-                    'Story node with id %s does not contain an '
-                    'exploration id.' % node.id)
+            assert node.exploration_id is not None
             exp_ids.append(node.exploration_id)
 
         validate_explorations_for_story(exp_ids, True)
@@ -967,3 +1037,47 @@ def record_completed_node_in_story_context(
         progress_model.completed_node_ids.append(node_id)
         progress_model.update_timestamps()
         progress_model.put()
+
+
+def get_chapter_notifications_stories_list() -> List[
+    story_domain.StoryPublicationTimeliness]:
+    """Returns a list of stories with behind-schedule or upcoming chapters.
+
+    Returns:
+        list(StoryPublicationTimeliness). A list of stories with having
+        behind-schedule chapters or chapters upcoming within
+        CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS.
+    """
+    topic_models = topic_fetchers.get_all_topics()
+    chapter_notifications_stories_list: List[
+        story_domain.StoryPublicationTimeliness] = []
+    all_canonical_story_ids = []
+    for topic_model in topic_models:
+        canonical_story_ids = [story_reference.story_id
+            for story_reference in topic_model.canonical_story_references]
+        all_canonical_story_ids += canonical_story_ids
+    all_canonical_stories = list(
+        filter(
+            None, story_fetchers.get_stories_by_ids(all_canonical_story_ids)))
+    for topic_model in topic_models:
+        topic_rights = topic_fetchers.get_topic_rights(topic_model.id)
+        if topic_rights.topic_is_published:
+            canonical_stories = [story for story in
+                all_canonical_stories if
+                story.corresponding_topic_id == topic_model.id]
+            for story in canonical_stories:
+                overdue_chapters = []
+                upcoming_chapters = []
+                for node in story.story_contents.nodes:
+                    if node.is_node_upcoming():
+                        upcoming_chapters.append(node.title)
+                    if node.is_node_behind_schedule():
+                        overdue_chapters.append(node.title)
+
+                if upcoming_chapters or overdue_chapters:
+                    story_timeliness = story_domain.StoryPublicationTimeliness(
+                        story.id, story.title, topic_model.name,
+                        overdue_chapters, upcoming_chapters)
+                    chapter_notifications_stories_list.append(story_timeliness)
+
+    return chapter_notifications_stories_list

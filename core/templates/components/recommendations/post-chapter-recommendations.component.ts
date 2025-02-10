@@ -16,10 +16,10 @@
  * @fileoverview Component for the post chapter recommendations component.
  */
 
-import { Component, Input } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
+import {Component, Input} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 @Component({
   selector: 'oppia-post-chapter-recommendations',
   templateUrl: './post-chapter-recommendations.component.html',
@@ -51,20 +51,28 @@ export class PostChapterRecommendationsComponent {
   }
 
   getPracticeTabUrl(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
-        topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
-        classroom_url_fragment: (
-          this.urlService.getUrlParams().classroom_url_fragment)
-      }) + '/practice';
+    return (
+      this.urlInterpolationService.interpolateUrl(
+        PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
+        {
+          topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+          classroom_url_fragment:
+            this.urlService.getUrlParams().classroom_url_fragment,
+        }
+      ) + '/practice'
+    );
   }
 
   getRevisionTabUrl(): string {
-    return this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
-        topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
-        classroom_url_fragment: (
-          this.urlService.getUrlParams().classroom_url_fragment)
-      }) + '/revision';
+    return (
+      this.urlInterpolationService.interpolateUrl(
+        PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
+        {
+          topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+          classroom_url_fragment:
+            this.urlService.getUrlParams().classroom_url_fragment,
+        }
+      ) + '/revision'
+    );
   }
 }

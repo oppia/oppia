@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for partnerships page.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { PartnershipsPageComponent } from './partnerships-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { PageTitleService } from 'services/page-title.service';
+import {PartnershipsPageComponent} from './partnerships-page.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PageTitleService} from 'services/page-title.service';
+import {AppConstants} from '../../app.constants';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -36,18 +37,18 @@ describe('Partnerships page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [PartnershipsPageComponent],
+      declarations: [PartnershipsPageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         PageTitleService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -55,38 +56,43 @@ describe('Partnerships page', () => {
 
   beforeEach(() => {
     const partnershipsPageComponent = TestBed.createComponent(
-      PartnershipsPageComponent);
+      PartnershipsPageComponent
+    );
     component = partnershipsPageComponent.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component from beforeEach block', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should set component properties when ngOnInit() is called', () => {
     spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
 
     expect(component.partnershipsImgUrl).toBe(
-      '/assets/images/general/partnerships_hero_image.png');
+      '/assets/images/general/partnerships_hero_image.png'
+    );
     expect(component.formIconUrl).toBe('/assets/images/icons/icon_form.png');
     expect(component.callIconUrl).toBe('/assets/images/icons/icon_call.png');
     expect(component.changeIconUrl).toBe(
-      '/assets/images/icons/icon_change.png');
+      '/assets/images/icons/icon_change.png'
+    );
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
-    component.ngOnInit();
-    spyOn(component, 'setPageTitle');
-    translateService.onLangChange.emit();
+  it(
+    'should obtain translated page title whenever the selected' +
+      'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setPageTitle');
+      translateService.onLangChange.emit();
 
-    expect(component.setPageTitle).toHaveBeenCalled();
-  });
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }
+  );
 
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -94,10 +100,64 @@ describe('Partnerships page', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_PARTNERSHIPS_PAGE_TITLE');
+      'I18N_PARTNERSHIPS_PAGE_TITLE'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_PARTNERSHIPS_PAGE_TITLE');
+      'I18N_PARTNERSHIPS_PAGE_TITLE'
+    );
   });
+
+  it(
+    'should obtain new form link whenever the selected' + 'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setFormLink');
+      translateService.onLangChange.emit();
+
+      expect(component.setFormLink).toHaveBeenCalled();
+    }
+  );
+
+  it('should set the correct form link for English language', () => {
+    translateService.currentLang = 'en';
+    const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
+    component.setFormLink();
+
+    expect(component.formLink).toBe(formLink);
+  });
+
+  it('should set the correct form link for Portuguese language', () => {
+    translateService.currentLang = 'pt-br';
+    const formLink =
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'pt' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
+    component.setFormLink();
+
+    expect(component.formLink).toBe(formLink);
+  });
+
+  it('should set the correct form link for general languages', () => {
+    translateService.currentLang = 'fr';
+    const formLink =
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+      'fr' +
+      AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
+    component.setFormLink();
+
+    expect(component.formLink).toBe(formLink);
+  });
+
+  it(
+    'should set english link for languages not supported by' + ' google forms',
+    () => {
+      translateService.currentLang = 'pcm';
+      const formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
+      component.setFormLink();
+
+      expect(component.formLink).toBe(formLink);
+    }
+  );
 
   it('should unsubscribe on component destruction', () => {
     component.directiveSubscriptions.add(

@@ -17,29 +17,30 @@
  * footer.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { StatsReportingService } from '../services/stats-reporting.service';
+import {Component} from '@angular/core';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {StatsReportingService} from '../services/stats-reporting.service';
 
 import './learner-view-info.component.css';
-
 
 @Component({
   selector: 'oppia-learner-view-info',
   templateUrl: './learner-view-info.component.html',
-  styleUrls: ['./learner-view-info.component.css']
+  styleUrls: ['./learner-view-info.component.css'],
 })
 export class LearnerViewInfoComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -57,8 +58,7 @@ export class LearnerViewInfoComponent {
 
   constructor(
     private contextService: ContextService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
@@ -72,58 +72,64 @@ export class LearnerViewInfoComponent {
     let explorationContext = false;
 
     for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'explore' ||
-          pathnameArray[i] === 'create' ||
-          pathnameArray[i] === 'skill_editor' ||
-          pathnameArray[i] === 'embed') {
+      if (
+        pathnameArray[i] === 'explore' ||
+        pathnameArray[i] === 'create' ||
+        pathnameArray[i] === 'skill_editor' ||
+        pathnameArray[i] === 'embed' ||
+        pathnameArray[i] === 'lesson'
+      ) {
         explorationContext = true;
         break;
       }
     }
 
-    this.explorationId = explorationContext ?
-      this.contextService.getExplorationId() : 'test_id';
+    this.explorationId = explorationContext
+      ? this.contextService.getExplorationId()
+      : 'test_id';
 
     this.explorationTitle = 'Loading...';
-    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-      this.explorationId,
-      this.urlService.getExplorationVersionFromUrl(),
-      this.urlService.getPidFromUrl())
-      .then((response) => {
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(
+        this.explorationId,
+        this.urlService.getExplorationVersionFromUrl(),
+        this.urlService.getPidFromUrl()
+      )
+      .then(response => {
         this.explorationTitle = response.exploration.title;
       });
-    this.explorationTitleTranslationKey = (
+    this.explorationTitleTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
         this.explorationId,
         TranslationKeyType.TITLE
-      )
-    );
+      );
     // To check if the exploration is linked to the topic or not.
     this.isLinkedToTopic = this.getTopicUrl() ? true : false;
     // If linked to topic then print topic name in the lesson player.
     if (this.isLinkedToTopic) {
-      let topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      let classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-      this.topicViewerBackendApiService.fetchTopicDataAsync(
-        topicUrlFragment, classroomUrlFragment).then(
-        (readOnlyTopic: ReadOnlyTopic) => {
+      let topicUrlFragment =
+        this.urlService.getTopicUrlFragmentFromLearnerUrl();
+      let classroomUrlFragment =
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+      this.topicViewerBackendApiService
+        .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
+        .then((readOnlyTopic: ReadOnlyTopic) => {
           this.topicName = readOnlyTopic.getTopicName();
           this.statsReportingService.setTopicName(this.topicName);
           this.siteAnalyticsService.registerCuratedLessonStarted(
-            this.topicName, this.explorationId);
-          this.topicNameTranslationKey = (
+            this.topicName,
+            this.explorationId
+          );
+          this.topicNameTranslationKey =
             this.i18nLanguageCodeService.getTopicTranslationKey(
               readOnlyTopic.getTopicId(),
               TranslationKeyType.TITLE
-            )
-          );
-        }
-      );
+            );
+        });
     } else {
       this.siteAnalyticsService.registerCommunityLessonStarted(
-        this.explorationId);
+        this.explorationId
+      );
     }
   }
 
@@ -134,19 +140,22 @@ export class LearnerViewInfoComponent {
     let classroomUrlFragment: string | null = null;
 
     try {
-      topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+      topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+      classroomUrlFragment =
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
     } catch (e) {}
 
-    return topicUrlFragment &&
+    return (
+      topicUrlFragment &&
       classroomUrlFragment &&
       this.urlInterpolationService.interpolateUrl(
-        ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+        ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE,
+        {
           topic_url_fragment: topicUrlFragment,
           classroom_url_fragment: classroomUrlFragment,
-        });
+        }
+      )
+    );
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
@@ -169,8 +178,3 @@ export class LearnerViewInfoComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaLearnerViewInfo',
-  downgradeComponent({
-    component: LearnerViewInfoComponent
-  }) as angular.IDirectiveFactory);
