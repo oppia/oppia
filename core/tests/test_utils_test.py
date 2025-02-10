@@ -820,7 +820,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index2')
         with self.assertRaisesRegex(
             elasticsearch.RequestError,
-            r'RequestError\(400, \'resource_already_exists_exception\'\)',
+            r'resource_already_exists_exception: index'
         ):
             stub.mock_create_index('index1')
 
@@ -828,10 +828,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]'
         ):
             stub.mock_delete('index1', 'some_id')
 
@@ -840,7 +837,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index1')
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            r'NotFoundError\(404,',
+            r'document not found: \[index1\]\[doc_id\]',
         ):
             stub.mock_delete('index1', 'doc_id')
 
@@ -848,10 +845,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]'
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
 

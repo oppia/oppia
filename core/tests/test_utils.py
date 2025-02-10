@@ -558,25 +558,28 @@ class ElasticSearchStub:
             elasticsearch.NotFoundError. A manually-constructed error
                 indicating that the index was not found.
         """
+        error_data = {
+            'reason': 'no such index [%s]' % index,
+            'root_cause': [{
+                'reason': 'no such index [%s]' % index,
+                'index': index,
+                'index_uuid': '_na_',
+                'type': 'index_not_found_exception',
+                'resource.type': 'index_or_alias',
+                'resource.id': index
+            }],
+            'index': index,
+            'index_uuid': '_na_',
+            'type': 'index_not_found_exception',
+            'resource.type': 'index_or_alias',
+            'resource.id': index
+        }
         raise elasticsearch.NotFoundError(
-            404, 'index_not_found_exception', {
+            message='index_not_found_exception: no such index [%s]' % index,
+            meta={'status': 404},
+            body={
                 'status': 404,
-                'error': {
-                    'reason': 'no such index [%s]' % index,
-                    'root_cause': [{
-                        'reason': 'no such index [%s]' % index,
-                        'index': index,
-                        'index_uuid': '_na_',
-                        'type': 'index_not_found_exception',
-                        'resource.type': 'index_or_alias',
-                        'resource.id': index
-                    }],
-                    'index': index,
-                    'index_uuid': '_na_',
-                    'type': 'index_not_found_exception',
-                    'resource.type': 'index_or_alias',
-                    'resource.id': index
-                }
+                'error': error_data
             }
         )
 
@@ -594,9 +597,17 @@ class ElasticSearchStub:
                 exists.
         """
         if index in self._DB:
+            error_data = {
+                'type': 'resource_already_exists_exception',
+                'reason': f'index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+                'index': index,
+                'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
+            }
             raise elasticsearch.RequestError(
-                400, 'resource_already_exists_exception',
-                'index [%s/RaNdOmStRiNgOfAlPhAs] already exists' % index)
+                message=f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
+                meta={'status': 400},
+                body={'error': error_data, 'status': 400}
+            )
         self._DB[index] = []
         return {
             'index': index,
@@ -686,7 +697,7 @@ class ElasticSearchStub:
         if index not in self._DB:
             self._generate_index_not_found_error(index)
         docs = [d for d in self._DB[index] if d['id'] != id]
-        if len(self._DB[index]) != len(docs):
+        if len(self._DB[index]) != len(docs):   
             self._DB[index] = docs
             return {
                 '_type': '_doc',
@@ -703,22 +714,25 @@ class ElasticSearchStub:
                 '_id': '0'
             }
 
+        error_body = {
+            '_index': index,
+            '_type': '_doc',
+            '_id': id,
+            '_version': 1,
+            'result': 'not_found',
+            '_shards': {
+                'total': 2,
+                'successful': 1,
+                'failed': 0
+            },
+            '_seq_no': 103,
+            '_primary_term': 1
+        }
         raise elasticsearch.NotFoundError(
-            404,
-            body={
-                '_index': index,
-                '_type': '_doc',
-                '_id': id,
-                '_version': 1,
-                'result': 'not_found',
-                '_shards': {
-                    'total': 2,
-                    'successful': 1,
-                    'failed': 0
-                },
-                '_seq_no': 103,
-                '_primary_term': 1
-            })
+            message=f'document not found: [{index}][{id}]',
+            meta={'status': 404},
+            body=error_body
+        )
 
     def mock_delete_by_query(
         self, index: str, query: Dict[str, Dict[str, Dict[str, str]]]
