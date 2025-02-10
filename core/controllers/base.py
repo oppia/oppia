@@ -308,8 +308,12 @@ class BaseHandler(
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if not self._is_requested_path_currently_accessible_to_user():
-            self.render_template('maintenance-page.mainpage.html')
+        if (
+            not self._is_requested_path_currently_accessible_to_user()
+            and request_split.path != '/maintenance'
+
+        ):
+            self.redirect('/maintenance')
             return
 
         if self.user_is_scheduled_for_deletion:
