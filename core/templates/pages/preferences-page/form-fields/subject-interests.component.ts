@@ -91,7 +91,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
 
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
-      if (!this.validInput(value)) {
+      if (!this.isValidInput(value)) {
         this.chipList.errorState = true;
       } else {
         this.chipList.errorState = false;
@@ -100,7 +100,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     this.allSubjectInterests = cloneDeep(this.subjectInterests);
   }
 
-  validInput(value: string): boolean {
+  isValidInput(value: string): boolean {
     // The following regex matches only lowercase
     // alphabetic characters and spaces.
     let validRegex = new RegExp('^[a-z\\s]*$');
@@ -114,7 +114,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
       return;
     }
 
-    if (this.validInput(value)) {
+    if (this.isValidInput(value)) {
       this.subjectInterests.push(value);
       if (this.allSubjectInterests.indexOf(value) < 0) {
         this.allSubjectInterests.push(value);
@@ -147,5 +147,30 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     return this.allSubjectInterests.filter(interest =>
       interest.toLowerCase().includes(filterValue)
     );
+  }
+  onBlur(): void {
+    // `nativeElement.value` represents the current value of the input field in the DOM.
+    const value = this.subjectInterestInput.nativeElement.value.trim();
+
+    if (value && this.isValidInput(value)) {
+      this.subjectInterests.push(value);
+      this.subjectInterestInput.nativeElement.value = '';
+      this.onChange(this.subjectInterests);
+    }
+  }
+
+  onInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const inputValue = inputElement.value.trim();
+
+    if (!inputValue) {
+      this.formCtrl.markAsPristine();
+      return;
+    }
+
+    if (this.isValidInput(inputValue)) {
+      this.formCtrl.markAsDirty();
+      this.onChange(this.subjectInterests);
+    }
   }
 }
