@@ -373,6 +373,11 @@ const pauseVoiceoverButton = '.e2e-test-pause-circle';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
+const practiceTabToggle = '.e2e-test-practice-tab-link';
+const startPracticeButton = '.e2e-test-practice-start-button';
+const answerInputSelector = '.e2e-test-conversation-input';
+const submitButtonSelector = '.oppia-learner-confirm-button';
+const nextButtonSelector = '.e2e-test-continue-to-next-card-button';
 const playLaterButton = '.e2e-test-add-to-playlist-btn';
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
@@ -4146,6 +4151,105 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.clickOn(pauseVoiceoverButton);
+  }
+  /**
+   * Clicks on the practice tab in topic page.
+   */
+  async clickPracticeTab(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTab = await this.page.$(practiceTabToggle);
+
+      if (!practiceTab) {
+        throw new Error('Practice tab not found');
+      }
+
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.waitForElementToBeClickable(practiceTab),
+        practiceTab.click(),
+      ]);
+    } catch (error) {
+      const newError = new Error(`Failed to click practice tab: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+  /**
+   * Starts a practice session from the practice tab
+   */
+  async startPracticeSession(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    try {
+      await this.page.waitForSelector(startPracticeButton);
+      const startButton = await this.page.$(startPracticeButton);
+      if (!startButton) {
+        throw new Error('Start button not found');
+      }
+      await Promise.all([
+        this.page.waitForNavigation({
+          waitUntil: ['networkidle2', 'load'],
+        }),
+        this.waitForElementToBeClickable(startButton),
+        startButton.click(),
+      ]);
+    } catch (error) {
+      throw new Error(`Failed to start practice session: ${error}`);
+    }
+  }
+
+  /**
+   * Answers practice questions in session
+   */
+  async answerPracticeQuestions(): Promise<void> {
+    try {
+      await this.page.waitForSelector(answerInputSelector);
+
+      // Answer each question.
+      while (await this.page.$(answerInputSelector)) {
+        const input = await this.page.$(answerInputSelector);
+        if (!input) {
+          throw new Error('Answer input not found');
+        }
+        await input.type('42'); // Default test answer.
+        await this.page.click(submitButtonSelector);
+        await this.page.click(nextButtonSelector);
+
+        // Wait for next question or completion.
+        await this.page.waitForNavigation();
+      }
+    } catch (error) {
+      throw new Error(`Failed to answer practice questions: ${error}`);
+    }
+  }
+
+  /**
+   * Verifies practice session score is displayed
+   */
+  async verifyPracticeScore(): Promise<void> {
+    const scoreSelector = '.practice-score';
+    const completionMsgSelector = '.completion-message';
+
+    try {
+      await this.page.waitForSelector(scoreSelector);
+      await this.page.waitForSelector(completionMsgSelector);
+
+      const scoreElement = await this.page.$(scoreSelector);
+      const score = await this.page.evaluate(
+        el => el.textContent,
+        scoreElement
+      );
+
+      if (!score) {
+        throw new Error('Practice score not found');
+      }
+    } catch (error) {
+      throw new Error(`Failed to verify practice score: ${error}`);
+    }
   }
 }
 
