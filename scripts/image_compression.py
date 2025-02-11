@@ -106,6 +106,18 @@ def main() -> None: # pragma: no cover
             print(image['path'])
             saved = image['original_size'] - image['new_size']
             space += saved
+        print('Use the following command to compress the images:\n')
+
+        print(
+            'For PNG images:\n'
+            'gm convert <input_file> -strip -compress Zip <output_file>'
+        )
+
+        print(
+            'For JPG and WebP images:\n'
+            'gm convert <input_file> -strip -compress LZW <output_file>'
+        )
+
         print(f'\nTotal space saved: {space} bytes\n')
     else:
         print('No images could be compressed further.')
