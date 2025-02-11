@@ -21,7 +21,9 @@
            [matAutocomplete]="auto"
            [matChipInputFor]="chipList"
            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-           (matChipInputTokenEnd)="add($event)">
+           (matChipInputTokenEnd)="add($event)"
+           (blur)="onBlur()"
+           (input)="onInput($event)">
   </mat-chip-list>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
     <mat-option *ngFor="let subjectInterest of filteredSubjectInterests | async" [value]="subjectInterest">
