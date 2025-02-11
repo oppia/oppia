@@ -35,7 +35,7 @@ class CompressedImageInfo(TypedDict):
     new_size: int
 
 
-def compress_images(
+def check_compressable_images(
         input_path: Union[str, pathlib.Path]
     ) -> List[CompressedImageInfo]:
     """Check and compress images using GraphicsMagick."""
@@ -79,22 +79,11 @@ def compress_images(
                         new_size = temp_compressed.stat().st_size
 
                         if new_size < original_size * 0.99:
-                            with open(temp_compressed, 'rb') as f:
-                                compressed_data = f.read()
-                            with open(file_path, 'wb') as f:
-                                f.write(compressed_data)
-
                             result_images.append({
                                 'path': file_path,
                                 'original_size': original_size,
                                 'new_size': new_size
                             })
-                            print(f'[COMPRESSED] {file_path}')
-                            print(
-                                f'Size: {original_size/1024:.1f}KB '
-                                f'→ {new_size/1024:.1f}KB '
-                                f'({(1 - new_size/original_size)*100:.1f}%)'
-                            )
                     else:
                         logging.info(
                             'Compressed image > original image'
@@ -108,17 +97,18 @@ def compress_images(
 def main() -> None: # pragma: no cover
     """Main function to compress images in the repository."""
     repo_path = pathlib.Path('./assets')
-    i = 1
-    while i <= 10:
+    compressed_images = check_compressable_images(str(repo_path))
+
+    if compressed_images:
         space = 0
-        compressed_images = compress_images(str(repo_path))
+        print(len(compressed_images), 'images could be compressed further:\n')
         for image in compressed_images:
+            print(image['path'])
             saved = image['original_size'] - image['new_size']
             space += saved
-
-        print('Summary of compressed images on iteration# ', i)
-        print(f'Total space saved: {space} bytes\n')
-        i = i + 1
+        print(f'\nTotal space saved: {space} bytes\n')
+    else:
+        print('No images could be compressed further.')
 
 
 if __name__ == '__main__':  # pragma: no cover
