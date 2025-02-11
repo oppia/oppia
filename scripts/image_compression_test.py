@@ -101,7 +101,7 @@ class TestImageCompression(unittest.TestCase):
         """Test actual image compression with real files."""
         if not shutil.which('gm'):
             self.skipTest('GraphicsMagick not installed')
-        compressed_images = image_compression.compress_images(
+        compressed_images = image_compression.check_compressable_images(
             str(self.test_dir)
         )
         self.assertGreater(
@@ -127,7 +127,7 @@ class TestImageCompression(unittest.TestCase):
         if not shutil.which('gm'):
             self.skipTest('GraphicsMagick not installed')
         test_image = self.test_dir / 'test_small.png'
-        compressed_images = image_compression.compress_images(
+        compressed_images = image_compression.check_compressable_images(
             str(self.test_dir)
         )
         optimized_results = [
@@ -145,7 +145,7 @@ class TestImageCompression(unittest.TestCase):
             self.skipTest('GraphicsMagick not installed')
         bmp_path = self.test_dir / 'unsupp.bmp'
         original_size = bmp_path.stat().st_size
-        compressed_images = image_compression.compress_images(
+        compressed_images = image_compression.check_compressable_images(
             str(self.test_dir)
         )
         bmp_results = [
@@ -168,7 +168,7 @@ class TestImageCompression(unittest.TestCase):
         with (
             mock.patch('subprocess.run', return_value=mock_result),
         ):
-            compressed_images = image_compression.compress_images(
+            compressed_images = image_compression.check_compressable_images(
                 str(self.test_dir)
             )
             self.assertEqual(len(compressed_images), 0)
@@ -184,7 +184,7 @@ class TestImageCompression(unittest.TestCase):
         with open(corrupt_path, 'wb') as f:
             f.write(b'Not an image file')
         try:
-            compressed_images = image_compression.compress_images(
+            compressed_images = image_compression.check_compressable_images(
                 str(self.test_dir)
             )
             corrupt_results = [
@@ -202,8 +202,8 @@ class TestImageCompression(unittest.TestCase):
         """Test multiple compression iterations."""
         if not shutil.which('gm'):
             self.skipTest('GraphicsMagick not installed')
-        first_run = image_compression.compress_images(str(self.test_dir))
-        second_run = image_compression.compress_images(str(self.test_dir))
+        first_run = image_compression.check_compressable_images(str(self.test_dir))
+        second_run = image_compression.check_compressable_images(str(self.test_dir))
         self.assertGreaterEqual(
             len(first_run),
             len(second_run),
