@@ -70,8 +70,7 @@ const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
-const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
+const impactReportUrl = testConstants.URLs.ImpactReportUrl;
 const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
@@ -86,10 +85,8 @@ const navbarLearnTabBasicMathematicsButton =
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
-const navbarAboutTabImpactReport2023Button =
-  'a.e2e-test-navbar-impact-report-button-2023';
-const navbarAboutTabImpactReport2022Button =
-  'a.e2e-test-navbar-impact-report-button-2022';
+const navbarAboutTabImpactReportButton =
+  'a.e2e-test-navbar-impact-report-button';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -135,14 +132,10 @@ const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
-const mobileSidebarImpactReport2023Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button-2023';
-const mobileSidebarImpactReport2022Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button-2022';
+const mobileSidebarImpactReportButton =
+  'a.e2e-mobile-test-sidebar-impact-report-button';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
-const mobileSidebarExpandImpactReportSubMenuButton =
-  'div.e2e-mobile-test-sidebar-expand-impactreport-submenu';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
@@ -658,24 +651,15 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
       await this.openExternalLink(
-        mobileSidebarImpactReport2023Button,
-        impactReport2023Url
-      );
-      await this.openExternalLink(
-        mobileSidebarImpactReport2022Button,
-        impactReport2022Url
+        mobileSidebarImpactReportButton,
+        impactReportUrl
       );
     } else {
       await this.clickOn(navbarAboutTab);
       await this.openExternalLink(
-        navbarAboutTabImpactReport2023Button,
-        impactReport2023Url
-      );
-      await this.openExternalLink(
-        navbarAboutTabImpactReport2022Button,
-        impactReport2022Url
+        navbarAboutTabImpactReportButton,
+        impactReportUrl
       );
     }
   }
@@ -2230,10 +2214,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalLink(
-      impactReportButtonInAboutPage,
-      impactReport2023Url
-    );
+    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
   }
 
   /**
