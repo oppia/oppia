@@ -39,6 +39,21 @@ describe('Logged-in User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    const explorationTitles = [
+      'Explore Title 1',
+      'Explore Title 2',
+      'Explore Title 3',
+      'Explore Title 4',
+      'Explore Title 5',
+    ];
+
+    await Promise.all(
+      explorationTitles.map(
+        async title =>
+          await curriculumAdmin.createAndPublishExplorationWithCards(title)
+      )
+    );
+
     const topics = [
       'Place Values',
       'Addition',
