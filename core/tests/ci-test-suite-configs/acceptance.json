@@ -82,7 +82,7 @@
     },
     {
       "name": "logged-in-user/manage-progress-in-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-progress-in-learner-dashboard.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",

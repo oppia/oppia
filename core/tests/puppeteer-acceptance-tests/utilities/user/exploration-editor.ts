@@ -1733,7 +1733,7 @@ export class ExplorationEditor extends BaseUser {
 
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
-    category: string = 'Algebra'
+    category: string = 'Mathematics'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -1742,23 +1742,23 @@ export class ExplorationEditor extends BaseUser {
     await this.updateTitleTo(explorationTitle);
     await this.navigateToEditorTab();
 
-    for (let i = 0; i < 2; i++) {
-      await Promise.all([
-        await this.updateCardContent(`Content ${i}`),
-        await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON),
-        await this.viewOppiaResponses(),
-      ]);
-      await this.directLearnersToNewCard(`Card ${i + 1}`);
-      await this.navigateToCard(`Card ${i + 1}`);
-    }
-    await this.updateCardContent('Content 2');
+    await this.updateCardContent('Content 0');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 1');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 1');
+    await this.updateCardContent('Content 1');
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await this.saveExplorationDraft();
 
     await this.navigateToCard('Introduction');
+    await this.saveExplorationDraft();
+
     return await this.publishExplorationWithMetadata(
       `Exploration Title: ${explorationTitle}`,
-      `Goals of ${explorationTitle}`,
+      `${explorationTitle}\'s goals`,
       category
     );
   }

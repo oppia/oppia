@@ -43,17 +43,17 @@ describe('Logged-in User', function () {
       'What are the Place Values?'
     );
 
-    /*loggedInUser = await UserFactory.createNewUser(
+    loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
-    ); */
+    );
     // Setup taking longer than 300000ms.
   }, 480000);
 
   it(
     'should play an exploration with several cards',
-    function () {
-      console.log('ss');
+    async function () {
+      await curriculumAdmin.navigateToCreatorDashboardPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
