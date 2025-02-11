@@ -39,9 +39,59 @@ describe('Logged-in User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'What are the Place Values?'
+    const topics = [
+      'Place Values',
+      'Addition',
+      'Subtraction',
+      'Multiplication',
+      'Division',
+    ];
+
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic algebra and trigonometry.',
+      'In this course, you will learn the following topics: algbera and trigonometry,'
     );
+
+    for (const topic of topics) {
+      await curriculumAdmin.createAndPublishTopic(
+        topic,
+        `${topic}\'s subtopics`,
+        `${topic}\'s skills`
+      );
+      await curriculumAdmin.addTopicToClassroom('Math', topic);
+    }
+
+    await curriculumAdmin.publishClassroom('Math');
+
+    const placeValueChapters = [
+      'What are the Place Values',
+      'Find the Value of a Number',
+      'Comparing Numbers',
+      'Rounding Numbers, Part 1',
+      'Rounding Numbers, Part 2',
+    ];
+
+    const chapterIds = await Promise.all(
+      placeValueChapters.map(
+        async chapter =>
+          await curriculumAdmin.createAndPublishExplorationWithCards(chapter)
+      )
+    );
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
+
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
+
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
