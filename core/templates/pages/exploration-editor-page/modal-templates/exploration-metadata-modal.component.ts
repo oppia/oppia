@@ -182,7 +182,7 @@ export class ExplorationMetadataModalComponent
         Promise.resolve(this.explorationTagsService.saveDisplayedValue())
       );
     }
-
+    // Wait for all save operations to complete before closing the modal.
     Promise.all(metadataSavePromises).then(() => {
       this.ngbActiveModal.close(metadataList);
     });
