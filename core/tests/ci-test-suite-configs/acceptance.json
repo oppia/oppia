@@ -197,6 +197,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/subscribe-to-newsletter-and-click-all-buttons.spec.ts"
     },
     {
+      "name": "logged-out-user/access-restrictions-logged-out-user",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/access-restrictions-logged-out-user.spec.ts"
+    },
+    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs/moderator/edit-featured-activities-list.spec.ts"
     },

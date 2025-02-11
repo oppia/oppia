@@ -78,6 +78,7 @@ const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 const testimonialCarouselNamesInTeachPage =
   testConstants.TeachPageTestimonialsNames;
 const creatorsCarouselNamesInTeachPage = testConstants.TeachPageCreatorsNames;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -365,7 +366,7 @@ const pauseVoiceoverButton = '.e2e-test-pause-circle';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
-
+const playLaterButton = '.e2e-test-add-to-playlist-btn';
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
 const newsletterSubscriptionThanksMessage =
@@ -2561,6 +2562,67 @@ export class LoggedOutUser extends BaseUser {
     } else {
       showMessage('The Read Our Blog button opens the Blog page.');
     }
+  }
+  /**
+   * Function to verify that the user is on the login page.
+   */
+  async expectToBeOnLoginPage(): Promise<void> {
+    const currentUrl = new URL(this.page.url());
+    expect(currentUrl.pathname.startsWith('/login')).toBe(true);
+  }
+
+  /**
+   * Function to navigate to the Creator Dashboard.
+   */
+  async navigateToCreatorDashboard(): Promise<void> {
+    const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+    await this.page.goto(creatorDashboardUrl);
+    await this.page.waitForSelector('oppia-login-page-root');
+  }
+
+  /**
+   * Function to navigate to the Moderator Page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+    await this.page.goto(moderatorPageUrl);
+    await this.page.waitForSelector('oppia-login-page-root');
+  }
+
+  /**
+   * Function to navigate to the Preferences Page.
+   */
+  async navigateToPreferencesPage(): Promise<void> {
+    const preferencesPageUrl = testConstants.URLs.Preferences;
+    await this.page.goto(preferencesPageUrl);
+    await this.page.waitForSelector('oppia-login-page-root');
+  }
+
+  /**
+   * Function to navigate to the Topics and Skills Dashboard Page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    const topicsAndSkillsDashboardUrl =
+      testConstants.URLs.TopicAndSkillsDashboard;
+    await this.page.goto(topicsAndSkillsDashboardUrl);
+    await this.page.waitForSelector('oppia-login-page-root');
+  }
+
+  /**
+   * Function to verify that the user cannot add an exploration to the Play Later list.
+   */
+  async expectCannotAddExplorationToPlayLater(): Promise<void> {
+    const addToPlayLaterButtonSelector = playLaterButton;
+    const isButtonVisible =
+      (await this.page.$(addToPlayLaterButtonSelector)) !== null;
+    expect(isButtonVisible).toBe(false);
+  }
+
+  /**
+   * Function to navigate to the Learner Dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
   }
 
   /**
