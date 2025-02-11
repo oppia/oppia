@@ -152,7 +152,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/library-page/search-bar/search-bar.component.spec.ts',
     'core/templates/pages/oppia-root/app-error-handler.ts',
     'core/templates/pages/oppia-root/routing/app.routing.module.ts',
-    'core/templates/pages/practice-session-page/practice-session-page.import.ts',
     'core/templates/pages/review-test-page/review-test-page.import.ts',
     'core/templates/pages/skill-editor-page/skill-editor-page.component.ts',
     'core/templates/pages/skill-editor-page/skill-editor-page.import.ts',
