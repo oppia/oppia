@@ -147,7 +147,7 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--skip-install',
     help='optional; if specified, skips the installation of '
-    'third party libraries',
+        'third party libraries',
     action='store_true')
 
 

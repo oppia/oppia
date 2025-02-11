@@ -1007,7 +1007,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_skip_install_skips_third_party_installation(self) -> None:
         from scripts import run_backend_tests
-        mock_install = unittest.mock.Mock()
+        mock_third_party_install = unittest.mock.Mock()
         swap_install = self.swap(
             install_third_party_libs, 'main', mock_install)
         swap_check_results = self.swap(
@@ -1024,7 +1024,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_third_party_installed_when_no_skip_flag(self) -> None:
         from scripts import run_backend_tests
-        mock_install = unittest.mock.Mock()
+        mock_third_party_install = unittest.mock.Mock()
         swap_install = self.swap(
             install_third_party_libs, 'main', mock_install)
         swap_check_results = self.swap(
