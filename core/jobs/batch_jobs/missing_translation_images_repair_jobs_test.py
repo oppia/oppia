@@ -25,7 +25,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import result
-from typing import Iterable, Set
+from typing import Iterable, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -54,24 +54,27 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
     MIME_TYPE = 'image/png'
 
     @staticmethod
-    def _make_translation_html(images: Iterable[str]) -> str:
+    def _make_translation_html(
+            images: Iterable[str], lst_format: bool) -> Union[List[str], str]:
         """Generate HTML with image elements with the provided filenames.
 
         Args:
             images: iterable(str). The image filenames to use.
+            lst_format: bool. Whether to format the returned translation html
+                as a list of strings instead of as a single string.
 
         Returns:
-            str. The HTML.
+            str|list(str). The HTML.
         """
         tags = [
             f'<oppia-noninteractive-image filepath-with-value="{image}">'
             for image in images
         ]
-        return '\n'.join(tags)
+        return tags if lst_format else '\n'.join(tags)
 
     def _add_suggestion(
         self, exp_id: str, image_filenames: Iterable[str], make_dst: bool,
-        make_src: bool
+        make_src: bool, lst_html: bool = False
     ) -> None:
         """Add a translation suggestion.
 
@@ -83,6 +86,9 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
                 exploration_suggestions/ in GCS.
             make_src: bool. Whether to create the source files under
                 exploration/ in GCS.
+            lst_html: bool. Whether to format the translation_html field of the
+                suggestion change_cmd as a list of strings instead of a single
+                string.
         """
         score_cat = '%s%s%s' % (
             suggestion_models.SCORE_TYPE_TRANSLATION,
@@ -98,7 +104,8 @@ class MissingTranslationImagesJobTestsBase(job_test_utils.JobTestBase):
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id=self.AUTHOR,
             change_cmd={
-                'translation_html': self._make_translation_html(image_filenames)
+                'translation_html': self._make_translation_html(
+                    image_filenames, lst_html)
             },
             score_category=score_cat,
         )
@@ -137,6 +144,39 @@ class CopyMissingTranslationImagesJobTests(
     def test_copy_images_when_dst_missing(self) -> None:
         self._add_suggestion(
             'e1', ['image1.png', 'image2.png'], False, True)
+        self.assertSetEqual(
+            self._gcs_ls('exploration/e1/assets/image'),
+            {'image1.png', 'image2.png'}
+        )
+        self.assertSetEqual(
+            self._gcs_ls('exploration_suggestions/e1/assets/image'),
+            set(),
+        )
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(result.Ok((
+                SRC1,
+                DST1,
+                'Copied',
+            ))),
+            job_run_result.JobRunResult.as_stdout(result.Ok((
+                SRC2,
+                DST2,
+                'Copied',
+            ))),
+        ])
+
+        self.assertSetEqual(
+            self._gcs_ls('exploration/e1/assets/image'),
+            {'image1.png', 'image2.png'}
+        )
+        self.assertSetEqual(
+            self._gcs_ls('exploration_suggestions/e1/assets/image'),
+            {'image1.png', 'image2.png'}
+        )
+
+    def test_copy_images_when_dst_missing_lst_translation_html(self) -> None:
+        self._add_suggestion(
+            'e1', ['image1.png', 'image2.png'], False, True, True)
         self.assertSetEqual(
             self._gcs_ls('exploration/e1/assets/image'),
             {'image1.png', 'image2.png'}

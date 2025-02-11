@@ -197,18 +197,24 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         image_filenames: List[str] = []
         for model in model_pcoll:
             translation_html = model.change_cmd['translation_html']
-            if not isinstance(translation_html, str):  # pragma: no cover
+            if isinstance(translation_html, str):
+                translation_html_lst: List[str] = [translation_html]
+            else:
+                translation_html_lst = translation_html
+            if not isinstance(translation_html[0], str):  # pragma: no cover
                 logging.error(
                     'Expected translation_html to be type str, not %s. obj: %s',
                     type(translation_html), translation_html)
             try:
-                translation_tree = bs4.BeautifulSoup(
-                    translation_html, 'html.parser')
-                image_nodes = translation_tree.findAll(
-                    name='oppia-noninteractive-image')
-                image_filenames += [
-                    html.unescape(node.get('filepath-with-value')).strip('"')
-                    for node in image_nodes]
+                for translation_html_str in translation_html_lst:
+                    translation_tree = bs4.BeautifulSoup(
+                        translation_html_str, 'html.parser')
+                    image_nodes = translation_tree.findAll(
+                        name='oppia-noninteractive-image')
+                    image_filenames += [
+                        html.unescape(
+                            node.get('filepath-with-value')).strip('"')
+                        for node in image_nodes]
             except Exception as exception:  # pragma: no cover
                 logging.exception(
                     'Exception raised while processing "%s": %s',
