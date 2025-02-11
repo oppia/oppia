@@ -25,7 +25,7 @@ import os
 import requests
 from typing import List
 
-INACTIVE_DAYS = 7
+INACTIVE_DAYS_THRESHOLD = 7
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
@@ -69,9 +69,9 @@ def get_inactive_issues(
         collaborators_url, headers=headers, timeout=10
     )
     collaborators = collaborators_response.json()
-    collaborator_logins = set()
+    collaborator_usernames = set()
     for c in collaborators:
-        collaborator_logins.add(c['login'])
+        collaborator_usernames.add(c['login'])
 
     pulls_url = f'{repo_url}/pulls?state=open'
     pulls_response = requests.get(pulls_url, headers=headers, timeout=10)
@@ -86,18 +86,20 @@ def get_inactive_issues(
         assignee_login = issue['assignee']['login']
         logging.info('Checking issue #%s', issue_number)
 
-        if assignee_login in collaborator_logins:
+        # Skip issues assigned to collaborators.
+        if assignee_login in collaborator_usernames:
             logging.info(
                 'Skipping issue #%s as %s is a collaborator.',
                 issue_number, assignee_login
             )
             continue
-
+        
+        # Check if there are any open pull requests related to the issue.
         related_pull_requests = [
             pr for pr in pull_requests
-            if pr.get('body') and issue_number in {
+            if issue_number in {
                 int(word.strip('#'))
-                for word in pr.get('body', '').split()
+                for word in pr['body'].split()
                 if word.strip('#').isdigit()
             }
         ]
@@ -124,18 +126,18 @@ def get_inactive_issues(
         )
 
         now = datetime.datetime.now(datetime.timezone.utc)
-        days_since_activity = (
+        days_since_last_activity = (
             (now - last_activity_date).total_seconds() / 86400
         )
 
-        if days_since_activity > INACTIVE_DAYS:
+        if days_since_last_activity > INACTIVE_DAYS_THRESHOLD:
             inactive_issues.append(InactiveIssue(
                 number=issue_number,
                 assignee=assignee_login
             ))
             logging.info(
                 'Issue #%s has been inactive for %d days',
-                issue_number, days_since_activity
+                issue_number, days_since_last_activity
             )
 
     return inactive_issues
@@ -163,23 +165,23 @@ def unassign_inactive_issues(
 
     for issue in inactive_issues:
         issue_number = issue.number
-        assignee_login = issue.assignee
+        assignee_username = issue.assignee
 
         try:
             assignees_url = f'{repo_url}/issues/{issue_number}/assignees'
             unassign_response = requests.delete(
                 assignees_url,
                 headers=headers,
-                json={'assignees': [assignee_login]},
+                json={'assignees': [assignee_username]},
                 timeout=10,
             )
 
             if unassign_response.status_code == 200:
                 comments_url = f'{repo_url}/issues/{issue_number}/comments'
                 comment_body = (
-                    f'@{assignee_login} has been unassigned '
+                    f'@{assignee_username} has been unassigned '
                     f'from this issue due to inactivity for '
-                    f'more than {INACTIVE_DAYS} days. If '
+                    f'more than {INACTIVE_DAYS_THRESHOLD} days. If '
                     f'you would like to continue working on '
                     f'this issue, please request to be reassigned.'
                 )
@@ -192,7 +194,7 @@ def unassign_inactive_issues(
 
                 logging.info(
                     'Unassigned issue #%s from %s due to inactivity.',
-                    issue_number, assignee_login
+                    issue_number, assignee_username
                 )
             else:
                 logging.error(
@@ -209,7 +211,6 @@ def unassign_inactive_issues(
 
 if __name__ == '__main__': # pragma: no cover
     GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
-    DEASSIGN_INACTIVE_CONTRIBUTOR = os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS']
 
     all_inactive_issues = get_inactive_issues(
         GITHUB_TOKEN, REPO_OWNER, REPO_NAME
@@ -224,7 +225,7 @@ if __name__ == '__main__': # pragma: no cover
     else:
         logging.info('No inactive issues found that need unassignment.')
 
-    if DEASSIGN_INACTIVE_CONTRIBUTOR:
+    if os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS']:
         unassign_inactive_issues(
             GITHUB_TOKEN, REPO_OWNER, REPO_NAME, all_inactive_issues
         )
