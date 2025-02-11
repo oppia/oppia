@@ -17,3 +17,4 @@ pyyaml==6.0
 rcssmin==1.1.1
 webtest==3.0.0
 xmltodict==0.13.0
+black==24.8.0
