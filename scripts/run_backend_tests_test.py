@@ -1009,7 +1009,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         from scripts import run_backend_tests
         mock_third_party_install = unittest.mock.Mock()
         swap_install = self.swap(
-            install_third_party_libs, 'main', mock_install)
+            install_third_party_libs, 'main', mock_third_party_install)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
             lambda *_: (100, 0, 0, {}))
@@ -1020,13 +1020,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with swap_coverage, self.swap_execute_task:
                     run_backend_tests.main(args=['--skip-install'])
-        mock_install.assert_not_called()
+        mock_third_party_install.assert_not_called()
 
     def test_third_party_installed_when_no_skip_flag(self) -> None:
         from scripts import run_backend_tests
         mock_third_party_install = unittest.mock.Mock()
         swap_install = self.swap(
-            install_third_party_libs, 'main', mock_install)
+            install_third_party_libs, 'main', mock_third_party_install)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
             lambda *_: (100, 0, 0, {}))
@@ -1037,4 +1037,4 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with swap_coverage, self.swap_execute_task:
                     run_backend_tests.main(args=[])
-        mock_install.assert_called_once()
+        mock_third_party_install.assert_called_once()
