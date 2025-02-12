@@ -50,7 +50,7 @@ ES = elasticsearch.Elasticsearch(
         if feconf.ES_CLOUD_ID else None
     ),
     timeout=30,
-    verify_certs=True,
+    verify_certs=False,
 )
 
 
