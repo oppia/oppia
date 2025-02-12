@@ -197,8 +197,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/subscribe-to-newsletter-and-click-all-buttons.spec.ts"
     },
     {
-      "name": "logged-out-user/try-to-access-protected-pages-and-features-without-login-and-get-denied",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/try-to-access-protected-pages-and-features-without-login-and-get-denied.spec.ts"
+      "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
