@@ -31,8 +31,6 @@ ruleTester.run('break-after-parens', rule, {
       }`,
     `it('should' +
     'happen')`,
-    `angular.module('oppia').constant('default',
-    false);`,
     `var a = (
       true);`,
   ],

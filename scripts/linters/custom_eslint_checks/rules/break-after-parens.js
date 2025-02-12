@@ -61,8 +61,7 @@ module.exports = {
           // call instead of an exception.
           if (
             line.startsWith('it(') ||
-            line.startsWith('describe(') ||
-            line.startsWith("angular.module('oppia').")
+            line.startsWith('describe(')
           ) {
             return true;
           }
