@@ -41,13 +41,12 @@ secrets_services = models.Registry.import_secrets_services()
 # longer than ElasticSearch expects.
 ES = elasticsearch.Elasticsearch(
     hosts=(
-        [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+        [f'https://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
         if feconf.ES_CLOUD_ID is None else None
     ),
     cloud_id=feconf.ES_CLOUD_ID,
     basic_auth=(
         (feconf.ES_USERNAME, secrets_services.get_secret('ES_PASSWORD'))
-        if feconf.ES_CLOUD_ID else None
     ),
     timeout=30,
     verify_certs=False,

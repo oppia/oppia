@@ -22,7 +22,7 @@ from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence, Mapping
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
@@ -33,13 +33,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_id = 'id'
 
         def mock_index(
-                index: str, body: Dict[str, str], id: str # pylint: disable=redefined-builtin
+                index: str, documents: Sequence[Mapping[str, Any]], id: str # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
-            self.assertEqual(body, {
-                'id': correct_id
-            })
             return {
                 '_shards': {
                     'failed': 0
@@ -54,13 +51,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
         correct_id = 'id'
         def mock_index(
-                index: str, body: Dict[str, str], id: str # pylint: disable=redefined-builtin
+                index: str, documents: Sequence[Mapping[str, Any]], id: str # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
-            self.assertEqual(body, {
-                'id': correct_id
-            })
             return {
                 '_shards': {
                     'failed': 2
@@ -110,10 +104,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     def test_clear_index(self) -> None:
         correct_index_name = 'index1'
         def mock_delete_by_query(
-                index: str, body: Dict[str, Dict[str, Dict[str, str]]]
+                index: str, query: Dict[str, Dict[str, Dict[str, str]]]
         ) -> None:
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query':
                 {
                     'match_all': {}
