@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -86,10 +86,8 @@ const navbarLearnTabBasicMathematicsButton =
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
-const navbarAboutTabImpactReport2023Button =
-  'a.e2e-test-navbar-impact-report-button-2023';
-const navbarAboutTabImpactReport2022Button =
-  'a.e2e-test-navbar-impact-report-button-2022';
+const navbarAboutTabImpactReportButton =
+  'a.e2e-test-navbar-impact-report-button';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
 const navbarGetInvolvedTabSchoolAndOrganizationsButton =
   'a.e2e-test-navbar-get-involved-menu-school-and-organizations-button';
@@ -135,10 +133,8 @@ const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
-const mobileSidebarImpactReport2023Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button-2023';
-const mobileSidebarImpactReport2022Button =
-  'a.e2e-mobile-test-sidebar-impact-report-button-2022';
+const mobileSidebarImpactReportButton =
+  'a.e2e-mobile-test-sidebar-impact-report-button';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
 const mobileSidebarExpandImpactReportSubMenuButton =
@@ -654,29 +650,64 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
+
   async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
-      await this.openExternalLink(
-        mobileSidebarImpactReport2023Button,
+      await this.openExternalLinkByClassAndText(
+        mobileSidebarImpactReportButton,
+        '2023',
         impactReport2023Url
       );
-      await this.openExternalLink(
-        mobileSidebarImpactReport2022Button,
+      await this.openExternalLinkByClassAndText(
+        mobileSidebarImpactReportButton,
+        '2022',
         impactReport2022Url
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalLink(
-        navbarAboutTabImpactReport2023Button,
+      await this.openExternalLinkByClassAndText(
+        navbarAboutTabImpactReportButton,
+        '2023',
         impactReport2023Url
       );
-      await this.openExternalLink(
-        navbarAboutTabImpactReport2022Button,
+      await this.openExternalLinkByClassAndText(
+        navbarAboutTabImpactReportButton,
+        '2022',
         impactReport2022Url
       );
+    }
+  }
+
+  async openExternalLinkByClassAndText(
+    className: string,
+    year: string,
+    expectedUrl: string
+  ): Promise<void> {
+    const links = await this.page.$$(className);
+    let impactReportLink: ElementHandle<Element> | null = null;
+
+    for (const link of links) {
+      const spanHandle = await link.$('span');
+      if (!spanHandle) continue;
+
+      const spanText = await spanHandle.evaluate(el => el.textContent?.trim());
+      if (spanText === year) {
+        impactReportLink = link;
+        break;
+      }
+    }
+
+    if (!impactReportLink) {
+      throw new Error(`Impact Report link for ${year} not found`);
+    }
+
+    const href = await impactReportLink.evaluate(el => el.getAttribute('href'));
+
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
     }
   }
 
