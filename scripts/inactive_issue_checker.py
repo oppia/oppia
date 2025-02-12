@@ -14,299 +14,300 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Inactive issue checker script for Oppia."""
+"""Script to check and unassign inactive issues in Oppia repository."""
 
 from __future__ import annotations
 
 import datetime
 import logging
 import os
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import requests
-from typing import Dict, List, Set
+
 
 INACTIVE_DAYS_THRESHOLD = 7
-REPO_OWNER = 'Ashu463'
-REPO_NAME = 'grid6.0'
+REPO_OWNER = 'oppia'
+REPO_NAME = 'oppia'
 
+@dataclass
+class Issue:
+    """Domain object representing a GitHub issue."""
+    number: int
+    assignee_username: Optional[str]
+    events_url: str
+    last_active_date: Optional[datetime.datetime] = None
 
-class InactiveIssue:
-    """Represents an inactive issue with its number and assignee."""
+    @classmethod
+    def from_github_data(cls, data: dict) -> 'Issue':
+        """Creates an Issue instance from GitHub API response data."""
+        return cls(
+            number=data['number'],
+            assignee_username=data['assignee']['login'] if data.get('assignee') else None,
+            events_url=data['events_url']
+        )
 
-    def __init__(self, number: int, assignee: str):
-        self.number = number
-        self.assignee = assignee
-
-
-def build_issue_pr_mapping(
-    github_token: str,
-    repo_owner: str,
-    repo_name: str
-) -> Dict[int, int]:
-    """Builds a mapping of issue numbers to their linked pull request number.
-    
-    Args:
-        github_token: str. The GitHub token for authentication.
-        repo_owner: str. The owner of the repository.
-        repo_name: str. The name of the repository.
+    def is_inactive(self) -> bool:
+        """Checks if the issue is inactive based on threshold."""
+        if not self.last_active_date:
+            return False
         
-    Returns:
-        Dict[int, int]. A mapping where key is issue number and value is the linked PR number.
-    """
-    issue_to_pr: Dict[int, int] = {}
-    
-    url = 'https://api.github.com/graphql'
-    headers = {
-        'Authorization': f'Bearer {github_token}',
-        'Content-Type': 'application/json',
-    }
-    
-    query = """
-    query($owner: String!, $name: String!, $cursor: String) {
-      repository(owner: $owner, name: $name) {
-        pullRequests(first: 100, states: [OPEN], after: $cursor) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          nodes {
-            number
-            closingIssuesReferences(first: 1) {  # Changed to first: 1
+        now = datetime.datetime.now(datetime.timezone.utc)
+        days_inactive = (now - self.last_active_date).total_seconds() / 86400
+        return days_inactive > INACTIVE_DAYS_THRESHOLD
+
+class GitHubService:
+    """Service class for GitHub API interactions."""
+
+    def __init__(self, token: str, repo_owner: str, repo_name: str):
+        self.token = token
+        self.repo_owner = repo_owner
+        self.repo_name = repo_name
+        self.rest_headers = {
+            'Authorization': f'token {token}',
+            'Accept': 'application/vnd.github.v3+json'
+        }
+        self.graphql_headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+        self.base_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
+
+    def get_open_issues(self) -> List[Issue]:
+        """Fetches all open issues from GitHub."""
+        url = f'{self.base_url}/issues?state=open'
+        response = requests.get(url, headers=self.rest_headers, timeout=10)
+        response.raise_for_status()
+        
+        issues_list = []
+        for issue_data in response.json():
+            if isinstance(issue_data, dict):
+                issue = Issue.from_github_data(issue_data)
+                issues_list.append(issue)
+
+        return issues_list
+
+    def get_collaborators(self) -> set[str]:
+        """Fetches repository collaborators."""
+        url = f'{self.base_url}/collaborators'
+        response = requests.get(url, headers=self.rest_headers, timeout=10)
+        response.raise_for_status()
+        
+        collaborators_set = set()
+        for collaborator in response.json():
+            if isinstance(collaborator, dict):
+                collaborators_set.add(collaborator['login'])
+
+        return collaborators_set
+
+
+    def get_issue_events(self, issue: Issue) -> datetime.datetime:
+        """Fetches and processes events for an issue."""
+        response = requests.get(
+            issue.events_url, 
+            headers=self.rest_headers, 
+            timeout=10
+        )
+        response.raise_for_status()
+        events = response.json()
+
+        if not events:
+            return None
+
+        # Find the most recent event date
+        latest_date = max(
+            datetime.datetime.strptime(
+                event['created_at'], 
+                '%Y-%m-%dT%H:%M:%SZ'
+            ).replace(tzinfo=datetime.timezone.utc)
+            for event in events
+        )
+        return latest_date
+
+    def get_issues_with_prs(self) -> Dict[int, int]:
+        """Fetches mapping of issues to their linked PRs using GraphQL."""
+        query = """
+        query($owner: String!, $name: String!, $cursor: String) {
+          repository(owner: $owner, name: $name) {
+            pullRequests(first: 100, states: [OPEN], after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
               nodes {
                 number
+                closingIssuesReferences(first: 1) {
+                  nodes {
+                    number
+                  }
+                }
               }
             }
           }
         }
-      }
-    }
-    """
-    
-    variables = {
-        "owner": repo_owner,
-        "name": repo_name,
-        "cursor": None
-    }
-    
-    has_next_page = True
-    
-    while has_next_page:
-        response = requests.post(
+        """
+        
+        variables = {
+            "owner": self.repo_owner,
+            "name": self.repo_name,
+            "cursor": None
+        }
+        
+        issue_to_pr: Dict[int, int] = {}
+        has_next_page = True
+        
+        while has_next_page:
+            response = requests.post(
+                'https://api.github.com/graphql',
+                headers=self.graphql_headers,
+                json={"query": query, "variables": variables},
+                timeout=10
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            pull_requests = data['data']['repository']['pullRequests']
+            
+            # Process each PR and its linked issues
+            for pr in pull_requests['nodes']:
+                pr_number = pr['number']
+                linked_issues = pr['closingIssuesReferences']['nodes']
+                
+                if linked_issues:
+                    issue_number = linked_issues[0]['number']
+                    issue_to_pr[issue_number] = pr_number
+            
+            # Update pagination
+            page_info = pull_requests['pageInfo']
+            has_next_page = page_info['hasNextPage']
+            variables['cursor'] = page_info['endCursor']
+        
+        return issue_to_pr
+
+    def unassign_issue(self, issue: Issue) -> bool:
+        """Unassigns a user from an issue."""
+        if not issue.assignee_username:
+            return False
+
+        url = f'{self.base_url}/issues/{issue.number}/assignees'
+        response = requests.delete(
             url,
-            headers=headers,
-            json={"query": query, "variables": variables},
+            headers=self.rest_headers,
+            json={'assignees': [issue.assignee_username]},
             timeout=10
         )
-        
-        if response.status_code != 200:
-            logging.error(
-                "GraphQL request failed: %s", 
-                response.json().get('errors', ['Unknown error'])
-            )
-            break
-            
-        data = response.json()
-        pull_requests = data['data']['repository']['pullRequests']
-        
-        for pr in pull_requests['nodes']:
-            pr_number = pr['number']
-            linked_issues = pr['closingIssuesReferences']['nodes']
-            
-            if linked_issues:
-                issue_number = linked_issues[0]['number']
-                issue_to_pr[issue_number] = pr_number
-        
-        # Check if there are more pages
-        page_info = pull_requests['pageInfo']
-        has_next_page = page_info['hasNextPage']
-        variables['cursor'] = page_info['endCursor']
-    
-    return issue_to_pr
+        return response.status_code == 200
 
-
-def get_inactive_issues(
-    github_token: str,
-    repo_owner: str,
-    repo_name: str
-) -> List[InactiveIssue]:
-    """Identifies inactive issues that need unassignment.
-
-    Args:
-        github_token: str. The GitHub token for authentication.
-        repo_owner: str. The owner of the repository.
-        repo_name: str. The name of the repository.
-
-    Returns:
-        List[InactiveIssue]. A list of issues that need unassignment.
-    """
-    headers = {
-        'Authorization': f'token {github_token}',
-        'Accept': 'application/vnd.github.v3+json',
-    }
-    repo_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
-    inactive_issues: List[InactiveIssue] = []
-
-    issues_url = f'{repo_url}/issues?state=open'
-    response = requests.get(issues_url, headers=headers, timeout=10)
-    issues = response.json()
-
-    collaborators_url = f'{repo_url}/collaborators'
-    collaborators_response = requests.get(
-        collaborators_url, headers=headers, timeout=10
-    )
-    collaborators = collaborators_response.json()
-    collaborator_usernames = set()
-    for c in collaborators:
-        collaborator_usernames.add(c['login'])
-
-    for issue in issues:
-        if not issue or not isinstance(
-            issue, dict) or not issue.get('assignee'):
-            continue
-
-        issue_number = issue['number']
-        assignee_login = issue['assignee']['login']
-        logging.info('Checking issue #%s', issue_number)
-
-        # Skip issues assigned to collaborators.
-        if assignee_login in collaborator_usernames:
-            logging.info(
-                'Skipping issue #%s as %s is a collaborator.',
-                issue_number, assignee_login
-            )
-            continue
-        
-        # Check if there are any open pull requests related to the issue.
-        related_pull_requests = build_issue_pr_mapping(
-            github_token, repo_owner,repo_name
+    def comment_on_issue(self, issue: Issue) -> None:
+        """Posts unassignment comment on an issue."""
+        url = f'{self.base_url}/issues/{issue.number}/comments'
+        comment = (
+            f'@{issue.assignee_username} has been unassigned from this issue '
+            f'due to inactivity for more than {INACTIVE_DAYS_THRESHOLD} days. '
+            f'If you would like to continue working on this issue, please '
+            f'request to be reassigned.'
         )
-        logging.info(
-            'related_pull_requests:', related_pull_requests
+        
+        response = requests.post(
+            url,
+            headers=self.rest_headers,
+            json={'body': comment},
+            timeout=10
         )
-        if issue_number in related_pull_requests:
-            logging.info(
-                'Skipping issue #%s as there are related open pull requests.',
-                issue_number
-            )
-            continue
+        response.raise_for_status()
 
-        events_url = issue['events_url']
-        events_response = requests.get(events_url, headers=headers, timeout=10)
-        events = events_response.json()
+class IssueManager:
+    """Manages issue operations and business logic."""
 
-        if not events:
-            continue
+    def __init__(self, github_service: GitHubService):
+        self.github = github_service
 
-        last_activity_date = max(
-            datetime.datetime.strptime(
-                event['created_at'], '%Y-%m-%dT%H:%M:%SZ')
-                .replace(tzinfo=datetime.timezone.utc)
-            for event in events
-        )
+    def get_inactive_issues(self) -> List[Issue]:
+        """Identifies issues that need unassignment."""
+        # Get necessary data
+        issues = self.github.get_open_issues()
+        collaborators = self.github.get_collaborators()
+        issues_with_prs = self.github.get_issues_with_prs()
+        
+        inactive_issues = []
+        for issue in issues:
+            # Skip if no assignee
+            if not issue.assignee_username:
+                continue
 
-        now = datetime.datetime.now(datetime.timezone.utc)
-        days_since_last_activity = (
-            (now - last_activity_date).total_seconds() / 86400
-        )
-
-        if days_since_last_activity > INACTIVE_DAYS_THRESHOLD:
-            inactive_issues.append(InactiveIssue(
-                number=issue_number,
-                assignee=assignee_login
-            ))
-            logging.info(
-                'Issue #%s has been inactive for %d days',
-                issue_number, days_since_last_activity
-            )
-
-    return inactive_issues
-
-
-def unassign_inactive_issues(
-    github_token: str,
-    repo_owner: str,
-    repo_name: str,
-    inactive_issues: List[InactiveIssue]
-) -> None:
-    """Unassigns the specified inactive issues and posts comments.
-
-    Args:
-        github_token: str. The GitHub token for authentication.
-        repo_owner: str. The owner of the repository.
-        repo_name: str. The name of the repository.
-        inactive_issues: List[InactiveIssue]. List of issues to unassign.
-    """
-    headers = {
-        'Authorization': f'token {github_token}',
-        'Accept': 'application/vnd.github.v3+json',
-    }
-    repo_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
-
-    for issue in inactive_issues:
-        issue_number = issue.number
-        assignee_username = issue.assignee
-
-        try:
-            assignees_url = f'{repo_url}/issues/{issue_number}/assignees'
-            unassign_response = requests.delete(
-                assignees_url,
-                headers=headers,
-                json={'assignees': [assignee_username]},
-                timeout=10,
-            )
-
-            if unassign_response.status_code == 200:
-                comments_url = f'{repo_url}/issues/{issue_number}/comments'
-                comment_body = (
-                    f'@{assignee_username} has been unassigned '
-                    f'from this issue due to inactivity for '
-                    f'more than {INACTIVE_DAYS_THRESHOLD} days. If '
-                    f'you would like to continue working on '
-                    f'this issue, please request to be reassigned.'
-                )
-                requests.post(
-                    comments_url,
-                    headers=headers,
-                    json={'body': comment_body},
-                    timeout=10
-                )
-
+            # Skip if assignee is a collaborator
+            if issue.assignee_username in collaborators:
                 logging.info(
-                    'Unassigned issue #%s from %s due to inactivity.',
-                    issue_number, assignee_username
+                    'Skipping issue #%d: assignee %s is a collaborator',
+                    issue.number, issue.assignee_username
                 )
-            else:
-                logging.error(
-                    'Failed to unassign issue #%s',
-                    issue_number
+                continue
+
+            # Skip if issue has an open PR
+            if issue.number in issues_with_prs:
+                logging.info(
+                    'Skipping issue #%d: has open PR #%d',
+                    issue.number, issues_with_prs[issue.number]
+                )
+                continue
+
+            # Get last activity date
+            issue.last_active_date = self.github.get_issue_events(issue)
+            
+            # Check if inactive
+            if issue.is_inactive():
+                inactive_issues.append(issue)
+                logging.info(
+                    'Issue #%d has been inactive for >%d days',
+                    issue.number, INACTIVE_DAYS_THRESHOLD
                 )
 
-        except Exception as error:
-            logging.error(
-                'Error processing issue #%s: %s',
-                issue_number, error
-            )
+        return inactive_issues
+
+    def unassign_issues(self, issues: List[Issue]) -> None:
+        """Unassigns users from inactive issues."""
+        for issue in issues:
+            try:
+                if self.github.unassign_issue(issue):
+                    self.github.comment_on_issue(issue)
+                    logging.info(
+                        'Unassigned issue #%d from %s',
+                        issue.number, issue.assignee_username
+                    )
+                else:
+                    logging.error(
+                        'Failed to unassign issue #%d',
+                        issue.number
+                    )
+            except Exception as e:
+                logging.error(
+                    'Error processing issue #%d: %s',
+                    issue.number, str(e)
+                )
 
 
 if __name__ == '__main__': # pragma: no cover
-    GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+    github_token = os.environ['GITHUB_TOKEN']
 
-    all_inactive_issues = get_inactive_issues(
-        GITHUB_TOKEN, REPO_OWNER, REPO_NAME
-    )
-    if all_inactive_issues:
+    # Initialize services
+    github_service = GitHubService(github_token, REPO_OWNER, REPO_NAME)
+    issue_manager = IssueManager(github_service)
+    
+    # Find inactive issues
+    inactive_issues = issue_manager.get_inactive_issues()
+    
+    if inactive_issues:
         logging.info('The following issues will be unassigned:')
-        for inactive_issue in all_inactive_issues:
+        for issue in inactive_issues:
             logging.info(
-                'Issue #%s (assignee: %s)',
-                inactive_issue.number, inactive_issue.assignee
+                'Issue #%d (assignee: %s)', issue.number, issue.assignee_username
             )
+            
+        # Only unassign if there are inactive issues AND DEASSIGN_INACTIVE_CONTRIBUTORS is 'true'
+        if os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS'] == 'true':
+            issue_manager.unassign_issues(inactive_issues)
+        else:
+            logging.info('Unassignment is currently disabled.')
     else:
         logging.info('No inactive issues found that need unassignment.')
-
-    if os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS']:
-        unassign_inactive_issues(
-            GITHUB_TOKEN, REPO_OWNER, REPO_NAME, all_inactive_issues
-        )
-    else:
-        logging.info('Unassignment is currently disabled.')
