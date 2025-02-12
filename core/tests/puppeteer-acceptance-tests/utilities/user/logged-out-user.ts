@@ -647,6 +647,42 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to open the external link by class and text inside it
+   */
+
+  async openExternalLinkByClassAndText(
+    className: string,
+    year: string,
+    expectedUrl: string
+  ): Promise<void> {
+    const links = await this.page.$$(className);
+    let impactReportLink: ElementHandle<Element> | null = null;
+
+    for (const link of links) {
+      const spanHandle = await link.$('span');
+      if (!spanHandle) {
+        continue;
+      }
+
+      const spanText = await spanHandle.evaluate(el => el.textContent?.trim());
+      if (spanText === year) {
+        impactReportLink = link;
+        break;
+      }
+    }
+
+    if (!impactReportLink) {
+      throw new Error(`Impact Report link for ${year} not found`);
+    }
+
+    const href = await impactReportLink.evaluate(el => el.getAttribute('href'));
+
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
@@ -678,36 +714,6 @@ export class LoggedOutUser extends BaseUser {
         '2022',
         impactReport2022Url
       );
-    }
-  }
-
-  async openExternalLinkByClassAndText(
-    className: string,
-    year: string,
-    expectedUrl: string
-  ): Promise<void> {
-    const links = await this.page.$$(className);
-    let impactReportLink: ElementHandle<Element> | null = null;
-
-    for (const link of links) {
-      const spanHandle = await link.$('span');
-      if (!spanHandle) continue;
-
-      const spanText = await spanHandle.evaluate(el => el.textContent?.trim());
-      if (spanText === year) {
-        impactReportLink = link;
-        break;
-      }
-    }
-
-    if (!impactReportLink) {
-      throw new Error(`Impact Report link for ${year} not found`);
-    }
-
-    const href = await impactReportLink.evaluate(el => el.getAttribute('href'));
-
-    if (href !== expectedUrl) {
-      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
     }
   }
 
