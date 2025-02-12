@@ -2,7 +2,7 @@
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
 
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
-    <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
+    <div #audioControls tabindex="0" class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
         <div class="audio-header-control-icons">
           <a (click)="onBackwardButtonClicked()">
