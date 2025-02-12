@@ -21,7 +21,6 @@
  */
 
 import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ImageClickAnswer} from 'interactions/answer-defs';
@@ -322,10 +321,3 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveImageClickInput',
-  downgradeComponent({
-    component: InteractiveImageClickInput,
-  }) as angular.IDirectiveFactory
-);

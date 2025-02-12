@@ -20,7 +20,6 @@ import {Ratio} from 'domain/objects/ratio.model';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'ratio-expression-editor',
@@ -81,9 +80,3 @@ export class RatioExpressionEditorComponent implements OnInit {
     }
   }
 }
-angular.module('oppia').directive(
-  'ratioExpressionEditor',
-  downgradeComponent({
-    component: RatioExpressionEditorComponent,
-  }) as angular.IDirectiveFactory
-);
