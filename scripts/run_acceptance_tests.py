@@ -27,7 +27,6 @@ from core.constants import constants
 from scripts import build
 from scripts import common
 from scripts import servers
-from scripts.utils import color_utils
 
 from typing import Final, List, Optional, Tuple
 
@@ -178,27 +177,12 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
 def main(args: Optional[List[str]] = None) -> None:
     """Run acceptance tests."""
-    try:
-        parsed_args = _PARSER.parse_args(args=args)
-        print(color_utils.colorize_success('Starting acceptance tests...'))
+    parsed_args = _PARSER.parse_args(args=args)
 
-        with servers.managed_portserver():
-            _, return_code = run_tests(parsed_args)
+    with servers.managed_portserver():
+        _, return_code = run_tests(parsed_args)
 
-            if return_code != 0:
-                print(
-                    color_utils.colorize_error(
-                        'Tests failed. Please check the error messages above.'
-                    )
-                )
-            sys.exit(return_code)
-
-    except KeyboardInterrupt:
-        print(color_utils.colorize_warning('\nTest run interrupted by user.'))
-        sys.exit(130)
-    except Exception as e:
-        print(color_utils.colorize_error(f'Unexpected error: {str(e)}'))
-        sys.exit(1)
+    sys.exit(return_code)
 
 
 if __name__ == '__main__':  # pragma: no cover
