@@ -23,10 +23,18 @@ from __future__ import annotations
 import html
 import io
 import json
+import re
+import uuid
 
 from core import feconf
+from core import utils
 from core.domain import fs_services
 from core.platform import models
+from core.domain import exp_fetchers
+from core.domain import state_domain
+from core.domain import translation_fetchers
+from core.domain import voiceover_services
+
 
 import bs4
 from mutagen import mp3
@@ -110,6 +118,19 @@ def parse_html(html_content: str) -> str:
     return text_content
 
 
+def preprocess_voiceover_text(parsed_text: str) -> str:
+    """Handles special cases by preprocessing the text for voiceover
+    regeneration.
+    Applies all custom rules to ensure accurate voiceovers.
+    """
+    updated_text = re.sub(r'_{2,}', 'dash', parsed_text)
+
+    pattern = r'(\d+)\s*/\s*(\d+)'
+    updated_text = re.sub(pattern, r'\1 ÷ \2', updated_text)
+
+    return updated_text
+
+
 def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
@@ -146,12 +167,16 @@ def synthesize_voiceover_for_html_string(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
 
     parsed_text = parse_html(content_html)
+    print('parsed_text', parsed_text)
+    processed_text_for_voiceover_regeneration = preprocess_voiceover_text(
+        parsed_text)
+    print('processed_text_for_voiceover_regeneration', processed_text_for_voiceover_regeneration)
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.
-        generate_hash_from_text(parsed_text)
+        generate_hash_from_text(processed_text_for_voiceover_regeneration)
     )
-
+    print('a.....\n\n')
     cached_model = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         get_cached_automatic_voiceover_model(
@@ -163,22 +188,34 @@ def synthesize_voiceover_for_html_string(
 
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
-    is_cached_model_used_for_voiceovers = False
+    # remove this.
+    cached_model = None
+
+    is_voiceover_from_cache = False
+    print('b.....\n\n')
 
     if cached_model is not None:
         error_details = None
-        if cached_model.plaintext == parsed_text:
+        if cached_model.plaintext == processed_text_for_voiceover_regeneration:
+            print('c.....\n\n')
+
             audio_offset_list = (
                 cached_model.audio_offset_list)
             filename = cached_model.voiceover_filename
             binary_audio_data = fs.get('%s/%s' % ('audio', filename))
-            is_cached_model_used_for_voiceovers = True
+            is_voiceover_from_cache = True
 
-    if not is_cached_model_used_for_voiceovers:
+    # Generate automatic voiceover only if the content is not available in the
+    # cache; otherwise, use the cached voiceovers.
+    if not is_voiceover_from_cache:
         try:
+            print('d.....\n\n')
+
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    parsed_text, language_accent_code))
+                    processed_text_for_voiceover_regeneration,
+                    language_accent_code)
+            )
         except Exception as e:
             error_details = str(e)
 
@@ -202,13 +239,17 @@ def synthesize_voiceover_for_html_string(
 
     # Case of Collison.
     if cached_model is not None:
-        if cached_model.plaintext != parsed_text:
-            if len(parsed_text) < len(cached_model.plaintext):
+        if cached_model.plaintext != processed_text_for_voiceover_regeneration:
+            if (
+                len(processed_text_for_voiceover_regeneration) <
+                len(cached_model.plaintext)
+            ):
                 # Since the current text is shorter than the one in the cached
                 # model, there is a higher likelihood of repetition in
                 # other content. Thus, updating the cached model to store the
                 # current data.
-                cached_model.plaintext = parsed_text
+                cached_model.plaintext = (
+                    processed_text_for_voiceover_regeneration)
                 cached_model.voiceover_filename = voiceover_filename
                 cached_model.audio_offset_list = audio_offset_list
                 cached_model.update_timestamps()
@@ -217,10 +258,92 @@ def synthesize_voiceover_for_html_string(
         new_cached_model = (
             voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
                 language_accent_code,
-                parsed_text,
+                processed_text_for_voiceover_regeneration,
                 voiceover_filename,
                 audio_offset_list))
         new_cached_model.update_timestamps()
         new_cached_model.put()
 
     return audio_offset_list
+
+
+def generate_new_voiceover_filename(content_id, language_accent_code):
+    random_string_for_filename = utils.convert_to_hash(uuid.uuid4().hex, 10)
+    return '%s-%s-%s.mp3' % (
+        content_id,
+        language_accent_code,
+        random_string_for_filename
+    )
+
+def get_content_html_in_requested_language(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    content_id: str,
+    language_accent_code: str
+):
+    language_code = (
+        voiceover_services.
+        get_language_code_from_language_accent_code(language_accent_code))
+    if language_code == 'en':
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        content_html = exploration.get_content_html(state_name, content_id)
+        return content_html
+    else:
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(feconf.ENTITY_TYPE_EXPLORATION),
+            exploration_id,
+            exploration_version,
+            language_code
+        )
+        try:
+            translated_content_html = entity_translations.translations[
+                content_id].content_value
+        except Exception:
+            raise Exception(
+                'Translation for content_id %s not found in language %s' % (
+                    content_id, language_code))
+        return translated_content_html
+
+
+def regenerate_voiceover_for_exploration_content(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    content_id: str,
+    language_accent_code: str
+):
+    content_html = get_content_html_in_requested_language(
+        exploration_id,
+        exploration_version,
+        state_name,
+        content_id,
+        language_accent_code
+    )
+    voiceover_filename = generate_new_voiceover_filename(
+        content_id, language_accent_code)
+
+    sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
+        exploration_id, content_html, language_accent_code, voiceover_filename)
+
+    fs = fs_services.GcsFileSystem(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+
+    binary_audio_data = fs.get('%s/%s' % ('audio', voiceover_filename))
+
+    tempbuffer = io.BytesIO()
+    tempbuffer.write(binary_audio_data)
+    tempbuffer.seek(0)
+    audio = mp3.MP3(tempbuffer)
+
+    # Fetch the audio file duration from the Mutagen metadata.
+    duration_secs = audio.info.length
+
+    # Get the size of the audio file in bytes.
+    audio_size_bytes = tempbuffer.getbuffer().nbytes
+
+    voiceover_dict = state_domain.Voiceover(
+        voiceover_filename, audio_size_bytes, False, duration_secs)
+
+    # Self: Save this to the model, based on the decision in the doc.
+    return voiceover_dict, sentence_tokens_with_durations

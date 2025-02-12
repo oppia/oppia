@@ -493,6 +493,19 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         return autogeneratable_language_accent_list
 
 
+def get_autogeneratable_language_accent_codes() -> List[str]:
+    """The method returns the list of lanaguage accent codes that are supported
+    by cloud service for autogeneration.
+
+    Returns:
+        List[str]. A list of language accent codes that are supported by the
+        cloud service for autogeneration.
+    """
+    language_accent_codes = list(
+        get_autogeneratable_language_accent_list().keys())
+    return language_accent_codes
+
+
 def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
     """The method returns a dict with all voice artist IDs as keys and nested
     dicts as values. Each nested dict contains language codes as keys and

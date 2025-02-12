@@ -57,7 +57,7 @@ MATH_TEMPLATE_SSML_BLOCK = """
 """
 
 # A string template block representing the non math content within the SSML.
-NON_MATH_TEMPLATE_SSML_BLOCK = """
+SSML_TEMPLATE_BLOCK = """
     <p>
         %s
     </p>
@@ -163,12 +163,22 @@ def convert_plaintext_to_ssml_content(
     content_list = plaintext.split(feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
     main_ssml_content = ''
-
     for content in content_list:
-        if is_mathematical_text(content):
+        if ' - ' in content:
+            content = content.replace(
+                ' - ',
+                MATH_TEMPLATE_SSML_BLOCK % ' - ')
+        if '×' in content or ' * ' in content:
+            content = content.replace(
+                ' * ',
+                MATH_TEMPLATE_SSML_BLOCK % ' * ')
+        if ' / ' in content or '÷' in content:
             main_ssml_content += (MATH_TEMPLATE_SSML_BLOCK % content)
-        else:
-            main_ssml_content += (NON_MATH_TEMPLATE_SSML_BLOCK % content)
+            content = content.replace(
+                ' - ',
+                MATH_TEMPLATE_SSML_BLOCK % ' / ')
+
+        main_ssml_content += (SSML_TEMPLATE_BLOCK % content)
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,
@@ -207,7 +217,7 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY')
+    azure_tts_api_key = '3942bbc2a96c45038607594354705d67'
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')
@@ -224,9 +234,9 @@ def regenerate_speech_from_text(
     speech_config.set_speech_synthesis_output_format(
         speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
 
+    file_config = speechsdk.audio.AudioOutputConfig(filename='./nikhil.mp3')
     speech_synthesizer = speechsdk.SpeechSynthesizer(
-        speech_config=speech_config, audio_config=None)
-
+        speech_config=speech_config, audio_config=file_config)
     word_boundary_collection_instance: WordBoundaryCollection = (
         WordBoundaryCollection())
     speech_synthesizer.synthesis_word_boundary.connect(
@@ -234,6 +244,9 @@ def regenerate_speech_from_text(
 
     ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(
         plaintext, language_accent_code)
+
+    print('ssml_text_for_speech_synthesis')
+    print(ssml_text_for_speech_synthesis)
 
     speech_synthesis_result = speech_synthesizer.speak_ssml_async(
         ssml_text_for_speech_synthesis).get()

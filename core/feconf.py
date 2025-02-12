@@ -519,7 +519,7 @@ OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
 # Resource region for the Azure Text-to-Speech service.
-AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
+AZURE_TEXT_TO_SPEECH_REGION = 'centralindia'
 
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
@@ -1054,6 +1054,8 @@ VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
 VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

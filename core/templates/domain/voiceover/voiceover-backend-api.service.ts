@@ -26,6 +26,10 @@ import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
+import {
+  Voiceover,
+  VoiceoverBackendDict,
+} from 'domain/exploration/voiceover.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -38,6 +42,7 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+  autogeneratable_language_accent_codes: string[];
 }
 
 interface EntityVoiceoversBulkBackendDict {
@@ -58,6 +63,10 @@ export interface LanguageAccentToDescription {
   [languageAccentCode: string]: string;
 }
 
+export interface LanguageAccentCodesToSupportsAutogeneration {
+  [languageAccentCode: string]: boolean;
+}
+
 export interface LanguageAccentMasterList {
   [languageCode: string]: LanguageAccentToDescription;
 }
@@ -71,6 +80,7 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
+  autoGeneratableLanguageAccentCodes: string[];
 }
 
 export interface VoiceArtistIdToLanguageMapping {
@@ -99,6 +109,32 @@ export interface VoiceArtistMetadataResponse {
   voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
 }
 
+interface TokensWithDurationBackendType {
+  token: string;
+  audio_offset_msecs: number;
+}
+
+export interface TokensWithDurationType {
+  token: string;
+  audioOffsetMsecs: number;
+}
+
+interface RegenerateVoiceoverBackendResponse {
+  filename: string;
+  duration_secs: number;
+  file_size_bytes: number;
+  needs_update: boolean;
+  sentence_tokens_with_durations: TokensWithDurationBackendType[];
+}
+
+export interface RegenerateVoiceoverResponse {
+  filename: string;
+  fileSizeBytes: number;
+  durationSecs: number;
+  needsUpdate: boolean;
+  sentenceTokenWithDurations: TokensWithDurationType[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -120,6 +156,8 @@ export class VoiceoverBackendApiService {
             resolve({
               languageAccentMasterList: response.language_accent_master_list,
               languageCodesMapping: response.language_codes_mapping,
+              autoGeneratableLanguageAccentCodes:
+                response.autogeneratable_language_accent_codes,
             });
           },
           errorResponse => {
@@ -189,6 +227,51 @@ export class VoiceoverBackendApiService {
         .then(
           response => {
             resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async generateAutotmaticVoiceoverAsync(
+    explorationID: string,
+    explorationVersion: number,
+    stateName: string,
+    contentId: string,
+    languageAccentCode: string
+  ): Promise<RegenerateVoiceoverResponse> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<RegenerateVoiceoverBackendResponse>(
+          VoiceoverDomainConstants.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+          {
+            exploration_id: explorationID,
+            exploration_version: explorationVersion,
+            state_name: stateName,
+            content_id: contentId,
+            language_accent_code: languageAccentCode,
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              filename: response.filename,
+              durationSecs: response.duration_secs,
+              fileSizeBytes: response.file_size_bytes,
+              needsUpdate: response.needs_update,
+              sentenceTokenWithDurations:
+                response.sentence_tokens_with_durations.map(
+                  tokenWithDuration => {
+                    return {
+                      token: tokenWithDuration.token,
+                      audioOffsetMsecs: tokenWithDuration.audio_offset_msecs,
+                    };
+                  }
+                ),
+            });
           },
           errorResponse => {
             reject(errorResponse?.error);

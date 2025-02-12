@@ -35,9 +35,12 @@ export class TranslationLanguageService {
   private activeLanguageAccentCode!: string;
   private allAudioLanguageCodes: string[] =
     this.languageUtilService.getAllVoiceoverLanguageCodes();
+  private cloudSupportedLanguageAccentCodes!: string[];
 
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeLanguageAccentChangedEventEmitter = new EventEmitter<void>();
+  private _cloudSupportedLanguageAccentChangedEventEmitter =
+    new EventEmitter<void>();
 
   constructor(
     private languageUtilService: LanguageUtilService,
@@ -67,6 +70,7 @@ export class TranslationLanguageService {
       return;
     }
     this.activeLanguageCode = newActiveLanguageCode;
+    console.log('1 ' + this.activeLanguageCode);
     this._activeLanguageChangedEventEmitter.emit();
   }
 
@@ -85,6 +89,7 @@ export class TranslationLanguageService {
   }
 
   setActiveLanguageAccentCode(newLanguageAccentCode: string): void {
+    console.log('Request to update lang accent code');
     this.localStorageService.setLastSelectedLanguageAccentCode(
       newLanguageAccentCode
     );
@@ -92,12 +97,30 @@ export class TranslationLanguageService {
     this._activeLanguageAccentChangedEventEmitter.emit();
   }
 
+  isAutogenerationSupportedForActiveLanguageAccent(): boolean {
+    return this.cloudSupportedLanguageAccentCodes.includes(
+      this.activeLanguageAccentCode
+    );
+  }
+
+  setCloudSupportedLanguageAccentCodes(
+    cloudSupportedLanguageAccentCodes: string[]
+  ) {
+    this.cloudSupportedLanguageAccentCodes = cloudSupportedLanguageAccentCodes;
+    this._cloudSupportedLanguageAccentChangedEventEmitter.emit();
+  }
+
   get onActiveLanguageChanged(): EventEmitter<void> {
+    console.log('1.5 ' + this.activeLanguageCode);
     return this._activeLanguageChangedEventEmitter;
   }
 
   get onActiveLanguageAccentChanged(): EventEmitter<void> {
     return this._activeLanguageAccentChangedEventEmitter;
+  }
+
+  get onCloudSupportedLanguageAccentChanged(): EventEmitter<void> {
+    return this._cloudSupportedLanguageAccentChangedEventEmitter;
   }
 }
 
