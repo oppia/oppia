@@ -103,17 +103,13 @@ export class ExplorationMetadataModalComponent
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
     let tagRegex = new RegExp(AppConstants.TAG_REGEX);
+    const currentTags = this.explorationTagsService.displayed as string[];
 
     // Add our explorationTags.
     if (value) {
-      if (
-        !this.explorationTagsService.displayed ||
-        (this.explorationTagsService.displayed as []).length < 10
-      ) {
+      if (!currentTags || currentTags.length < 10) {
         if (
-          (this.explorationTagsService.displayed as string[]).includes(
-            value.toLowerCase()
-          ) ||
+          currentTags.includes(value.toLowerCase()) ||
           !value.match(tagRegex)
         ) {
           // Clear the input value.
