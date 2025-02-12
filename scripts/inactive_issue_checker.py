@@ -23,11 +23,11 @@ import logging
 import os
 
 import requests
-from typing import List
+from typing import Dict, List, Set
 
 INACTIVE_DAYS_THRESHOLD = 7
-REPO_OWNER = 'oppia'
-REPO_NAME = 'oppia'
+REPO_OWNER = 'Ashu463'
+REPO_NAME = 'grid6.0'
 
 
 class InactiveIssue:
@@ -36,6 +36,92 @@ class InactiveIssue:
     def __init__(self, number: int, assignee: str):
         self.number = number
         self.assignee = assignee
+
+
+def build_issue_pr_mapping(
+    github_token: str,
+    repo_owner: str,
+    repo_name: str
+) -> Dict[int, int]:
+    """Builds a mapping of issue numbers to their linked pull request number.
+    
+    Args:
+        github_token: str. The GitHub token for authentication.
+        repo_owner: str. The owner of the repository.
+        repo_name: str. The name of the repository.
+        
+    Returns:
+        Dict[int, int]. A mapping where key is issue number and value is the linked PR number.
+    """
+    issue_to_pr: Dict[int, int] = {}
+    
+    url = 'https://api.github.com/graphql'
+    headers = {
+        'Authorization': f'Bearer {github_token}',
+        'Content-Type': 'application/json',
+    }
+    
+    query = """
+    query($owner: String!, $name: String!, $cursor: String) {
+      repository(owner: $owner, name: $name) {
+        pullRequests(first: 100, states: [OPEN], after: $cursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            number
+            closingIssuesReferences(first: 1) {  # Changed to first: 1
+              nodes {
+                number
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    
+    variables = {
+        "owner": repo_owner,
+        "name": repo_name,
+        "cursor": None
+    }
+    
+    has_next_page = True
+    
+    while has_next_page:
+        response = requests.post(
+            url,
+            headers=headers,
+            json={"query": query, "variables": variables},
+            timeout=10
+        )
+        
+        if response.status_code != 200:
+            logging.error(
+                "GraphQL request failed: %s", 
+                response.json().get('errors', ['Unknown error'])
+            )
+            break
+            
+        data = response.json()
+        pull_requests = data['data']['repository']['pullRequests']
+        
+        for pr in pull_requests['nodes']:
+            pr_number = pr['number']
+            linked_issues = pr['closingIssuesReferences']['nodes']
+            
+            if linked_issues:
+                issue_number = linked_issues[0]['number']
+                issue_to_pr[issue_number] = pr_number
+        
+        # Check if there are more pages
+        page_info = pull_requests['pageInfo']
+        has_next_page = page_info['hasNextPage']
+        variables['cursor'] = page_info['endCursor']
+    
+    return issue_to_pr
 
 
 def get_inactive_issues(
@@ -73,10 +159,6 @@ def get_inactive_issues(
     for c in collaborators:
         collaborator_usernames.add(c['login'])
 
-    pulls_url = f'{repo_url}/pulls?state=open'
-    pulls_response = requests.get(pulls_url, headers=headers, timeout=10)
-    pull_requests = pulls_response.json()
-
     for issue in issues:
         if not issue or not isinstance(
             issue, dict) or not issue.get('assignee'):
@@ -95,16 +177,13 @@ def get_inactive_issues(
             continue
         
         # Check if there are any open pull requests related to the issue.
-        related_pull_requests = [
-            pr for pr in pull_requests
-            if issue_number in {
-                int(word.strip('#'))
-                for word in pr['body'].split()
-                if word.strip('#').isdigit()
-            }
-        ]
-
-        if related_pull_requests:
+        related_pull_requests = build_issue_pr_mapping(
+            github_token, repo_owner,repo_name
+        )
+        logging.info(
+            'related_pull_requests:', related_pull_requests
+        )
+        if issue_number in related_pull_requests:
             logging.info(
                 'Skipping issue #%s as there are related open pull requests.',
                 issue_number
