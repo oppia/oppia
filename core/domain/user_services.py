@@ -391,6 +391,8 @@ def fetch_gravatar(user_email: str) -> str:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
+            # File_details might be None if the file does not
+            # match any of the types that filetype supports.
             file_details = filetype.guess(response.content)
             if file_details is not None and file_details.extension == 'png':
                 return utils.convert_image_binary_to_data_url(
