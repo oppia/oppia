@@ -70,11 +70,11 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import '../../../core/templates/third-party-imports/gif-frames.import';
+import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 const gifshot = require('gifshot');
-import * as gifFrames from 'gif-frames';
+//import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
 // default Window interface doesn't contain "GifFrames" property. Hence we want
@@ -83,11 +83,11 @@ import * as gifFrames from 'gif-frames';
 // global scope Window as Window is a global object. Typescript interfaces only
 // union the interfaces with the same name when presented in the same scope.
 // TODO(#16735): Remove the usage of declare globals in "non-global" files.
-declare global {
-  interface Window {
-    GifFrames: gifFrames;
-  }
-}
+//declare global {
+//  interface Window {
+//    GifFrames: gifFrames;
+//  }
+//}
 
 interface FilepathData {
   mode: number;
@@ -1126,48 +1126,46 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    (this.windowRef.nativeWindow as Window)
-      .GifFrames({
-        url: imageDataURI,
-        frames: 'all',
-        outputType: 'canvas',
-      })
-      .then(async function (frameData) {
-        let frames = [];
-        for (let i = 0; i < frameData.length; i += 1) {
-          let sourceCanvas = frameData[i].getImage();
-          // Some GIFs may be optimised such that frames are stacked and
-          // only incremental changes are present in individual frames.
-          // For such GIFs, no additional operation needs to be done to
-          // handle transparent content. These GIFs have 0 or 1 Disposal
-          // method value.
-          // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
-          if (frameData[i].frameInfo.disposal > 1) {
-            // Frames that have transparent content may not render
-            // properly in the gifshot output. As a workaround, add a
-            // white background to individual frames before creating a
-            // GIF.
-            let ctx = sourceCanvas.getContext('2d');
-            ctx.globalCompositeOperation = 'destination-over';
-            ctx.fillStyle = '#FFF';
-            ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-            ctx.globalCompositeOperation = 'source-over';
-          }
-          let dataURL = sourceCanvas.toDataURL('image/png');
-          let updatedFrame = processFrameCallback
-            ? await processFrameCallback(dataURL)
-            : dataURL;
-          frames.push(updatedFrame);
+    gifFrames({
+      url: imageDataURI,
+      frames: 'all',
+      outputType: 'canvas',
+    }).then(async function (frameData) {
+      let frames = [];
+      for (let i = 0; i < frameData.length; i += 1) {
+        let sourceCanvas = frameData[i].getImage();
+        // Some GIFs may be optimised such that frames are stacked and
+        // only incremental changes are present in individual frames.
+        // For such GIFs, no additional operation needs to be done to
+        // handle transparent content. These GIFs have 0 or 1 Disposal
+        // method value.
+        // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+        if (frameData[i].frameInfo.disposal > 1) {
+          // Frames that have transparent content may not render
+          // properly in the gifshot output. As a workaround, add a
+          // white background to individual frames before creating a
+          // GIF.
+          let ctx = sourceCanvas.getContext('2d');
+          ctx.globalCompositeOperation = 'destination-over';
+          ctx.fillStyle = '#FFF';
+          ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+          ctx.globalCompositeOperation = 'source-over';
         }
-        gifshot.createGIF(
-          {
-            gifWidth: width,
-            gifHeight: height,
-            images: frames,
-          },
-          successCallback
-        );
-      });
+        let dataURL = sourceCanvas.toDataURL('image/png');
+        let updatedFrame = processFrameCallback
+          ? await processFrameCallback(dataURL)
+          : dataURL;
+        frames.push(updatedFrame);
+      }
+      gifshot.createGIF(
+        {
+          gifWidth: width,
+          gifHeight: height,
+          images: frames,
+        },
+        successCallback
+      );
+    });
   }
 
   saveImageToLocalStorage(

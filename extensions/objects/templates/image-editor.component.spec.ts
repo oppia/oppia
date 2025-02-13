@@ -39,13 +39,14 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
 
-declare global {
-  interface Window {
-    GifFrames: Function;
-  }
-}
+//declare global {
+//  interface Window {
+//    GifFrames: Function;
+//  }
+//}
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
@@ -1894,7 +1895,7 @@ describe('ImageEditor', () => {
         },
       })
     );
-    spyOn(window, 'GifFrames').and.resolveTo([
+    spyOn(gifFrames, 'default').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -2265,7 +2266,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'default').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2375,7 +2376,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'default').and.resolveTo([
         {
           getImage: () => {
             return {

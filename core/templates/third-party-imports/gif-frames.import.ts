@@ -16,4 +16,11 @@
  * @fileoverview This file imports the gif-frames library.
  */
 
-(window as Window).GifFrames = require('gif-frames');
+// Remove the global assignment if it exists:
+// (window as Window).GifFrames = require('gif-frames');
+
+// Import gifFrames from the 'gif-frames' module.
+import * as gifFrames from 'gif-frames';
+
+// Export gifFrames so that other modules can import it.
+export {gifFrames};
