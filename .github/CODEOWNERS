@@ -275,7 +275,6 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.css @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/background-banner.*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @oppia/lace-frontend-reviewers
-/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @oppia/lace-frontend-reviewers
@@ -590,7 +589,7 @@
 /core/templates/services/oppia-rte-parser.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-local-storage*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/rte-helper-modal.controller*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
 /core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
 /extensions/ckeditor_plugins/ @oppia/lace-backend-reviewers
