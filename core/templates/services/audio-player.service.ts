@@ -107,7 +107,7 @@ export class AudioPlayerService {
         // We can safely typecast it to 'number'.
         this._currentTrack.seek(this._lastPauseOrSeekPos as number);
       }
-      interval(250)
+      interval(500)
         .pipe(takeUntil(this._stopIntervalSubject))
         .subscribe(() => {
           this.ngZone.run(() => {
