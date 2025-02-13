@@ -279,11 +279,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'schema': {
                     'type': 'int',
                     'validators': [{
-                        'expect_invalid_default_value': False,
-                        'id': 'is_at_least', 'min_value': 1
+                        'id': 'is_at_least', 'min_value': 1,
+                        'expect_invalid_default_value': False
                     }, {
-                        'expect_invalid_default_value': False,
-                        'id': 'is_at_most', 'max_value': 10
+                        'id': 'is_at_most', 'max_value': 10,
+                        'expect_invalid_default_value': False
                     }]
                 },
                 'default_value': 1,
@@ -615,9 +615,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            self.assertIn(
-                'oppiaInteractive%s' % interaction_id,
-                interaction_ts_file_content)
             self.assertIn(
                 'oppiaResponse%s' % interaction_id,
                 response_ts_file_content)

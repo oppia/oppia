@@ -27,7 +27,6 @@ import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component
 import 'firebase/auth';
 import 'leaflet/dist/leaflet.css';
 import {ContextService} from 'services/context.service';
-require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.component.ts');
 require('components/button-directives/social-buttons.component.ts');
