@@ -23,7 +23,7 @@
           class="w-100">
       <button class="btn btn-success e2e-test-confirm-skill-selection-button"
               (click)="confirm()"
-              [disabled]="!isDoneButtonDisabled()">
+              [disabled]="!isDoneButtonDisabled() || !isSaveButtonEnabled()">
         Done
       </button>
     </span>
