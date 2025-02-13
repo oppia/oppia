@@ -22,7 +22,6 @@
 
 import {Component} from '@angular/core';
 
-
 @Component({
   selector: 'oppia-short-response-end-exploration',
   templateUrl: './end-exploration-short-response.component.html',
