@@ -120,8 +120,6 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         shell: bash
         run: python -m scripts.check_backend_test_coverage
-
-            Thanks!
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ steps.check_backend_coverage.outputs.WORKFLOW_STATUS == 'failure' && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
