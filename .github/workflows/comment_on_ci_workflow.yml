@@ -10,20 +10,35 @@ concurrency:
 
 jobs:
   comment_on_ci_results:
-    name: Comment On CI Workflows
+    name: "CI Workflow Commenter"
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
     strategy:
       matrix:
-        test_name: ["Full-Stack Tests", "Backend Unit Test Suite", "Frontend Unit Test Suite"]
+        test_name: ["Full-Stack Tests", "Backend Coverage Tests", "Frontend Tests"]
         include:
           - test_name: "Full-Stack Tests"
             workflow_file: "full_stack_tests.yml"
-          - test_name: "Backend Unit Test Suite"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the **Comprehensive Full-Stack Tests** are failing on your PR.
+              Please check the logs and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+              to fix the issues, or report the error as a flake. Thanks!
+          - test_name: "Backend Coverage Tests"
             workflow_file: "backend_unit_tests.yml"
-          - test_name: "Frontend Unit Test Suite"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the backend coverage tests are failing on your PR. Please follow
+              [these instructions](https://github.com/oppia/oppia/wiki/Backend-tests#coverage-reports)
+              to fix the missing coverage.
+          - test_name: "Frontend Tests"
             workflow_file: "frontend_unit_tests.yml"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the frontend tests are failing on your PR. Please look at the logs
+              and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+              to fix them, or report the error as a flake.
+              
+              You might also find the [instructions for debugging frontend tests](https://github.com/oppia/oppia/wiki/Debug-frontend-tests)
+              helpful.
     steps:
       - name: Await Test Workflow Completion
         id: wait
@@ -35,19 +50,14 @@ jobs:
             success
             failure
             action_required
-
       - name: Verify Manual Approval Requirement
         if: ${{ steps.wait.outputs.run-conclusion == 'action_required' }}
         run: |
           echo "::error::First-time contributor workflows require manual approval. After approval, please re-run the comment workflows to post the report."
           exit 1
-
       - name: Notify on Test Failure
         if: ${{ steps.wait.outputs.run-conclusion == 'failure' && !cancelled() }}
         uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the **${{ matrix.test_name }}** are failing on your PR.
-            Please check the logs and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
-            to fix the issues, or report the error as a flake. Thanks!
+          body: ${{ matrix.message }}
