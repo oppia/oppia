@@ -159,11 +159,14 @@ export class AudioBarComponent {
 
   ngAfterContentChecked(): void {
     if (
-        this.audioPlayerService.isTrackLoaded() &&
-        this.audioPlayerService.isPlaying()
-      ) {
-      this.currentVoiceoverTime = this.audioPlayerService.getCurrentTimeInSecs();
-      this.totalVoiceoverDurationSecs = Math.floor(this.audioPlayerService.getAudioDuration());
+      this.audioPlayerService.isTrackLoaded() &&
+      this.audioPlayerService.isPlaying()
+    ) {
+      this.currentVoiceoverTime =
+        this.audioPlayerService.getCurrentTimeInSecs();
+      this.totalVoiceoverDurationSecs = Math.floor(
+        this.audioPlayerService.getAudioDuration()
+      );
     }
     if (!this.audioPlayerService.isTrackLoaded()) {
       this.currentVoiceoverTime = 0;
