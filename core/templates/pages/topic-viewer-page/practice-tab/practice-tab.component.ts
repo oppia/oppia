@@ -49,7 +49,7 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() startButtonIsDisabled: boolean = false;
+  @Input() startButtonIsDisabled: boolean = true;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
@@ -165,18 +165,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  isStartButtonDisabled(): boolean {
-    if (this.startButtonIsDisabled) {
-      return true;
-    }
-    for (var idx in this.selectedSubtopicIndices) {
-      if (this.selectedSubtopicIndices[idx]) {
-        return !this.questionsAreAvailable;
-      }
-    }
-    return true;
-  }
-
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds: string[] = [];
     this.questionsStatusCallIsComplete = false;
@@ -193,9 +181,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
           this.questionsStatusCallIsComplete = true;
           if (this.questionsAreAvailable) {
             this.startButtonIsDisabled = false;
+          } else {
+            this.startButtonIsDisabled = true;
           }
         });
     } else {
+      this.startButtonIsDisabled = true;
       this.questionsAreAvailable = false;
       this.questionsStatusCallIsComplete = true;
     }

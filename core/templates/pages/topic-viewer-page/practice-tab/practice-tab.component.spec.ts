@@ -72,12 +72,6 @@ class MockWindowRef {
   }
 }
 
-class MockQuestionBackendApiService {
-  async fetchTotalQuestionCountForSkillIdsAsync() {
-    return Promise.resolve(1);
-  }
-}
-
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string, interpolateParams?: Object): string {
@@ -89,7 +83,7 @@ describe('Practice tab component', function () {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
-  let questionBackendApiService: MockQuestionBackendApiService;
+  let questionBackendApiService: QuestionBackendApiService;
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -99,7 +93,6 @@ describe('Practice tab component', function () {
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
-    questionBackendApiService = new MockQuestionBackendApiService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [PracticeTabComponent, MockTranslatePipe],
@@ -107,14 +100,11 @@ describe('Practice tab component', function () {
         NgbModal,
         I18nLanguageCodeService,
         LoaderService,
+        QuestionBackendApiService,
         EditableTopicBackendApiService,
         UrlInterpolationService,
         {provide: UrlService, useClass: MockUrlService},
         {provide: WindowRef, useValue: windowRef},
-        {
-          provide: QuestionBackendApiService,
-          useValue: questionBackendApiService,
-        },
         {
           provide: TranslateService,
           useClass: MockTranslateService,
@@ -170,6 +160,7 @@ describe('Practice tab component', function () {
     editableTopicBackendApiService = TestBed.inject(
       EditableTopicBackendApiService
     );
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     urlService = TestBed.inject(UrlService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -261,23 +252,42 @@ describe('Practice tab component', function () {
     }
   );
 
-  it('should have start button enabled when a subtopic is selected', function () {
+  it('should have start button enabled when a subtopic is selected', fakeAsync(() => {
     component.selectedSubtopicIndices[0] = true;
-    component.questionsAreAvailable = true;
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(1));
 
-    expect(component.isStartButtonDisabled()).toBe(false);
-  });
+    component.checkIfQuestionsExist(component.selectedSubtopicIndices);
+    tick();
+
+    expect(component.startButtonIsDisabled).toBe(false);
+  }));
+
+  it('should have start button disabled when a subtopic is selected but no questions are available', fakeAsync(() => {
+    component.selectedSubtopicIndices[0] = true;
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(0));
+
+    component.checkIfQuestionsExist(component.selectedSubtopicIndices);
+    tick();
+
+    expect(component.startButtonIsDisabled).toBe(true);
+  }));
 
   it('should have start button disabled when there is no subtopic selected', function () {
     component.selectedSubtopicIndices[0] = false;
 
-    expect(component.isStartButtonDisabled()).toBe(true);
+    expect(component.startButtonIsDisabled).toBe(true);
   });
 
   it('should have start button disabled when the disable boolean is set', function () {
     component.startButtonIsDisabled = true;
 
-    expect(component.isStartButtonDisabled()).toBe(true);
+    expect(component.startButtonIsDisabled).toBe(true);
   });
 
   it(
@@ -326,6 +336,11 @@ describe('Practice tab component', function () {
   }));
 
   it('should check if questions exist for the selected subtopics', fakeAsync(() => {
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(1));
+
     component.checkIfQuestionsExist([true]);
     flushMicrotasks();
 
