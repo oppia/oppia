@@ -176,7 +176,7 @@ export class AudioPlayerService {
     if (typeof currentTime !== 'number') {
       return 0;
     }
-    return Math.floor(currentTime*10)/10;
+    return Math.floor(currentTime * 10) / 10;
   }
 
   setCurrentTime(val: number): void {
