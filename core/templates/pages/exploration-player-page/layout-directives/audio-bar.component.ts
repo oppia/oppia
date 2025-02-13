@@ -165,7 +165,7 @@ export class AudioBarComponent {
       this.currentVoiceoverTime = this.audioPlayerService.getCurrentTimeInSecs();
       this.totalVoiceoverDurationSecs = Math.floor(this.audioPlayerService.getAudioDuration());
     }
-    if (!this.audioPlayerService.isTrackLoaded() ) {
+    if (!this.audioPlayerService.isTrackLoaded()) {
       this.currentVoiceoverTime = 0;
     }
   }
