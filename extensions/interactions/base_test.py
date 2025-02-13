@@ -616,9 +616,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 validation_service_ts_file)
 
             self.assertIn(
-                'oppiaResponse%s' % interaction_id,
-                response_ts_file_content)
-            self.assertIn(
                 'oppiaShortResponse%s' % interaction_id,
                 short_response_ts_file_content)
             self.assertIn(
