@@ -53,16 +53,6 @@ class Issue:
         self.events_url = events_url
         self.last_active_date = last_active_date
 
-    def __eq__(self, other):
-        if not isinstance(other, Issue):
-            return NotImplemented
-        return (
-            self.number == other.number
-            and self.assignee_username == other.assignee_username
-            and self.events_url == other.events_url
-            and self.last_active_date == other.last_active_date
-        )
-
     @classmethod
     def from_github_data(cls, data: IssueDict) -> 'Issue':
         """Creates an Issue instance from GitHub API response data.
@@ -133,7 +123,12 @@ class GitHubService:
         issues_list = []
         for issue_data in response.json():
             if isinstance(issue_data, dict):
-                issue = Issue.from_github_data(issue_data)
+                typed_issue_data: IssueDict = {
+                    'number': issue_data['number'],
+                    'assignee': issue_data.get('assignee'),
+                    'events_url': issue_data['events_url']
+                }
+                issue = Issue.from_github_data(typed_issue_data)
                 issues_list.append(issue)
 
         return issues_list
