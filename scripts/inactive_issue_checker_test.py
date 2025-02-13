@@ -18,197 +18,277 @@
 
 from __future__ import annotations
 
+import unittest
+from unittest.mock import patch, Mock
 import datetime
-import unittest.mock
+from datetime import timezone
+from scripts import inactive_issue_checker as checker
 
-from scripts import inactive_issue_checker
+class TestIssue(unittest.TestCase):
+    def test_issue_equality(self):
+        """Test Issue equality comparison."""
+        date = datetime.datetime(2024, 1, 1, tzinfo=timezone.utc)
+        issue1 = checker.Issue(1, "user1", "events_url", date)
+        issue2 = checker.Issue(1, "user1", "events_url", date)
+        issue3 = checker.Issue(2, "user2", "events_url", date)
+        
+        self.assertEqual(issue1, issue2)
+        self.assertNotEqual(issue1, issue3)
+        self.assertNotEqual(issue1, "not_an_issue")
 
-import requests
+    def test_from_github_data(self):
+        """Test Issue creation from GitHub data."""
+        data = {
+            "number": 123,
+            "assignee": {"login": "testuser"},
+            "events_url": "https://api.github.com/events"
+        }
+        issue = checker.Issue.from_github_data(data)
+        
+        self.assertEqual(issue.number, 123)
+        self.assertEqual(issue.assignee_username, "testuser")
+        self.assertEqual(issue.events_url, "https://api.github.com/events")
 
+    def test_is_inactive(self):
+        """Test issue inactivity check."""
+        now = datetime.datetime.now(timezone.utc)
+        active_date = now - datetime.timedelta(days=5)
+        inactive_date = now - datetime.timedelta(days=10)
+        
+        active_issue = checker.Issue(1, "user1", "url", active_date)
+        inactive_issue = checker.Issue(2, "user2", "url", inactive_date)
+        no_date_issue = checker.Issue(3, "user3", "url")
+        
+        self.assertFalse(active_issue.is_inactive())
+        self.assertTrue(inactive_issue.is_inactive())
+        self.assertFalse(no_date_issue.is_inactive())
 
-class TestInactiveIssueChecker(unittest.TestCase):
-    """Test the inactive issue checker script."""
+class TestGitHubService(unittest.TestCase):
+    def setUp(self):
+        self.service = checker.GitHubService("test_token", "owner", "repo")
+        self.base_url = "https://api.github.com/repos/owner/repo"
 
-    def setUp(self) -> None:
-        self.current_time = datetime.datetime.now(datetime.timezone.utc)
-        self.mock_get_patcher = unittest.mock.patch('requests.get')
-        self.mock_delete_patcher = unittest.mock.patch('requests.delete')
-        self.mock_post_patcher = unittest.mock.patch('requests.post')
-        self.mock_get = self.mock_get_patcher.start()
-        self.mock_delete = self.mock_delete_patcher.start()
-        self.mock_post = self.mock_post_patcher.start()
-
-    def tearDown(self) -> None:
-        self.mock_get_patcher.stop()
-        self.mock_delete_patcher.stop()
-        self.mock_post_patcher.stop()
-
-    def test_issue_without_assignee_is_skipped(self) -> None:
-        mock_issues_response = unittest.mock.Mock()
-        mock_issues_response.json.return_value = [{
-            'number': 1,
-            'events_url': 'mock_events_url',
-            'assignee': None
-        }]
-
-        mock_collaborators_response = unittest.mock.Mock()
-        mock_collaborators_response.json.return_value = []
-
-        mock_pulls_response = unittest.mock.Mock()
-        mock_pulls_response.json.return_value = []
-
-        self.mock_get.side_effect = [
-            mock_issues_response,
-            mock_collaborators_response,
-            mock_pulls_response
+    @patch('requests.get')
+    def test_get_open_issues(self, mock_get):
+        """Test fetching open issues."""
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {
+                "number": 1,
+                "assignee": {"login": "user1"},
+                "events_url": f"{self.base_url}/issues/1/events"
+            },
+            {
+                "number": 2,
+                "assignee": None,
+                "events_url": f"{self.base_url}/issues/2/events"
+            }
         ]
+        mock_get.return_value = mock_response
 
-        inactive_issues = inactive_issue_checker.get_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo')
-
-        self.assertEqual(len(inactive_issues), 0)
-        self.assertEqual(self.mock_get.call_count, 3)
-
-    def test_invalid_issue_format(self) -> None:
-        mock_issues_response = unittest.mock.Mock()
-        mock_issues_response.json.return_value = [None, 'not_a_dict', {}]
-
-        mock_collaborators_response = unittest.mock.Mock()
-        mock_collaborators_response.json.return_value = []
-
-        mock_pulls_response = unittest.mock.Mock()
-        mock_pulls_response.json.return_value = []
-
-        self.mock_get.side_effect = [
-            mock_issues_response,
-            mock_collaborators_response,
-            mock_pulls_response
-        ]
-
-        inactive_issues = inactive_issue_checker.get_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo')
-
-        self.assertEqual(len(inactive_issues), 0)
-        self.assertEqual(self.mock_get.call_count, 3)
-
-    def test_empty_events(self) -> None:
-        mock_issues_response = unittest.mock.Mock()
-        mock_issues_response.json.return_value = [{
-            'number': 1,
-            'assignee': {'login': 'user123'},
-            'events_url': 'mock_events_url',
-            'body': ''
-        }]
-        self.mock_get.side_effect = [
-            mock_issues_response,
-            unittest.mock.Mock(json=lambda: []),
-            unittest.mock.Mock(json=lambda: []),
-            unittest.mock.Mock(json=lambda: [])
-        ]
-
-        inactive_issues = inactive_issue_checker.get_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo')
-
-        self.assertEqual(len(inactive_issues), 0)
-        self.assertEqual(self.mock_get.call_count, 4)
-
-    def test_nested_assignee_login_access(self) -> None:
-        mock_issues_response = unittest.mock.Mock()
-        mock_issues_response.json.return_value = [{
-            'number': 1,
-            'assignee': {'login': 'test_user'},
-            'events_url': 'mock_events_url',
-            'events': [{
-                'created_at': (
-                    self.current_time - datetime.timedelta(days=10))
-                    .strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'event': 'assigned'
-            }]
-        }]
-
-        mock_collaborators_response = unittest.mock.Mock()
-        mock_collaborators_response.json.return_value = [
-            {'login': 'other_user'}
-        ]
-
-        mock_pulls_response = unittest.mock.Mock()
-        mock_pulls_response.json.return_value = []
-
-        self.mock_get.side_effect = [
-            mock_issues_response,
-            mock_collaborators_response,
-            mock_pulls_response,
-            unittest.mock.Mock(json=lambda: [])
-        ]
-
-        inactive_issues = inactive_issue_checker.get_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo')
-
-        self.assertEqual(len(inactive_issues), 0)
-
-    def test_error_during_unassignment(self) -> None:
-        mock_delete_response = unittest.mock.Mock(status_code=500)
-        self.mock_delete.return_value = mock_delete_response
-
-        inactive_issues = [
-            inactive_issue_checker.InactiveIssue(number=1, assignee='user123')
-        ]
-
-        inactive_issue_checker.unassign_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo', inactive_issues)
-
-        self.mock_delete.assert_called_once()
-        self.mock_post.assert_not_called()
-
-    def test_issue_with_related_pr(self) -> None:
-        mock_issues_response = unittest.mock.Mock()
-        mock_issues_response.json.return_value = [{
-            'number': 3,
-            'assignee': {'login': 'user789'},
-            'events_url': 'mock_events_url',
-            'events': [{
-                'created_at': (
-                    self.current_time - datetime.timedelta(days=10))
-                    .strftime('%Y-%m-%dT%H:%M:%SZ'),
-                'event': 'assigned'
-            }]
-        }]
-
-        mock_collaborators_response = unittest.mock.Mock()
-        mock_collaborators_response.json.return_value = []
-
-        mock_pulls_response = unittest.mock.Mock()
-        mock_pulls_response.json.return_value = [
-            {'body': 'This fixes issue #3'}
-        ]
-
-        self.mock_get.side_effect = [
-            mock_issues_response,
-            mock_collaborators_response,
-            mock_pulls_response,
-            unittest.mock.Mock(json=lambda: [])
-        ]
-
-        inactive_issues = inactive_issue_checker.get_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo')
-
-        self.assertEqual(len(inactive_issues), 0)
-
-    def test_exception_handling_in_unassignment(self) -> None:
-        self.mock_delete.side_effect = requests.RequestException(
-            'Connection error'
+        issues = self.service.get_open_issues()
+        
+        self.assertEqual(len(issues), 2)
+        self.assertEqual(issues[0].number, 1)
+        self.assertEqual(issues[0].assignee_username, "user1")
+        self.assertIsNone(issues[1].assignee_username)
+        
+        mock_get.assert_called_once_with(
+            f"{self.base_url}/issues?state=open",
+            headers=self.service.rest_headers,
+            timeout=10
         )
 
-        inactive_issues = [
-            inactive_issue_checker.InactiveIssue(number=1, assignee='test_user')
+    @patch('requests.get')
+    def test_get_collaborators(self, mock_get):
+        """Test fetching repository collaborators."""
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"login": "collab1"},
+            {"login": "collab2"}
         ]
+        mock_get.return_value = mock_response
 
-        inactive_issue_checker.unassign_inactive_issues(
-            'mock_token', 'mock_owner', 'mock_repo', inactive_issues)
+        collaborators = self.service.get_collaborators()
+        
+        self.assertEqual(collaborators, {"collab1", "collab2"})
+        mock_get.assert_called_once_with(
+            f"{self.base_url}/collaborators",
+            headers=self.service.rest_headers,
+            timeout=10
+        )
 
-        self.mock_delete.assert_called_once()
-        self.mock_post.assert_not_called()
+    @patch('requests.get')
+    def test_get_issue_events(self, mock_get):
+        """Test fetching issue events."""
+        mock_response = Mock()
+        mock_response.json.return_value = [
+            {"created_at": "2024-01-01T10:00:00Z"},
+            {"created_at": "2024-01-02T10:00:00Z"}
+        ]
+        mock_get.return_value = mock_response
 
+        issue = checker.Issue(1, "user1", "events_url")
+        latest_date = self.service.get_issue_events(issue)
+        
+        expected_date = datetime.datetime(2024, 1, 2, 10, 0, tzinfo=timezone.utc)
+        self.assertEqual(latest_date, expected_date)
+        
+        mock_get.assert_called_once_with(
+            issue.events_url,
+            headers=self.service.rest_headers,
+            timeout=10
+        )
+
+    @patch('requests.post')
+    def test_get_issues_with_prs(self, mock_post):
+        """Test fetching issues with PRs using GraphQL."""
+        mock_responses = [
+            {
+                'data': {
+                    'repository': {
+                        'pullRequests': {
+                            'pageInfo': {
+                                'hasNextPage': False,
+                                'endCursor': None
+                            },
+                            'nodes': [
+                                {
+                                    'number': 100,
+                                    'closingIssuesReferences': {
+                                        'nodes': [{'number': 1}]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ]
+        
+        mock_post.side_effect = [Mock(json=lambda: resp) for resp in mock_responses]
+        
+        issues_with_prs = self.service.get_issues_with_prs()
+        
+        self.assertEqual(issues_with_prs, {1: 100})
+        self.assertEqual(mock_post.call_count, 1)
+
+    @patch('requests.delete')
+    def test_unassign_issue(self, mock_delete):
+        """Test unassigning an issue."""
+        mock_delete.return_value = Mock(status_code=200)
+        
+        issue = checker.Issue(1, "user1", "events_url")
+        success = self.service.unassign_issue(issue)
+        
+        self.assertTrue(success)
+        mock_delete.assert_called_once_with(
+            f"{self.base_url}/issues/1/assignees",
+            headers=self.service.rest_headers,
+            json={'assignees': ['user1']},
+            timeout=10
+        )
+
+    @patch('requests.post')
+    def test_comment_on_issue(self, mock_post):
+        """Test commenting on an issue."""
+        issue = checker.Issue(1, "user1", "events_url")
+        self.service.comment_on_issue(issue)
+        
+        expected_comment = (
+            '@user1 has been unassigned from this issue '
+            f'due to inactivity for more than {checker.INACTIVE_DAYS_THRESHOLD} days. '
+            'If you would like to continue working on this issue, please '
+            'request to be reassigned.'
+        )
+        
+        mock_post.assert_called_once_with(
+            f"{self.base_url}/issues/1/comments",
+            headers=self.service.rest_headers,
+            json={'body': expected_comment},
+            timeout=10
+        )
+
+    @patch('requests.get')
+    def test_get_issue_events_empty(self, mock_get):
+        """Test fetching issue events when there are no events."""
+        mock_response = Mock()
+        mock_response.json.return_value = []  # Empty events list
+        mock_get.return_value = mock_response
+
+        issue = checker.Issue(1, "user1", "events_url")
+        latest_date = self.service.get_issue_events(issue)
+        
+        self.assertIsNone(latest_date)
+        mock_get.assert_called_once_with(
+            issue.events_url,
+            headers=self.service.rest_headers,
+            timeout=10
+        )
+
+
+class TestIssueManager(unittest.TestCase):
+    def setUp(self):
+        self.github_service = Mock()
+        self.manager = checker.IssueManager(self.github_service)
+
+    def test_get_inactive_issues(self):
+        """Test identifying inactive issues."""
+        now = datetime.datetime.now(timezone.utc)
+        
+        # Mock issues
+        active_issue = checker.Issue(1, "user1", "url1")
+        active_issue.last_active_date = now - datetime.timedelta(days=5)
+        
+        inactive_issue = checker.Issue(2, "user2", "url2")
+        inactive_issue.last_active_date = now - datetime.timedelta(days=10)
+        
+        collaborator_issue = checker.Issue(3, "collab1", "url3")
+        pr_linked_issue = checker.Issue(4, "user3", "url4")
+        
+        # Setup mock returns
+        self.github_service.get_open_issues.return_value = [
+            active_issue, inactive_issue, collaborator_issue, pr_linked_issue
+        ]
+        self.github_service.get_collaborators.return_value = {"collab1"}
+        self.github_service.get_issues_with_prs.return_value = {4: 100}
+        self.github_service.get_issue_events.side_effect = [
+            active_issue.last_active_date,
+            inactive_issue.last_active_date
+        ]
+        
+        inactive_issues = self.manager.get_inactive_issues()
+        
+        self.assertEqual(len(inactive_issues), 1)
+        self.assertEqual(inactive_issues[0], inactive_issue)
+
+    def test_unassign_issues(self):
+        """Test unassigning multiple issues."""
+        issues = [
+            checker.Issue(1, "user1", "url1"),
+            checker.Issue(2, "user2", "url2")
+        ]
+        
+        self.github_service.unassign_issue.side_effect = [True, False]
+        
+        self.manager.unassign_issues(issues)
+        
+        self.assertEqual(self.github_service.unassign_issue.call_count, 2)
+        self.assertEqual(self.github_service.comment_on_issue.call_count, 1)
+
+    def test_get_inactive_issues_no_assignee(self):
+        """Test handling issues with no assignee."""
+        unassigned_issue = checker.Issue(1, None, "url1")  # Issue with no assignee
+        
+        self.github_service.get_open_issues.return_value = [unassigned_issue]
+        self.github_service.get_collaborators.return_value = set()
+        self.github_service.get_issues_with_prs.return_value = {}
+        
+        inactive_issues = self.manager.get_inactive_issues()
+        
+        self.assertEqual(len(inactive_issues), 0)
+        # Verify get_issue_events was not called for unassigned issue
+        self.github_service.get_issue_events.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

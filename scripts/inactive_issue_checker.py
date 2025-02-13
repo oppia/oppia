@@ -367,8 +367,7 @@ class IssueManager:
                 )
 
 
-def main() -> None:
-    """Main function to run the inactive issue checker."""
+if __name__ == '__main__': # pragma: no cover
     github_token = os.environ['GITHUB_TOKEN']
 
     gh_service = GitHubService(github_token, REPO_OWNER, REPO_NAME)
@@ -391,7 +390,3 @@ def main() -> None:
             logging.info('Unassignment is currently disabled.')
     else:
         logging.info('No inactive issues found that need unassignment.')
-
-
-if __name__ == '__main__': # pragma: no cover
-    main()
