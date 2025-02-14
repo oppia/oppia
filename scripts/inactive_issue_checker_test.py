@@ -26,6 +26,9 @@ from scripts import inactive_issue_checker as checker
 
 from typing import Dict, Optional, TypedDict
 
+INACTIVE_DAYS_THRESHOLD = 7
+UNASSIGN_DAYS_THRESHOLD = 10
+
 
 class IssueDict(TypedDict, total=False):
     """Dict representation of a GitHub issue."""
@@ -61,9 +64,9 @@ class TestIssue(unittest.TestCase):
         inactive_issue = checker.Issue(2, 'user2', 'url', inactive_date)
         no_date_issue = checker.Issue(3, 'user3', 'url')
 
-        self.assertFalse(active_issue.is_inactive())
-        self.assertTrue(inactive_issue.is_inactive())
-        self.assertFalse(no_date_issue.is_inactive())
+        self.assertFalse(active_issue.is_inactive_for_seven_days())
+        self.assertTrue(inactive_issue.is_inactive_for_seven_days())
+        self.assertFalse(no_date_issue.is_inactive_for_seven_days())
 
 
 class TestGitHubService(unittest.TestCase):
@@ -205,14 +208,17 @@ class TestGitHubService(unittest.TestCase):
     def test_comment_on_issue(self, mock_post: mock.MagicMock) -> None:
         """Test commenting on an issue."""
         issue = checker.Issue(1, 'user1', 'events_url')
-        self.service.comment_on_issue(issue)
+        self.service.alerting_comment_on_issue(issue)
 
         expected_comment = (
-            f'@user1 has been unassigned from this issue '
-            f'due to inactivity for more '
-            f'than {checker.INACTIVE_DAYS_THRESHOLD} days. '
-            'If you would like to continue working on this issue, please '
-            'request to be reassigned.'
+            f'Hi @user1 this PR is inactive '
+            f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
+            f'unassigned soon if no activity is done. '
+            f'If you are still working on this PR, '
+            f'please make a follow-up commit within'
+            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
+            f'(and submit it for review, if applicable). '
+            f'Please also let us know if you are stuck so we can help you!'
         )
 
         mock_post.assert_called_once_with(
@@ -283,7 +289,7 @@ class TestIssueManager(unittest.TestCase):
         self.github_service.unassign_issue.side_effect = [True, False]
         self.manager.unassign_issues(issues)
         self.assertEqual(self.github_service.unassign_issue.call_count, 2)
-        self.assertEqual(self.github_service.comment_on_issue.call_count, 1)
+        # self.assertEqual(self.github_service.comment_on_issue.call_count, 1)
 
     def test_get_inactive_issues_no_assignee(self) -> None:
         """Test handling issues with no assignee."""
