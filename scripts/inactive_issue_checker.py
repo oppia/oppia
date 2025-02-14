@@ -26,6 +26,7 @@ import requests
 from typing import Dict, List, Optional, TypedDict
 
 INACTIVE_DAYS_THRESHOLD = 7
+UNASSIGN_DAYS_THRESHOLD = 10
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
@@ -72,7 +73,7 @@ class Issue:
             events_url=data['events_url']
         )
 
-    def is_inactive(self) -> bool:
+    def is_inactive_for_seven_days(self) -> bool:
         """Checks if the issue is inactive based on threshold.
 
         Returns:
@@ -84,6 +85,19 @@ class Issue:
         now = datetime.datetime.now(datetime.timezone.utc)
         days_inactive = (now - self.last_active_date).total_seconds() / 86400
         return days_inactive > INACTIVE_DAYS_THRESHOLD
+
+    def is_inactive_for_ten_days(self) -> bool:
+        """Checks if the issue is inactive based on threshold.
+
+        Returns:
+            bool. Whether the issue is inactive.
+        """
+        if not self.last_active_date:
+            return False
+
+        now = datetime.datetime.now(datetime.timezone.utc)
+        days_inactive = (now - self.last_active_date).total_seconds() / 86400
+        return days_inactive > UNASSIGN_DAYS_THRESHOLD
 
 
 class GitHubService:
@@ -262,7 +276,33 @@ class GitHubService:
         )
         return response.status_code == 200
 
-    def comment_on_issue(self, issue: Issue) -> None:
+    def alerting_comment_on_issue(self, issue: Issue) -> None:
+        """Posts unassignment comment on an issue.
+
+        Args:
+            issue: Issue. The issue to comment on.
+        """
+        url = f'{self.base_url}/issues/{issue.number}/comments'
+        comment = (
+            f'Hi @{issue.assignee_username} this PR is inactive '
+            f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
+            f'unassigned soon if no activity is done. '
+            f'If you are still working on this PR, '
+            f'please make a follow-up commit within'
+            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
+            f'(and submit it for review, if applicable). '
+            f'Please also let us know if you are stuck so we can help you!'
+        )
+
+        response = requests.post(
+            url,
+            headers=self.rest_headers,
+            json={'body': comment},
+            timeout=10
+        )
+        response.raise_for_status()
+
+    def unassinging_comment_on_issue(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
@@ -271,7 +311,7 @@ class GitHubService:
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
             f'@{issue.assignee_username} has been unassigned from this issue '
-            f'due to inactivity for more than {INACTIVE_DAYS_THRESHOLD} days. '
+            f'due to inactivity for more than {UNASSIGN_DAYS_THRESHOLD} days. '
             f'If you would like to continue working on this issue, please '
             f'request to be reassigned.'
         )
@@ -327,11 +367,18 @@ class IssueManager:
 
             issue.last_active_date = self.github.get_issue_events(issue)
 
-            if issue.is_inactive():
-                inactive_issues.append(issue)
+            if issue.is_inactive_for_seven_days():
+                self.github.alerting_comment_on_issue(issue)
                 logging.info(
                     'Issue #%d has been inactive for >%d days',
                     issue.number, INACTIVE_DAYS_THRESHOLD
+                )
+
+            if issue.is_inactive_for_ten_days():
+                inactive_issues.append(issue)
+                logging.info(
+                    'Issue #%d has been inactive for >%d days',
+                    issue.number, UNASSIGN_DAYS_THRESHOLD
                 )
 
         return inactive_issues
@@ -345,7 +392,7 @@ class IssueManager:
         for issue in issues:
             try:
                 if self.github.unassign_issue(issue):
-                    self.github.comment_on_issue(issue)
+                    self.github.unassinging_comment_on_issue(issue)
                     logging.info(
                         'Unassigned issue #%d from %s',
                         issue.number, issue.assignee_username
