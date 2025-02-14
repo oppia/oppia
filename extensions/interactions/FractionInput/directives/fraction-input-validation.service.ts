@@ -219,16 +219,85 @@ export class FractionInputValidationService {
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
-          case 'IsEquivalentTo': // fall-through.
+          case 'IsEquivalentTo':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form.',
+                });
+              }
+            }
+          // Intentional fall through.
           case 'IsEquivalentToAndInSimplestForm':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form.',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsGreaterThan':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form.',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, Infinity, false, false);
             break;
           case 'IsLessThan':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form.',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, -Infinity, f, false, false);
             break;
