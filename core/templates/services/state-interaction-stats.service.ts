@@ -16,7 +16,6 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';

@@ -17,7 +17,6 @@
  * the learner and editor views.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';

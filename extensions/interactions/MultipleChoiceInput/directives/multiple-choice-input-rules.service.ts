@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {MultipleChoiceAnswer} from 'interactions/answer-defs';
 import {MultipleChoiceRuleInputs} from 'interactions/rule-input-defs';
 

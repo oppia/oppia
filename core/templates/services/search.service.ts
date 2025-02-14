@@ -16,7 +16,6 @@
  * @fileoverview Search service for activityTilesInfinityGrid.
  */
 
-
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {

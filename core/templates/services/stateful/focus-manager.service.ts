@@ -21,7 +21,6 @@
 
 import {EventEmitter, Injectable} from '@angular/core';
 
-
 import {AppConstants} from 'app.constants';
 import {IdGenerationService} from 'services/id-generation.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';

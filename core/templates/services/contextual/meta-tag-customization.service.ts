@@ -16,7 +16,6 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from './window-ref.service';

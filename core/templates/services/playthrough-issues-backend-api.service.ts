@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
 
-
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 

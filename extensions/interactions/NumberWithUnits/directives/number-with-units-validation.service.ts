@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {unit} from 'mathjs';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';

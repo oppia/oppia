@@ -19,7 +19,6 @@
 import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 import {Injectable} from '@angular/core';
 
-
 import {MusicNotesAnswer} from 'interactions/answer-defs';
 import {UtilsService} from 'services/utils.service';
 

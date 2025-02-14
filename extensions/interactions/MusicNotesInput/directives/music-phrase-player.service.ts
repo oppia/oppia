@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 export interface Note {
   midiValue: number;
   duration: number;

@@ -17,7 +17,6 @@
  * functions on $window to be mocked in unit tests.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';

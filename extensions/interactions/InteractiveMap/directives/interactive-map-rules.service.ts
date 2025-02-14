@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {InteractiveMapAnswer} from 'interactions/answer-defs';
 import {InteractiveMapRuleInputs} from 'interactions/rule-input-defs';
 

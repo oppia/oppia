@@ -16,7 +16,6 @@
  * @fileoverview Rules service for the interaction.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {

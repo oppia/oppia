@@ -22,7 +22,6 @@
  * before working further and avoid unnecessary data loss.
  */
 
-
 import {Injectable} from '@angular/core';
 import {LocalStorageService} from './local-storage.service';
 

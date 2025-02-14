@@ -17,7 +17,6 @@
  * questions list in editors.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';

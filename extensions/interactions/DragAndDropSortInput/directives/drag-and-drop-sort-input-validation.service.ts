@@ -16,7 +16,6 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';

@@ -16,7 +16,6 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';

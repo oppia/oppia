@@ -17,7 +17,6 @@
  * attrs for interactions.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';

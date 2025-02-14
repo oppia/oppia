@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {NumericInputAnswer} from 'interactions/answer-defs';
 import {
   NumericInputEqualRuleInputs,

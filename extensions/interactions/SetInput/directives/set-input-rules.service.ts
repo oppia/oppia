@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {SetInputAnswer} from 'interactions/answer-defs';
 import {SetInputRuleInputs} from 'interactions/rule-input-defs';
 

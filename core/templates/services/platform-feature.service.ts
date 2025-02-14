@@ -36,7 +36,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {
   FeatureStatusChecker,
   FeatureStatusSummary,

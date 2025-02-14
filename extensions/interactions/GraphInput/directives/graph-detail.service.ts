@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {GraphAnswer} from 'interactions/answer-defs';
 
 export interface EdgeCentre {

@@ -16,7 +16,6 @@
  * @fileoverview Validation service for the interaction.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';

@@ -17,7 +17,6 @@
  * visible.
  */
 
-
 import {Injectable} from '@angular/core';
 
 @Injectable({

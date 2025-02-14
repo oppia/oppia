@@ -16,7 +16,6 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 

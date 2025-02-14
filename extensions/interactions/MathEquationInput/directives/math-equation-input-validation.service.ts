@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import nerdamer from 'nerdamer';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -228,4 +227,3 @@ export class MathEquationInputValidationService {
     return warningsList;
   }
 }
-

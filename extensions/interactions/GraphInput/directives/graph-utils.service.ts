@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {GraphAnswer} from 'interactions/answer-defs';
 
 // 'null' indicates that the pairs of vertices are not adjacent in the graph.

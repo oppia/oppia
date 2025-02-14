@@ -16,7 +16,6 @@
  * @fileoverview Service for inspecting and managing suggestion objects.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';

@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {CodeNormalizerService} from 'services/code-normalizer.service';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {CodeReplAnswer} from 'interactions/answer-defs';

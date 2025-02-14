@@ -16,7 +16,6 @@
  * @fileoverview The backend API service to fetch promo bar data.
  */
 
-
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {PromoBar, PromoBarBackendDict} from 'domain/promo_bar/promo-bar.model';

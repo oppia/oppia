@@ -19,7 +19,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {States} from 'domain/exploration/StatesObjectFactory';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';

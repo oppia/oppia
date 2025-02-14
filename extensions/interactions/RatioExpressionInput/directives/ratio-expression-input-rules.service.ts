@@ -16,7 +16,6 @@
  * @fileoverview Rules service for the RatioExpressionInput interaction.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {Ratio} from 'domain/objects/ratio.model';

@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import nerdamer from 'nerdamer';
 
 import {

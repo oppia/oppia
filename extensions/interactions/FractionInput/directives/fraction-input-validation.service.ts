@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {FractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
 import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
@@ -448,4 +447,3 @@ export class FractionInputValidationService {
     return warningsList;
   }
 }
-

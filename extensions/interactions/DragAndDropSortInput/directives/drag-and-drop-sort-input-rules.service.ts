@@ -20,7 +20,6 @@
 
 import {Injectable} from '@angular/core';
 
-
 import {DragAndDropAnswer} from 'interactions/answer-defs';
 import {
   DragAndDropCheckEqualityRuleInputs,

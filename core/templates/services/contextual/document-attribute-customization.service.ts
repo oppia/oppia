@@ -16,7 +16,6 @@
  * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';

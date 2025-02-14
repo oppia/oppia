@@ -17,7 +17,6 @@
  * warning messages if the validation fails.
  */
 
-
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';

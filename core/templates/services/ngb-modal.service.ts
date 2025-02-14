@@ -16,6 +16,4 @@
  * @fileoverview Downgraded NgbModal service for use in AngularJS files.
  */
 
-
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-
