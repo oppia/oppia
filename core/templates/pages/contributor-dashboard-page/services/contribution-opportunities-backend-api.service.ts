@@ -17,7 +17,6 @@
  * contributors to contribute.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -294,10 +293,3 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributionOpportunitiesBackendApiService',
-    downgradeInjectable(ContributionOpportunitiesBackendApiService)
-  );

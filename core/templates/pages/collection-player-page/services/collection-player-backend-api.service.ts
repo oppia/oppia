@@ -16,7 +16,6 @@
  * @fileoverview Backend Api Service for the Collection Player Page
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {CollectionSummary} from '../collection-player-page.component';
@@ -39,10 +38,3 @@ export class CollectionPlayerBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionPlayerBackendApiService',
-    downgradeInjectable(CollectionPlayerBackendApiService)
-  );

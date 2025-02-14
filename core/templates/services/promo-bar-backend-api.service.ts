@@ -16,7 +16,7 @@
  * @fileoverview The backend API service to fetch promo bar data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {PromoBar, PromoBarBackendDict} from 'domain/promo_bar/promo-bar.model';
@@ -73,10 +73,3 @@ export class PromoBarBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PromoBarBackendApiService',
-    downgradeInjectable(PromoBarBackendApiService)
-  );

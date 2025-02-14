@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Injectable({
@@ -83,6 +83,3 @@ export class SidebarStatusService {
   }
 }
 
-angular
-  .module('oppia')
-  .factory('SidebarStatusService', downgradeInjectable(SidebarStatusService));

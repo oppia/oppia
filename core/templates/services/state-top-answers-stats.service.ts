@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {States} from 'domain/exploration/StatesObjectFactory';
@@ -185,10 +185,3 @@ export class StateTopAnswersStatsService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateTopAnswersStatsService',
-    downgradeInjectable(StateTopAnswersStatsService)
-  );

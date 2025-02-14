@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {NumericInputAnswer} from 'interactions/answer-defs';
 import {
@@ -81,10 +81,3 @@ export class NumericInputRulesService {
     return answer >= inputs.x - inputs.tol && answer <= inputs.x + inputs.tol;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumericInputRulesService',
-    downgradeInjectable(NumericInputRulesService)
-  );

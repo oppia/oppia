@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import nerdamer from 'nerdamer';
 
@@ -229,9 +229,3 @@ export class MathEquationInputValidationService {
   }
 }
 
-angular
-  .module('oppia')
-  .factory(
-    'MathEquationInputValidationService',
-    downgradeInjectable(MathEquationInputValidationService)
-  );

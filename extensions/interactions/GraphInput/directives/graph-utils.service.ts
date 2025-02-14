@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {GraphAnswer} from 'interactions/answer-defs';
 
@@ -202,7 +202,3 @@ export class GraphUtilsService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));

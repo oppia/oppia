@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {GraphAnswer} from 'interactions/answer-defs';
 
@@ -107,7 +107,3 @@ export class GraphDetailService {
     };
   }
 }
-
-angular
-  .module('oppia')
-  .factory('GraphDetailService', downgradeInjectable(GraphDetailService));

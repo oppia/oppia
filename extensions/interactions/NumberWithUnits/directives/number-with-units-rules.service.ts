@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {unit} from 'mathjs';
 
@@ -91,10 +91,3 @@ export class NumberWithUnitsRulesService {
     return unit(answerString).equals(unit(inputsString));
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsRulesService',
-    downgradeInjectable(NumberWithUnitsRulesService)
-  );

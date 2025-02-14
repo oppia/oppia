@@ -16,7 +16,7 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -354,10 +354,3 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ItemSelectionInputValidationService',
-    downgradeInjectable(ItemSelectionInputValidationService)
-  );

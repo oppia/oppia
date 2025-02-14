@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
@@ -297,10 +296,3 @@ export class HintsAndSolutionManagerService {
     return this._learnerReallyStuckEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'HintsAndSolutionManagerService',
-    downgradeInjectable(HintsAndSolutionManagerService)
-  );
