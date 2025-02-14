@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import nerdamer from 'nerdamer';
 
@@ -99,10 +99,3 @@ export class AlgebraicExpressionInputRulesService {
     return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AlgebraicExpressionInputRulesService',
-    downgradeInjectable(AlgebraicExpressionInputRulesService)
-  );

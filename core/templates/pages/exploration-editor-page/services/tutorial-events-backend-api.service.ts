@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -57,10 +56,3 @@ export class TutorialEventsBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TutorialEventsBackendApiService',
-    downgradeInjectable(TutorialEventsBackendApiService)
-  );

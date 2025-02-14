@@ -17,7 +17,6 @@
  * improvements tasks for an exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {group} from 'd3-array';
 
@@ -564,10 +563,3 @@ export class ExplorationImprovementsTaskRegistryService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationImprovementsTaskRegistryService',
-    downgradeInjectable(ExplorationImprovementsTaskRegistryService)
-  );

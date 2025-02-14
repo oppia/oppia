@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 import {
   ExplorationMetadata,
@@ -196,10 +195,3 @@ export class CompareVersionsService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CompareVersionsService',
-    downgradeInjectable(CompareVersionsService)
-  );

@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
@@ -285,10 +285,3 @@ export class RatioExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'RatioExpressionInputValidationService',
-    downgradeInjectable(RatioExpressionInputValidationService)
-  );

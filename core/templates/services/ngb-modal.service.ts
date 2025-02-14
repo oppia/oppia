@@ -16,7 +16,6 @@
  * @fileoverview Downgraded NgbModal service for use in AngularJS files.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-angular.module('oppia').factory('NgbModal', downgradeInjectable(NgbModal));

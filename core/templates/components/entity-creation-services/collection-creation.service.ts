@@ -16,7 +16,6 @@
  * @fileoverview Modal and functionality for the create collection button.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -79,10 +78,3 @@ export class CollectionCreationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionCreationService',
-    downgradeInjectable(CollectionCreationService)
-  );

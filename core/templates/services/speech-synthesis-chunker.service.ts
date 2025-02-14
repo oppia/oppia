@@ -24,7 +24,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ServicesConstants} from 'services/services.constants';
@@ -291,10 +291,3 @@ export class SpeechSynthesisChunkerService {
     return this._formatLatexToSpeakableText(latex);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SpeechSynthesisChunkerService',
-    downgradeInjectable(SpeechSynthesisChunkerService)
-  );

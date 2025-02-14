@@ -19,7 +19,7 @@
 // Rules Service for DragAndDropSortInput interaction.
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 
 import {DragAndDropAnswer} from 'interactions/answer-defs';
 import {
@@ -127,10 +127,3 @@ export class DragAndDropSortInputRulesService {
     return indX < indY;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'DragAndDropSortInputRulesService',
-    downgradeInjectable(DragAndDropSortInputRulesService)
-  );

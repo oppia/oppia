@@ -16,7 +16,7 @@
  * @fileoverview Rules service for the RatioExpressionInput interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Injectable} from '@angular/core';
 
 import {Ratio} from 'domain/objects/ratio.model';
@@ -58,10 +58,3 @@ export class RatioExpressionInputRulesService {
     return Ratio.arrayEquals(simplifiedAnswer, simplifiedInput);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'RatioExpressionInputRulesService',
-    downgradeInjectable(RatioExpressionInputRulesService)
-  );
