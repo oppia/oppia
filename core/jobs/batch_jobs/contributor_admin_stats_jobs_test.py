@@ -1625,6 +1625,33 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             translation_submitter_total_stats.recent_review_outcomes
         )
 
+    def test_job_does_not_creates_stats_if_no_contribution_stats_model_exist(self) -> None: # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_2.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_2.update_timestamps()
+
+        self.put_multi([
+            self.translation_suggestion_accepted_with_edits_model,
+            self.topic_model_2,
+            self.exp_2,
+            self.story_2,
+            self.exp_context_2,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user1, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \nUnique valid topic IDs '
+                    'with contribution stats: \n'))
+        ])
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
