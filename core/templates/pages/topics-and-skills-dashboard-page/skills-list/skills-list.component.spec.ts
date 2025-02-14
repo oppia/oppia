@@ -84,7 +84,6 @@ describe('Skills List Component', () => {
     // The modal is initialized to different values to test various components.
     modal!: string;
     success: boolean = true;
-    cancelCallbackTopics: string[] | undefined = ['test_id', 'b', 'c'];
     open(
       content:
         | AssignSkillToTopicModalComponent
@@ -169,12 +168,12 @@ describe('Skills List Component', () => {
           result: {
             then: (
               successCallback: (skillsToAssign: string[]) => void,
-              cancelCallback: (skillsToAssign?: string[]) => void
+              cancelCallback: () => void
             ) => {
               if (this.success) {
                 successCallback(['test_id', 'b', 'c']);
               } else {
-                cancelCallback(this.cancelCallbackTopics);
+                cancelCallback();
               }
             },
           },
@@ -470,26 +469,6 @@ describe('Skills List Component', () => {
       'emit'
     );
     spyOn(alertsService, 'addSuccessMessage');
-
-    mockNgbModal.success = false;
-    componentInstance.assignSkillToTopic(
-      AugmentedSkillSummary.createFromBackendDict(
-        augmentedSkillSummaryBackendDict
-      )
-    );
-
-    tick(500);
-    expect(componentInstance.editableTopicSummaries[0].isSelected).toBe(false);
-    mockNgbModal.cancelCallbackTopics = undefined;
-    componentInstance.assignSkillToTopic(
-      AugmentedSkillSummary.createFromBackendDict(
-        augmentedSkillSummaryBackendDict
-      )
-    );
-    tick(500);
-    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
-
-    mockNgbModal.success = true;
     componentInstance.assignSkillToTopic(
       AugmentedSkillSummary.createFromBackendDict(
         augmentedSkillSummaryBackendDict
@@ -502,6 +481,12 @@ describe('Skills List Component', () => {
     ).toHaveBeenCalledWith(true);
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'The skill has been assigned to the topic.'
+    );
+    mockNgbModal.success = false;
+    componentInstance.assignSkillToTopic(
+      AugmentedSkillSummary.createFromBackendDict(
+        augmentedSkillSummaryBackendDict
+      )
     );
   }));
 });
