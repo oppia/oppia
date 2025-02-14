@@ -75,7 +75,6 @@
     "src/environments/environment.ts",
     "extensions/extensions.module.ts",
     "core/templates/domain/state/state-version-history.model.ts",
-    "core/templates/services/ngb-modal.service.ts",
     "core/templates/directives/angular-html-bind.directive.ts",
     "core/templates/directives/mathjax-bind.directive.ts",
     "core/templates/third-party-imports/select2.import.ts",

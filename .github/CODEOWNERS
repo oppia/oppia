@@ -297,7 +297,6 @@
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/ngb-modal.service.ts @oppia/lace-frontend-reviewers
 
 
 # Global frontend services
