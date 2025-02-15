@@ -42,11 +42,11 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
 
-//declare global {
-//  interface Window {
-//    GifFrames: Function;
-//  }
-//}
+// Declare global {
+//   interface Window {
+//     GifFrames: Function;
+//   }
+// }
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;

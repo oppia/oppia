@@ -74,7 +74,7 @@ import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 const gifshot = require('gifshot');
-//import * as gifFrames from 'gif-frames';
+// Import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
 // default Window interface doesn't contain "GifFrames" property. Hence we want
@@ -83,11 +83,11 @@ const gifshot = require('gifshot');
 // global scope Window as Window is a global object. Typescript interfaces only
 // union the interfaces with the same name when presented in the same scope.
 // TODO(#16735): Remove the usage of declare globals in "non-global" files.
-//declare global {
-//  interface Window {
-//    GifFrames: gifFrames;
-//  }
-//}
+// Declare global {
+//   interface Window {
+//     GifFrames: gifFrames;
+//   }
+// }
 
 interface FilepathData {
   mode: number;

@@ -746,9 +746,6 @@
 /core/tests/puppeteer-acceptance-tests/ @oppia/acceptance-test-reviewers
 /core/tests/puppeteer/ @oppia/acceptance-test-reviewers
 /core/tests/test-modules-mappings/acceptance/ @oppia/acceptance-test-reviewers
-/scripts/utils/__init__.py @oppia/acceptance-test-reviewers
-/scripts/utils/color_utils.py @oppia/acceptance-test-reviewers
-/scripts/utils/color_utils_test.py @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests_test.py @oppia/acceptance-test-reviewers
 /scripts/run_acceptance_tests.py @oppia/acceptance-test-reviewers
 
