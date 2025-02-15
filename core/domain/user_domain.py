@@ -24,6 +24,7 @@ import re
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -330,8 +331,7 @@ class UserSettings:
         """Updates last_edited_an_exploration to the current datetime for the
         user.
         """
-        self.last_edited_an_exploration = datetime.datetime.utcnow()
-
+        self.last_edited_an_exploration = get_current_datetime_utc()
     def update_first_contribution_msec(
         self, first_contribution_msec: float
     ) -> None:

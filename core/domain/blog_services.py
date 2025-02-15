@@ -33,6 +33,7 @@ from core.domain import search_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import (
     Callable, List, Literal, Optional, Sequence, Tuple, TypedDict, overload)
@@ -497,7 +498,7 @@ def publish_blog_post(blog_post_id: str) -> None:
 
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
-        published_on = datetime.datetime.utcnow()
+        published_on = get_current_datetime_utc()
         blog_post.published_on = published_on
         blog_post_summary.published_on = published_on
 

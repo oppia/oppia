@@ -37,6 +37,7 @@ import urllib.request
 
 from core import feconf
 from core.constants import constants
+from core.storage.base_model.gae_models import from_milliseconds_utc
 
 from PIL import Image
 import certifi

@@ -23,6 +23,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import (
     Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
@@ -419,7 +420,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(str). A list of the ids of the suggestions that are stale.
         """
         threshold_time = (
-            datetime.datetime.utcnow() - datetime.timedelta(
+            get_current_datetime_utc() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         suggestion_models: Sequence[GeneralSuggestionModel] = (
             cls.get_all().filter(
@@ -451,7 +452,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.')
         threshold_time = (
-            datetime.datetime.utcnow() - datetime.timedelta(
+            get_current_datetime_utc() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
@@ -466,7 +467,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def get_new_suggestions_waiting_for_review(
         cls,
     ) -> Sequence[GeneralSuggestionModel]:
-        """Returns new suggestions waiting for review that were
+        """Returns new suggestions waiting for review that were 
         submitted within timespan of SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
         days.
 

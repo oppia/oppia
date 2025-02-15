@@ -37,6 +37,7 @@ from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.types import base_validation_errors
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 import apache_beam as beam
 
@@ -87,7 +88,7 @@ class ValidateDeletedModel(beam.DoFn):  # type: ignore[misc]
         cloned_entity = job_utils.clone_model(entity)
 
         expiration_date = (
-            datetime.datetime.utcnow() -
+            get_current_datetime_utc() -
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
         if cloned_entity.last_updated < expiration_date:
@@ -275,7 +276,7 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
             yield base_validation_errors.InconsistentTimestampsError(
                 cloned_entity)
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = get_current_datetime_utc()
         last_updated_corrected = (
                 cloned_entity.last_updated - MAX_CLOCK_SKEW_SECS)
         if last_updated_corrected > current_datetime:

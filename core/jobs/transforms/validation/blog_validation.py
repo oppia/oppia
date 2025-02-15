@@ -27,6 +27,7 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import blog_validation_errors
 from core.jobs.types import model_property
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 import apache_beam as beam
 
@@ -137,7 +138,7 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
             yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                 model)
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = get_current_datetime_utc()
         if model.published_on:
             if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
                     current_datetime):

@@ -36,6 +36,7 @@ from core.domain import subscription_services
 from core.domain import suggestion_registry
 from core.domain import user_services
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import (
     Callable, DefaultDict, Dict, Final, List, Mapping, Optional, Sequence,
@@ -562,7 +563,7 @@ def _send_email(
             cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
-            intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
+            intent, email_subject, cleaned_html_body, get_current_datetime_utc()
         )
 
     _send_email_transactional()
@@ -625,7 +626,7 @@ def _send_bulk_mail(
 
         email_models.BulkEmailModel.create(
             instance_id, sender_id, sender_name_email, intent,
-            email_subject, cleaned_html_body, datetime.datetime.utcnow())
+            email_subject, cleaned_html_body, get_current_datetime_utc())
 
     _send_bulk_mail_transactional(instance_id)
 

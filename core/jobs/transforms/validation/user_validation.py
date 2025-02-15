@@ -27,6 +27,7 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import model_property
 from core.jobs.types import user_validation_errors
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 import apache_beam as beam
 
@@ -425,7 +426,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):  # type: ignore[misc]
                 not model.draft_change_list_last_updated):
             yield user_validation_errors.DraftChangeListLastUpdatedNoneError(
                 model)
-        current_time = datetime.datetime.utcnow()
+        current_time = get_current_datetime_utc()
         if (model.draft_change_list_last_updated and
                 model.draft_change_list_last_updated > current_time):
             yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(

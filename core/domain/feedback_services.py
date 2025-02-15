@@ -31,6 +31,8 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
+
 
 from typing import Dict, Final, List, Optional, Tuple, Type, cast
 
@@ -1079,7 +1081,7 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
-        (datetime.datetime.utcnow() - model.created_on).seconds)
+        (get_current_datetime_utc() - model.created_on).seconds)
 
     if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):

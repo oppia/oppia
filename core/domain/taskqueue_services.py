@@ -23,6 +23,7 @@ import json
 
 from core import feconf
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Any, Dict, Final
 
@@ -136,7 +137,7 @@ def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
         raise ValueError(
             'The params added to the email task call cannot be json serialized'
         ) from e
-    scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
+    scheduled_datetime = get_current_datetime_utc() + datetime.timedelta(
         seconds=countdown)
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,

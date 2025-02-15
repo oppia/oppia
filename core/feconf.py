@@ -24,7 +24,7 @@ import enum
 import os
 
 from core.constants import constants
-
+from core.storage.base_model.gae_models import from_milliseconds_utc
 from typing import Callable, Dict, Final, List, TypedDict, Union
 
 # The datastore model ID for the list of featured activity references. This
@@ -658,8 +658,8 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 
 # Timestamp in sec since epoch for Mar 1 2021 12:00:00 UTC for the earliest
 # datetime that a report could be received.
-EARLIEST_APP_FEEDBACK_REPORT_DATETIME = datetime.datetime.fromtimestamp(
-    1614556800)
+EARLIEST_APP_FEEDBACK_REPORT_DATETIME = from_milliseconds_utc(1614556800 * 1000.0)
+
 
 # The minimum and maximum package version codes for Oppia Android.
 MINIMUM_ANDROID_PACKAGE_VERSION_CODE = 1

@@ -38,6 +38,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_domain
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
@@ -215,7 +216,7 @@ def pre_delete_user(user_id: str) -> None:
 
     user_services.mark_user_for_deletion(user_id)
 
-    date_now = datetime.datetime.utcnow()
+    date_now = get_current_datetime_utc()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
     if user_settings.created_on is None:

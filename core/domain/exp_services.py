@@ -69,6 +69,8 @@ from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from extensions import domain
+from core.storage.base_model.gae_models import get_current_datetime_utc
+from core.storage.base_model.gae_models import from_milliseconds_utc
 
 import deepdiff
 from typing import (
@@ -2266,7 +2268,7 @@ def update_exploration_summary(
         # TODO(#15895): Revisit this after we have validations for the model to
         # see whether exploration_model_last_updated and
         # ExplorationModel.last_updated are in sync or not.
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
+        exploration_model_last_updated = from_milliseconds_utc(
             get_last_updated_by_human_ms(exploration.id) / 1000.0)
 
     contributor_ids = list(exp_summary.contributors_summary.keys())
@@ -2309,7 +2311,7 @@ def generate_new_exploration_summary(
     """
     ratings = feconf.get_empty_ratings()
     scaled_average_rating = get_scaled_average_rating(ratings)
-    exploration_model_last_updated = datetime.datetime.fromtimestamp(
+    exploration_model_last_updated = from_milliseconds_utc(
         get_last_updated_by_human_ms(exploration.id) / 1000.0)
 
     if exploration.created_on is None:
@@ -3570,7 +3572,7 @@ def update_logged_out_user_progress(
         exp_version)
     checkpoint_url_model.most_recently_reached_checkpoint_state_name = (
         state_name)
-    checkpoint_url_model.last_updated = datetime.datetime.utcnow()
+    checkpoint_url_model.last_updated = get_current_datetime_utc()
     checkpoint_url_model.update_timestamps()
     checkpoint_url_model.put()
 

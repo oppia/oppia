@@ -25,7 +25,7 @@ from core.domain import event_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.platform import models
-
+from core.storage.base_model.gae_models import get_current_datetime_utc
 from typing import Dict, Optional
 
 MYPY = False
@@ -89,7 +89,7 @@ def assign_rating_to_exploration(
             exp_user_data_model = user_models.ExplorationUserDataModel.create(
                 user_id, exploration_id)
         exp_user_data_model.rating = new_rating
-        exp_user_data_model.rated_on = datetime.datetime.utcnow()
+        exp_user_data_model.rated_on = get_current_datetime_utc()
         exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating

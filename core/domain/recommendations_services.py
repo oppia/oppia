@@ -27,6 +27,7 @@ from core import feconf
 from core.domain import exp_domain
 from core.domain import rights_domain
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Dict, Final, List, Sequence, cast
 
@@ -346,7 +347,7 @@ def get_item_similarity(
     ):
         similarity_score += 2.0
 
-    time_now = datetime.datetime.utcnow()
+    time_now = get_current_datetime_utc()
     time_delta_days = int(
         (time_now - compared_exp_summary.exploration_model_last_updated).days)
     if time_delta_days <= 7:

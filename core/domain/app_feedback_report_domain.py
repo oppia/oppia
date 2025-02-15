@@ -26,6 +26,8 @@ from core import utils
 from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
+from core.storage.base_model.gae_models import from_milliseconds_utc
+
 
 from typing import Any, Dict, List, Match, Optional, TypedDict, Union
 
@@ -331,7 +333,7 @@ class AppFeedbackReport:
             app_context_json['account_is_profile_admin'],
             app_context_json['event_logs'], app_context_json['logcat_logs'])
 
-        report_datetime = datetime.datetime.fromtimestamp(
+        report_datetime = from_milliseconds_utc(
             report_dict['report_submission_timestamp_sec'])
         report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(

@@ -33,6 +33,7 @@ import apache_beam as beam
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Any, Iterator, Optional, Sequence, Type
 
@@ -55,7 +56,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     RUNTIME_TYPE_CHECK = True
 
     # Helpful constants used by tests to create models.
-    NOW = datetime.datetime.utcnow()
+    NOW = get_current_datetime_utc()
     YEAR_AGO = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER = NOW + datetime.timedelta(weeks=52)
 

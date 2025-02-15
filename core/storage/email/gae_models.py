@@ -23,6 +23,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.platform import models
+from core.storage.base_model.gae_models import get_current_datetime_utc
 
 from typing import Dict, Optional, Sequence
 
@@ -315,7 +316,7 @@ class SentEmailModel(base_models.BaseModel):
         email_hash = cls._generate_hash(
             recipient_id, email_subject, email_body)
 
-        datetime_now = datetime.datetime.utcnow()
+        datetime_now = get_current_datetime_utc()
         time_interval = datetime.timedelta(
             minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
 
