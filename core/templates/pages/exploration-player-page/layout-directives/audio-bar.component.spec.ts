@@ -232,6 +232,25 @@ describe('Audio Bar Component', () => {
     expect(result).toBe(false);
   });
 
+  it('should call focusOnAudioControls when expanding the audio bar', () => {
+    spyOn(component, 'focusOnAudioControls');
+    component.expandAudioBar();
+    expect(component.focusOnAudioControls).toHaveBeenCalled();
+  });
+
+  it('should focus on audio controls element when focusOnAudioControls is called', () => {
+    const mockElementRef = {
+      nativeElement: {
+        focus: jasmine.createSpy('focus'),
+      },
+    };
+    component.audioControlsRef = mockElementRef as ElementRef;
+
+    component.focusOnAudioControls();
+
+    expect(mockElementRef.nativeElement.focus).toHaveBeenCalled();
+  });
+
   it('should check if the audio bar is available with enabled accent', () => {
     component.languageAccentDecriptions = ['English (India)', 'English (US)'];
     spyOn(
