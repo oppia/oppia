@@ -246,10 +246,24 @@ export class SkillsListComponent {
           }
         }
       },
-      () => {
+      (topicIds?: string[]) => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+        if (!topicIds) {
+          return;
+        }
+        topicIds.forEach(topicId => {
+          let topicIndex = this.editableTopicSummaries.findIndex(
+            topic => topic.id === topicId
+          );
+          if (topicIndex !== -1) {
+            (
+              this.editableTopicSummaries[topicIndex] as CreatorTopicSummary & {
+                isSelected: boolean;
+              }
+            ).isSelected = false;
+          }
+        });
       }
     );
   }
