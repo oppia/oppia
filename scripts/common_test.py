@@ -1469,4 +1469,3 @@ class UrlRetrieveTests(CommonTests):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
-                
