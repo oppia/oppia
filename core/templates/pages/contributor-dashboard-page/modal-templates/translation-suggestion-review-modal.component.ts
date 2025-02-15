@@ -165,7 +165,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   hasQueuedSuggestion: boolean = false;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   isUndoFeatureEnabled: boolean = false;
-  hasIncompleteTranslationError: boolean = false;
+  incompleteTranslationErrorIsShown: boolean = false;
 
   @Input() altTextIsDisplayed: boolean = false;
 
@@ -251,24 +251,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] = this.activeContribution;
     this.refreshActiveContributionState();
-    this.activeSuggestion.change_cmd.content_html as string;
-    const domParser = new DOMParser();
-    const originalElements = domParser.parseFromString(
-      this.activeSuggestion.change_cmd.content_html as string,
-      'text/html'
-    );
-    const translatedElements = domParser.parseFromString(
-      this.translationHtml,
-      'text/html'
-    );
-
     const translationError =
-      this.translationValidationService.validateTranslation(
-        originalElements.getElementsByTagName('*'),
-        translatedElements.getElementsByTagName('*')
+      this.translationValidationService.validateTranslationFromHtmlStrings(
+        this.activeSuggestion.change_cmd.content_html as string,
+        this.translationHtml
       );
-
-    this.hasIncompleteTranslationError =
+    this.incompleteTranslationErrorIsShown =
       translationError.hasUntranslatedElements;
 
     // The 'html' value is passed as an object as it is required for
@@ -392,24 +380,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   isComponentsMismatched(): boolean {
-    const domParser = new DOMParser();
-    const originalElements = domParser.parseFromString(
-      this.activeSuggestion.change_cmd.content_html as string,
-      'text/html'
-    );
-    const updatedElements = domParser.parseFromString(
-      this.editedContent.html,
-      'text/html'
-    );
-
     const translationError =
-      this.translationValidationService.validateTranslation(
-        originalElements.getElementsByTagName('*'),
-        updatedElements.getElementsByTagName('*')
+      this.translationValidationService.validateTranslationFromHtmlStrings(
+        this.activeSuggestion.change_cmd.content_html as string,
+        this.editedContent.html
       );
-    this.hasIncompleteTranslationError =
-      translationError.hasUntranslatedElements;
 
+    this.incompleteTranslationErrorIsShown =
+      translationError.hasUntranslatedElements;
     return translationError.hasUntranslatedElements;
   }
 
@@ -417,7 +395,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (changes.editedContent && this.editedContent) {
       this.isComponentsMismatched();
 
-      if (!this.hasIncompleteTranslationError) {
+      if (!this.incompleteTranslationErrorIsShown) {
         this.errorMessage = '';
         this.errorFound = false;
       }

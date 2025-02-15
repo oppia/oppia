@@ -123,6 +123,26 @@ export class TranslationValidationService {
     return originalElements.some(hasMatchingTranslatedElement);
   }
 
+  validateTranslationFromHtmlStrings(
+    originalHtml: string,
+    translatedHtml: string
+  ): TranslationError {
+    const domParser = new DOMParser();
+    const originalElements = domParser.parseFromString(
+      originalHtml,
+      'text/html'
+    );
+    const translatedElements = domParser.parseFromString(
+      translatedHtml,
+      'text/html'
+    );
+
+    return this.validateTranslation(
+      originalElements.getElementsByTagName('*'),
+      translatedElements.getElementsByTagName('*')
+    );
+  }
+
   isTranslationCompleted(
     originalElements: HTMLCollectionOf<Element>,
     translatedElements: HTMLCollectionOf<Element>

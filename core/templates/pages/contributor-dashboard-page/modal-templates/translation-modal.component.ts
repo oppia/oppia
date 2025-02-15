@@ -438,20 +438,10 @@ export class TranslationModalComponent {
 
   translatedTextCanBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
-      const domParser = new DOMParser();
-      const originalElements = domParser.parseFromString(
-        this.textToTranslate as string,
-        'text/html'
-      );
-      const translatedElements = domParser.parseFromString(
-        this.activeWrittenTranslation as string,
-        'text/html'
-      );
-
       const translationError =
-        this.translationValidationService.validateTranslation(
-          originalElements.getElementsByTagName('*'),
-          translatedElements.getElementsByTagName('*')
+        this.translationValidationService.validateTranslationFromHtmlStrings(
+          this.textToTranslate as string,
+          this.activeWrittenTranslation as string
         );
 
       this.hasImgTextError =

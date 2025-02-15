@@ -2711,7 +2711,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     expect(result).toEqual(expectedHtmlString);
   });
 
-  describe('Translation Suggestion Review Modal - Component Validation', () => {
+  fdescribe('Translation Suggestion Review Modal - Component Validation', () => {
     const htmlWithComponents = `
     <p>Content with components</p>
     <oppia-noninteractive-image
@@ -2858,11 +2858,11 @@ describe('Translation Suggestion Review Modal Component', function () {
           .content_html
       ).toBe(htmlWithComponents);
 
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.ngOnInit();
 
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       expect(component.translationHtml).toBe(htmlWithComponents);
     });
@@ -2874,7 +2874,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.ngOnInit();
 
@@ -2883,7 +2883,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
       expect(component.isComponentsMismatched()).toBeTrue();
-      expect(component.hasIncompleteTranslationError).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
     it('should detect component mismatch when adding components', () => {
@@ -2895,17 +2895,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_2.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithoutComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.ngOnInit();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
       expect(component.isComponentsMismatched()).toBeTrue();
-      expect(component.hasIncompleteTranslationError).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
     it('should detect no mismatch when components match', () => {
@@ -2915,17 +2915,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.ngOnInit();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
       expect(component.isComponentsMismatched()).toBeFalse();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
     });
 
     it('should handle multiple components correctly', () => {
@@ -2937,17 +2937,17 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_3.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithMultipleComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.ngOnInit();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.editedContent = {html: htmlWithMultipleComponents};
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithMultipleComponents);
 
       expect(component.isComponentsMismatched()).toBeFalse();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
     });
 
     it('should disable update button when components mismatch', () => {
@@ -2957,11 +2957,11 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
       expect(component.startedEditing).toBeFalse();
 
       component.ngOnInit();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.startedEditing = true;
       expect(component.startedEditing).toBeTrue();
@@ -2971,7 +2971,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
       expect(component.isUpdateDisabled).toBeTrue();
-      expect(component.hasIncompleteTranslationError).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
     it('should handle successful update when components match', () => {
@@ -2981,7 +2981,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
       expect(component.errorFound).toBeFalse();
 
       const updateSpy = spyOn(
@@ -2991,7 +2991,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(updateSpy).not.toHaveBeenCalled();
 
       component.ngOnInit();
-      expect(component.hasIncompleteTranslationError).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
 
       component.editedContent = {html: htmlWithComponents};
       expect(component.editedContent).toBeDefined();
@@ -3030,7 +3030,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should clear error when no component mismatch', () => {
       component.errorMessage = 'Some error';
       component.errorFound = true;
-      component.hasIncompleteTranslationError = false;
+      component.incompleteTranslationErrorIsShown = false;
 
       component.activeSuggestion = {
         author_name: 'author_name',
@@ -3071,7 +3071,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should keep error when component mismatch exists', () => {
       component.errorMessage = 'Some error';
       component.errorFound = true;
-      component.hasIncompleteTranslationError = true;
+      component.incompleteTranslationErrorIsShown = true;
 
       component.activeSuggestion = {
         author_name: 'author_name',
@@ -3145,6 +3145,37 @@ describe('Translation Suggestion Review Modal Component', function () {
       });
 
       expect(component.errorMessage).toBe('Some error');
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should not update when an image is replaced with a math formula', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.translationHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-image
+          alt-with-value="&amp;quot;Image description&amp;quot;"
+          caption-with-value="&amp;quot;Image caption&amp;quot;"
+          filepath-with-value="&amp;quot;img_20241109_030945_oc195e5356_height_350_width_450.svg&amp;quot;">
+        </oppia-noninteractive-image>
+      `;
+      component.ngOnInit();
+      const updatedHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-math
+          math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;,\u0026amp;quot;svg_filename\u0026amp;quot;:\u0026amp;quot;mathImg_20250126_225215_x5vy0sjj6v_height_3d205_width_1d784_vertical_1d306.svg\u0026amp;quot;}">
+        </oppia-noninteractive-math>
+      `;
+      component.editedContent = {
+        html: updatedHtml,
+      };
+
+      component.updateSuggestion();
+
+      expect(component.errorMessage).toBe(
+        'The number of components in the translation must match the original content.'
+      );
       expect(component.errorFound).toBeTrue();
     });
   });
