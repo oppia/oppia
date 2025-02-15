@@ -2,40 +2,43 @@
   <div class="modal-header">
     <h3>Customize This Component</h3>
   </div>
+
   <div class="modal-body">
     <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
       <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
            class="oppia-customization-arg-editor">
         <strong>{{ customizationArgSpec.description }}</strong>
         <div class="oppia-customization-arg-editor-inner">
-          <!-- Autofocus is applied to the first editor (ind === 0), ensuring the first form control receives focus when the form is loaded. -->
           <schema-based-editor [formControlName]="ind"
-                               [schema]="customizationArgSpec.schema"
-                               [attr.autofocus]="ind === 0 ? '' : null">
+                               [schema]="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
       </div>
     </form>
     <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </div>
+
   <div class="modal-footer">
     <button type="button"
             class="btn btn-danger e2e-test-delete-button"
             *ngIf="!componentIsNewlyCreated"
             (click)="delete()">
-      Delete
+            Delete
     </button>
+
     <button type="button"
             class="btn btn-secondary e2e-test-cancel-rich-text-editor oppia-cancel-btn"
             (click)="cancel()">
-      Cancel
+            Cancel
     </button>
+
     <button type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
             (click)="save()"
             [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
-      Done
+            Done
     </button>
+
   </div>
 </div>
 <style>
@@ -44,7 +47,7 @@
     z-index: 3001;
   }
   .oppia-customization-arg-form-container
-  .oppia-customization-arg-editor-inner {
+    .oppia-customization-arg-editor-inner {
     margin-top: 15px;
   }
   .oppia-customization-arg-form-container .error-message {
@@ -56,6 +59,6 @@
     z-index: 1;
   }
   input.oppia-save-btn, input.oppia-cancel-btn {
-    max-width: 100px;
+    max-width: 100px
   }
 </style>
