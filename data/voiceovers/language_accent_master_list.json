@@ -2,6 +2,9 @@
     "af": {
         "af-ZA": "Afrikaans (South Africa)"
     },
+    "ak": {
+        "ak-GH": "Akan (Ghana)"
+    },
     "am": {
         "am-ET": "Amharic (Ethiopia)"
     },
@@ -53,6 +56,9 @@
         "de-AT": "German (Austria)",
         "de-CH": "German (Switzerland)",
         "de-DE": "German (Germany)"
+    },
+    "ee": {
+        "ee-GH": "Ewe (Ghana)"
     },
     "el": {
         "el-GR": "Greek (Greece)"
@@ -122,6 +128,9 @@
     },
     "ga": {
         "ga-IE": "Irish (Ireland)"
+    },
+    "gaa": {
+        "gaa-GH": "Ga (Ghana)"
     },
     "gl": {
         "gl-ES": "Galician"

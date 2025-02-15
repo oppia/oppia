@@ -19,6 +19,8 @@ voiceovers model."""
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 
 from core.domain import state_domain
@@ -104,6 +106,11 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         entity_type = 'exploration'
         entity_id = exploration_model.id
         entity_version = exploration_model.version
+
+        logging.info(
+            'Exploration ID: %s, exploration version: %s.' % (
+                entity_id, entity_version)
+        )
 
         entity_voiceovers_id_to_entity_voiceovers: Dict[
             str, voiceover_domain.EntityVoiceovers] = {}
