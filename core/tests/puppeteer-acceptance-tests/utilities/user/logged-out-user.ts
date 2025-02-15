@@ -4185,6 +4185,7 @@ export class LoggedOutUser extends BaseUser {
   async startPracticeSession(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
+      await this.page.click('.e2e-test-skill-checkbox');
       await this.page.waitForSelector(startPracticeButton);
       const startButton = await this.page.$(startPracticeButton);
       if (!startButton) {
