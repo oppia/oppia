@@ -41,7 +41,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
-(window as any).gifFrames = gifFrames;
+(window as Window).gifFrames = gifFrames;
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
