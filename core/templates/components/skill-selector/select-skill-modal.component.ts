@@ -79,7 +79,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   isSaveButtonEnabled(): boolean {
-    if (!this.selectedSkillId) {
+    if (!this.selectedSkillId || this.associatedSkillSummaries.length === 0) {
       return false;
     }
     for (let idx in this.associatedSkillSummaries) {
