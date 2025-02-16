@@ -18,7 +18,10 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        test_name: ["Full-Stack Tests", "Backend Coverage Tests", "Frontend Tests"]
+        test_name:
+          - "Full-Stack Tests"
+          - "Backend Coverage Tests"
+          - "Frontend Tests"
         include:
           - test_name: "Full-Stack Tests"
             workflow_file: "full_stack_tests.yml"
@@ -53,12 +56,12 @@ jobs:
             failure
             action_required
       - name: Verify Manual Approval Requirement
-        if: ${{ steps['wait_for_completion_of_workflow'].outputs.run-conclusion == 'action_required' }}
+        if: ${{ steps.wait_for_completion_of_workflow.outputs.run-conclusion == 'action_required' }}
         run: |
           echo "::error::First-time contributor workflows require manual approval. After approval, please re-run the comment workflows to post the report."
           exit 1
       - name: Notify on Test Failure
-        if: ${{ steps['wait_for_completion_of_workflow'].outputs.run-conclusion == 'failure' && !cancelled() }}
+        if: ${{ steps.wait_for_completion_of_workflow.outputs.run-conclusion == 'failure' && !cancelled() }}
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
