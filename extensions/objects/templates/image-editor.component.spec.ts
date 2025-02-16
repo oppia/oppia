@@ -41,7 +41,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
-
+let mutableGifFrames = gifFrames;
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
@@ -1896,24 +1896,26 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    (gifFrames as jasmine.Spy) = jasmine.createSpy('gifFrames').and.returnValue(
-      Promise.resolve([
-        {
-          getImage: () => {
-            return {
-              toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
-              },
-            };
+    (mutableGifFrames as jasmine.Spy) = jasmine
+      .createSpy('gifFrames')
+      .and.returnValue(
+        Promise.resolve([
+          {
+            getImage: () => {
+              return {
+                toDataURL: () => {
+                  return {
+                    image: dataGif.uploadedImageData,
+                  };
+                },
+              };
+            },
+            frameInfo: {
+              disposal: 1,
+            },
           },
-          frameInfo: {
-            disposal: 1,
-          },
-        },
-      ] as never)
-    );
+        ] as never)
+      );
 
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -2270,7 +2272,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      (gifFrames as jasmine.Spy) = jasmine
+      (mutableGifFrames as jasmine.Spy) = jasmine
         .createSpy('gifFrames')
         .and.returnValue(
           Promise.resolve([
@@ -2384,7 +2386,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      (gifFrames as jasmine.Spy) = jasmine
+      (mutableGifFrames as jasmine.Spy) = jasmine
         .createSpy('gifFrames')
         .and.returnValue(
           Promise.resolve([
