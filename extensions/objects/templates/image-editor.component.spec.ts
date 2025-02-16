@@ -40,14 +40,13 @@ import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
-(window as Window).gifFrames = require('gif-frames');
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
 //   }
 // }
 interface Window {
-  gifFrames: Function;
+  GifFrames: Function;
 }
 
 describe('ImageEditor', () => {
@@ -1898,7 +1897,7 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(window, 'gifFrames').and.resolveTo([
+    spyOn(window, 'GifFrames').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -2270,7 +2269,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'gifFrames').and.resolveTo([
+      spyOn(window, 'GifFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2380,7 +2379,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'gifFrames').and.resolveTo([
+      spyOn(window, 'GifFrames').and.resolveTo([
         {
           getImage: () => {
             return {
