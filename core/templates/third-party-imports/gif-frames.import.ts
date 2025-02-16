@@ -21,6 +21,6 @@
 
 // Import gifFrames from the 'gif-frames' module.
 import * as gifFrames from 'gif-frames';
-(window as Window).gifFrames = require('gif-Frames');
+
 // Export gifFrames so that other modules can import it.
 export default gifFrames;
