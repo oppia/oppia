@@ -20,6 +20,6 @@
 // (window as Window).GifFrames = require('gif-frames');
 
 // Import gifFrames from the 'gif-frames' module.
-(window as Window).gifFrames = require('gif-frames');
+(window as Window).GifFrames = require('gif-frames');
 // Export gifFrames so that other modules can import it.
-//export default gifFrames;
+// Export default gifFrames;
