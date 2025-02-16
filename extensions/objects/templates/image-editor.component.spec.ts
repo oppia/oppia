@@ -1895,22 +1895,26 @@ describe('ImageEditor', () => {
         },
       })
     );
-    spyOn(gifFrames, 'default').and.resolveTo([
-      {
-        getImage: () => {
-          return {
-            toDataURL: () => {
-              return {
-                image: dataGif.uploadedImageData,
-              };
-            },
-          };
+    // Replace gifFrames with a spy that returns a resolved promise.
+    (gifFrames as jasmine.Spy) = jasmine.createSpy('gifFrames').and.returnValue(
+      Promise.resolve([
+        {
+          getImage: () => {
+            return {
+              toDataURL: () => {
+                return {
+                  image: dataGif.uploadedImageData,
+                };
+              },
+            };
+          },
+          frameInfo: {
+            disposal: 1,
+          },
         },
-        frameInfo: {
-          disposal: 1,
-        },
-      },
-    ] as never);
+      ] as never)
+    );
+
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
@@ -2266,22 +2270,26 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(gifFrames, 'default').and.resolveTo([
-        {
-          getImage: () => {
-            return {
-              toDataURL: () => {
+      (gifFrames as jasmine.Spy) = jasmine
+        .createSpy('gifFrames')
+        .and.returnValue(
+          Promise.resolve([
+            {
+              getImage: () => {
                 return {
-                  image: dataGif.uploadedImageData,
+                  toDataURL: () => {
+                    return {
+                      image: dataGif.uploadedImageData,
+                    };
+                  },
                 };
               },
-            };
-          },
-          frameInfo: {
-            disposal: 1,
-          },
-        },
-      ] as never);
+              frameInfo: {
+                disposal: 1,
+              },
+            },
+          ] as never)
+        );
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
@@ -2376,22 +2384,26 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(gifFrames, 'default').and.resolveTo([
-        {
-          getImage: () => {
-            return {
-              toDataURL: () => {
+      (gifFrames as jasmine.Spy) = jasmine
+        .createSpy('gifFrames')
+        .and.returnValue(
+          Promise.resolve([
+            {
+              getImage: () => {
                 return {
-                  image: dataGif.uploadedImageData,
+                  toDataURL: () => {
+                    return {
+                      image: dataGif.uploadedImageData,
+                    };
+                  },
                 };
               },
-            };
-          },
-          frameInfo: {
-            disposal: 1,
-          },
-        },
-      ] as never);
+              frameInfo: {
+                disposal: 1,
+              },
+            },
+          ] as never)
+        );
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
