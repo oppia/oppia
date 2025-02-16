@@ -2874,6 +2874,34 @@ def can_edit_topic(
 
     return test_can_edit
 
+def test_edit_question_without_permission(self):
+    self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+    editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+    self.set_editor(editor_id)
+
+    question_id = question_services.create_new_question(
+        editor_id, self.SKILL_ID, self.QUESTION_DATA)
+    
+    response = self.put_json(
+        '/edit_question/%s' % question_id, 
+        {'new_content': 'updated content'},
+        expected_status_int=401
+    )
+    self.assertEqual(response['error'], 'You do not have credentials to edit this question.')
+
+def test_delete_question_without_permission(self):
+    self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+    editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+    self.set_editor(editor_id)
+
+    question_id = question_services.create_new_question(
+        editor_id, self.SKILL_ID, self.QUESTION_DATA)
+    
+    response = self.delete_json(
+        '/delete_question/%s' % question_id, 
+        expected_status_int=401
+    )
+    self.assertEqual(response['error'], 'You do not have credentials to delete this question.')
 
 def can_edit_question(
     handler: Callable[..., _GenericHandlerFunctionReturnType]

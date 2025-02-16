@@ -2978,35 +2978,33 @@ class QuestionAdminRoleHandler(
         """Adds or removes the question role for a user.
 
         Raises:
-            NotFoundException. User with given username does not exist.
+            InvalidInputException. If the request payload is invalid.
+            NotFoundException. If the user with the given username does not exist.
+            UnauthorizedUserException. If the user has manager rights and cannot be deassigned.
         """
-        assert self.normalized_payload is not None
+        if self.normalized_payload is None:
+            raise self.InvalidInputException('Invalid request payload.')
+
         username = self.normalized_payload['username']
         action = self.normalized_payload['action']
 
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.NotFoundException(
-                'User with given username does not exist.')
+            self.render_json({'error': 'User with given username does not exist.'}, 404)
+            return
 
         user_id = user_settings.user_id
-        if (action == 'assign' and
-                not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles):
-            user_services.add_user_role(user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
-        else:
-            # The handler schema defines the possible values of 'action'.
-            # If 'action' has a value other than those defined in the schema,
-            # a Bad Request error will be thrown. Hence, 'action' must be
-            # 'deassign' if this branch is executed.
-            assert action == 'deassign'
+        if action == 'assign':
+            if feconf.ROLE_ID_QUESTION_ADMIN not in user_settings.roles:
+                user_services.add_user_role(user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
-            # The case where user does not have manager rights it will be
-            # caught before in topic_services.deassign_manager_role_from_topic
-            # method.
-            assert not topic_fetchers.get_topic_rights_with_user(user_id)
-            user_services.remove_user_role(
-                user_id, feconf.ROLE_ID_QUESTION_ADMIN)
+        elif action == 'deassign':
+            if topic_fetchers.get_topic_rights_with_user(user_id):
+                raise self.UnauthorizedUserException(
+                    'User has manager rights and cannot be deassigned.'
+                )
+            user_services.remove_user_role(user_id, feconf.ROLE_ID_QUESTION_ADMIN)
 
         self.render_json({})
