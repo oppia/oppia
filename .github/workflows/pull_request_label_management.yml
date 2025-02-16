@@ -4,6 +4,9 @@ on:
   pull_request_target:
     types: [labeled, unlabeled]
 
+env:
+  PAT_TOKEN: ${{ secrets.TEAM_READ_PAT }}  # PAT with read:org scopes
+
 permissions: {}
 
 jobs:
@@ -12,116 +15,127 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       pull-requests: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
+    steps:
       - name: Handle label changes
         uses: actions/github-script@v7
-        id: main-script
-        env:
-          VALID_LABELS: >
-            PR: Affects datastore layer,
-            PR: Needs to be hotfixed,
-            dependencies,
-            stale
         with:
+          github-token: ${{ env.PAT_TOKEN }}
           script: |
-            const event = context.payload;
-            const action = event.action;
-            const label = event.label?.name || '';
-            const sender = event.sender?.login || '';
-            const fs = require('fs');
-            const path = require('path');
-            const userWhitelistPath = path.join(process.env.GITHUB_WORKSPACE, 'userWhitelist.json');
-            
-            let authorizedUsers = new Set();
-            let releaseCoordinators = [];
-            try {
-              const users = JSON.parse(fs.readFileSync(userWhitelistPath, 'utf8'));
-              authorizedUsers = new Set([
-                ...users.releaseCoordinators,
-                ...users.serverJobAdmins
-              ]);
-              releaseCoordinators = users.releaseCoordinators || [];
-            } catch (error) {
-              core.error(`Failed to load userwhitelist.json: ${error.message}`);
+            const { context, github } = require('@actions/github');
+            const octokit = github.rest;
+
+            // ======================
+            // GRAPHQL TEAM QUERIES
+            // ======================
+            async function getTeamMembers(teamSlug) {
+              const org = 'oppia';
+              try {
+                const result = await github.graphql({
+                  query: `
+                    query ($org: String!, $teamSlug: String!) {
+                      organization(login: $org) {
+                        team(slug: $teamSlug) {
+                          members(first: 100) {
+                            nodes { login }
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  org,
+                  teamSlug,
+                  headers: {
+                    authorization: `token ${process.env.PAT_TOKEN}`
+                  }
+                });
+                
+                return new Set(
+                  result.organization.team.members.nodes
+                    .map(node => node.login.toLowerCase())
+                );
+              } catch (error) {
+                core.error(`Team query failed: ${error.message}`);
+                return new Set();
+              }
+            }
+
+
+            const action = context.payload.action;
+            const label = (context.payload.label?.name || '').trim();
+            const sender = (context.payload.sender?.login || '').toLowerCase();
+            const prNumber = context.issue.number;
+            const { owner, repo } = context.repo;
+
+            // Validate critical inputs
+            if (!/^[\w\s-:]+$/i.test(label)) {
+              core.error(`Invalid label format: ${label}`);
               return;
             }
-            const validLabels = new Set(
-              process.env.VALID_LABELS
-                .split(',')
-                .map(l => l.trim())
-                .filter(l => l)
-            );
-            const sanitizedLabel = label.replace(/[^a-zA-Z0-9 _:-]/g, '').trim();
-            
-            let restoredDatastore = false;
-            let assignedHotfix = false;
-            // datastore label removal
-            if (action === 'unlabeled' && sanitizedLabel === 'PR: Affects datastore layer') {
-              const userAllowed = authorizedUsers.has(sender);
-              if (!userAllowed) {
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  labels: [sanitizedLabel]
+
+            // Fetch team data
+            const [releaseTeam, serverJobTeam] = await Promise.all([
+              getTeamMembers('oppia-release-coordinators'),
+              getTeamMembers('oppia-server-job-admins')
+            ]);
+
+            const authorizedUsers = new Set([...releaseTeam, ...serverJobTeam]);
+            const validLabels = new Set(process.env.VALID_LABELS.split(',').map(l => l.trim()));
+
+            // Label change handlers
+            const handleDatastoreLabelRemoval = async () => {
+              if (!authorizedUsers.has(sender)) {
+                await octokit.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  labels: [label]
                 });
-                restoredDatastore = true;
-              }
-            }
-            // hotfix label addition
-            if (action === 'labeled' && sanitizedLabel === 'PR: Needs to be hotfixed') {
-              const validUsers = releaseCoordinators.filter(u => u); // Use only releaseCoordinators
-              if (validUsers.length > 0) {
-                const randomUser = validUsers[Math.floor(Math.random() * validUsers.length)];
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  assignees: [randomUser]
+                await octokit.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: `@${sender} Unauthorized label removal detected. Only authorized team members may remove "${label}".`
                 });
-                assignedHotfix = true;
               }
-            }
-            // Validate label 
-            if (action === 'labeled') {
-              const isCustomPRLabel = sanitizedLabel.startsWith('PR:') && !validLabels.has(sanitizedLabel);
-              
-              if (!validLabels.has(sanitizedLabel) && !isCustomPRLabel) {
-                try {
-                  await github.rest.issues.removeLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
-                    name: sanitizedLabel
-                  });
-                  
-                  await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
-                    body: `Removed invalid label: ${sanitizedLabel}. Please use approved labels only.`
-                  });
-                } catch (error) {
-                  core.error(`Error handling invalid label: ${error.message}`);
-                }
+            };
+
+            const handleHotfixLabelAddition = async () => {
+              const coordinators = [...releaseTeam];
+              if (coordinators.length > 0) {
+                const assignee = coordinators[Math.floor(Math.random() * coordinators.length)];
+                await octokit.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  assignees: [assignee]
+                });
+                await octokit.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: `Hotfix label added. Randomly assigned to @${assignee} for priority review.`
+                });
               }
-            }
-            if (restoredDatastore) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: 'Unauthorized removal of "PR: Affects datastore layer" detected. Label restored.'
-              });
-            }
-            if (assignedHotfix) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: 'PR marked as hotfix. Assigned release coordinators for review.'
-              });
+            };
+
+            // Execute label-specific logic
+            switch(true) {
+              case action === 'unlabeled' && label === 'PR: Affects datastore layer':
+                await handleDatastoreLabelRemoval();
+                break;
+
+              case action === 'labeled' && label === 'PR: Needs to be hotfixed':
+                await handleHotfixLabelAddition();
+                break;
+
+              case action === 'labeled' && !validLabels.has(label):
+                await octokit.issues.removeLabel({ owner, repo, issue_number: prNumber, name: label });
+                await octokit.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: `@${sender} Removed invalid label: ${label}`
+                });
+                break;
             }
