@@ -23,4 +23,4 @@
 import * as gifFrames from 'gif-frames';
 
 // Export gifFrames so that other modules can import it.
-export {gifFrames};
+export default gifFrames;
