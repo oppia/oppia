@@ -3022,7 +3022,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.updateSuggestion();
 
       expect(component.errorMessage).toBe(
-        'The number of components in the translation must match the original content.'
+        `Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.`
       );
       expect(component.errorFound).toBeTrue();
     });
@@ -3174,7 +3174,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.updateSuggestion();
 
       expect(component.errorMessage).toBe(
-        'The number of components in the translation must match the original content.'
+        `Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.`
       );
       expect(component.errorFound).toBeTrue();
     });

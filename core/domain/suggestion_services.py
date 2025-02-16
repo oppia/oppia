@@ -43,6 +43,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
+import bs4
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match,
     Optional, Sequence, Set, Tuple, Union, cast, overload
@@ -100,8 +101,6 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
-
-IMAGE_TAG_REGEX = r'<oppia-noninteractive-image\b[^>]*?filepath-with-value='
 
 
 @overload
@@ -2146,26 +2145,47 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
-def count_images(html_content: str) -> int:
-    """Counts the number of image tags in the provided HTML content."""
-    return len(re.findall(IMAGE_TAG_REGEX, html_content))
-
-
-def update_translation_suggestion(
-    suggestion_id: str, translation_html: str
-) -> None:
-    """Updates the translation_html of a suggestion with the given
-    suggestion_id.
+def count_rte_components(html_content: str) -> Dict[str, int]:
+    """Counts the number of each RTE component in the provided HTML content.
 
     Args:
-        suggestion_id: str. The id of the suggestion to be updated.
-        translation_html: str. The new translation_html string.
+        html_content: str. The HTML content to analyze.
+
+    Returns:
+        Dict[str, int]. A dictionary where keys are RTE component names
+        (e.g., 'oppia-noninteractive-image') and values are their counts.
+    """
+    soup = bs4.BeautifulSoup(html_content, 'html.parser')
+    component_counts = {}
+
+    rte_tags = [
+        "oppia-noninteractive-image",
+        "oppia-noninteractive-math",
+        "oppia-noninteractive-concept-card",
+        "oppia-noninteractive-video"
+    ]
+
+    for tag in rte_tags:
+        component_counts[tag] = len(soup.find_all(tag))
+
+    return component_counts
+
+def update_translation_suggestion(
+    suggestion_id: str,
+    translation_html: str
+) -> None:
+    """Updates a translation suggestion while ensuring RTE components remain unchanged.
+
+    Args:
+        suggestion_id: str. The ID of the suggestion being updated.
+        translation_html: str. The new translated HTML content.
 
     Raises:
-        Exception. Expected SuggestionTranslateContent suggestion but found
-            different suggestion.
+        InvalidInputException: If the number of RTE components in
+        the original and updated translations do not match.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+
     if not isinstance(
         suggestion, suggestion_registry.SuggestionTranslateContent
     ):
@@ -2173,16 +2193,15 @@ def update_translation_suggestion(
             'Expected SuggestionTranslateContent suggestion but found: %s.'
             % type(suggestion).__name__
         )
-    original_text_html = suggestion.change_cmd.content_html
-    original_image_count = count_images(original_text_html)
-    updated_image_count = count_images(translation_html)
 
-    if updated_image_count != original_image_count:
+    original_text_html = suggestion.change_cmd.content_html
+    original_rte_counts = count_rte_components(original_text_html)
+    updated_rte_counts = count_rte_components(translation_html)
+
+    if original_rte_counts != updated_rte_counts:
         raise utils.InvalidInputException(
-            'The number of images in the updated translation (%d) '
-            'must match the original content (%d). '
-            'Adding or removing images is not '
-            'allowed.' % (updated_image_count, original_image_count)
+            'The number of RTE components (images, math, concept cards, videos) '
+            'in the updated translation must match the original content.'
         )
 
     suggestion.change_cmd.translation_html = (

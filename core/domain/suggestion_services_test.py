@@ -1037,7 +1037,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def create_translation_suggestion(
             self, content_html: str, translation_html: str
         ) -> suggestion_registry.SuggestionTranslateContent:
-
         """Creates a translation suggestion for testing purposes."""
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
@@ -1074,53 +1073,60 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'exploration1', self.target_version_at_submission,
             self.author_id, add_translation_change_dict, 'test description')
 
-    def test_updating_translation_suggestion_raise_error_when_image_is_removed(
+    def test_updating_translation_suggestion_raise_error_when_rte_component_is_removed(
             self
         ) -> None:
-        content_html_with_image = (
+        content_html_with_rte_components = (
             '<p>Original content with image.</p>'
             '<oppia-noninteractive-image '
             'alt-with-value="Image description" '
             'caption-with-value="Sample caption" '
             'filepath-with-value="img.svg"> '
             '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
         )
-        translation_html_with_image = (
-            '<p>Translation for original content with image.</p>'
+        translation_html_with_rte_components = (
+            '<p>Original content with image.</p>'
             '<oppia-noninteractive-image '
             'alt-with-value="Image description" '
             'caption-with-value="Sample caption" '
             'filepath-with-value="img.svg"> '
             '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
         )
         suggestion = self.create_translation_suggestion(
-            content_html=content_html_with_image,
-            translation_html=translation_html_with_image
-        )
-
-        self.assertIn(
-            '<oppia-noninteractive-image',
-            suggestion.change_cmd.translation_html,
-            msg='Initial translation suggestion should contain an image.'
+            content_html=content_html_with_rte_components,
+            translation_html=translation_html_with_rte_components
         )
 
         updated_translation_without_image = (
             '<p>Updated translation without image</p>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
         )
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-                'The number of images in the updated translation \\(0\\) '
-                'must match the original content \\(1\\). '
-                'Adding or removing images is not '
-                'allowed.'
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
+            'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
                 updated_translation_without_image
             )
 
-    def test_update_translation_suggestion_raises_error_when_image_is_added(
+    def test_updating_translation_suggestion_raises_error_when_component_is_added(
         self
     ) -> None:
         content_html_without_image = (
@@ -1145,17 +1151,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-                'The number of images in the updated translation \\(1\\) '
-                'must match the original content \\(0\\). '
-                'Adding or removing images is not '
-                'allowed.'
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
+            'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
                 new_translation_html_with_image
             )
 
-    def test_update_translation_suggestion_rejects_image_count_reduction(
+    def test_updating_translation_suggestion_raises_error_when_component_count_changes(
         self
     ) -> None:
         content_html_with_multiple_images = (
@@ -1188,131 +1192,104 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             content_html_with_multiple_images,
             translation_html_with_multiple_images
         )
-
-        # Test case for removing one image.
-        updated_translation_with_one_image_removed = (
-            '<p>Updated translation with one image removed.</p>'
+        updated_translation = (
+            '<p>Updated translation with an extra video.</p>'
             '<oppia-noninteractive-image '
             'alt-with-value="Image description 1" '
             'caption-with-value="Sample Caption 1" '
             'filepath-with-value="img1.svg"> '
             '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            (
-                'The number of images in the updated translation \\(1\\) '
-                'must match the original content \\(2\\). '
-                'Adding or removing images is not '
-                'allowed.'
-            )
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
+            'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
-                updated_translation_with_one_image_removed
-            )
-
-        # Test case for removing all images.
-        updated_translation_with_all_images_removed = (
-            '<p>Updated translation with all images removed.</p>'
-        )
-        with self.assertRaisesRegex(
-            utils.InvalidInputException,
-            (
-                'The number of images in the updated translation \\(0\\) '
-                'must match the original content \\(2\\). '
-                'Adding or removing images is not '
-                'allowed.'
-            )
-        ):
-            suggestion_services.update_translation_suggestion(
-                suggestion.suggestion_id,
-                updated_translation_with_all_images_removed
+                updated_translation
             )
 
         updated_suggestion = suggestion_services.get_suggestion_by_id(
             suggestion.suggestion_id
         )
-        original_image_count = suggestion_services.count_images(
+        original_component_counts = suggestion_services.count_rte_components(
             updated_suggestion.change_cmd.translation_html
         )
         self.assertEqual(
-            original_image_count, 2
+            original_component_counts,
+            {
+                'oppia-noninteractive-image': 2,
+                'oppia-noninteractive-math': 0,
+                'oppia-noninteractive-concept-card': 0,
+                'oppia-noninteractive-video': 0
+            }
         )
 
-    def test_update_translation_suggestion_raises_error_when_images_are_added(
-        self
-    ) -> None:
-        content_html_with_single_image = (
-            '<p>Original content with one image.</p>'
-            '<oppia-noninteractive-image '
-            'alt-with-value="Image description 1" '
-            'caption-with-value="Caption 1" '
-            'filepath-with-value="img1.svg"> '
-            '</oppia-noninteractive-image>'
-        )
-        translation_html_with_single_image = (
-            '<p>Translation with one image.</p>'
-            '<oppia-noninteractive-image '
-            'alt-with-value="Image description 1" '
-            'caption-with-value="Caption 1" '
-            'filepath-with-value="img1.svg"> '
-            '</oppia-noninteractive-image>'
-        )
-        suggestion = self.create_translation_suggestion(
-            content_html_with_single_image,
-            translation_html_with_single_image
-        )
-
-        original_image_count = suggestion_services.count_images(
-            suggestion.change_cmd.translation_html
-        )
-        self.assertEqual(
-            original_image_count, 1
-        )
-
-        new_translation_html_with_additional_images = (
-            '<p>Translation with additional images.</p>'
-            '<oppia-noninteractive-image '
-            'alt-with-value="Image description 1" '
-            'caption-with-value="Caption 1" '
-            'filepath-with-value="img1.svg"> '
-            '</oppia-noninteractive-image> '
-            '<oppia-noninteractive-image '
-            'alt-with-value="New image description" '
-            'caption-with-value="New Caption" '
-            'filepath-with-value="new_img.svg"> '
-            '</oppia-noninteractive-image>'
-        )
-
-        with self.assertRaisesRegex(
-            utils.InvalidInputException,
-            (
-                'The number of images in the updated translation \\(2\\) '
-                'must match the original content \\(1\\). '
-                'Adding or removing images is not '
-                'allowed.'
+    def test_updating_translation_suggestion_raises_error_when_component_types_mismatch(
+            self
+        ) -> None:
+            """Test that updating a translation raises an error when RTE components
+            are replaced with different types, even if total count remains same.
+            """
+            content_html_with_image = (
+                '<p>Original content with image.</p>'
+                '<oppia-noninteractive-image '
+                'alt-with-value="Image description" '
+                'caption-with-value="Sample Caption" '
+                'filepath-with-value="img.svg"> '
+                '</oppia-noninteractive-image>'
             )
-        ):
-            suggestion_services.update_translation_suggestion(
-                suggestion.suggestion_id,
-                new_translation_html_with_additional_images
+            translation_html_with_image = (
+                '<p>Translation with image.</p>'
+                '<oppia-noninteractive-image '
+                'alt-with-value="Image description" '
+                'caption-with-value="Sample Caption" '
+                'filepath-with-value="img.svg"> '
+                '</oppia-noninteractive-image>'
+            )
+            suggestion = self.create_translation_suggestion(
+                content_html_with_image,
+                translation_html_with_image
             )
 
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id
-        )
-        self.assertEqual(
-            updated_suggestion.change_cmd.translation_html,
-            translation_html_with_single_image
-        )
+            # Create updated translation that replaces the image with a math formula
+            updated_translation_with_math = (
+                '<p>Updated translation with math instead of image.</p>'
+                '<oppia-noninteractive-math '
+                'math_content-with-value="{&amp;q'
+                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+                '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+                '</oppia-noninteractive-math>'
+            )
 
-        updated_image_count = suggestion_services.count_images(
-            updated_suggestion.change_cmd.translation_html
-        )
-        self.assertEqual(
-            updated_image_count, 1
-        )
+            with self.assertRaisesRegex(
+                utils.InvalidInputException,
+                r'\s*The number of RTE components \(images, math, concept cards, videos\) '
+                'in the updated translation must match the original content\s*'
+            ):
+                suggestion_services.update_translation_suggestion(
+                    suggestion.suggestion_id,
+                    updated_translation_with_math
+                )
+
+            updated_suggestion = suggestion_services.get_suggestion_by_id(
+                suggestion.suggestion_id
+            )
+            self.assertEqual(
+                updated_suggestion.change_cmd.translation_html,
+                translation_html_with_image
+            )
 
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
