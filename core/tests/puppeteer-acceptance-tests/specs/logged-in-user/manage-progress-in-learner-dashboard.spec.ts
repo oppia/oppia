@@ -23,6 +23,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -30,6 +31,7 @@ const ROLES = testConstants.Roles;
 describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let releaseCoordinator: ReleaseCoordinator;
   let explorationId1: string | null;
 
   beforeAll(async function () {
@@ -40,19 +42,18 @@ describe('Logged-in User', function () {
     );
 
     const explorationTitles = [
-      'Explore Title 1',
-      'Explore Title 2',
-      'Explore Title 3',
-      'Explore Title 4',
-      'Explore Title 5',
+      'Explore 1',
+      'Explore 2',
+      'Explore 3',
+      'Explore 4',
+      'Explore 5',
     ];
 
-    await Promise.all(
-      explorationTitles.map(
-        async title =>
-          await curriculumAdmin.createAndPublishExplorationWithCards(title)
-      )
-    );
+    await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle('title');
+
+    for (const title of explorationTitles) {
+      await curriculumAdmin.createAndPublishExplorationWithCards(title);
+    }
 
     const topics = [
       'Place Values',
@@ -111,6 +112,16 @@ describe('Logged-in User', function () {
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
     );
     // Setup taking longer than 300000ms.
   }, 480000);
