@@ -17,7 +17,12 @@
  * audio translation in the learner view.
  */
 
-import {Component} from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -48,6 +53,7 @@ import {LocalStorageService} from 'services/local-storage.service';
   templateUrl: './audio-bar.component.html',
 })
 export class AudioBarComponent {
+  @ViewChild('audioControls', {static: false}) audioControlsRef!: ElementRef;
   lastScrollTop: number = 0;
   isPaused: boolean = true;
   directiveSubscriptions: Subscription = new Subscription();
@@ -79,7 +85,8 @@ export class AudioBarComponent {
     private entityVoiceoversService: EntityVoiceoversService,
     private platformFeatureService: PlatformFeatureService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.explorationPlayerModeIsActive =
       this.contextService.isInExplorationPlayerPage();
@@ -194,9 +201,15 @@ export class AudioBarComponent {
     }
   }
 
+  focusOnAudioControls(): void {
+    this.audioControlsRef?.nativeElement.focus();
+  }
+
   expandAudioBar(): void {
     this.audioBarIsExpanded = true;
     this.audioBarStatusService.markAudioBarExpanded();
+    this.cdRef.detectChanges();
+    this.focusOnAudioControls();
   }
 
   collapseAudioBar(): void {
