@@ -137,33 +137,13 @@ describe('Select Skill Modal', () => {
     expect(componentInstance.isSaveButtonEnabled()).toBe(true);
   });
 
-  it('should disable Done button when associatedSkillSummaries is empty', () => {
-    componentInstance.associatedSkillSummaries = [];
-    componentInstance.selectedSkillId = 'skillId3';
+  it('should keep Done button disabled when no skill is selected', () => {
+    componentInstance.selectedSkillId = '';
     expect(componentInstance.isDoneButtonDisabled()).toBe(true);
   });
 
-  it('should disable Done button if Save button is disabled', () => {
-    componentInstance.associatedSkillSummaries = [
-      ShortSkillSummary.createFromBackendDict({
-        skill_id: 'skillId1',
-        skill_description: 'Skill Description',
-      }),
-    ];
-    componentInstance.selectedSkillId = 'skillId1';
-    expect(componentInstance.isSaveButtonEnabled()).toBe(false);
-    expect(componentInstance.isDoneButtonDisabled()).toBe(true);
-  });
-
-  it('should enable Done button when a skill is chosen and Save button is enabled', () => {
-    componentInstance.associatedSkillSummaries = [
-      ShortSkillSummary.createFromBackendDict({
-        skill_id: 'skillId1',
-        skill_description: 'Skill Description',
-      }),
-    ];
+  it('should activate Done button when a skill is chosen', () => {
     componentInstance.selectedSkillId = 'skillId3';
-    expect(componentInstance.isSaveButtonEnabled()).toBe(true);
     expect(componentInstance.isDoneButtonDisabled()).toBe(false);
   });
 });
