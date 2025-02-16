@@ -47,7 +47,7 @@ let gifshot = require('gifshot');
 //   }
 // }
 interface Window {
-  gifFrames: Function; // Or more specific type if available
+  gifFrames: Function;
 }
 
 describe('ImageEditor', () => {
