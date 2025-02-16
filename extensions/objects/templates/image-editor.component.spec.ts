@@ -39,16 +39,13 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import '../../../core/templates/third-party-imports/gif-frames.import';
+import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
 //   }
 // }
-interface Window {
-  GifFrames: Function;
-}
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
@@ -1898,22 +1895,24 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(window, 'GifFrames').and.resolveTo([
-      {
-        getImage: () => {
-          return {
-            toDataURL: () => {
-              return {
-                image: dataGif.uploadedImageData,
-              };
-            },
-          };
+    spyOn(gifFrames, 'default').and.returnValue(
+      Promise.resolve([
+        {
+          getImage: () => {
+            return {
+              toDataURL: () => {
+                return {
+                  image: dataGif.uploadedImageData,
+                };
+              },
+            };
+          },
+          frameInfo: {
+            disposal: 1,
+          },
         },
-        frameInfo: {
-          disposal: 1,
-        },
-      },
-    ] as never);
+      ] as never)
+    );
 
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -2270,22 +2269,24 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
-        {
-          getImage: () => {
-            return {
-              toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
-              },
-            };
+      spyOn(gifFrames, 'default').and.returnValue(
+        Promise.resolve([
+          {
+            getImage: () => {
+              return {
+                toDataURL: () => {
+                  return {
+                    image: dataGif.uploadedImageData,
+                  };
+                },
+              };
+            },
+            frameInfo: {
+              disposal: 1,
+            },
           },
-          frameInfo: {
-            disposal: 1,
-          },
-        },
-      ] as never);
+        ] as never)
+      );
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
@@ -2380,22 +2381,24 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
-        {
-          getImage: () => {
-            return {
-              toDataURL: () => {
-                return {
-                  image: dataGif.uploadedImageData,
-                };
-              },
-            };
+      spyOn(gifFrames, 'default').and.returnValue(
+        Promise.resolve([
+          {
+            getImage: () => {
+              return {
+                toDataURL: () => {
+                  return {
+                    image: dataGif.uploadedImageData,
+                  };
+                },
+              };
+            },
+            frameInfo: {
+              disposal: 1,
+            },
           },
-          frameInfo: {
-            disposal: 1,
-          },
-        },
-      ] as never);
+        ] as never)
+      );
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
