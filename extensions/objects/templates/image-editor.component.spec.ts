@@ -1895,7 +1895,7 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(gifFrames, 'default').and.returnValue(
+    spyOn(gifFrames, '').and.returnValue(
       Promise.resolve([
         {
           getImage: () => {
@@ -2269,7 +2269,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(gifFrames, 'default').and.returnValue(
+      spyOn(gifFrames, '').and.returnValue(
         Promise.resolve([
           {
             getImage: () => {
@@ -2381,7 +2381,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(gifFrames, 'default').and.returnValue(
+      spyOn(gifFrames, '').and.returnValue(
         Promise.resolve([
           {
             getImage: () => {
