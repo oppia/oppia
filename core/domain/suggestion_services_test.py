@@ -1118,8 +1118,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
-            'in the updated translation must match the original content\s*'
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
+            r'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1151,8 +1151,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
-            'in the updated translation must match the original content\s*'
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
+            r'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1212,8 +1212,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) '
-            'in the updated translation must match the original content\s*'
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
+            r'in the updated translation must match the original content\s*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1239,57 +1239,59 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_updating_translation_suggestion_raises_error_when_component_types_mismatch(
             self
         ) -> None:
-            """Test that updating a translation raises an error when RTE components
-            are replaced with different types, even if total count remains same.
-            """
-            content_html_with_image = (
-                '<p>Original content with image.</p>'
-                '<oppia-noninteractive-image '
-                'alt-with-value="Image description" '
-                'caption-with-value="Sample Caption" '
-                'filepath-with-value="img.svg"> '
-                '</oppia-noninteractive-image>'
-            )
-            translation_html_with_image = (
-                '<p>Translation with image.</p>'
-                '<oppia-noninteractive-image '
-                'alt-with-value="Image description" '
-                'caption-with-value="Sample Caption" '
-                'filepath-with-value="img.svg"> '
-                '</oppia-noninteractive-image>'
-            )
-            suggestion = self.create_translation_suggestion(
-                content_html_with_image,
-                translation_html_with_image
+        """Test that updating a translation raises an error when RTE components
+        are replaced with different types, even if total count remains same.
+        """
+        content_html_with_image = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        translation_html_with_image = (
+            '<p>Translation with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        suggestion = self.create_translation_suggestion(
+            content_html_with_image,
+            translation_html_with_image
+        )
+
+        # Create updated translation that replaces image with a math formula
+        updated_translation_with_math = (
+            '<p>Updated translation with math instead of image.</p>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)'
+            '&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg'
+            '&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
+            r'in the updated translation must match the original content\s*'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id,
+                updated_translation_with_math
             )
 
-            # Create updated translation that replaces the image with a math formula
-            updated_translation_with_math = (
-                '<p>Updated translation with math instead of image.</p>'
-                '<oppia-noninteractive-math '
-                'math_content-with-value="{&amp;q'
-                'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
-                '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
-                '</oppia-noninteractive-math>'
-            )
-
-            with self.assertRaisesRegex(
-                utils.InvalidInputException,
-                r'\s*The number of RTE components \(images, math, concept cards, videos\) '
-                'in the updated translation must match the original content\s*'
-            ):
-                suggestion_services.update_translation_suggestion(
-                    suggestion.suggestion_id,
-                    updated_translation_with_math
-                )
-
-            updated_suggestion = suggestion_services.get_suggestion_by_id(
-                suggestion.suggestion_id
-            )
-            self.assertEqual(
-                updated_suggestion.change_cmd.translation_html,
-                translation_html_with_image
-            )
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.change_cmd.translation_html,
+            translation_html_with_image
+        )
 
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self

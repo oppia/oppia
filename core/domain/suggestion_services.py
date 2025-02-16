@@ -2159,16 +2159,17 @@ def count_rte_components(html_content: str) -> Dict[str, int]:
     component_counts = {}
 
     rte_tags = [
-        "oppia-noninteractive-image",
-        "oppia-noninteractive-math",
-        "oppia-noninteractive-concept-card",
-        "oppia-noninteractive-video"
+        'oppia-noninteractive-image',
+        'oppia-noninteractive-math',
+        'oppia-noninteractive-concept-card',
+        'oppia-noninteractive-video'
     ]
 
     for tag in rte_tags:
         component_counts[tag] = len(soup.find_all(tag))
 
     return component_counts
+
 
 def update_translation_suggestion(
     suggestion_id: str,
@@ -2181,8 +2182,9 @@ def update_translation_suggestion(
         translation_html: str. The new translated HTML content.
 
     Raises:
-        InvalidInputException: If the number of RTE components in
-        the original and updated translations do not match.
+        InvalidInputException: The RTE component counts in the updated translation
+            do not match the original content.
+        Exception: The suggestion is not of type SuggestionTranslateContent.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
@@ -2200,8 +2202,8 @@ def update_translation_suggestion(
 
     if original_rte_counts != updated_rte_counts:
         raise utils.InvalidInputException(
-            'The number of RTE components (images, math, concept cards, videos) '
-            'in the updated translation must match the original content.'
+            'The number of RTE components (images, math, concept cards, '
+            'videos) in the updated translation must match the original content.'
         )
 
     suggestion.change_cmd.translation_html = (

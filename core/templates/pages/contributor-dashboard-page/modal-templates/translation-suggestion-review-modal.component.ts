@@ -412,8 +412,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     if (this.isComponentsMismatched()) {
       this.errorMessage =
-        `Please ensure all components (images, math formulas, concept cards, videos) ` +
-        `in your translation match the original content.`;
+        'Please ensure all components (images, math formulas, concept cards, videos) ' +
+        'in your translation match the original content.';
       this.errorFound = true;
       return;
     }
