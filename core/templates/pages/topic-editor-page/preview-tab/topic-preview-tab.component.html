@@ -40,7 +40,7 @@
       </div>
     </div>
     <div *ngIf="activeTab === 'story'">
-      <stories-list *ngIf="canonicalStorySummaries.length"
+      <stories-list
                     [topicName]="topic.getName()"
                     [topicId]="topic.getId()"
                     [topicDescription]="topic.getDescription()"
