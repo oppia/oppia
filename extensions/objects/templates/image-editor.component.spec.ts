@@ -39,14 +39,15 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
 let gifshot = require('gifshot');
-(window as Window).gifFrames = gifFrames;
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
 //   }
 // }
+interface Window {
+  gifFrames: Function; // Or more specific type if available
+}
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
