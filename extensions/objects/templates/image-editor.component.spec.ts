@@ -40,7 +40,7 @@ import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 let gifshot = require('gifshot');
-(window as Window).gifFrames = require('gif-Frames');
+(window as Window).gifFrames = require('gif-frames');
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
