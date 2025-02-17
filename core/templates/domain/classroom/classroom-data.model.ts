@@ -133,6 +133,10 @@ export class ClassroomData {
     return this._isPublished;
   }
 
+  getIsDiagnosticTestEnabled(): boolean {
+    return this._isDiagnosticTestEnabled;
+  }
+
   getPublicClassroomsCount(): number {
     return this._publicClassroomsCount;
   }

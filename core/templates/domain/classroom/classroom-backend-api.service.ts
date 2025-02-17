@@ -286,7 +286,8 @@ export class ClassroomBackendApiService {
               classroomDict.topic_id_to_prerequisite_topic_ids,
             teaser_text: classroomDict.teaser_text,
             is_published: classroomDict.is_published,
-            is_diagnostic_test_enabled: classroomDict.is_diagnostic_test_enabled,
+            is_diagnostic_test_enabled:
+              classroomDict.is_diagnostic_test_enabled,
             thumbnail_data: {
               filename: classroomDict.thumbnail_data.filename,
               bg_color: classroomDict.thumbnail_data.bg_color,
