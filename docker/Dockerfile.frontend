@@ -19,3 +19,4 @@ RUN yarn install --pure-lockfile
 
 # Clean up temporary files
 RUN rm -rf /tmp/* /var/tmp/*
+    

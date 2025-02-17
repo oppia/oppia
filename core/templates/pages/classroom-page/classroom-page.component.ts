@@ -158,10 +158,19 @@ export class ClassroomPageComponent implements OnDestroy {
                   classroomData &&
                   classroomData.getTopicSummaries().length > 0
                 ) {
-                  let firstTopic = classroomData.getTopicSummaries()[0].name;
-                  this.firstTopicUrl =
+                
+                  let firstLessonData = classroomData.getTopicSummaries().find(item => item.name === 'place value')
+                  if(firstLessonData = null){
+                    let firstTopic = classroomData.getTopicSummaries()[0].name;
+                    this.firstTopicUrl =
                     `/learn/${classroomData.getUrlFragment()}/` +
                     classroomData.getTopicSummaries()[0].urlFragment;
+                  }
+                  let firstTopic = firstLessonData.name;
+                  console.log(firstLessonData)
+                  this.firstTopicUrl =
+                    `/learn/${classroomData.getUrlFragment()}/` +
+                    firstLessonData.urlFragment;
 
                   this.beginWithFirstTopicButtonText =
                     this.translateService.instant(
