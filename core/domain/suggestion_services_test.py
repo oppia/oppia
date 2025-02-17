@@ -1073,7 +1073,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'exploration1', self.target_version_at_submission,
             self.author_id, add_translation_change_dict, 'test description')
 
-    def test_updating_translation_suggestion_raise_error_when_rte_component_is_removed(
+    def test_update_translation_suggestion_error_on_rte_removal(
             self
         ) -> None:
         content_html_with_rte_components = (
@@ -1118,8 +1118,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
-            r'in the updated translation must match the original content\s*'
+            (
+                r'\s*The number of RTE components \(images, math, concept cards, '
+                r'videos\) in the updated translation must match the original '
+                r'content\s*'
+            )
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1151,8 +1154,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
-            r'in the updated translation must match the original content\s*'
+            (
+                r'\s*The number of RTE components \(images, math, concept cards, '
+                r'videos\) in the updated translation must match the original '
+                r'content\s*'
+            )
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1212,8 +1218,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
-            r'in the updated translation must match the original content\s*'
+            (
+                r'\s*The number of RTE components \(images, math, concept cards, '
+                r'videos\) in the updated translation must match the original '
+                r'content\s*'
+            )
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1277,8 +1286,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'\s*The number of RTE components \(images, math, concept cards, videos\) ' +
-            r'in the updated translation must match the original content\s*'
+            (
+                r'\s*The number of RTE components \(images, math, concept cards, '
+                r'videos\) in the updated translation must match the original '
+                r'content\s*'
+            )
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,

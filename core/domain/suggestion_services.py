@@ -2205,7 +2205,8 @@ def update_translation_suggestion(
     if original_rte_counts != updated_rte_counts:
         raise utils.InvalidInputException(
             'The number of RTE components (images, math, concept cards, '
-            'videos) in the updated translation must match the original content.'
+            'videos) in the updated translation must match the original '
+            'content.'
         )
 
     suggestion.change_cmd.translation_html = (
