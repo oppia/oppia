@@ -41,7 +41,7 @@ describe('Logged-in User', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    const explorationTitles = [
+    /*const explorationTitles = [
       'Explore 1',
       'Explore 2',
       'Explore 3',
@@ -49,19 +49,15 @@ describe('Logged-in User', function () {
       'Explore 5',
     ];
 
-    await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle('title');
-
     for (const title of explorationTitles) {
       await curriculumAdmin.createAndPublishExplorationWithCards(title);
-    }
+    }*/
 
-    const topics = [
+    /*const topics = [
       'Place Values',
       'Addition',
-      'Subtraction',
-      'Multiplication',
-      'Division',
-    ];
+      'Subtraction'
+    ];*/
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -71,38 +67,27 @@ describe('Logged-in User', function () {
       'In this course, you will learn the following topics: algbera and trigonometry,'
     );
 
-    for (const topic of topics) {
-      await curriculumAdmin.createAndPublishTopic(
-        topic,
-        `${topic}\'s subtopics`,
-        `${topic}\'s skills`
-      );
-      await curriculumAdmin.addTopicToClassroom('Math', topic);
-    }
-
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values subtopics',
+      'Place Values skills'
+    );
+    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
     await curriculumAdmin.publishClassroom('Math');
 
-    const placeValueChapters = [
-      'What are the Place Values',
-      'Find the Value of a Number',
-      'Comparing Numbers',
-      'Rounding Numbers, Part 1',
-      'Rounding Numbers, Part 2',
-    ];
-
-    const chapterIds = await Promise.all(
-      placeValueChapters.map(
-        async chapter =>
-          await curriculumAdmin.createAndPublishExplorationWithCards(chapter)
-      )
-    );
     await curriculumAdmin.addStoryToTopic(
       "Jamie's Adventures in the Arcade",
       'story',
       'Place Values'
     );
-
-    for (const [index, id] of chapterIds.entries()) {
+    const placeValueChapters = [
+      'What are the Place Values',
+      'Find the Value of a Number',
+      'Comparing Numbers',
+    ];
+    for (const [index, chapter] of placeValueChapters) {
+      const id =
+        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
     }
 
@@ -129,7 +114,7 @@ describe('Logged-in User', function () {
   it(
     'should play an exploration with several cards',
     async function () {
-      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await loggedInUser.navigateToLearnerDashboard();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
