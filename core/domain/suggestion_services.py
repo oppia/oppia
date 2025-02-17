@@ -2183,10 +2183,10 @@ def update_translation_suggestion(
         translation_html: str. The new translated HTML content.
 
     Raises:
-        utils.InvalidInputException. Raised if the RTE component counts
-        in the updated translation do not match the original content.
-        Exception. Raised if the suggestion is not of type
-        SuggestionTranslateContent.
+        utils.InvalidInputException: Raised if the RTE component counts in
+            the updated translation do not match the original content.
+        Exception: Raised if the suggestion is not of type
+            SuggestionTranslateContent.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
@@ -2204,8 +2204,8 @@ def update_translation_suggestion(
 
     if original_rte_counts != updated_rte_counts:
         raise utils.InvalidInputException(
-            'The number of RTE components (images, math, concept cards, videos'
-            ') in the updated translation must match the original content.'
+            'The number of RTE components (images, math, concept cards, videos) '
+            'in the updated translation must match the original content.'
         )
 
     suggestion.change_cmd.translation_html = (
