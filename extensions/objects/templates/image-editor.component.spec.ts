@@ -1913,7 +1913,7 @@ describe('ImageEditor', () => {
       .createSpy()
       .and.returnValue(Promise.resolve(mockFrameData));
 
-    spyOn(gifFrames, 'getImage').and.returnValue(mockGifFrames);
+    spyOn(gifFrames, '').and.returnValue(mockGifFrames);
 
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -2289,7 +2289,7 @@ describe('ImageEditor', () => {
         .and.returnValue(Promise.resolve(mockFrameData));
 
       // This properly spies on the module's default export.
-      spyOn(gifFrames, 'getImage').and.returnValue(mockGifFrames);
+      spyOn(gifFrames, '').and.returnValue(mockGifFrames);
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
@@ -2403,7 +2403,7 @@ describe('ImageEditor', () => {
         .and.returnValue(Promise.resolve(mockFrameData));
 
       // This properly spies on the module's default export.
-      spyOn(gifFrames, 'getImage').and.returnValue(mockGifFrames);
+      spyOn(gifFrames, '').and.returnValue(mockGifFrames);
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
