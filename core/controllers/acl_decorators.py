@@ -2935,6 +2935,8 @@ def can_edit_question(
                             return handler(self, question_id, **kwargs)
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this question.')
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to edit this question.')
 
     return test_can_edit
 
