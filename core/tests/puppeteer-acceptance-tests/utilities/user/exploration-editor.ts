@@ -1714,7 +1714,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Mathematics'
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
