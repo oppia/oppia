@@ -1731,16 +1731,16 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Function for creating an exploration with two cards.
+   */
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
-    category: string = 'Algebra'
+    category: string = 'Mathematics'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
     await this.dismissWelcomeModal();
-    //await this.navigateToSettingsTab();
-    //await this.updateTitleTo(explorationTitle);
-    //await this.navigateToEditorTab();
 
     await this.updateCardContent('Content 0');
     await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
