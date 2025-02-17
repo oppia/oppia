@@ -223,8 +223,8 @@ oppia-library-page .button-alignment-div {
   background-color: #afd2eb;
   min-height: 100vh;
   position: relative;
-  width: 100%;
   overflow-y: auto;
+  width: 100%;
 }
 .oppia-library-container-inner {
   position: relative;
