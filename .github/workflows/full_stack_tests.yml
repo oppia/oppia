@@ -225,8 +225,6 @@ jobs:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.suites }}
     name: Lighthouse perf (shard ${{ matrix.suite.name }})
     steps:
-      - name: Simulate Test failure
-        run: exit 1
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
@@ -293,7 +291,7 @@ jobs:
             follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
             to fix them, or report the error as a flake. Thanks!
       - name: Fail if workflow status is failure
-        if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
+        if: always()
         run: |
           echo "Note to developers: This CI check is failing because another e2e/acceptance/lighthouse full-stack test workflow has failed. Please see that other workflow for the relevant logs to investigate. When all full-stack workflows pass, this CI check will automatically pass."
           echo "If all other full-stack workflows have passed and this is the only failure, please file an issue on our issue tracker and link to this log. Thanks!"
