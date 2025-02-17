@@ -2183,10 +2183,10 @@ def update_translation_suggestion(
         translation_html: str. The new translated HTML content.
 
     Raises:
-        utils.InvalidInputException. Raised if the RTE component counts in
-        the updated translation do not match the original content.
+        InvalidInputException. Raised if the RTE component counts in
+            the updated translation do not match the original content.
         Exception. Raised if the suggestion is not of type
-        SuggestionTranslateContent.
+            SuggestionTranslateContent.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
