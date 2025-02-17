@@ -21,85 +21,52 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {QuestionAdmin} from '../../utilities/user/question-admin';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
-  // eslint-disable-next-line
-  // let explorationId: string | null;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & QuestionAdmin;
 
   beforeAll(async function () {
-    // Create curriculum admin.
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
+      [ROLES.CURRICULUM_ADMIN, ROLES.QUESTION_ADMIN]
     );
 
-    // Create and publish exploration.
-    // explorationId =
-    //   await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-    //     'Negative Numbers'
-    //   );
-
-    // Create topic.
-    await curriculumAdmin.createAndPublishTopic(
+    await curriculumAdmin.createAndPublishTopicForPracticeQues(
       'Algebra I',
       'Negative Numbers',
-      'Negative Numbers'
+      'Negative Numbers Skill'
     );
 
-    // Create classroom.
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Algebra I'
     );
-    // Create story with chapter.
-    // await curriculumAdmin.createAndPublishStoryWithChapter(
-    //   'Algebra Story',
-    //   'algebra-story',
-    //   'Understanding Negative Numbers',
-    //   explorationId as string,
-    //   'Algebra I'
-    // );
-    // eslint-disable-next-line no-console
-    // await curriculumAdmin.createSkillForTopic('This lesson gonna teach you algebra.', 'Algebra I');
+
     loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, 900000);
+  }, 420000);
 
-  it(
-    'should complete a practice questions session as logged-out user',
-    async function () {
-      // Step 1: Navigate to topic.
-      // eslint-disable-next-line no-console
-      console.log('Successfully navigated to classroom page.');
-      await loggedOutUser.navigateToClassroomPage('math');
-      // eslint-disable
-      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
-      await loggedOutUser.selectAndOpenTopic('Algebra I');
-      // eslint-disable-next-line no-console
-      console.log('Successfully navigated to topic page.');
-      // Step 2: Access practice tab.
-      // eslint-disable-next-line no-console
-      console.log('Attempting to access practice tab.');
-      await loggedOutUser.clickPracticeTab();
-      // eslint-disable-next-line no-console
-      console.log('Successfully navigated from practice page.');
-      // Step 3: Configure & start session.
-      await loggedOutUser.startPracticeSession();
+  it('should complete a practice questions session as logged-out user', async function () {
+    // Step 1: Navigate to topic.
+    await loggedOutUser.navigateToClassroomPage('math');
+    await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
+    await loggedOutUser.selectAndOpenTopic('Algebra I');
 
-      // Step 4: Complete questions.
-      await loggedOutUser.answerPracticeQuestions();
+    await loggedOutUser.clickPracticeTab();
+    // Step 3: Configure & start session.
+    await loggedOutUser.startPracticeSession();
 
-      // Step 5: Verify completion.
-      // await loggedOutUser.verifyPracticeScore();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Step 4: Complete questions.
+    await loggedOutUser.answerAllQuestion();
+
+    // Step 5: Verify completion.
+    // await loggedOutUser.verifyPracticeScore();
+  }, 420000);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

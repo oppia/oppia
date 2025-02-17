@@ -84,6 +84,7 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const preferencesPageUrl = testConstants.URLs.Preferences;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -375,9 +376,9 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const getStartedHeader = '.e2e-test-get-started-page';
 const practiceTabToggle = '.e2e-test-practice-tab-link';
 const startPracticeButton = '.e2e-test-practice-start-button';
-const answerInputSelector = '.e2e-test-conversation-input';
-const submitButtonSelector = '.oppia-learner-confirm-button';
-const nextButtonSelector = '.e2e-test-continue-to-next-card-button';
+const answerInputSelector = '.e2e-test-float-form-input';
+const submitButtonSelector = '.e2e-test-submit-answer-button';
+const nextButtonSelector = '.ng-star-inserted .e2e-test-next-card-button';
 const playLaterButton = '.e2e-test-add-to-playlist-btn';
 const newsletterEmailInputField = '.e2e-test-newsletter-input';
 const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
@@ -4152,6 +4153,18 @@ export class LoggedOutUser extends BaseUser {
   async pauseVoiceover(): Promise<void> {
     await this.clickOn(pauseVoiceoverButton);
   }
+
+  async clickonPracticeCheckbox(): Promise<void> {
+    // Navigate to topic and skills dashboard.
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(topicAndSkillsDashboardUrl);
+    // Click on the topic button.
+    await this.clickOn('.e2e-test-topic-name');
+    // Click on practice button checkbox.
+    await this.clickOn('.e2e-test-toggle-practice');
+  }
+
   /**
    * Clicks on the practice tab in topic page.
    */
@@ -4185,7 +4198,7 @@ export class LoggedOutUser extends BaseUser {
   async startPracticeSession(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
-      await this.page.click('.e2e-test-skill-checkbox');
+      await this.page.click('.e2e-test-skill-checkbox-title');
       await this.page.waitForSelector(startPracticeButton);
       const startButton = await this.page.$(startPracticeButton);
       if (!startButton) {
@@ -4204,7 +4217,18 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Answers practice questions in session
+   * Answers all practice questions in session
+   */
+  async answerAllQuestion(): Promise<void> {
+    var i = 0;
+
+    while (i < 10) {
+      await this.answerPracticeQuestions();
+      i++;
+    }
+  }
+  /**
+   * Answers practice question in session
    */
   async answerPracticeQuestions(): Promise<void> {
     try {
@@ -4216,12 +4240,13 @@ export class LoggedOutUser extends BaseUser {
         if (!input) {
           throw new Error('Answer input not found');
         }
-        await input.type('42'); // Default test answer.
+        await input.type('3'); // Default test answer.
         await this.page.click(submitButtonSelector);
+        await this.page.waitForSelector(nextButtonSelector);
         await this.page.click(nextButtonSelector);
 
         // Wait for next question or completion.
-        await this.page.waitForNavigation();
+        // await this.page.waitForNavigation();
       }
     } catch (error) {
       throw new Error(`Failed to answer practice questions: ${error}`);

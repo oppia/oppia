@@ -673,7 +673,11 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
   }
-
+  async clickShowPracticeButton(topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.clickOn('.e2e-test-toggle-practice-tab');
+    await this.saveTopicDraft(topicName);
+  }
   async publishDraftTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -1589,6 +1593,38 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
+    await this.publishDraftTopic(topicName);
+  }
+  /**
+   * Creates and publishes a topic with a subtopic and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopicForPracticeQues(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSubtopicForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      topicName
+    );
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.clickShowPracticeButton(topicName);
     await this.publishDraftTopic(topicName);
   }
 
