@@ -54,6 +54,9 @@ import * as hammer from 'hammerjs';
 import {AppErrorHandlerProvider} from './app-error-handler';
 import {I18nModule} from 'i18n/i18n.module';
 
+//services
+import {ClickTrackerService} from 'services/contextual/click-tracker.service';
+
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
   allowHtml: false,
@@ -120,6 +123,7 @@ export class MyHammerConfig extends HammerGestureConfig {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig,
     },
+    ClickTrackerService,
   ],
   bootstrap: [OppiaRootComponent],
 })

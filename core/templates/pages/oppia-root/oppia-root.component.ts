@@ -17,9 +17,12 @@
  */
 
 import {Component} from '@angular/core';
+import {ClickTrackerService} from 'services/contextual/click-tracker.service';
 
 @Component({
   selector: 'oppia-root',
   templateUrl: './oppia-root.component.html',
 })
-export class OppiaRootComponent {}
+export class OppiaRootComponent {
+  constructor(private clickTracker: ClickTrackerService) {}
+}

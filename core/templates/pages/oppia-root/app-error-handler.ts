@@ -24,6 +24,7 @@
 import {HttpClient} from '@angular/common/http';
 import {ErrorHandler} from '@angular/core';
 import {LoggerService} from 'services/contextual/logger.service';
+import {ClickTrackerService} from 'services/contextual/click-tracker.service';
 import firebase from 'firebase/app';
 
 export class AppErrorHandler extends ErrorHandler {
@@ -57,7 +58,8 @@ export class AppErrorHandler extends ErrorHandler {
 
   constructor(
     private http: HttpClient,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private clickTracker: ClickTrackerService
   ) {
     super();
   }
@@ -97,11 +99,23 @@ export class AppErrorHandler extends ErrorHandler {
       }
     }
 
+    // Retrieveing the last recorded clicks.
+
+    const clickHistory = this.clickTracker.getClickHistory();
+    console.log('Click History:', clickHistory);
+    const formattedClickHistory = clickHistory.length
+      ? `Last ${clickHistory.length} clicks: [${clickHistory.join(', ')}]`
+      : 'No recorded clicks.';
+
     let messageAndStackTrace = [
       '',
       error.message,
       '',
       '    at URL: ' + window.location.href,
+      '',
+      formattedClickHistory, // Appended click history here.
+      '',
+      'Stacktrace :' + error?.stack,
     ].join('\n');
     let timeDifference = Date.now() - this.timeOfLastPostedError;
     // To prevent an overdose of errors, throttle to at most 1 error
@@ -131,5 +145,5 @@ export class AppErrorHandler extends ErrorHandler {
 export const AppErrorHandlerProvider = {
   provide: ErrorHandler,
   useClass: AppErrorHandler,
-  deps: [HttpClient, LoggerService],
+  deps: [HttpClient, LoggerService, ClickTrackerService],
 };
