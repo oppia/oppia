@@ -32,71 +32,12 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationId1: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
-    );
-
-    /*const explorationTitles = [
-      'Explore 1',
-      'Explore 2',
-      'Explore 3',
-      'Explore 4',
-      'Explore 5',
-    ];
-
-    for (const title of explorationTitles) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(title);
-    }*/
-
-    /*const topics = [
-      'Place Values',
-      'Addition',
-      'Subtraction'
-    ];*/
-
-    await curriculumAdmin.createNewClassroom('Math', 'math');
-    await curriculumAdmin.updateClassroom(
-      'Math',
-      'Welcome to Math classroom!',
-      'This course covers basic algebra and trigonometry.',
-      'In this course, you will learn the following topics: algbera and trigonometry,'
-    );
-
-    await curriculumAdmin.createAndPublishTopic(
-      'Place Values',
-      'Place Values subtopics',
-      'Place Values skills'
-    );
-    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-    await curriculumAdmin.publishClassroom('Math');
-
-    await curriculumAdmin.addStoryToTopic(
-      "Jamie's Adventures in the Arcade",
-      'story',
-      'Place Values'
-    );
-    const placeValueChapters = [
-      'What are the Place Values',
-      'Find the Value of a Number',
-      'Comparing Numbers',
-    ];
-    for (const [index, chapter] of placeValueChapters) {
-      const id =
-        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
-      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
-    }
-
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
-
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser1',
-      'logged_in_user1@example.com'
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
@@ -108,11 +49,58 @@ describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
-    // Setup taking longer than 300000ms.
+
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
+    );
+
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values subtopics',
+      'Place Values skills'
+    );
+    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+    await curriculumAdmin.publishClassroom('Math');
+
+    const placeValueChapters = [
+      'What are the Place Values',
+      'Find the Value of a Number',
+      'Comparing Numbers',
+    ];
+
+    const chapterIds: (string | null)[] = [];
+
+    for (const chapter of placeValueChapters) {
+      const id =
+        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+      chapterIds.push(id);
+    }
+
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
+
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
+
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser1',
+      'logged_in_user1@example.com'
+    );
   }, 480000);
 
   it(
-    'should play an exploration with several cards',
+    'should navigate to the new learner dashboard',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
     },
