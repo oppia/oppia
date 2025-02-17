@@ -649,36 +649,32 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to open the external link by class and text inside it
    */
-
-  async openExternalLinkByClassAndText(
-    className: string,
-    year: string,
+  async openExternalLinkBySelectorAndText(
+    selector: string,
+    linkText: string,
     expectedUrl: string
   ): Promise<void> {
-    const links = await this.page.$$(className);
-    let impactReportLink: ElementHandle<Element> | null = null;
+    await this.page.waitForSelector(selector, {visible: true});
 
-    for (const link of links) {
-      const spanHandle = await link.$('span');
-      if (!spanHandle) {
-        continue;
-      }
+    const url = await this.page.$$eval(
+      selector,
+      (elements, searchText) => {
+        for (const element of elements) {
+          if (element.textContent?.trim() === searchText) {
+            return element.getAttribute('href');
+          }
+        }
+        return null;
+      },
+      linkText
+    );
 
-      const spanText = await spanHandle.evaluate(el => el.textContent?.trim());
-      if (spanText === year) {
-        impactReportLink = link;
-        break;
-      }
+    if (!url) {
+      throw new Error(`Link with text "${linkText}" not found.`);
     }
 
-    if (!impactReportLink) {
-      throw new Error(`Impact Report link for ${year} not found`);
-    }
-
-    const href = await impactReportLink.evaluate(el => el.getAttribute('href'));
-
-    if (href !== expectedUrl) {
-      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    if (url !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. Found: ${url}.`);
     }
   }
 
@@ -686,30 +682,29 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
-
   async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
-      await this.openExternalLinkByClassAndText(
+      await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
         '2023',
         impactReport2023Url
       );
-      await this.openExternalLinkByClassAndText(
+      await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
         '2022',
         impactReport2022Url
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalLinkByClassAndText(
+      await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
         '2023',
         impactReport2023Url
       );
-      await this.openExternalLinkByClassAndText(
+      await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
         '2022',
         impactReport2022Url
