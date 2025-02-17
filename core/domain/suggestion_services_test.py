@@ -1119,9 +1119,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.InvalidInputException,
             (
-                r'\s*The number of RTE components \(images, math, concept cards, '
-                r'videos\) in the updated translation must match the original '
-                r'content\s*'
+                r'\s*The number of RTE components \(images, math, concept '
+                r'cards, videos\) in the updated translation must match the '
+                r'original content\s*'
             )
         ):
             suggestion_services.update_translation_suggestion(
@@ -1129,7 +1129,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 updated_translation_without_image
             )
 
-    def test_updating_translation_suggestion_raises_error_when_component_is_added(
+    def test_update_translation_suggestion_error_when_component_is_added(
         self
     ) -> None:
         content_html_without_image = (
@@ -1155,9 +1155,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.InvalidInputException,
             (
-                r'\s*The number of RTE components \(images, math, concept cards, '
-                r'videos\) in the updated translation must match the original '
-                r'content\s*'
+                r'\s*The number of RTE components \(images, math, concept '
+                r'cards, videos\) in the updated translation must match the '
+                r'original content\s*'
             )
         ):
             suggestion_services.update_translation_suggestion(
@@ -1165,7 +1165,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 new_translation_html_with_image
             )
 
-    def test_updating_translation_suggestion_raises_error_when_component_count_changes(
+    def test_update_translation_suggestion_error_when_component_count_changes(
         self
     ) -> None:
         content_html_with_multiple_images = (
@@ -1219,9 +1219,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.InvalidInputException,
             (
-                r'\s*The number of RTE components \(images, math, concept cards, '
-                r'videos\) in the updated translation must match the original '
-                r'content\s*'
+                r'\s*The number of RTE components \(images, math, concept '
+                r'cards, videos\) in the updated translation must match the '
+                r'original content\s*'
             )
         ):
             suggestion_services.update_translation_suggestion(
@@ -1245,7 +1245,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             }
         )
 
-    def test_updating_translation_suggestion_raises_error_when_component_types_mismatch(
+    def test_update_translation_suggestion_error_when_component_types_mismatch(
             self
         ) -> None:
         """Test that updating a translation raises an error when RTE components
@@ -1272,7 +1272,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             translation_html_with_image
         )
 
-        # Create updated translation that replaces image with a math formula
         updated_translation_with_math = (
             '<p>Updated translation with math instead of image.</p>'
             '<oppia-noninteractive-math '
@@ -1287,9 +1286,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.InvalidInputException,
             (
-                r'\s*The number of RTE components \(images, math, concept cards, '
-                r'videos\) in the updated translation must match the original '
-                r'content\s*'
+                r'\s*The number of RTE components \(images, math, concept '
+                r'cards, videos\) in the updated translation must match the '
+                r'original content\s*'
             )
         ):
             suggestion_services.update_translation_suggestion(
