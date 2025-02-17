@@ -1913,7 +1913,6 @@ describe('ImageEditor', () => {
       .createSpy()
       .and.returnValue(Promise.resolve(mockFrameData));
 
-    // This properly spies on the module's default export
     spyOn(gifFrames, 'default').and.returnValue(mockGifFrames);
 
     // This throws an error "Type '{ lastModified: number; name:
@@ -2403,7 +2402,7 @@ describe('ImageEditor', () => {
         .createSpy()
         .and.returnValue(Promise.resolve(mockFrameData));
 
-      // This properly spies on the module's default export
+      // This properly spies on the module's default export.
       spyOn(gifFrames, 'default').and.returnValue(mockGifFrames);
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
