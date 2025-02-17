@@ -686,7 +686,7 @@ export class TopicManager extends BaseUser {
     title: string,
     description: string
   ): Promise<void> {
-    await this.page.waitForSelector(topicPreviewTitleSelector);
+    await this.page.waitForSelector(topicPreviewTitleSelector, {hidden: true});
     const titleElement = await this.page.$(topicPreviewTitleSelector);
     const actualTitle = await this.page.evaluate(
       el => el.textContent,
