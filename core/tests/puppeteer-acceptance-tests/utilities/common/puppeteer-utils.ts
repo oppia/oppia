@@ -79,8 +79,8 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
+      '--start-fullscreen',
       '--use-fake-ui-for-media-stream',
-      '--window-size=1920,1080',
     ];
 
     const headless = process.env.HEADLESS === 'true';
@@ -134,7 +134,7 @@ export class BaseUser {
           this.page.setViewport({width: 1920, height: 1080});
         }
 
-        // Enable Video Recording.To switch between modes dynamically, you can use a separate compose file (e.g., docker-compose.override.yml) with different settings.
+        // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const outputFileName =
             `${specName}-${new Date().toISOString()}.mp4`.replace(
@@ -152,26 +152,9 @@ export class BaseUser {
             fps: 25,
             ffmpeg_Path: null,
             videoFrame: {
-              width: 1920,
-              height: 1080,
+              width: this.page.viewport()?.width,
+              height: this.page.viewport()?.height,
             },
-            aspectRatio: '16:9',
-            videoCrf: 18,
-            videoCodec: 'libx264',
-            videoPreset: 'medium',
-            videoBitrate: 1000,
-            autopad: {
-              color: 'black',
-            },
-            waitForFrameAfterPageLoad: 2000, // Wait 2 seconds after page load.
-            maxRetries: 3, // Add retry mechanism.
-            ffmpegFlags: [
-              // Additional ffmpeg flags for stability.
-              '-movflags',
-              '+faststart',
-              '-max_muxing_queue_size',
-              '9999',
-            ],
           };
 
           this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
