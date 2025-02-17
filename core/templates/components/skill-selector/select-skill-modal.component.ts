@@ -75,7 +75,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   isDoneButtonDisabled(): boolean {
-    const isDisabled = !this.selectedSkillId || !this.isSaveButtonEnabled();
+    return !this.selectedSkillId || !this.isSaveButtonEnabled();
     return isDisabled;
   }
 
