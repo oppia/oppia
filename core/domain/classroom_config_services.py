@@ -236,6 +236,7 @@ def update_classroom(
         classroom.topic_id_to_prerequisite_topic_ids)
     classroom_model.teaser_text = classroom.teaser_text
     classroom_model.is_published = classroom.is_published
+    classroom_model.is_diagnostic_test_enabled = classroom.is_diagnostic_test_enabled
     classroom_model.thumbnail_filename = (
         classroom.thumbnail_data.filename
     )
