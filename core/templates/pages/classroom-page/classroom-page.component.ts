@@ -102,7 +102,7 @@ export class ClassroomPageComponent implements OnDestroy {
       : this.urlInterpolationService.getStaticImageUrl(
           '/classroom/default-classroom-thumbnail.svg'
         );
-    classroomData;
+
     this.classroomBanner = bannerFilename
       ? this.assetsBackendApiService.getImageUrlForPreview(
           AppConstants.ENTITY_TYPE.CLASSROOM,
