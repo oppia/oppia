@@ -52,7 +52,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 // eslint-disable-next-line oppia/disallow-httpclient
 import {HttpClient} from '@angular/common/http';
 
@@ -1277,10 +1276,3 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'imageEditor',
-  downgradeComponent({
-    component: ImageEditorComponent,
-  }) as angular.IDirectiveFactory
-);

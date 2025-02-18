@@ -17,7 +17,6 @@
  * backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -41,10 +40,3 @@ export class TeachOppiaModalBackendApiService {
     return this.http.get<TeachOppiaModalData>(urlFragment, params).toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TeachOppiaModalBackendApiService',
-    downgradeInjectable(TeachOppiaModalBackendApiService)
-  );

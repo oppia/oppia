@@ -16,7 +16,6 @@
  * @fileoverview Services for stats reporting.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, NgZone} from '@angular/core';
 
 import {ContextService} from 'services/context.service';
@@ -570,6 +569,3 @@ export class StatsReportingService {
     );
   }
 }
-angular
-  .module('oppia')
-  .factory('StatsReportingService', downgradeInjectable(StatsReportingService));

@@ -20,7 +20,6 @@
 // because Angular doesn't support global definitions and every library used
 // needs to be imported explicitly.
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 // eslint-disable-next-line oppia/disallow-httpclient
 import {HttpClient, HttpBackend} from '@angular/common/http';
@@ -64,7 +63,3 @@ export class CsrfTokenService {
     return this.tokenPromise;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('CsrfTokenService', downgradeInjectable(CsrfTokenService));

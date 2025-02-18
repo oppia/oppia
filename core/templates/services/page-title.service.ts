@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -82,7 +81,3 @@ export class PageTitleService {
     return this.pageSubtitleForMobile;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('PageTitleService', downgradeInjectable(PageTitleService));
