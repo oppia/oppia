@@ -17,7 +17,6 @@
   from the backend and to merge skills from the dashboard.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 
@@ -359,9 +358,3 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this._topicsAndSkillsDashboardReinitializedEventEmitter;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'TopicsAndSkillsDashboardBackendApiService',
-    downgradeInjectable(TopicsAndSkillsDashboardBackendApiService)
-  );

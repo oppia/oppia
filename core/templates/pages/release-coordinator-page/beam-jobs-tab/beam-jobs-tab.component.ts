@@ -20,7 +20,6 @@
 import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   BehaviorSubject,
   combineLatest,
@@ -222,10 +221,3 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     this.beamJobRuns.next(newBeamJobRuns);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaBeamJobsTab',
-    downgradeComponent({component: BeamJobsTabComponent})
-  );

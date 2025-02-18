@@ -15,7 +15,6 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -297,10 +296,3 @@ export class QuestionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionBackendApiService',
-    downgradeInjectable(QuestionBackendApiService)
-  );
