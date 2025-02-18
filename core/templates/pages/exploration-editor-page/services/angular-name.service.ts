@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +39,3 @@ export class AngularNameService {
     return AngularNameService.angularName;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AngularNameService', downgradeInjectable(AngularNameService));

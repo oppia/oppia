@@ -21,7 +21,6 @@
  */
 
 import {Component, OnInit, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -41,10 +40,3 @@ export class ResponseMathEquationInput implements OnInit {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseMathEquationInput',
-  downgradeComponent({
-    component: ResponseMathEquationInput,
-  }) as angular.IDirectiveFactory
-);

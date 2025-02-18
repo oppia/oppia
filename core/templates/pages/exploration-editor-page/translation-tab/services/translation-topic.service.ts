@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {
@@ -68,10 +67,3 @@ export class TranslationTopicService {
     return this._activeTopicChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .service(
-    'TranslationTopicService',
-    downgradeInjectable(TranslationTopicService)
-  );

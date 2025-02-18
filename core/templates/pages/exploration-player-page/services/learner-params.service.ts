@@ -19,7 +19,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 export interface ExplorationParams {
@@ -58,7 +57,3 @@ export class LearnerParamsService {
     return cloneDeep(this._paramDict);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('LearnerParamsService', downgradeInjectable(LearnerParamsService));

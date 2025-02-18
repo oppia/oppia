@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -354,6 +353,3 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-angular
-  .module('oppia')
-  .directive('aboutPage', downgradeComponent({component: AboutPageComponent}));

@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -209,7 +209,3 @@ export class SolutionObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SolutionObjectFactory', downgradeInjectable(SolutionObjectFactory));

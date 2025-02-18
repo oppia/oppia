@@ -23,7 +23,6 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
@@ -773,10 +772,3 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionsList',
-  downgradeComponent({
-    component: QuestionsListComponent,
-  }) as angular.IDirectiveFactory
-);
