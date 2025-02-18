@@ -572,7 +572,8 @@ class AllClassroomsSummaryHandler(
                 'url_fragment': classroom.url_fragment,
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
-                'is_diagnostic_test_enabled': classroom.is_diagnostic_test_enabled,
+                'is_diagnostic_test_enabled': (
+                    classroom.is_diagnostic_test_enabled),
                 'thumbnail_filename': classroom.thumbnail_data.filename,
                 'thumbnail_bg_color': classroom.banner_data.bg_color,
                 'index': 0 if classroom.index is None else classroom.index

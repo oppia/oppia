@@ -104,7 +104,8 @@ class ClassroomModel(base_models.BaseModel):
             'topic_id_to_prerequisite_topic_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'is_diagnostic_test_enabled': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_diagnostic_test_enabled': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,

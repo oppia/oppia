@@ -78,7 +78,8 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            is_diagnostic_test_enabled: bool. Whether this classroom is published or not.
+            is_diagnostic_test_enabled: bool. Whether this classroom 
+                is published or not.
             thumbnail_data: ImageData. Image data object for classroom
                 thumbnail.
             banner_data: ImageData. Image data object for classroom banner.
@@ -353,11 +354,12 @@ class Classroom:
             raise utils.ValidationError(
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
-        
+
         if not isinstance(self.is_diagnostic_test_enabled, bool):
             raise utils.ValidationError(
-                'Expected is_diagnostic_test_enabled of the classroom to be a boolean, '
-                'received: %s.' % self.is_diagnostic_test_enabled)
+                'Expected is_diagnostic_test_enabled of the classroom to '
+                'be a boolean, received: %s.' % (
+                    self.is_diagnostic_test_enabled))
 
         if strict:
             if not isinstance(self.index, int):

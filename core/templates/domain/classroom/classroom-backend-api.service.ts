@@ -252,7 +252,6 @@ export class ClassroomBackendApiService {
                 bannerData: response.classroom_dict.banner_data,
               },
             });
-            console.log(response);
           },
           errorResponse => {
             reject(errorResponse?.error?.error);

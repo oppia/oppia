@@ -4195,6 +4195,7 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
+        is_diagnostic_test_enabled: bool = False,
         thumbnail_data: Optional[
             classroom_config_domain.ImageData
         ] = None,
@@ -4216,6 +4217,8 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
+            is_diagnostic_test_enabled: bool. Whether this classroom 
+                is published or not.
             thumbnail_data: Optional[ImageData]. Image data object for
                 thumbnail.
             banner_data: Optional[ImageData]. Image data object for banner.
@@ -4242,6 +4245,8 @@ version: 1
                 else {}
             ),
             is_published=is_published,
+            is_diagnostic_test_enabled= (
+                is_diagnostic_test_enabled),
             thumbnail_data=(
                 thumbnail_data
                 if thumbnail_data is not None
