@@ -62,13 +62,10 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.save_new_valid_classroom(
-            is_diagnostic_test_enabled=False
-        )
+        self.save_new_valid_classroom()
         self.save_new_valid_classroom(
             'history', 'history', 'history',
             is_published=False,
-            is_diagnostic_test_enabled=False
         )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
@@ -116,9 +113,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_validation_returns_true_if_we_have_public_classrooms(
             self) -> None:
-        self.save_new_valid_classroom(
-            is_diagnostic_test_enabled=False
-        )
+        self.save_new_valid_classroom()
         self.get_html_response(
             '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
