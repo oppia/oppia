@@ -54,7 +54,7 @@ import * as hammer from 'hammerjs';
 import {AppErrorHandlerProvider} from './app-error-handler';
 import {I18nModule} from 'i18n/i18n.module';
 
-//services
+// Services .
 import {ClickTrackerService} from 'services/contextual/click-tracker.service';
 
 // Config for ToastrModule (helps in flashing messages and alerts).

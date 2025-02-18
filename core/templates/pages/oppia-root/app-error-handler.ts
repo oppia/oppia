@@ -102,7 +102,6 @@ export class AppErrorHandler extends ErrorHandler {
     // Retrieveing the last recorded clicks.
 
     const clickHistory = this.clickTracker.getClickHistory();
-    console.log('Click History:', clickHistory);
     const formattedClickHistory = clickHistory.length
       ? `Last ${clickHistory.length} clicks: [${clickHistory.join(', ')}]`
       : 'No recorded clicks.';
