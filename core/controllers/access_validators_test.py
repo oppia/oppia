@@ -116,7 +116,9 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_validation_returns_true_if_we_have_public_classrooms(
             self) -> None:
-        self.save_new_valid_classroom()
+        self.save_new_valid_classroom(
+            is_diagnostic_test_enabled=False
+        )
         self.get_html_response(
             '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
