@@ -130,11 +130,11 @@ describe('Select Skill Modal', () => {
     ];
 
     componentInstance.setSelectedSkillId('skillId1');
-    expect(componentInstance.isSaveButtonEnabled()).toBe(false);
+    expect(componentInstance.canLinkSelectedSkill()).toBe(false);
 
     // Selecting a skill which is not already linked.
     componentInstance.setSelectedSkillId('skillId3');
-    expect(componentInstance.isSaveButtonEnabled()).toBe(true);
+    expect(componentInstance.canLinkSelectedSkill()).toBe(true);
   });
 
   it('should keep Done button disabled when no skill is selected', () => {

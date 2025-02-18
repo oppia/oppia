@@ -75,10 +75,10 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   }
 
   isDoneButtonDisabled(): boolean {
-    return !this.selectedSkillId || !this.isSaveButtonEnabled();
+    return !this.selectedSkillId || !this.canLinkSelectedSkill();
   }
 
-  isSaveButtonEnabled(): boolean {
+  canLinkSelectedSkill(): boolean {
     for (let idx in this.associatedSkillSummaries) {
       if (this.associatedSkillSummaries[idx].getId() === this.selectedSkillId) {
         return false;
