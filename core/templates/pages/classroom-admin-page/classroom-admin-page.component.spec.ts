@@ -505,6 +505,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      isDiagnosticTestEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };

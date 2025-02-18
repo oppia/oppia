@@ -924,6 +924,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'url_fragment': 'history',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
+                'is_diagnostic_test_enabled': False,
                 'thumbnail_filename': 'thumbnail.svg',
                 'thumbnail_bg_color': 'transparent', 'index': 0
             },
@@ -933,6 +934,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'url_fragment': 'english',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
+                'is_diagnostic_test_enabled': False,
                 'thumbnail_filename': 'thumbnail.svg',
                 'thumbnail_bg_color': 'transparent', 'index': 1
             }
