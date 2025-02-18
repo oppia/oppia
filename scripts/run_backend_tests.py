@@ -419,8 +419,6 @@ def check_test_results(
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
 
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
@@ -439,6 +437,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
 
     with contextlib.ExitStack() as stack:
         # TODO(#18260): Remove this when we permanently move to the
