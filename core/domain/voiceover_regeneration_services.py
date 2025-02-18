@@ -167,16 +167,13 @@ def synthesize_voiceover_for_html_string(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
 
     parsed_text = parse_html(content_html)
-    print('parsed_text', parsed_text)
     processed_text_for_voiceover_regeneration = preprocess_voiceover_text(
         parsed_text)
-    print('processed_text_for_voiceover_regeneration', processed_text_for_voiceover_regeneration)
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         generate_hash_from_text(processed_text_for_voiceover_regeneration)
     )
-    print('a.....\n\n')
     cached_model = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         get_cached_automatic_voiceover_model(
@@ -188,17 +185,10 @@ def synthesize_voiceover_for_html_string(
 
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
-    # remove this.
-    cached_model = None
-
     is_voiceover_from_cache = False
-    print('b.....\n\n')
-
     if cached_model is not None:
         error_details = None
         if cached_model.plaintext == processed_text_for_voiceover_regeneration:
-            print('c.....\n\n')
-
             audio_offset_list = (
                 cached_model.audio_offset_list)
             filename = cached_model.voiceover_filename
@@ -209,8 +199,6 @@ def synthesize_voiceover_for_html_string(
     # cache; otherwise, use the cached voiceovers.
     if not is_voiceover_from_cache:
         try:
-            print('d.....\n\n')
-
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
                     processed_text_for_voiceover_regeneration,
@@ -342,8 +330,15 @@ def regenerate_voiceover_for_exploration_content(
     # Get the size of the audio file in bytes.
     audio_size_bytes = tempbuffer.getbuffer().nbytes
 
-    voiceover_dict = state_domain.Voiceover(
+    voiceover = state_domain.Voiceover(
         voiceover_filename, audio_size_bytes, False, duration_secs)
 
-    # Self: Save this to the model, based on the decision in the doc.
-    return voiceover_dict, sentence_tokens_with_durations
+    entity_voiceovers = voiceover_services.get_voiceovers_for_given_language_accent_code(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id, exploration_version, language_accent_code
+    )
+    entity_voiceovers.add_voiceover(content_id, feconf.VoiceoverType.AUTO, voiceover)
+    entity_voiceovers.add_automated_voiceovers_audio_offsets(content_id, sentence_tokens_with_durations)
+    entity_voiceovers.validate()
+    voiceover_services.save_entity_voiceovers(entity_voiceovers)
+
+    return voiceover, sentence_tokens_with_durations

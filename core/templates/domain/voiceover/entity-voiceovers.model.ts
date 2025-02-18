@@ -98,10 +98,24 @@ export class EntityVoiceovers {
       let voiceoverTypeToVoiceovers =
         entityVoiceoversBackendDict.voiceovers_mapping[contentId];
 
-      contentIdToVoiceoversMapping[contentId] = {
-        manual: Voiceover.createFromBackendDict(
+      let manualVoiceovers: Voiceover | undefined;
+      let automaticVoiceovers: Voiceover | undefined;
+
+      if (voiceoverTypeToVoiceovers.manual) {
+        manualVoiceovers = Voiceover.createFromBackendDict(
           voiceoverTypeToVoiceovers.manual
-        ),
+        );
+      }
+
+      if (voiceoverTypeToVoiceovers.auto) {
+        automaticVoiceovers = Voiceover.createFromBackendDict(
+          voiceoverTypeToVoiceovers.auto
+        );
+      }
+
+      contentIdToVoiceoversMapping[contentId] = {
+        manual: manualVoiceovers,
+        auto: automaticVoiceovers,
       };
     }
 

@@ -397,6 +397,19 @@ def create_entity_voiceovers_model(
     return entity_voiceovers_model
 
 
+def save_entity_voiceovers(
+    entity_voiceovers: voiceover_domain.EntityVoiceovers
+) -> None:
+    """Saves the entity voiceovers domain object to the datastore.
+
+    Args:
+        entity_voiceovers: EntityVoiceovers. An instance of the entity
+            voiceovers domain class.
+    """
+    entity_voiceovers_model = create_entity_voiceovers_model(entity_voiceovers)
+    entity_voiceovers_model.put()
+
+
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]]
 ) -> None:

@@ -18,8 +18,8 @@
       <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
-          <mat-icon *ngIf="!audioPlayerService.isPlaying()" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="audioPlayerService.isPlaying()" matTooltip="Pause">pause_arrow</mat-icon>
+          <mat-icon *ngIf="!isManualVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isManualVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
         </button>
           <mat-progress-bar mode="determinate"
                             [value]="manualVoiceoverProgress"
@@ -63,9 +63,9 @@
     <div class="automatic-voiceovers" *ngIf="isActiveLanguageAccentSupportsAutoVoiceovers">
       <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
       <div class="voiceovers-component" *ngIf="automaticVoiceover">
-        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'automatic')">
-          <mat-icon *ngIf="!audioPlayerService.isPlaying()" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="audioPlayerService.isPlaying()" matTooltip="Pause">pause_arrow</mat-icon>
+        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
+          <mat-icon *ngIf="!isAutomaticVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isAutomaticVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
         </button>
         <mat-progress-bar mode="determinate"
                           [value]="automaticVoiceoverProgress"

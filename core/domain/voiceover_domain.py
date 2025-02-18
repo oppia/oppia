@@ -261,6 +261,10 @@ class EntityVoiceovers:
             voiceovers_mapping: Voiceover. The voiceover instance to be added to
                 the entity voiceovers object.
         """
+
+        if content_id not in self.voiceovers_mapping:
+            self.add_new_content_id_without_voiceovers(content_id)
+
         self.voiceovers_mapping[content_id][voiceover_type] = voiceovers_mapping
 
     def remove_voiceover(
@@ -299,6 +303,14 @@ class EntityVoiceovers:
             self.voiceovers_mapping[content_id][
                 feconf.VoiceoverType.AUTO] is None
         )
+
+    def add_automated_voiceovers_audio_offsets(
+        self,
+        content_id: str,
+        sentence_tokens_with_durations: List[Dict[str, Union[str, float]]]
+    ):
+        self.automated_voiceovers_audio_offsets_msecs[content_id] = (
+            sentence_tokens_with_durations)
 
     @classmethod
     def create_empty(

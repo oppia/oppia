@@ -205,7 +205,6 @@ export class TranslatorOverviewComponent implements OnInit {
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
     this.localStorageService.setLastSelectedLanguageAccentCode('');
     this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-      console.log('Now updaing the accents...');
       this.updateLanguageAccentCodesDropdownOptions();
     });
   }
@@ -385,10 +384,6 @@ export class TranslatorOverviewComponent implements OnInit {
     } else {
       this.selectedLanguageAccentCode = firstLanguageAccentCode;
     }
-    console.log('----');
-    console.log(this.selectedLanguageAccentCode);
-    console.log(this.languageCode);
-    console.log('----');
     this.updateLanguageAccentCode(this.selectedLanguageAccentCode);
   }
 

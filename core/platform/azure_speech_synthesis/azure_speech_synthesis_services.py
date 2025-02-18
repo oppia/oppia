@@ -217,7 +217,7 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = '3942bbc2a96c45038607594354705d67'
+    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY')
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')
@@ -234,9 +234,8 @@ def regenerate_speech_from_text(
     speech_config.set_speech_synthesis_output_format(
         speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
 
-    file_config = speechsdk.audio.AudioOutputConfig(filename='./nikhil.mp3')
     speech_synthesizer = speechsdk.SpeechSynthesizer(
-        speech_config=speech_config, audio_config=file_config)
+        speech_config=speech_config, audio_config=None)
     word_boundary_collection_instance: WordBoundaryCollection = (
         WordBoundaryCollection())
     speech_synthesizer.synthesis_word_boundary.connect(
