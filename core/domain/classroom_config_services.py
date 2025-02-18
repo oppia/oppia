@@ -308,7 +308,7 @@ def create_new_default_classroom(
         teaser_text='', course_details='', topic_list_intro='',
         topic_id_to_prerequisite_topic_ids={},
         is_published=feconf.DEFAULT_CLASSROOM_PUBLICATION_STATUS,
-        is_diagnostic_test_enabled= (
+        is_diagnostic_test_enabled=(
             feconf.DEFAULT_CLASSROOM_DIAGNOSTIC_TEST_STATUS),
         thumbnail_data=classroom_config_domain.ImageData('', '', 0),
         banner_data=classroom_config_domain.ImageData('', '', 0),

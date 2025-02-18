@@ -71,6 +71,7 @@ let dummyClassroomDict = {
   topicListIntro: 'Start from the basics with our first topic.',
   topicIdToPrerequisiteTopicIds: {},
   isPublished: true,
+  isDiagnosticTestEnabled: false,
   thumbnailData: dummyThumbnailData,
   bannerData: dummyBannerData,
 };
@@ -491,6 +492,7 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
+      is_diagnostic_test_enabled: false,
       thumbnail_data: dummyThumbnailData,
       banner_data: dummyBannerData,
     };
@@ -579,6 +581,7 @@ describe('Classroom Admin Page component ', () => {
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {},
         isPublished: true,
+        isDiagnosticTestEnabled: false,
         thumbnailData: dummyThumbnailData,
         bannerData: dummyBannerData,
       });

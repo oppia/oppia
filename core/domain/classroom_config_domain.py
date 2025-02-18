@@ -35,6 +35,7 @@ class ClassroomDict(TypedDict):
     teaser_text: str
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
+    is_diagnostic_test_enabled: bool
     is_published: bool
     thumbnail_data: ImageDataDict
     banner_data: ImageDataDict

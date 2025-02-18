@@ -4245,7 +4245,7 @@ version: 1
                 else {}
             ),
             is_published=is_published,
-            is_diagnostic_test_enabled= (
+            is_diagnostic_test_enabled=(
                 is_diagnostic_test_enabled),
             thumbnail_data=(
                 thumbnail_data
@@ -4279,7 +4279,7 @@ class LinterTestBase(GenericTestBase):
                 *args: list(*). Variable length argument list of values to print
                     in the same line of output.
             """
-            self.linter_stdout.append(' '.join(str(arg) for arg in args))
+            self.linter_stdtest_utilsout.append(' '.join(str(arg) for arg in args))
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 

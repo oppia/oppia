@@ -64,7 +64,9 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_valid_classroom()
         self.save_new_valid_classroom(
-            'history', 'history', 'history', is_published=False
+            'history', 'history', 'history',
+            is_published=False,
+            is_diagnostic_test_enabled=False
         )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:

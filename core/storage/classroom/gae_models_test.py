@@ -61,7 +61,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         classroom_model_instance = (classroom_models.ClassroomModel.create(
             classroom_id, 'physics', 'physics', 'Curated physics course.',
             'Learn physics through fun stories!', 
-            'Start from the basic physics.', {}, False,
+            'Start from the basic physics.', {}, False, False,
             'thumbnail.svg', 'transparent', 1000, 'banner.png',
             'transparent', 1000, 0))
 
@@ -179,7 +179,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                     'classroom_id', 'math', 'math',
                     'Curated math foundations course.',
                     'Learn math through fun stories!',
-                    'Start from the basic math.', {}, True,
+                    'Start from the basic math.', {}, True, False,
                     'thumbnail.svg', 'transparent', 1000, 'banner.png',
                     'transparent', 1000, 0
                 )
