@@ -65,6 +65,7 @@ describe('Classroom data model', () => {
       'Topics Covered',
       'Learn math',
       true,
+      false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1

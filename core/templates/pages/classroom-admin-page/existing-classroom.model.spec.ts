@@ -48,6 +48,7 @@ describe('Classroom admin model', () => {
       'Start from the basics with our first topic.',
       {},
       true,
+      false,
       dummyThumbnailData,
       dummyBannerData
     );
