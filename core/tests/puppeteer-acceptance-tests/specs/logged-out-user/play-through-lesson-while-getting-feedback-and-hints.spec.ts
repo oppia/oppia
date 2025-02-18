@@ -40,7 +40,7 @@ enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   ALGEBRA_BASICS = 'Algebra Basics',
   FRACTION_CONVERSION = 'Fraction Conversion',
-  REVISION_CARD = 'Revision Card',
+  REVISION_CARD = 'Study Guide',
   FINAL_CARD = 'Final Card',
 }
 
@@ -192,7 +192,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.viewHint();
       await loggedOutUser.closeHintModal();
 
-      // Again wrong answer is submitted number of times to get stuck and navigate to Revision card.
+      // Again wrong answer is submitted number of times to get stuck and navigate to Study Guide.
       await loggedOutUser.submitAnswer('1/3');
       await loggedOutUser.submitAnswer('1/4');
       await loggedOutUser.simulateDelayToAvoidFatigueDetection();

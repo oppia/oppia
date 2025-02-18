@@ -34,7 +34,7 @@ enum INTERACTION_TYPES {
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   TEST_QUESTION = 'Test Question',
-  REVISION_CARD = 'Revision Card',
+  REVISION_CARD = 'Study Guide',
   FINAL_CARD = 'Final Card',
 }
 

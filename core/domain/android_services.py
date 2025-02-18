@@ -183,7 +183,7 @@ def initialize_android_test_data() -> str:
         subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
             1, topic_id))
     subtopic_page.page_contents.subtitled_html.html = (
-        'Example revision card. Click <oppia-noninteractive-skillreview '
+        'Example Study Guide. Click <oppia-noninteractive-skillreview '
         'skill_id-with-value="&amp;quot;%s&amp;quot;" text-with-value="'
         '&amp;quot;here&amp;quot;"></oppia-noninteractive-skillreview> to'
         ' open a concept card.' % skill_id
