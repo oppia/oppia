@@ -618,9 +618,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
-            '/community-library', expected_status_int=200)
+            '/community-library', expected_status_int=302)
 
-        self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
@@ -676,7 +675,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_signup_fails(self) -> None:
         with self.assertRaisesRegex(
-            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'):
+            Exception, '302 Moved Temporarily'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self) -> None:
@@ -723,8 +722,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        response = self.get_html_response('/url_handler?current_url=/')
-        self.assertIn(b'<oppia-maintenance-page>', response.body)
+        self.get_html_response(
+            '/url_handler?current_url=/', expected_status_int=302)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
