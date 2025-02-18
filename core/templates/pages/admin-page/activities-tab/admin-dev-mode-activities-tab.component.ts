@@ -23,6 +23,7 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
@@ -36,8 +37,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
   numDummySuggestionQuesToGenerate: number = 0;
+  numDummyStoriesToGenerate: number = 0;
+  topicList: CreatorTopicSummary[] = [];
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
+  selectedTopicForStory: string = '';
   numDummyTranslationOpportunitiesToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
@@ -251,6 +255,28 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  generateDummyStories(selectedTopicForStory: string): void {
+    // Generate dummy story for the selected topic.
+    const selectedIndex = Number(selectedTopicForStory);
+    let selectedTopic = this.topicList[selectedIndex];
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyStoriesAsync(
+        selectedTopic.id,
+        this.numDummyStoriesToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit('Dummy stories generated successfully.');
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
   generateNewBlogPost(blogPostTitle: string): void {
     if (!blogPostTitle) {
       this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
@@ -321,6 +347,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.demoExplorationIds = adminDataObject.demoExplorationIds;
     this.reloadingAllExplorationPossible = true;
     this.skillList = adminDataObject.skillList;
+    this.topicList = adminDataObject.topicSummaries;
   }
 
   ngOnInit(): void {

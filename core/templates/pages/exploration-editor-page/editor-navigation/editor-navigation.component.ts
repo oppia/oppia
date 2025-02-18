@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {HelpModalComponent} from 'pages/exploration-editor-page/modal-templates/help-modal.component';
@@ -317,10 +316,3 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaEditorNavigation',
-  downgradeComponent({
-    component: EditorNavigationComponent,
-  }) as angular.IDirectiveFactory
-);
