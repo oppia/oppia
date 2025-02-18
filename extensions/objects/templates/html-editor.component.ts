@@ -22,7 +22,6 @@
 //
 // This component is based on the UnicodeString directive.
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'html-editor',
@@ -45,10 +44,3 @@ export class HtmlEditorComponent {
     this.valueChanged.emit(value);
   }
 }
-
-angular.module('oppia').directive(
-  'htmlEditor',
-  downgradeComponent({
-    component: HtmlEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -18,7 +18,6 @@
 
 import Mousetrap from 'mousetrap';
 import {Injectable, ApplicationRef} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {KeyboardShortcutHelpModalComponent} from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -152,10 +151,3 @@ export class KeyboardShortcutService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'KeyboardShortcutService',
-    downgradeInjectable(KeyboardShortcutService)
-  );

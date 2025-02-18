@@ -40,7 +40,6 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UtilsService} from 'services/utils.service';
 import {EdgeCentre, GraphDetailService} from './graph-detail.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
@@ -694,9 +693,3 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.selectedEdge = null;
   }
 }
-angular.module('oppia').directive(
-  'graphViz',
-  downgradeComponent({
-    component: GraphVizComponent,
-  })
-);

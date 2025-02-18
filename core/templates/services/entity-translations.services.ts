@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {
   EntityTranslation,
@@ -166,10 +165,3 @@ export class EntityTranslationsService {
     this.languageCodeToLatestEntityTranslations = {};
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EntityTranslationsService',
-    downgradeInjectable(EntityTranslationsService)
-  );
