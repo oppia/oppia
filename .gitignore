@@ -77,3 +77,4 @@ firebase-debug.log
 debug.log
 # development logs and status entries
 .dev
+skulpt-dist/
