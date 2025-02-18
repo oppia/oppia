@@ -39,7 +39,7 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
+import * as gifFrames from 'gif-frames';
 let gifshot = require('gifshot');
 // Declare global {
 //   interface Window {
@@ -1895,25 +1895,22 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    const mockFrameData = [
+    spyOn(gifFrames, 'default').and.resolveTo([
       {
-        getImage: () => ({
-          toDataURL: () => ({
-            image: dataGif.uploadedImageData,
-          }),
-        }),
+        getImage: () => {
+          return {
+            toDataURL: () => {
+              return {
+                image: dataGif.uploadedImageData,
+              };
+            },
+          };
+        },
         frameInfo: {
           disposal: 1,
         },
       },
-    ];
-
-    // This creates a spy that returns a Promise (which gif-frames requires)
-    const mockGifFrames = jasmine
-      .createSpy()
-      .and.returnValue(Promise.resolve(mockFrameData));
-
-    spyOn(gifFrames).and.returnValue(mockGifFrames);
+    ] as never);
 
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -2270,26 +2267,22 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      const mockFrameData = [
+      spyOn(gifFrames, 'default').and.resolveTo([
         {
-          getImage: () => ({
-            toDataURL: () => ({
-              image: dataGif.uploadedImageData,
-            }),
-          }),
+          getImage: () => {
+            return {
+              toDataURL: () => {
+                return {
+                  image: dataGif.uploadedImageData,
+                };
+              },
+            };
+          },
           frameInfo: {
             disposal: 1,
           },
         },
-      ];
-
-      // This creates a spy that returns a Promise (which gif-frames requires)
-      const mockGifFrames = jasmine
-        .createSpy()
-        .and.returnValue(Promise.resolve(mockFrameData));
-
-      // This properly spies on the module's default export.
-      spyOn(gifFrames).and.returnValue(mockGifFrames);
+      ] as never);
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
@@ -2384,26 +2377,22 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      const mockFrameData = [
+      spyOn(gifFrames, 'default').and.resolveTo([
         {
-          getImage: () => ({
-            toDataURL: () => ({
-              image: dataGif.uploadedImageData,
-            }),
-          }),
+          getImage: () => {
+            return {
+              toDataURL: () => {
+                return {
+                  image: dataGif.uploadedImageData,
+                };
+              },
+            };
+          },
           frameInfo: {
             disposal: 1,
           },
         },
-      ];
-
-      // This creates a spy that returns a Promise (which gif-frames requires)
-      const mockGifFrames = jasmine
-        .createSpy()
-        .and.returnValue(Promise.resolve(mockFrameData));
-
-      // This properly spies on the module's default export.
-      spyOn(gifFrames).and.returnValue(mockGifFrames);
+      ] as never);
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
