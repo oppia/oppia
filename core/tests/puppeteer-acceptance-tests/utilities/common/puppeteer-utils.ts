@@ -163,7 +163,8 @@ export class BaseUser {
             autopad: {
               color: 'black',
             },
-            waitForFrameAfterPageLoad: 2000, // Wait 2 seconds after page load.
+            waitForFrameBeforeStart: 2000,
+            waitForFrameAfterPageLoad: 2000,
             maxRetries: 3, // Add retry mechanism.
             ffmpegFlags: [
               // Additional ffmpeg flags for stability.
