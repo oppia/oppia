@@ -695,7 +695,7 @@ export class ExplorationEditor extends BaseUser {
   async selectLanguage(language: string): Promise<void> {
     // The language dropdown was visible, but it was mostly hidden towards the bottom
     // of the screen. When we clicked on the dropdown, the options did not fully appear,
-    // leading to incorrect selections. To prevent this, we are now scrolling the page.
+    // leading to incorrect selections.To prevent this, we are now scrolling the page.
     // We can use 300 - 500px to move the language dropdown to the upper part of the page.
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
