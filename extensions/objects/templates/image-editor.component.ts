@@ -70,7 +70,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import gifFrames from '../../../core/templates/third-party-imports/gif-frames.import';
+import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
 const gifshot = require('gifshot');
 // Import * as gifFrames from 'gif-frames';
