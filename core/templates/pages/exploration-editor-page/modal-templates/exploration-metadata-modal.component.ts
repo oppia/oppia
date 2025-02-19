@@ -138,50 +138,37 @@ export class ExplorationMetadataModalComponent
     this.explorationTagsService.displayed = this.explorationTags;
   }
 
-  save(): void {
+  async save(): Promise<void> {
     if (!this.areRequiredFieldsFilled()) {
       return;
     }
 
     // Record any fields that have changed.
     let metadataList: string[] = [];
-    const metadataSavePromises: Promise<void>[] = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
-      metadataSavePromises.push(
-        Promise.resolve(this.explorationTitleService.saveDisplayedValue())
-      );
     }
     if (this.explorationObjectiveService.hasChanged()) {
       metadataList.push('objective');
-      metadataSavePromises.push(
-        Promise.resolve(this.explorationObjectiveService.saveDisplayedValue())
-      );
     }
     if (this.explorationCategoryService.hasChanged()) {
       metadataList.push('category');
-      metadataSavePromises.push(
-        Promise.resolve(this.explorationCategoryService.saveDisplayedValue())
-      );
     }
     if (this.explorationLanguageCodeService.hasChanged()) {
       metadataList.push('language');
-      metadataSavePromises.push(
-        Promise.resolve(
-          this.explorationLanguageCodeService.saveDisplayedValue()
-        )
-      );
     }
     if (this.explorationTagsService.hasChanged()) {
       metadataList.push('tags');
-      metadataSavePromises.push(
-        Promise.resolve(this.explorationTagsService.saveDisplayedValue())
-      );
     }
-    // Wait for all save operations to complete before closing the modal.
-    Promise.all(metadataSavePromises).then(() => {
-      this.ngbActiveModal.close(metadataList);
-    });
+
+    // Save displayed values sequentially to prevent race conditions.
+    await this.explorationTitleService.saveDisplayedValue();
+    await this.explorationObjectiveService.saveDisplayedValue();
+    await this.explorationCategoryService.saveDisplayedValue();
+    await this.explorationLanguageCodeService.saveDisplayedValue();
+    await this.explorationTagsService.saveDisplayedValue();
+
+    this.ngbActiveModal.close(metadataList);
   }
 
   areRequiredFieldsFilled(): boolean {
