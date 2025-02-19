@@ -39,7 +39,8 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-//import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+// Import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+
 let gifshot = require('gifshot');
 // Declare global {
 //   interface Window {
@@ -47,7 +48,7 @@ let gifshot = require('gifshot');
 //   }
 // }
 
-interface Window {
+interface window {
   GifFrames: Function;
 }
 
