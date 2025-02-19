@@ -121,6 +121,13 @@ describe('Contribution Opportunities backend API service', function () {
   let userInfo: UserInfo[];
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
+  const sampleTopicsPerClassroomBackendDict = {
+    topic_names_per_classroom: [
+      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
+      {classroom: 'Class 2', topics: ['Topic 3']},
+      {classroom: '', topics: ['Topic 4']},
+    ],
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -725,4 +732,56 @@ describe('Contribution Opportunities backend API service', function () {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should successfully fetch translatable topic names per classroom', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletopicnamesperclassroom'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(sampleTopicsPerClassroomBackendDict);
+    flushMicrotasks();
+
+    const expectedResponse = [
+      {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
+      {classroom: 'Class 2', topics: ['Topic 3']},
+      {
+        classroom: '',
+        topics: [AppConstants.TOPIC_SENTINEL_NAME_ALL, 'Topic 4'],
+      },
+    ];
+
+    expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle error response from backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    contributionOpportunitiesBackendApiService
+      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(
+      '/gettranslatabletopicnamesperclassroom'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      {error: 'Failed to fetch translatable topic names by classroom.'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

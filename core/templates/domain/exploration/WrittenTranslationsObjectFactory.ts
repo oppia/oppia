@@ -17,7 +17,6 @@
  * WrittenTranslations domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -200,10 +199,3 @@ export class WrittenTranslationsObjectFactory {
     return new WrittenTranslations({}, this.writtenTranslationObjectFactory);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'WrittenTranslationsObjectFactory',
-    downgradeInjectable(WrittenTranslationsObjectFactory)
-  );

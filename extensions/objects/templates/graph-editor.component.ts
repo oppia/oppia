@@ -27,7 +27,6 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {GraphAnswer} from 'interactions/answer-defs';
 
 @Component({
@@ -58,10 +57,3 @@ export class GraphEditorComponent implements AfterViewInit {
     this.valueChanged.emit(graph);
   }
 }
-
-angular.module('oppia').directive(
-  'graphEditor',
-  downgradeComponent({
-    component: GraphEditorComponent,
-  }) as angular.IDirectiveFactory
-);

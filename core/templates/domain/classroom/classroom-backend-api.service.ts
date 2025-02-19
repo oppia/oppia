@@ -16,7 +16,6 @@
  * @fileoverview Service to get classroom data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 
@@ -507,10 +506,3 @@ export class ClassroomBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ClassroomBackendApiService',
-    downgradeInjectable(ClassroomBackendApiService)
-  );

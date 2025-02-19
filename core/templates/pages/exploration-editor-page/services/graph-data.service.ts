@@ -16,7 +16,6 @@
  * @fileoverview Service for computing graph data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import {ComputeGraphService, GraphData} from 'services/compute-graph.service';
@@ -65,7 +64,3 @@ export class GraphDataService {
     return cloneDeep(this._graphData);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('GraphDataService', downgradeInjectable(GraphDataService));
