@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
@@ -327,10 +326,3 @@ export class NumberWithUnitsObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsObjectFactory',
-    downgradeInjectable(NumberWithUnitsObjectFactory)
-  );

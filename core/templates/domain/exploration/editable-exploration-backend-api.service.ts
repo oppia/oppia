@@ -23,7 +23,6 @@ import {AppConstants} from 'app.constants';
 import {ExplorationBackendDict} from './ExplorationObjectFactory';
 import {ExplorationChange} from './exploration-draft.model';
 import {tap} from 'rxjs/operators';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -247,10 +246,3 @@ export class EditableExplorationBackendApiService {
     return this._deleteExplorationAsync(explorationId);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableExplorationBackendApiService',
-    downgradeInjectable(EditableExplorationBackendApiService)
-  );

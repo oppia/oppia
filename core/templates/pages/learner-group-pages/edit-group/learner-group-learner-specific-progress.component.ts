@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
@@ -166,10 +165,3 @@ export class LearnerGroupLearnerSpecificProgressComponent {
     ).length;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerGroupLearnerSpecificProgress',
-  downgradeComponent({
-    component: LearnerGroupLearnerSpecificProgressComponent,
-  })
-);

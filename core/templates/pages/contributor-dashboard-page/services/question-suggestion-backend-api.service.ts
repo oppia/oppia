@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ImageData} from 'domain/skill/skill-creation-backend-api.service';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {Skill} from 'domain/skill/SkillObjectFactory';
@@ -63,10 +62,3 @@ export class QuestionSuggestionBackendApiService {
     return this.httpClient.post<Object>(url, body).toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionSuggestionBackendApiService',
-    downgradeInjectable(QuestionSuggestionBackendApiService)
-  );

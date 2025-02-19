@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ParamChange, ParamChangeBackendDict} from './ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
 import {
@@ -153,10 +152,3 @@ export class ExplorationMetadataObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationMetadataObjectFactory',
-    downgradeInjectable(ExplorationMetadataObjectFactory)
-  );

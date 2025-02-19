@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {MathInteractionsService} from 'services/math-interactions.service';
 
@@ -113,10 +112,3 @@ export class GuppyInitializationService {
     GuppyInitializationService.allowedVariables = allowedVariables;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GuppyInitializationService',
-    downgradeInjectable(GuppyInitializationService)
-  );

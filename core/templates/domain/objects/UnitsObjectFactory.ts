@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {createUnit, unit} from 'mathjs';
@@ -265,7 +264,3 @@ export class UnitsObjectFactory {
     return new Units(this.fromStringToList(units));
   }
 }
-
-angular
-  .module('oppia')
-  .factory('UnitsObjectFactory', downgradeInjectable(UnitsObjectFactory));

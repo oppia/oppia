@@ -19,7 +19,6 @@
 import {Ratio} from 'domain/objects/ratio.model';
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
@@ -150,10 +149,3 @@ export class InteractiveRatioExpressionInputComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveRatioExpressionInput',
-  downgradeComponent({
-    component: InteractiveRatioExpressionInputComponent,
-  }) as angular.IDirectiveFactory
-);

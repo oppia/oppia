@@ -184,6 +184,27 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
+
+  validateAccessToPracticeSessionPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    selectedSubtopicIds: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.PRACTICE_SESSION_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+      }
+    );
+    const params = new HttpParams().set(
+      'selected_subtopic_ids',
+      selectedSubtopicIds
+    );
+    return this.http.get<void>(url, {params}).toPromise();
+  }
+
+
   validateAccessToClassroomPage(classroomUrlFragment: string): Promise<void> {
     return this.http
       .get<void>(this.CLASSROOM_PAGE_ACCESS_VALIDATOR, {

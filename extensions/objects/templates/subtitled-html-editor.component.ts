@@ -24,7 +24,6 @@ import {
   Output,
   ChangeDetectorRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Schema} from 'services/schema-default-value.service';
 
@@ -74,10 +73,3 @@ export class SubtitledHtmlEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'subtitledHtmlEditor',
-  downgradeComponent({
-    component: SubtitledHtmlEditorComponent,
-  }) as angular.IDirectiveFactory
-);

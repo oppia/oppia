@@ -21,7 +21,6 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface ListOfUnicodeStringSchema {
@@ -66,10 +65,3 @@ export class ListOfUnicodeStringEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
-
-angular.module('oppia').directive(
-  'listOfUnicodeStringEditor',
-  downgradeComponent({
-    component: ListOfUnicodeStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);
