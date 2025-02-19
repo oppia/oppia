@@ -17,7 +17,6 @@
  * warning messages if the validation fails.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -143,7 +142,3 @@ export class ValidatorsService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ValidatorsService', downgradeInjectable(ValidatorsService));

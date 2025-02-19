@@ -16,7 +16,6 @@
  * @fileoverview Component for content toggle button
  */
 import {Component, EventEmitter, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 @Component({
   selector: 'oppia-content-toggle-button',
@@ -45,10 +44,3 @@ export class ContentToggleButtonComponent {
     this.contentToggleEmitter.emit(this.isExpanded);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'contentToggleButtonComponent',
-    downgradeComponent({component: ContentToggleButtonComponent})
-  );

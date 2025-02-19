@@ -236,6 +236,7 @@ def regenerate_speech_from_text(
 
     speech_synthesizer = speechsdk.SpeechSynthesizer(
         speech_config=speech_config, audio_config=None)
+
     word_boundary_collection_instance: WordBoundaryCollection = (
         WordBoundaryCollection())
     speech_synthesizer.synthesis_word_boundary.connect(
@@ -243,9 +244,6 @@ def regenerate_speech_from_text(
 
     ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(
         plaintext, language_accent_code)
-
-    print('ssml_text_for_speech_synthesis')
-    print(ssml_text_for_speech_synthesis)
 
     speech_synthesis_result = speech_synthesizer.speak_ssml_async(
         ssml_text_for_speech_synthesis).get()

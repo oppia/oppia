@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {unit} from 'mathjs';
 
@@ -187,10 +186,3 @@ export class NumberWithUnitsValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsValidationService',
-    downgradeInjectable(NumberWithUnitsValidationService)
-  );

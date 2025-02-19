@@ -17,7 +17,6 @@
  */
 import {RemoveDuplicatesInArrayPipe} from 'filters/remove-duplicates-in-array.pipe';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ItemSelectionAnswer} from 'interactions/answer-defs';
 import {ItemSelectionRuleInputs} from 'interactions/rule-input-defs';
@@ -81,10 +80,3 @@ export class ItemSelectionInputRulesService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ItemSelectionInputRulesService',
-    downgradeInjectable(ItemSelectionInputRulesService)
-  );

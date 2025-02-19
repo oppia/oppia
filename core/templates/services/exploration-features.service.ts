@@ -17,7 +17,6 @@
  *               the exploration editor.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ExplorationFeatures} from 'services/exploration-features-backend-api.service';
@@ -101,10 +100,3 @@ export class ExplorationFeaturesService {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationFeaturesService',
-    downgradeInjectable(ExplorationFeaturesService)
-  );

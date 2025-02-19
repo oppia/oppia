@@ -23,7 +23,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
@@ -171,10 +170,3 @@ export class AndroidPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'androidPage',
-    downgradeComponent({component: AndroidPageComponent})
-  );

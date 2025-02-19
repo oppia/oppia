@@ -16,7 +16,6 @@
  * @fileoverview Service to get voiceover admin data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -347,10 +346,3 @@ export class VoiceoverBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverBackendApiService',
-    downgradeInjectable(VoiceoverBackendApiService)
-  );

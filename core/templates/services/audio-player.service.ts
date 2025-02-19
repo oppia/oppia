@@ -25,7 +25,6 @@ import {
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {ContextService} from './context.service';
 import {Howl} from 'howler';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {interval, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
@@ -231,7 +230,3 @@ export class AudioPlayerService {
     return this._stopIntervalSubject;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AudioPlayerService', downgradeInjectable(AudioPlayerService));
