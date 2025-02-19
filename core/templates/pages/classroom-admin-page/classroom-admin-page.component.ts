@@ -836,7 +836,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   toggleDiagnosticTestStatus(): void {
-    this.tempClassroomData.settIsDiagnosticTestEnabled(
+    this.tempClassroomData.setIsDiagnosticTestEnabled(
       !this.tempClassroomData.getIsDiagnosticTestEnabled()
     );
     this.updateClassroomField();

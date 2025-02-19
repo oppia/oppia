@@ -139,7 +139,7 @@ export class ExistingClassroomData
     this._isPublished = isPublished;
   }
 
-  settIsDiagnosticTestEnabled(isDiagnosticTestEnabled: boolean): void {
+  setIsDiagnosticTestEnabled(isDiagnosticTestEnabled: boolean): void {
     this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
   }
 

@@ -130,6 +130,9 @@ describe('Classroom admin model', () => {
     expect(classroom.getIsPublished()).toBeTrue();
     classroom.setIsPublished(false);
     expect(classroom.getIsPublished()).toBeFalse();
+    expect(classroom.getIsDiagnosticTestEnabled()).toBeFalse();
+    classroom.setIsDiagnosticTestEnabled(true);
+    expect(classroom.getIsDiagnosticTestEnabled()).toBeTrue();
   });
 
   it('should be able to get classroom dict from object', () => {

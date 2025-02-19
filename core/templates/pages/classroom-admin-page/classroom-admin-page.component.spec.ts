@@ -1417,6 +1417,27 @@ describe('Classroom Admin Page component ', () => {
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
+  it('should toggle diagnostic test status', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    expect(component.tempClassroomData.getIsDiagnosticTestEnabled()).toBeFalse();
+
+    component.toggleDiagnosticTestStatus();
+
+    expect(component.tempClassroomData.getIsDiagnosticTestEnabled()).toBeTrue();
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
   it('should not be able to publish classroom due to validation errors', () => {
     const response = {
       classroomDict: {
