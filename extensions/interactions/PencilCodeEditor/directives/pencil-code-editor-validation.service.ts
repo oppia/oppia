@@ -16,7 +16,6 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -71,10 +70,3 @@ export class PencilCodeEditorValidationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PencilCodeEditorValidationService',
-    downgradeInjectable(PencilCodeEditorValidationService)
-  );

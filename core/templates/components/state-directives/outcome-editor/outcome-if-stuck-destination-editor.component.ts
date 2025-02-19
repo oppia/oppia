@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
@@ -214,10 +213,3 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaOutcomeIfStuckDestinationEditor',
-  downgradeComponent({
-    component: OutcomeIfStuckDestinationEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'lazy-loading',
@@ -27,9 +26,3 @@ import {downgradeComponent} from '@angular/upgrade/static';
 export class LazyLoadingComponent {
   constructor() {}
 }
-angular
-  .module('oppia')
-  .directive(
-    'lazyLoading',
-    downgradeComponent({component: LazyLoadingComponent})
-  );

@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 @Injectable({
@@ -86,7 +85,3 @@ export class AdminRouterService {
     return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.MISC;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AdminRouterService', downgradeInjectable(AdminRouterService));
