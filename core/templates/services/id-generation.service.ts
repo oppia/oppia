@@ -16,7 +16,6 @@
  * @fileoverview Service for generating random IDs.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -33,7 +32,3 @@ export class IdGenerationService {
     return randomString.slice(-10);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('IdGenerationService', downgradeInjectable(IdGenerationService));

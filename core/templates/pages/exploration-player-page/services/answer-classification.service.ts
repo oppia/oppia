@@ -16,7 +16,6 @@
  * @fileoverview Classification service for answer groups.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -269,10 +268,3 @@ export class AnswerClassificationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AnswerClassificationService',
-    downgradeInjectable(AnswerClassificationService)
-  );

@@ -19,7 +19,6 @@
 import {EventEmitter} from '@angular/core';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
 
@@ -64,10 +63,3 @@ export class LearnerViewRatingService {
     return this._ratingUpdatedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerViewRatingService',
-    downgradeInjectable(LearnerViewRatingService)
-  );

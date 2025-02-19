@@ -33,7 +33,6 @@ export interface TaggedMisconception {
   misconceptionId: number;
 }
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 export class Misconception {
@@ -130,10 +129,3 @@ export class MisconceptionObjectFactory {
     return new Misconception(id, name, notes, feedback, mustBeAddressed);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MisconceptionObjectFactory',
-    downgradeInjectable(MisconceptionObjectFactory)
-  );

@@ -35,7 +35,6 @@ import {
   ValidationErrors,
   NgForm,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   Schema,
   SchemaDefaultValue,
@@ -158,10 +157,3 @@ export class SchemaBasedEditorComponent
     });
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedEditor',
-  downgradeComponent({
-    component: SchemaBasedEditorComponent,
-  })
-);
