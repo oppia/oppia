@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 import {PlatformParameterDomainConstants} from 'domain/platform-parameter/platform-parameter-domain.constants';
@@ -56,10 +55,3 @@ export class PlatformParameterAdminBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PlatformParameterAdminBackendApiService',
-    downgradeInjectable(PlatformParameterAdminBackendApiService)
-  );

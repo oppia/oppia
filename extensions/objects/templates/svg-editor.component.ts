@@ -25,7 +25,6 @@ import {
   Output,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {fabric} from 'fabric';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
@@ -1716,10 +1715,3 @@ export class SvgEditorComponent implements OnInit {
     fabric.Object.prototype.originY = 'center';
   }
 }
-
-angular.module('oppia').directive(
-  'svgEditor',
-  downgradeComponent({
-    component: SvgEditorComponent,
-  })
-);

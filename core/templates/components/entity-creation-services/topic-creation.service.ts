@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicCreationBackendApiService} from 'domain/topic/topic-creation-backend-api.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -106,7 +105,3 @@ export class TopicCreationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TopicCreationService', downgradeInjectable(TopicCreationService));

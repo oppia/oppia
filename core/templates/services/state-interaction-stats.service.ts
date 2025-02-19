@@ -16,7 +16,6 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
@@ -152,9 +151,3 @@ export class StateInteractionStatsService {
     return statsPromise;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'StateInteractionStatsService',
-    downgradeInjectable(StateInteractionStatsService)
-  );

@@ -225,6 +225,7 @@
         "scripts.linters.general_purpose_linter_test",
         "core.storage.app_feedback_report.gae_models_test",
         "core.jobs.batch_jobs.model_validation_jobs_test",
+        "core.jobs.batch_jobs.audit_topic_related_models_relation_jobs_test",
         "core.jobs.base_jobs_test",
         "core.jobs.decorators.validation_decorators_test",
         "core.jobs.io.ndb_io_test",
@@ -394,6 +395,9 @@
         "scripts.check_ci_test_suites_to_run_test",
         "scripts.check_tests_are_captured_in_ci_test",
         "scripts.check_github_workflow_status_test",
-        "scripts.check_backend_test_times_test"
+        "scripts.check_backend_test_times_test",
+        "core.domain.voiceover_regeneration_services_test",
+        "core.platform.azure_speech_synthesis.azure_speech_synthesis_services_test",
+        "core.platform.azure_speech_synthesis.dev_mode_azure_speech_synthesis_services_test"
     ]
 }

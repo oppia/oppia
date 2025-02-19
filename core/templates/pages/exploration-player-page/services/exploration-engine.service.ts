@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -841,10 +840,3 @@ export class ExplorationEngineService {
     return shortestPathToStateInReverse.reverse();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationEngineService',
-    downgradeInjectable(ExplorationEngineService)
-  );
