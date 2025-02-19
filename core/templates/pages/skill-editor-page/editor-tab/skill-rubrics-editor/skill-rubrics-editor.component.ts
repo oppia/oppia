@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
@@ -92,10 +91,3 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillRubricsEditor',
-  downgradeComponent({
-    component: SkillRubricsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

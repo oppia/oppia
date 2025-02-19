@@ -18,7 +18,6 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -662,11 +661,3 @@ export class StateGraphLayoutService {
     return 70.0 * (maxDepth + 1);
   }
 }
-
-// Service for computing layout of state graph nodes.
-angular
-  .module('oppia')
-  .factory(
-    'StateGraphLayoutService',
-    downgradeInjectable(StateGraphLayoutService)
-  );

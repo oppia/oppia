@@ -21,7 +21,6 @@
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -456,7 +455,3 @@ export class LocalStorageService {
     return null;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('LocalStorageService', downgradeInjectable(LocalStorageService));

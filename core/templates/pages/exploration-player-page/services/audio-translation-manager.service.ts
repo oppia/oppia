@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Voiceover} from 'domain/exploration/voiceover.model';
 
@@ -140,10 +139,3 @@ export class AudioTranslationManagerService {
     return cleanChoiceLabel + '. ';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AudioTranslationManagerService',
-    downgradeInjectable(AudioTranslationManagerService)
-  );

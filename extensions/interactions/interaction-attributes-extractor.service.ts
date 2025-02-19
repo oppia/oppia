@@ -17,7 +17,6 @@
  * attrs for interactions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -90,9 +89,3 @@ export class InteractionAttributesExtractorService {
     return ca;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'InteractionAttributesExtractorService',
-    downgradeInjectable(InteractionAttributesExtractorService)
-  );
