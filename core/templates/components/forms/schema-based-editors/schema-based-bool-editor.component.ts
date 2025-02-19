@@ -25,7 +25,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-bool-editor',
@@ -83,10 +82,3 @@ export class SchemaBasedBoolEditorComponent
     this.onChange(val);
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedBoolEditor',
-  downgradeComponent({
-    component: SchemaBasedBoolEditorComponent,
-  }) as angular.IDirectiveFactory
-);

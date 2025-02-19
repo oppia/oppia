@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-loading-message',
@@ -29,10 +28,3 @@ export class LoadingMessageComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() message!: string;
 }
-
-angular.module('oppia').directive(
-  'oppiaLoadingMessage',
-  downgradeComponent({
-    component: LoadingMessageComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -16,7 +16,6 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -123,10 +122,3 @@ export class EmailDashboardDataService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EmailDashboardDataService',
-    downgradeInjectable(EmailDashboardDataService)
-  );

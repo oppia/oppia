@@ -18,7 +18,6 @@
 
 import {PlatformLocation} from '@angular/common';
 import {Injectable, EventEmitter, NgZone} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
@@ -350,7 +349,3 @@ export class RouterService {
     return this.refreshVersionHistoryEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('RouterService', downgradeInjectable(RouterService));

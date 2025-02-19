@@ -19,7 +19,6 @@
 import {AppConstants} from 'app.constants';
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -168,10 +167,3 @@ export class SharingLinksComponent implements OnInit {
 
 type ShareType = 'exploration' | 'collection' | 'blog';
 type SharingPlatform = 'facebook' | 'twitter' | 'classroom' | 'linkedin';
-
-angular
-  .module('oppia')
-  .directive(
-    'sharingLinks',
-    downgradeComponent({component: SharingLinksComponent})
-  );

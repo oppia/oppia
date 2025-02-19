@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -367,7 +366,3 @@ export class StateEditorService {
     return this._onChangeLinkedSkillIdEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateEditorService', downgradeInjectable(StateEditorService));
