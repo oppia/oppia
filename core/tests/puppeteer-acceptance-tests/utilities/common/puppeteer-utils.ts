@@ -134,7 +134,7 @@ export class BaseUser {
           this.page.setViewport({width: 1920, height: 1080});
         }
 
-        // Enable Video Recording.To switch between modes dynamically, you can use a separate compose file (e.g., docker-compose.override.yml) with different settings.
+        // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const outputFileName =
             `${specName}-${new Date().toISOString()}.mp4`.replace(
