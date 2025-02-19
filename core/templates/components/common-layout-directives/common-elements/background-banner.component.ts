@@ -18,7 +18,6 @@
 
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'background-banner',
@@ -43,10 +42,3 @@ export class BackgroundBannerComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'backgroundBanner',
-    downgradeComponent({component: BackgroundBannerComponent})
-  );

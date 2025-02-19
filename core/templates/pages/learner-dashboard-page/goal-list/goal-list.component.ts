@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -138,10 +137,3 @@ export class GoalListComponent implements OnInit {
     this.displayAllNodes = updateState;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'goalListComponent',
-    downgradeComponent({component: GoalListComponent})
-  );

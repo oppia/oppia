@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {InteractiveMapAnswer} from 'interactions/answer-defs';
 import {InteractiveMapRuleInputs} from 'interactions/rule-input-defs';
@@ -79,10 +78,3 @@ export class InteractiveMapRulesService {
     return actualDistance > inputs.d;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InteractiveMapRulesService',
-    downgradeInjectable(InteractiveMapRulesService)
-  );

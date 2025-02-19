@@ -18,7 +18,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
   FetchExplorationBackendResponse,
@@ -531,10 +530,3 @@ export class ExplorationPlayerStateService {
     return this._playerProgressModalShownEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationPlayerStateService',
-    downgradeInjectable(ExplorationPlayerStateService)
-  );

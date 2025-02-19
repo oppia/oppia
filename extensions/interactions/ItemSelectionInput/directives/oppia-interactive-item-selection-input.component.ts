@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -218,10 +217,3 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     return !this.notEnoughSelections;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveItemSelectionInput',
-  downgradeComponent({
-    component: InteractiveItemSelectionInputComponent,
-  }) as angular.IDirectiveFactory
-);
