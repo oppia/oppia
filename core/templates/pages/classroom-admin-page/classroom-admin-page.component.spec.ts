@@ -1420,7 +1420,7 @@ describe('Classroom Admin Page component ', () => {
   it('should toggle diagnostic test status', () => {
     const response = {
       classroomDict: {
-        ...dummyClassroomDict
+        ...dummyClassroomDict,
       },
     };
     component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
@@ -1430,7 +1430,9 @@ describe('Classroom Admin Page component ', () => {
       response.classroomDict
     );
 
-    expect(component.tempClassroomData.getIsDiagnosticTestEnabled()).toBeFalse();
+    expect(
+      component.tempClassroomData.getIsDiagnosticTestEnabled()
+    ).toBeFalse();
 
     component.toggleDiagnosticTestStatus();
 

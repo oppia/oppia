@@ -341,6 +341,19 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
     # test wrong inputs that we can normally catch by typing.
+    def test_invalid_is_diagnostic_test_enabled_should_raise_exception(self) -> None:
+        self.classroom.is_diagnostic_test_enabled = 1 # type: ignore[assignment]
+        error_msg = (
+            'Expected is_diagnostic_test_enabled of the classroom to be a boolean, '
+            'received: 1.'
+        )
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_msg):
+            self.classroom.validate(strict=True)
+
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_invalid_index_should_raise_exception(self) -> None:
         self.classroom.index = 'index' # type: ignore[assignment]
         error_msg = (
