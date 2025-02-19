@@ -39,16 +39,18 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-// Import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 
 let gifshot = require('gifshot');
+(window as Window).GifFrames = require('gif-frames');
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
 //   }
 // }
 
-interface window {
+interface Window {
   GifFrames: Function;
 }
 
@@ -62,7 +64,7 @@ describe('ImageEditor', () => {
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
-  //let GifFrames: gifFrames;
+  // Let GifFrames: gifFrames;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
