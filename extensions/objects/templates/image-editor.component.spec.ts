@@ -57,6 +57,7 @@ describe('ImageEditor', () => {
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
+  let GifFrames: gifFrames;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -1895,7 +1896,7 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(component, 'gifFrames').and.resolveTo([
+    spyOn(component, GifFrames).and.resolveTo([
       {
         getImage: () => {
           return {
@@ -2267,7 +2268,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(component, 'gifFrames').and.resolveTo([
+      spyOn(component, GifFrames).and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2377,7 +2378,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(gifFrames, 'gifFrames').and.resolveTo([
+      spyOn(component, GifFrames).and.resolveTo([
         {
           getImage: () => {
             return {
