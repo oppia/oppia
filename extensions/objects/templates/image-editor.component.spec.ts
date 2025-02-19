@@ -39,20 +39,15 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+// Import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
 
 let gifshot = require('gifshot');
-(window as Window).GifFrames = require('gif-frames');
+
 // Declare global {
 //   interface Window {
 //     GifFrames: Function;
 //   }
 // }
-
-interface Window {
-  GifFrames: Function;
-}
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
@@ -1903,7 +1898,7 @@ describe('ImageEditor', () => {
       })
     );
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(window, 'GifFrames').and.resolveTo([
+    spyOn(component, 'GifFrames').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -2275,7 +2270,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(component, 'GifFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2385,7 +2380,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(component, 'GifFrames').and.resolveTo([
         {
           getImage: () => {
             return {
