@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {
@@ -109,10 +108,3 @@ export class VoiceoverPlayerService {
     return this.languageAccentDescriptions;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverPlayerService',
-    downgradeInjectable(VoiceoverPlayerService)
-  );

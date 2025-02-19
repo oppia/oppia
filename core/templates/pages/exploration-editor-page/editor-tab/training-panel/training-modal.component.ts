@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ResponsesService} from '../services/responses.service';
@@ -217,10 +216,3 @@ export class TrainingModalComponent
     this.classification.newOutcome = classificationResult.outcome;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTrainingModal',
-  downgradeComponent({
-    component: TrainingModalComponent,
-  }) as angular.IDirectiveFactory
-);

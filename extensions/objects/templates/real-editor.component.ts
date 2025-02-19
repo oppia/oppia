@@ -29,7 +29,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 interface RealSchema {
   type: string;
@@ -108,9 +107,3 @@ export class RealEditorComponent
     }
   }
 }
-angular.module('oppia').directive(
-  'realEditor',
-  downgradeComponent({
-    component: RealEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -47,10 +46,3 @@ export class ShortResponseSetInputComponent implements OnInit {
         : 'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseSetInput',
-  downgradeComponent({
-    component: ShortResponseSetInputComponent,
-  })
-);

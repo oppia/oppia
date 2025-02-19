@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -87,9 +86,3 @@ export class OppiaInteractiveContinue implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-angular.module('oppia').directive(
-  'oppiaInteractiveContinue',
-  downgradeComponent({
-    component: OppiaInteractiveContinue,
-  }) as angular.IDirectiveFactory
-);

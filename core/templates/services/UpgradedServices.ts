@@ -16,7 +16,6 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, Injector} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
 import {
@@ -1212,7 +1211,3 @@ export class UpgradedServices {
     return upgradedServices;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('UpgradedServices', downgradeInjectable(UpgradedServices));

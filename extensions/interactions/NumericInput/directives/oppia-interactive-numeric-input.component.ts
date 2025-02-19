@@ -21,7 +21,6 @@
  */
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import isUndefined from 'lodash/isUndefined';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -139,10 +138,3 @@ export class InteractiveNumericInput implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveNumericInput',
-  downgradeComponent({
-    component: InteractiveNumericInput,
-  }) as angular.IDirectiveFactory
-);

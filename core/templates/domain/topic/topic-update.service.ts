@@ -23,7 +23,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -1026,6 +1025,3 @@ export class TopicUpdateService {
     );
   }
 }
-angular
-  .module('oppia')
-  .factory('TopicUpdateService', downgradeInjectable(TopicUpdateService));

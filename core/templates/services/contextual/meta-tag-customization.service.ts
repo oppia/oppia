@@ -16,7 +16,6 @@
  * @fileoverview Service to add custom meta tags.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from './window-ref.service';
@@ -50,10 +49,3 @@ export class MetaTagCustomizationService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MetaTagCustomizationService',
-    downgradeInjectable(MetaTagCustomizationService)
-  );

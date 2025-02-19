@@ -16,7 +16,6 @@
  * @fileoverview Service to manage the content translations displayed.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -121,10 +120,3 @@ export class ContentTranslationManagerService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContentTranslationManagerService',
-    downgradeInjectable(ContentTranslationManagerService)
-  );

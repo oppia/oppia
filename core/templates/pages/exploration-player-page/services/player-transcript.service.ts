@@ -21,7 +21,6 @@
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -178,10 +177,3 @@ export class PlayerTranscriptService {
     return null;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PlayerTranscriptService',
-    downgradeInjectable(PlayerTranscriptService)
-  );

@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {State} from 'domain/state/StateObjectFactory';
@@ -191,10 +190,3 @@ export class LearnerAnswerInfoService {
     return $('<span>').append(el).html();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerAnswerInfoService',
-    downgradeInjectable(LearnerAnswerInfoService)
-  );
