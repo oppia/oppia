@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
 import {AlertsService} from 'services/alerts.service';
 import {ChangeListService} from './change-list.service';
@@ -38,10 +37,3 @@ export class ExplorationParamChangesService extends ExplorationPropertyService {
     super(alertsService, changeListService, loggerService);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationParamChangesService',
-    downgradeInjectable(ExplorationParamChangesService)
-  );

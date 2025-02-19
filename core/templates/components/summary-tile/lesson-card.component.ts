@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -234,10 +233,3 @@ export class LessonCardComponent implements OnInit {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'lessonCardComponent',
-    downgradeComponent({component: LessonCardComponent})
-  );

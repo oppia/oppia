@@ -16,7 +16,6 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {HttpClient} from '@angular/common/http';
@@ -264,10 +263,3 @@ export class SkillBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillBackendApiService',
-    downgradeInjectable(SkillBackendApiService)
-  );

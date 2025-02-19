@@ -18,7 +18,6 @@
  * with base class as ExplorationPropertyService.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
@@ -164,10 +163,3 @@ export class ExplorationPropertyService {
     return this._explorationPropertyChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationPropertyService',
-    downgradeInjectable(ExplorationPropertyService)
-  );

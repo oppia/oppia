@@ -28,7 +28,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime} from 'rxjs/operators';
 
@@ -265,10 +264,3 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'mathExpressionContentEditor',
-  downgradeComponent({
-    component: MathExpressionContentEditorComponent,
-  })
-);

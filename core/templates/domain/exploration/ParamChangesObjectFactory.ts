@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   ParamChangeBackendDict,
@@ -41,10 +40,3 @@ export class ParamChangesObjectFactory {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParamChangesObjectFactory',
-    downgradeInjectable(ParamChangesObjectFactory)
-  );

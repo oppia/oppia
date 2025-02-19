@@ -15,7 +15,6 @@
 /**
  * @fileoverview A data service that stores the current interaction solution.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -33,7 +32,3 @@ export class StateSolutionService extends StatePropertyService<Solution | null> 
     this.setterMethodKey = 'saveSolution';
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateSolutionService', downgradeInjectable(StateSolutionService));

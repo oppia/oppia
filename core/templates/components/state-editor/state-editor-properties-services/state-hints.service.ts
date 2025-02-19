@@ -16,7 +16,6 @@
  * @fileoverview A data service that stores the current interaction hints.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -50,7 +49,3 @@ export class StateHintsService extends StatePropertyService<Hint[]> {
     this.setActiveHintIndex(null);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateHintsService', downgradeInjectable(StateHintsService));

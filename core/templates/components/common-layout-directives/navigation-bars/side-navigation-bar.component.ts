@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -131,10 +130,3 @@ export class SideNavigationBarComponent {
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSideNavigationBar',
-  downgradeComponent({
-    component: SideNavigationBarComponent,
-  }) as angular.IDirectiveFactory
-);

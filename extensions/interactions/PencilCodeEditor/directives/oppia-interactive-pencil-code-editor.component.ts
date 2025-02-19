@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Component, Input, OnDestroy, OnInit, ElementRef} from '@angular/core';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -235,10 +234,3 @@ export class PencilCodeEditor implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractivePencilCodeEditor',
-  downgradeComponent({
-    component: PencilCodeEditor,
-  }) as angular.IDirectiveFactory
-);

@@ -25,7 +25,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
 import {IdGenerationService} from 'services/id-generation.service';
@@ -323,10 +322,3 @@ export class SchemaBasedListEditorComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedListEditor',
-  downgradeComponent({
-    component: SchemaBasedListEditorComponent,
-  }) as angular.IDirectiveFactory
-);

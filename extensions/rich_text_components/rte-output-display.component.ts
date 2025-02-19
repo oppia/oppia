@@ -29,7 +29,6 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   OppiaRteParserService,
   OppiaRteNode,
@@ -216,13 +215,6 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRteOutputDisplay',
-  downgradeComponent({
-    component: RteOutputDisplayComponent,
-  })
-);
 
 /**
  * The directive below is required because we have &nbsp; in the string. String

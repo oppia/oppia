@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -53,10 +52,3 @@ export class SkillMasteryModalComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillMasteryModal',
-  downgradeComponent({
-    component: SkillMasteryModalComponent,
-  }) as angular.IDirectiveFactory
-);
