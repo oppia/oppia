@@ -224,6 +224,10 @@ fasteners==0.19 \
     # via
     #   apache-beam
     #   google-apitools
+filetype==1.2.0 \
+    --hash=sha256:66b56cd6474bf41d8c54660347d37afcc3f7d1970648de365c102ef77548aadb \
+    --hash=sha256:7ce71b6880181241cf7ac8697a2f1eb6a8bd9b429f7ad6d27b8db9ba5f1c2d25
+    # via -r requirements.in
 firebase-admin==5.2.0 \
     --hash=sha256:cd1a47ff43e5d83cf8d6e2c478387860c363876d9b9149b5034a13b81f8b4bda \
     --hash=sha256:e6d69fb055b1c1e4dc048e0192772c978f9c826a9912d566e5a924eea449bdc1
