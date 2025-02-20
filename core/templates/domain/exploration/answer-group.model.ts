@@ -70,15 +70,8 @@ export class AnswerGroup extends BaseTranslatableObject {
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId,
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AnswerGroupObjectFactory {
-  constructor() {}
-
-  generateRulesFromBackendDict(
+  static generateRulesFromBackendDict(
     ruleBackendDicts: RuleBackendDict[],
     interactionId: string
   ): Rule[] {
@@ -87,7 +80,7 @@ export class AnswerGroupObjectFactory {
     );
   }
 
-  createNew(
+  static createNew(
     rules: Rule[],
     outcome: Outcome,
     trainingData: readonly InteractionAnswer[],
@@ -101,7 +94,7 @@ export class AnswerGroupObjectFactory {
     );
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
     answerGroupBackendDict: AnswerGroupBackendDict,
     interactionId: string
   ): AnswerGroup {

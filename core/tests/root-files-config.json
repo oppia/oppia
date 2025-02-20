@@ -59,7 +59,6 @@
     "core/tests/ci-test-suite-configs/README.md",
     "core/templates/AppSpec.ts",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
-    "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],

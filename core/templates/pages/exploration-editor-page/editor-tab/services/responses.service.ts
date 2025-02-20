@@ -27,7 +27,7 @@ import {
   AnswerChoice,
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';

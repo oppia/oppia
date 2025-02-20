@@ -24,7 +24,7 @@ import {GraphDataService} from 'pages/exploration-editor-page/services/graph-dat
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {State} from 'domain/state/StateObjectFactory';
 import {Outcome} from 'domain/exploration/outcome.model';

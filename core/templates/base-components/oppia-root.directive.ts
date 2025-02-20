@@ -42,7 +42,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'AlertsService',
               'AngularNameService',
               'AnswerClassificationService',
-              'AnswerGroupObjectFactory',
               'AssetsBackendApiService',
               'AudioPreloaderService',
               'AudioTranslationLanguageService',

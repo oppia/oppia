@@ -35,7 +35,7 @@ import {Question} from 'domain/question/QuestionObjectFactory';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
