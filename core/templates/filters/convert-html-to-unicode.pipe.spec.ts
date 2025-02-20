@@ -16,7 +16,7 @@
  * @fileoverview Tests for the convert HTML to Unicode pipe.
  */
 
-import { ConvertHtmlToUnicodePipe } from './convert-html-to-unicode.pipe';
+import {ConvertHtmlToUnicodePipe} from './convert-html-to-unicode.pipe';
 
 describe('ConvertHtmlToUnicodePipe', () => {
   let pipe: ConvertHtmlToUnicodePipe;
