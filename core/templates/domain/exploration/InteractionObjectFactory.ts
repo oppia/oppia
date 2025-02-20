@@ -30,8 +30,7 @@ import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
 import {
   OutcomeBackendDict,
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   Solution,
@@ -311,7 +310,6 @@ export class InteractionObjectFactory {
   constructor(
     private answerGroupFactory: AnswerGroupObjectFactory,
     private solutionFactory: SolutionObjectFactory,
-    private outcomeFactory: OutcomeObjectFactory,
     private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory
   ) {}
 

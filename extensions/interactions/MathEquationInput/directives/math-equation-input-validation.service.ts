@@ -28,7 +28,7 @@ import {
 import {MathEquationInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {MathEquationInputRulesService} from './math-equation-input-rules.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';

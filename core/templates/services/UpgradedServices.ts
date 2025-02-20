@@ -209,7 +209,6 @@ import {
   NumericExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {PageTitleService} from 'services/page-title.service';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
@@ -615,7 +614,6 @@ export class UpgradedServices {
         upgradedServices['UnitsObjectFactory'],
         upgradedServices['UtilsService']
       );
-    upgradedServices['OutcomeObjectFactory'] = new OutcomeObjectFactory();
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'],
       upgradedServices['Title']
@@ -637,7 +635,6 @@ export class UpgradedServices {
     upgradedServices['ResponsesService'] = new ResponsesService(
       upgradedServices['AlertsService'],
       upgradedServices['LoggerService'],
-      upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SolutionValidityService'],
       upgradedServices['SolutionVerificationService'],
       upgradedServices['StateCustomizationArgsService'],
@@ -702,7 +699,6 @@ export class UpgradedServices {
       upgradedServices['HttpXhrBackend']
     );
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory']
     );
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(upgradedServices['HtmlEscaperService']);
@@ -1169,7 +1165,6 @@ export class UpgradedServices {
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
       upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
-      upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SubtitledUnicodeObjectFactory']
     );
 

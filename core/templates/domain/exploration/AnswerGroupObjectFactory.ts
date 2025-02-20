@@ -13,18 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of AnswerGroup
+ * @fileoverview Model class for creating new frontend instances of AnswerGroup
  * domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   Outcome,
   OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule, RuleBackendDict} from 'domain/exploration/rule.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
@@ -79,7 +76,7 @@ export class AnswerGroup extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class AnswerGroupObjectFactory {
-  constructor(private outcomeObjectFactory: OutcomeObjectFactory) {}
+  constructor() {}
 
   generateRulesFromBackendDict(
     ruleBackendDicts: RuleBackendDict[],
@@ -113,7 +110,7 @@ export class AnswerGroupObjectFactory {
         answerGroupBackendDict.rule_specs,
         interactionId
       ),
-      this.outcomeObjectFactory.createFromBackendDict(
+      Outcome.createFromBackendDict(
         answerGroupBackendDict.outcome
       ),
       answerGroupBackendDict.training_data,

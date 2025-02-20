@@ -22,7 +22,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {EditabilityService} from 'services/editability.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 interface DeleteValue {
   index: number;

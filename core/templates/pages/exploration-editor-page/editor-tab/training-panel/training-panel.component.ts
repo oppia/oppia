@@ -22,8 +22,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
@@ -72,7 +71,6 @@ export class TrainingPanelComponent implements OnInit {
     private explorationStatesService: ExplorationStatesService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private generateContentIdService: GenerateContentIdService,
-    private outcomeObjectFactory: OutcomeObjectFactory
   ) {}
 
   _updateAnswerTemplate(): void {
@@ -93,7 +91,7 @@ export class TrainingPanelComponent implements OnInit {
     );
     let currentStateName = this.stateEditorService.getActiveStateName();
     if (currentStateName) {
-      this.classification.newOutcome = this.outcomeObjectFactory.createNew(
+      this.classification.newOutcome = Outcome.createNew(
         currentStateName,
         contentId,
         '',

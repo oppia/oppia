@@ -25,7 +25,7 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UserService} from 'services/user.service';
 import {AppConstants} from 'app.constants';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 interface DestinationChoice {
   id: string;

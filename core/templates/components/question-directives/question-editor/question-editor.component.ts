@@ -30,7 +30,7 @@ import {Subscription} from 'rxjs';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';

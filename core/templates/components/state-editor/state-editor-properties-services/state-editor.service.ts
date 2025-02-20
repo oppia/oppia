@@ -33,7 +33,7 @@ import {
   MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {State} from 'domain/state/StateObjectFactory';

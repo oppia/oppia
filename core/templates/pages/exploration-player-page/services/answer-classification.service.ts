@@ -25,7 +25,7 @@ import {ExplorationPlayerConstants} from 'pages/exploration-player-page/explorat
 import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {
   InteractionRuleInputs,

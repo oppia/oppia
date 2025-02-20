@@ -25,7 +25,7 @@ import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {TextInputRulesService} from './text-input-rules.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import {TranslatableSetOfNormalizedString} from 'interactions/rule-input-defs';
 import {UtilsService} from 'services/utils.service';

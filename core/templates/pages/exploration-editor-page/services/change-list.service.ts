@@ -52,7 +52,7 @@ import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {
   Outcome,
   OutcomeBackendDict,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {
   RecordedVoiceOverBackendDict,
   RecordedVoiceovers,

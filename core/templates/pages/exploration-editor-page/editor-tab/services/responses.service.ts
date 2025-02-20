@@ -37,8 +37,7 @@ import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {LoggerService} from 'services/contextual/logger.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -112,7 +111,6 @@ export class ResponsesService {
   constructor(
     private alertsService: AlertsService,
     private loggerService: LoggerService,
-    private outcomeObjectFactory: OutcomeObjectFactory,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -359,7 +357,7 @@ export class ResponsesService {
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();
         if (stateName) {
-          this._defaultOutcome = this.outcomeObjectFactory.createNew(
+          this._defaultOutcome = Outcome.createNew(
             stateName,
             ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
             '',

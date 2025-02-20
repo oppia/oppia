@@ -29,7 +29,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {RouterService} from '../services/router.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {InteractionData} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint} from 'domain/exploration/hint-object.model';

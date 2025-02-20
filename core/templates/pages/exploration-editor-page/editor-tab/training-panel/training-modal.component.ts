@@ -41,7 +41,7 @@ import {AnswerClassificationService} from 'pages/exploration-player-page/service
 import {TrainingDataService} from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
 import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';

@@ -24,7 +24,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ContextService} from 'services/context.service';
 
 @Component({

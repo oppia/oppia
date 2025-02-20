@@ -24,7 +24,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AppConstants} from 'app.constants';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 interface DestinationChoice {
   id: string | null;
