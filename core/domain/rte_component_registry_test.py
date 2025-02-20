@@ -185,8 +185,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(main_html_file))
 
             ts_file_content = utils.get_file_contents(main_ts_file)
-            self.assertIn(
-                'oppiaNoninteractive%s' % component_id, ts_file_content)
             self.assertNotIn('<script>', ts_file_content)
             self.assertNotIn('</script>', ts_file_content)
 

@@ -16,7 +16,6 @@
  * @fileoverview Component for the FractionInput response.
  */
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Fraction} from 'domain/objects/fraction.model';
 import {FractionAnswer} from 'interactions/answer-defs';
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -39,10 +38,3 @@ export class ResponseFractionInput {
     this.escapedAnswer = Fraction.fromDict(fraction).toString();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseFractionInput',
-  downgradeComponent({
-    component: ResponseFractionInput,
-  }) as angular.IDirectiveFactory
-);

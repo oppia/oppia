@@ -21,7 +21,6 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface IntValidatorSchema {
   type: string;
@@ -65,10 +64,3 @@ export class IntEditorComponent implements OnInit {
     this.valueChanged.emit(value);
   }
 }
-
-angular.module('oppia').directive(
-  'intEditor',
-  downgradeComponent({
-    component: IntEditorComponent,
-  }) as angular.IDirectiveFactory
-);
