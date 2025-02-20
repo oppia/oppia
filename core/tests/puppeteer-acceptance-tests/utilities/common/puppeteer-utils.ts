@@ -151,6 +151,7 @@ export class BaseUser {
             followNewTab: true,
             fps: 25,
             ffmpeg_Path: null,
+            // Below dimensions are of recorded video.
             videoFrame: {
               width: 1920,
               height: 1080,
