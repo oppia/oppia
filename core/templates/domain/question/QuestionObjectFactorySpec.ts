@@ -18,9 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
@@ -47,14 +45,9 @@ describe('Question object factory', function () {
   beforeEach(
     angular.mock.module('oppia', function ($provide) {
       $provide.value(
-        'AnswerGroupObjectFactory',
-        new AnswerGroupObjectFactory(new OutcomeObjectFactory())
-      );
-      $provide.value(
         'MisconceptionObjectFactory',
         new MisconceptionObjectFactory()
       );
-      $provide.value('OutcomeObjectFactory', new OutcomeObjectFactory());
       $provide.value(
         'ParamChangeObjectFactory',
         new ParamChangeObjectFactory()

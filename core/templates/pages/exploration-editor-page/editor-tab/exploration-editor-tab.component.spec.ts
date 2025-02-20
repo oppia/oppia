@@ -25,10 +25,10 @@ import {
   ComponentFixture,
   waitForAsync,
 } from '@angular/core/testing';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -82,13 +82,11 @@ import {AlertsService} from 'services/alerts.service';
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
@@ -213,10 +211,8 @@ describe('Exploration editor tab component', () => {
     fixture = TestBed.createComponent(ExplorationEditorTabComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -778,7 +774,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           training_data: null,
@@ -801,7 +797,7 @@ describe('Exploration editor tab component', () => {
     ]);
 
     let displayedValue = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -834,7 +830,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
-      outcomeObjectFactory.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'default',
         dest_if_really_stuck: null,
         feedback: {
@@ -848,7 +844,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = outcomeObjectFactory.createFromBackendDict({
+    let displayedValue = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {

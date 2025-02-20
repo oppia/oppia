@@ -20,14 +20,12 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import {
@@ -48,15 +46,11 @@ describe('TextInputValidationService', () => {
   let customizationArguments: TextInputCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.inject(TextInputValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     let customizationArgSpecs =
       INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -66,7 +60,7 @@ describe('TextInputValidationService', () => {
     maxRows = validators[1].max_value;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -91,9 +85,9 @@ describe('TextInputValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   it('should be able to perform basic validation', () => {

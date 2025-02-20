@@ -22,8 +22,7 @@ import {fakeAsync, TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {
@@ -33,8 +32,7 @@ import {
 import {LoggerService} from 'services/contextual/logger.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
@@ -48,13 +46,11 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let interactionData: Interaction;
   let interactionDataWithRules: Interaction;
   let interactionObjectFactory: InteractionObjectFactory;
   let loggerService: LoggerService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let responsesService: ResponsesService;
   let savedMemento: Solution;
   let stateEditorService: StateEditorService;
@@ -65,13 +61,11 @@ describe('Responses Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     alertsService = TestBed.get(AlertsService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService
     );
     loggerService = TestBed.get(LoggerService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     responsesService = TestBed.get(ResponsesService);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
@@ -248,7 +242,7 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',
@@ -825,7 +819,7 @@ describe('Responses Service', () => {
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-    const expectedDefaultOutcomeCreated = outcomeObjectFactory.createNew(
+    const expectedDefaultOutcomeCreated = Outcome.createNew(
       'State',
       'default_outcome',
       '',
@@ -858,14 +852,14 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
         '0'
       ),
     ];
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'State',
       'new_id',
       'This is a new feedback text',
@@ -901,14 +895,14 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
         '0'
       ),
     ];
-    let updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    let updatedDefaultOutcome = Outcome.createNew(
       'State',
       'new_id',
       'This is a new feedback text',
@@ -918,7 +912,7 @@ describe('Responses Service', () => {
     // Save first time.
     responsesService.save(updatedAnswerGroups, updatedDefaultOutcome, () => {});
 
-    updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',
@@ -957,7 +951,7 @@ describe('Responses Service', () => {
   });
 
   it('should throw error if background image are empty', fakeAsync(() => {
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',

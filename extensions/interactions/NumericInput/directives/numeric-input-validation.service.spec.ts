@@ -22,14 +22,12 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {NumericInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
@@ -56,7 +54,6 @@ describe('NumericInputValidationService', () => {
     zeroWithinToleranceOfOneRule: Rule,
     zeroWithinToleranceOfOneRuleLessThanZero: Rule,
     nonPositiveToleranceRule: Rule;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -66,8 +63,6 @@ describe('NumericInputValidationService', () => {
     validatorService = TestBed.inject(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     customizationArgs = {
       requireNonnegativeInput: {
@@ -75,7 +70,7 @@ describe('NumericInputValidationService', () => {
       },
     };
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -220,7 +215,7 @@ describe('NumericInputValidationService', () => {
       'NumericInput'
     );
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsZeroRule, betweenNegativeOneAndOneRule],
         goodDefaultOutcome,
         [],

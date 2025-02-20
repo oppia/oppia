@@ -22,13 +22,13 @@ import {
   StateEditorService,
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {
   Interaction,
   InteractionObjectFactory,
 } from 'domain/exploration/InteractionObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -40,8 +40,6 @@ describe('Editor state service', () => {
   let suof: SubtitledUnicodeObjectFactory;
   let sof: SolutionObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let solutionValidityService: SolutionValidityService;
   let mockInteraction: Interaction;
 
@@ -65,8 +63,6 @@ describe('Editor state service', () => {
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
     // Here, mockInteraction consists of an TextInput interaction with an
@@ -464,9 +460,9 @@ describe('Editor state service', () => {
 
   it('should set interaction answer groups', () => {
     let newAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
         '0'
       ),
@@ -474,9 +470,9 @@ describe('Editor state service', () => {
 
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew(
+        Outcome.createNew(
           'State',
           'This is a new feedback text',
           '',
@@ -491,7 +487,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction default outcome', () => {
-    let newDefaultOutcome = outcomeObjectFactory.createNew(
+    let newDefaultOutcome = Outcome.createNew(
       'Hola1',
       '',
       'Feedback text',
@@ -500,7 +496,7 @@ describe('Editor state service', () => {
 
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.defaultOutcome).toEqual(
-      outcomeObjectFactory.createNew('Hola', '', '', [])
+      Outcome.createNew('Hola', '', '', [])
     );
     ecs.setInteractionDefaultOutcome(newDefaultOutcome);
     expect(ecs.interaction.defaultOutcome).toEqual(newDefaultOutcome);

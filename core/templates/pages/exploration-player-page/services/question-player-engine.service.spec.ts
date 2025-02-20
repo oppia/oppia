@@ -19,7 +19,7 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   Question,
   QuestionBackendDict,
@@ -46,7 +46,6 @@ describe('Question player engine service ', () => {
   let expressionInterpolationService: ExpressionInterpolationService;
   let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
@@ -425,7 +424,6 @@ describe('Question player engine service ', () => {
     );
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     textInputService = TestBed.get(TextInputRulesService);
 
@@ -481,7 +479,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -595,7 +593,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -704,7 +702,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -741,7 +739,7 @@ describe('Question player engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -771,7 +769,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', null, null, []),
+          Outcome.createNew('default', null, null, []),
           1,
           0,
           'default_outcome'
@@ -820,7 +818,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -871,7 +869,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -914,7 +912,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'

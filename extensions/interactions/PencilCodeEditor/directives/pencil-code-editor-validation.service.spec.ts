@@ -18,24 +18,19 @@
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import {Rule, RuleInputs} from 'domain/exploration/rule.model';
 import {TestBed} from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService;
-  let oof: OutcomeObjectFactory;
   let inputBackend: RuleInputs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
-    oof = TestBed.inject(OutcomeObjectFactory);
     pcevs = TestBed.inject(PencilCodeEditorValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
   });
 
   describe('on calling getCustomizationArgsWarnings', () => {
@@ -58,7 +53,7 @@ describe('Pencil Code Editor Validation Service', () => {
           value: ' Add the initial code snippet here.↵code is here',
         },
       };
-      const testOutcome1 = oof.createNew(
+      const testOutcome1 = Outcome.createNew(
         'Introduction',
         'default_outcome',
         '',
@@ -86,7 +81,7 @@ describe('Pencil Code Editor Validation Service', () => {
       inputBackend = {
         x: [['<p>one</p>']],
       };
-      const testOutcome2 = oof.createNew(
+      const testOutcome2 = Outcome.createNew(
         'Introduction',
         'feedback_0',
         '<p>YES</p>',
@@ -95,7 +90,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
+      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
       expect(
@@ -118,7 +113,7 @@ describe('Pencil Code Editor Validation Service', () => {
       inputBackend = {
         x: [['<p>one</p>']],
       };
-      const testOutcome = oof.createNew(
+      const testOutcome = Outcome.createNew(
         'Introduction',
         'feedback_0',
         '<p>YES</p>',
@@ -127,8 +122,8 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
-      const testOutcome2 = oof.createNew(
+      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome, [], null);
+      const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',
         '<p>no</p>',
@@ -153,7 +148,7 @@ describe('Pencil Code Editor Validation Service', () => {
           value: ' Add the initial code snippet here.↵code is here',
         },
       };
-      const testOutcome1 = oof.createNew(
+      const testOutcome1 = Outcome.createNew(
         'Introduction',
         'default_outcome',
         '',
@@ -187,7 +182,7 @@ describe('Pencil Code Editor Validation Service', () => {
       inputBackend = {
         x: [['<p>one</p>']],
       };
-      const testOutcome = oof.createNew(
+      const testOutcome = Outcome.createNew(
         'Introduction',
         'feedback_0',
         '<p>YES</p>',
@@ -196,8 +191,8 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
-      const testOutcome2 = oof.createNew(
+      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome, [], null);
+      const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',
         '<p>no</p>',

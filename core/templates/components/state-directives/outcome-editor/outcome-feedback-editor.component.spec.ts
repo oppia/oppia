@@ -18,7 +18,7 @@
 
 import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ContextService} from 'services/context.service';
 import {OutcomeFeedbackEditorComponent} from './outcome-feedback-editor.component';

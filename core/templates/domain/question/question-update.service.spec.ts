@@ -18,8 +18,6 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // question-update.service.ts is upgraded to Angular 8.
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
@@ -57,11 +55,6 @@ describe('Question update service', function () {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', function ($provide) {
-      $provide.value(
-        'AnswerGroupObjectFactory',
-        new AnswerGroupObjectFactory(new OutcomeObjectFactory())
-      );
-      $provide.value('OutcomeObjectFactory', new OutcomeObjectFactory());
       $provide.value(
         'ParamChangeObjectFactory',
         new ParamChangeObjectFactory()

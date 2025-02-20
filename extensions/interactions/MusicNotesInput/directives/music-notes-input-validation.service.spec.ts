@@ -20,13 +20,11 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
@@ -41,7 +39,6 @@ describe('MusicNotesInputValidationService', () => {
   let answerGroups: AnswerGroup[],
     goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -50,11 +47,8 @@ describe('MusicNotesInputValidationService', () => {
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -66,7 +60,7 @@ describe('MusicNotesInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], '')];
+    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], '')];
   });
 
   it('should be able to perform basic validation', () => {
@@ -87,7 +81,7 @@ describe('MusicNotesInputValidationService', () => {
   });
 
   it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
-    var answerGroup = agof.createNew(
+    var answerGroup = AnswerGroup.createNew(
       [
         Rule.createNew(
           'HasLengthInclusivelyBetween',

@@ -18,19 +18,17 @@
 
 import {TestBed} from '@angular/core/testing';
 import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
-import {OutcomeObjectFactory} from './OutcomeObjectFactory';
+import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
 
 describe('Lost Change Object Factory', () => {
   let lcof: LostChangeObjectFactory;
-  let oof: OutcomeObjectFactory;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LostChangeObjectFactory],
     });
 
     lcof = TestBed.inject(LostChangeObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
   });
 
   it('should evaluate values from a Lost Change', () => {
@@ -173,7 +171,7 @@ describe('Lost Change Object Factory', () => {
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
-          outcome: oof.createFromBackendDict({
+          outcome: Outcome.createFromBackendDict({
             dest: 'outcome 2',
             dest_if_really_stuck: null,
             feedback: {
@@ -199,7 +197,7 @@ describe('Lost Change Object Factory', () => {
           ],
         },
         old_value: {
-          outcome: oof.createFromBackendDict({
+          outcome: Outcome.createFromBackendDict({
             dest: 'outcome 1',
             dest_if_really_stuck: null,
             feedback: {
@@ -280,7 +278,7 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 2',
           dest_if_really_stuck: null,
           feedback: {
@@ -307,7 +305,7 @@ describe('Lost Change Object Factory', () => {
         ],
       },
       old_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           dest_if_really_stuck: null,
           feedback: {

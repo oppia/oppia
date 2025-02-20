@@ -20,14 +20,12 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -42,8 +40,6 @@ describe('MultipleChoiceInputValidationService', () => {
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: MultipleChoiceInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [MultipleChoiceInputValidationService],
@@ -51,11 +47,9 @@ describe('MultipleChoiceInputValidationService', () => {
 
     validatorService = TestBed.get(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -68,7 +62,7 @@ describe('MultipleChoiceInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
       feedback: {
@@ -96,7 +90,7 @@ describe('MultipleChoiceInputValidationService', () => {
     };
 
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           {
             rule_type: 'Equals',

@@ -20,16 +20,14 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {
   RatioExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
@@ -45,7 +43,6 @@ describe('RatioExpressionInputValidationService', () => {
   let equals: Rule, isEquivalent: Rule;
   let hasNumberOfTermsEqualTo: Rule, hasSpecificTermEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -54,12 +51,10 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(RatioExpressionInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -122,7 +117,7 @@ describe('RatioExpressionInputValidationService', () => {
       'RatioExpressionInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {

@@ -26,12 +26,11 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {ResponsesService} from '../services/responses.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {TrainingDataService} from './training-data.service';
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
@@ -83,7 +82,6 @@ describe('Training Modal Component', () => {
   let responsesService: ResponsesService;
   let ngbActiveModal: NgbActiveModal;
   let trainingDataService: TrainingDataService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let graphDataService: GraphDataService;
   let explorationWarningsService: ExplorationWarningsService;
 
@@ -121,7 +119,6 @@ describe('Training Modal Component', () => {
           provide: AnswerClassificationService,
           useClass: MockAnswerClassificationService,
         },
-        AnswerGroupObjectFactory,
         TrainingDataService,
         ResponsesService,
         ExplorationWarningsService,
@@ -136,7 +133,6 @@ describe('Training Modal Component', () => {
     component = fixture.componentInstance;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     trainingDataService = TestBed.inject(TrainingDataService);
     responsesService = TestBed.inject(ResponsesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
@@ -163,7 +159,6 @@ describe('Training Modal Component', () => {
       };
       component.unhandledAnswer = 'string';
 
-      spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(null);
       spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
       spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(1);
       spyOn(responsesService, 'getAnswerGroups').and.returnValue([

@@ -30,8 +30,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
@@ -61,7 +60,7 @@ import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
@@ -122,11 +121,10 @@ class MockConvertToPlainTextPipe {
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let Outcome: Outcome;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
@@ -303,7 +301,7 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
+        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -340,9 +338,8 @@ describe('State translation component', () => {
     fixture = TestBed.createComponent(StateTranslationComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    Outcome = TestBed.inject(Outcome);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
@@ -756,7 +753,7 @@ describe('State translation component', () => {
       it('should get summary default outcome when outcome is linear', () => {
         expect(
           component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+            Outcome.createNew('unused', '1', 'Feedback Text', []),
             'Continue',
             0,
             'true'
@@ -770,7 +767,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
+              Outcome.createNew(
                 'unused',
                 '1',
                 'Feedback Text',
@@ -790,7 +787,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
+              Outcome.createNew(
                 'unused',
                 '1',
                 'Feedback Text',
@@ -813,9 +810,9 @@ describe('State translation component', () => {
       it('should get summary answer group', () => {
         expect(
           component.summarizeAnswerGroup(
-            answerGroupObjectFactory.createNew(
+            AnswerGroup.createNew(
               [],
-              outcomeObjectFactory.createNew(
+              Outcome.createNew(
                 'unused',
                 '1',
                 'Feedback text',
@@ -1013,7 +1010,7 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
+        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -1536,7 +1533,7 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
+        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -2222,7 +2219,7 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
+        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,

@@ -23,8 +23,7 @@ import {ContextService} from 'services/context.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
@@ -48,7 +47,6 @@ describe('ExplorationStatesService', () => {
   let changeListService: ChangeListService;
   let contextService: ContextService;
   let explorationStatesService: ExplorationStatesService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let answerGroup: AnswerGroup;
   let generateContentIdService: GenerateContentIdService;
 
@@ -70,7 +68,6 @@ describe('ExplorationStatesService', () => {
     changeListService = TestBed.inject(ChangeListService);
     contextService = TestBed.inject(ContextService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
       () => 0,
@@ -82,7 +79,7 @@ describe('ExplorationStatesService', () => {
     let EXP_ID = '7';
     spyOn(contextService, 'getExplorationId').and.returnValue(EXP_ID);
 
-    answerGroup = answerGroupObjectFactory.createFromBackendDict(
+    answerGroup = AnswerGroup.createFromBackendDict(
       {
         rule_specs: [
           {

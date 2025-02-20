@@ -25,7 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {State} from 'domain/state/StateObjectFactory';

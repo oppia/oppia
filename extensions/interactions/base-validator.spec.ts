@@ -27,9 +27,7 @@
 import {AppConstants} from 'app.constants';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // interaction validators is upgraded to Angular 8.
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {UpgradedServices} from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -54,14 +52,9 @@ describe('Interaction validator', function () {
   beforeEach(
     angular.mock.module('oppia', function ($provide) {
       $provide.value(
-        'AnswerGroupObjectFactory',
-        new AnswerGroupObjectFactory(new OutcomeObjectFactory())
-      );
-      $provide.value(
         'baseInteractionValidationService',
         new baseInteractionValidationService()
       );
-      $provide.value('OutcomeObjectFactory', new OutcomeObjectFactory());
     })
   );
 
@@ -69,8 +62,6 @@ describe('Interaction validator', function () {
     angular.mock.inject(function ($injector, $rootScope) {
       bivs = $injector.get('baseInteractionValidationService');
       WARNING_TYPES = AppConstants.WARNING_TYPES;
-      agof = $injector.get('AnswerGroupObjectFactory');
-      oof = $injector.get('OutcomeObjectFactory');
 
       currentState = 'First State';
       otherState = 'Second State';

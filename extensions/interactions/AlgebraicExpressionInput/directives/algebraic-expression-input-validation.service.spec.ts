@@ -20,16 +20,14 @@ import {TestBed} from '@angular/core/testing';
 
 import {
   AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {
   AlgebraicExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import {
   Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {AlgebraicExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 
@@ -43,7 +41,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: AlgebraicExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -52,12 +49,10 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(AlgebraicExpressionInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -97,7 +92,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       'AlgebraicExpressionInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
