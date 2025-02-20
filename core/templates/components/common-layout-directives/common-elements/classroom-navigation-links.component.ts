@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {
   ClassroomBackendApiService,
@@ -89,10 +88,3 @@ export class ClassroomNavigationLinksComponent implements OnInit {
       });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaClassroomNavigationLinks',
-  downgradeComponent({
-    component: ClassroomNavigationLinksComponent,
-  }) as angular.IDirectiveFactory
-);

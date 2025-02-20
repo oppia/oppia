@@ -20,7 +20,6 @@
 
 import {StateCard} from 'domain/state_card/state-card.model';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ExplorationPlayerStateService} from './exploration-player-state.service';
@@ -54,10 +53,3 @@ export class ConversationFlowService {
     return !card.isInteractionInline();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ConversationFlowService',
-    downgradeInjectable(ConversationFlowService)
-  );

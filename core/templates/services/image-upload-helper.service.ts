@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {SvgSanitizerService} from './svg-sanitizer.service';
@@ -131,10 +130,3 @@ export class ImageUploadHelperService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ImageUploadHelperService',
-    downgradeInjectable(ImageUploadHelperService)
-  );

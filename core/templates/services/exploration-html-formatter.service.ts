@@ -16,7 +16,6 @@
  * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -206,10 +205,3 @@ export class ExplorationHtmlFormatterService {
     return element.outerHTML;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationHtmlFormatterService',
-    downgradeInjectable(ExplorationHtmlFormatterService)
-  );

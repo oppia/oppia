@@ -17,7 +17,6 @@
  * domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -122,10 +121,3 @@ export class AnswerGroupObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AnswerGroupObjectFactory',
-    downgradeInjectable(AnswerGroupObjectFactory)
-  );
