@@ -607,7 +607,10 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']
       );
     upgradedServices['NumberWithUnitsRulesService'] =
-      new NumberWithUnitsRulesService(upgradedServices['UtilsService']);
+      new NumberWithUnitsRulesService(
+        upgradedServices['NumberWithUnitsObjectFactory'],
+        upgradedServices['UtilsService']
+      );
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'],
       upgradedServices['Title']

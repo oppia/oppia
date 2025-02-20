@@ -17,7 +17,6 @@
  * domain objects.
  */
 
-import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -27,7 +26,6 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Units} from 'domain/objects/units.model';
 import {
   DragAndDropAnswer,
   FractionAnswer,
@@ -112,7 +110,7 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer
       ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = new NumberWithUnitsObjectFactory(new UnitsObjectFactory())
+      correctAnswer = new NumberWithUnitsObjectFactory()
         .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
         .toString();
     } else if (interactionId === 'DragAndDropSortInput') {

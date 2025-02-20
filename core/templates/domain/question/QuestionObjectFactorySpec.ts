@@ -21,7 +21,6 @@
 import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {Units} from 'domain/objects/units.model';
 import {WrittenTranslationObjectFactory} from 'domain/exploration/WrittenTranslationObjectFactory';
 import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {UpgradedServices} from 'services/UpgradedServices';

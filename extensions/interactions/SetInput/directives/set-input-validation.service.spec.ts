@@ -68,7 +68,9 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
 
-    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
 
     createAnswerGroupByRules = rules =>
       AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
