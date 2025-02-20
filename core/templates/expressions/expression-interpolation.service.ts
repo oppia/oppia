@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {convertHtmlToUnicode} from 'filters/convert-html-to-unicode.filter';
 import {ExpressionEvaluatorService} from 'expressions/expression-evaluator.service';
@@ -110,10 +109,3 @@ export class ExpressionInterpolationService {
     return allParams.sort();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionInterpolationService',
-    downgradeInjectable(ExpressionInterpolationService)
-  );

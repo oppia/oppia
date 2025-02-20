@@ -23,7 +23,6 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
 import {Rubric} from 'domain/skill/rubric.model';
@@ -238,10 +237,3 @@ export class RubricsEditorComponent {
     this.rubric = this.rubrics[this.selectedRubricIndex];
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaRubricsEditor',
-    downgradeComponent({component: RubricsEditorComponent})
-  );

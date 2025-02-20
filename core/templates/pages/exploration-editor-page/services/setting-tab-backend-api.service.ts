@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for Setting tab;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -38,10 +37,3 @@ export class SettingTabBackendApiService {
     return this.http.get<SettingTabBackendDict>(url).toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SettingTabBackendApiService',
-    downgradeInjectable(SettingTabBackendApiService)
-  );

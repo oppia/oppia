@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
@@ -371,10 +370,3 @@ export class QuestionPlayerEngineService {
     return answerIsCorrect;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionPlayerEngineService',
-    downgradeInjectable(QuestionPlayerEngineService)
-  );

@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
@@ -154,10 +153,3 @@ export class NumericExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumericExpressionInputValidationService',
-    downgradeInjectable(NumericExpressionInputValidationService)
-  );

@@ -15,7 +15,6 @@
 /**
  * @fileoverview A data service that stores the current state content.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -43,7 +42,3 @@ export class StateContentService extends StatePropertyService<SubtitledHtml> {
     super.init(stateName, value);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateContentService', downgradeInjectable(StateContentService));
