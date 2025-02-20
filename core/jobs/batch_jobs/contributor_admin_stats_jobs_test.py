@@ -1964,47 +1964,56 @@ class LogSuggestionAndStatsJobTests(ContributorDashboardTest):
 
     def test_job_output(self) -> None:
         self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps()  # pylint: disable=line-too-long
         self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_with_invalid_topic.update_timestamps()
         self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
         self.question_review_model_1.update_timestamps()
-        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_review_model_with_invalid_topic.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
         self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.topic_model_1.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.story_1.update_timestamps()
+        self.exp_context_1.update_timestamps()
 
         self.put_multi([
             self.translation_contribution_model_1,
+            self.translation_contribution_model_with_invalid_topic,
             self.translation_review_model_1,
+            self.translation_review_model_with_invalid_topic,
             self.question_contribution_model_1,
+            self.question_contribution_model_with_invalid_topic,
             self.question_review_model_1,
+            self.question_review_model_with_invalid_topic,
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_model,
             self.translation_suggestion_rejected_model_user1,
-            self.translation_suggestion_rejected_model_user2
+            self.translation_suggestion_rejected_model_user2,
+            self.topic_model_1,
+            self.exp_1,
+            self.story_1,
+            self.exp_context_1
         ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout=(
                 'Question Suggestions Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Question Contribution Stats Models SUCCESS: 1')), 
+                'Question Contribution Stats Models SUCCESS: 2')), 
             job_run_result.JobRunResult(stdout=(
                 'Translation Suggestions Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Translation Contribution Stats Models SUCCESS: 1')),
+                'Translation Contribution Stats Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Translation Review Stats Models SUCCESS: 1')),
+                'Translation Review Stats Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Question Review Stats Models SUCCESS: 1')), 
+                'Question Review Stats Models SUCCESS: 2')), 
             job_run_result.JobRunResult(stdout=(
-                'Output Logs SUCCESS: 5')),
-            job_run_result.JobRunResult(stdout=(
-                '<==Question Review Stats (Reviewer ID: user1):==>\n-Review '
-                'Stats Model ID: 20\n--Topic ID: topic1\n--Reviewed Questions:'
-                ' 10\n--Accepted Questions: 5\n--Accepted Questions (reviewer '
-                'edits): 3\n--First Date: 2023-04-02\n--Last Date: 2023-05-02'
-                '\n-----------------------------------------------------------'
-                '-')),
+                'Output Logs SUCCESS: 8')),
             job_run_result.JobRunResult(stdout=(
                 '<==Translation Review Stats (Language: es, Reviewer ID: user1'
                 '):==>\n-Reviewer Stats Model ID: 9\n--Topic ID: topic1\n--'
@@ -2013,6 +2022,27 @@ class LogSuggestionAndStatsJobTests(ContributorDashboardTest):
                 '2023-04-02\n--Last Date: 2023-05-02\n------------------------'
                 '------------------------------------')),
             job_run_result.JobRunResult(stdout=(
+                '<==Translation Review Stats (Language: es, Reviewer ID: user3'
+                '):==>\n-Reviewer Stats Model ID: 13\n--Topic ID: '
+                'invalid_topic\n--Reviewed Translations: 20\n--Accepted '
+                'Translations: 15\n--Accepted Translations (reviewer edits): '
+                '10\n--First Date: 2023-04-02\n--Last Date: 2023-05-02\n------'
+                '------------------------------------------------------')),
+            job_run_result.JobRunResult(stdout=(
+                '<==Question Review Stats (Reviewer ID: user1):==>\n-Review '
+                'Stats Model ID: 20\n--Topic ID: topic1\n--Reviewed Questions'
+                ': 10\n--Accepted Questions: 5\n--Accepted Questions (reviewer'
+                ' edits): 3\n--First Date: 2023-04-02\n--Last Date: 2023-05-02'
+                '\n-----------------------------------------------------------'
+                '-')),
+            job_run_result.JobRunResult(stdout=(
+                '<==Question Review Stats (Reviewer ID: user3):==>\n-Review '
+                'Stats Model ID: 24\n--Topic ID: invalid_topic\n--Reviewed '
+                'Questions: 10\n--Accepted Questions: 5\n--Accepted Questions '
+                '(reviewer edits): 3\n--First Date: 2023-04-02\n--Last Date: '
+                '2023-05-02\n-------------------------------------------------'
+                '-----------')),
+            job_run_result.JobRunResult(stdout=(
                 '<==Translation Suggestion and Contribution Stats (Language: '
                 'hi, Contributor ID: user1):==>\n-Suggestion ID: 31\n--Target '
                 'ID: exp1\n--Target Version (at submission): 1\n--Status: '
@@ -2020,8 +2050,12 @@ class LogSuggestionAndStatsJobTests(ContributorDashboardTest):
                 '\n--Submitted Translations: 1\n--Accepted Translations: 1\n--'
                 'Accepted Translations (without edits): 0\n--Rejected '
                 'Translations: 0\n--Contribution Dates: [datetime.date(2022, '
-                '5, 2)]\n-----------------------------------------------------'
-                '-------')),
+                '5, 2)]\n-Contribution Stats Model ID: 6\n--Topic ID: '
+                'invalid_topic\n--Submitted Translations: 20\n--Accepted '
+                'Translations: 0\n--Accepted Translations (without edits): '
+                '0\n--Rejected Translations: 1\n--Contribution Dates: '
+                '[datetime.date(2022, 5, 2), datetime.date(2023, 4, 2)]\n-----'
+                '-------------------------------------------------------')),
             job_run_result.JobRunResult(stdout=(
                 '<==Translation Suggestion and Contribution Stats (Language: '
                 'es, Contributor ID: user2):==>\n-Suggestion ID: 32\n--Target '
@@ -2029,16 +2063,23 @@ class LogSuggestionAndStatsJobTests(ContributorDashboardTest):
                 'rejected\n---------------------------------------------------'
                 '---------')),
             job_run_result.JobRunResult(stdout=(
-                '<==Question Suggestion and Contribution Stats (Contributor '
-                'ID: user1):==>\n-Suggestion ID: 25\n--Target ID: exp1\n--'
+                '<==Question Suggestion and Contribution Stats (Contributor ID'
+                ': user1):==>\n-Suggestion ID: 25\n--Target ID: exp1\n--'
                 'Target Version (at submission): 1\n--Status: rejected\n-'
                 'Suggestion ID: 27\n--Target ID: exp1\n--Target Version (at '
                 'submission): 1\n--Status: accepted\n-Contribution Stats '
-                'Model ID: 14\n--Topic ID: topic1\n--Submitted Questions: 10\n'
-                '--Accepted Questions: 5\n--Accepted Questions (without '
-                'edits): 3\n--First Date: 2023-04-02\n--Last Date: '
-                '2023-05-02\n-------------------------------------------------'
-                '-----------'))
+                'Model ID: 14\n--Topic ID: topic1\n--Submitted Questions: 10'
+                '\n--Accepted Questions: 5\n--Accepted Questions (without '
+                'edits): 3\n--First Date: 2023-04-02\n--Last Date: 2023-05-02'
+                '\n-----------------------------------------------------------'
+                '-')),
+            job_run_result.JobRunResult(stdout=(
+                '<==Question Suggestion and Contribution Stats (Contributor ID'
+                ': user3):==>\n-Contribution Stats Model ID: 19\n--Topic ID: '
+                'invalid_topic\n--Submitted Questions: 10\n--Accepted '
+                'Questions: 5\n--Accepted Questions (without edits): 3\n'
+                '--First Date: 2023-04-02\n--Last Date: 2023-05-02\n----------'
+                '--------------------------------------------------'))
         ])
 
 
@@ -2051,46 +2092,56 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJobTests(
 
     def test_job_output(self) -> None:
         self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps()  # pylint: disable=line-too-long
         self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_with_invalid_topic.update_timestamps()
         self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
         self.question_review_model_1.update_timestamps()
-        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_review_model_with_invalid_topic.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
         self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.topic_model_1.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.story_1.update_timestamps()
+        self.exp_context_1.update_timestamps()
 
         self.put_multi([
             self.translation_contribution_model_1,
+            self.translation_contribution_model_with_invalid_topic,
             self.translation_review_model_1,
+            self.translation_review_model_with_invalid_topic,
             self.question_contribution_model_1,
+            self.question_contribution_model_with_invalid_topic,
             self.question_review_model_1,
+            self.question_review_model_with_invalid_topic,
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_model,
             self.translation_suggestion_rejected_model_user1,
-            self.translation_suggestion_rejected_model_user2
+            self.translation_suggestion_rejected_model_user2,
+            self.topic_model_1,
+            self.exp_1,
+            self.story_1,
+            self.exp_context_1
         ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(stdout=(
                 'Question Suggestions Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Question Contribution Stats Models SUCCESS: 1')), 
+                'Question Contribution Stats Models SUCCESS: 2')), 
             job_run_result.JobRunResult(stdout=(
                 'Translation Suggestions Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Translation Contribution Stats Models SUCCESS: 1')),
+                'Translation Contribution Stats Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Translation Review Stats Models SUCCESS: 1')),
+                'Translation Review Stats Models SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'Question Review Stats Models SUCCESS: 1')), 
+                'Question Review Stats Models SUCCESS: 2')), 
             job_run_result.JobRunResult(stdout=(
-                'Output Logs SUCCESS: 5')),
-            job_run_result.JobRunResult(stdout=(
-                '{\n  type: translation_review,\n  language_code: es,\n  '
-                'reviewer_id: user1,\n  topic_ids_with_review_stats: [topic1,]'
-                ',\n  topic_ids_with_review_stats_COUNT: 1,\n  '
-                'valid_topic_ids_with_review_stats: [topic1,],\n  '
-                'valid_topic_ids_with_review_stats_COUNT: 1,\n},\n')), 
+                'Output Logs SUCCESS: 8')),
             job_run_result.JobRunResult(stdout=(
                 '{\n  type: question_review,\n  reviewer_id: user1,\n  '
                 'topic_ids_with_review_stats: [topic1,],\n  '
@@ -2098,29 +2149,55 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJobTests(
                 'valid_topic_ids_with_review_stats: [topic1,],\n  '
                 'valid_topic_ids_with_review_stats_COUNT: 1,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                '{\n  type: translation_contribution,\n  language_code: hi,\n '
-                ' contributor_id: user1,\n  '
-                'topic_ids_with_translation_suggestions: [],\n  '
-                'topic_ids_with_translation_suggestions_COUNT: 0,\n  '
-                'topic_ids_with_contribution_stats: [topic2,],\n  '
-                'topic_ids_with_contribution_stats_COUNT: 1,\n  '
+                '{\n  type: question_review,\n  reviewer_id: user3,\n  '
+                'topic_ids_with_review_stats: [invalid_topic,],\n  '
+                'topic_ids_with_review_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_review_stats: [],\n  '
+                'valid_topic_ids_with_review_stats_COUNT: 0,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '{\n  type: translation_review,\n  language_code: es,\n  '
+                'reviewer_id: user1,\n  topic_ids_with_review_stats: '
+                '[topic1,],\n  topic_ids_with_review_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_review_stats: [topic1,],\n  '
+                'valid_topic_ids_with_review_stats_COUNT: 1,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '{\n  type: translation_review,\n  language_code: es,\n  '
+                'reviewer_id: user3,\n  topic_ids_with_review_stats: '
+                '[invalid_topic,],\n  topic_ids_with_review_stats_COUNT: 1,\n'
+                '  valid_topic_ids_with_review_stats: [],\n  '
+                'valid_topic_ids_with_review_stats_COUNT: 0,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '{\n  type: translation_contribution,\n  language_code: hi,'
+                '\n  contributor_id: user1,\n  '
+                'topic_ids_with_translation_suggestions: [topic1,],\n  '
+                'topic_ids_with_translation_suggestions_COUNT: 1,\n  '
+                'topic_ids_with_contribution_stats: [invalid_topic,topic2,],'
+                '\n  topic_ids_with_contribution_stats_COUNT: 2,\n  '
                 'valid_topic_ids_with_contribution_stats: [topic2,],\n  '
                 'valid_topic_ids_with_contribution_stats_COUNT: 1,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                '{\n  type: translation_contribution,\n  language_code: es,\n '
-                ' contributor_id: user2,\n  '
-                'topic_ids_with_translation_suggestions: [],\n  '
-                'topic_ids_with_translation_suggestions_COUNT: 0,\n  '
+                '{\n  type: translation_contribution,\n  language_code: es,'
+                '\n  contributor_id: user2,\n  '
+                'topic_ids_with_translation_suggestions: [topic1,],\n  '
+                'topic_ids_with_translation_suggestions_COUNT: 1,\n  '
                 'topic_ids_with_contribution_stats: [],\n  '
                 'topic_ids_with_contribution_stats_COUNT: 0,\n  '
                 'valid_topic_ids_with_contribution_stats: [],\n  '
                 'valid_topic_ids_with_contribution_stats_COUNT: 0,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                '{\n  type: question_contribution,\n  contributor_id: user1,\n '
-                ' topic_ids_with_question_suggestions: [],\n  '
-                'topic_ids_with_question_suggestions_COUNT: 0,\n  '
+                '{\n  type: question_contribution,\n  contributor_id: user1,'
+                '\n  topic_ids_with_question_suggestions: [topic1,],\n  '
+                'topic_ids_with_question_suggestions_COUNT: 1,\n  '
                 'topic_ids_with_contribution_stats: [topic1,],\n  '
                 'topic_ids_with_contribution_stats_COUNT: 1,\n  '
                 'valid_topic_ids_with_contribution_stats: [topic1,],\n  '
-                'valid_topic_ids_with_contribution_stats_COUNT: 1,\n},\n'))
+                'valid_topic_ids_with_contribution_stats_COUNT: 1,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '{\n  type: question_contribution,\n  contributor_id: user3,'
+                '\n  topic_ids_with_question_suggestions: [],\n  '
+                'topic_ids_with_question_suggestions_COUNT: 0,\n  '
+                'topic_ids_with_contribution_stats: [invalid_topic,],\n  '
+                'topic_ids_with_contribution_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_contribution_stats: [],\n  '
+                'valid_topic_ids_with_contribution_stats_COUNT: 0,\n},\n'))
         ])

@@ -90,7 +90,6 @@ import {IntEditorComponent} from 'objects/templates/int-editor.component';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ComponentRef} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
@@ -351,10 +350,3 @@ export class ObjectEditorComponent
     this.componentRef.changeDetectorRef.detach();
   }
 }
-
-angular.module('oppia').directive(
-  'objectEditor',
-  downgradeComponent({
-    component: ObjectEditorComponent,
-  })
-);

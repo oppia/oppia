@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'copier',
@@ -39,10 +38,3 @@ export class CopierComponent {
     return '/value_generator_handler/' + this.generatorId;
   }
 }
-
-angular.module('oppia').directive(
-  'copier',
-  downgradeComponent({
-    component: CopierComponent,
-  })
-);

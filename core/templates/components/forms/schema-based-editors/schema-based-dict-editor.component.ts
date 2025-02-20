@@ -25,7 +25,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {IdGenerationService} from 'services/id-generation.service';
 import {
   Schema,
@@ -121,10 +120,3 @@ export class SchemaBasedDictEditorComponent
     return property.description || '[' + property.name + ']';
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedDictEditor',
-  downgradeComponent({
-    component: SchemaBasedDictEditorComponent,
-  })
-);

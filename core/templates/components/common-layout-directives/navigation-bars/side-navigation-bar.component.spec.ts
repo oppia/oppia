@@ -151,6 +151,14 @@ describe('Side Navigation Bar Component', () => {
     expect(componentInstance.aboutSubmenuIsShown).toBeFalse();
   });
 
+  it('should toggle impact-report submenu', () => {
+    componentInstance.impactReportSubmenuIsShown = false;
+    componentInstance.toggleImpactReportSubmenu();
+    expect(componentInstance.impactReportSubmenuIsShown).toBeTrue();
+    componentInstance.toggleImpactReportSubmenu();
+    expect(componentInstance.impactReportSubmenuIsShown).toBeFalse();
+  });
+
   it('should get static image url', () => {
     expect(componentInstance.getStaticImageUrl('test')).toEqual(imageUrl);
   });

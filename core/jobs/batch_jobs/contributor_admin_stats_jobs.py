@@ -30,7 +30,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, Optional, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -884,11 +884,12 @@ class AuditGenerateContributorAdminStatsJob(
 
 
 class LogSuggestionAndStatsJob(base_jobs.JobBase):
-    """Job that returns suggestion models and their corresponding
-    contribution and reviewer stats as job run results.
+    """Job that returns suggestion models and their corresponding contribution
+    and reviewer stats as job run results.
     """
 
-    DATASTORE_UPDATES_ALLOWED = False  # We're not updating any datastore.
+    # We're not updating any datastore.
+    DATASTORE_UPDATES_ALLOWED = False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns suggestion models and corresponding contribution and
@@ -968,7 +969,10 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Translation Suggestions and Stats' >> beam.CoGroupByKey()
             | 'Format Translation Contribution Output' >> beam.MapTuple(
-                self.format_translation_contribution_output)
+                lambda key, value:
+                    self.format_translation_contribution_output(
+                        key, value['suggestion'], value['contribution_stats']
+                    ))
         )
 
         translation_review = (
@@ -977,7 +981,10 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Translation review Stats' >> beam.CoGroupByKey()
             | 'Format Translation Review Output' >> beam.MapTuple(
-                self.format_translation_review_output)
+                lambda key, value:
+                    self.format_translation_review_output(
+                        key, value['review_stats']
+                    ))
         )
 
         # Pair question suggestions with their stats.
@@ -1009,7 +1016,10 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Question Suggestions and Stats' >> beam.CoGroupByKey()
             | 'Format Question Contribution Output' >> beam.MapTuple(
-                self.format_question_contribution_output)
+                lambda key, value:
+                    self.format_question_contribution_output(
+                        key, value['suggestion'], value['contribution_stats']
+                    ))
         )
 
         question_review = (
@@ -1018,7 +1028,10 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Question review Stats' >> beam.CoGroupByKey()
             | 'Format Question Review Output' >> beam.MapTuple(
-                self.format_question_review_output)
+                lambda key, value:
+                    self.format_question_review_output(
+                        key, value['review_stats']
+                    ))
         )
 
         # Merge both translation and question outputs.
@@ -1116,106 +1129,170 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             | 'Merge all results' >> beam.Flatten()
         )
 
-    def format_translation_contribution_output(self, key, group):
+    def format_translation_contribution_output(
+        self,
+        key: Tuple[str, str],
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        contribution_stats: List[
+            suggestion_models.TranslationContributionStatsModel]
+    ) -> str:
         """Formats the output for translation suggestions and contribution
-        stats."""
-        suggestions = group['suggestion']
-        contribution_stats = group['contribution_stats']
+        stats.
+
+        Args:
+            key: tuple(str, str). A tuple containing the language code and
+                contributor ID.
+            suggestions: list(GeneralSuggestionModel). A lists of translation
+                suggestion models.
+            contribution_stats: list(TranslationContributionStatsModel). A
+                lists of translation contribution stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
-        output_logs.append('<==Translation Suggestion and Contribution '
-            f'Stats (Language: {key[0]}, Contributor ID: {key[1]}):==>')
+        output_logs.append(
+            '<==Translation Suggestion and Contribution Stats (Language: '
+            f'{key[0]}, Contributor ID: {key[1]}):==>')
 
         for suggestion in suggestions:
             output_logs.append(f'-Suggestion ID: {suggestion.id}')
             output_logs.append(f'--Target ID: {suggestion.target_id}')
-            output_logs.append('--Target Version (at submission): '
+            output_logs.append(
+                '--Target Version (at submission): '
                 f'{suggestion.target_version_at_submission}')
             output_logs.append(f'--Status: {suggestion.status}')
 
         for stat in contribution_stats:
             output_logs.append(f'-Contribution Stats Model ID: {stat.id}')
             output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append('--Submitted Translations: '
+            output_logs.append(
+                '--Submitted Translations: '
                 f'{stat.submitted_translations_count}')
-            output_logs.append('--Accepted Translations: '
-                f'{stat.accepted_translations_count}')
-            output_logs.append('--Accepted Translations (without edits): '
+            output_logs.append(
+                f'--Accepted Translations: {stat.accepted_translations_count}')
+            output_logs.append(
+                '--Accepted Translations (without edits): '
                 f'{stat.accepted_translations_without_reviewer_edits_count}')
-            output_logs.append('--Rejected Translations: '
-                f'{stat.rejected_translations_count}')
-            output_logs.append('--Contribution Dates: '
-                f'{stat.contribution_dates}')
+            output_logs.append(
+                f'--Rejected Translations: {stat.rejected_translations_count}')
+            output_logs.append(
+                f'--Contribution Dates: {stat.contribution_dates}')
 
-        output_logs.append('--------------------------------------------------'
-            '----------')
+        output_logs.append(
+            '------------------------------------------------------------')
 
         return '\n'.join(output_logs)
 
-    def format_translation_review_output(self, key, group):
-        """Formats the output for translation review stats."""
-        review_stats = group['review_stats']
+    def format_translation_review_output(
+        self,
+        key: Tuple[str, str],
+        review_stats: List[suggestion_models.TranslationReviewStatsModel]
+    ) -> str:
+        """Formats the output for translation review stats.
+
+        Args:
+            key: tuple(str, str). A tuple containing the language code and
+                contributor ID.
+            review_stats: list(TranslationReviewStatsModel). A lists of
+                translation review stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
-        output_logs.append(f'<==Translation Review Stats (Language: {key[0]},'
-        f' Reviewer ID: {key[1]}):==>')
+        output_logs.append(
+            f'<==Translation Review Stats (Language: {key[0]}, Reviewer ID: '
+            f'{key[1]}):==>')
 
         for stat in review_stats:
             output_logs.append(f'-Reviewer Stats Model ID: {stat.id}')
             output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append('--Reviewed Translations: '
-                f'{stat.reviewed_translations_count}')
-            output_logs.append('--Accepted Translations: '
-                f'{stat.accepted_translations_count}')
-            output_logs.append('--Accepted Translations (reviewer edits): '
+            output_logs.append(
+                f'--Reviewed Translations: {stat.reviewed_translations_count}')
+            output_logs.append(
+                f'--Accepted Translations: {stat.accepted_translations_count}')
+            output_logs.append(
+                '--Accepted Translations (reviewer edits): '
                 f'{stat.accepted_translations_with_reviewer_edits_count}')
-            output_logs.append('--First Date: '
-                f'{stat.first_contribution_date}')
+            output_logs.append(
+                f'--First Date: {stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append('--------------------------------------------------'
-            '----------')
+        output_logs.append(
+            '------------------------------------------------------------')
 
         return '\n'.join(output_logs)
 
-    def format_question_contribution_output(self, key, group):
-        """Formats the output for question suggestions and contribution
-        stats."""
-        suggestions = group['suggestion']
-        contribution_stats = group['contribution_stats']
+    def format_question_contribution_output(
+        self,
+        key: Tuple[str, str],
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        contribution_stats: List[
+            suggestion_models.QuestionContributionStatsModel]
+    ) -> str:
+        """Formats the output for question suggestions and contribution stats.
+
+        Args:
+            key: str. Contributor ID.
+            suggestions: list(GeneralSuggestionModel). A lists of question
+                suggestion models.
+            contribution_stats: List(QuestionContributionStatsModel). A lists
+                of question contribution stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
-        output_logs.append('<==Question Suggestion and Contribution Stats '
-            f'(Contributor ID: {key}):==>')
+        output_logs.append(
+            '<==Question Suggestion and Contribution Stats (Contributor ID: '
+            f'{key}):==>')
 
         for suggestion in suggestions:
             output_logs.append(f'-Suggestion ID: {suggestion.id}')
             output_logs.append(f'--Target ID: {suggestion.target_id}')
-            output_logs.append('--Target Version (at submission): '
+            output_logs.append(
+                '--Target Version (at submission): '
                 f'{suggestion.target_version_at_submission}')
             output_logs.append(f'--Status: {suggestion.status}')
 
         for stat in contribution_stats:
             output_logs.append(f'-Contribution Stats Model ID: {stat.id}')
             output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append('--Submitted Questions: '
-                f'{stat.submitted_questions_count}')
-            output_logs.append('--Accepted Questions: '
-                f'{stat.accepted_questions_count}')
-            output_logs.append('--Accepted Questions (without edits): '
+            output_logs.append(
+                f'--Submitted Questions: {stat.submitted_questions_count}')
+            output_logs.append(
+                f'--Accepted Questions: {stat.accepted_questions_count}')
+            output_logs.append(
+                '--Accepted Questions (without edits): '
                 f'{stat.accepted_questions_without_reviewer_edits_count}')
-            output_logs.append('--First Date: '
-                f'{stat.first_contribution_date}')
+            output_logs.append(
+                f'--First Date: {stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append('--------------------------------------------------'
-            '----------')
+        output_logs.append(
+            '------------------------------------------------------------')
 
         return '\n'.join(output_logs)
 
-    def format_question_review_output(self, key, group):
-        """Formats the output for question review stats."""
-        review_stats = group['review_stats']
+    def format_question_review_output(
+        self,
+        key: Tuple[str, str],
+        review_stats: List[suggestion_models.QuestionReviewStatsModel]
+    ) -> str:
+        """Formats the output for question review stats.
+
+        Args:
+            key: str. Contributor ID.
+            review_stats: list(QuestionReviewStatsModel). A lists of question
+                review stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
         output_logs.append(
@@ -1224,18 +1301,19 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
         for stat in review_stats:
             output_logs.append(f'-Review Stats Model ID: {stat.id}')
             output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append('--Reviewed Questions: '
-                f'{stat.reviewed_questions_count}')
-            output_logs.append('--Accepted Questions: '
-                f'{stat.accepted_questions_count}')
-            output_logs.append('--Accepted Questions (reviewer edits): '
+            output_logs.append(
+                f'--Reviewed Questions: {stat.reviewed_questions_count}')
+            output_logs.append(
+                f'--Accepted Questions: {stat.accepted_questions_count}')
+            output_logs.append(
+                '--Accepted Questions (reviewer edits): '
                 f'{stat.accepted_questions_with_reviewer_edits_count}')
-            output_logs.append('--First Date: '
-                f'{stat.first_contribution_date}')
+            output_logs.append(
+                f'--First Date: {stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append('--------------------------------------------------'
-            '----------')
+        output_logs.append(
+            '------------------------------------------------------------')
 
         return '\n'.join(output_logs)
 
@@ -1245,7 +1323,8 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
     their corresponding contribution and reviewer stats as job run results.
     """
 
-    DATASTORE_UPDATES_ALLOWED = False  # We're not updating any datastore.
+    # We're not updating any datastore.
+    DATASTORE_UPDATES_ALLOWED = False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns topic ids accociated to suggestion models and
@@ -1325,7 +1404,10 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Translation Suggestions and Stats' >> beam.CoGroupByKey()
             | 'Format Translation Contribution Output' >> beam.MapTuple(
-                self.format_translation_contribution_output)
+                lambda key, value:
+                    self.format_translation_contribution_output(
+                        key, value['suggestion'], value['contribution_stats']
+                    ))
         )
 
         translation_review = (
@@ -1334,7 +1416,10 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Translation review Stats' >> beam.CoGroupByKey()
             | 'Format Translation Review Output' >> beam.MapTuple(
-                self.format_translation_review_output)
+                lambda key, value:
+                    self.format_translation_review_output(
+                        key, value['review_stats']
+                    ))
         )
 
         # Pair question suggestions with their stats.
@@ -1366,7 +1451,10 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Question Suggestions and Stats' >> beam.CoGroupByKey()
             | 'Format Question Contribution Output' >> beam.MapTuple(
-                self.format_question_contribution_output)
+                lambda key, value:
+                    self.format_question_contribution_output(
+                        key, value['suggestion'], value['contribution_stats']
+                    ))
         )
 
         question_review = (
@@ -1375,7 +1463,10 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
             }
             | 'Join Question review Stats' >> beam.CoGroupByKey()
             | 'Format Question Review Output' >> beam.MapTuple(
-                self.format_question_review_output)
+                lambda key, value:
+                    self.format_question_review_output(
+                        key, value['review_stats']
+                    ))
         )
 
         # Merge both translation and question outputs.
@@ -1473,16 +1564,32 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
             | 'Merge all results' >> beam.Flatten()
         )
 
-    def format_translation_contribution_output(self, key, group):
-        """Formats the output for translation suggestions and
-        contribution stats."""
-        suggestions = group['suggestion']
-        contribution_stats = group['contribution_stats']
+    def format_translation_contribution_output(
+        self,
+        key: Tuple[str, str],
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        contribution_stats: List[
+            suggestion_models.TranslationContributionStatsModel]
+    ) -> str:
+        """Formats the output for translation suggestions and contribution
+        stats.
+
+        Args:
+            key: tuple(str, str). A tuple containing the language code and
+                contributor ID.
+            suggestions: list(GeneralSuggestionModel). A lists of translation
+                suggestion models.
+            contribution_stats: list(TranslationContributionStatsModel). A
+                lists of translation contribution stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
         exp_ids_with_translation_suggestions = sorted(
             {v.target_id for v in suggestions})
-        
+
         topic_ids_with_translation_submissions_list = []
         with datastore_services.get_ndb_context():
             for exp_id in exp_ids_with_translation_suggestions:
@@ -1496,10 +1603,10 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
 
         topic_ids_with_translation_submissions = sorted(
             set(topic_ids_with_translation_submissions_list))
-        
+
         topic_ids_with_contribution_stats = sorted(
             {v.topic_id for v in contribution_stats})
-        
+
         for stat in contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
@@ -1534,15 +1641,28 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
         output_logs.append('},\n')
 
         return ''.join(output_logs)
-    
-    def format_translation_review_output(self, key, group):
-        """Formats the output for translation review stats."""
-        review_stats = group['review_stats']
+
+    def format_translation_review_output(
+        self,
+        key: Tuple[str, str],
+        review_stats: List[suggestion_models.TranslationReviewStatsModel]
+    ) -> str:
+        """Formats the output for translation review stats.
+
+        Args:
+            key: tuple(str, str). A tuple containing the language code and
+                contributor ID.
+            review_stats: list(TranslationReviewStatsModel). A lists of
+                translation review stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
         topic_ids_with_review_stats = sorted(
             {v.topic_id for v in review_stats})
-        
+
         for stat in review_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
@@ -1571,11 +1691,25 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
 
         return ''.join(output_logs)
 
-    def format_question_contribution_output(self, key, group):
-        """Formats the output for question suggestions and
-        contribution stats."""
-        suggestions = group['suggestion']
-        contribution_stats = group['contribution_stats']
+    def format_question_contribution_output(
+        self,
+        key: Tuple[str, str],
+        suggestions: List[suggestion_models.GeneralSuggestionModel],
+        contribution_stats: List[
+            suggestion_models.QuestionContributionStatsModel]
+    ) -> str:
+        """Formats the output for question suggestions and contribution stats.
+
+        Args:
+            key: str. Contributor ID.
+            suggestions: list(GeneralSuggestionModel). A lists of question
+                suggestion models.
+            contribution_stats: List(QuestionContributionStatsModel). A lists
+                of question contribution stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
         by_topic_id = lambda m: m.topic_id
 
@@ -1632,9 +1766,21 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
 
         return ''.join(output_logs)
 
-    def format_question_review_output(self, key, group):
-        """Formats the output for question review stats."""
-        review_stats = group['review_stats']
+    def format_question_review_output(
+        self,
+        key: Tuple[str, str],
+        review_stats: List[suggestion_models.QuestionReviewStatsModel]
+    ) -> str:
+        """Formats the output for question review stats.
+
+        Args:
+            key: str. Contributor ID.
+            review_stats: list(QuestionReviewStatsModel). A lists of question
+                review stats models.
+
+        Returns:
+            str. A formatted log string.
+        """
         output_logs = []
 
         topic_ids_with_review_stats = sorted(

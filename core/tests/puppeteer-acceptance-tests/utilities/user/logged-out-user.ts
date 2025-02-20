@@ -70,7 +70,8 @@ const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-const impactReportUrl = testConstants.URLs.ImpactReportUrl;
+const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
+const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
@@ -136,6 +137,8 @@ const mobileSidebarImpactReportButton =
   'a.e2e-mobile-test-sidebar-impact-report-button';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
+const mobileSidebarExpandImpactReportSubMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-impactreport-submenu';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
@@ -644,6 +647,38 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to open the external link by class and text inside it
+   */
+  async openExternalLinkBySelectorAndText(
+    selector: string,
+    linkText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
+
+    const url = await this.page.$$eval(
+      selector,
+      (elements, searchText) => {
+        for (const element of elements) {
+          if (element.textContent?.trim() === searchText) {
+            return element.getAttribute('href');
+          }
+        }
+        return null;
+      },
+      linkText
+    );
+
+    if (!url) {
+      throw new Error(`Link with text "${linkText}" not found.`);
+    }
+
+    if (url !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. Found: ${url}.`);
+    }
+  }
+
+  /**
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
@@ -651,15 +686,28 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.openExternalLink(
+      await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
+      await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
-        impactReportUrl
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2022',
+        impactReport2022Url
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalLink(
+      await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
-        impactReportUrl
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2022',
+        impactReport2022Url
       );
     }
   }
@@ -2214,7 +2262,10 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
+    await this.openExternalLink(
+      impactReportButtonInAboutPage,
+      impactReport2023Url
+    );
   }
 
   /**

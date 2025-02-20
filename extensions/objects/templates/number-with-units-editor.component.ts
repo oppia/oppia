@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
@@ -89,10 +88,3 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'numberWithUnitsEditor',
-  downgradeComponent({
-    component: NumberWithUnitsEditorComponent,
-  }) as angular.IDirectiveFactory
-);
