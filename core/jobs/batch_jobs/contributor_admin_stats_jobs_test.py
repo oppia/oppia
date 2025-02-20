@@ -2086,53 +2086,41 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJobTests(
             job_run_result.JobRunResult(stdout=(
                 'Output Logs SUCCESS: 5')),
             job_run_result.JobRunResult(stdout=(
-                'Translation Reviewer ID: user1, Language code: es\nUnique '
-                'topic IDs with translation review stats: \n- Translation '
-                'Review Stats ID 9\n-- Topic ID: topic1\nUnique topic IDs with'
-                ' translation review stats COUNT: 1\nUnique valid topic IDs '
-                'with translation review stats: \n- Translation Review Stats '
-                'ID 9\n-- Topic ID: topic1\nUnique valid topic IDs with '
-                'translation review stats COUNT: 1\n--------------------------'
-                '----------------------------------')),
+                '{\n  type: translation_review,\n  language_code: es,\n  '
+                'reviewer_id: user1,\n  topic_ids_with_review_stats: [topic1,]'
+                ',\n  topic_ids_with_review_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_review_stats: [topic1,],\n  '
+                'valid_topic_ids_with_review_stats_COUNT: 1,\n},\n')), 
             job_run_result.JobRunResult(stdout=(
-                'Question Reviewer ID: user1\nUnique topic IDs with question '
-                'review stats: \n- Question Review Stats ID 20\n-- Topic ID: '
-                'topic1\nUnique topic IDs with question review stats COUNT: '
-                '1\nUnique valid topic IDs with question review stats: \n- '
-                'Question Review Stats ID 20\n-- Topic ID: topic1\nUnique valid'
-                ' topic IDs with question review stats COUNT: 1\n-------------'
-                '-----------------------------------------------')),
+                '{\n  type: question_review,\n  reviewer_id: user1,\n  '
+                'topic_ids_with_review_stats: [topic1,],\n  '
+                'topic_ids_with_review_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_review_stats: [topic1,],\n  '
+                'valid_topic_ids_with_review_stats_COUNT: 1,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                'Translation submitter ID: user1, Language code: hi\nUnique '
-                'exp IDs with translation suggestion: \n- Exp ID: exp1\n'
-                'Unique topic IDs with translation suggestions COUNT: 0\n'
-                'Unique topic IDs with translation contribution stats: \n- '
-                'Translation Contribution Stats ID 1\n-- Topic ID: topic2\n'
-                'Unique topic IDs with translation contribution stats COUNT: '
-                '1\nUnique valid topic IDs with translation contribution '
-                'stats COUNT: 1\nUnique valid topic IDs with translation '
-                'contribution stats: \n- Translation Contribution Stats ID 1'
-                '\n-- Topic ID: topic2\n---------------------------------------'
-                '---------------------')),
+                '{\n  type: translation_contribution,\n  language_code: hi,\n '
+                ' contributor_id: user1,\n  '
+                'topic_ids_with_translation_suggestions: [],\n  '
+                'topic_ids_with_translation_suggestions_COUNT: 0,\n  '
+                'topic_ids_with_contribution_stats: [topic2,],\n  '
+                'topic_ids_with_contribution_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_contribution_stats: [topic2,],\n  '
+                'valid_topic_ids_with_contribution_stats_COUNT: 1,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                'Translation submitter ID: user2, Language code: es\nUnique '
-                'exp IDs with translation suggestion: \n- Exp ID: exp1\n'
-                'Unique topic IDs with translation suggestions COUNT: 0\n'
-                'Unique topic IDs with translation contribution stats: \n'
-                'Unique topic IDs with translation contribution stats COUNT: '
-                '0\nUnique valid topic IDs with translation contribution '
-                'stats COUNT: 0\nUnique valid topic IDs with translation '
-                'contribution stats: \n---------------------------------------'
-                '---------------------')),
+                '{\n  type: translation_contribution,\n  language_code: es,\n '
+                ' contributor_id: user2,\n  '
+                'topic_ids_with_translation_suggestions: [],\n  '
+                'topic_ids_with_translation_suggestions_COUNT: 0,\n  '
+                'topic_ids_with_contribution_stats: [],\n  '
+                'topic_ids_with_contribution_stats_COUNT: 0,\n  '
+                'valid_topic_ids_with_contribution_stats: [],\n  '
+                'valid_topic_ids_with_contribution_stats_COUNT: 0,\n},\n')),
             job_run_result.JobRunResult(stdout=(
-                'Question submitter ID: user1.\nUnique skill IDs with '
-                'question suggestion: \n- Skill ID: exp1\nUnique topic IDs '
-                'with question suggestions COUNT: 0\nUnique topic IDs with '
-                'question contribution stats: \n- Question Contribution Stats '
-                'ID: 14\n-- Topic ID: topic1\nUnique topic IDs with question '
-                'contribution stats COUNT: 1\nUnique valid topic IDs with '
-                'question contribution stats COUNT: 1\nUnique valid topic IDs '
-                'with question contribution stats: \n- Question Contribution '
-                'Stats ID: 14\n-- Topic ID: topic1\n\n-------------------------'
-                '-----------------------------------'))
+                '{\n  type: question_contribution,\n  contributor_id: user1,\n '
+                ' topic_ids_with_question_suggestions: [],\n  '
+                'topic_ids_with_question_suggestions_COUNT: 0,\n  '
+                'topic_ids_with_contribution_stats: [topic1,],\n  '
+                'topic_ids_with_contribution_stats_COUNT: 1,\n  '
+                'valid_topic_ids_with_contribution_stats: [topic1,],\n  '
+                'valid_topic_ids_with_contribution_stats_COUNT: 1,\n},\n'))
         ])

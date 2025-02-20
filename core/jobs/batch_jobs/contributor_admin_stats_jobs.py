@@ -1147,7 +1147,8 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
             output_logs.append('--Contribution Dates: '
                 f'{stat.contribution_dates}')
 
-        output_logs.append("------------------------------------------------------------")
+        output_logs.append('--------------------------------------------------'
+            '----------')
 
         return '\n'.join(output_logs)
 
@@ -1172,7 +1173,8 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
                 f'{stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append("------------------------------------------------------------")
+        output_logs.append('--------------------------------------------------'
+            '----------')
 
         return '\n'.join(output_logs)
 
@@ -1206,7 +1208,8 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
                 f'{stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append("------------------------------------------------------------")
+        output_logs.append('--------------------------------------------------'
+            '----------')
 
         return '\n'.join(output_logs)
 
@@ -1231,7 +1234,8 @@ class LogSuggestionAndStatsJob(base_jobs.JobBase):
                 f'{stat.first_contribution_date}')
             output_logs.append(f'--Last Date: {stat.last_contribution_date}')
 
-        output_logs.append("------------------------------------------------------------")
+        output_logs.append('--------------------------------------------------'
+            '----------')
 
         return '\n'.join(output_logs)
 
@@ -1241,14 +1245,15 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
     their corresponding contribution and reviewer stats as job run results.
     """
 
-    DATASTORE_UPDATES_ALLOWED = False  # We're not updating any datastore entities.
+    DATASTORE_UPDATES_ALLOWED = False  # We're not updating any datastore.
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns topic ids accociated to suggestion models and
         corresponding contribution and reviewer stats.
 
         Returns:
-            PCollection. A PCollection of JobRunResult containing formatted output.
+            PCollection. A PCollection of JobRunResult containing formatted
+            output.
         """
 
         # Fetch all non-deleted GeneralSuggestionModels.
@@ -1469,8 +1474,8 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
         )
 
     def format_translation_contribution_output(self, key, group):
-        """Formats the output for translation suggestions and contribution
-        stats."""
+        """Formats the output for translation suggestions and
+        contribution stats."""
         suggestions = group['suggestion']
         contribution_stats = group['contribution_stats']
         output_logs = []
@@ -1491,111 +1496,84 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
 
         topic_ids_with_translation_submissions = sorted(
             set(topic_ids_with_translation_submissions_list))
-
-        output_logs.append(
-            'Translation submitter ID: %s, Language code: %s' % (
-                key[1], key[0]))
-
-        output_logs.append(
-            'Unique exp IDs with translation suggestion: ')
-
-        with datastore_services.get_ndb_context():
-            for exp_id in exp_ids_with_translation_suggestions:
-                output_logs.append(
-                    '- Exp ID: %s' % exp_id)
-                story_id = exp_services.get_story_id_linked_to_exploration(
-                    exp_id)
-                if story_id is not None:
-                    output_logs.append(
-                        '-- Story ID: %s' % story_id)
-                    story = story_fetchers.get_story_by_id(story_id)
-                    if story is not None:
-                        output_logs.append(
-                            '---- Topic ID: %s' % (
-                                story.corresponding_topic_id))
         
-        output_logs.append(
-            'Unique topic IDs with translation suggestions COUNT: '
-            f'{len(topic_ids_with_translation_submissions)}')
-
-        output_logs.append(
-            'Unique topic IDs with translation contribution stats: ')
-        for v in contribution_stats:
-            output_logs.append(
-                '- Translation Contribution Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
-
-        output_logs.append(
-            'Unique topic IDs with translation contribution stats COUNT: '
-            f'{len(contribution_stats)}')
+        topic_ids_with_contribution_stats = sorted(
+            {v.topic_id for v in contribution_stats})
         
         for stat in contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 contribution_stats.remove(stat)
 
-        output_logs.append(
-            'Unique valid topic IDs with translation contribution stats COUNT:'
-            f' {len(contribution_stats)}')
+        valid_topic_ids_with_contribution_stats = sorted(
+            {v.topic_id for v in contribution_stats})
 
-        output_logs.append(
-            'Unique valid topic IDs with translation contribution stats: ')
-        for v in contribution_stats:
-            output_logs.append(
-                '- Translation Contribution Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
+        output_logs.append('{\n')
+        output_logs.append('  type: translation_contribution,\n')
+        output_logs.append(f'  language_code: {key[0]},\n')
+        output_logs.append(f'  contributor_id: {key[1]},\n')
+        output_logs.append('  topic_ids_with_translation_suggestions: [')
+        for topic_id in topic_ids_with_translation_submissions:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_translation_suggestions_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_translation_submissions)},\n')
+        output_logs.append('  topic_ids_with_contribution_stats: [')
+        for topic_id in topic_ids_with_contribution_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_contribution_stats_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_contribution_stats)},\n')
+        output_logs.append('  valid_topic_ids_with_contribution_stats: [')
+        for topic_id in valid_topic_ids_with_contribution_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  valid_topic_ids_with_contribution_stats_COUNT: ')
+        output_logs.append(f'{len(valid_topic_ids_with_contribution_stats)},')
+        output_logs.append('\n')
+        output_logs.append('},\n')
 
-        output_logs.append("------------------------------------------------------------")
-
-        return '\n'.join(output_logs)
-
+        return ''.join(output_logs)
+    
     def format_translation_review_output(self, key, group):
         """Formats the output for translation review stats."""
         review_stats = group['review_stats']
         output_logs = []
 
-        output_logs.append(
-            'Translation Reviewer ID: %s, Language code: %s' % (
-                key[1], key[0]))
-
-        output_logs.append(
-            'Unique topic IDs with translation review stats: ')
-        for v in review_stats:
-            output_logs.append(
-                '- Translation Review Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
-
-        output_logs.append(
-            'Unique topic IDs with translation review stats COUNT: '
-            f'{len(review_stats)}')
+        topic_ids_with_review_stats = sorted(
+            {v.topic_id for v in review_stats})
         
         for stat in review_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 review_stats.remove(stat)
 
-        output_logs.append(
-            'Unique valid topic IDs with translation review stats: ')
-        for v in review_stats:
-            output_logs.append(
-                '- Translation Review Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
+        valid_topic_ids_with_review_stats = sorted(
+            {v.topic_id for v in review_stats})
 
-        output_logs.append(
-            'Unique valid topic IDs with translation review stats COUNT: '
-            f'{len(review_stats)}')
+        output_logs.append('{\n')
+        output_logs.append('  type: translation_review,\n')
+        output_logs.append(f'  language_code: {key[0]},\n')
+        output_logs.append(f'  reviewer_id: {key[1]},\n')
+        output_logs.append('  topic_ids_with_review_stats: [')
+        for topic_id in topic_ids_with_review_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_review_stats_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_review_stats)},\n')
+        output_logs.append('  valid_topic_ids_with_review_stats: [')
+        for topic_id in valid_topic_ids_with_review_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  valid_topic_ids_with_review_stats_COUNT: ')
+        output_logs.append(f'{len(valid_topic_ids_with_review_stats)},\n')
+        output_logs.append('},\n')
 
-        output_logs.append("------------------------------------------------------------")
-
-        return '\n'.join(output_logs)
+        return ''.join(output_logs)
 
     def format_question_contribution_output(self, key, group):
-        """Formats the output for question suggestions and contribution
-        stats."""
+        """Formats the output for question suggestions and
+        contribution stats."""
         suggestions = group['suggestion']
         contribution_stats = group['contribution_stats']
         output_logs = []
@@ -1617,97 +1595,74 @@ class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
         topic_ids_with_question_submissions = sorted(
             set(topic_ids_with_question_submissions_list))
 
-        output_logs.append(
-                'Question submitter ID: %s.' % key)
-
-        output_logs.append(
-            'Unique skill IDs with question suggestion: ')
-
-        with datastore_services.get_ndb_context():
-            for skill_id in skill_ids_with_question_suggestions:
-                output_logs.append(
-                    '- Skill ID: %s' % skill_id)
-                topic_assignments = sorted(
-                    skill_services.get_all_topic_assignments_for_skill(
-                        skill_id), key=by_topic_id)
-                for topic_assignment in topic_assignments:
-                    output_logs.append(
-                        '-- Topic ID: %s' % topic_assignment.topic_id)
-
-        output_logs.append(
-            'Unique topic IDs with question suggestions COUNT: '
-            f'{len(topic_ids_with_question_submissions)}')
-
-        output_logs.append(
-            'Unique topic IDs with question contribution stats: ')
-        for v in contribution_stats:
-            output_logs.append(
-                '- Question Contribution Stats ID: %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
-
-        output_logs.append(
-            'Unique topic IDs with question contribution stats COUNT: '
-            f'{len(contribution_stats)}')
+        topic_ids_with_contribution_stats = sorted(
+            {v.topic_id for v in contribution_stats})
 
         for stat in contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 contribution_stats.remove(stat)
 
-        output_logs.append(
-            'Unique valid topic IDs with question contribution stats COUNT: '
-            f'{len(contribution_stats)}')
+        valid_topic_ids_with_contribution_stats = sorted(
+            {v.topic_id for v in contribution_stats})
 
-        output_logs.append(
-            'Unique valid topic IDs with question contribution stats: ')
-        for v in contribution_stats:
-            output_logs.append(
-                '- Question Contribution Stats ID: %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s\n' % v.topic_id)
+        output_logs.append('{\n')
+        output_logs.append('  type: question_contribution,\n')
+        output_logs.append(f'  contributor_id: {key},\n')
+        output_logs.append('  topic_ids_with_question_suggestions: [')
+        for topic_id in topic_ids_with_question_submissions:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_question_suggestions_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_question_submissions)},\n')
+        output_logs.append('  topic_ids_with_contribution_stats: [')
+        for topic_id in topic_ids_with_contribution_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_contribution_stats_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_contribution_stats)},\n')
+        output_logs.append('  valid_topic_ids_with_contribution_stats: [')
+        for topic_id in valid_topic_ids_with_contribution_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  valid_topic_ids_with_contribution_stats_COUNT: ')
+        output_logs.append(f'{len(valid_topic_ids_with_contribution_stats)},')
+        output_logs.append('\n')
+        output_logs.append('},\n')
 
-        output_logs.append("------------------------------------------------------------")
-
-        return '\n'.join(output_logs)
+        return ''.join(output_logs)
 
     def format_question_review_output(self, key, group):
         """Formats the output for question review stats."""
         review_stats = group['review_stats']
         output_logs = []
 
-        output_logs.append(
-            'Question Reviewer ID: %s' % key)
+        topic_ids_with_review_stats = sorted(
+            {v.topic_id for v in review_stats})
 
-        output_logs.append(
-            'Unique topic IDs with question review stats: ')
-        for v in review_stats:
-            output_logs.append(
-                '- Question Review Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
-
-        output_logs.append(
-            'Unique topic IDs with question review stats COUNT: '
-            f'{len(review_stats)}')
-        
         for stat in review_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 review_stats.remove(stat)
 
-        output_logs.append(
-            'Unique valid topic IDs with question review stats: ')
-        for v in review_stats:
-            output_logs.append(
-                '- Question Review Stats ID %s' % v.id)
-            output_logs.append(
-                '-- Topic ID: %s' % v.topic_id)
+        valid_topic_ids_with_review_stats = sorted(
+            {v.topic_id for v in review_stats})
 
-        output_logs.append(
-            'Unique valid topic IDs with question review stats COUNT: '
-            f'{len(review_stats)}')
+        output_logs.append('{\n')
+        output_logs.append('  type: question_review,\n')
+        output_logs.append(f'  reviewer_id: {key},\n')
+        output_logs.append('  topic_ids_with_review_stats: [')
+        for topic_id in topic_ids_with_review_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  topic_ids_with_review_stats_COUNT: ')
+        output_logs.append(f'{len(topic_ids_with_review_stats)},\n')
+        output_logs.append('  valid_topic_ids_with_review_stats: [')
+        for topic_id in valid_topic_ids_with_review_stats:
+            output_logs.append(f'{topic_id},')
+        output_logs.append('],\n')
+        output_logs.append('  valid_topic_ids_with_review_stats_COUNT: ')
+        output_logs.append(f'{len(valid_topic_ids_with_review_stats)},\n')
+        output_logs.append('},\n')
 
-        output_logs.append("------------------------------------------------------------")
-
-        return '\n'.join(output_logs)
+        return ''.join(output_logs)
