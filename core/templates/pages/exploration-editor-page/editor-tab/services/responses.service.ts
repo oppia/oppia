@@ -35,9 +35,7 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {LoggerService} from 'services/contextual/logger.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';

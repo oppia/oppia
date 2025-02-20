@@ -18,16 +18,12 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   NumericExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';

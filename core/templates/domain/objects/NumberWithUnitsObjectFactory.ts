@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 
 import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
-import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
 import {unit as mathjsUnit} from 'mathjs';
 
@@ -85,7 +85,7 @@ export class NumberWithUnits {
     // type, real, fraction and units. Hence, we cannot inject
     // UnitsObjectFactory, since that'll lead to creation of 5th property
     // which isn't allowed. Refer objects.py L#956.
-    let unitsString = new UnitsObjectFactory().fromList(this.units).toString();
+    let unitsString = Units.fromList(this.units).toString();
     if (unitsString.includes('$')) {
       unitsString = unitsString.replace('$', '');
       numberWithUnitsString += '$' + ' ';
@@ -111,10 +111,8 @@ export class NumberWithUnits {
 
   toMathjsCompatibleString(): string {
     let numberWithUnitsString = '';
-    let unitsString = new UnitsObjectFactory().fromList(this.units).toString();
-    unitsString = new UnitsObjectFactory().toMathjsCompatibleString(
-      unitsString
-    );
+    let unitsString = Units.fromList(this.units).toString();
+    unitsString = Units.toMathjsCompatibleString(unitsString);
 
     if (this.type === 'real') {
       numberWithUnitsString += this.real + ' ';
@@ -170,10 +168,10 @@ export class NumberWithUnits {
   providedIn: 'root',
 })
 export class NumberWithUnitsObjectFactory {
-  constructor(private unitsFactory: UnitsObjectFactory) {}
+  constructor() {}
   createCurrencyUnits(): void {
     try {
-      this.unitsFactory.createCurrencyUnits();
+      Units.createCurrencyUnits();
     } catch (parsingError) {}
   }
 
@@ -313,12 +311,12 @@ export class NumberWithUnitsObjectFactory {
       }
     }
 
-    const unitsObj = this.unitsFactory.fromRawInputString(units);
-    var duplicatedUnit = this.unitsFactory.getDuplicatedUnit(units);
+    const unitsObj = Units.fromRawInputString(units);
+    var duplicatedUnit = Units.getDuplicatedUnit(units);
 
-    var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
+    var correctedFormats = Units.getCorrectedFormat(unitsObj);
 
-    var containMultipleSlashes = this.unitsFactory.hasMultipleSlashes(units);
+    var containMultipleSlashes = Units.hasMultipleSlashes(units);
 
     if (duplicatedUnit) {
       throw new Error(
@@ -339,7 +337,7 @@ export class NumberWithUnitsObjectFactory {
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,
       Fraction.fromDict(numberWithUnitsDict.fraction),
-      this.unitsFactory.fromList(numberWithUnitsDict.units)
+      Units.fromList(numberWithUnitsDict.units)
     );
   }
 }

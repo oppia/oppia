@@ -29,10 +29,7 @@ import {
   Interaction,
   InteractionBackendDict,
 } from 'domain/exploration/InteractionObjectFactory';
-import {
-  OutcomeBackendDict,
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   SolutionObjectFactory,
@@ -663,7 +660,9 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
-    const newDefaultOutcome = Outcome.createFromBackendDict(newDefaultOutcomeDict);
+    const newDefaultOutcome = Outcome.createFromBackendDict(
+      newDefaultOutcomeDict
+    );
     expect(testInteraction.defaultOutcome).toEqual(
       Outcome.createFromBackendDict({
         dest: 'dest_default',

@@ -43,9 +43,7 @@ import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/servi
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';

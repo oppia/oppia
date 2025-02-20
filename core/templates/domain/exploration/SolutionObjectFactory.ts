@@ -27,7 +27,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 import {
   DragAndDropAnswer,
   FractionAnswer,

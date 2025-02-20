@@ -18,16 +18,12 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   MathEquationInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {MathEquationInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 

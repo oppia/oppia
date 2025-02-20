@@ -472,12 +472,7 @@ describe('Editor state service', () => {
     expect(ecs.interaction.answerGroups).toEqual([
       AnswerGroup.createNew(
         [],
-        Outcome.createNew(
-          'State',
-          'This is a new feedback text',
-          '',
-          []
-        ),
+        Outcome.createNew('State', 'This is a new feedback text', '', []),
         [],
         ''
       ),
@@ -487,12 +482,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction default outcome', () => {
-    let newDefaultOutcome = Outcome.createNew(
-      'Hola1',
-      '',
-      'Feedback text',
-      []
-    );
+    let newDefaultOutcome = Outcome.createNew('Hola1', '', 'Feedback text', []);
 
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.defaultOutcome).toEqual(

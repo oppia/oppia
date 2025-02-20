@@ -27,9 +27,7 @@ import {
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {of} from 'rxjs';
@@ -78,7 +76,6 @@ describe('Outcome Editor Component', () => {
     fixture = TestBed.createComponent(OutcomeEditorComponent);
     component = fixture.componentInstance;
     externalSaveService = TestBed.inject(ExternalSaveService);
-    Outcome = TestBed.inject(Outcome);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     ngbModal = TestBed.inject(NgbModal);
@@ -381,18 +378,8 @@ describe('Outcome Editor Component', () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'State Name'
       );
-      component.outcome = Outcome.createNew(
-        'Introduction',
-        '1',
-        '',
-        []
-      );
-      component.savedOutcome = Outcome.createNew(
-        'State Name',
-        '1',
-        '',
-        []
-      );
+      component.outcome = Outcome.createNew('Introduction', '1', '', []);
+      component.savedOutcome = Outcome.createNew('State Name', '1', '', []);
 
       expect(component.invalidStateAfterFeedbackSave()).toBeTrue();
     }
@@ -404,18 +391,8 @@ describe('Outcome Editor Component', () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction'
       );
-      component.outcome = Outcome.createNew(
-        'Introduction',
-        '1',
-        '',
-        []
-      );
-      component.savedOutcome = Outcome.createNew(
-        'State Name',
-        '1',
-        '',
-        []
-      );
+      component.outcome = Outcome.createNew('Introduction', '1', '', []);
+      component.savedOutcome = Outcome.createNew('State Name', '1', '', []);
 
       expect(component.invalidStateAfterDestinationSave()).toBeTrue();
     }

@@ -18,13 +18,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {AppConstants} from 'app.constants';
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {TestBed} from '@angular/core/testing';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';

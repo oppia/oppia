@@ -767,12 +767,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              Outcome.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               1,
               'true'
@@ -787,12 +782,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              Outcome.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               0,
               'true'
@@ -812,12 +802,7 @@ describe('State translation component', () => {
           component.summarizeAnswerGroup(
             AnswerGroup.createNew(
               [],
-              Outcome.createNew(
-                'unused',
-                '1',
-                'Feedback text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
             ),

@@ -26,10 +26,7 @@ import {
   AnswerGroupBackendDict,
 } from 'domain/exploration/answer-group.model';
 import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
-import {
-  OutcomeBackendDict,
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   Solution,

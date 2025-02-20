@@ -18,14 +18,10 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 

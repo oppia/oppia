@@ -18,13 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import {AppConstants} from 'app.constants';
@@ -59,7 +55,9 @@ describe('ContinueValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
 
-    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
     customizationArguments = {
       buttonText: {
         value: new SubtitledUnicode('Some Button Text', 'ca_buttonText'),

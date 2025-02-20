@@ -337,7 +337,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserBackendApiService} from 'services/user-backend-api.service';
@@ -489,7 +488,6 @@ export class UpgradedServices {
       new TopicsAndSkillsDashboardPageService(
         upgradedServices['PlatformFeatureService']
       );
-    upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
@@ -603,16 +601,13 @@ export class UpgradedServices {
         upgradedServices['baseInteractionValidationService']
       );
     upgradedServices['NumberWithUnitsObjectFactory'] =
-      new NumberWithUnitsObjectFactory(upgradedServices['UnitsObjectFactory']);
+      new NumberWithUnitsObjectFactory();
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['baseInteractionValidationService']
       );
     upgradedServices['NumberWithUnitsRulesService'] =
-      new NumberWithUnitsRulesService(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['UtilsService']
-      );
+      new NumberWithUnitsRulesService(upgradedServices['UtilsService']);
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'],
       upgradedServices['Title']

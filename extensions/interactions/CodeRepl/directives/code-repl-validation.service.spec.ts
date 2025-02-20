@@ -18,13 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
@@ -72,7 +68,9 @@ describe('CodeReplValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
   });
 
   it('should be able to perform basic validation', () => {

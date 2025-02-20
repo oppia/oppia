@@ -20,13 +20,9 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {GraphAnswer} from 'interactions/answer-defs';
 

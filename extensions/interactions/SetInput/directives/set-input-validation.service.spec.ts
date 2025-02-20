@@ -18,13 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -72,10 +68,10 @@ describe('SetInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
 
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   describe('.getCustomizationArgsWarnings', () => {

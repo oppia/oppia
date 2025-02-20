@@ -18,10 +18,7 @@
  */
 
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {
-  Outcome,
-  OutcomeBackendDict,
-} from 'domain/exploration/outcome.model';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {Rule, RuleBackendDict} from 'domain/exploration/rule.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
@@ -103,9 +100,7 @@ export class AnswerGroup extends BaseTranslatableObject {
         answerGroupBackendDict.rule_specs,
         interactionId
       ),
-      Outcome.createFromBackendDict(
-        answerGroupBackendDict.outcome
-      ),
+      Outcome.createFromBackendDict(answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,
       answerGroupBackendDict.tagged_skill_misconception_id
     );

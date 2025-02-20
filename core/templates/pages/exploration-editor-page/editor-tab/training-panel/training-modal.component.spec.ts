@@ -28,9 +28,7 @@ import {ResponsesService} from '../services/responses.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {TrainingDataService} from './training-data.service';
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';

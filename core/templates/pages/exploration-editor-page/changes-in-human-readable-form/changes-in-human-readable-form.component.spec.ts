@@ -24,10 +24,7 @@ import {
   LostChangeObjectFactory,
   LostChangeValue,
 } from 'domain/exploration/LostChangeObjectFactory';
-import {
-  Outcome,
-  OutcomeBackendDict,
-} from 'domain/exploration/outcome.model';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ChangesInHumanReadableFormComponent} from './changes-in-human-readable-form.component';
 

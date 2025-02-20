@@ -16,9 +16,7 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
@@ -90,7 +88,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome2, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome2,
+        [],
+        null
+      );
 
       // It also returns the error when feedback is not provided.
       expect(
@@ -122,7 +125,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome,
+        [],
+        null
+      );
       const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',
@@ -191,7 +199,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = AnswerGroup.createNew([rulesDict], testOutcome, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome,
+        [],
+        null
+      );
       const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',

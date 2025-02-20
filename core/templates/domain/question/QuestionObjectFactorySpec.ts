@@ -21,7 +21,7 @@
 import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 import {WrittenTranslationObjectFactory} from 'domain/exploration/WrittenTranslationObjectFactory';
 import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {UpgradedServices} from 'services/UpgradedServices';
@@ -56,7 +56,6 @@ describe('Question object factory', function () {
         'ParamChangesObjectFactory',
         new ParamChangesObjectFactory(new ParamChangeObjectFactory())
       );
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',
         new WrittenTranslationObjectFactory()

@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of Units domain objects.
+ * @fileoverview Model class for creating instances of Units domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {createUnit, unit} from 'mathjs';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
@@ -56,23 +54,18 @@ export class Units {
     }
     return unit.trim();
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class UnitsObjectFactory {
-  isunit(unit: string): boolean {
+  static isunit(unit: string): boolean {
     return !'/*() '.includes(unit);
   }
 
-  isLastElementUnit(unitList: string[]): boolean {
+  static isLastElementUnit(unitList: string[]): boolean {
     return (
       unitList.length > 0 && this.isunit(unitList.slice(-1).pop() as string)
     );
   }
 
-  stringToLexical(units: string): string[] {
+  static stringToLexical(units: string): string[] {
     units += '#';
     var unitList = [];
     var unit = '';
@@ -98,7 +91,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitWithMultiplier(unitList: string[]): [string, number][] {
+  static unitWithMultiplier(unitList: string[]): [string, number][] {
     var multiplier = 1;
     var unitsWithMultiplier: [string, number][] = [];
     var parenthesisStack = [];
@@ -136,7 +129,7 @@ export class UnitsObjectFactory {
     return unitsWithMultiplier;
   }
 
-  convertUnitDictToList(unitDict: UnitsDict): Unit[] {
+  static convertUnitDictToList(unitDict: UnitsDict): Unit[] {
     var unitList: Unit[] = [];
     for (var key in unitDict) {
       unitList.push({unit: key, exponent: unitDict[key]});
@@ -144,7 +137,7 @@ export class UnitsObjectFactory {
     return unitList;
   }
 
-  unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
+  static unitToList(unitsWithMultiplier: [string, number][]): Unit[] {
     var unitDict: UnitsDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
@@ -167,17 +160,17 @@ export class UnitsObjectFactory {
     return this.convertUnitDictToList(unitDict);
   }
 
-  fromList(unitsList: Unit[]): Units {
+  static fromList(unitsList: Unit[]): Units {
     return new Units(unitsList);
   }
 
-  fromStringToList(unitsString: string): Unit[] {
+  static fromStringToList(unitsString: string): Unit[] {
     return this.unitToList(
       this.unitWithMultiplier(this.stringToLexical(unitsString))
     );
   }
 
-  createCurrencyUnits(): void {
+  static createCurrencyUnits(): void {
     var keys = Object.keys(
       ObjectsDomainConstants.CURRENCY_UNITS
     ) as CurrencyUnitsKeys;
@@ -203,7 +196,7 @@ export class UnitsObjectFactory {
     }
   }
 
-  toMathjsCompatibleString(units: string): string {
+  static toMathjsCompatibleString(units: string): string {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
 
@@ -252,7 +245,7 @@ export class UnitsObjectFactory {
     return units.trim();
   }
 
-  fromRawInputString(units: string): Units {
+  static fromRawInputString(units: string): Units {
     try {
       this.createCurrencyUnits();
     } catch (parsingError) {}
@@ -263,7 +256,7 @@ export class UnitsObjectFactory {
     }
     return new Units(this.fromStringToList(units));
   }
-  getAllInstancesOfUnits(units: string[]): string[] {
+  static getAllInstancesOfUnits(units: string[]): string[] {
     let unitInstances: string[] = [];
 
     units.forEach(unitString => {
@@ -285,7 +278,7 @@ export class UnitsObjectFactory {
     return unitInstances;
   }
 
-  getDuplicatedUnit(units: string): string {
+  static getDuplicatedUnit(units: string): string {
     let unitList = this.getAllInstancesOfUnits(this.stringToLexical(units));
 
     let unitNormalizationMap: {[originalUnit: string]: string} = {};
@@ -317,13 +310,13 @@ export class UnitsObjectFactory {
     return '';
   }
 
-  hasMultipleSlashes(units: string): boolean {
+  static hasMultipleSlashes(units: string): boolean {
     let slashCount = (units.match(/\//g) || []).length;
 
     return slashCount > 1;
   }
 
-  getCorrectedFormat(units: {
+  static getCorrectedFormat(units: {
     units: {unit: string; exponent: number}[];
   }): string {
     let unitDetails = units.units;

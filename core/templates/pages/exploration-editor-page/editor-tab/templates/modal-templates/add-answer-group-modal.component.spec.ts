@@ -26,9 +26,7 @@ import {
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-} from 'domain/exploration/outcome.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Subscription} from 'rxjs';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
@@ -180,31 +178,16 @@ describe('Add Answer Group Modal Component', () => {
 
     expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
-    var outcome2 = Outcome.createNew(
-      'State Name',
-      '1',
-      'Feedback Text',
-      []
-    );
+    var outcome2 = Outcome.createNew('State Name', '1', 'Feedback Text', []);
     tick();
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   }));
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
-    var outcome1 = Outcome.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10000),
-      []
-    );
+    var outcome1 = Outcome.createNew('State Name', '1', 'a'.repeat(10000), []);
     expect(component.isFeedbackLengthExceeded(outcome1)).toBe(false);
 
-    var outcome2 = Outcome.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10001),
-      []
-    );
+    var outcome2 = Outcome.createNew('State Name', '1', 'a'.repeat(10001), []);
     expect(component.isFeedbackLengthExceeded(outcome2)).toBe(true);
   });
 

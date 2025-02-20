@@ -32,11 +32,10 @@ import {UpgradedServices} from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Interaction validator', function () {
-  var bivs, WARNING_TYPES, agof;
+  var bivs, WARNING_TYPES;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
-  var badOutcome, goodAnswerGroups;
-  var agof, oof;
+  var badOutcome, goodAnswerGroups, Outcome, AnswerGroup;
 
   beforeEach(function () {
     angular.mock.module('oppia');
@@ -65,7 +64,7 @@ describe('Interaction validator', function () {
 
       currentState = 'First State';
       otherState = 'Second State';
-      goodOutcomeDest = oof.createFromBackendDict({
+      goodOutcomeDest = Outcome.createFromBackendDict({
         dest: otherState,
         dest_if_really_stuck: null,
         feedback: {
@@ -77,7 +76,7 @@ describe('Interaction validator', function () {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       });
-      goodOutcomeFeedback = oof.createFromBackendDict({
+      goodOutcomeFeedback = Outcome.createFromBackendDict({
         dest: currentState,
         dest_if_really_stuck: null,
         feedback: {
@@ -89,7 +88,7 @@ describe('Interaction validator', function () {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       });
-      badOutcome = oof.createFromBackendDict({
+      badOutcome = Outcome.createFromBackendDict({
         dest: currentState,
         dest_if_really_stuck: null,
         feedback: {
@@ -103,8 +102,8 @@ describe('Interaction validator', function () {
       });
 
       goodAnswerGroups = [
-        agof.createNew([], goodOutcomeDest, false, null),
-        agof.createNew([], goodOutcomeFeedback, false, null),
+        AnswerGroup.createNew([], goodOutcomeDest, false, null),
+        AnswerGroup.createNew([], goodOutcomeFeedback, false, null),
       ];
     })
   );
@@ -124,9 +123,9 @@ describe('Interaction validator', function () {
 
     it('should have a warning for an answer group with a confusing outcome', function () {
       var answerGroups = [
-        agof.createNew([], goodOutcomeDest, false, null),
-        agof.createNew([], badOutcome, false, null),
-        agof.createNew([], goodOutcomeFeedback, false, null),
+        AnswerGroup.createNew([], goodOutcomeDest, false, null),
+        AnswerGroup.createNew([], badOutcome, false, null),
+        AnswerGroup.createNew([], goodOutcomeFeedback, false, null),
       ];
       var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
       expect(warnings).toEqual([
@@ -143,7 +142,7 @@ describe('Interaction validator', function () {
       function () {
         goodOutcomeFeedback.labelledAsCorrect = true;
         var answerGroups = [
-          agof.createNew([], goodOutcomeFeedback, false, null),
+          AnswerGroup.createNew([], goodOutcomeFeedback, false, null),
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([
@@ -159,7 +158,9 @@ describe('Interaction validator', function () {
     it('should have a warning for a correct answer group with destIfStuck', function () {
       goodOutcomeDest.labelledAsCorrect = true;
       goodOutcomeDest.destIfReallyStuck = 'destIfReallyStuck';
-      const answerGroups = [agof.createNew([], goodOutcomeDest, false, null)];
+      const answerGroups = [
+        AnswerGroup.createNew([], goodOutcomeDest, false, null),
+      ];
       const warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
       expect(warnings).toEqual([
         {
@@ -232,9 +233,9 @@ describe('Interaction validator', function () {
         'the default outcome',
       function () {
         var badAnswerGroups = [
-          agof.createNew([], goodOutcomeDest, false, null),
-          agof.createNew([], badOutcome, false, null),
-          agof.createNew([], badOutcome, false, null),
+          AnswerGroup.createNew([], goodOutcomeDest, false, null),
+          AnswerGroup.createNew([], badOutcome, false, null),
+          AnswerGroup.createNew([], badOutcome, false, null),
         ];
         var warnings = bivs.getAllOutcomeWarnings(
           badAnswerGroups,

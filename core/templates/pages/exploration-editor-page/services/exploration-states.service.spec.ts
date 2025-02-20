@@ -21,9 +21,7 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ContextService} from 'services/context.service';
 import {ExplorationStatesService} from './exploration-states.service';
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 

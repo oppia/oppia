@@ -20,9 +20,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStateSkillModalComponent} from './delete-state-skill-modal.component';
 import {ResponsesService} from '../../services/responses.service';
-import {
-  AnswerGroup,
-} from 'domain/exploration/answer-group.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Delete Topic Modal Component', () => {

@@ -20,7 +20,7 @@
 // all the rules are upgraded to Angular 8.
 import {CodeNormalizerService} from 'services/code-normalizer.service';
 import {GraphUtilsService} from 'interactions/GraphInput/directives/graph-utils.service';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
@@ -104,7 +104,7 @@ describe('Rule spec services', function () {
       $provide.value(
         'NumberWithUnitsRulesService',
         new NumberWithUnitsRulesService(
-          new NumberWithUnitsObjectFactory(new UnitsObjectFactory()),
+          new NumberWithUnitsObjectFactory(Units),
           new UtilsService()
         )
       );
@@ -136,7 +136,6 @@ describe('Rule spec services', function () {
           return answer.clickedRegions.indexOf(inputs.x) !== -1;
         },
       });
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
     })
   );
   beforeEach(
