@@ -70,7 +70,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      year: '2023',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      year: '2022',
+    },
+  ];
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
