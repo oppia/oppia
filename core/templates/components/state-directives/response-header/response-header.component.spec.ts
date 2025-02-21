@@ -43,7 +43,6 @@ describe('Response Header Component', () => {
       declarations: [ResponseHeaderComponent],
       providers: [
         StateEditorService,
-        Outcome,
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState,

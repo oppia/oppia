@@ -51,7 +51,7 @@ describe('Changes in Human Readable Form Component', () => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [ChangesInHumanReadableFormComponent],
-      providers: [LostChangeObjectFactory, Outcome],
+      providers: [LostChangeObjectFactory],
     }).compileComponents();
   }));
 

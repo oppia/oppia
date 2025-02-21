@@ -70,7 +70,6 @@ describe('Add Answer Group Modal Component', () => {
       providers: [
         EditorFirstTimeEventsService,
         GenerateContentIdService,
-        Outcome,
         StateEditorService,
         {
           provide: NgbActiveModal,

@@ -165,7 +165,6 @@ describe('State Responses Component', () => {
         StateSolicitAnswerDetailsService,
         AlertsService,
         InteractionObjectFactory,
-        Outcome,
         MisconceptionObjectFactory,
         {
           provide: NgbModal,
