@@ -20,7 +20,6 @@
 // all the rules are upgraded to Angular 8.
 import {CodeNormalizerService} from 'services/code-normalizer.service';
 import {GraphUtilsService} from 'interactions/GraphInput/directives/graph-utils.service';
-import {Units} from 'domain/objects/units.model';
 import {SetInputRulesService} from 'interactions/SetInput/directives/set-input-rules.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
@@ -31,7 +30,6 @@ import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/
 import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import {MathEquationInputRulesService} from 'interactions/MathEquationInput/directives/math-equation-input-rules.service';
 import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
 import {GraphInputRulesService} from 'interactions/GraphInput/directives/graph-input-rules.service';
@@ -103,10 +101,7 @@ describe('Rule spec services', function () {
       );
       $provide.value(
         'NumberWithUnitsRulesService',
-        new NumberWithUnitsRulesService(
-          new NumberWithUnitsObjectFactory(Units),
-          new UtilsService()
-        )
+        new NumberWithUnitsRulesService(new UtilsService())
       );
       $provide.value(
         'NumericExpressionInputRulesService',

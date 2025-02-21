@@ -29,7 +29,7 @@ import {
 } from 'interactions/answer-defs';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-units.component';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 
 @Component({
@@ -57,7 +57,6 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private focusManagerService: FocusManagerService,
-    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
     private ngbModal: NgbModal
   ) {
@@ -71,7 +70,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         )
         .subscribe(newValue => {
           try {
-            this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
+            NumberWithUnits.fromRawInputString(newValue);
             this.errorMessageI18nKey = '';
             this.isValid = true;
           } catch (parsingError) {
@@ -88,16 +87,16 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
-      savedSolution = this.numberWithUnitsObjectFactory
-        .fromDict(savedSolution as NumberWithUnitsAnswer)
-        .toString();
+      savedSolution = NumberWithUnits.fromDict(
+        savedSolution as NumberWithUnitsAnswer
+      ).toString();
       this.answer = savedSolution;
     } else {
       this.answer = '';
     }
 
     try {
-      this.numberWithUnitsObjectFactory.createCurrencyUnits();
+      NumberWithUnits.createCurrencyUnits();
     } catch (parsingError) {}
 
     const submitAnswerFn = () => this.submitAnswer();
@@ -122,8 +121,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
         return;
       }
-      const numberWithUnits =
-        this.numberWithUnitsObjectFactory.fromRawInputString(this.answer);
+      const numberWithUnits = NumberWithUnits.fromRawInputString(this.answer);
       this.currentInteractionService.onSubmit(
         numberWithUnits,
         this.numberWithUnitsRulesService as NumberWithUnitsRulesService
