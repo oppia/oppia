@@ -202,8 +202,12 @@ class TestImageCompression(unittest.TestCase):
         """Test multiple compression iterations."""
         if not shutil.which('gm'):
             self.skipTest('GraphicsMagick not installed')
-        first_run = image_compression.check_compressable_images(str(self.test_dir))
-        second_run = image_compression.check_compressable_images(str(self.test_dir))
+        first_run = image_compression.check_compressable_images(
+            str(self.test_dir)
+        )
+        second_run = image_compression.check_compressable_images(
+            str(self.test_dir)
+        )
         self.assertGreaterEqual(
             len(first_run),
             len(second_run),
