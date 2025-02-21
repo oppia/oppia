@@ -155,7 +155,7 @@ export class VoiceoverCardComponent implements OnInit {
       ) {
         if (this.isManualVoiceoverPlaying) {
           this.manualVoiceoverCurrentDuration =
-            this.audioPlayerService.getCurrentTime();
+            this.audioPlayerService.getCurrentTimeInSecs();
           this.manualVoiceoverProgress = Math.round(
             (this.manualVoiceoverCurrentDuration /
               this.manualVoiceoverTotalDuration) *
@@ -164,7 +164,7 @@ export class VoiceoverCardComponent implements OnInit {
         }
         if (this.isAutomaticVoiceoverPlaying) {
           this.automaticVoiceoverCurrentDuration =
-            this.audioPlayerService.getCurrentTime();
+            this.audioPlayerService.getCurrentTimeInSecs();
           this.automaticVoiceoverProgress = Math.round(
             (this.automaticVoiceoverCurrentDuration /
               this.automaticVoiceoverTotalDuration) *

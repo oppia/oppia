@@ -123,7 +123,7 @@ export class AudioPlayerService {
     if (!this.isPlaying()) {
       return;
     }
-    this._lastPauseOrSeekPos = this.getCurrentTime();
+    this._lastPauseOrSeekPos = Math.floor(this.getCurrentTimeInSecs());
     // 'currentTrack' is not null since the track is playing
     // and that is why we use '?'.
     this._currentTrack?.pause();
@@ -167,7 +167,7 @@ export class AudioPlayerService {
     }
   }
 
-  getCurrentTime(): number {
+  getCurrentTimeInSecs(): number {
     if (!this._currentTrack) {
       return 0;
     }
@@ -175,7 +175,7 @@ export class AudioPlayerService {
     if (typeof currentTime !== 'number') {
       return 0;
     }
-    return Math.floor(currentTime);
+    return Math.floor(currentTime * 10) / 10;
   }
 
   setCurrentTime(val: number): void {
