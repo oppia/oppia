@@ -18,7 +18,6 @@
 
 import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {MusicNotesAnswer} from 'interactions/answer-defs';
 import {UtilsService} from 'services/utils.service';
@@ -135,10 +134,3 @@ export class MusicNotesInputRulesService {
     return numWrongNotes <= inputs.k;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MusicNotesInputRulesService',
-    downgradeInjectable(MusicNotesInputRulesService)
-  );

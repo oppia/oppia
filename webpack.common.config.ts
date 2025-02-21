@@ -65,15 +65,9 @@ module.exports = {
     },
   },
   entry: {
-    error: commonPrefix + '/pages/error-pages/error-page.import.ts',
-    maintenance:
-      commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
-    practice_session:
-      commonPrefix +
-      '/pages/practice-session-page/practice-session-page.import.ts',
   },
 
   /**
@@ -104,42 +98,6 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-400.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 400,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-401.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 401,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-500.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 500,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['maintenance'],
-      filename: 'maintenance-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['oppia_root'],
       filename: 'oppia-root.mainpage.html',
       meta: defaultMeta,
@@ -157,18 +115,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['practice_session'],
-      filename: 'practice-session-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/practice-session-page/' +
-        'practice-session-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],

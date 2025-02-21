@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
@@ -44,10 +43,3 @@ export class TranslationTabActiveModeService {
     return this.activeMode === ExplorationEditorPageConstants.VOICEOVER_MODE;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslationTabActiveModeService',
-    downgradeInjectable(TranslationTabActiveModeService)
-  );

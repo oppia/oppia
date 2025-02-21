@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -261,10 +260,3 @@ export class ClassroomPageComponent implements OnDestroy {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaClassroomPage',
-  downgradeComponent({
-    component: ClassroomPageComponent,
-  }) as angular.IDirectiveFactory
-);

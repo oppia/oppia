@@ -129,9 +129,9 @@ export class VoiceoverCardComponent implements OnInit {
         this.audioPlayerService.isTrackLoaded() &&
         this.audioPlayerService.isPlaying()
       ) {
-        this.currentVoiceoverDuration =
-          this.audioPlayerService.getCurrentTime();
-
+        this.currentVoiceoverDuration = Math.floor(
+          this.audioPlayerService.getCurrentTimeInSecs()
+        );
         this.voiceoverProgress = Math.round(
           (this.currentVoiceoverDuration / this.manualVoiceoverDuration) * 100
         );
