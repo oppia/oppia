@@ -150,8 +150,10 @@ export class EntityVoiceovers {
   getManualVoiceover(contentId: string): Voiceover | undefined {
     let voiceoverTypeToVoiceovers = this.voiceoversMapping[contentId];
 
-    if (voiceoverTypeToVoiceovers) {
+    if (voiceoverTypeToVoiceovers && voiceoverTypeToVoiceovers.manual) {
       return voiceoverTypeToVoiceovers.manual;
+    } else if (voiceoverTypeToVoiceovers && voiceoverTypeToVoiceovers.auto) {
+      return voiceoverTypeToVoiceovers.auto;
     } else {
       return undefined;
     }

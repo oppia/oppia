@@ -69,7 +69,6 @@ export class TranslationLanguageService {
       return;
     }
     this.activeLanguageCode = newActiveLanguageCode;
-    console.log('1 ' + this.activeLanguageCode);
     this._activeLanguageChangedEventEmitter.emit();
   }
 
@@ -88,7 +87,6 @@ export class TranslationLanguageService {
   }
 
   setActiveLanguageAccentCode(newLanguageAccentCode: string): void {
-    console.log('Request to update lang accent code');
     this.localStorageService.setLastSelectedLanguageAccentCode(
       newLanguageAccentCode
     );
@@ -110,7 +108,6 @@ export class TranslationLanguageService {
   }
 
   get onActiveLanguageChanged(): EventEmitter<void> {
-    console.log('1.5 ' + this.activeLanguageCode);
     return this._activeLanguageChangedEventEmitter;
   }
 

@@ -190,23 +190,24 @@ export class TranslatorOverviewComponent implements OnInit {
       .getEntityTranslationsAsync(this.languageCode)
       .then(entityTranslations => {
         this.updateTranslationWithChangeList(entityTranslations);
-        this.translationLanguageService.setActiveLanguageCode(
-          this.languageCode
-        );
-        this.translationStatusService.refresh();
-        this.windowRef.nativeWindow.localStorage.setItem(
-          this.LAST_SELECTED_TRANSLATION_LANGUAGE,
-          this.languageCode
-        );
-        this.routerService.onCenterGraph.emit();
-        this.loaderService.hideLoadingScreen();
-      });
 
-    this.entityVoiceoversService.setLanguageCode(this.languageCode);
-    this.localStorageService.setLastSelectedLanguageAccentCode('');
-    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-      this.updateLanguageAccentCodesDropdownOptions();
-    });
+        this.entityVoiceoversService.setLanguageCode(this.languageCode);
+        this.localStorageService.setLastSelectedLanguageAccentCode('');
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.updateLanguageAccentCodesDropdownOptions();
+
+          this.translationLanguageService.setActiveLanguageCode(
+            this.languageCode
+          );
+          this.translationStatusService.refresh();
+          this.windowRef.nativeWindow.localStorage.setItem(
+            this.LAST_SELECTED_TRANSLATION_LANGUAGE,
+            this.languageCode
+          );
+          this.routerService.onCenterGraph.emit();
+          this.loaderService.hideLoadingScreen();
+        });
+      });
   }
 
   getTranslationProgressAriaLabel(): string {
@@ -307,6 +308,7 @@ export class TranslatorOverviewComponent implements OnInit {
         this.inVoiceoverMode = false;
         this.refreshDirectiveScope();
       });
+
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
 
     this.voiceoverBackendApiService
@@ -317,27 +319,20 @@ export class TranslatorOverviewComponent implements OnInit {
           response.autoGeneratableLanguageAccentCodes,
           response.languageCodesMapping
         );
+
         this.languageAccentMasterList = response.languageAccentMasterList;
         this.languageCodesMapping = response.languageCodesMapping;
-        this.updateLanguageAccentCodesDropdownOptions();
+
         this.voiceoverPlayerService.languageAccentMasterList =
           this.languageAccentMasterList;
         this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
           this.languageCode,
           this.entityVoiceoversService.getLanguageAccentCodes()
         );
+
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
           this.updateLanguageAccentCodesDropdownOptions();
         });
-
-        let cloudSupportedLanguageAccentCodes =
-          this.voiceoverLanguageManagementService.getAutogeneratableLanguageAccents(
-            this.languageCode
-          );
-
-        this.translationLanguageService.setCloudSupportedLanguageAccentCodes(
-          cloudSupportedLanguageAccentCodes
-        );
       });
   }
 

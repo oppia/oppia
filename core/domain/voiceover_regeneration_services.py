@@ -25,6 +25,7 @@ import io
 import json
 import re
 import uuid
+import logging
 
 from core import feconf
 from core import utils
@@ -188,12 +189,16 @@ def synthesize_voiceover_for_html_string(
     is_voiceover_from_cache = False
     if cached_model is not None:
         error_details = None
-        if cached_model.plaintext == processed_text_for_voiceover_regeneration:
-            audio_offset_list = (
-                cached_model.audio_offset_list)
-            filename = cached_model.voiceover_filename
-            binary_audio_data = fs.get('%s/%s' % ('audio', filename))
-            is_voiceover_from_cache = True
+        try:
+            if cached_model.plaintext == processed_text_for_voiceover_regeneration:
+                audio_offset_list = (
+                    cached_model.audio_offset_list)
+                filename = cached_model.voiceover_filename
+                binary_audio_data = fs.get('%s/%s' % ('audio', filename))
+                is_voiceover_from_cache = True
+        except Exception as e:
+            cached_model = None
+            logging.error('Failed to retrieve voiceover from cache: %s' % e)
 
     # Generate automatic voiceover only if the content is not available in the
     # cache; otherwise, use the cached voiceovers.

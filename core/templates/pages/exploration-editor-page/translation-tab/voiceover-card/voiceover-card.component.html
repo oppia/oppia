@@ -1,19 +1,19 @@
 <mat-card>
   <h3>Voiceovers</h3>
-  <div *ngIf="pageIsLoaded">
+  <div *ngIf="voiceoversAreLoaded">
     <div *ngIf="unsupportedLanguageCode">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
         Please contact a server admin for more details.
       </i>
     </div>
-    <div *ngIf="!contentAvailableForVoiceovers">
+    <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers">
       <i>
         Content is not available for voiceovers in the selected language.
       </i>
     </div>
   </div>
 
-  <div *ngIf="pageIsLoaded && voiceoversAreLoaded && !unsupportedLanguageCode && contentAvailableForVoiceovers">
+  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode && contentAvailableForVoiceovers">
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="automatic-voiceovers" *ngIf="isActiveLanguageAccentSupportsAutoVoiceovers">
+    <div class="automatic-voiceovers" *ngIf="isVoiceoverAutogenerationSupportedForSelectedAccent">
       <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
       <div class="voiceovers-component" *ngIf="automaticVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">

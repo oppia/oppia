@@ -35,7 +35,6 @@ export class AddAudioTranslationModalComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() audioFile!: File;
   @Input() generatedFilename!: string;
-  @Input() isAudioAvailable!: boolean;
   @Input() languageCode!: string;
 
   uploadedFile!: Blob | null;

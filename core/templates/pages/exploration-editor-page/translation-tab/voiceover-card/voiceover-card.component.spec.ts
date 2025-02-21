@@ -217,7 +217,7 @@ describe('Voiceover card component', () => {
 
     spyOn(entityVoiceoversService, 'addEntityVoiceovers');
 
-    component.updateVoiceoverWithChangeList();
+    component.updateManualVoiceoverWithChangeList();
     flush();
     discardPeriodicTasks();
 

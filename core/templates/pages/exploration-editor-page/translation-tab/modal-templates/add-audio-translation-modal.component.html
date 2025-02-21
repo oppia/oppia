@@ -17,10 +17,6 @@
                                        (fileChange)="updateUploadedFile($event)"
                                        (fileClear)="clearUploadedFile()">
             </oppia-audio-file-uploader>
-            <div *ngIf="isAudioAvailable"
-                 class="oppia-updated-audio-file-upload-message" tabindex="0">
-              <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.
-            </div>
             <div *ngIf="errorMessage"
                  class="oppia-audio-file-upload-field-error-message e2e-test-audio-file-upload-field-error-message">
               <i class="fas fa-exclamation-triangle"></i>
