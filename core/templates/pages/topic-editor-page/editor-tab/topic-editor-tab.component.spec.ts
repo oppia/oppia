@@ -257,7 +257,7 @@ describe('Topic editor tab directive', () => {
     expect(component.maxCharsInTopicName).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_NAME
     );
-    expect(component.maxCharsInTopicUrlFragment).toEqual(
+    expect(component.MAX_CHARS_IN_TOPIC_URL_FRAGMENT).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
     );
     expect(component.maxCharsInTopicDescription).toEqual(

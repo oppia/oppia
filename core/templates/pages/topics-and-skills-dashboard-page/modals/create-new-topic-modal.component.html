@@ -27,7 +27,7 @@
     <div class="e2e-test-new-topic-url-fragment-field">
       <url-fragment-editor-component label="Topic URL Fragment"
                                      placeholder="Enter url fragment for the topic."
-                                     [maxLength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
+                                     maxLength="{{MAX_CHARS_IN_TOPIC_URL_FRAGMENT}}"
                                      fragmentType="topic"
                                      [generatedUrlPrefix]="generatedUrlPrefix"
                                      [fragmentIsDuplicate]="topicUrlFragmentExists"

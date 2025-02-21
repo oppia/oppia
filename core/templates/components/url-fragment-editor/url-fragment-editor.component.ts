@@ -63,4 +63,13 @@ export class UrlFragmentEditorComponent {
     this.formatUrlFragment();
     this.urlFragmentChange.emit(this.urlFragment);
   }
+
+  isInvalidUrlFragment(): boolean {
+    const trimmedFragment = this.urlFragment.trim();
+    return (
+      trimmedFragment !== '' &&
+      (this.fragmentIsDuplicate ||
+        !this.validUrlFragmentRegex.test(trimmedFragment))
+    );
+  }
 }

@@ -47,7 +47,7 @@
     <div class="story-input e2e-test-create-new-story-url-fragment-field">
       <url-fragment-editor-component label="Url Fragment"
                                      placeholder="Enter url fragment for the story."
-                                     [maxLength]="MAX_CHARS_IN_STORY_URL_FRAGMENT"
+                                     maxLength="{{MAX_CHARS_IN_STORY_URL_FRAGMENT}}"
                                      fragmentType="story"
                                      [generatedUrlPrefix]="generatedUrlPrefix"
                                      [fragmentIsDuplicate]="storyUrlFragmentExists"

@@ -92,7 +92,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
   maxCharsInTopicName!: number;
-  maxCharsInTopicUrlFragment!: number;
+  MAX_CHARS_IN_TOPIC_URL_FRAGMENT!: number;
   maxCharsInTopicDescription!: number;
   maxCharsInPageTitleFragmentForWeb!: number;
   maxCharsInMetaTagContent!: number;
@@ -673,7 +673,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.initEditor();
     this._initStorySummaries();
     this.maxCharsInTopicName = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
-    this.maxCharsInTopicUrlFragment =
+    this.MAX_CHARS_IN_TOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     this.maxCharsInTopicDescription =
       AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION;

@@ -67,7 +67,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
-  maxCharsInSubtopicUrlFragment!: number;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
   generatedUrlPrefix: string;
 
@@ -347,7 +347,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.initEditor();
     }
     this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
-    this.maxCharsInSubtopicUrlFragment =
+    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 

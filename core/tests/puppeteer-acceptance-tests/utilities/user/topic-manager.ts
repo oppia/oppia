@@ -120,7 +120,7 @@ const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
 const filterOptionSelector = '.mat-option-text';
 const topicNameField = '.e2e-test-topic-name-field';
-const updateTopicUrlFragmentField =
+const topicEditorUrlFragmentField =
   '.e2e-test-topic-url-fragment-field .e2e-test-url-fragment-field';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
@@ -403,11 +403,11 @@ export class TopicManager extends BaseUser {
       await this.type(topicNameField, topicName);
     }
     if (urlFragment) {
-      await this.page.waitForSelector(updateTopicUrlFragmentField, {
+      await this.page.waitForSelector(topicEditorUrlFragmentField, {
         visible: true,
       });
-      await this.clearAllTextFrom(updateTopicUrlFragmentField);
-      await this.page.type(updateTopicUrlFragmentField, urlFragment);
+      await this.clearAllTextFrom(topicEditorUrlFragmentField);
+      await this.page.type(topicEditorUrlFragmentField, urlFragment);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);

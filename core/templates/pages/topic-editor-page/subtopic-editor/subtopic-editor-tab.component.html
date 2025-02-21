@@ -62,7 +62,7 @@
           <div class="subtopic-url-fragment e2e-test-subtopic-url-fragment-field" tabindex="0">
             <url-fragment-editor-component label="Url Fragment"
                                            placeholder="Enter url fragment for the subtopic."
-                                           [maxLength]="maxCharsInSubtopicUrlFragment"
+                                           maxLength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}"
                                            fragmentType="subtopic"
                                            [generatedUrlPrefix]="generatedUrlPrefix"
                                            [fragmentIsDuplicate]="subtopicUrlFragmentExists"
