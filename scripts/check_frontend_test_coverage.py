@@ -76,7 +76,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-list-select-skill-and-difficulty-modal.component.ts',
     # TODO(#16656): This file will be covered by angular migration team.
-    'extensions/interactions/base-interaction-validation.service.ts',
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-opportunities-select-difficulty-modal.component.ts',
     # TODO(#16656): This file will be covered by angular migration team.
