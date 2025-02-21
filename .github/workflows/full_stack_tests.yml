@@ -100,15 +100,18 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
-        uses: oppia/retry@a9fb265410e634c84ee90f3e87f323fde0541037
-        with:
-          max_attempts: 2
-          substrings_indicating_flaky_execution: ${{ matrix.suite.flaky_indicators || '' }}
-          command: >
-            VIDEO_RECORDING_IS_ENABLED=0
-            xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-            python -m scripts.run_e2e_tests --skip-install
-            --skip-build --suite=${{ matrix.suite.name }} --prod_env
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+        if: ${{ failure() }}
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -155,7 +158,24 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests 
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+        if: ${{ failure() }}
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests 
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
+      - name: Uploading Desktop test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
       - name: Uploading generated test to angular module mapping as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -164,6 +184,21 @@ jobs:
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
+      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+        if: ${{ failure() }}
+        # We use xvfb-run to create a virtual screen to run tests without headless mode.
+        # Numbers in 1285x1000x24 represents screen width, height and color depth respectively.
+        run: >
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          python -m scripts.run_acceptance_tests --skip-build 
+          --suite=${{ matrix.suite.name }} --prod_env --mobile
+      - name: Uploading Mobile test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
       - name: Uploading webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
