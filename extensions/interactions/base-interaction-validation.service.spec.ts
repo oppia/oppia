@@ -23,7 +23,6 @@ import {
 } from './base-interaction-validation.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {AppConstants} from 'app.constants';
 
 describe('baseInteractionValidationService', () => {
   let service: baseInteractionValidationService;
