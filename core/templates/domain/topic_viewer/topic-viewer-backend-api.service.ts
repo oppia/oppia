@@ -54,8 +54,7 @@ export class TopicViewerBackendApiService {
       .toPromise()
       .then(
         response => {
-          let readOnlyTopic =
-            ReadOnlyTopic.createFromBackendDict(response);
+          let readOnlyTopic = ReadOnlyTopic.createFromBackendDict(response);
           if (successCallback) {
             successCallback(readOnlyTopic);
           }

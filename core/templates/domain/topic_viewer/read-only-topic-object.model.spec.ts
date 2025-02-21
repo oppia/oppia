@@ -16,9 +16,7 @@
  * @fileoverview Tests for ReadOnlyTopic model class.
  */
 
-import {
-  ReadOnlyTopic,
-} from 'domain/topic_viewer/read-only-topic-object.model';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.model';
 import {StoryNode} from 'domain/story/story-node.model';
 
 describe('Read only topic object Factory', () => {
