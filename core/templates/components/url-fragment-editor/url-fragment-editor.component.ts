@@ -64,8 +64,11 @@ export class UrlFragmentEditorComponent {
     this.urlFragmentChange.emit(this.urlFragment);
   }
 
-  isInvalidUrlFragment(): boolean {
+  shouldInvalidUrlFragmentMessageBeShown(): boolean {
     const trimmedFragment = this.urlFragment.trim();
+    // If trimmedFragment is empty, we should not show
+    // an error message because, initially, when the component
+    // loads, it will be empty, but the user is going to type.
     return (
       trimmedFragment !== '' &&
       (this.fragmentIsDuplicate ||

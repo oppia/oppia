@@ -171,24 +171,24 @@ describe('UrlFragmentEditorComponent', () => {
   it('should return false when urlFragment is empty', () => {
     component.urlFragment = '';
     component.fragmentIsDuplicate = false;
-    expect(component.isInvalidUrlFragment()).toBeFalse();
+    expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeFalse();
   });
 
   it('should return true when urlFragment is duplicate', () => {
     component.urlFragment = 'test-url';
     component.fragmentIsDuplicate = true;
-    expect(component.isInvalidUrlFragment()).toBeTrue();
+    expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeTrue();
   });
 
   it('should return true when urlFragment does not match regex', () => {
     component.urlFragment = 'Invalid@Url!';
     component.fragmentIsDuplicate = false;
-    expect(component.isInvalidUrlFragment()).toBeTrue();
+    expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeTrue();
   });
 
   it('should return false when urlFragment is valid and not duplicate', () => {
     component.urlFragment = 'valid-url';
     component.fragmentIsDuplicate = false;
-    expect(component.isInvalidUrlFragment()).toBeFalse();
+    expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeFalse();
   });
 });
