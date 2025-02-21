@@ -45,7 +45,6 @@ describe('Diagnostic test engine service', () => {
   let question4: Question;
   let stateObject: StateObjectFactory;
   let textInputService: InteractionRulesService;
-  let Outcome: Outcome;
   let answerClassificationService: AnswerClassificationService;
   let alertsService: AlertsService;
   let questionObjectFactory: QuestionObjectFactory;
