@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {
@@ -134,10 +133,3 @@ export class CuratedExplorationValidationService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CuratedExplorationValidationService',
-    downgradeInjectable(CuratedExplorationValidationService)
-  );

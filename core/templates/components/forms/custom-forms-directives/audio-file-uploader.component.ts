@@ -24,7 +24,6 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 
 @Component({
@@ -84,10 +83,3 @@ export class AudioFileUploaderComponent {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaAudioFileUploader',
-    downgradeComponent({component: AudioFileUploaderComponent})
-  );

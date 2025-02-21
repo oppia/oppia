@@ -26,7 +26,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -358,10 +357,3 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateInteractionEditor',
-  downgradeComponent({
-    component: StateInteractionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

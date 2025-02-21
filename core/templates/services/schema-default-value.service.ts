@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {LoggerService} from 'services/contextual/logger.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
@@ -165,10 +165,3 @@ export class SchemaDefaultValueService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SchemaDefaultValueService',
-    downgradeInjectable(SchemaDefaultValueService)
-  );

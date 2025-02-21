@@ -18,7 +18,6 @@
 
 import {EventEmitter, OnInit, Output} from '@angular/core';
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
@@ -156,10 +155,3 @@ export class ImageUploaderComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaThumbnailUploader',
-    downgradeComponent({component: ImageUploaderComponent})
-  );

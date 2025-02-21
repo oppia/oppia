@@ -16,7 +16,6 @@
  * @fileoverview Utility service for checking web browser type.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -100,7 +99,3 @@ export class BrowserCheckerService {
     return 'Others';
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BrowserCheckerService', downgradeInjectable(BrowserCheckerService));
