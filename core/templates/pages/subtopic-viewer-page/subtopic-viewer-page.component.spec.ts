@@ -39,7 +39,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.model';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();

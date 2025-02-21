@@ -28,7 +28,7 @@ import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-bac
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-} from 'domain/topic_viewer/read-only-topic-object.model';
+} from 'domain/topic_viewer/read-only-topic.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 class MockUrlService {

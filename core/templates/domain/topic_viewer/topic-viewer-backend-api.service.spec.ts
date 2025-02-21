@@ -25,7 +25,7 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-} from 'domain/topic_viewer/read-only-topic-object.model';
+} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 
 describe('Topic viewer backend API service', () => {

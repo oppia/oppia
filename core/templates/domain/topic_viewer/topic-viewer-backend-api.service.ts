@@ -23,7 +23,7 @@ import {Injectable} from '@angular/core';
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-} from 'domain/topic_viewer/read-only-topic-object.model';
+} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 

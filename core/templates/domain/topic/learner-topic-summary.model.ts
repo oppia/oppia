@@ -16,7 +16,7 @@ import {
   StorySummary,
   StorySummaryBackendDict,
 } from 'domain/story/story-summary.model';
-import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic-object.model';
+import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic.model';
 import {
   SubtopicBackendDict,
   Subtopic,

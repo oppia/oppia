@@ -32,7 +32,7 @@ import {
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-} from 'domain/topic_viewer/read-only-topic-object.model';
+} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
