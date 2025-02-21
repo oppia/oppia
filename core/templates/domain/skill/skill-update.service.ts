@@ -24,7 +24,7 @@ import {
   DomainObject,
   SkillChange,
 } from 'domain/editor/undo_redo/change.model';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';

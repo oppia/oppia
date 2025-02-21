@@ -169,7 +169,6 @@ import {
 } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import {MessengerService} from 'services/messenger.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {
   MultipleChoiceInputRulesService,
   // eslint-disable-next-line max-len
@@ -448,8 +447,6 @@ export class UpgradedServices {
         upgradedServices['AlgebraicExpressionInputRulesService']
       );
     upgradedServices['Meta'] = new Meta({});
-    upgradedServices['MisconceptionObjectFactory'] =
-      new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
       new MultipleChoiceInputRulesService();
     upgradedServices['MusicPhrasePlayerService'] =
@@ -1006,7 +1003,6 @@ export class UpgradedServices {
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SkillObjectFactory'] = new SkillObjectFactory(
-      upgradedServices['MisconceptionObjectFactory'],
       upgradedServices['ValidatorsService']
     );
     upgradedServices['SkillRightsBackendApiService'] =

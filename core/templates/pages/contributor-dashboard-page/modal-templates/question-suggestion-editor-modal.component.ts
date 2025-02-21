@@ -24,7 +24,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {Skill} from 'domain/skill/SkillObjectFactory';

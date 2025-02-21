@@ -30,8 +30,7 @@ import {of, Subscription} from 'rxjs';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {
   Misconception,
-  MisconceptionObjectFactory,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
@@ -42,7 +41,6 @@ import {SkillMisconceptionsEditorComponent} from './skill-misconceptions-editor.
 describe('Skill Misconceptions Editor Component', () => {
   let component: SkillMisconceptionsEditorComponent;
   let fixture: ComponentFixture<SkillMisconceptionsEditorComponent>;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let ngbModal: NgbModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillUpdateService: SkillUpdateService;
@@ -83,7 +81,6 @@ describe('Skill Misconceptions Editor Component', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     sampleSkill = new Skill(
       'id1',
@@ -98,7 +95,7 @@ describe('Skill Misconceptions Editor Component', () => {
       false,
       []
     );
-    sampleMisconception = misconceptionObjectFactory.create(
+    sampleMisconception = Misconception.create(
       1,
       'misconceptionName',
       'notes',

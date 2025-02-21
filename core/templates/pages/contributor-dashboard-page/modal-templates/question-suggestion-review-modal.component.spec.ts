@@ -44,7 +44,7 @@ import {
 } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import {ContextService} from 'services/context.service';
 import {Question} from 'domain/question/QuestionObjectFactory';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {

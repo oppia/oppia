@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
@@ -40,7 +40,6 @@ describe('Question object factory', function () {
   var StateObjectFactory = null;
   var sampleQuestion = null;
   var sampleQuestionBackendDict = null;
-  var misconceptionObjectFactory = null;
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -49,10 +48,6 @@ describe('Question object factory', function () {
       $provide.value(
         'AnswerGroupObjectFactory',
         new AnswerGroupObjectFactory(new OutcomeObjectFactory())
-      );
-      $provide.value(
-        'MisconceptionObjectFactory',
-        new MisconceptionObjectFactory()
       );
       $provide.value('OutcomeObjectFactory', new OutcomeObjectFactory());
       $provide.value(
@@ -99,14 +94,6 @@ describe('Question object factory', function () {
     angular.mock.inject(function ($injector) {
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       StateObjectFactory = $injector.get('StateObjectFactory');
-      // The injector is required because this service is directly used in this
-      // spec, therefore even though MisconceptionObjectFactory is upgraded to
-      // Angular, it cannot be used just by instantiating it by its class but
-      // instead needs to be injected. Note that 'misconceptionObjectFactory' is
-      // the injected service instance whereas 'MisconceptionObjectFactory' is the
-      // service class itself. Therefore, use the instance instead of the class in
-      // the specs.
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
       sampleQuestionBackendDict = {
         id: 'question_id',
@@ -258,21 +245,21 @@ describe('Question object factory', function () {
 
   it('should correctly report unaddressed misconceptions', function () {
     var interaction = sampleQuestion.getStateData().interaction;
-    var misconception1 = misconceptionObjectFactory.create(
+    var misconception1 = Misconception.create(
       'id',
       'name',
       'notes',
       'feedback',
       true
     );
-    var misconception2 = misconceptionObjectFactory.create(
+    var misconception2 = Misconception.create(
       'id_2',
       'name_2',
       'notes',
       'feedback',
       true
     );
-    var misconception3 = misconceptionObjectFactory.create(
+    var misconception3 = Misconception.create(
       'id_3',
       'name_3',
       'notes',

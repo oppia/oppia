@@ -37,10 +37,9 @@ import {
   ConceptCardBackendDict,
 } from 'domain/skill/concept-card.model';
 import {
-  MisconceptionObjectFactory,
   Misconception,
   MisconceptionBackendDict,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
 import {ValidatorsService} from 'services/validators.service';
 import {AppConstants} from 'app.constants';
@@ -262,7 +261,6 @@ export class Skill {
 })
 export class SkillObjectFactory {
   constructor(
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private validatorService: ValidatorsService
   ) {}
 
@@ -297,7 +295,7 @@ export class SkillObjectFactory {
     misconceptionsBackendDicts: MisconceptionBackendDict[]
   ): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
-      return this.misconceptionObjectFactory.createFromBackendDict(
+      return Misconception.createFromBackendDict(
         misconceptionsBackendDict
       );
     });

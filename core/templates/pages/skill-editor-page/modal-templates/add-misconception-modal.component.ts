@@ -21,7 +21,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
@@ -68,7 +68,6 @@ export class AddMisconceptionModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private skillEditorStateService: SkillEditorStateService,
     private changeDetectorRef: ChangeDetectorRef
   ) {
@@ -115,7 +114,7 @@ export class AddMisconceptionModalComponent
     }
     let newMisconceptionId = this.skill.getNextMisconceptionId();
     this.ngbActiveModal.close({
-      misconception: this.misconceptionObjectFactory.create(
+      misconception: Misconception.create(
         newMisconceptionId,
         this.misconceptionName,
         this.misconceptionNotes,

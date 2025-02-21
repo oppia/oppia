@@ -25,9 +25,9 @@ import {
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {QuestionValidationService} from './question-validation.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -38,7 +38,6 @@ import {
 import {Rule} from 'domain/exploration/rule.model';
 
 describe('Question Validation Service', () => {
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
   let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
@@ -60,7 +59,6 @@ describe('Question Validation Service', () => {
   }));
 
   beforeEach(() => {
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     qvs = TestBed.inject(QuestionValidationService);
     rs = TestBed.inject(ResponsesService);
     ses = TestBed.inject(StateEditorService);
@@ -181,14 +179,14 @@ describe('Question Validation Service', () => {
     } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
+        Misconception.create(
           1,
           'misc1',
           'notes1',
           'feedback1',
           true
         ),
-        misconceptionObjectFactory.create(
+        Misconception.create(
           2,
           'misc2',
           'notes2',

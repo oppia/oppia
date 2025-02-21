@@ -24,7 +24,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {AppConstants} from 'app.constants';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 
 /* Null in ID denotes a new question whose ID is yet
   to be set, this ID is later set in backend API service. */

@@ -23,9 +23,9 @@ import {
   ConceptCard,
 } from 'domain/skill/concept-card.model';
 import {
+  Misconception,
   MisconceptionBackendDict,
-  MisconceptionObjectFactory,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
 import {
@@ -37,7 +37,6 @@ import {AppConstants} from 'app.constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let example1 = null;
   let example2 = null;
   let misconceptionDict1: MisconceptionBackendDict;
@@ -51,7 +50,6 @@ describe('Skill object factory', () => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe],
     });
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     misconceptionDict1 = {
@@ -130,8 +128,8 @@ describe('Skill object factory', () => {
     expect(skill.getId()).toEqual('1');
     expect(skill.getDescription()).toEqual('test description');
     expect(skill.getMisconceptions()).toEqual([
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict1),
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict2),
+      Misconception.createFromBackendDict(misconceptionDict1),
+      Misconception.createFromBackendDict(misconceptionDict2),
     ]);
     expect(skill.getRubrics()).toEqual([
       Rubric.createFromBackendDict(rubricDict),
@@ -149,7 +147,7 @@ describe('Skill object factory', () => {
   it('should find misconception by id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.findMisconceptionById(4)).toEqual(
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict2)
+      Misconception.createFromBackendDict(misconceptionDict2)
     );
   });
 
@@ -167,7 +165,7 @@ describe('Skill object factory', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.deleteMisconception(2);
     expect(skill.getMisconceptions()).toEqual([
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict2),
+      Misconception.createFromBackendDict(misconceptionDict2),
     ]);
   });
 
@@ -212,7 +210,7 @@ describe('Skill object factory', () => {
     skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
 
-    var misconceptionToAdd1 = misconceptionObjectFactory.createFromBackendDict({
+    var misconceptionToAdd1 = Misconception.createFromBackendDict({
       id: skill.getNextMisconceptionId(),
       name: 'test name',
       notes: 'test notes',

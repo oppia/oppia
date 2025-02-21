@@ -34,7 +34,6 @@ import {
 } from 'domain/question/editable-question-backend-api.service';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
@@ -90,7 +89,6 @@ describe('Questions List Component', () => {
   let contextService: ContextService;
   let questionValidationService: QuestionValidationService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let question = null;
   let questionStateData = null;
   let skill = null;
@@ -129,8 +127,6 @@ describe('Questions List Component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
-
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);
     skillEditorRoutingService = TestBed.inject(SkillEditorRoutingService);
@@ -431,7 +427,7 @@ describe('Questions List Component', () => {
 
     expect(component.misconceptionsBySkill).toEqual({
       skillId1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',

@@ -22,7 +22,7 @@ import {AppConstants} from 'app.constants';
 import {
   Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {
   Question,
   QuestionBackendDict,
