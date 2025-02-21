@@ -123,7 +123,6 @@ describe('State translation component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
-  let Outcome: Outcome;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
@@ -299,7 +298,6 @@ describe('State translation component', () => {
         ExplorationStatesService,
         ExternalSaveService,
         TextInputRulesService,
-        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -337,7 +335,6 @@ describe('State translation component', () => {
     component = fixture.componentInstance;
 
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    Outcome = TestBed.inject(Outcome);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
@@ -992,7 +989,6 @@ describe('State translation component', () => {
         ExplorationStatesService,
         ExternalSaveService,
         TextInputRulesService,
-        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -1514,7 +1510,6 @@ describe('State translation component', () => {
         ExplorationStatesService,
         ExternalSaveService,
         TextInputRulesService,
-        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -2199,7 +2194,6 @@ describe('State translation component', () => {
         ExplorationStatesService,
         ExternalSaveService,
         TextInputRulesService,
-        Outcome,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
