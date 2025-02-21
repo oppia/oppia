@@ -11,6 +11,7 @@ on:
     branches:
       - develop
       - release-*
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
