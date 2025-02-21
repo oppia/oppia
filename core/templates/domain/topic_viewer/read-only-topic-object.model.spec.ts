@@ -13,22 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ReadOnlyTopicObjectFactory.
+ * @fileoverview Tests for ReadOnlyTopic model class.
  */
 
 import {
   ReadOnlyTopic,
-  ReadOnlyTopicObjectFactory,
-} from 'domain/topic_viewer/read-only-topic-object.factory';
+} from 'domain/topic_viewer/read-only-topic-object.model';
 import {StoryNode} from 'domain/story/story-node.model';
 
 describe('Read only topic object Factory', () => {
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   let _sampleReadOnlyTopic: ReadOnlyTopic;
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
-
     let nodeDict = {
       id: 'node_1',
       thumbnail_filename: 'image.png',
@@ -106,7 +102,7 @@ describe('Read only topic object Factory', () => {
     };
 
     _sampleReadOnlyTopic =
-      readOnlyTopicObjectFactory.createFromBackendDict(sampleTopicDataDict);
+      ReadOnlyTopic.createFromBackendDict(sampleTopicDataDict);
   });
 
   it('should return correct values for read-only topic object', () => {
