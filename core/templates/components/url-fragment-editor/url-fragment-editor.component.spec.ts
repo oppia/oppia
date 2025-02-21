@@ -174,6 +174,12 @@ describe('UrlFragmentEditorComponent', () => {
     expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeFalse();
   });
 
+  it('should return false when urlFragment contains spaces', () => {
+    component.urlFragment = '   ';
+    component.fragmentIsDuplicate = false;
+    expect(component.shouldInvalidUrlFragmentMessageBeShown()).toBeFalse();
+  });
+
   it('should return true when urlFragment is duplicate', () => {
     component.urlFragment = 'test-url';
     component.fragmentIsDuplicate = true;
