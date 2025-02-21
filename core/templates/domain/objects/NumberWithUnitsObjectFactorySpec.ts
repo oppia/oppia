@@ -30,7 +30,7 @@ describe('NumberWithUnitsObjectFactory', () => {
     let errors: typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
 
     beforeEach(() => {
-      nwuof = new NumberWithUnitsObjectFactory(new Units());
+      nwuof = new NumberWithUnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
 
