@@ -16,7 +16,6 @@
  * @fileoverview Component for skills
  */
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -102,10 +101,3 @@ export class SkillCardComponent {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'cardDisplayComponent',
-    downgradeComponent({component: SkillCardComponent})
-  );

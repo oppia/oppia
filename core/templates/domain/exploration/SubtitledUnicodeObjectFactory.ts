@@ -23,7 +23,6 @@ export interface SubtitledUnicodeBackendDict {
 }
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export class SubtitledUnicode {
   // A null 'content_id' indicates that the 'SubtitledHtml' has been created
@@ -79,10 +78,3 @@ export class SubtitledUnicodeObjectFactory {
     return new SubtitledUnicode(unicode, contentId);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SubtitledUnicodeObjectFactory',
-    downgradeInjectable(SubtitledUnicodeObjectFactory)
-  );

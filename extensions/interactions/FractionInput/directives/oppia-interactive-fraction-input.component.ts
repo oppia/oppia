@@ -27,7 +27,6 @@ import {InteractionAttributesExtractorService} from 'interactions/interaction-at
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 
 import {FractionInputRulesService} from './fraction-input-rules.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
 
@@ -224,10 +223,3 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveFractionInput',
-  downgradeComponent({
-    component: InteractiveFractionInputComponent,
-  }) as angular.IDirectiveFactory
-);

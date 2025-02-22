@@ -16,7 +16,6 @@
  * @fileoverview A data service that stores the current interaction skill.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {
@@ -42,10 +41,3 @@ export class StateLinkedSkillIdService extends StatePropertyService<
     return this.statePropertyInitializedEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateLinkedSkillIdService',
-    downgradeInjectable(StateLinkedSkillIdService)
-  );

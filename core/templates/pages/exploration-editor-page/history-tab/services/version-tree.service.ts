@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   RevertChangeList,
@@ -165,7 +164,3 @@ export class VersionTreeService {
     return cloneDeep(this._snapshots[version].commit_cmds);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('VersionTreeService', downgradeInjectable(VersionTreeService));
