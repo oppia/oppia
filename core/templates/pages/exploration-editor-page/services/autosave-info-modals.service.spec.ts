@@ -22,7 +22,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 import {AutosaveInfoModalsService} from './autosave-info-modals.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {LocalStorageService} from 'services/local-storage.service';
 
 class showNonStrictValidationFailModalRef {

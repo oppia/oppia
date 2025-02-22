@@ -17,24 +17,18 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {OutcomeObjectFactory} from './OutcomeObjectFactory';
 import {SubtitledHtml} from './subtitled-html.model';
 
 describe('Lost Change Object Factory', () => {
-  let lcof: LostChangeObjectFactory;
   let oof: OutcomeObjectFactory;
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [LostChangeObjectFactory],
-    });
-
-    lcof = TestBed.inject(LostChangeObjectFactory);
     oof = TestBed.inject(OutcomeObjectFactory);
   });
 
   it('should evaluate values from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'add_state',
       state_name: 'State name',
       content_id_for_state_content: 'content_0',
@@ -46,7 +40,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a renaming Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'rename_state',
       old_state_name: 'Old state name',
       new_state_name: 'New state name',
@@ -58,7 +52,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a Lost Change with edition changes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -84,7 +78,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should get state property value when it is an array from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1', 'value 2'],
@@ -104,7 +98,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should get relative changes when changes is awways from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1', 'value 2', 'value 3'],
@@ -116,7 +110,7 @@ describe('Lost Change Object Factory', () => {
     expect(lostChange.isOldValueEmpty()).toBeFalse();
     expect(lostChange.isNewValueEmpty()).toBeFalse();
 
-    const lostChange2 = lcof.createNew({
+    const lostChange2 = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1'],
@@ -130,7 +124,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a EndExploration Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
@@ -148,7 +142,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a Lost Change with deleted changes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       // 'new_value' will be null when the EndExploration
@@ -169,7 +163,7 @@ describe('Lost Change Object Factory', () => {
     'should evaluate values from a Lost Change with equal outcomes and' +
       ' rules',
     () => {
-      const lostChange = lcof.createNew({
+      const lostChange = LostChange.createNew({
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
@@ -235,7 +229,7 @@ describe('Lost Change Object Factory', () => {
   );
 
   it('should return false if any of the outcome dest are not present', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -276,7 +270,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a Lost Change with equal outcomes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -342,14 +336,14 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should return the language name from language code', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_exploration_property',
       new_value: 'bn',
       old_value: 'en',
       property_name: 'language_code',
     });
     expect(lostChange.getLanguage()).toBe('বাংলা (Bangla)');
-    const lostChange2 = lcof.createNew({
+    const lostChange2 = LostChange.createNew({
       language_code: 'en',
       cmd: 'add_written_translation',
       content_id: 'content',

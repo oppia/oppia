@@ -57,7 +57,7 @@ import {
   RecordedVoiceOverBackendDict,
   RecordedVoiceovers,
 } from 'domain/exploration/recorded-voiceovers.model';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';

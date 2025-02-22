@@ -69,7 +69,6 @@ import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-da
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
@@ -697,7 +696,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
-  ['LostChangeObjectFactory', LostChangeObjectFactory],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
   ['MathInteractionsService', MathInteractionsService],

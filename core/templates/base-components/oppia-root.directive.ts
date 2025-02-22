@@ -88,7 +88,6 @@ angular.module('oppia').directive('oppiaRoot', [
               'LoaderService',
               'LocalStorageService',
               'LoggerService',
-              'LostChangeObjectFactory',
               'MessengerService',
               'MetaTagCustomizationService',
               'NormalizeWhitespacePipe',
