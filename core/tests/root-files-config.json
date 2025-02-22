@@ -18,7 +18,6 @@
     "extensions/rich_text_components/richTextComponentsRequires.ts",
     "core/templates/domain/exploration/LostChangeObjectFactorySpec.ts",
     "core/templates/domain/question/QuestionObjectFactorySpec.ts",
-    "core/templates/domain/skill/SkillObjectFactorySpec.ts",
     "core/templates/domain/exploration/StatesObjectFactorySpec.ts",
     "core/templates/domain/state/StateObjectFactorySpec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
@@ -59,7 +58,6 @@
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md",
     "core/templates/AppSpec.ts",
-    "core/templates/domain/skill/misconception.modelSpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"

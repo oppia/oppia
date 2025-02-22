@@ -21,7 +21,7 @@ import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {WorkedExample} from 'domain/skill/worked-example.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WorkedExampleEditorComponent} from './worked-example-editor.component';

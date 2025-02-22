@@ -26,7 +26,7 @@ import {
 } from '@angular/core';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 
@@ -49,8 +49,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   skillDescriptionEditorIsShown: boolean = false;
   constructor(
     private skillUpdateService: SkillUpdateService,
-    private skillEditorStateService: SkillEditorStateService,
-    private skillObjectFactory: SkillObjectFactory
+    private skillEditorStateService: SkillEditorStateService
   ) {}
 
   canEditSkillDescription(): boolean {
@@ -65,7 +64,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
-    if (this.skillObjectFactory.hasValidDescription(newSkillDescription)) {
+    if (Skill.hasValidDescription(newSkillDescription)) {
       this.skillDescriptionEditorIsShown = false;
       this.skillUpdateService.setSkillDescription(
         this.skill,

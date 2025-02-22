@@ -22,7 +22,7 @@ import {
 } from 'domain/skill/skill-rights.model';
 
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {SkillDescriptionEditorComponent} from './skill-description-editor.component';
 
@@ -36,7 +36,6 @@ describe('Skill Description Editor Component', () => {
 
   let skillUpdateService: SkillUpdateService;
   let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
 
   let sampleSkillRights: SkillRights;
   let skillRightsDict: SkillRightsBackendDict;
@@ -57,7 +56,6 @@ describe('Skill Description Editor Component', () => {
 
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
@@ -131,7 +129,7 @@ describe('Skill Description Editor Component', () => {
       'setSkillDescription'
     ).and.callThrough();
     spyOn(component.onSaveDescription, 'emit').and.callThrough();
-    spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(true);
+    spyOn(Skill, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
@@ -159,7 +157,7 @@ describe('Skill Description Editor Component', () => {
       skillUpdateService,
       'setSkillDescription'
     ).and.callThrough();
-    spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(false);
+    spyOn(Skill, 'hasValidDescription').and.returnValue(false);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');

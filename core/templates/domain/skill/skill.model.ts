@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating frontend skills
+ * @fileoverview Model class for creating frontend skills
  */
 
 export interface SkillBackendDict {
@@ -254,15 +254,8 @@ export class Skill {
     }
     return issues;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class SkillObjectFactory {
-  constructor(private validatorService: ValidatorsService) {}
-
-  hasValidDescription(description: string): boolean {
+  static hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
     return this.validatorService.isValidEntityName(
       description,
@@ -271,7 +264,7 @@ export class SkillObjectFactory {
     );
   }
 
-  createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
+  static createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,
@@ -289,7 +282,7 @@ export class SkillObjectFactory {
     );
   }
 
-  generateMisconceptionsFromBackendDict(
+  static generateMisconceptionsFromBackendDict(
     misconceptionsBackendDicts: MisconceptionBackendDict[]
   ): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
@@ -297,7 +290,7 @@ export class SkillObjectFactory {
     });
   }
 
-  generateRubricsFromBackendDict(
+  static generateRubricsFromBackendDict(
     rubricBackendDicts: RubricBackendDict[]
   ): Rubric[] {
     return rubricBackendDicts.map(rubricBackendDict => {

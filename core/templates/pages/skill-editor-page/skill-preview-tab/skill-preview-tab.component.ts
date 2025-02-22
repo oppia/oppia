@@ -22,7 +22,7 @@ import {
   QuestionBackendDict,
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';

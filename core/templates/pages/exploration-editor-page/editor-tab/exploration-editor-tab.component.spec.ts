@@ -75,7 +75,7 @@ import {
   FetchSkillResponse,
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 
@@ -106,7 +106,6 @@ describe('Exploration editor tab component', () => {
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
   let alertsService: AlertsService;
 
   class MockJoyrideService {
@@ -243,7 +242,6 @@ describe('Exploration editor tab component', () => {
       VersionHistoryBackendApiService
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
@@ -690,7 +688,7 @@ describe('Exploration editor tab component', () => {
   it('should populate misconceptions for state', fakeAsync(() => {
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill_id1',
           description: 'test description 1',
           misconceptions: [

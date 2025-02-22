@@ -25,7 +25,7 @@ import {
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 import {Rubric} from 'domain/skill/rubric.model';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {ContextService} from 'services/context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
@@ -61,7 +61,6 @@ export class CreateNewSkillModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private skillObjectFactory: SkillObjectFactory,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
@@ -85,9 +84,7 @@ export class CreateNewSkillModalComponent {
   }
 
   setErrorMessageIfNeeded(): void {
-    if (
-      !this.skillObjectFactory.hasValidDescription(this.newSkillDescription)
-    ) {
+    if (!Skill.hasValidDescription(this.newSkillDescription)) {
       this.errorMsg =
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.';

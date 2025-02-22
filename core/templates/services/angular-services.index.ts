@@ -107,7 +107,6 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
@@ -804,7 +803,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillEditorStateService', SkillEditorStateService],
   ['SkillEditorRoutingService', SkillEditorRoutingService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
-  ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SkillUpdateService', SkillUpdateService],
   ['SolutionObjectFactory', SolutionObjectFactory],

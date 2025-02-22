@@ -255,7 +255,6 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SkillCreationBackendApiService} from 'domain/skill/skill-creation-backend-api.service';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -1002,9 +1001,6 @@ export class UpgradedServices {
       );
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(upgradedServices['HttpClient']);
-    upgradedServices['SkillObjectFactory'] = new SkillObjectFactory(
-      upgradedServices['ValidatorsService']
-    );
     upgradedServices['SkillRightsBackendApiService'] =
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
