@@ -260,9 +260,7 @@ export class Skill {
   providedIn: 'root',
 })
 export class SkillObjectFactory {
-  constructor(
-    private validatorService: ValidatorsService
-  ) {}
+  constructor(private validatorService: ValidatorsService) {}
 
   hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
@@ -295,9 +293,7 @@ export class SkillObjectFactory {
     misconceptionsBackendDicts: MisconceptionBackendDict[]
   ): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
-      return Misconception.createFromBackendDict(
-        misconceptionsBackendDict
-      );
+      return Misconception.createFromBackendDict(misconceptionsBackendDict);
     });
   }
 

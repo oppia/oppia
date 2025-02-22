@@ -50,11 +50,7 @@ describe('Skill update service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        SkillUpdateService,
-        UndoRedoService,
-        SkillObjectFactory,
-      ],
+      providers: [SkillUpdateService, UndoRedoService, SkillObjectFactory],
     });
 
     skillUpdateService = TestBed.inject(SkillUpdateService);

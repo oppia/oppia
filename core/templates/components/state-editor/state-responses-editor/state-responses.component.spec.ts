@@ -587,15 +587,7 @@ describe('State Responses Component', () => {
       'onStateEditorInitialized'
     ).and.returnValue(onStateEditorInitializedEmitter);
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.returnValue({
-      skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-      ],
+      skill1: [Misconception.create(1, 'Misconception 1', 'note', '', false)],
     });
 
     expect(component.misconceptionsBySkill).toBe(undefined);
@@ -605,15 +597,7 @@ describe('State Responses Component', () => {
     onStateEditorInitializedEmitter.emit();
 
     expect(component.misconceptionsBySkill).toEqual({
-      skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-      ],
+      skill1: [Misconception.create(1, 'Misconception 1', 'note', '', false)],
     });
     expect(component.containsOptionalMisconceptions).toBe(true);
 
@@ -626,15 +610,7 @@ describe('State Responses Component', () => {
       onUpdateMisconceptionsEmitter
     );
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.returnValue({
-      skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-      ],
+      skill1: [Misconception.create(1, 'Misconception 1', 'note', '', false)],
     });
 
     expect(component.misconceptionsBySkill).toBe(undefined);
@@ -644,15 +620,7 @@ describe('State Responses Component', () => {
     onUpdateMisconceptionsEmitter.emit();
 
     expect(component.misconceptionsBySkill).toEqual({
-      skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-      ],
+      skill1: [Misconception.create(1, 'Misconception 1', 'note', '', false)],
     });
     expect(component.containsOptionalMisconceptions).toBe(true);
 
@@ -1611,20 +1579,8 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
     component.misconceptionsBySkill = {
       skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-        Misconception.create(
-          2,
-          'Misconception 2',
-          'note',
-          '',
-          true
-        ),
+        Misconception.create(1, 'Misconception 1', 'note', '', false),
+        Misconception.create(2, 'Misconception 2', 'note', '', true),
       ],
     };
 
@@ -1639,20 +1595,8 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getLinkedSkillId').and.returnValue('skill1');
     component.misconceptionsBySkill = {
       skill1: [
-        Misconception.create(
-          1,
-          'Misconception 1',
-          'note',
-          '',
-          false
-        ),
-        Misconception.create(
-          2,
-          'Misconception 2',
-          'note',
-          '',
-          true
-        ),
+        Misconception.create(1, 'Misconception 1', 'note', '', false),
+        Misconception.create(2, 'Misconception 2', 'note', '', true),
       ],
     };
 

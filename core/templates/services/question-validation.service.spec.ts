@@ -179,20 +179,8 @@ describe('Question Validation Service', () => {
     } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
-        Misconception.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-        Misconception.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          false
-        ),
+        Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create(2, 'misc2', 'notes2', 'feedback1', false),
       ],
     };
   });

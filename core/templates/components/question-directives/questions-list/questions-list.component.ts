@@ -259,9 +259,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             response.associated_skill_dicts.forEach(skillDict => {
               this.misconceptionsBySkill[skillDict.id] =
                 skillDict.misconceptions.map(misconception => {
-                  return Misconception.createFromBackendDict(
-                    misconception
-                  );
+                  return Misconception.createFromBackendDict(misconception);
                 });
               this.associatedSkillSummaries.push(
                 ShortSkillSummary.create(skillDict.id, skillDict.description)
