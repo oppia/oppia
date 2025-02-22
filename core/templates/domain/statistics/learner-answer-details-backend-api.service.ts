@@ -16,7 +16,6 @@
  * @fileoverview Service to record learner answer info.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -66,10 +65,3 @@ export class LearnerAnswerDetailsBackendApiService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerAnswerDetailsBackendApiService',
-    downgradeInjectable(LearnerAnswerDetailsBackendApiService)
-  );

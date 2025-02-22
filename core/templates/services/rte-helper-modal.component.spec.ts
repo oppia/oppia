@@ -23,7 +23,7 @@ import {
   fakeAsync,
   flush,
 } from '@angular/core/testing';
-import {RteHelperModalComponent} from './rte-helper-modal.controller';
+import {RteHelperModalComponent} from './rte-helper-modal.component';
 import {ExternalRteSaveService} from './external-rte-save.service';
 import {AlertsService} from './alerts.service';
 import {ContextService} from './context.service';

@@ -18,7 +18,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
@@ -154,10 +153,3 @@ export class OnScreenKeyboardComponent {
     return false;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaOnScreenKeyboard',
-    downgradeComponent({component: OnScreenKeyboardComponent})
-  );

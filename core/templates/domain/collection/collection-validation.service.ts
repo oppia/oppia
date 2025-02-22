@@ -19,7 +19,6 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -141,10 +140,3 @@ export class CollectionValidationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionValidationService',
-    downgradeInjectable(CollectionValidationService)
-  );

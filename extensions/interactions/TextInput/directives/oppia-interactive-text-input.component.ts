@@ -21,7 +21,6 @@
  */
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TextInputAnswer} from 'interactions/answer-defs';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -138,10 +137,3 @@ export class InteractiveTextInputComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveTextInput',
-  downgradeComponent({
-    component: InteractiveTextInputComponent,
-  })
-);
