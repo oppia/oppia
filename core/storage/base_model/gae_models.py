@@ -1131,6 +1131,87 @@ class VersionedModel(BaseModel):
             BaseModel.update_timestamps_multi(models_to_put_values)
             BaseModel.put_multi(models_to_put_values)
 
+    # Here force_deletion is true.
+    def get_datastore_keys_for_delete(
+        self
+    ) -> List[datastore_services.Key]:
+        """Get this model instance's Datastore keys.
+
+        Returns:
+            list(datastore_services.Key). The models associated datastore keys.
+
+        Raises:
+            Exception. This model instance has been already deleted.
+        """
+        current_version = self.version
+
+        version_numbers = range(1, current_version + 1)
+        snapshot_ids = [
+            self.get_snapshot_id(self.id, version_number)
+            for version_number in version_numbers]
+
+        metadata_keys = [
+            datastore_services.Key(
+                self.SNAPSHOT_METADATA_CLASS, snapshot_id)
+            for snapshot_id in snapshot_ids]
+
+        content_keys = [
+            datastore_services.Key(self.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+            for snapshot_id in snapshot_ids]
+
+        commit_log_keys: List[datastore_services.Key] = []
+        if self.COMMIT_LOG_ENTRY_CLASS is not None:
+            commit_log_ids = (
+                self.COMMIT_LOG_ENTRY_CLASS.get_instance_id(
+                    self.id, version_number)
+                for version_number in version_numbers
+            )
+            commit_log_keys = [
+                datastore_services.Key(
+                    self.COMMIT_LOG_ENTRY_CLASS, commit_log_id)
+                for commit_log_id in commit_log_ids]
+
+        return content_keys + metadata_keys + commit_log_keys
+
+    # Here force deletion is false
+    def get_models_for_deletion(
+            self,
+            committer_id: str,
+            commit_message: str,
+        ) -> List[BaseModel]:
+            """Get this models instance for deletion.
+
+            Args:
+                committer_id: str. The user_id of the user who committed the change.
+                commit_message: str. The commit description message.
+
+            Returns:
+                list(BaseModel). The BaseModel models.
+
+            Raises:
+                Exception. This model instance has been already deleted.
+            """
+            self._require_not_marked_deleted()  # pylint: disable=protected-access
+            self.deleted = True
+
+            commit_cmds = [{
+                'cmd': self.CMD_DELETE_COMMIT
+            }]
+            models_to_put = self.compute_models_to_commit(
+                committer_id,
+                feconf.COMMIT_TYPE_DELETE,
+                commit_message,
+                commit_cmds,
+                self._prepare_additional_models()
+            )
+            models_to_put_values = []
+            for model_to_put in models_to_put.values():
+                # Here, we are narrowing down the type from object to BaseModel.
+                assert isinstance(model_to_put, BaseModel)
+                models_to_put_values.append(model_to_put)
+            return model_to_put
+
+
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override

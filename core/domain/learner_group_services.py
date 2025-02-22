@@ -38,9 +38,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
+    from mypy_imports import base_models
 
-(learner_group_models, user_models) = models.Registry.import_models(
-    [models.Names.LEARNER_GROUP, models.Names.USER])
+(learner_group_models, user_models, base_models) = models.Registry.import_models(
+    [models.Names.LEARNER_GROUP, models.Names.USER, models.Names.BASE_MODEL,])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -735,6 +736,28 @@ def remove_story_reference_from_learner_groups(story_id: str) -> None:
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
 
 
+def get_model_remove_story_reference_from_learner_groups(story_id: str) -> List[base_models.BaseModel]:
+    """Removes a given story id from all learner groups that have it's
+    reference.
+
+    Args:
+        story_id: str. Story id to remove.
+    """
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_models.LearnerGroupModel.get_all().filter(
+            datastore_services.any_of(
+                learner_group_models.LearnerGroupModel.story_ids == story_id
+            )
+        ).fetch()
+    )
+
+    models_to_put = []
+    for model in found_models:
+        model.story_ids.remove(story_id)
+        models_to_put.append(model)
+    return models_to_put
+
+
 def remove_subtopic_page_reference_from_learner_groups(
     topic_id: str,
     subtopic_id: int
@@ -765,6 +788,34 @@ def remove_subtopic_page_reference_from_learner_groups(
     learner_group_models.LearnerGroupModel.update_timestamps_multi(
         models_to_put)
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
+
+
+def get_instance_for_subtopic_page_removal(
+    topic_id: str,
+    subtopic_id: int
+) -> List[base_models.BaseModel]:
+    """Get the model of associated instance.
+
+    Args:
+        topic_id: str. Id of the topic of the subtopic page.
+        subtopic_id: int. Id of the subtopic of the subtopic page.
+    """
+    subtopic_page_id = '{}:{}'.format(topic_id, subtopic_id)
+
+    learner_group_model_cls = learner_group_models.LearnerGroupModel
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_model_cls.get_all().filter(
+            datastore_services.any_of(
+                learner_group_model_cls.subtopic_page_ids == subtopic_page_id
+            )
+        ).fetch()
+    )
+
+    models_to_put = []
+    for model in found_models:
+        model.subtopic_page_ids.remove(subtopic_page_id)
+        models_to_put.append(model)
+    return models_to_put
 
 
 def update_progress_sharing_permission(

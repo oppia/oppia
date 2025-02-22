@@ -42,9 +42,10 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import user_models
+    from mypy_imports import base_models
 
-(opportunity_models, user_models) = models.Registry.import_models([
-    models.Names.OPPORTUNITY, models.Names.USER
+(opportunity_models, user_models, base_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.USER, models.Names.BASE_MODEL
 ])
 
 # NOTE TO DEVELOPERS: The functions:
@@ -523,6 +524,24 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
         exp_opprtunity_model_class.story_id == story_id
     ).fetch()
     exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
+
+
+def get_model_for_delete_exp_opportunities_corresponding_to_story(story_id: str) -> List[base_models.BaseModel]:
+    """Deletes the ExplorationOpportunitySummaryModel models which corresponds
+    to the given story_id.
+
+    Args:
+        story_id: str. The ID of the story.
+    """
+    exp_opprtunity_model_class = (
+        opportunity_models.ExplorationOpportunitySummaryModel)
+    exp_opportunity_models: Sequence[
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ] = exp_opprtunity_model_class.get_all().filter(
+        exp_opprtunity_model_class.story_id == story_id
+    ).fetch()
+    return list(exp_opportunity_models)
+    # exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
 
 
 def get_translation_opportunities(

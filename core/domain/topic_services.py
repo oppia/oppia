@@ -54,13 +54,13 @@ from typing import Dict, List, Optional, Sequence, Tuple, cast
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import topic_models
-    from mypy_imports import transaction_services
     from mypy_imports import datastore_services
     from mypy_imports import subtopic_models
     from mypy_imports import story_models
+    from mypy_imports import base_models
 
-(topic_models,subtopic_models,story_models,) = models.Registry.import_models([models.Names.TOPIC,models.Names.SUBTOPIC,models.Names.STORY])
-transaction_services = models.Registry.import_transaction_services()
+(topic_models,subtopic_models,story_models,base_models,) = models.Registry.import_models(
+    [models.Names.TOPIC,models.Names.SUBTOPIC,models.Names.STORY,models.Names.BASE_MODEL,])
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -1026,56 +1026,48 @@ def add_additional_story(
 def delete_topic_transactional(
     topic_id: str
 ) -> None:
-    """Transactional function to delete a topic.
+    """Transactional function to delete a topic when force_deletion is True.
 
     Args:
-        committer_id: str. ID of the committer.
         topic_id: str. ID of the topic to be deleted.
-        force_deletion: bool. If true, the topic and its history are fully
-            deleted and are unrecoverable. Otherwise, the topic and all
-            its history are marked as deleted, but the corresponding models are
-            still retained in the datastore. This last option is the preferred
-            one.
 
     Raises:
         ValueError. User does not have enough rights to delete a topic.
     """
 
     keys_to_delete = []
-    topic_rights_key = datastore_services.Key(
-        topic_models.TopicRightsModel,topic_id)
-    keys_to_delete.append(topic_rights_key);
-    topic_summary_key = datastore_services.Key(
-        topic_models.TopicSummaryModel,topic_id)
-    keys_to_delete.append(topic_summary_key)
-
-    # Delete the summary of the topic (regardless of whether
-    # force_deletion is True or not).
+    topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
+    topic_rights_keys = topic_rights_model.get_datastore_keys_for_delete()
+    keys_to_delete.append(topic_rights_keys)
+    # topic_summary_model =topic_models.TopicSummaryModel.get(topic_id)
+    # topic_summary_keys = topic_summary_model.get_datastore_keys_for_delete()
+    # keys_to_delete.append(topic_summary_keys)
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         
         subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic['id'])
-        subtopic_page_key = datastore_services.Key(
-            subtopic_models.SubtopicPageModel,
-            subtopic_page_id
-        )
-        keys_to_delete.append(subtopic_page_key)
+        subtopic_page_keys = subtopic_models.SubtopicPageModel.get(subtopic_page_id).get_datastore_keys_for_delete()
+        keys_to_delete.append(subtopic_page_keys)
 
     all_story_references = (
         topic_model.canonical_story_references +
         topic_model.additional_story_references)
+    story_model_list = []
     for story_reference in all_story_references:
-        story_model_key = datastore_services.Key(
-            story_models.StoryModel, story_reference['story_id'])
-        keys_to_delete.append(story_model_key)
-    topic_model_key = datastore_services.Key(
-        topic_models.TopicModel,topic_id
-    )
-    keys_to_delete.append(topic_model_key)
+        story_model = story_models.StoryModel.get(story_reference['story_id'], strict=False)
+        if story_model is not None:
+            story_model_list.append(story_model)
+            story_model_keys = story_model.get_datastore_keys_for_delete()
+            keys_to_delete.append(story_model_keys)
+
+    topic_model_keys = topic_models.TopicModel.get(topic_id).get_datastore_keys_for_delete()
+    keys_to_delete.append(topic_model_keys)
+    keys_to_delete.append(feedback_services.get_delete_thread_keys_for_multiple_entities(
+        feconf.ENTITY_TYPE_TOPIC, [topic_id]))
     cloud_datastore_services.delete_multi_transactional(keys_to_delete)
-    feedback_services.delete_threads_for_multiple_entities(
-        feconf.ENTITY_TYPE_TOPIC, [topic_id])
+    for story in story_model_list:
+        story_services.post_delete_story(story)
 
 
 def delete_topic(
@@ -1095,7 +1087,42 @@ def delete_topic(
     Raises:
         ValueError. User does not have enough rights to delete a topic.
     """
-    delete_topic_transactional(topic_id)
+    if force_deletion:
+        delete_topic_transactional(topic_id=topic_id)
+    else:
+        model_to_put: List[base_models.BaseModel] = []
+        keys_to_delete: List[datastore_services.Key] = []
+        topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
+        # topic_rights_model.delete(
+        #     committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
+        #     force_deletion=force_deletion)
+        model_to_put.append(topic_rights_model.get_models_for_deletion(
+            committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
+
+        # Delete the summary of the topic (regardless of whether
+        # force_deletion is True or not).
+        # delete_topic_summary(topic_id)
+        keys_to_delete.append(topic_models.TopicSummaryModel.get(topic_id).get_datastore_keys_for_delete())
+        topic_model = topic_models.TopicModel.get(topic_id)
+        for subtopic in topic_model.subtopics:
+            # subtopic_page_services.delete_subtopic_page(
+            #     committer_id, topic_id, subtopic['id'])
+            model_to_put.append(subtopic_page_services.get_model_instances_for_delete_subtopic_page(
+                committer_id, topic_id, subtopic['id']))
+
+        all_story_references = (
+            topic_model.canonical_story_references +
+            topic_model.additional_story_references)
+        for story_reference in all_story_references:
+            story_dict = story_services.get_model_keys_And_delete_story(
+                committer_id, story_reference['story_id'])
+            model_to_put.append(story_dict['model_to_put'])
+            keys_to_delete.append(story_dict['keys_to_delete'])
+        model_to_put.append(topic_model.get_models_for_deletion(
+            committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
+
+        datastore_services.update_timestamps_and_put_multi_transactional(model_to_put)
+        datastore_services.delete_multi_transactional(keys_to_delete)
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.
     caching_services.delete_multi(

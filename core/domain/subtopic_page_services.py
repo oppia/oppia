@@ -34,8 +34,9 @@ from typing import Dict, List, Literal, Optional, Sequence, overload
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
+    from mypy_imports import base_models
 
-(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
+(subtopic_models, base_models) = models.Registry.import_models([models.Names.SUBTOPIC, models.Names.BASE_MODEL])
 
 
 def _migrate_page_contents_to_latest_schema(
@@ -339,6 +340,27 @@ def delete_subtopic_page(
         force_deletion=force_deletion)
     learner_group_services.remove_subtopic_page_reference_from_learner_groups(
         topic_id, subtopic_id)
+
+
+def get_model_instances_for_delete_subtopic_page(
+    committer_id: str,
+    topic_id: str,
+    subtopic_id: int,
+) -> List[base_models.BaseModel]:
+    """Get topic summary model and related model instances.
+
+    Args:
+        committer_id: str. The user who is deleting the subtopic page.
+        topic_id: str. The ID of the topic that this subtopic belongs to.
+        subtopic_id: int. ID of the subtopic which was removed.
+    """
+    subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, subtopic_id)
+    model_to_put = subtopic_models.SubtopicPageModel.get(subtopic_page_id).get_models_for_deletion(
+        committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED)
+    model_to_put.append(learner_group_services.get_instance_for_subtopic_page_removal(
+        topic_id, subtopic_id))
+    return model_to_put
 
 
 def get_topic_ids_from_subtopic_page_ids(

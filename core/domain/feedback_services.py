@@ -486,6 +486,50 @@ def delete_threads_for_multiple_entities(
     datastore_services.delete_multi(model_keys)
 
 
+def get_delete_thread_keys_for_multiple_entities(
+    entity_type: str, entity_ids: List[str]
+) -> List[datastore_services.Key]:
+    """Retrieves model keys for deleting threads associated with multiple entities.
+
+    Args:
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_ids: list(str). The ids of the entities.
+
+    Returns:
+            list(datastore_services.Key). The models associated datastore keys.
+    """
+    threads = []
+    for entity_id in entity_ids:
+        threads.extend(get_threads(entity_type, entity_id))
+
+    model_keys = []
+    for thread in threads:
+        for message in get_messages(thread.id):
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id)
+            )
+        model_keys.append(
+            datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, thread.id)
+        )
+        if thread.has_suggestion:
+            model_keys.append(
+                datastore_services.Key(
+                    suggestion_models.GeneralSuggestionModel, thread.id)
+            )
+
+    model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
+
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        for entity_id in entity_ids:
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, entity_id)
+            )
+    return model_keys
+
+
 def update_messages_read_by_the_user(
     user_id: str, thread_id: str, message_ids: List[int]
 ) -> None:

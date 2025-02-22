@@ -40,16 +40,19 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast
+from typing import List, Sequence, Tuple, cast, Dict
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import story_models
     from mypy_imports import user_models
+    from mypy_imports import datastore_services
+    from mypy_imports import base_models
 
-(exp_models, story_models, user_models,) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER])
+(exp_models, story_models, user_models,base_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER, models.Names.BASE_MODEL])
+datastore_services = models.Registry.import_datastore_services()
 
 
 def get_new_story_id() -> str:
@@ -909,6 +912,110 @@ def delete_story(
     # Delete references of the story from all related learner groups.
     learner_group_services.remove_story_reference_from_learner_groups(story_id)
 
+
+def get_model_keys_And_delete_story(
+    committer_id: str, story_id: str
+) -> Dict[List[base_models.BaseModel],List[datastore_services.Key]]:
+    """Deletes the story with the given story_id.
+
+    Args:
+        committer_id: str. ID of the committer.
+        story_id: str. ID of the story to be deleted.
+        force_deletion: bool. If true, the story and its history are fully
+            deleted and are unrecoverable. Otherwise, the story and all
+            its history are marked as deleted, but the corresponding models are
+            still retained in the datastore. This last option is the preferred
+            one.
+    """
+
+    story_model = story_models.StoryModel.get(story_id, strict=False)
+    model_to_put = []
+    keys_to_delete = []
+    if story_model is not None:
+        story = story_fetchers.get_story_from_model(story_model)
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        # story_model.delete(
+        #     committer_id,
+        #     feconf.COMMIT_MESSAGE_STORY_DELETED,
+        #     force_deletion=force_deletion
+        # )
+        model_to_put.append(story_model.get_models_for_deletion(
+            committer_id,
+            feconf.COMMIT_MESSAGE_STORY_DELETED))
+        # Reject the suggestions related to the exploration used in
+        # the story.
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids)
+
+    exploration_context_models: Sequence[
+        exp_models.ExplorationContextModel
+    ] = (
+        exp_models.ExplorationContextModel.get_all().filter(
+            exp_models.ExplorationContextModel.story_id == story_id
+        ).fetch()
+    )
+    model_to_put.append(list(exploration_context_models))
+    # exp_models.ExplorationContextModel.delete_multi(
+    #     list(exploration_context_models)
+    # )
+
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story_id])
+
+    # Delete the summary of the story (regardless of whether
+    # force_deletion is True or not).
+    # delete_story_summary(story_id)
+    keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_keys_for_delete())
+
+    # Delete the opportunities available.
+    model_to_put.append(opportunity_services.get_model_for_delete_exp_opportunities_corresponding_to_story(
+        story_id))
+
+    # Delete references of the story from all related learner groups.
+    model_to_put.append(learner_group_services.get_model_remove_story_reference_from_learner_groups(story_id))
+
+    return {"model_to_put": model_to_put, "keys_to_delete": keys_to_delete}
+
+
+def post_delete_story(
+    story_model: story_models.StoryModel
+) -> None:
+    story = story_fetchers.get_story_from_model(story_model)
+    exp_ids = story.story_contents.get_all_linked_exp_ids()
+    # Reject the suggestions related to the exploration used in
+    # the story.
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+        exp_ids)
+
+    exploration_context_models: Sequence[
+        exp_models.ExplorationContextModel
+    ] = (
+        exp_models.ExplorationContextModel.get_all().filter(
+            exp_models.ExplorationContextModel.story_id == story.id
+        ).fetch()
+    )
+    exp_models.ExplorationContextModel.delete_multi(
+        list(exploration_context_models)
+    )
+
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    caching_services.delete_multi(
+        caching_services.CACHE_NAMESPACE_STORY, None, [story.id])
+
+    # Delete the summary of the story (regardless of whether
+    # force_deletion is True or not).
+    delete_story_summary(story.id)
+
+    # Delete the opportunities available.
+    opportunity_services.delete_exp_opportunities_corresponding_to_story(
+        story.id)
+
+    # Delete references of the story from all related learner groups.
+    learner_group_services.remove_story_reference_from_learner_groups(story.id)
+    
 
 def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.

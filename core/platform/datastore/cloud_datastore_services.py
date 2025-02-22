@@ -130,6 +130,29 @@ def put_multi(entities: Sequence[Model]) -> List[str]:
 
 
 @transaction_services.run_in_transaction_wrapper
+def update_timestamps_and_put_multi_transactional(
+    entities: Sequence[base_models.BaseModel],
+    update_last_updated_time: bool = True
+) -> List[str]:
+    """Update the created_on and last_updated fields of all given entities
+    and put in datastore in transactional way.
+
+    Args:
+        entities: list(datastore_services.Model). List of model instances to
+            be stored.
+        update_last_updated_time: bool. Whether to update the
+            last_updated field of the model.
+
+    Returns:
+        list(str). A list with the stored keys.
+    """
+    for entity in entities:
+        entity.update_timestamps(
+            update_last_updated_time=update_last_updated_time)
+    return ndb.put_multi(list(entities))
+
+
+@transaction_services.run_in_transaction_wrapper
 def delete_multi_transactional(keys: List[Key]) -> List[None]:
     """Deletes models corresponding to a sequence of keys and runs it through
     a transaction. Either all models are deleted, or none of them in the case
