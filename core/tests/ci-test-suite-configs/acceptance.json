@@ -81,6 +81,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
     },
     {
+      "name": "logged-in-user/unauthorized-users-cannot-access-pages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/unauthorized-users-cannot-access-pages.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },
