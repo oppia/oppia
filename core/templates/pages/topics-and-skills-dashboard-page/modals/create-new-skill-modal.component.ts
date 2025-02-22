@@ -61,7 +61,8 @@ export class CreateNewSkillModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private skill: Skill
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +85,7 @@ export class CreateNewSkillModalComponent {
   }
 
   setErrorMessageIfNeeded(): void {
-    if (!Skill.hasValidDescription(this.newSkillDescription)) {
+    if (!this.skill.hasValidDescription(this.newSkillDescription)) {
       this.errorMsg =
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.';

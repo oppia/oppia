@@ -64,7 +64,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
-    if (Skill.hasValidDescription(newSkillDescription)) {
+    if (this.skill.hasValidDescription(newSkillDescription)) {
       this.skillDescriptionEditorIsShown = false;
       this.skillUpdateService.setSkillDescription(
         this.skill,

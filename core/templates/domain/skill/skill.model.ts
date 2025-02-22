@@ -30,8 +30,6 @@ export interface SkillBackendDict {
   version: number;
 }
 
-import {Injectable} from '@angular/core';
-
 import {
   ConceptCard,
   ConceptCardBackendDict,
@@ -45,6 +43,8 @@ import {ValidatorsService} from 'services/validators.service';
 import {AppConstants} from 'app.constants';
 
 export class Skill {
+  private _validatorService: ValidatorsService;
+
   _id: string;
   _description: string;
   _misconceptions: Misconception[];
@@ -255,9 +255,9 @@ export class Skill {
     return issues;
   }
 
-  static hasValidDescription(description: string): boolean {
+  hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
-    return this.validatorService.isValidEntityName(
+    return this._validatorService.isValidEntityName(
       description,
       false,
       allowDescriptionToBeBlank
