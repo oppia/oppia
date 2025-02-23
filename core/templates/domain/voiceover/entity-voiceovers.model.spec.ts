@@ -33,10 +33,26 @@ describe('EntityVoiceovers model class', function () {
     needs_update: false,
     duration_secs: 10.0,
   };
+  let automaticVoiceoverBackendDict: VoiceoverBackendDict = {
+    filename: 'b.mp3',
+    file_size_bytes: 200000,
+    needs_update: false,
+    duration_secs: 10.0,
+  };
   let contentIdToVoiceoversMappingBackendDict = {
     content0: {
       manual: manualVoiceoverBackendDict,
+      auto: automaticVoiceoverBackendDict,
     },
+  };
+  let contentIdToVoiceoversAudioOffsetsMsecsBackendDict = {
+    content0: [
+      {token: 'This', audio_offset_msecs: 0.0},
+      {token: 'is', audio_offset_msecs: 100.0},
+      {token: 'from', audio_offset_msecs: 200.0},
+      {token: 'cached', audio_offset_msecs: 300.0},
+      {token: 'model', audio_offset_msecs: 400.0},
+    ],
   };
 
   let entityVoiceoversBackendDict = {
@@ -45,16 +61,32 @@ describe('EntityVoiceovers model class', function () {
     entity_version: entityVersion,
     language_accent_code: languageAccentCode,
     voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+    automated_voiceovers_audio_offsets_msecs:
+      contentIdToVoiceoversAudioOffsetsMsecsBackendDict,
   };
 
   let manualVoiceover = Voiceover.createFromBackendDict(
     manualVoiceoverBackendDict
   );
+  let automaticVoiceover = Voiceover.createFromBackendDict(
+    automaticVoiceoverBackendDict
+  );
 
   let contentIdToVoiceoversMapping = {
     content0: {
       manual: manualVoiceover,
+      auto: automaticVoiceover,
     },
+  };
+
+  let contentIdToVoiceoversAudioOffsetsMsecs = {
+    content0: [
+      {token: 'This', audioOffsetMsecs: 0.0},
+      {token: 'is', audioOffsetMsecs: 100.0},
+      {token: 'from', audioOffsetMsecs: 200.0},
+      {token: 'cached', audioOffsetMsecs: 300.0},
+      {token: 'model', audioOffsetMsecs: 400.0},
+    ],
   };
 
   it('should be able to create model instance', () => {
@@ -68,6 +100,9 @@ describe('EntityVoiceovers model class', function () {
     expect(entityVoiceovers.languageAccentCode).toEqual(languageAccentCode);
     expect(entityVoiceovers.voiceoversMapping).toEqual(
       contentIdToVoiceoversMapping
+    );
+    expect(entityVoiceovers.automatedVoiceoversAudioOffsetsMsecs).toEqual(
+      contentIdToVoiceoversAudioOffsetsMsecs
     );
   });
 

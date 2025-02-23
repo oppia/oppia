@@ -112,13 +112,20 @@ export class TranslationStatusService implements OnInit {
       return availabilityStatus;
     }
 
-    let voiceover = entityVoiceovers.getManualVoiceover(contentId);
+    let manualVoiceover = entityVoiceovers.getManualVoiceover(contentId);
+    let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(contentId);
 
-    if (voiceover === undefined) {
+    if (manualVoiceover) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = manualVoiceover.needsUpdate;
+    } else if (automaticVoiceover) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = automaticVoiceover.needsUpdate;
+    }
+
+    if (manualVoiceover === undefined) {
       return availabilityStatus;
     }
-    availabilityStatus.available = true;
-    availabilityStatus.needsUpdate = voiceover.needsUpdate;
 
     return availabilityStatus;
   }

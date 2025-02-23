@@ -71,11 +71,13 @@ describe('Voiceover backend API service', function () {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
     };
 
     req.flush({
       language_accent_master_list: languageAccentMasterList,
       language_codes_mapping: languageCodesMapping,
+      autogeneratable_language_accent_codes: ['en-US', 'hi-IN'],
     });
 
     flushMicrotasks();

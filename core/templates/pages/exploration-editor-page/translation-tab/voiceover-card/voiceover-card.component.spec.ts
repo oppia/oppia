@@ -137,9 +137,9 @@ describe('Voiceover card component', () => {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
     spyOn(audioPlayerService, 'getCurrentTimeInSecs').and.returnValue(10);
 
-    component.manualVoiceoverDuration = 10;
-    component.voiceoverProgress = 0;
-    component.pageIsLoaded = false;
+    component.manualVoiceoverTotalDuration = 10;
+    component.manualVoiceoverProgress = 0;
+    component.isManualVoiceoverPlaying = true;
 
     component.ngOnInit();
     translationLanguageService.onActiveLanguageAccentChanged.emit();
@@ -152,9 +152,7 @@ describe('Voiceover card component', () => {
     tick();
     discardPeriodicTasks();
 
-    expect(component.pageIsLoaded).toBeTrue();
-
-    expect(component.voiceoverProgress).toEqual(100);
+    expect(component.manualVoiceoverProgress).toEqual(100);
   }));
 
   it('should be able to initialize the voiceover card component when audio is not loaded', fakeAsync(() => {
@@ -168,8 +166,7 @@ describe('Voiceover card component', () => {
 
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
 
-    component.pageIsLoaded = false;
-    component.voiceoverProgress = 80;
+    component.manualVoiceoverProgress = 80;
 
     component.ngOnInit();
     flush();
@@ -177,8 +174,7 @@ describe('Voiceover card component', () => {
     tick();
     discardPeriodicTasks();
 
-    expect(component.pageIsLoaded).toBeTrue();
-    expect(component.voiceoverProgress).toEqual(0);
+    expect(component.manualVoiceoverProgress).toEqual(0);
   }));
 
   it('should be able to update voiceover with the active change list', fakeAsync(() => {
@@ -390,15 +386,20 @@ describe('Voiceover card component', () => {
     let contentIdToVoiceoversMappingBackendDict = {
       content0: {
         manual: manualVoiceoverBackendDict,
+        auto: undefined,
       },
     };
+    let contentIdToVoiceoversAudioOffsetsMsecsBackendDict = {};
     let entityVoiceoversBackendDict = {
       entity_id: entityId,
       entity_type: entityType,
       entity_version: entityVersion,
       language_accent_code: languageAccentCode,
       voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      automated_voiceovers_audio_offsets_msecs:
+        contentIdToVoiceoversAudioOffsetsMsecsBackendDict,
     };
+    component.activeContentId = 'content0';
     component.activeEntityVoiceoversInstance =
       EntityVoiceovers.createFromBackendDict(entityVoiceoversBackendDict);
 

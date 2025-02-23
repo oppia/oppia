@@ -152,7 +152,15 @@ export class EntityVoiceovers {
 
     if (voiceoverTypeToVoiceovers && voiceoverTypeToVoiceovers.manual) {
       return voiceoverTypeToVoiceovers.manual;
-    } else if (voiceoverTypeToVoiceovers && voiceoverTypeToVoiceovers.auto) {
+    } else {
+      return undefined;
+    }
+  }
+
+  getAutomaticVoiceover(contentId: string): Voiceover | undefined {
+    let voiceoverTypeToVoiceovers = this.voiceoversMapping[contentId];
+
+    if (voiceoverTypeToVoiceovers && voiceoverTypeToVoiceovers.auto) {
       return voiceoverTypeToVoiceovers.auto;
     } else {
       return undefined;

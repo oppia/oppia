@@ -16,7 +16,13 @@
  * @fileoverview Component for the voiceovers in the Exploration editor page.
  */
 
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  AfterViewChecked,
+} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
@@ -50,7 +56,7 @@ import {AppConstants} from 'app.constants';
   selector: 'oppia-voiceover-card',
   templateUrl: './voiceover-card.component.html',
 })
-export class VoiceoverCardComponent implements OnInit {
+export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   @ViewChild('visualized') visualized!: ElementRef<Element>;
   directiveSubscriptions = new Subscription();
 
@@ -186,6 +192,17 @@ export class VoiceoverCardComponent implements OnInit {
     this.updateActiveContent();
   }
 
+  ngAfterViewChecked(): void {
+    if (
+      this.changeListService.explorationChangeList.length >= 0 &&
+      this.changeListService.isOnlyVoiceoverChangeListPresent()
+    ) {
+      this.isGenerateAutomaticVoiceoverOptionEnabled = true;
+    } else {
+      this.isGenerateAutomaticVoiceoverOptionEnabled = false;
+    }
+  }
+
   updateManualVoiceoverWithChangeList(): void {
     this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
       changeDict = changeDict as ExplorationChangeEditVoiceovers;
@@ -253,15 +270,6 @@ export class VoiceoverCardComponent implements OnInit {
       this.contentAvailableForVoiceovers = true;
     } else {
       this.contentAvailableForVoiceovers = false;
-    }
-
-    if (
-      this.changeListService.explorationChangeList.length >= 0 &&
-      this.changeListService.isOnlyVoiceoverChangeListPresent()
-    ) {
-      this.isGenerateAutomaticVoiceoverOptionEnabled = true;
-    } else {
-      this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
   }
 
@@ -489,6 +497,22 @@ export class VoiceoverCardComponent implements OnInit {
         this.activeEntityVoiceoversInstance.voiceoversMapping[
           this.activeContentId
         ].manual = undefined;
+
+        if (
+          this.activeEntityVoiceoversInstance.voiceoversMapping[
+            this.activeContentId
+          ].auto === undefined
+        ) {
+          delete this.activeEntityVoiceoversInstance.voiceoversMapping[
+            this.activeContentId
+          ];
+        }
+
+        this.entityVoiceoversService.addEntityVoiceovers(
+          this.languageAccentCode,
+          this.activeEntityVoiceoversInstance
+        );
+
         this.updateStatusGraph();
       },
       () => {
@@ -579,13 +603,15 @@ export class VoiceoverCardComponent implements OnInit {
           ] = {};
         }
 
-        (this.activeEntityVoiceoversInstance.voiceoversMapping[
+        this.activeEntityVoiceoversInstance.voiceoversMapping[
           this.activeContentId
-        ].manual = this.manualVoiceover),
-          this.entityVoiceoversService.addEntityVoiceovers(
-            this.languageAccentCode,
-            this.activeEntityVoiceoversInstance
-          );
+        ].manual = this.manualVoiceover;
+
+        this.entityVoiceoversService.addEntityVoiceovers(
+          this.languageAccentCode,
+          this.activeEntityVoiceoversInstance
+        );
+
         this.updateStatusGraph();
       },
       () => {

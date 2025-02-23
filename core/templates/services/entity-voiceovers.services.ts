@@ -147,14 +147,26 @@ export class EntityVoiceoversService {
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
       for (let contentId in entityVoiceovers.voiceoversMapping) {
+        let voiceovers = [];
+        let manualVoiceover = entityVoiceovers.getManualVoiceover(
+          contentId
+        ) as Voiceover;
+        let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(
+          contentId
+        ) as Voiceover;
+
+        if (manualVoiceover) {
+          voiceovers.push(manualVoiceover);
+        }
+
+        if (automaticVoiceover) {
+          voiceovers.push(automaticVoiceover);
+        }
+
         if (Object.keys(contentIdToVoiceovers).indexOf(contentId) !== -1) {
-          contentIdToVoiceovers[contentId].push(
-            entityVoiceovers.getManualVoiceover(contentId) as Voiceover
-          );
+          contentIdToVoiceovers[contentId].concat(voiceovers);
         } else {
-          contentIdToVoiceovers[contentId] = [
-            entityVoiceovers.getManualVoiceover(contentId) as Voiceover,
-          ];
+          contentIdToVoiceovers[contentId] = voiceovers;
         }
       }
     }
