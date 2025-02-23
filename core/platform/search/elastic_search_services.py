@@ -211,6 +211,8 @@ def clear_index(index_name: str) -> None:
                     'match_all': {}
                 }
         })
+
+
 def search(
     query_string: str,
     index_name: str,
