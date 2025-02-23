@@ -211,8 +211,8 @@ def clear_index(index_name: str) -> None:
                     'match_all': {}
                 }
         })
-
-
+    
+    
 def search(
     query_string: str,
     index_name: str,
@@ -224,74 +224,51 @@ def search(
     """Searches for documents (explorations or collections) matching the given
     query in the given index.
 
-    This function also creates the index if it does not exist yet.
-
     Args:
         query_string: str. The terms that the user is searching for.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
         categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results. If it is not
-            empty, then a result is considered valid if it matches at least one
-            of these categories.
+            empty, no category filter is applied to the results.
         language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results. If
-            it is not empty, then a result is considered valid if it matches at
-            least one of these language codes.
-        offset: int|None. The offset into the index. Pass this in to start at
-            the 'offset' when searching through a list of results of max length
-            'size'. Leave as None to start at the beginning.
+            it is empty, no language code filter is applied to the results.
+        offset: int|None. The offset into the index.
         size: int. The maximum number of documents to return.
 
     Returns:
-        2-tuple of (result_ids, resulting_offset). Where:
-            result_ids: list(str). Represents search documents, this
-                will be a list of strings corresponding to the search document
-                ids.
-            resulting_offset: int. The resulting offset to start at for the next
-                section of the results. Returns None if there are no more
-                results.
+        2-tuple of (result_ids, resulting_offset).
     """
     if offset is None:
         offset = 0
 
-    # Convert the query into a Query DSL object. See
-    # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
-    # for more details about Query DSL.
-    # Here we use type Any because the query_definition is a dictionary having
-    # values of various types.
-    # This can be seen from the type stubs of elastic search.
-    # The type of 'body' is 'Any'.
-    # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-    # Constructing the Elasticsearch Query DSL object
-    # Enhanced with fuzziness for handling typos and incomplete queries.
     query_definition: Dict[str, Any] = {
         'query': {
             'bool': {
-                'must': [
-                    {
-                        'multi_match': {
-                            'query': query_string,
-                            'fields': ['title^3', 'description', 'category^2'],
-                            'fuzziness': 'AUTO',
-                            'prefix_length': 1,
-                            'max_expansions': 50,
-                            'minimum_should_match': '75%' 
-                        }
-                    }
-                ],
+                'must': [],
                 'filter': []
             }
         },
         'sort': [{
             'rank': {
-                'order': 'desc', 
-                'missing': '_last', 
+                'order': 'desc',
+                'missing': '_last',
                 'unmapped_type': 'float'
             }
-        }],
+        }]
     }
-
+    if query_string.strip() == '':
+        query_definition['query']['bool']['must'].append({'match_all': {}})
+    else:
+        query_definition['query']['bool']['must'].append({
+            'multi_match': {
+                'query': query_string,
+                'fields': ['title^3', 'description', 'category^2'],
+                'fuzziness': 'AUTO',
+                'prefix_length': 1,
+                'max_expansions': 50,
+                'minimum_should_match': '75%'
+            }
+        })
     if categories:
         query_definition['query']['bool']['filter'].append(
             {'terms': {'category.keyword': categories}}
@@ -299,8 +276,7 @@ def search(
     if language_codes:
         query_definition['query']['bool']['filter'].append(
             {'terms': {'language_code.keyword': language_codes}}
-        )
-
+        )  
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
         query_definition, index_name, offset, size
     )

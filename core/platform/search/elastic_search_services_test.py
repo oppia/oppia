@@ -125,7 +125,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_delete_by_query:
             elastic_search_services.clear_index(correct_index_name)
 
-    def test_search_returns_ids_only(self) -> None:
+    def test_search_returns_ids_only_new(self) -> None:
         correct_index_name = 'index1'
         elastic_search_services.add_documents_to_index([{
             'id': 1,
@@ -140,14 +140,46 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'param2': 4
             }
         }], correct_index_name)
-
-        result, new_offset = (
-            elastic_search_services.search(
-                '', correct_index_name, [], [], offset=0,
-                size=50
+        def mock_search(
+            body: Dict[str, Any], index: str, params: Dict[str, int]
+        ) -> Dict[str, Any]:
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'must': [{
+                            'match_all': {}
+                        }],
+                        'filter': []
+                    }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 51
+            })
+            return {
+                'hits': {
+                    'hits': [
+                        {'_id': '1'},
+                        {'_id': '12'}
+                    ]
+                }
+            }
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = elastic_search_services.search(
+                '', correct_index_name, [], [], offset=0, size=50
             )
-        )
-        self.assertEqual(result, [1, 12])
+        self.assertEqual(result, ['1', '12'])
         self.assertIsNone(new_offset)
 
     def test_search_returns_none_when_response_is_empty(self) -> None:
@@ -170,28 +202,26 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
-                'query': {
-                    'bool': {
-                        'filter': [{
-                            'match': {
-                                'category': '"my_category"',
-                            }
-                        }, {
-                            'match': {
-                                'language_code': '"en" "es"'
-                            }
-                        }],
-                        'must': [],
-                    }
-                },
-                'sort': [{
-                    'rank': {
-                        'order': 'desc',
-                        'missing': '_last',
-                        'unmapped_type': 'float'
-                    }
-                }]
-            })
+                    'query': {
+                        'bool': {
+                            'must': [{
+                                'match_all':{}
+                            }],
+                            'filter': [{
+                                'terms': {'category.keyword': ['my_category']}
+                            }, {
+                                'terms': {'language_code.keyword': ['en', 'es']}
+                            }]
+                        }
+                    },
+                    'sort': [{
+                        'rank': {
+                            'order': 'desc',
+                            'missing': '_last',
+                            'unmapped_type': 'float'
+                        }
+                    }]
+                })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params, {
                 'from': 0,
@@ -208,19 +238,16 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    '', correct_index_name, ['my_category'], ['en', 'es']))
+                    ' ', correct_index_name, ['my_category'], ['en', 'es']))
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
-    def test_search_constructs_nonempty_query_with_categories_and_langs(
+    def test_search_constructs_nonempty_query_with_categories_and_langs_new(
         self
     ) -> None:
         correct_index_name = 'index1'
 
-        # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
+    
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -229,16 +256,21 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'bool': {
                         'must': [{
                             'multi_match': {
-                                'query': 'query'
+                                'query': 'query',
+                                'fields': ['title^3', 'description', 'category^2'],
+                                'fuzziness': 'AUTO',
+                                'prefix_length': 1,
+                                'max_expansions': 50,
+                                'minimum_should_match': '75%'
                             }
                         }],
                         'filter': [{
-                            'match': {
-                                'category': '"my_category"',
+                            'terms': {
+                                'category.keyword': ['my_category']
                             }
                         }, {
-                            'match': {
-                                'language_code': '"en" "es"'
+                            'terms': {
+                                'language_code.keyword': ['en', 'es']
                             }
                         }]
                     }
@@ -261,13 +293,13 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'hits': []
                 }
             }
-
+        
         swap_search = self.swap(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
-            result, new_offset = (
-                elastic_search_services.search(
-                    'query', correct_index_name, ['my_category'], ['en', 'es']))
+            result, new_offset = elastic_search_services.search(
+                'query', correct_index_name, ['my_category'], ['en', 'es']
+            )
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
