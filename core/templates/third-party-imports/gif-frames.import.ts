@@ -21,8 +21,10 @@
 
 import * as gifFrames from 'gif-frames';
 
+export type GifFramesOptions = Record<string, unknown>;
+
 export class GifFramesService {
-  getFrames(options: any): Promise<any> {
+  getFrames(options: GifFramesOptions): Promise<unknown> {
     // Call the underlying gif-frames function.
     return gifFrames(options);
   }

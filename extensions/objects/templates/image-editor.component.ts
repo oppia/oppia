@@ -73,7 +73,6 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
 const gifshot = require('gifshot');
-const gifFrames = new GifFramesService();
 // Import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
