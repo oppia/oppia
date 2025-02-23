@@ -212,7 +212,7 @@ def clear_index(index_name: str) -> None:
                 }
         })
     
-    
+
 def search(
     query_string: str,
     index_name: str,
@@ -240,7 +240,15 @@ def search(
     """
     if offset is None:
         offset = 0
-
+        
+    # Convert the query into a Query DSL object. See
+    # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+    # for more details about Query DSL.
+    # Here we use type Any because the query_definition is a dictionary having
+    # values of various types.
+    # This can be seen from the type stubs of elastic search.
+    # The type of 'body' is 'Any'.
+    # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
     query_definition: Dict[str, Any] = {
         'query': {
             'bool': {
@@ -277,6 +285,7 @@ def search(
         query_definition['query']['bool']['filter'].append(
             {'terms': {'language_code.keyword': language_codes}}
         )  
+
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
         query_definition, index_name, offset, size
     )

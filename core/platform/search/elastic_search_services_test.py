@@ -245,9 +245,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     def test_search_constructs_nonempty_query_with_categories_and_langs_new(
         self
     ) -> None:
-        correct_index_name = 'index1'
+        correct_index_name = 'index1'  
 
-    
+        # Here we use type Any because this method mocks the behavior of
+        # elastic_search_services.ES.search, so to match the type annotations
+        # with 'search' method we defined the body as 'Dict[str, Any]' type,
+        # and also in the type stubs the type of body is mentioned as Any.  
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -257,7 +260,11 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                         'must': [{
                             'multi_match': {
                                 'query': 'query',
-                                'fields': ['title^3', 'description', 'category^2'],
+                                'fields': [
+                                    'title^3', 
+                                    'description', 
+                                    'category^2'
+                                ],
                                 'fuzziness': 'AUTO',
                                 'prefix_length': 1,
                                 'max_expansions': 50,
