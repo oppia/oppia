@@ -47,6 +47,8 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
+const profileDropdown = '.e2e-test-profile-dropdown';
+const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
@@ -117,6 +119,7 @@ const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const matFormTextSelector = '.oppia-form-text';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -177,6 +180,14 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToLearnerDashboard(): Promise<void> {
     await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Navigates to the learner dashboard using profile dropdown in the navbar.
+   */
+  async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.clickOn(profileDropdown);
+    await this.clickOn(learnerDashboardMenuLink);
   }
 
   /**
@@ -792,12 +803,26 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Updates the user's subject interests in preference page.
-   * @param {string[]} interests - The new interests to set for the user.
+   * @param {string[]} interests - The new interests to set for the user after each interest is entered in the input field, followed by pressing the Enter key.
    */
-  async updateSubjectInterests(interests: string[]): Promise<void> {
+  async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
+    }
+  }
+  /**
+   * Updates the user's subject interests in the preferences page
+   * when the input field loses focus.
+   *
+   * @param {string[]} interests - The new interests to set for the user when the input field is blurred (i.e., focus is moved away).
+   */
+  async updateSubjectInterestsWhenBlurringField(
+    interests: string[]
+  ): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.click(matFormTextSelector);
     }
   }
 

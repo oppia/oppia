@@ -60,6 +60,7 @@ const saveResponseButton = 'button.e2e-test-add-new-response';
 const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
 const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
 const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
@@ -69,6 +70,7 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -170,8 +172,7 @@ const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
 const classroomBannerContainer = '.e2e-test-classroom-banner-container';
-const uploadClassroomImageButton = '.e2e-test-photo-upload-submit';
-const imageUploaderModal = '.e2e-test-thumbnail-editor';
+const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
@@ -331,6 +332,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(equalsRuleButtonText);
     await this.type(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
+    await this.clickOn(openAnswerGroupFeedBackEditor);
+    await this.type(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -500,7 +503,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.page.waitForSelector(closeSaveModalButton, {visible: true});
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`,
+        {visible: true}
+      );
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
@@ -835,6 +841,23 @@ export class CurriculumAdmin extends BaseUser {
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
       showMessage(`welcome modal not found: ${error.message}`);
+    }
+  }
+
+  /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dropdownToggleIcon, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
+    } catch (error) {
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -1379,17 +1402,19 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
     await this.clickOn(classroomThumbnailContainer);
+
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickOn(uploadClassroomImageButton);
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.page.waitForSelector(uploadPhotoButton, {hidden: true});
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
     await this.uploadFile(classroomBannerImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadClassroomImageButton);
+    await this.clickOn(uploadPhotoButton);
+    await this.page.waitForSelector(imageUploaderModal, {hidden: true});
+
     await this.clickOn(saveClassroomButton);
 
     showMessage(`Updated ${classroomName} classroom.`);

@@ -35,11 +35,6 @@ indexes:
   - name: published_on
     direction: desc
 
-- kind: ClassifierTrainingJobModel
-  properties:
-  - name: status
-  - name: next_scheduled_check_time
-
 - kind: CollectionRightsSnapshotMetadataModel
   properties:
   - name: committer_id

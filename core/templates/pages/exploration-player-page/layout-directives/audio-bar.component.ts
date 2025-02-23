@@ -17,8 +17,12 @@
  * audio translation in the learner view.
  */
 
-import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -49,6 +53,7 @@ import {LocalStorageService} from 'services/local-storage.service';
   templateUrl: './audio-bar.component.html',
 })
 export class AudioBarComponent {
+  @ViewChild('audioControls', {static: false}) audioControlsRef!: ElementRef;
   lastScrollTop: number = 0;
   isPaused: boolean = true;
   directiveSubscriptions: Subscription = new Subscription();
@@ -64,6 +69,7 @@ export class AudioBarComponent {
   selectedLanguageAccentDescription!: string;
   voiceoverToBePlayed!: Voiceover | undefined;
   currentVoiceoverTime: number = 0;
+  totalVoiceoverDurationSecs: number = 0;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -80,7 +86,8 @@ export class AudioBarComponent {
     private entityVoiceoversService: EntityVoiceoversService,
     private platformFeatureService: PlatformFeatureService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.explorationPlayerModeIsActive =
       this.contextService.isInExplorationPlayerPage();
@@ -151,7 +158,19 @@ export class AudioBarComponent {
   }
 
   ngAfterContentChecked(): void {
-    this.currentVoiceoverTime = this.audioPlayerService.getCurrentTime();
+    if (
+      this.audioPlayerService.isTrackLoaded() &&
+      this.audioPlayerService.isPlaying()
+    ) {
+      this.currentVoiceoverTime =
+        this.audioPlayerService.getCurrentTimeInSecs();
+      this.totalVoiceoverDurationSecs = Math.floor(
+        this.audioPlayerService.getAudioDuration()
+      );
+    }
+    if (!this.audioPlayerService.isTrackLoaded()) {
+      this.currentVoiceoverTime = 0;
+    }
   }
 
   setProgress(val: {value: number}): void {
@@ -195,9 +214,15 @@ export class AudioBarComponent {
     }
   }
 
+  focusOnAudioControls(): void {
+    this.audioControlsRef?.nativeElement.focus();
+  }
+
   expandAudioBar(): void {
     this.audioBarIsExpanded = true;
     this.audioBarStatusService.markAudioBarExpanded();
+    this.cdRef.detectChanges();
+    this.focusOnAudioControls();
   }
 
   collapseAudioBar(): void {
@@ -438,10 +463,3 @@ export class AudioBarComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAudioBar',
-  downgradeComponent({
-    component: AudioBarComponent,
-  }) as angular.IDirectiveFactory
-);

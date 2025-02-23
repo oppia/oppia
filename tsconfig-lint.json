@@ -67,9 +67,6 @@
       "services/*": [
         "core/templates/services/*"
       ],
-      "classifiers/*": [
-        "extensions/classifiers/*"
-      ],
       "interactions/*": [
         "extensions/interactions/*"
       ],

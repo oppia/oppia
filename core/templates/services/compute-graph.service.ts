@@ -17,7 +17,6 @@
  * exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {States} from 'domain/exploration/StatesObjectFactory';
@@ -148,7 +147,3 @@ export class ComputeGraphService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ComputeGraphService', downgradeInjectable(ComputeGraphService));

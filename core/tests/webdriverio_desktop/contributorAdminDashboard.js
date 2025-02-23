@@ -206,6 +206,7 @@ describe('Contributor Admin Dashboard', function () {
     // Accept suggestion as user1.
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
+    await contributorDashboardPage.waitForAvailableTaskLabelToAppear();
     await contributorDashboardPage.selectTranslationReviewButton();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');

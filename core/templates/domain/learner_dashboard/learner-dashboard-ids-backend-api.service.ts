@@ -17,7 +17,6 @@
  * activities present in the learner dashboard.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -62,10 +61,3 @@ export class LearnerDashboardIdsBackendApiService {
     return this._fetchLearnerDashboardIdsAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerDashboardIdsBackendApiService',
-    downgradeInjectable(LearnerDashboardIdsBackendApiService)
-  );

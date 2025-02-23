@@ -26,8 +26,8 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
+import {AppConstants} from 'app.constants';
 import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
@@ -47,6 +47,7 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   options!: string[];
   dropdownShown = false;
+  topicsPerClassroomMap: Record<string, string[]> = {};
 
   constructor(
     private contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService
@@ -54,10 +55,16 @@ export class TranslationTopicSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesAsync()
-      .then(topicNames => {
-        this.options = topicNames;
+      .fetchTranslatableTopicNamesPerClassroomAsync()
+      .then(topicsPerClassroom => {
+        topicsPerClassroom.forEach(({classroom, topics}) => {
+          this.topicsPerClassroomMap[classroom] = topics;
+        });
       });
+
+    // Set initial value for activeTopicName to "ALL".
+    this.activeTopicName = AppConstants.TOPIC_SENTINEL_NAME_ALL;
+    this.setActiveTopicName.emit(this.activeTopicName);
   }
 
   toggleDropdown(): void {
@@ -84,12 +91,3 @@ export class TranslationTopicSelectorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'translationTopicSelector',
-  downgradeComponent({
-    component: TranslationTopicSelectorComponent,
-    inputs: ['activeTopicName'],
-    outputs: ['setActiveTopicName'],
-  })
-);

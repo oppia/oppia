@@ -49,7 +49,7 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 BASE_MODEL_ID_PATTERN: str = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
-MAX_CLOCK_SKEW_SECS: Final = datetime.timedelta(seconds=1)
+MAX_CLOCK_SKEW_DURATION: Final = datetime.timedelta(seconds=1)
 
 ModelInstanceType = TypeVar('ModelInstanceType', bound='base_models.BaseModel')
 
@@ -270,14 +270,14 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
         """
         cloned_entity = job_utils.clone_model(entity)
         last_updated_corrected = (
-            cloned_entity.last_updated + MAX_CLOCK_SKEW_SECS)
+            cloned_entity.last_updated + MAX_CLOCK_SKEW_DURATION)
         if cloned_entity.created_on > last_updated_corrected:
             yield base_validation_errors.InconsistentTimestampsError(
                 cloned_entity)
 
         current_datetime = datetime.datetime.utcnow()
         last_updated_corrected = (
-                cloned_entity.last_updated - MAX_CLOCK_SKEW_SECS)
+                cloned_entity.last_updated - MAX_CLOCK_SKEW_DURATION)
         if last_updated_corrected > current_datetime:
             yield base_validation_errors.ModelMutatedDuringJobError(
                 cloned_entity)
@@ -298,7 +298,7 @@ class ValidateModelDomainObjectInstances(
     # Here we use type Any because in child classes this method can be
     # redefined with domain objects as return type. So, to allow every
     # domain object as return type, we used Any here.
-    def _get_model_domain_object_instance(
+    def _get_model_domain_object_instance(  # pylint: disable=redundant-returns-doc
         self, unused_item: ModelInstanceType
     ) -> Any:
         """Returns a domain object instance created from the model.
@@ -380,16 +380,13 @@ class BaseValidateCommitCmdsSchema(beam.DoFn, Generic[ModelInstanceType]):  # ty
     def _get_change_domain_class(
         self, unused_item: ModelInstanceType
     ) -> Type[change_domain.BaseChange]:
-        """Returns a Change domain class.
+        """Returns a Change domain class for the changes made by commit
+        commands of the model.
 
         This should be implemented by subclasses.
 
         Args:
             unused_item: datastore_services.Model. Entity to validate.
-
-        Returns:
-            change_domain.BaseChange. A domain object class for the
-            changes made by commit commands of the model.
 
         Raises:
             NotImplementedError. This function has not yet been implemented.

@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
@@ -30,7 +29,6 @@ import {
   ParamSpecsBackendDict,
   ParamSpecsObjectFactory,
 } from 'domain/exploration/ParamSpecsObjectFactory';
-import {StateClassifierMappingService} from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import {AlertsService} from 'services/alerts.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {ContextService} from 'services/context.service';
@@ -80,6 +78,10 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -176,7 +178,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private stateClassifierMappingService: StateClassifierMappingService,
     private stateEditorRefreshService: StateEditorRefreshService,
     private stateEditorService: StateEditorService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
@@ -187,7 +188,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private insertScriptService: InsertScriptService
   ) {}
 
   setDocumentTitle(): void {
@@ -241,10 +243,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
       this.explorationFeaturesService.init(explorationData, featuresData);
 
-      this.stateClassifierMappingService.init(
-        this.contextService.getExplorationId(),
-        explorationData.version
-      );
       this.explorationStatesService.init(
         explorationData.states,
         (explorationData as ExplorationData).exploration_is_linked_to_story
@@ -690,6 +688,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.internetConnectivityService.startCheckingConnection();
 
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
+
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(
         () => {
@@ -812,10 +812,3 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'explorationEditorPage',
-  downgradeComponent({
-    component: ExplorationEditorPageComponent,
-  }) as angular.IDirectiveFactory
-);

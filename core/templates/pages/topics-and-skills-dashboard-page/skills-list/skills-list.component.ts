@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MergeSkillModalComponent} from 'components/skill-selector/merge-skill-modal.component';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -247,10 +246,24 @@ export class SkillsListComponent {
           }
         }
       },
-      () => {
+      (topicIds?: string[]) => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+        if (!topicIds) {
+          return;
+        }
+        topicIds.forEach(topicId => {
+          let topicIndex = this.editableTopicSummaries.findIndex(
+            topic => topic.id === topicId
+          );
+          if (topicIndex !== -1) {
+            (
+              this.editableTopicSummaries[topicIndex] as CreatorTopicSummary & {
+                isSelected: boolean;
+              }
+            ).isSelected = false;
+          }
+        });
       }
     );
   }
@@ -325,10 +338,3 @@ export class SkillsListComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillsList',
-    downgradeComponent({component: SkillsListComponent})
-  );

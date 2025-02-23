@@ -16,7 +16,7 @@
  * @fileoverview Service to get topic data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -84,10 +84,3 @@ export class TopicViewerBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TopicViewerBackendApiService',
-    downgradeInjectable(TopicViewerBackendApiService)
-  );

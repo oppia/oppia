@@ -58,8 +58,6 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import auth_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.platform import models
 
 import firebase_admin
@@ -85,9 +83,6 @@ def establish_firebase_connection() -> None:
     Firebase server connection. The initialize_app() function raises an error
     when it's called more than once, however, so we make this function
     idempotent by trying to "get" the app first.
-
-    Returns:
-        firebase_admin.App. The App being by the Firebase SDK.
 
     Raises:
         ValueError. The Firebase app has a genuine problem.
@@ -593,8 +588,7 @@ def _create_auth_claims(
     auth_id = firebase_claims['sub']
     email = firebase_claims.get('email')
     role_is_super_admin = (
-        email == platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value) or
+        email == feconf.ADMIN_EMAIL_ADDRESS or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)

@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   AnswerChoice,
   StateEditorService,
@@ -344,7 +343,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   isMLEnabled(): boolean {
-    return AppConstants.ENABLE_ML_CLASSIFIERS;
+    return AppConstants.ENABLE_TRAINING_DATA_UI;
   }
 
   /**
@@ -425,10 +424,3 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAnswerGroupEditor',
-  downgradeComponent({
-    component: AnswerGroupEditor,
-  }) as angular.IDirectiveFactory
-);

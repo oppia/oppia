@@ -2,7 +2,12 @@
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
-     <!--TODO(#18384): Learner group and goal tags-->
+      <!--TODO(#18384): Learner group tags-->
+      <!--TODO(#18384): Should goal tags display if completed?-->
+      <div *ngIf="isGoal" class="lesson-card-tags-container">
+        <span aria-hidden="true" class="fas fa-bullseye lesson-card-tags-icon"></span>
+        <p class="lesson-card-tags-text"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION' | translate }} </p>
+      </div>
     </div>
   </div>
   <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
@@ -69,6 +74,28 @@
     left: 0;
     padding: 8px;
     position: absolute;
+    top: 0;
+  }
+
+  .lesson-card-tags-container {
+    align-items: center;
+    background-color: #fff9;
+    border-radius: 4px;
+    display: flex;
+    gap: 0 4px;
+    padding: 4px;
+    width: fit-content;
+  }
+
+  .lesson-card-tags-icon {
+    color: #00645c;
+    font-size: 16px;
+  }
+
+  .lesson-card-tags-text {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
   }
 
   .lesson-card-title {

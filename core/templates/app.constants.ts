@@ -99,8 +99,10 @@ export const AppConstants = {
   LOADING_INDICATOR_URL: '/activity/loadingIndicator.gif',
   OBJECT_EDITOR_URL_PREFIX: '/object_editor_template/',
   // Feature still in development.
-  // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-  ENABLE_ML_CLASSIFIERS: false,
+  // NOTE TO DEVELOPERS: This should only be turned on after we have
+  // infrastructure to process answer-group-specific training data for ML
+  // classification.
+  ENABLE_TRAINING_DATA_UI: false,
   // Feature still in development.
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION:
     'The current solution does not lead to another card.',
@@ -324,8 +326,10 @@ export const AppConstants = {
   },
   VOLUNTEER_FORM_LINK:
     'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-  IMPACT_REPORT_LINK:
+  IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  IMPACT_REPORT_LINK_2023:
+    'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:

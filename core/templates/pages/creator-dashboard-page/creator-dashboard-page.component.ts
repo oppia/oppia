@@ -28,7 +28,6 @@ import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {forkJoin} from 'rxjs';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CreatorDashboardData} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -298,10 +297,3 @@ export class CreatorDashboardPageComponent {
     return 0;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaCreatorDashboardPage',
-  downgradeComponent({
-    component: CreatorDashboardPageComponent,
-  }) as angular.IDirectiveFactory
-);

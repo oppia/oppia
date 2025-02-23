@@ -85,14 +85,6 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_beam_job_models,
             self.registry_instance.import_models([models.Names.BEAM_JOB]))
 
-    def test_import_models_classifier(self) -> None:
-        """Tests import_models function with classifier option."""
-        from core.storage.classifier import gae_models as classifier_data_models
-        expected_classifier_models = (classifier_data_models,)
-        self.assertEqual(
-            expected_classifier_models,
-            self.registry_instance.import_models([models.Names.CLASSIFIER]))
-
     def test_import_models_collection(self) -> None:
         """Tests import_models function with collection option."""
         from core.storage.collection import gae_models as collection_models
@@ -292,6 +284,15 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertEqual(
             self.registry_instance.import_app_identity_services(),
             gae_app_identity_services)
+
+    def test_import_azure_speech_synthesis_services(self) -> None:
+        """Tests import azure speech synthesis services function."""
+        with self.swap(constants, 'DEV_MODE', False):
+            from core.platform.azure_speech_synthesis import (
+                azure_speech_synthesis_services)
+            self.assertEqual(
+                azure_speech_synthesis_services,
+                self.registry_instance.import_azure_speech_synthesis_services())
 
     def test_import_email_services_mailgun(self) -> None:
         """Tests import email services method for when email service provider is

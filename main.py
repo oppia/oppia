@@ -30,7 +30,6 @@ from core.controllers import beam_jobs
 from core.controllers import blog_admin
 from core.controllers import blog_dashboard
 from core.controllers import blog_homepage
-from core.controllers import classifier
 from core.controllers import classroom
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
@@ -101,7 +100,7 @@ datastore_services = models.Registry.import_datastore_services()
 # Cloud Logging is disabled in emulator mode, since it is unnecessary and
 # creates a lot of noise.
 if not constants.EMULATOR_MODE:
-    # Instantiates a client and rtrieves a Cloud Logging handler based on the
+    # Instantiates a client and retrieves a Cloud Logging handler based on the
     # environment you're running in and integrates the handler with the Python
     # logging module.
     client = google.cloud.logging.Client()
@@ -246,6 +245,11 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionEditorAccessValidationPage
     ),
+     get_redirect_route(
+        r'%s/can_access_exploration_editor_page/<exploration_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ExplorationEditorAccessValidationHandlerPage
+    ),
 
     get_redirect_route(
         r'%s/can_access_story_editor_page/<story_id>' %
@@ -276,6 +280,12 @@ URLS = [
     get_redirect_route(
         r'%s/can_manage_own_account' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ManageOwnAccountValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_topic_editor/<topic_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicEditorAccessValidationPage
+    ),
 
     get_redirect_route(
         r'%s/does_profile_exist/<username>' %
@@ -322,6 +332,41 @@ URLS = [
         access_validators.DiagnosticTestPlayerAccessValidationHandler
     ),
 
+    get_redirect_route(
+        r'%s/can_access_practice_session_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/practice/session' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.PracticeSessionAccessValidationPage
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/story' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/revision' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/practice' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -336,6 +381,10 @@ URLS = [
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
+    get_redirect_route(
+        r'%s' % feconf.AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL,
+        admin.AutomaticVoiceoverAdminControlHandler
+    ),
     get_redirect_route(
         r'/updateblogpostdatahandler', admin.UpdateBlogPostHandler),
     get_redirect_route(
@@ -361,9 +410,6 @@ URLS = [
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
     get_redirect_route(
-        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
-        contributor_dashboard.ContributorDashboardPage),
-    get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
         contributor_dashboard.ContributorStatsSummariesHandler),
@@ -380,9 +426,6 @@ URLS = [
     get_redirect_route(
         '/creator_dashboard',
         creator_dashboard.OldCreatorDashboardRedirectPage),
-    get_redirect_route(
-        r'%s' % feconf.CREATOR_DASHBOARD_URL,
-        creator_dashboard.CreatorDashboardPage),
     get_redirect_route(
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
@@ -426,6 +469,9 @@ URLS = [
         r'/gettranslatabletopicnames',
         contributor_dashboard.TranslatableTopicNamesHandler),
     get_redirect_route(
+        r'/gettranslatabletopicnamesperclassroom',
+        contributor_dashboard.TranslatableTopicNamesPerClassroomHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -437,9 +483,6 @@ URLS = [
     get_redirect_route(
         r'%s/<comma_separated_skill_ids>' % feconf.QUESTION_COUNT_URL_PREFIX,
         questions_list.QuestionCountDataHandler),
-    get_redirect_route(
-        r'%s/practice/session' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        practice_sessions.PracticeSessionsPage),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>' %
         feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
@@ -476,9 +519,6 @@ URLS = [
         r'%s/' %
         feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
         topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
-    get_redirect_route(
-        r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
@@ -546,17 +586,8 @@ URLS = [
         r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
-    get_redirect_route(
-        r'%s' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         % feconf.TOPIC_DATA_HANDLER,
@@ -595,9 +626,6 @@ URLS = [
         r'%s/<thread_id>' %
         feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
         feedback_updates.FeedbackThreadHandler),
-    get_redirect_route(
-        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
-        topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
     get_redirect_route(
         r'%s' % feconf.MERGE_SKILLS_URL,
         topics_and_skills_dashboard.MergeSkillHandler),
@@ -700,13 +728,11 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.USER_GROUPS_HANDLER_URL,
         release_coordinator.UserGroupHandler),
-
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
-        reader.ExplorationPage),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
-        reader.ExplorationEmbedPage),
+        r'%s/can_access_exploration_player_page/<exploration_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.ExplorationPlayerAccessValidationPage
+    ),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler),
@@ -789,9 +815,6 @@ URLS = [
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
         question_editor.EditableQuestionDataHandler),
 
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
-        editor.ExplorationPage),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
@@ -944,9 +967,6 @@ URLS = [
         collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
-        topic_editor.TopicEditorPage),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),
     get_redirect_route(
@@ -979,8 +999,9 @@ URLS = [
         r'%s' % feconf.FETCH_SKILLS_URL_PREFIX,
         skill_editor.FetchSkillsHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
-        skill_editor.SkillEditorPage),
+        r'%s/can_access_skill_editor/<skill_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.SkillEditorPageAccessValidationHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
@@ -1079,11 +1100,6 @@ URLS = [
 
     get_redirect_route(
         r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
-
-    get_redirect_route(
-        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
-    get_redirect_route(
-        r'/ml/nextjobhandler', classifier.NextJobHandler),
 
     get_redirect_route(
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
@@ -1221,7 +1237,42 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_URL_EMBED_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s%s' % (
+            feconf.TOPIC_VIEWER_URL_PREFIX,
+            feconf.PRACTICE_SESSION_URL_PREFIX,
+        ),
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
         r'%s/<blog_post_url>' % feconf.BLOG_HOMEPAGE_URL,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
@@ -1229,9 +1280,17 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+      get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
+        oppia_root.OppiaRootPage
+    ),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
         oppia_root.OppiaRootPage
-    )
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work

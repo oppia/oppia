@@ -10,6 +10,9 @@
   </div>
   <div *ngIf="voiceoversAreLoaded">
     <div class="embedded-body" *ngIf="pageIsIframed">
+      <div class="navbar-container">
+        <oppia-top-navigation-bar></oppia-top-navigation-bar>
+      </div>
       <oppia-conversation-skin></oppia-conversation-skin>
     </div>
     <oppia-conversation-skin *ngIf="!pageIsIframed"></oppia-conversation-skin>
@@ -29,5 +32,9 @@
     position: absolute;
     text-align: center;
     width: 100vw;
-}
+  }
+  .navbar-container {
+    background-color: #00645c;
+    padding: 0 10px;
+  }
 </style>

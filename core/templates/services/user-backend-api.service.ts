@@ -18,7 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {UserInfo, UserInfoBackendDict} from 'domain/user/user-info.model';
 
 export interface SubscriptionSummary {
@@ -172,6 +172,3 @@ export class UserBackendApiService {
       .toPromise();
   }
 }
-angular
-  .module('oppia')
-  .factory('UserBackendApiService', downgradeInjectable(UserBackendApiService));

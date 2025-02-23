@@ -52,7 +52,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 // eslint-disable-next-line oppia/disallow-httpclient
 import {HttpClient} from '@angular/common/http';
 
@@ -646,8 +645,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseMoveOnImageArea(e: MouseEvent): void {
-    e.preventDefault();
-
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
 
     if (this.userIsDraggingCropArea) {
@@ -662,7 +659,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseDownOnCropArea(e: MouseEvent): void {
-    e.preventDefault();
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
     const position = this.mousePositionWithinCropArea;
 
@@ -679,7 +675,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   }
 
   onMouseUpOnCropArea(e: MouseEvent): void {
-    e.preventDefault();
     this.userIsDraggingCropArea = false;
     this.userIsResizingCropArea = false;
   }
@@ -1281,10 +1276,3 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'imageEditor',
-  downgradeComponent({
-    component: ImageEditorComponent,
-  }) as angular.IDirectiveFactory
-);

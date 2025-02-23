@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -780,10 +779,3 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateTranslation',
-  downgradeComponent({
-    component: StateTranslationComponent,
-  }) as angular.IDirectiveFactory
-);

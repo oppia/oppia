@@ -82,17 +82,6 @@
 /scripts/run_typescript_checks*.py @oppia/dev-workflow-reviewers
 
 
-# Answer classification team.
-/core/controllers/classifier*.py @oppia/ml
-/core/domain/classifier*.py @oppia/ml
-/proto_files/ @oppia/ml
-/core/templates/domain/classifier/ @oppia/ml
-/core/templates/services/classifier-data-backend-api.service*.ts @oppia/ml
-/extensions/classifiers/ @oppia/ml
-/buf.yaml @oppia/ml
-/buf.gen.yaml @oppia/ml
-
-
 # App Feedback Reporting project
 /core/domain/app_feedback_report_*.py @oppia/web-android-compatibility-reviewers
 /core/controllers/incoming_app_feedback_report*.py @oppia/web-android-compatibility-reviewers
@@ -234,6 +223,7 @@
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/unsaved-changes-status-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/version-diff-visualization/ @oppia/lace-frontend-reviewers
+/core/templates/domain/classifier/ @oppia/lace-frontend-reviewers
 /core/templates/domain/editor/ @oppia/lace-frontend-reviewers
 /core/templates/domain/entity_editor_browser_tabs_info/ @oppia/lace-frontend-reviewers
 /core/templates/domain/exploration/ @oppia/lace-frontend-reviewers
@@ -285,7 +275,6 @@
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.css @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/background-banner.*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @oppia/lace-frontend-reviewers
-/core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/lazy-loading.component.ts @oppia/lace-frontend-reviewers
@@ -297,6 +286,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
 /core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
+/core/templates/components/language-banner/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
 /core/templates/directives/angular-html-bind.directive*.ts @oppia/lace-frontend-reviewers
@@ -307,7 +297,6 @@
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/ngb-modal.service.ts @oppia/lace-frontend-reviewers
 
 
 # Global frontend services
@@ -520,12 +509,10 @@
 /core/templates/app.constants.ts @oppia/lace-frontend-reviewers
 /core/templates/app.constants.ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/combined-tests.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/interaction-specs.constants.ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/interaction-specs.constants.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/login-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/logout-page/ @oppia/lace-frontend-reviewers
 /core/templates/app-events/ @oppia/lace-frontend-reviewers
-/core/templates/services/app.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
@@ -555,7 +542,6 @@
 # Python typing
 /mypy.ini @oppia/dev-workflow-reviewers
 /mypy_imports*.py @oppia/dev-workflow-reviewers
-/mypy_requirements.txt @oppia/dev-workflow-reviewers
 /stubs/ @oppia/dev-workflow-reviewers
 /scripts/run_mypy_checks*.py @oppia/dev-workflow-reviewers
 
@@ -601,7 +587,7 @@
 /core/templates/services/oppia-rte-parser.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/image-local-storage*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/rte-helper.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/rte-helper-modal.controller*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/rte-helper-modal.component*.ts @oppia/lace-frontend-reviewers
 /core/domain/image_validation_services*.py @oppia/lace-backend-reviewers
 /core/domain/rte_component_registry*.py @oppia/lace-frontend-reviewers
 /extensions/ckeditor_plugins/ @oppia/lace-backend-reviewers
@@ -694,7 +680,6 @@
 
 
 # Service constants
-/core/templates/services/services.constants.ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/services/services.constants.ts @oppia/lace-frontend-reviewers
 
 

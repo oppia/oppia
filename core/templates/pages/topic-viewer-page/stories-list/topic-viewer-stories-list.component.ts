@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {StorySummary} from 'domain/story/story-summary.model';
 import {
@@ -27,6 +26,7 @@ import {
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import './topic-viewer-stories-list.component.css';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'stories-list',
@@ -50,7 +50,8 @@ export class StoriesListComponent implements OnInit {
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -105,10 +106,13 @@ export class StoriesListComponent implements OnInit {
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
+
+  getClassroomUrl(): string {
+    if (this.classroomUrlFragment) {
+      return this.urlInterpolationService.interpolateUrl('/learn/<classroom>', {
+        classroom: this.classroomUrlFragment,
+      });
+    }
+    return '/learn';
+  }
 }
-angular
-  .module('oppia')
-  .directive(
-    'storiesList',
-    downgradeComponent({component: StoriesListComponent})
-  );

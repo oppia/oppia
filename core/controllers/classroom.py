@@ -139,6 +139,16 @@ class ClassroomDataHandler(
         self.render_json(self.values)
 
 
+class ClassroomIdIndexMappingDict(TypedDict):
+    """Dict for representing the mapping of a classroom's
+    ID and name to its index.
+    """
+
+    classroom_id: str
+    classroom_name: str
+    classroom_index: int
+
+
 class ClassroomDisplayInfoHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -152,25 +162,15 @@ class ClassroomDisplayInfoHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom name and index."""
-        classroom_id_index_mappings: List[Dict[str, str|int]] = []
+        classroom_id_index_mappings: List[ClassroomIdIndexMappingDict] = []
         classrooms = classroom_config_services.get_all_classrooms()
 
         for classroom in classrooms:
-            classroom_id_index_mapping_dict: Dict[str, str|int]
-            # TODO(#20845): Remove this custom logic once we have
-            # populated the index field of the math classroom.
-            if classroom.index is not None:
-                classroom_id_index_mapping_dict = {
-                    'classroom_id': classroom.classroom_id,
-                    'classroom_name': classroom.name,
-                    'classroom_index': classroom.index
-                }
-            else:
-                classroom_id_index_mapping_dict = {
-                    'classroom_id': classroom.classroom_id,
-                    'classroom_name': classroom.name,
-                    'classroom_index': 0
-                }
+            classroom_id_index_mapping_dict: ClassroomIdIndexMappingDict = {
+                'classroom_id': classroom.classroom_id,
+                'classroom_name': classroom.name,
+                'classroom_index': classroom.index
+            }
             classroom_id_index_mappings.append(classroom_id_index_mapping_dict)
 
         self.values.update({

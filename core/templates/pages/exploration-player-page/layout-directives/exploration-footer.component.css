@@ -15,6 +15,10 @@
   width: 100%;
 }
 
+.oppia-exploration-footer .row {
+  flex-wrap: nowrap;
+}
+
 .oppia-exploration-footer .exploration-footer-img {
   height: 60px;
   margin: -31px 5px 0 10px;
@@ -320,6 +324,14 @@
     margin-right: 10px;
     padding: 16px 8px 16px 8px;
   }
+
+  .oppia-footer-info-icon {
+    display: none;
+  }
+
+  .oppia-lesson-info-header {
+    display: none;
+  }
 }
 
 @media (max-width: 658px) {
@@ -336,6 +348,16 @@
 
 @media (min-width: 768px) {
   .oppia-exploration-footer .oppia-exploration-footer-info-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 450px) {
+  .oppia-lesson-info-header {
+    display: none;
+  }
+
+  .oppia-footer-info-icon {
     display: none;
   }
 }

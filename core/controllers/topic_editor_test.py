@@ -24,7 +24,6 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -164,8 +163,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': None,
-            'first_publication_date_msecs': 1672684200000,
-            'last_modified_msecs': 1672684200000,
+            'first_publication_date_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -183,9 +182,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1672770600000,
+            'planned_publication_date_msecs': 1672770600000.0,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -203,9 +202,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690655400000,
+            'planned_publication_date_msecs': 1690655400000.0,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000.0,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
@@ -536,73 +535,8 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-
-    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX,
-                topic_fetchers.get_new_topic_id()), expected_status_int=404)
-
-        self.logout()
-
-    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
-        self
-    ) -> None:
-        # Check that the editor page can not be accessed with an
-        # an invalid topic id.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_id'),
-            expected_status_int=404)
-        self.logout()
-
-    def test_access_topic_editor_page(self) -> None:
-        """Test access to editor pages for the sample topic."""
-
-        # Check that non-admin and topic_manager cannot access the editor
-        # page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access the editor page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
-        # Check that any topic manager can access the editor page.
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_get(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
@@ -616,9 +550,8 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(
-            self.admin_email_address)
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/%s' % (
@@ -637,7 +570,7 @@ class TopicEditorTests(
             json_response['skill_id_to_description_dict'][self.skill_id])
 
         messages = self._get_sent_email_messages(
-            self.admin_email_address)
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
@@ -711,18 +644,7 @@ class TopicEditorTests(
         self.assertEqual(json_response['error'], 'Name should be a string.')
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_editable_topic_handler_put(self) -> None:
         # Check that admins can edit a topic.
@@ -802,9 +724,8 @@ class TopicEditorTests(
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        assert isinstance(self.admin_email_address, str)
         messages = self._get_sent_email_messages(
-            self.admin_email_address)
+            feconf.ADMIN_EMAIL_ADDRESS)
         self.assertEqual(len(messages), 0)
         json_response = self.put_json(
             '%s/%s' % (
@@ -818,7 +739,7 @@ class TopicEditorTests(
             json_response['skill_id_to_description_dict'][self.skill_id])
 
         messages = self._get_sent_email_messages(
-            self.admin_email_address)
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
@@ -1093,18 +1014,7 @@ class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
-        [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            ),
-            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
-        ]
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_send_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -1114,11 +1024,8 @@ class TopicPublishSendMailHandlerTests(
             '%s/%s' % (
                 feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
             {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        admin_email_address = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
-        assert isinstance(admin_email_address, str)
-        messages = self._get_sent_email_messages(admin_email_address)
+        messages = self._get_sent_email_messages(
+            feconf.ADMIN_EMAIL_ADDRESS)
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s/%s, please review'
             ' and publish if it looks good.'

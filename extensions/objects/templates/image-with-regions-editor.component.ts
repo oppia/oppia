@@ -29,7 +29,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -510,7 +509,6 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   onSvgMouseDown(evt: MouseEvent): void {
-    evt.preventDefault();
     this.originalMouseX = this.mouseX;
     this.originalMouseY = this.mouseY;
     if (this.hoveredRegion === null) {
@@ -753,10 +751,3 @@ export class ImageWithRegionsEditorComponent implements OnInit {
     return this.SCHEMA as CustomSchema;
   }
 }
-
-angular.module('oppia').directive(
-  'imageWithRegionsEditor',
-  downgradeComponent({
-    component: ImageWithRegionsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

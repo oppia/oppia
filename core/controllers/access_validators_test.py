@@ -21,9 +21,16 @@ import datetime
 from core import feature_flag_list
 from core import feconf
 from core.constants import constants
+from core.domain import caching_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
+from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import fs_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -36,13 +43,15 @@ from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
 
-from typing import Final
+from typing import Dict, Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
+    from mypy_imports import skill_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
+(skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
 ACCESS_VALIDATION_HANDLER_PREFIX: Final = (
     feconf.ACCESS_VALIDATION_HANDLER_PREFIX
@@ -86,6 +95,162 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'history'))
 
 
+class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.topic_id = 'topic'
+        self.topic_id_1 = 'topic1'
+        self.skill_id1 = 'skill_id_1'
+        self.skill_id2 = 'skill_id_2'
+
+        self.save_new_skill(
+            self.skill_id1, self.admin_id, description='Skill 1')
+        self.save_new_skill(
+            self.skill_id2, self.admin_id, description='Skill 2')
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'public_topic_name',
+            'public-topic-name', 'description', 'fragm')
+        self.topic.subtopics.append(topic_domain.Subtopic(
+            1, 'subtopic_name', [self.skill_id1], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'subtopic-name-one'))
+        self.topic.subtopics.append(topic_domain.Subtopic(
+            2, 'subtopic_name_2', [self.skill_id2], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'subtopic-name-two'))
+        self.topic.next_subtopic_id = 3
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id1]
+        self.topic.thumbnail_filename = 'Topic.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id_1, 'private_topic_name',
+            'private-topic-name', 'description', 'fragm')
+        self.topic.thumbnail_filename = 'Topic.svg'
+        self.topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic_services.save_new_topic(self.admin_id, self.topic)
+
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+
+        classroom_id_1 = classroom_config_services.get_new_classroom_id()
+        topic_dependency_for_classroom_1: Dict[str, list[str]] = {
+            self.topic_id: [],
+            self.topic_id_1: [],
+        }
+
+        thumbnail_image = b''
+        with open(
+            'core/tests/data/thumbnail.svg', 'rt',
+            encoding='utf-8') as svg_file:
+            svg_file_content = svg_file.read()
+            thumbnail_image = svg_file_content.encode('ascii')
+        fs_services.save_original_and_compressed_versions_of_image(
+            'thumbnail.svg', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
+            thumbnail_image, 'thumbnail', False)
+
+        banner_image = b''
+        with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+            banner_image = png_file.read()
+        fs_services.save_original_and_compressed_versions_of_image(
+            'banner.png', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
+            banner_image, 'image', False)
+
+        classroom_1 = classroom_config_domain.Classroom(
+                        classroom_id=classroom_id_1,
+                        name='math',
+                        url_fragment='math',
+                        course_details='Math course details',
+                        teaser_text='Math teaser text',
+                        topic_list_intro='Start with our first topic.',
+                        topic_id_to_prerequisite_topic_ids=(
+                            topic_dependency_for_classroom_1),
+                        is_published=True,
+                        thumbnail_data=classroom_config_domain.ImageData(
+                            'thumbnail.svg', 'transparent', 1000
+                        ),
+                        banner_data=classroom_config_domain.ImageData(
+                            'banner.png', 'transparent', 1000
+                        ),
+                        index=0
+                    )
+
+        classroom_config_services.create_new_classroom(classroom_1)
+
+    def test_any_user_can_access_practice_sessions_page(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                params={'selected_subtopic_ids': '[1,2]'},
+            expected_status_int=200)
+
+    def test_get_fails_when_subtopics_not_provided(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                expected_status_int=400)
+
+    def test_get_fails_when_subtopic_id_is_invalid(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                params={'selected_subtopic_ids': '[999]'},
+                expected_status_int=404)
+
+    def test_get_fails_when_selected_subtopic_ids_is_none(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            expected_status_int=400)
+
+    def test_get_fails_when_selected_subtopic_ids_contains_non_integer(self) -> None: # pylint: disable=line-too-long
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+            params={'selected_subtopic_ids': '["invalid"]'},
+            expected_status_int=400)
+
+    def test_get_succeeds_with_valid_subtopic_ids(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'public-topic-name'),
+                params={'selected_subtopic_ids': '[1,2]'},
+                expected_status_int=200)
+
+    def test_no_user_can_access_unpublished_topic_practice_session_page(
+        self
+    ) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/staging/%s/practice/session' % ( # pylint: disable=line-too-long
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'private-topic-name'),
+                params={'selected_subtopic_ids': '[1,2]'},
+            expected_status_int=302)
+
+    def test_invalid_topic_url_fragment_raises_exception(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 12345),
+                params={'selected_subtopic_ids': '[1,2]'},
+            expected_status_int=400)
+
+    def test_get_fails_when_topic_doesnt_exist(self) -> None:
+        self.get_html_response(
+            '%s/can_access_practice_session_page/%s/%s/practice/session' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'invalid-topic'),
+                params={'selected_subtopic_ids': '[1,2]'},
+            expected_status_int=302)
+
+
 class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_validation_returns_false_if_no_public_classrooms_are_present(
@@ -109,6 +274,51 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.save_new_valid_classroom()
         self.get_html_response(
             '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
+
+
+class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the blog home page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_any_user_can_access_topic_viewer_page(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_classroom'
+            }, csrf_token=csrf_token)
+        self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_viewer_page/%s/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'math', 'fraction'),
+            expected_status_int=200)
+
+    def test_accessibility_of_unpublished_topic_viewer_page(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        topic = topic_domain.Topic.create_default_topic(
+            'topic_id_1', 'private_topic_name',
+            'private_topic_name', 'description', 'fragm')
+        topic.thumbnail_filename = 'Image.svg'
+        topic.thumbnail_bg_color = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        topic.url_fragment = 'private'
+        topic_services.save_new_topic(self.admin_id, topic)
+
+        self.get_json(
+            '%s/can_access_topic_viewer_page/staging/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, 'private'),
+            expected_status_int=404)
+        self.logout()
 
 
 class CollectionViewerPageAccessValidationHandlerTests(
@@ -314,6 +524,90 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_release_coordinator_page' %
             ACCESS_VALIDATION_HANDLER_PREFIX)
+
+
+class ExplorationPlayerAccessValidationPageTests(
+        test_utils.GenericTestBase):
+    """Test for exploration player access validation."""
+
+    def setUp(self) -> None:
+        """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'asaB1nm2UGVI', self.editor_id, title=self.UNICODE_TEST_STRING,
+            category=self.UNICODE_TEST_STRING)
+
+        self.publish_exploration(self.editor_id, self.exploration.id)
+
+    def test_exploration_player_page_with_invalid_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/invalid' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=404)
+
+    def test_exploration_player_page_with_valid_id(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id),
+            expected_status_int=200)
+
+    def test_exploration_player_page_raises_error_with_invalid_exploration_version( # pylint: disable=line-too-long
+        self) -> None:
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': 10,
+            }, expected_status_int=404
+        )
+
+    def test_exploration_player_page_with_valid_exploration_version(
+        self) -> None:
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'parent': True,
+            }, expected_status_int=200
+        )
+
+    def test_handler_raises_error_with_invaild_collection(self) -> None:
+        self.login(self.OWNER_EMAIL)
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'collection_id': 'aZ9_______12'
+            }, expected_status_int=404
+        )
+        self.logout()
+
+    def test_handler_with_valid_collection(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        col_id = 'aZ9_______12'
+        self.save_new_valid_collection(col_id, self.owner_id)
+
+        self.get_html_response(
+            '%s/can_access_exploration_player_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                self.exploration.id), params={
+                'v': self.exploration.version,
+                'collection_id': col_id
+            }, expected_status_int=200
+        )
+        self.logout()
 
 
 class DiagnosticTestPlayerPageAccessValidationHandlerTests(
@@ -724,6 +1018,114 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
+class TopicEditorPageAccessValidationPage(test_utils.GenericTestBase):
+    """Checks the access to the topic editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='topic-one', url_fragment='topic-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+    def test_access_topic_editor_page_with_curriculum_admin_right(
+            self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
+                expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        invalid_topic_id = 'p3MBT4ndlCTX'
+
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                invalid_topic_id),
+                expected_status_int=404)
+        self.logout()
+
+    def test_access_topic_editor_page_without_curriculum_admin_right(
+            self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_topic_editor/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401)
+
+
+class SkillEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
+    """Checks the access to the skill editor page and its rendenring"""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
+
+    def test_access_skill_editor_page_without_logging_in(self) -> None:
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+
+    def test_access_skill_editor_page_with_guest_user(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_access_skill_editor_page_with_curriculum_admin(
+            self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_skill_editor_page_fails(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_model = skill_models.SkillModel.get(self.skill_id)
+        skill_model.delete(self.admin_id, 'Delete skill model.')
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, [self.skill_id])
+        self.get_json(
+            '%s/can_access_skill_editor/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.skill_id
+            ), expected_status_int=404
+        )
+        self.logout()
+
+
 class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     """Test for collection editor page access validation"""
 
@@ -781,6 +1183,54 @@ class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
         )
 
 
+class ExplorationEditorPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase):
+    """Checks the access to the exploration editor page and its rendering."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.guest_username = 'guest'
+        self.guest_email = 'guest@example.com'
+        self.signup(self.guest_email, self.guest_username)
+        self.owner_id = self.get_user_id_from_email(self.guest_email)
+        self.exp_id = 'unpub_eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+    def test_access_exploration_editor_page_without_logging_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id
+            ), expected_status_int=404
+        )
+
+    def test_access_exploration_editor_page_after_logging_in(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.exp_id
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_get_with_disabled_exp_id_raises_error_not_logged_in(self) -> None:
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
+            expected_status_int=404)
+
+    def test_get_with_disabled_exp_id_raises_err_after_logging_in(self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_exploration_editor_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                feconf.DISABLED_EXPLORATION_IDS[0]),
+            expected_status_int=404)
+        self.logout()
+
+
 class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the story editor page and its rendering."""
 
@@ -808,8 +1258,7 @@ class StoryEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_story_editor_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.story_id
-            ), expected_status_int=302
-        )
+            ), expected_status_int=302)
 
     def test_access_story_editor_page_with_curriculum_admin(
             self) -> None:
@@ -866,8 +1315,8 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': self.exp_id,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100,
-            'last_modified_msecs': 100,
+            'planned_publication_date_msecs': 100.0,
+            'last_modified_msecs': 100.0,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }

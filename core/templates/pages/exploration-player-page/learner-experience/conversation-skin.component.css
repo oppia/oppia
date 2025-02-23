@@ -25,14 +25,15 @@ oppia-conversation-skin .supplemental-card-parent-container {
 .conversation-skin-next-lesson-wrapper {
   align-items: center;
   background-color: white;
-  bottom: 0;
   display: flex;
-  margin: 0 0 -68px 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  overflow: hidden;
   padding: 10px;
-  position: absolute;
-  right: 0;
+  position: relative;
   text-align: right;
   vertical-align: middle;
+  width: 100%;
 }
 
 .conversation-skin-next-lesson-text {
@@ -52,6 +53,10 @@ oppia-conversation-skin .supplemental-card-parent-container {
   max-width: 1400px;
   padding: 56px 14px 0;
   width: 100%;
+}
+
+.conversation-skin-cards-container-embedded {
+  padding: 10px 14px 0 !important;
 }
 
 .conversation-skin-help-card-content {

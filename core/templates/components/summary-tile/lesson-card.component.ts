@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -35,6 +34,8 @@ export class LessonCardComponent implements OnInit {
   @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
   @Input() topic!: string;
   @Input() isCommunityLessonComplete?: boolean;
+  @Input() isGoal?: boolean;
+  @Input() isRecommendation?: boolean;
 
   desc!: string;
   imgColor!: string;
@@ -69,10 +70,69 @@ export class LessonCardComponent implements OnInit {
       storyModel.getId()
     );
 
-    const nextStory =
-      completedStories === storyModel.getAllNodes().length
-        ? completedStories - 1
-        : completedStories;
+    let nextStory = 0;
+    const completedNodeIndices: {[title: string]: number} = {};
+    for (let j = 0; j < storyModel.getAllNodes().length; j++) {
+      if (storyModel.isNodeCompleted(storyModel.getAllNodes()[j].getTitle())) {
+        completedNodeIndices[storyModel.getAllNodes()[j].getTitle()] = j;
+      }
+    }
+
+    for (let i = completedStories - 1; i >= 0; i--) {
+      let currentIndex =
+        completedNodeIndices[storyModel.getCompletedNodeTitles()[i]];
+      if (
+        currentIndex === storyModel.getAllNodes().length - 1 &&
+        !storyModel.isNodeCompleted(storyModel.getAllNodes()[0].getTitle())
+      ) {
+        nextStory = 0;
+        break;
+      } else if (
+        currentIndex + 1 < storyModel.getAllNodes().length &&
+        !storyModel.isNodeCompleted(
+          storyModel.getAllNodes()[currentIndex + 1].getTitle()
+        )
+      ) {
+        nextStory = currentIndex + 1;
+        break;
+      }
+    }
+    if (this.isRecommendation) {
+      if (completedStories === 0) {
+        nextStory = 1;
+      } else {
+        let nextRecommendation = nextStory;
+        let recommend = -1;
+        while (nextRecommendation < storyModel.getAllNodes().length - 1) {
+          nextRecommendation += 1;
+          if (
+            !storyModel.isNodeCompleted(
+              storyModel.getAllNodes()[nextRecommendation].getTitle()
+            )
+          ) {
+            recommend = nextRecommendation;
+            break;
+          }
+        }
+
+        if (recommend === -1) {
+          nextRecommendation = 0;
+          while (nextRecommendation < nextStory) {
+            if (
+              !storyModel.isNodeCompleted(
+                storyModel.getAllNodes()[nextRecommendation].getTitle()
+              )
+            ) {
+              recommend = nextRecommendation;
+              break;
+            }
+            nextRecommendation += 1;
+          }
+        }
+        nextStory = recommend;
+      }
+    }
+    // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
 
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
@@ -82,6 +142,7 @@ export class LessonCardComponent implements OnInit {
     );
 
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
+
     this.progress = Math.floor(
       (completedStories / storyModel.getNodeTitles().length) * 100
     );
@@ -172,10 +233,3 @@ export class LessonCardComponent implements OnInit {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'lessonCardComponent',
-    downgradeComponent({component: LessonCardComponent})
-  );

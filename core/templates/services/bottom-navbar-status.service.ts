@@ -17,7 +17,6 @@
  * bottom navigation bar.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -40,10 +39,3 @@ export class BottomNavbarStatusService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BottomNavbarStatusService',
-    downgradeInjectable(BottomNavbarStatusService)
-  );

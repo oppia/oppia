@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {InputResponsePair} from 'domain/state_card/state-card.model';
@@ -175,10 +174,3 @@ export class InputResponsePairComponent {
     this.popover.toggle();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInputResponsePair',
-  downgradeComponent({
-    component: InputResponsePairComponent,
-  }) as angular.IDirectiveFactory
-);

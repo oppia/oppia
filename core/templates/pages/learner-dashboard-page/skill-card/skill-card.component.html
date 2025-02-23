@@ -1,0 +1,77 @@
+<div *ngIf="questionStatus" class="skill-card-container">
+  <div class="align-items-center d-flex justify-content-center skill-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
+    <img alt="" class="h-100" [src]="imgUrl">
+  </div>
+  <div class="d-flex flex-column skill-card-info justify-content-between">
+    <div class="d-flex flex-column flex-grow">
+      <div class="skill-card-title-container mt-1">
+        <p class="skill-card-title mb-0"> {{ subtopic.getTitle() }} </p>
+      </div>
+      <p class="skill-card-topic mb-0"> {{ topic.name }} </p>
+    </div>
+    <div class="align-items-center d-flex justify-content-between mt-2">
+      <circle-progress [titleColor]="'#fff'"
+                       [percent]="progress"
+                       [unitsColor]="'#fff'"
+                       [outerStrokeColor]="'#fff'"
+      >
+      </circle-progress>
+      <button class="oppia-learner-dash-button-sm oppia-learner-dash-button--skill" (click)="openNewPracticeSession()">
+        {{ getButtonTranslationKey() | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-learner-dash-button--skill {
+    background-color: transparent;
+    border-color: #fff;
+    color: #fff;
+    width: 122px;
+  }
+
+  .oppia-learner-dash-button--skill:hover {
+    background-color: #fff;
+    color: #c55f45;
+  }
+
+  .skill-card-container {
+    background-color: #c55f45;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px 0 #00000040;
+    height: 260px;
+    padding: 0;
+    width: 216px;
+  }
+
+  .skill-card-info {
+    border-radius: 0 0 4px 4px;
+    height: 124px;
+    padding: 8px;
+  }
+
+  .skill-card-img {
+    height: 136px;
+    max-height: 100%;
+    position: relative;
+  }
+
+  .skill-card-title {
+    color: #fff;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 15px;
+    -webkit-line-clamp: 2;
+    line-height: 20px;
+  }
+
+  .skill-card-title-container {
+    height: 40px;
+  }
+
+  .skill-card-topic {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+  }
+</style>

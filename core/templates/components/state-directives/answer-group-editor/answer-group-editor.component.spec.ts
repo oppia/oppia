@@ -487,7 +487,7 @@ describe('Answer Group Editor Component', () => {
 
     expect(component.isCurrentInteractionTrainable()).toBe(true);
 
-    // We set the current interaction as MultipleChoiceInpit, which is not
+    // We set the current interaction as MultipleChoiceInput, which is not
     // trainable, according to the values provided during setup.
     stateInteractionIdService.savedMemento = 'MultipleChoiceInput';
 

@@ -18,7 +18,6 @@
  */
 
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
@@ -94,7 +93,10 @@ export class ContentLanguageSelectorComponent implements OnInit {
       }
     }
 
-    if (this.isVoiceoverContributionWithAccentEnabled()) {
+    if (
+      this.isVoiceoverContributionWithAccentEnabled() &&
+      this.audioPreloaderService.exploration !== undefined
+    ) {
       this.voiceoverBackendApiService
         .fetchVoiceoverAdminDataAsync()
         .then(response => {
@@ -164,10 +166,3 @@ export class ContentLanguageSelectorComponent implements OnInit {
     return firstCard.getInputResponsePairs().length > 0;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaContentLanguageSelector',
-    downgradeComponent({component: ContentLanguageSelectorComponent})
-  );

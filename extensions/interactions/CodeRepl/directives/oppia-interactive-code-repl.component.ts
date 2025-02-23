@@ -29,7 +29,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {Subscription} from 'rxjs';
@@ -108,7 +107,10 @@ export class InteractiveCodeReplComponent
         }
       ) as CodeReplCustomizationArgs;
 
-    this.interactionIsActive = this.lastAnswer === null;
+    this.interactionIsActive = true;
+    if (this.lastAnswer) {
+      this.interactionIsActive = false;
+    }
     this.language = language.value;
     this.placeholder = placeholder.value;
     this.preCode = preCode.value;
@@ -305,10 +307,3 @@ export class InteractiveCodeReplComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveCodeRepl',
-  downgradeComponent({
-    component: InteractiveCodeReplComponent,
-  }) as angular.IDirectiveFactory
-);

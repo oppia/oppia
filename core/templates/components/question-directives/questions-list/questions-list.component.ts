@@ -23,7 +23,6 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
@@ -63,6 +62,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {UtilsService} from 'services/utils.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -131,7 +131,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private skillEditorRoutingService: SkillEditorRoutingService,
     private utilsService: UtilsService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private topicEditorStateService: TopicEditorStateService
   ) {}
 
   createQuestion(): void {
@@ -168,6 +169,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
+    this.topicEditorStateService.toggleQuestionEditor(
+      true,
+      this.newQuestionIsBeingCreated
+    );
     this.editorIsOpen = true;
 
     this.skillLinkageModificationsArray = [];
@@ -282,6 +287,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   openQuestionEditor(): void {
     this.questionUndoRedoService.clearChanges();
     this.editorIsOpen = true;
+    this.topicEditorStateService.toggleQuestionEditor(true);
     this.imageLocalStorageService.flushStoredImagesData();
     if (this.newQuestionIsBeingCreated) {
       this.contextService.setImageSaveDestinationToLocalStorage();
@@ -472,20 +478,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   goToNextPage(): void {
     this.questionsListService.incrementPageNumber();
-    this.questionsListService.getQuestionSummariesAsync(
-      this.selectedSkillId,
-      true,
-      false
-    );
+    this.questionsListService
+      .getQuestionSummariesAsync(this.selectedSkillId, true, false)
+      .then(() => this.getQuestionSummariesForOneSkill());
   }
 
   goToPreviousPage(): void {
     this.questionsListService.decrementPageNumber();
-    this.questionsListService.getQuestionSummariesAsync(
-      this.selectedSkillId,
-      false,
-      false
-    );
+    this.getQuestionSummariesForOneSkill();
   }
 
   showUnaddressedSkillMisconceptionWarning(
@@ -580,6 +580,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
                 this.questionUndoRedoService.clearChanges();
                 this.editorIsOpen = false;
                 this.questionIsBeingSaved = false;
+                this.questionsListService.resetPageNumber();
                 this.questionsListService.getQuestionSummariesAsync(
                   this.selectedSkillId,
                   true,
@@ -622,6 +623,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         () => {
           this.contextService.resetImageSaveDestination();
           this.editorIsOpen = false;
+          this.topicEditorStateService.toggleQuestionEditor(false);
           this.windowRef.nativeWindow.location.hash = null;
           this.skillEditorRoutingService.questionIsBeingCreated = false;
         },
@@ -685,12 +687,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.contextService.resetImageSaveDestination();
               this.saveAndPublishQuestion(commitMessage);
             }
+            this.topicEditorStateService.toggleQuestionEditor(false);
           },
           () => {
             this.questionIsBeingSaved = false;
           }
         );
     } else {
+      this.topicEditorStateService.toggleQuestionEditor(false);
       this.contextService.resetImageSaveDestination();
       this.saveAndPublishQuestion(null);
       this.skillEditorRoutingService.creatingNewQuestion(false);
@@ -750,6 +754,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       })
     );
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onQuestionEditorOpened.subscribe()
+    );
 
     this.showDifficultyChoices = false;
     this.difficultyCardIsShown = !this.windowDimensionsService.isWindowNarrow();
@@ -765,10 +772,3 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionsList',
-  downgradeComponent({
-    component: QuestionsListComponent,
-  }) as angular.IDirectiveFactory
-);

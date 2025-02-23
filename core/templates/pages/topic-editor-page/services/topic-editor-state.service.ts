@@ -19,7 +19,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
@@ -48,6 +47,7 @@ import {
 } from 'domain/editor/undo_redo/change.model';
 import {LoaderService} from 'services/loader.service';
 import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
 interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
@@ -87,6 +87,8 @@ export class TopicEditorStateService {
   private _classroomUrlFragment: string | null = null;
   private _curriculumAdminUsernames: string[] = [];
   private _classroomName: string | null = null;
+  private _questionEditorOpened: boolean = false;
+  private _newQuestionEditor: boolean = false;
   private _storySummariesInitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
 
@@ -98,6 +100,9 @@ export class TopicEditorStateService {
 
   private _topicReinitializedEventEmitter: EventEmitter<void> =
     new EventEmitter();
+
+  private _questionEditorOpenedEventEmitter: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private alertsService: AlertsService,
@@ -317,6 +322,14 @@ export class TopicEditorStateService {
     );
   }
 
+  isQuestionEditorOpened(): boolean {
+    return this._questionEditorOpened;
+  }
+
+  isNewQuestionEditor(): boolean {
+    return this._newQuestionEditor;
+  }
+
   getGroupedSkillSummaries(): object {
     return cloneDeep(this._groupedSkillSummaries);
   }
@@ -464,6 +477,28 @@ export class TopicEditorStateService {
     }
   }
 
+  /**
+   * When the editor is opened (editorOpened is true),
+   * assign the value of newQuestion to _newQuestionEditor,
+   * and set _questionEditorOpened to true.
+   * When the editor is closed (editorOpened is false),
+   * both flags are set to false.
+   */
+  toggleQuestionEditor(
+    editorOpened: boolean,
+    newQuestion: boolean = false
+  ): void {
+    if (editorOpened) {
+      this._newQuestionEditor = newQuestion;
+      this._questionEditorOpened = true;
+    } else {
+      this._newQuestionEditor = false;
+      this._questionEditorOpened = false;
+    }
+
+    this._questionEditorOpenedEventEmitter.emit();
+  }
+
   deleteSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
@@ -605,6 +640,10 @@ export class TopicEditorStateService {
     return this._topicReinitializedEventEmitter;
   }
 
+  get onQuestionEditorOpened(): EventEmitter<boolean> {
+    return this._questionEditorOpenedEventEmitter;
+  }
+
   /**
    * Returns the classroom url fragment if the topic is assigned to any
    * classroom, else null.
@@ -623,6 +662,22 @@ export class TopicEditorStateService {
 
   getCurriculumAdminUsernames(): string[] {
     return this._curriculumAdminUsernames;
+  }
+
+  /**
+   * Retrieves the name of the skill associated with the given skill ID,
+   * typically the skill whose question is currently being edited.
+   * The skill description will always be present in allSkillSummaries,
+   * but to ensure robustness, the skill ID will be displayed in case of a failure.
+   */
+  getSelectedSkillName(
+    skillId: string,
+    allSkillSummaries: ShortSkillSummary[]
+  ): string {
+    return (
+      allSkillSummaries?.find(skill => skill.id === skillId)?.description ||
+      skillId
+    );
   }
 
   /**
@@ -708,10 +763,3 @@ export class TopicEditorStateService {
     return this._subtopicPageLoadedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TopicEditorStateService',
-    downgradeInjectable(TopicEditorStateService)
-  );

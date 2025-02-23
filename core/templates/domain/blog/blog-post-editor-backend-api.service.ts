@@ -16,7 +16,6 @@
  * @fileoverview Service to send changes to a blog post to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -217,10 +216,3 @@ export class BlogPostEditorBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BlogPostEditorBackendApiService',
-    downgradeInjectable(BlogPostEditorBackendApiService)
-  );
