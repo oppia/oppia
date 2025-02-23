@@ -210,9 +210,7 @@ def clear_index(index_name: str) -> None:
                 {
                     'match_all': {}
                 }
-        })   
-    
- 
+        })
 def search(
     query_string: str,
     index_name: str,
@@ -290,8 +288,8 @@ def search(
     if language_codes:
         query_definition['query']['bool']['filter'].append(
             {'terms': {'language_code.keyword': language_codes}}
-        )  
-        
+        )
+
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
         query_definition, index_name, offset, size
     )
