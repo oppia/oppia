@@ -71,8 +71,11 @@ export class BaseUser {
   username: string = '';
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
+  static instances: BaseUser[] = []; // Track instances.
 
-  constructor() {}
+  constructor() {
+    BaseUser.instances.push(this);
+  }
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -200,6 +203,42 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * This function takes the screenshot of all the instances of browser during a test failure.
+   */
+  async captureScreenshots(): Promise<void> {
+    let i: number = 0;
+    const specName = process.env.SPEC_NAME;
+    const outputDir = testConstants.TEST_SCREENSHOT_DIR;
+    const CONFIG_FILE = path.resolve(
+      __dirname,
+      '../../jest-runtime-config.json'
+    );
+    const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
+      /[^a-z0-9.-]/gi,
+      '_'
+    );
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, {recursive: true});
+    }
+    if (fs.existsSync(CONFIG_FILE)) {
+      // Deletes the config file.
+      fs.unlinkSync(CONFIG_FILE);
+    }
+    for (const instance of BaseUser.instances) {
+      if (instance.page) {
+        await instance.page.screenshot({
+          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+        });
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+        );
+        await instance.browserObject.close();
+        i = i + 1;
+      }
+    }
   }
 
   /**
@@ -513,6 +552,17 @@ export class BaseUser {
   async closeBrowser(): Promise<void> {
     if (this.screenRecorder) {
       await this.screenRecorder.stop();
+    }
+    const CONFIG_FILE = path.resolve(
+      __dirname,
+      '../../jest-runtime-config.json'
+    );
+    if (fs.existsSync(CONFIG_FILE)) {
+      const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+      if (configData.testFailureDetected) {
+        // Signal all BaseUser instances to take screenshots.
+        await this.captureScreenshots();
+      }
     }
     await this.browserObject.close();
   }

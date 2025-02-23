@@ -25,6 +25,8 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(
     CURR_DIR, '..', 'oppia_full_stack_test_video_recordings')
+FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(
+    CURR_DIR, '..', 'oppia_full_stack_test_screenshots')
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -61,6 +63,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     delete_directory_tree(OPPIA_TOOLS_DIR)
     delete_directory_tree(FULL_STACK_TEST_VIDEO_RECORDING_DIR)
+    delete_directory_tree(FULL_STACK_TEST_SCREENSHOT_DIR)
     delete_directory_tree('node_modules/')
     delete_directory_tree('third_party/')
     delete_directory_tree('build/')
