@@ -39,7 +39,7 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-// Import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 
 let gifshot = require('gifshot');
 
@@ -59,7 +59,7 @@ describe('ImageEditor', () => {
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
-  // Let GifFrames: gifFrames;
+  let gifFrames: GifFramesService;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -1897,8 +1897,13 @@ describe('ImageEditor', () => {
         },
       })
     );
+
+    beforeEach(() => {
+      gifFrames = new GifFramesService();
+    });
+
     // Replace gifFrames with a spy that returns a resolved promise.
-    spyOn(component, 'GifFrames').and.resolveTo([
+    spyOn(gifFrames, 'getFrames').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -2270,7 +2275,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(component, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2380,7 +2385,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(component, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {

@@ -70,10 +70,10 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import {gifFrames} from '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
 const gifshot = require('gifshot');
-(window as Window).GifFrames = require('gif-frames');
+const gifFrames = new GifFramesService();
 // Import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
@@ -88,10 +88,6 @@ const gifshot = require('gifshot');
 //     GifFrames: gifFrames;
 //   }
 // }
-
-interface Window {
-  GifFrames: gifFrames;
-}
 
 interface FilepathData {
   mode: number;
@@ -215,7 +211,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private gifFramesService: GifFramesService
   ) {}
 
   ngOnInit(): void {
@@ -1130,13 +1127,14 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    (this.windowRef.nativeWindow as Window)
-      .GifFrames({
+    this.windowRef.nativeWindow as Window;
+    this.gifFramesService
+      .getFrames({
         url: imageDataURI,
         frames: 'all',
         outputType: 'canvas',
       })
-      .then(async function (frameData) {
+      .then(async frameData => {
         let frames = [];
         for (let i = 0; i < frameData.length; i += 1) {
           let sourceCanvas = frameData[i].getImage();

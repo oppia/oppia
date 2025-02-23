@@ -19,9 +19,11 @@
 // Remove the global assignment if it exists:
 // (window as Window).GifFrames = require('gif-frames');
 
-// Import gifFrames from the 'gif-frames' module.
-// Import * as gifFrames from 'gif-frames';
-// Export gifFrames so that other modules can import it.
-// Export default gifFrames;
-import gifFrames from 'gif-frames';
-export {gifFrames};
+import * as gifFrames from 'gif-frames';
+
+export class GifFramesService {
+  getFrames(options: any): Promise<any> {
+    // Call the underlying gif-frames function.
+    return gifFrames(options);
+  }
+}
