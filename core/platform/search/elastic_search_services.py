@@ -265,7 +265,7 @@ def search(
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
     # Constructing the Elasticsearch Query DSL object
     # Enhanced with fuzziness for handling typos and incomplete queries.
-    query_definition : Dict[str, Any] = {
+    query_definition: Dict[str, Any] = {
         'query': {
             'bool': {
                 'must': [
