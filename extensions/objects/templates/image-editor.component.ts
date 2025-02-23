@@ -1133,7 +1133,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         frames: 'all',
         outputType: 'canvas',
       })
-      .then(async frameData => {
+      .then(async function (frameData) {
         let frames = [];
         for (let i = 0; i < frameData.length; i += 1) {
           let sourceCanvas = frameData[i].getImage();
