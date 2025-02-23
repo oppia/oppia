@@ -32,7 +32,7 @@ const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
-const contributorAdminDashboardPageUrl =
+const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
 
@@ -1361,7 +1361,7 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Contributor Admin Dashboard page.
    */
   async navigateToContributorAdminDashboardPage(): Promise<void> {
-    await this.goto(contributorAdminDashboardPageUrl);
+    await this.goto(contributorDashboardAdminUrl);
   }
 
   /**

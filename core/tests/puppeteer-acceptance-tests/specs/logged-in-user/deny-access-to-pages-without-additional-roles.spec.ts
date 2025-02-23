@@ -51,8 +51,8 @@ describe('Logged-in User Access Restrictions', function () {
     await loggedInUser.expectErrorPage(404); // Expect a 404 Not Found error.
   });
 
-  // The logged-in user cannot access the contributor dashboard admin page.
-  it('should be restricted from accessing the contributor dashboard admin page', async function () {
+  // The logged-in user cannot access the contributor admin dashboard page.
+  it('should be restricted from accessing the contributor admin dashboard page', async function () {
     await loggedInUser.navigateToContributorAdminDashboardPage();
     await loggedInUser.expectErrorPage(401); // Expect a 401 Unauthorized error.
   });
