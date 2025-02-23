@@ -25,6 +25,9 @@
               (click)="confirm()"
               [disabled]="isDoneButtonDisabled()">
         Done
+        <i class="fas fa-exclamation-triangle story-save-draft-warning"
+        *ngIf="!isDoneButtonEnabled()">
+     </i>
       </button>
     </span>
   </div>
