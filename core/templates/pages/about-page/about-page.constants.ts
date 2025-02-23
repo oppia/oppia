@@ -583,7 +583,6 @@ export const AboutPageConstants = {
     'Sandeep Patel',
     'Sanjana Konte',
     'Sanjay Saju Jacob',
-    'Sanket Nabade',
     'Sankranti Joshi',
     'Santos Hernandez',
     'Sanyam Khurana',
