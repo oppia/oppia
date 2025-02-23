@@ -7,192 +7,131 @@ on:
 jobs:
   assign-reviewers:
     if: github.event.issue.pull_request != null
-    runs-on: ubuntu-22.04
-    permissions: 
+    runs-on: ubuntu-24.04
+    permissions:
       pull-requests: write
       issues: write
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: reviewer assignment script
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const https = require('https');
+      - name: Assign reviewers
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const sanitizeUsername = (input) => {
+              const allowed = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+              return typeof input === 'string' 
+                ? (allowed.test(input) ? input.trim() : '')
+                : '';
+            };
 
-          // --------------------------------------------
-          // Helper function: Perform a GitHub API request
-          // --------------------------------------------
-          function githubApiRequest(method, path, body) {
-            return new Promise((resolve, reject) => {
-              const data = body ? JSON.stringify(body) : null;
-              const options = {
-                hostname: 'api.github.com',
-                path: path,
-                method: method,
-                headers: {
-                  'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-                  'User-Agent': 'node.js',
-                  'Content-Type': 'application/json'
-                }
-              };
+            const sanitizeRepo = (input) => {
+              const allowed = /^[A-Za-z0-9_.-]{1,100}$/;
+              return typeof input === 'string'
+                ? (allowed.test(input) ? input.trim() : '')
+                : '';
+            };
 
-              const req = https.request(options, res => {
-                let responseData = '';
-                res.on('data', chunk => {
-                  responseData += chunk;
-                });
-                res.on('end', () => {
-                  try {
-                    const parsed = JSON.parse(responseData);
-                    if (res.statusCode < 200 || res.statusCode >= 300) {
-                      return reject(new Error(`HTTP ${res.statusCode}: ${JSON.stringify(parsed)}`));
-                    }
-                    resolve(parsed);
-                  } catch (err) {
-                    reject(err);
-                  }
-                });
+            const sanitizePrNumber = (num) => {
+              const n = Number(num);
+              return Number.isInteger(n) && n > 0 ? n : NaN;
+            };
+
+            const validateContext = () => {
+              if (!context.payload || !context.payload.issue || !context.payload.repository) {
+                core.setFailed('Invalid event payload structure');
+                return false;
+              }
+              return true;
+            };
+
+            if (!validateContext()) return;
+
+            const rawPrNumber = context.payload.issue?.number;
+            const prNumber = sanitizePrNumber(rawPrNumber);
+            if (isNaN(prNumber)) {
+              core.setFailed(`Invalid PR number: ${rawPrNumber}`);
+              return;
+            }
+
+            const rawRepo = context.payload.repository?.name;
+            const rawOwner = context.payload.repository?.owner?.login;
+            const repo = sanitizeRepo(rawRepo);
+            const owner = sanitizeUsername(rawOwner); // Owner follows username rules
+            
+            if (!repo || !owner) {
+              core.setFailed(`Invalid repository (${repo}) or owner (${owner})`);
+              return;
+            }
+
+
+            const rawComment = context.payload.comment?.body || '';
+            const comment = rawComment.trim().slice(0, 1000); // Limit length
+
+
+            const reviewerPattern = /^((?:@[\w-]+[\s,]*)+)\s+(ptal|take\s+a\s+pass|please\s+review)\b/i;
+            const match = comment.match(reviewerPattern);
+            if (!match) {
+              console.log('No valid PTAL pattern found');
+              return;
+            }
+
+
+            const reviewers = match[1]
+              .split(/[\s,]+/g)
+              .map(u => u.replace(/^@+/, '')) // Remove leading @
+              .map(sanitizeUsername)
+              .filter(u => u.length > 0 && u !== owner); // Filter invalid and self-assign
+
+            if (reviewers.length === 0) {
+              console.log('No valid reviewers after sanitization');
+              return;
+            }
+
+            try {
+              // Verify PR existence first
+              const { data: prData } = await github.rest.issues.get({
+                owner,
+                repo,
+                issue_number: prNumber
               });
 
-              req.on('error', err => reject(err));
-              if (data) req.write(data);
-              req.end();
-            });
-          }
+              if (!prData.pull_request) {
+                core.setFailed('Issue is not a pull request');
+                return;
+              }
 
-          // --------------------------------------------
-          // Helper functions for sanitization
-          // --------------------------------------------
-          function sanitizeString(input, allowedRegex) {
-            if (typeof input !== 'string') return '';
-            const trimmed = input.trim();
-            return allowedRegex.test(trimmed) ? trimmed : '';
-          }
+              const currentAssignees = prData.assignees
+                .map(a => sanitizeUsername(a.login))
+                .filter(Boolean);
 
-          function sanitizeUsername(username) {
-            const allowedRegex = /^[\w-]+$/;
-            return sanitizeString(username, allowedRegex);
-          }
+              const newAssignees = [...new Set([...currentAssignees, ...reviewers])];
 
-          function sanitizeRepo(repo) {
-            const allowedRegex = /^[A-Za-z0-9_.-]+$/;
-            return sanitizeString(repo, allowedRegex);
-          }
+              await github.rest.issues.addAssignees({
+                owner,
+                repo,
+                issue_number: prNumber,
+                assignees: reviewers
+              });
 
-          function sanitizeOwner(owner) {
-            const allowedRegex = /^[A-Za-z0-9_.-]+$/;
-            return sanitizeString(owner, allowedRegex);
-          }
+              const safeMessage = `Assigning Reviewers: ${reviewers.map(u => `@${u}`).join(', ')}. Thanks!`;
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: safeMessage.slice(0, 500)
+              });
 
-          // --------------------------------------------
-          // Step 1: Retrieve and sanitize PR and repository info
-          // --------------------------------------------
-          const eventPath = process.env.GITHUB_EVENT_PATH;
-          if (!eventPath) {
-            console.error("GITHUB_EVENT_PATH is not defined.");
-            process.exit(1);
-          }
-          const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
-
-          const prNumberRaw = eventData.issue && eventData.issue.number;
-          const prNumber = parseInt(prNumberRaw, 10);
-          if (isNaN(prNumber)) {
-            console.log('Invalid or missing PR number. Exiting.');
-            process.exit(0);
-          }
-          const repoRaw = eventData.repository && eventData.repository.name;
-          const ownerRaw = eventData.repository && eventData.repository.owner && eventData.repository.owner.login;
-          const repo = sanitizeRepo(repoRaw);
-          const owner = sanitizeOwner(ownerRaw);
-          if (!repo || !owner) {
-            console.log('Invalid repository or owner information. Exiting.');
-            process.exit(0);
-          }
-
-          // --------------------------------------------
-          // Step 2: Sanitize and extract reviewers from the comment
-          // --------------------------------------------
-          const commentRaw = eventData.comment && eventData.comment.body;
-          const comment = commentRaw ? commentRaw.trim() : '';
-          if (!comment) {
-            console.log('Empty comment. Nothing to do.');
-            process.exit(0);
-          }
-
-          // This regex matches one or more @mentions (optionally separated by commas)
-          // immediately followed by one of the trigger phrases.
-          const structuredRegex = /((?:@[\w-]+(?:\s*,\s*)?)+)\s*(ptal|take a pass|please review)\b/i;
-          const match = comment.match(structuredRegex);
-          if (!match) {
-            console.log('No valid PTAL trigger with a structured list of reviewers was found in the comment.');
-            process.exit(0);
-          }
-
-          // Extract and sanitize reviewer usernames.
-          const reviewersRaw = match[1];
-          const reviewerMatches = reviewersRaw.match(/@([\w-]+)/g);
-          let reviewers = [];
-          if (reviewerMatches) {
-            reviewers = reviewerMatches
-              .map(r => sanitizeUsername(r.substring(1)))
-              .filter(r => r !== '');
-          }
-          if (reviewers.length === 0) {
-            console.log('No valid reviewers found after sanitization. Exiting.');
-            process.exit(0);
-          }
-          console.log(`Reviewers extracted and sanitized: ${reviewers.join(', ')}`);
-
-          // --------------------------------------------
-          // Step 3: Get current assignees on the PR
-          // --------------------------------------------
-          (async () => {
-            let currentAssignees = [];
-            try {
-              const prData = await githubApiRequest('GET', `/repos/${owner}/${repo}/pulls/${prNumber}`);
-              currentAssignees = prData.assignees.map(a => sanitizeUsername(a.login));
             } catch (error) {
-              console.error('Error fetching PR details:', error);
-              process.exit(1);
+              core.setFailed(`API Error: ${error.message}`);
             }
-
-            // --------------------------------------------
-            // Step 4: Merge current assignees with the new reviewers and update the PR
-            // --------------------------------------------
-            const newAssignees = Array.from(new Set([...currentAssignees, ...reviewers]));
-            console.log(`Updating PR #${prNumber} with the following assignees: ${newAssignees.join(', ')}`);
-            try {
-              await githubApiRequest('PATCH', `/repos/${owner}/${repo}/issues/${prNumber}`, { assignees: newAssignees });
-              console.log('Assignees updated successfully.');
-            } catch (error) {
-              console.error('Error updating PR assignees:', error);
-              process.exit(1);
-            }
-
-            // --------------------------------------------
-            // Step 5: Post a confirmation comment
-            // --------------------------------------------
-            const confirmationMessage = `Assigning Reviewers ${reviewers.map(u => '@' + u).join(', ')}. Thanks!`;
-            try {
-              await githubApiRequest('POST', `/repos/${owner}/${repo}/issues/${prNumber}/comments`, { body: confirmationMessage });
-              console.log('Posted confirmation comment successfully.');
-            } catch (error) {
-              console.error('Error posting confirmation comment:', error);
-              process.exit(1);
-            }
-          })();
-          EOF
 
   report-failure:
     needs: assign-reviewers
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ always() && needs.assign-reviewers.result == 'failure' }}
     steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Report failure if workflow failed
+      - uses: actions/checkout@v4
+      - name: Send notification
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "A typescript test failed on the upstream develop branch."
+          message: "Failed to assign reviewers in PR workflow"
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
