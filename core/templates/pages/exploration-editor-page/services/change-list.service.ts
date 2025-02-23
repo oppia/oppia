@@ -17,7 +17,6 @@
  * committed to the server.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Output} from '@angular/core';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
@@ -506,7 +505,3 @@ export class ChangeListService {
     return this.autosaveInProgressEventEmitter.asObservable();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ChangeListService', downgradeInjectable(ChangeListService));

@@ -39,7 +39,6 @@ import {
   TileLayer,
   tileLayer,
 } from 'leaflet';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface OverlayStyle {
   'background-color': string;
@@ -210,10 +209,3 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveInteractiveMap',
-  downgradeComponent({
-    component: InteractiveInteractiveMapComponent,
-  })
-);

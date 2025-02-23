@@ -18,7 +18,6 @@
 
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -448,10 +447,3 @@ export class EditableTopicBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableTopicBackendApiService',
-    downgradeInjectable(EditableTopicBackendApiService)
-  );

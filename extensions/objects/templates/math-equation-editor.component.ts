@@ -27,7 +27,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
@@ -160,10 +159,3 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'mathEquationEditor',
-  downgradeComponent({
-    component: MathEquationEditorComponent,
-  }) as angular.IDirectiveFactory
-);

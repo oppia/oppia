@@ -200,7 +200,7 @@ import {DynamicComponentModule} from 'value_generators/templates/dynamic-compone
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.component';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
-import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
+import {RteHelperModalComponent} from 'services/rte-helper-modal.component';
 import {DirectivesModule} from 'directives/directives.module';
 import {PreviewSummaryTileModalComponent} from 'pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component';
 import {LostChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component';

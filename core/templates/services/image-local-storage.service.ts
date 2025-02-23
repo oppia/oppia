@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AlertsService} from 'services/alerts.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -152,10 +151,3 @@ export class ImageLocalStorageService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ImageLocalStorageService',
-    downgradeInjectable(ImageLocalStorageService)
-  );

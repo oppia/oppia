@@ -17,7 +17,6 @@
  */
 import {Subscription} from 'rxjs';
 import {Component, Injector, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -305,10 +304,3 @@ export class TrainingDataEditorPanelComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'trainingDataEditorPanel',
-  downgradeComponent({
-    component: TrainingDataEditorPanelComponent,
-  }) as angular.IDirectiveFactory
-);
