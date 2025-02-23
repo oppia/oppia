@@ -263,38 +263,40 @@ def search(
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-
-
-    # Constructing the Elasticsearch Query DSL object.
+    # Constructing the Elasticsearch Query DSL object
     # Enhanced with fuzziness for handling typos and incomplete queries.
     query_definition = {
-        "query": {
-            "bool": {
-                "must": [
+        'query': {
+            'bool': {
+                'must': [
                     {
-                        "multi_match": {
-                            "query": query_string,
-                            "fields": ["title^3", "description", "category^2"],
-                            "fuzziness": "AUTO", # Automatically adjusts fuzziness based on query length.
-                            "prefix_length": 1,  # Ensures the first character matches exactly.
-                            "max_expansions": 50,# Expands the number of terms to match for better coverage.
-                            "minimum_should_match": "75%" # Ensures partial matches still yield results.
+                        'multi_match': {
+                            'query': query_string,
+                            'fields': ['title^3', 'description', 'category^2'],
+                            # Automatically adjusts fuzziness based on query length
+                            'fuzziness': 'AUTO',
+                            # Ensures the first character matches exactly
+                            'prefix_length': 1,
+                            # Expands the number of terms to match for better coverage
+                            'max_expansions': 50,
+                            # Ensures partial matches still yield results.
+                            'minimum_should_match': '75%' 
                         }
                     }
                 ],
-                "filter": []
+                'filter': []
             }
         },
-        "sort": [{"rank": {"order": "desc", "missing": "_last", "unmapped_type": "float"}}]
+        'sort': [{'rank': {'order': 'desc', 'missing': '_last', 'unmapped_type': 'float'}}]
     }
 
     if categories:
-        query_definition["query"]["bool"]["filter"].append(
-            {"terms": {"category.keyword": categories}}
+        query_definition['query']['bool']['filter'].append(
+            {'terms': {'category.keyword': categories}}
         )
     if language_codes:
-        query_definition["query"]["bool"]["filter"].append(
-            {"terms": {"language_code.keyword": language_codes}}
+        query_definition['query']['bool']['filter'].append(
+            {'terms': {'language_code.keyword': language_codes}}
         )
 
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
