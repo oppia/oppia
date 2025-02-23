@@ -557,7 +557,10 @@ export class BaseUser {
       __dirname,
       '../../jest-runtime-config.json'
     );
-    if (fs.existsSync(CONFIG_FILE)) {
+    if (
+      fs.existsSync(CONFIG_FILE) &&
+      !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
+    ) {
       const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
       if (configData.testFailureDetected) {
         // Signal all BaseUser instances to take screenshots.
