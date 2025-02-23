@@ -210,9 +210,9 @@ def clear_index(index_name: str) -> None:
                 {
                     'match_all': {}
                 }
-        })
+        })   
     
-
+ 
 def search(
     query_string: str,
     index_name: str,
@@ -236,11 +236,17 @@ def search(
         size: int. The maximum number of documents to return.
 
     Returns:
-        2-tuple of (result_ids, resulting_offset).
+        2-tuple of (result_ids, resulting_offset). Where:
+            result_ids: list(str). Represents search documents, this
+                will be a list of strings corresponding to the search document
+                ids.
+            resulting_offset: int. The resulting offset to start at for the next
+                section of the results. Returns None if there are no more
+                results.
     """
     if offset is None:
         offset = 0
-        
+
     # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
     # for more details about Query DSL.
@@ -285,7 +291,7 @@ def search(
         query_definition['query']['bool']['filter'].append(
             {'terms': {'language_code.keyword': language_codes}}
         )  
-
+        
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
         query_definition, index_name, offset, size
     )

@@ -140,6 +140,11 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'param2': 4
             }
         }], correct_index_name)
+
+        # Here we use type Any because this method mocks the behavior of
+        # elastic_search_services.ES.search, so to match the type annotations
+        # with 'search' method we defined the body as 'Dict[str, Any]' type,
+        # and also in the type stubs the type of body is mentioned as Any.
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Any]:
@@ -205,7 +210,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'query': {
                         'bool': {
                             'must': [{
-                                'match_all':{}
+                                'match_all': {}
                             }],
                             'filter': [{
                                 'terms': {'category.keyword': ['my_category']}
@@ -300,7 +305,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'hits': []
                 }
             }
-        
+                    
         swap_search = self.swap(
             elastic_search_services.ES, 'search', mock_search)
         with swap_search:
