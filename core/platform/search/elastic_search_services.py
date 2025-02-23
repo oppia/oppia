@@ -219,7 +219,7 @@ def search(
     categories: List[str],
     language_codes: List[str],
     offset: Optional[int] = None,
-    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE
 ) -> Tuple[List[str], Optional[int]]:
     """Searches for documents (explorations or collections) matching the given
     query in the given index.
@@ -263,36 +263,38 @@ def search(
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-    query_definition: Dict[str, Any] = {
-        'query': {
-            'bool': {
-                'must': [],
-                'filter': [],
+
+
+    # Constructing the Elasticsearch Query DSL object.
+    # Enhanced with fuzziness for handling typos and incomplete queries.
+    query_definition = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "multi_match": {
+                            "query": query_string,
+                            "fields": ["title^3", "description", "category^2"],
+                            "fuzziness": "AUTO", # Automatically adjusts fuzziness based on query length.
+                            "prefix_length": 1,  # Ensures the first character matches exactly.
+                            "max_expansions": 50,# Expands the number of terms to match for better coverage.
+                            "minimum_should_match": "75%" # Ensures partial matches still yield results.
+                        }
+                    }
+                ],
+                "filter": []
             }
         },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
-            }
-        }],
+        "sort": [{"rank": {"order": "desc", "missing": "_last", "unmapped_type": "float"}}]
     }
-    if query_string:
-        query_definition['query']['bool']['must'] = [{
-            'multi_match': {
-                'query': query_string,
-            }
-        }]
+
     if categories:
-        category_string = ' '.join(['"%s"' % cat for cat in categories])
-        query_definition['query']['bool']['filter'].append(
-            {'match': {'category': category_string}}
+        query_definition["query"]["bool"]["filter"].append(
+            {"terms": {"category.keyword": categories}}
         )
     if language_codes:
-        language_code_string = ' '.join(['"%s"' % lc for lc in language_codes])
-        query_definition['query']['bool']['filter'].append(
-            {'match': {'language_code': language_code_string}}
+        query_definition["query"]["bool"]["filter"].append(
+            {"terms": {"language_code.keyword": language_codes}}
         )
 
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
