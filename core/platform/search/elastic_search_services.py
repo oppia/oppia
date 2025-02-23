@@ -273,13 +273,9 @@ def search(
                         'multi_match': {
                             'query': query_string,
                             'fields': ['title^3', 'description', 'category^2'],
-                            # Automatically adjusts fuzziness based on query length
                             'fuzziness': 'AUTO',
-                            # Ensures the first character matches exactly
                             'prefix_length': 1,
-                            # Expands the number of terms to match for better coverage
                             'max_expansions': 50,
-                            # Ensures partial matches still yield results.
                             'minimum_should_match': '75%' 
                         }
                     }
@@ -287,7 +283,13 @@ def search(
                 'filter': []
             }
         },
-        'sort': [{'rank': {'order': 'desc', 'missing': '_last', 'unmapped_type': 'float'}}]
+        'sort': [{
+            'rank': {
+                'order': 'desc', 
+                'missing': '_last', 
+                'unmapped_type': 'float'
+            }
+        }],
     }
 
     if categories:
