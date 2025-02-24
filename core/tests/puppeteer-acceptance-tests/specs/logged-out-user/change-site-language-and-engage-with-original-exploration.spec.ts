@@ -95,7 +95,7 @@ describe('Logged-out User', function () {
 
       // Check the navbar to confirm that it is translated correctly.
       await loggedOutUser.expectNavbarButtonsToHaveText([
-        'के बारे में',
+        'परिचय',
         'बुनियादी गणित',
         'जानिए',
       ]);
