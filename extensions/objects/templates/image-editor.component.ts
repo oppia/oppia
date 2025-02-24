@@ -1126,7 +1126,6 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    this.windowRef.nativeWindow as Window;
     this.gifFramesService
       .getFrames({
         url: imageDataURI,
@@ -1134,20 +1133,16 @@ export class ImageEditorComponent implements OnInit, OnChanges {
         outputType: 'canvas',
       })
       .then(async function (frameData) {
-        const frameArray = frameData as {
-          getImage: () => HTMLCanvasElement;
-          frameInfo: {disposal: number};
-        }[];
         let frames = [];
-        for (let i = 0; i < frameArray.length; i += 1) {
-          let sourceCanvas = frameArray[i].getImage();
+        for (let i = 0; i < frameData.length; i += 1) {
+          let sourceCanvas = frameData[i].getImage();
           // Some GIFs may be optimised such that frames are stacked and
           // only incremental changes are present in individual frames.
           // For such GIFs, no additional operation needs to be done to
           // handle transparent content. These GIFs have 0 or 1 Disposal
           // method value.
           // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
-          if (frameArray[i].frameInfo.disposal > 1) {
+          if (frameData[i].frameInfo.disposal > 1) {
             // Frames that have transparent content may not render
             // properly in the gifshot output. As a workaround, add a
             // white background to individual frames before creating a
