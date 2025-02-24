@@ -115,7 +115,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
+        'इस पाठ को पूरा करने के लिए बधाई! अब आप अगली बार जब वापस आएंगे तो पाठ को शुरू से ' +
+          'शुरू करेंगे।'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
