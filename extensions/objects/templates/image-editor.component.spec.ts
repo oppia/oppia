@@ -404,6 +404,7 @@ describe('ImageEditor', () => {
     contextService = TestBed.inject(ContextService);
     fixture = TestBed.createComponent(ImageEditorComponent);
     component = fixture.componentInstance;
+    gifFrames = TestBed.inject(GifFramesService);
     spyOn(contextService, 'getEntityId').and.returnValue('2');
     spyOn(contextService, 'getEntityType').and.returnValue('question');
     // This throws "Argument of type 'mockImageObject' is not assignable to
@@ -1897,10 +1898,6 @@ describe('ImageEditor', () => {
         },
       })
     );
-
-    beforeEach(() => {
-      gifFrames = new GifFramesService();
-    });
 
     // Replace gifFrames with a spy that returns a resolved promise.
     spyOn(gifFrames, 'getFrames').and.resolveTo([
