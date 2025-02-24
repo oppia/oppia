@@ -41,7 +41,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/App.ts',
     'core/templates/AppSpec.ts',
     'core/templates/Polyfills.ts',
-    'core/templates/app.constants.ajs.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
     'core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.spec.ts',

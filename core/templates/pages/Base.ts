@@ -20,8 +20,6 @@ require('services/contextual/meta-tag-customization.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/background-mask.service.ts');
 
-require('app.constants.ajs.ts');
-
 /**
  * @fileoverview Oppia's base controller.
  */
