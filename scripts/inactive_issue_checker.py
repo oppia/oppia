@@ -25,10 +25,10 @@ import os
 import requests
 from typing import Dict, List, Optional, Set, TypedDict
 
-INACTIVE_DAYS_THRESHOLD = 0.00000000000007
-UNASSIGN_DAYS_THRESHOLD = 0.00000000000010
-REPO_OWNER = 'Ashu463'
-REPO_NAME = 'grid6.0'
+INACTIVE_DAYS_THRESHOLD = 7
+UNASSIGN_DAYS_THRESHOLD = 10
+REPO_OWNER = 'oppia'
+REPO_NAME = 'oppia'
 
 
 class IssueDict(TypedDict, total=False):
