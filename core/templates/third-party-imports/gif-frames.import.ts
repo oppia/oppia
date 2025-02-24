@@ -19,12 +19,13 @@
 // Remove the global assignment if it exists:
 // (window as Window).GifFrames = require('gif-frames');
 
+import {AnyARecord} from 'dns';
 import * as gifFrames from 'gif-frames';
 
 export type GifFramesOptions = Record<string, unknown>;
 
 export class GifFramesService {
-  getFrames(options: GifFramesOptions): any {
+  getFrames(options: GifFramesOptions): Promise<any> {
     // Call the underlying gif-frames function.
     return gifFrames(options);
   }
