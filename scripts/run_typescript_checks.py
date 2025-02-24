@@ -187,7 +187,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
-    'extensions/interactions/MusicNotesInput/directives/music-notes-input.spec.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-response-music-notes-input.component.ts',
     'extensions/interactions/MusicNotesInput/directives/oppia-short-response-music-notes-input.component.ts',
