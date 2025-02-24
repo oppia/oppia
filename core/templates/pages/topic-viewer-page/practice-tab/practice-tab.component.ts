@@ -20,12 +20,10 @@ import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
-import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
-import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   I18nLanguageCodeService,

@@ -33,7 +33,6 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {PracticeTabComponent} from './practice-tab.component';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -60,7 +59,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('Practice tab component', function () {
+describe('Practice tab component', function () {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
