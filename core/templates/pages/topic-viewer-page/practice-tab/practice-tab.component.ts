@@ -70,13 +70,11 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private translateService: TranslateService,
     private loaderService: LoaderService,
-    private siteAnalyticsService: SiteAnalyticsService,
-    private editableTopicBackendApiService: EditableTopicBackendApiService
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -102,30 +100,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       false
     );
     this.clientWidth = window.innerWidth;
-    if (
-      this.displayArea === 'topicViewer' &&
-      this.urlService.getPathname().startsWith('/learn')
-    ) {
-      this.topicUrlFragment =
-        this.urlService.getTopicUrlFragmentFromLearnerUrl();
-      this.classroomUrlFragment =
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    } else if (
-      this.displayArea === 'topicViewer' &&
-      this.urlService.getPathname().startsWith('/topic_editor')
-    ) {
-      this.topicId = this.urlService.getTopicIdFromUrl();
-      let topicDataPromise =
-        this.editableTopicBackendApiService.fetchTopicAsync(this.topicId);
-      topicDataPromise
-        .then(topicData => {
-          this.topicUrlFragment = topicData.topicDict.url_fragment;
-          this.classroomUrlFragment = topicData.classroomUrlFragment ?? '';
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
         this.topicId,

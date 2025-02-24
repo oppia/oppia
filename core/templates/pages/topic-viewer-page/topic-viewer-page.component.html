@@ -52,7 +52,9 @@
       <practice-tab *ngIf="practiceTabIsDisplayed && topicId"
                     [subtopicsList]="subtopics"
                     [topicName]="topicName"
-                    [topicId]="topicId">
+                    [topicId]="topicId"
+                    [topicUrlFragment]="topicUrlFragment"
+                    [classroomUrlFragment]="classroomUrlFragment">
       </practice-tab>
       <mat-card dir="auto" *ngIf="!practiceTabIsDisplayed" class="oppia-page-card practice-tab-not-available-card">
         <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">

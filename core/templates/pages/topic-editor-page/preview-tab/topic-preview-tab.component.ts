@@ -37,6 +37,8 @@ export class TopicPreviewTabComponent {
   topic!: Topic;
   topicName!: string;
   subtopics!: Subtopic[];
+  classroomUrlFragment!: string;
+  topicUrlFragment!: string;
   cannonicalStorySummaries!: StorySummary[];
   activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
@@ -48,7 +50,10 @@ export class TopicPreviewTabComponent {
 
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
+    this.classroomUrlFragment =
+      this.topicEditorStateService.getClassroomUrlFragment();
     this.topicName = this.topic.getName();
+    this.topicUrlFragment = this.topic.getUrlFragment();
     this.subtopics = this.topic.getSubtopics();
     this.cannonicalStorySummaries =
       this.topicEditorStateService.getCanonicalStorySummaries();
