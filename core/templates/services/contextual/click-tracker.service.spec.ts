@@ -65,7 +65,7 @@ describe('ClickTrackerService', () => {
     }
 
     const history = cts.getClickHistory();
-    expect(history.length).toBeLessThanOrEqual(50); // maxLength is 50
+    expect(history.length).toBeLessThanOrEqual(50); // MaxLength is 50.
   });
 
   it('should handle errors gracefully', () => {
