@@ -63,7 +63,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
-    'core/templates/pages/Base.ts',
     'core/templates/pages/exploration-editor-page/services/'
         'exploration-states.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/'

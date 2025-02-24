@@ -655,7 +655,6 @@
 # Speed Improvement team.
 /core/templates/google-analytics.initializer.ts @oppia/lace-frontend-reviewers
 /core/templates/base-components/ @oppia/lace-frontend-reviewers
-/core/templates/pages/Base.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/footer_js_libs.html @oppia/lace-frontend-reviewers
 /core/templates/pages/header_css_libs.html @oppia/lace-frontend-reviewers
 /core/templates/pages/header_js_libs.html @oppia/lace-frontend-reviewers
