@@ -74,7 +74,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/question/QuestionObjectFactorySpec.ts',
     'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-update.service.spec.ts',
-    'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/statistics/learner-answer-info.model.ts',
     'core/templates/domain/topic/topic-update.service.spec.ts',
     'core/templates/domain/topic/topic-update.service.ts',

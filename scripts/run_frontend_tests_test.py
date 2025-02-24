@@ -200,21 +200,18 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         args=['--check_coverage', '--specs_to_run='
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
-                              'test-module.js,'
-                              'App.ts'])
+                              'test-module.js,'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=AppSpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js']
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
-            '--files_to_check=AppSpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'
