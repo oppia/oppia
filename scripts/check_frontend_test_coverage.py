@@ -59,7 +59,6 @@ NOT_FULLY_COVERED_FILENAMES = [
         'object-editor.directive.ts',
     'core/templates/components/state-directives/rule-editor/'
         'rule-type-selector.directive.ts',
-    'core/templates/directives/angular-html-bind.directive.ts',
     'core/templates/directives/mathjax-bind.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
