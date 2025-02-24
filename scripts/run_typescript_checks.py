@@ -175,7 +175,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/rte-helper.service.spec.ts',
     'core/templates/services/rte-helper.service.ts',
     'core/templates/tests/unit-test-utils.ajs.ts',
-    'core/tests/build_sources/templates/pages/Base.ts',
     'core/tests/karma.conf.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.spec.ts',
     'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
