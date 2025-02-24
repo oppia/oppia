@@ -560,8 +560,8 @@
   }
 
   .splash-page .splash-arrows-container {
-    position: relative;
     cursor: pointer;
+    position: relative;
   }
 
   .splash-page .oppia-splash-section-four-left .oppia-splash-button,
