@@ -109,7 +109,7 @@ class CleanTests(test_utils.GenericTestBase):
             'delete_file_is_called': 0
         }
         expected_check_function_calls = {
-            'delete_directory_tree_is_called': 9,
+            'delete_directory_tree_is_called': 10,
             'delete_file_is_called': 4
         }
         def mock_delete_dir(unused_path: str) -> None:

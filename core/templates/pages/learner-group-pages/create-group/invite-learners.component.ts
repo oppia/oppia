@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
 import {UserService} from 'services/user.service';
@@ -98,10 +97,3 @@ export class InviteLearnersComponent {
     return webpImageUrl;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaInviteLearners',
-    downgradeComponent({component: InviteLearnersComponent})
-  );

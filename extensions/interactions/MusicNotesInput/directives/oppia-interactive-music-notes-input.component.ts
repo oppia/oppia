@@ -28,7 +28,6 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
   MusicNotesInputCustomizationArgs,
@@ -951,10 +950,3 @@ export class MusicNotesInputComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveMusicNotesInput',
-  downgradeComponent({
-    component: MusicNotesInputComponent,
-  }) as angular.IDirectiveFactory
-);

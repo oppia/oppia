@@ -19,7 +19,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {CreateNewSubtopicModalComponent} from 'pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component';
 import {CreateNewSkillModalService} from './create-new-skill-modal.service';
@@ -62,7 +61,3 @@ export class EntityCreationService {
     this.createNewSkillModalService.createNewSkill([topicId]);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('EntityCreationService', downgradeInjectable(EntityCreationService));

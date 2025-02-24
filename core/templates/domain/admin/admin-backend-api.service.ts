@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for fetching the admin data;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -735,10 +734,3 @@ export class AdminBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AdminBackendApiService',
-    downgradeInjectable(AdminBackendApiService)
-  );
