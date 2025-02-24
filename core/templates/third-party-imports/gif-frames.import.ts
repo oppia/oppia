@@ -32,7 +32,6 @@ interface GifFrame {
 
 export class GifFramesService {
   getFrames(options: GifFramesOptions): Promise<GifFrame[]> {
-    // Call the underlying gif-frames functions
     return gifFrames(options);
   }
 }
