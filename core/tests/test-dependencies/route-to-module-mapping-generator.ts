@@ -46,13 +46,6 @@ const ROUTING_MODULE_FILE_PATHS = [
   ),
 ];
 
-// List of routes that are not defined in routing modules. These routes are
-// manually mapped to their corresponding modules. These routes are currently not
-// covered by the routing module scraping logic since they are loaded by webpack and
-// not definied in the above routing modules. This list should not be updated unless
-// the routes are removed from the webpack configuration.
-const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([]);
-
 /**
  * Extends two maps while avoiding duplicates.
  */
@@ -328,9 +321,7 @@ const validateRouteToModuleMapping = (
  * Gets the full codebase's route to module mapping.
  */
 export const getRouteToModuleMapping = (): Map<Route, string> => {
-  let routeToModuleMapping: Map<Route, string> = new Map([
-    ...MANUAL_ROUTE_TO_MODULE_MAPPING,
-  ]);
+  let routeToModuleMapping: Map<Route, string> = new Map([]);
 
   for (const routingModuleFilePath of ROUTING_MODULE_FILE_PATHS) {
     const routingModuleRouteToModuleMapping =
