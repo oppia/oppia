@@ -37,7 +37,7 @@ export class TopicPreviewTabComponent {
   topic!: Topic;
   topicName!: string;
   subtopics!: Subtopic[];
-  classroomUrlFragment!: string;
+  classroomUrlFragment!: string | null;
   topicUrlFragment!: string;
   cannonicalStorySummaries!: StorySummary[];
   activeTab: string = this._TAB_STORY;
