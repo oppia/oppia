@@ -63,11 +63,18 @@ describe('Topic Preview Tab Component', () => {
         getSubtopics() {
           return [];
         },
+        getUrlFragment() {
+          return 'topic_1';
+        },
       };
     }
 
     getCanonicalStorySummaries() {
       return storySummaries;
+    }
+
+    getClassroomUrlFragment() {
+      return 'classroom_1';
     }
   }
 
@@ -106,6 +113,8 @@ describe('Topic Preview Tab Component', () => {
 
   it('should initialize', () => {
     componentInstance.ngOnInit();
+    expect(componentInstance.classroomUrlFragment).toEqual('classroom_1');
+    expect(componentInstance.topicUrlFragment).toEqual('topic_1');
     expect(componentInstance.topicName).toEqual(testName);
     expect(componentInstance.subtopics).toEqual([]);
     expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
