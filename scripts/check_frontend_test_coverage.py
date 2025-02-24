@@ -77,8 +77,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/services/rte-helper-modal.component.ts',
     # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
-    'core/templates/services/'
-        'translation-file-hash-loader-backend-api.service.ts',
     # Please don't try to cover unit-test-utils.ajs.ts file.
     'core/templates/tests/unit-test-utils.ajs.ts',
     'extensions/interactions/MusicNotesInput/directives/'

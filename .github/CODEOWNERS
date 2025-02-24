@@ -513,7 +513,6 @@
 /core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/lace-frontend-reviewers
 /redis.conf @oppia/dev-workflow-reviewers
 /redis_docker.conf @oppia/dev-workflow-reviewers
 /.firebase.json @oppia/dev-workflow-reviewers
