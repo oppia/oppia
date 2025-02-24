@@ -52,8 +52,7 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'core/templates/components/ck-editor-helpers/'
-        'ck-editor-4-rte.component.ts',
+    'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
         'ck-editor-4-widgets.initializer.ts',
     'core/templates/components/forms/custom-forms-directives/'
@@ -61,8 +60,8 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/state-directives/rule-editor/'
         'rule-type-selector.directive.ts',
     'core/templates/directives/mathjax-bind.directive.ts',
-    'core/templates/domain/question/QuestionObjectFactory.ts',
     'core/templates/domain/question/question-update.service.ts',
+    'core/templates/domain/question/QuestionObjectFactory.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
     'core/templates/pages/exploration-editor-page/services/'
@@ -73,16 +72,19 @@ NOT_FULLY_COVERED_FILENAMES = [
         'learner-answer-info.service.ts',
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-list-select-skill-and-difficulty-modal.component.ts',
+    # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/pages/topic-editor-page/modal-templates/'
         'questions-opportunities-select-difficulty-modal.component.ts',
+    # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/services/rte-helper-modal.component.ts',
+    # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
     'core/templates/tests/unit-test-utils.ajs.ts',
+    # Please don't try to cover unit-test-utils.ajs.ts file.
     'extensions/interactions/MusicNotesInput/directives/'
         'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
         'oppia-interactive-pencil-code-editor.component.ts'
 ]
-
 
 
 class LcovStanzaRelevantLines:
