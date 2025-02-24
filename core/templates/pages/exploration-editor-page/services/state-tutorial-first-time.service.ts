@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {TutorialEventsBackendApiService} from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
@@ -127,10 +126,3 @@ export class StateTutorialFirstTimeService {
     return this._openTranslationTutorialEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateTutorialFirstTimeService',
-    downgradeInjectable(StateTutorialFirstTimeService)
-  );

@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
@@ -435,10 +434,3 @@ export class ExplorationSaveService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationSaveService',
-    downgradeInjectable(ExplorationSaveService)
-  );

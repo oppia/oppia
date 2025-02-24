@@ -17,7 +17,6 @@
    thread domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
@@ -112,10 +111,3 @@ export class FeedbackThreadObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FeedbackThreadObjectFactory',
-    downgradeInjectable(FeedbackThreadObjectFactory)
-  );

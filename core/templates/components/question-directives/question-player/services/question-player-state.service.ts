@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Question} from 'domain/question/QuestionObjectFactory';
 
 interface UsedHintOrSolution {
@@ -128,10 +127,3 @@ export class QuestionPlayerStateService {
     return this._resultsPageIsLoadedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionPlayerStateService',
-    downgradeInjectable(QuestionPlayerStateService)
-  );

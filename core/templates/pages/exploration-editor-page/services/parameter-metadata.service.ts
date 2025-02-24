@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ParamMetadata} from 'domain/exploration/param-metadata.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
@@ -290,10 +289,3 @@ export class ParameterMetadataService {
     return unsetParametersInfo;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParameterMetadataService',
-    downgradeInjectable(ParameterMetadataService)
-  );

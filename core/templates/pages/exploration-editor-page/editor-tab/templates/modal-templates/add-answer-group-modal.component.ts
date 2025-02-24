@@ -32,7 +32,6 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
@@ -225,10 +224,3 @@ export class AddAnswerGroupModalComponent
     this.eventBusGroup.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAddAnswerGroupModalComponent',
-  downgradeComponent({
-    component: AddAnswerGroupModalComponent,
-  }) as angular.IDirectiveFactory
-);

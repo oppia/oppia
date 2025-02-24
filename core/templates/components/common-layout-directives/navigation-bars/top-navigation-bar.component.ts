@@ -41,7 +41,6 @@ import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {I18nService} from 'i18n/i18n.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -71,7 +70,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      year: '2023',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      year: '2022',
+    },
+  ];
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -572,10 +580,3 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopNavigationBar',
-  downgradeComponent({
-    component: TopNavigationBarComponent,
-  }) as angular.IDirectiveFactory
-);

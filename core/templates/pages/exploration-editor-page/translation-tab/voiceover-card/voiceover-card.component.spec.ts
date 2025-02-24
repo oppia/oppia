@@ -135,7 +135,7 @@ describe('Voiceover card component', () => {
 
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
-    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(10);
+    spyOn(audioPlayerService, 'getCurrentTimeInSecs').and.returnValue(10);
 
     component.manualVoiceoverDuration = 10;
     component.voiceoverProgress = 0;
