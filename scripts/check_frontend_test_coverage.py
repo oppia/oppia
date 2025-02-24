@@ -52,7 +52,6 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'core/templates/base-components/oppia-root.directive.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
         'ck-editor-4-widgets.initializer.ts',
