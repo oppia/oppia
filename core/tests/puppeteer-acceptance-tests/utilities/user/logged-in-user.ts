@@ -1337,17 +1337,17 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the Moderator page.
-   */
-  async navigateToModeratorPage(): Promise<void> {
-    await this.goto(moderatorPageUrl);
-  }
-
-  /**
    * Navigates to the Topics and Skills Dashboard page.
    */
   async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
     await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
   }
 
   /**
