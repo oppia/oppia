@@ -70,7 +70,8 @@ const aboutPageThanksModalURL = testConstants.URLs.AboutPageThanksModalURL;
 const volunteerFormUrl = testConstants.URLs.VolunteerForm;
 const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
-const impactReportUrl = testConstants.URLs.ImpactReportUrl;
+const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
+const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
 const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
@@ -78,6 +79,11 @@ const lessonCreatorLinkedInUrl = testConstants.URLs.LessonCreatorLinkedInUrl;
 const testimonialCarouselNamesInTeachPage =
   testConstants.TeachPageTestimonialsNames;
 const creatorsCarouselNamesInTeachPage = testConstants.TeachPageCreatorsNames;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const preferencesPageUrl = testConstants.URLs.Preferences;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -136,6 +142,8 @@ const mobileSidebarImpactReportButton =
   'a.e2e-mobile-test-sidebar-impact-report-button';
 const mobileSidebarExpandAboutMenuButton =
   'div.e2e-mobile-test-sidebar-expand-about-menu';
+const mobileSidebarExpandImpactReportSubMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-impactreport-submenu';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
@@ -365,7 +373,16 @@ const pauseVoiceoverButton = '.e2e-test-pause-circle';
 const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 
 const getStartedHeader = '.e2e-test-get-started-page';
-
+const playLaterButton = '.e2e-test-add-to-playlist-btn';
+const newsletterEmailInputField = '.e2e-test-newsletter-input';
+const newsletterSubscribeButton = '.e2e-test-newsletter-subscribe-btn';
+const newsletterSubscriptionThanksMessage =
+  '.e2e-test-thanks-subscribe-message';
+const watchAVideoButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-watch-video-btn';
+const readOurBlogButtonInThanksForSubscribe =
+  '.e2e-test-thanks-for-subscribe-read-blog-btn';
+const readBlogUrl = testConstants.URLs.ReadBlogLink;
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -635,6 +652,38 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to open the external link by class and text inside it
+   */
+  async openExternalLinkBySelectorAndText(
+    selector: string,
+    linkText: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector, {visible: true});
+
+    const url = await this.page.$$eval(
+      selector,
+      (elements, searchText) => {
+        for (const element of elements) {
+          if (element.textContent?.trim() === searchText) {
+            return element.getAttribute('href');
+          }
+        }
+        return null;
+      },
+      linkText
+    );
+
+    if (!url) {
+      throw new Error(`Link with text "${linkText}" not found.`);
+    }
+
+    if (url !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. Found: ${url}.`);
+    }
+  }
+
+  /**
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
@@ -642,15 +691,28 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.openExternalLink(
+      await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
+      await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
-        impactReportUrl
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2022',
+        impactReport2022Url
       );
     } else {
       await this.clickOn(navbarAboutTab);
-      await this.openExternalLink(
+      await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
-        impactReportUrl
+        '2023',
+        impactReport2023Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2022',
+        impactReport2022Url
       );
     }
   }
@@ -2205,7 +2267,10 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Impact Report.
    */
   async clickViewReportButtonInAboutPage(): Promise<void> {
-    await this.openExternalLink(impactReportButtonInAboutPage, impactReportUrl);
+    await this.openExternalLink(
+      impactReportButtonInAboutPage,
+      impactReport2023Url
+    );
   }
 
   /**
@@ -2474,6 +2539,134 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to submit an email to the newsletter input field.
+   * @param {string} email - The email to submit.
+   */
+  async submitEmailForNewsletter(email: string): Promise<void> {
+    await this.waitForElementToBeClickable(newsletterEmailInputField);
+    await this.type(newsletterEmailInputField, email);
+    await this.clickOn(newsletterSubscribeButton);
+  }
+
+  /**
+   * Function to check for presence of Thanks Message to verify Newsletter Subscription.
+   */
+  async expectNewsletterSubscriptionThanksMessage(): Promise<void> {
+    await this.page.waitForSelector(newsletterSubscriptionThanksMessage);
+    const thanksMessage = await this.page.$eval(
+      newsletterSubscriptionThanksMessage,
+      element => element.textContent
+    );
+
+    if (!thanksMessage || !thanksMessage.includes('Thanks for subscribing!')) {
+      throw new Error('Thank you message does not exist or incorrect');
+    }
+
+    showMessage('Subscribed to newsletter successfully');
+  }
+
+  /**
+   * Function to verify the Watch a Video button after subscribing to newsletter.
+   */
+  async clickWatchAVideoButton(): Promise<void> {
+    await this.page.waitForSelector(watchAVideoButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      watchAVideoButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Watch a video') {
+      throw new Error('The Watch A Video button does not exist!');
+    }
+    await Promise.all([
+      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
+    ]);
+    await this.waitForPageToFullyLoad();
+
+    const url = this.page.url();
+    if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
+      throw new Error(
+        `The Watch A Video button should open the right page,
+          but it opens ${url} instead.`
+      );
+    }
+    showMessage('The Watch A Video button opens the right page.');
+  }
+
+  /**
+   * Function to verify the Read Blog button after subscribing to newsletter.
+   */
+  async clickReadBlogButton(): Promise<void> {
+    await this.page.waitForSelector(readOurBlogButtonInThanksForSubscribe);
+    const buttonText = await this.page.$eval(
+      readOurBlogButtonInThanksForSubscribe,
+      element => (element as HTMLElement).innerText
+    );
+    if (buttonText !== 'Read our blog') {
+      throw new Error('The Read Our Blog button does not exist!');
+    }
+    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+
+    if (this.page.url() !== readBlogUrl) {
+      throw new Error(
+        `The Read Our Blog button should open the Blog page,
+          but it opens ${this.page.url()} instead.`
+      );
+    } else {
+      showMessage('The Read Our Blog button opens the Blog page.');
+    }
+  }
+  /**
+   * Function to verify that the user is on the login page.
+   */
+  async expectToBeOnLoginPage(): Promise<void> {
+    const currentUrl = new URL(this.page.url());
+    expect(currentUrl.pathname.startsWith('/login')).toBe(true);
+  }
+
+  /**
+   * Function to navigate to the Creator Dashboard.
+   */
+  async navigateToCreatorDashboard(): Promise<void> {
+    await this.goto(creatorDashboardUrl);
+  }
+
+  /**
+   * Function to navigate to the Moderator Page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Function to navigate to the Preferences Page.
+   */
+  async navigateToPreferencesPage(): Promise<void> {
+    await this.goto(preferencesPageUrl);
+  }
+
+  /**
+   * Function to navigate to the Topics and Skills Dashboard Page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Function to verify that the user cannot add an exploration to the Play Later list.
+   */
+  async expectCannotAddExplorationToPlayLater(): Promise<void> {
+    const isButtonVisible = (await this.page.$(playLaterButton)) !== null;
+    expect(isButtonVisible).toBe(false);
+  }
+
+  /**
+   * Function to navigate to the Learner Dashboard.
+   */
+  async navigateToLearnerDashboard(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
   }
 
   /**

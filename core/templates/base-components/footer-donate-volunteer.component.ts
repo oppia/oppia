@@ -17,7 +17,6 @@
  */
 
 import {Component, ViewEncapsulation} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
@@ -40,10 +39,3 @@ export class FooterDonateVolunteerComponent {
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 }
-
-angular.module('oppia').directive(
-  'footerDonateVolunteer',
-  downgradeComponent({
-    component: FooterDonateVolunteerComponent,
-  }) as angular.IDirectiveFactory
-);

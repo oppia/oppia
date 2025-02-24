@@ -360,7 +360,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
         def mock_npx_subprocess(  # pylint: disable=unused-argument
-                cmds: List[str], shell: bool, check: bool) -> None:
+                cmds: List[str], check: bool) -> None:
             self.assertTrue(cmds[0].endswith('npx'))
             self.assertEqual(cmds[1], 'lint-staged')
             check_function_calls['check_npx_subprocess_is_called'] = True

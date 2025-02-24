@@ -1,0 +1,113 @@
+<oppia-angular-root>
+  <div ng-controller="Base">
+    <oppia-base-content>
+      <navbar-breadcrumb>
+        <oppia-editor-navbar-breadcrumb></oppia-editor-navbar-breadcrumb>
+      </navbar-breadcrumb>
+
+      <nav-options>
+        <exploration-save-and-publish-buttons class="ml-auto"></exploration-save-and-publish-buttons>
+      </nav-options>
+
+      <content>
+        <exploration-editor-page></exploration-editor-page>
+      </content>
+
+      <page-footer>
+        <oppia-editor-navigation></oppia-editor-navigation>
+      </page-footer>
+    </oppia-base-content>
+  </div>
+</oppia-angular-root>
+
+<link rel="stylesheet" type="text/html" href="/node_modules/guppy-dev/build/guppy-default.min.css">
+<script>
+  // Use the normal default browser eventlistener without passive set to false.
+  // TODO(#8833): Use passive listeners when guppy supports it.
+  EventTarget.prototype.addEventListener = (
+    EventTarget.prototype.addEventListener._original);
+</script>
+
+<!--Preload the interactions thumbnails.-->
+<!--TODO(#13465): Migrate the PNG images to the webp images.-->
+<link rel="preload" type="image/png" href="/extensions/interactions/RatioExpressionInput/static/RatioExpressionInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/FractionInput/static/FractionInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/AlgebraicExpressionInput/static/AlgebraicExpressionInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/CodeRepl/static/CodeRepl.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/Continue/static/Continue.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/DragAndDropSortInput/static/DragAndDropSortInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/EndExploration/static/EndExploration.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/GraphInput/static/GraphInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/ImageClickInput/static/ImageClickInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/ItemSelectionInput/static/ItemSelectionInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/MathEquationInput/static/MathEquationInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/MultipleChoiceInput/static/MultipleChoiceInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/MusicNotesInput/static/MusicNotesInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/NumberWithUnits/static/NumberWithUnits.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/NumericExpressionInput/static/NumericExpressionInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/NumericInput/static/NumericInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/PencilCodeEditor/static/PencilCodeEditor.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/SetInput/static/SetInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/TextInput/static/TextInput.png" as="image">
+<link rel="preload" type="image/png" href="/extensions/interactions/InteractiveMap/static/InteractiveMap.png" as="image">
+<link rel="preload" type="image/webp" href="/assets/images/avatar/user_blue_72px.webp" as="image">
+
+<style>
+  /* Some of the style attributes have been marked with '!important' since they
+  are directly applied to the element's style attributes in the third-party lib
+  and thus need to be overriden with '!important'. The styles are being added
+  here: https://github.com/oppia/guppy/blob/f509e155dc66f6310737c328cbfbc35b85194be2/build/guppy.js#L4292*/
+
+  .guppy_help {
+    max-width: fit-content;
+    position: fixed !important;
+    top: 10% !important;
+    z-index: 1052;
+  }
+
+  .guppy_active {
+    border: 1px solid rgba(81, 203, 238, 1);
+    height: 100px;
+    overflow: auto;
+    padding: 5px;
+    word-break: normal;
+    word-wrap: normal;
+  }
+
+  .guppy_inactive {
+    background: #fff;
+    border: 1px solid #000;
+    font-size: 10pt;
+    height: 100px;
+    overflow: auto;
+    padding: 5px;
+    word-break: normal;
+    word-wrap: normal;
+  }
+
+  .guppy_active .main_cursor {
+    -webkit-animation: guppy-blink-animation 1s steps(2, start) infinite;
+    animation: guppy-blink-animation 1s steps(2, start) infinite;
+    /* Overrides the inline styling and sets the cursor color to black. */
+    color: #000 !important;
+  }
+
+  @keyframes guppy-blink-animation {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  @-webkit-keyframes guppy-blink-animation {
+    to {
+      visibility: hidden;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    span.mord {
+      font-size: 90%;
+    }
+  }
+
+</style>

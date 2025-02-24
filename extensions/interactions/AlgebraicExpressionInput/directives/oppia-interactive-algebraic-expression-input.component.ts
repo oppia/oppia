@@ -28,7 +28,6 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
 import {AppConstants} from 'app.constants';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -159,10 +158,3 @@ export class AlgebraicExpressionInputInteractionComponent
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveAlgebraicExpressionInput',
-  downgradeComponent({
-    component: AlgebraicExpressionInputInteractionComponent,
-  }) as angular.IDirectiveFactory
-);

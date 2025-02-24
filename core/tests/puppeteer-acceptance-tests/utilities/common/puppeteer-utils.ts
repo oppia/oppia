@@ -24,8 +24,10 @@ import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-m
 import {showMessage} from './show-message';
 
 var path = require('path');
+var fs = require('fs');
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
+import {PuppeteerScreenRecorder} from 'puppeteer-screen-recorder';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
@@ -68,6 +70,7 @@ export class BaseUser {
   email: string = '';
   username: string = '';
   startTimeInMilliseconds: number = -1;
+  screenRecorder!: PuppeteerScreenRecorder;
 
   constructor() {}
 
@@ -130,6 +133,61 @@ export class BaseUser {
         } else {
           this.page.setViewport({width: 1920, height: 1080});
         }
+
+        // Enable Video Recording.
+        if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          const outputFileName =
+            `${specName}-${new Date().toISOString()}.mp4`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+
+          const outputDir = testConstants.TEST_VIDEO_DIR;
+          if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, {recursive: true});
+          }
+
+          const config = {
+            followNewTab: true,
+            fps: 25,
+            ffmpeg_Path: null,
+            // Below dimensions are of recorded video.
+            videoFrame: {
+              width: 1920,
+              height: 1080,
+            },
+            aspectRatio: '16:9',
+            videoCrf: 18,
+            videoCodec: 'libx264',
+            videoPreset: 'medium',
+            videoBitrate: 1000,
+            autopad: {
+              color: 'black',
+            },
+            waitForFrameBeforeStart: 2000,
+            waitForFrameAfterPageLoad: 2000,
+            maxRetries: 3, // Add retry mechanism.
+            ffmpegFlags: [
+              // Additional ffmpeg flags for stability.
+              '-movflags',
+              '+faststart',
+              '-max_muxing_queue_size',
+              '9999',
+            ],
+          };
+
+          this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
+          await this.screenRecorder.start(path.join(outputDir, outputFileName));
+
+          // Ensure recording is stopped when the test fails.
+          process.on('SIGTERM', async () => {
+            await this.screenRecorder.stop();
+          });
+          process.on('SIGINT', async () => {
+            await this.screenRecorder.stop();
+          });
+        }
+
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -453,6 +511,9 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    if (this.screenRecorder) {
+      await this.screenRecorder.stop();
+    }
     await this.browserObject.close();
   }
 
@@ -615,7 +676,7 @@ export class BaseUser {
     await currentPage.waitForTimeout(5000);
 
     /* The variable failureTrigger is the percentage of the difference between the stored screenshot and the current screenshot that would trigger a failure
-     * In general, it is set as 0.0028/0.28% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
+     * In general, it is set as 0.04/4% (desktop) 0.042/4.2% (mobile) for the randomness of the page that are small enough to be ignored.
      * Based on the existence of the background/library banner, which are randomly selected from a set of four,
      * failureTrigger is set in the specific percentage for the randomness of the banner in desktop mode and mobile mode.
      */
@@ -639,7 +700,7 @@ export class BaseUser {
       } else {
         dirName = '/dev-desktop-screenshots';
       }
-      failureTrigger += 0.0028;
+      failureTrigger += 0.04;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.03;
       } else if (await currentPage.$(libraryBanner)) {

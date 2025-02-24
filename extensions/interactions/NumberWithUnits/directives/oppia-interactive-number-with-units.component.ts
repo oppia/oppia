@@ -19,7 +19,6 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -168,10 +167,3 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveNumberWithUnits',
-  downgradeComponent({
-    component: InteractiveNumberWithUnitsComponent,
-  }) as angular.IDirectiveFactory
-);

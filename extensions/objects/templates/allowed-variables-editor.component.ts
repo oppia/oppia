@@ -21,7 +21,6 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
@@ -138,10 +137,3 @@ export class AllowedVariablesEditorComponent implements OnInit {
 }
 
 require('services/guppy-initialization.service.ts');
-
-angular.module('oppia').directive(
-  'allowedVariablesEditor',
-  downgradeComponent({
-    component: AllowedVariablesEditorComponent,
-  })
-);

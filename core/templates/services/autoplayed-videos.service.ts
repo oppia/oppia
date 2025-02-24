@@ -30,7 +30,6 @@
 // autoplaying.
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -57,10 +56,3 @@ export class AutoplayedVideosService {
     return Boolean(this.autoplayedVideosDict[videoId]);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AutoplayedVideosService',
-    downgradeInjectable(AutoplayedVideosService)
-  );

@@ -15,6 +15,5 @@ pylint==2.17.2
 pylint-quotes==0.2.3
 pyyaml==6.0
 rcssmin==1.1.1
-typed-ast==1.4.2
 webtest==3.0.0
 xmltodict==0.13.0

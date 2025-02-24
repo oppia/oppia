@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 
@@ -353,7 +352,3 @@ export class VersionHistoryService {
       this.currentPositionInMetadataVersionHistoryList + 1;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('VersionHistoryService', downgradeInjectable(VersionHistoryService));

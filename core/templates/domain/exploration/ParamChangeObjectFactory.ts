@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface CustomizationArgs {
   [generatorId: string]: ParamChangeCustomizationArgs;
@@ -111,10 +110,3 @@ export class ParamChangeObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParamChangeObjectFactory',
-    downgradeInjectable(ParamChangeObjectFactory)
-  );

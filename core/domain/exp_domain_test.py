@@ -19,11 +19,14 @@
 from __future__ import annotations
 
 import copy
+import json
 import os
+from unittest import mock
 
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -36,7 +39,8 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Tuple, Union, cast
+from typing import Any, Dict, Final, List, Tuple, Union, cast
+import yaml
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -4037,6 +4041,258 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.to_dict(),
             exp_domain.Exploration.deserialize(
                 exploration.serialize()).to_dict())
+
+    def test_put_exploration_into_cache_and_retrieve_from_cache_to_verify(
+            self
+    ) -> None:
+        """Checks if the caching service is working properly for the
+        Exploration object. Verifies whether the Exploration object stored
+        in the cache is the same as the one retrieved from it.
+        """
+        init_state_name = feconf.DEFAULT_INIT_STATE_NAME
+        exploration_id = 'expid_12145'
+        title = feconf.DEFAULT_EXPLORATION_TITLE
+        category = feconf.DEFAULT_EXPLORATION_CATEGORY
+        objective = feconf.DEFAULT_EXPLORATION_OBJECTIVE
+        language_code = constants.DEFAULT_LANGUAGE_CODE
+        content_id_generator = translation_domain.ContentIdGenerator()
+        init_state_dict = state_domain.State.create_default_state(
+            init_state_name,
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME),
+            is_initial_state=True).to_dict()
+        states_dict = {
+            init_state_name: init_state_dict
+        }
+        new_exploration = exp_domain.Exploration(
+              exploration_id, title, category, objective, language_code, [],
+                '', '', feconf.CURRENT_STATE_SCHEMA_VERSION,
+              init_state_name, states_dict, {}, [], 0,
+              feconf.DEFAULT_AUTO_TTS_ENABLED,
+              content_id_generator.next_content_id_index, True)
+        sub_namespace = (
+            str(new_exploration.version) if new_exploration.version else None)
+        is_properly_cacheable = caching_services.set_multi(
+            namespace=caching_services.CACHE_NAMESPACE_EXPLORATION,
+            sub_namespace=sub_namespace,
+            id_value_mapping={exploration_id: new_exploration})
+        new_exploration_retrieve_from_cache = caching_services.get_multi(
+            namespace=caching_services.CACHE_NAMESPACE_EXPLORATION,
+            sub_namespace=sub_namespace,
+            obj_ids=[exploration_id]
+        ).get(exploration_id)
+        self.assertTrue(
+            is_properly_cacheable,
+            """The operation to store the Exploration object in the cache
+            has failed"""
+        )
+        self.assertIsNotNone(
+            new_exploration_retrieve_from_cache,
+            """Expected the Exploration object to be retrieved from the
+            cache, but it was None."""
+        )
+        assert new_exploration_retrieve_from_cache is not None
+        new_exploration_dict_retrieve_from_cache = (
+            new_exploration_retrieve_from_cache.to_dict())
+        self.assertEqual(
+            new_exploration.to_dict(),
+            new_exploration_dict_retrieve_from_cache,
+            """Exploration object put into cache and retrieved from cache is
+            not same"""
+        )
+
+    @mock.patch('core.domain.caching_services._get_memcache_key')
+    def test_migrate_state_schema(
+        self,
+        mock_import_module: mock.MagicMock
+    ) -> None:
+        """Checks if the state schema version is migrated properly.
+        The process involves storing an older version of Exploration object
+        with an older state schema version in the cache. This is achieved
+        by passing the Exploration object through the serialize function
+        before storing it in the cache. When the Exploration object is
+        retrieved from the cache, it is passed through the deserialize
+        function. Inside the deserialize function, the migrate_state_schema
+        function is called to migrate the state schema version. Additionally,
+        the old version yaml convert to latest Exploration object.
+        It verifies whether the these objects are equal.
+        """
+        old_version_yaml_content: str = (
+            """author_notes: ''
+auto_tts_enabled: false
+blurb: ''
+category: Category
+edits_allowed: true
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 1</p>
+            - <p>Choice 2</p>
+            - <p>Choice Invalid</p>
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>Choice 1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+        mock_import_module.return_value = 'mocked_memcache_key'
+        exploration_id = 'mocked_memcache_key'
+        old_version_exploration = (
+            create_old_schema_exploration(
+            exploration_id, old_version_yaml_content))
+        latest_version_exploration = exp_domain.Exploration.from_yaml(
+            exploration_id, old_version_yaml_content)
+        self.assertNotEqual(
+            old_version_exploration.to_dict(),
+            latest_version_exploration.to_dict(),
+            """Old version Exploration schema is not same as latest Exploration
+            schema"""
+        )
+        sub_namespace = str(old_version_exploration.version)
+        # Here we use MyPy ignore because no overload variant
+        # of "set_multi" matches argument types
+        # "Dict[str, OldVersionExploration]".
+        is_properly_cacheable = caching_services.set_multi( # type: ignore[call-overload]
+            namespace=caching_services.CACHE_NAMESPACE_EXPLORATION,
+            sub_namespace=sub_namespace,
+            id_value_mapping={'mocked_memcache_key': old_version_exploration})
+        self.assertTrue(
+            is_properly_cacheable,
+            """The operation to store the Exploration object in the cache
+            has succeeded."""
+        )
+        new_exploration_retrieve_from_cache = caching_services.get_multi(
+            namespace=caching_services.CACHE_NAMESPACE_EXPLORATION,
+            sub_namespace=sub_namespace,
+            obj_ids=[exploration_id]
+        ).get(exploration_id)
+        self.assertIsNotNone(
+            new_exploration_retrieve_from_cache,
+            """Expected the Exploration object to be retrieved from the
+            cache, but it was not None."""
+        )
+        assert new_exploration_retrieve_from_cache is not None
+        updated_exploration = new_exploration_retrieve_from_cache.to_dict()
+        new_exploration_dict = old_version_exploration.to_dict()
+        versioned_states = exp_domain.VersionedExplorationStatesDict(
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION - 1,
+            states=new_exploration_dict['states'])
+        self.assertEqual(
+            updated_exploration['states_schema_version'],
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
+            'Exploration state schema version failed to update'
+        )
+        self.assertNotEqual(
+            updated_exploration['states'],
+            versioned_states['states'],
+            'Migration to the latest state schema version has failed'
+        )
+        self.assertEqual(
+            updated_exploration['states'],
+            latest_version_exploration.to_dict()['states'],
+            'Migration to the latest state schema version has failed'
+        )
 
     def test_get_all_translatable_content_for_exp(self) -> None:
         """Get all translatable fields from exploration."""
@@ -18564,3 +18820,107 @@ class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
         ).to_dict()
 
         self.assertEqual(actual_dict, expected_dict)
+
+
+class OldVersionExploration(translation_domain.BaseTranslatableObject):
+    """Initailize old version Exploration object
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        exploration_dict: dict. The dict representation of the old version
+            exploration.
+    """
+
+    def __init__(
+            self,
+            exploration_id: str,
+            exploration_dict: Dict[str, Any]):
+        self.id = exploration_id
+        self.author_notes = exploration_dict.get('author_notes', '')
+        self.auto_tts_enabled = exploration_dict.get(
+            'auto_tts_enabled', True)
+        self.blurb = exploration_dict.get('blurb', '')
+        self.category = exploration_dict.get('category', '')
+        self.edits_allowed = exploration_dict.get(
+            'edits_allowed', True)
+        self.init_state_name = exploration_dict.get(
+            'init_state_name', '')
+        self.language_code = exploration_dict.get(
+            'language_code', '')
+        self.objective = exploration_dict.get('objective', '')
+        self.param_changes = exploration_dict.get(
+            'param_changes', [])
+        self.param_specs = exploration_dict.get('param_specs', {})
+        self.version = exploration_dict.get('schema_version', 0)
+        self.states = exploration_dict.get('states', {})
+        self.states_schema_version = exploration_dict.get(
+            'states_schema_version', 0)
+        self.tags = exploration_dict.get('tags', [])
+        self.title = exploration_dict.get('title', '')
+        self.next_content_id_index = exploration_dict.get(
+            'next_content_id_index', 0)
+
+    # Here we use type Any because old versioned Exploration
+    # object have any field.
+    def to_dict(self) -> exp_domain.ExplorationDict:
+
+        """Returns a copy of the exploration as a dictionary."""
+
+        exploration_dict: exp_domain.ExplorationDict = ({
+            'id': self.id,
+            'title': self.title,
+            'category': self.category,
+            'author_notes': self.author_notes,
+            'blurb': self.blurb,
+            'states_schema_version': self.states_schema_version,
+            'language_code': self.language_code,
+            'objective': self.objective,
+            'param_changes': self.param_changes,
+            'param_specs': self.param_specs,
+            'tags': self.tags,
+            'auto_tts_enabled': self.auto_tts_enabled,
+            'states': {
+                state_name: (
+                    state.to_dict()
+                    if hasattr(state, 'to_dict') else state)
+                for state_name, state in self.states.items()
+            },
+            'version': self.version,
+            'edits_allowed': self.edits_allowed,
+            'init_state_name': self.init_state_name,
+            'next_content_id_index': self.next_content_id_index,
+
+        })
+        exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
+        return exploration_dict_deepcopy
+
+    def serialize(self) -> str:
+        """Returns the object serialized as a JSON string.
+
+        Returns:
+            str. JSON-encoded str encoding all of the information
+            composing the object.
+        """
+        # Here we use MyPy ignore because to_dict() method returns a general
+        # dictionary representation of domain object (OldVersionExploration)
+        # that assign with SerializableExplorationDict to put in cache for
+        # testing purpose.
+        exploration_dict: exp_domain.SerializableExplorationDict = self.to_dict() # type: ignore[assignment]
+        exploration_dict['version'] = self.version
+        return json.dumps(exploration_dict)
+
+
+def create_old_schema_exploration(
+        exploration_id: str,
+        yaml_content: str) -> OldVersionExploration:
+    """Creates an old version exploration object from the yaml content.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        yaml_content: str. The yaml content of the old version exploration.
+
+    Returns:
+        OldVersionExploration. The exploration object of old version.
+    """
+    exploration_dict = yaml.safe_load(yaml_content)
+    return OldVersionExploration(exploration_id, exploration_dict)

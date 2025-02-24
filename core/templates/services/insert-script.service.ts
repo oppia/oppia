@@ -17,12 +17,12 @@
  */
 
 import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
   UNKNOWN = 'UNKNOWN',
   MATHJAX = 'MATHJAX',
+  PENCILCODE = 'PENCILCODE',
 }
 
 @Injectable({
@@ -72,6 +72,9 @@ export class InsertScriptService {
           scriptElement.src =
             '/third_party/static/MathJax-2.7.5/MathJax.js?config=default';
           break;
+        case KNOWN_SCRIPTS.PENCILCODE:
+          scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
+          break;
         default:
           return false;
       }
@@ -101,7 +104,3 @@ export class InsertScriptService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('InsertScriptService', downgradeInjectable(InsertScriptService));

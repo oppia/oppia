@@ -16,7 +16,6 @@
  * @fileoverview Service to get story data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable, EventEmitter} from '@angular/core';
 
@@ -200,10 +199,3 @@ export class StoryViewerBackendApiService {
     return this._storyDataEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StoryViewerBackendApiService',
-    downgradeInjectable(StoryViewerBackendApiService)
-  );
