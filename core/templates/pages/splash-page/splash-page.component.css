@@ -244,6 +244,7 @@
   height: 300px;
   overflow: hidden; 
   transition: height 0.3s ease;
+  cursor: pointer;
 }
 
 .splash-page .oppia-splash-section-seven-left {
