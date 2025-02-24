@@ -24,7 +24,7 @@ import * as gifFrames from 'gif-frames';
 export type GifFramesOptions = Record<string, unknown>;
 
 export class GifFramesService {
-  getFrames(options: GifFramesOptions) {
+  getFrames(options: GifFramesOptions): any {
     // Call the underlying gif-frames function.
     return gifFrames(options);
   }
