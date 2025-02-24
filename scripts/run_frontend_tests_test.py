@@ -187,8 +187,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             if path == 'test-module.spec.js':
                 return True
-            if path == 'AppSpec.ts':
-                return True
             return original_os_path_exists(path)
         os_path_exists_swap = self.swap(
             os.path, 'exists', mock_os_path_exists)
