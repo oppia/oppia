@@ -67,7 +67,7 @@ from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-posit
 
 # This installs third party libraries before importing other files or importing
 # libraries that use the builtins python module (e.g. build, utils).
-install_third_party_libs.main()
+# install_third_party_libs.main()
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -143,6 +143,11 @@ _PARSER.add_argument(
     '-v',
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
+    action='store_true')
+_PARSER.add_argument(
+    '--skip-install',
+    help='optional; if specified, skips the installation of '
+        'third party libraries',
     action='store_true')
 
 
@@ -432,7 +437,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
-
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
     with contextlib.ExitStack() as stack:
         # TODO(#18260): Remove this when we permanently move to the
         # Dockerized Setup.
