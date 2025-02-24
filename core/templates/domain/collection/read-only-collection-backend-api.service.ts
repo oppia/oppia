@@ -17,7 +17,6 @@
  * about collections from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 
@@ -185,10 +184,3 @@ export class ReadOnlyCollectionBackendApiService {
     return this._collectionLoadedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReadOnlyCollectionBackendApiService',
-    downgradeInjectable(ReadOnlyCollectionBackendApiService)
-  );

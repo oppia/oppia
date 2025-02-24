@@ -24,7 +24,6 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -365,7 +364,3 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive('teachPage', downgradeComponent({component: TeachPageComponent}));

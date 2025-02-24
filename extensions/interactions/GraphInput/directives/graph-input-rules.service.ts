@@ -16,7 +16,6 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -258,10 +257,3 @@ export class GraphInputRulesService {
     return this.isIsomorphic(answer, inputs.g);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GraphInputRulesService',
-    downgradeInjectable(GraphInputRulesService)
-  );

@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {LoaderService} from 'services/loader.service';
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
@@ -179,10 +178,3 @@ export class ViewLearnerGroupPageComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaViewLearnerGroupPage',
-    downgradeComponent({component: ViewLearnerGroupPageComponent})
-  );

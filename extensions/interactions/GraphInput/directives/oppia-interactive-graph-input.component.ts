@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {GraphAnswer} from 'interactions/answer-defs';
 import {GraphInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -185,9 +184,3 @@ export class InteractiveGraphInput implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-angular.module('oppia').directive(
-  'oppiaInteractiveGraphInput',
-  downgradeComponent({
-    component: InteractiveGraphInput,
-  }) as angular.IDirectiveFactory
-);
