@@ -51,8 +51,9 @@ export class TopicPreviewTabComponent {
 
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicUrlFragment =
-      this.topicEditorStateService.getTopic()._urlFragment;
+    this.topicUrlFragment = this.topicEditorStateService
+      .getTopic()
+      .getUrlFragment();
     this.classroomName = this.topicEditorStateService.getClassroomName() ?? '';
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment() ?? '';
