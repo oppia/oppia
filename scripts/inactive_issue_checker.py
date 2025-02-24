@@ -23,12 +23,12 @@ import logging
 import os
 
 import requests
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional, Set, TypedDict
 
-INACTIVE_DAYS_THRESHOLD = 7
-UNASSIGN_DAYS_THRESHOLD = 10
-REPO_OWNER = 'oppia'
-REPO_NAME = 'oppia'
+INACTIVE_DAYS_THRESHOLD = 0.00000000000007
+UNASSIGN_DAYS_THRESHOLD = 0.00000000000010
+REPO_OWNER = 'Ashu463'
+REPO_NAME = 'grid6.0'
 
 
 class IssueDict(TypedDict, total=False):
@@ -55,7 +55,7 @@ class Issue:
         self.last_active_date = last_active_date
 
     @classmethod
-    def from_github_data(cls, data: IssueDict) -> 'Issue':
+    def from_github_data(cls, data: IssueDict) -> Issue:
         """Creates an Issue instance from GitHub API response data.
 
         Args:
@@ -131,38 +131,66 @@ class GitHubService:
             List[Issue]. List of open issues.
         """
         url = f'{self.base_url}/issues?state=open'
-        response = requests.get(url, headers=self.rest_headers, timeout=10)
-        response.raise_for_status()
 
-        issues_list = []
-        for issue_data in response.json():
-            if isinstance(issue_data, dict):
-                typed_issue_data: IssueDict = {
-                    'number': issue_data['number'],
-                    'assignee': issue_data.get('assignee'),
-                    'events_url': issue_data['events_url']
-                }
-                issue = Issue.from_github_data(typed_issue_data)
-                issues_list.append(issue)
+        try: 
+            response = requests.get(url, headers=self.rest_headers, timeout=10)
+            if response is None:
+                logging.error("Received null res while fetching issues")
+                return []
 
-        return issues_list
+            if response.status_code != 200:
+                logging.error(
+                    'Failed to fetch issues from GitHub: %s',
+                    response.json()
+            )
 
-    def get_collaborators(self) -> set[str]:
+            issues_list = []
+            for issue_data in response.json():
+                if isinstance(issue_data, dict):
+                    typed_issue_data: IssueDict = {
+                        'number': issue_data['number'],
+                        'assignee': issue_data.get('assignee'),
+                        'events_url': issue_data['events_url']
+                    }
+                    issue = Issue.from_github_data(typed_issue_data)
+                    issues_list.append(issue)
+
+            return issues_list
+
+        except Exception as e:
+            logging.error(f'Error while fetching open issues: {str(e)}')
+            return []
+
+    def get_repo_collaborators(self) -> set[str]:
         """Fetches repository collaborators.
 
         Returns:
             set[str]. Set of collaborator usernames.
         """
         url = f'{self.base_url}/collaborators'
-        response = requests.get(url, headers=self.rest_headers, timeout=10)
-        response.raise_for_status()
 
-        collaborators_set = set()
-        for collaborator in response.json():
-            if isinstance(collaborator, dict):
-                collaborators_set.add(collaborator['login'])
+        try:
+            response = requests.get(url, headers=self.rest_headers, timeout=10)
+            if response is None:
+                logging.error("Received null res while fetching collaborators")
+                return set()
 
-        return collaborators_set
+            if response.status_code != 200:
+                logging.error(
+                    'Failed to fetch collaborators from GitHub: %s',
+                    response.json()
+            )
+
+            collaborators = set()
+            for collaborator_dict in response.json():
+                if isinstance(collaborator_dict, dict):
+                    collaborators.add(collaborator_dict['login'])
+
+            return collaborators
+
+        except Exception as e:
+            logging.error(f'Error while fetching collaborators: {str(e)}')
+            return set()
 
     def get_issue_events(self, issue: Issue) -> Optional[datetime.datetime]:
         """Fetches and processes events for an issue.
@@ -173,27 +201,48 @@ class GitHubService:
         Returns:
             Optional[datetime.datetime]. The date of the latest event, if any.
         """
-        response = requests.get(
-            issue.events_url,
-            headers=self.rest_headers,
-            timeout=10
-        )
-        response.raise_for_status()
-        events = response.json()
+        try: 
+            response = requests.get(
+                issue.events_url,
+                headers=self.rest_headers,
+                timeout=10
+            )
+            if response is None:
+                logging.error("Received null res while fetching issue events")
+                return None
 
-        if not events:
+            if response.status_code != 200:
+                logging.error(
+                    'Failed to fetch issue events from GitHub: %s',
+                    response.json()
+            )
+            events_dict = response.json()
+
+            if not events_dict:
+                return None
+
+            assignee_events = []  
+            for event in events_dict:  
+                if event.get("actor", {}).get("login") == issue.assignee_username:  
+                    assignee_events.append(event)
+
+            if not assignee_events:
+                return None
+
+            latest_event_date = max(
+                datetime.datetime.strptime(
+                    event['created_at'],
+                    '%Y-%m-%dT%H:%M:%SZ'
+                ).replace(tzinfo=datetime.timezone.utc)
+                for event in assignee_events
+            )
+            return latest_event_date
+
+        except Exception as e: 
+            logging.error(f'Error while fetching issue events: {str(e)}')
             return None
 
-        latest_date = max(
-            datetime.datetime.strptime(
-                event['created_at'],
-                '%Y-%m-%dT%H:%M:%SZ'
-            ).replace(tzinfo=datetime.timezone.utc)
-            for event in events
-        )
-        return latest_date
-
-    def get_issues_with_prs(self) -> Dict[int, int]:
+    def get_issues_with_prs(self) -> Dict[int, Set[int]]:
         """Fetches mapping of issues to their linked PRs using GraphQL.
 
         Returns:
@@ -220,40 +269,55 @@ class GitHubService:
         }
         """
 
-        variables = {
+        req_credentials = {
             'owner': self.repo_owner,
             'name': self.repo_name,
             'cursor': None
         }
 
-        issue_to_pr: Dict[int, int] = {}
+        issue_to_prs: Dict[int, Set[int]] = {}
         has_next_page = True
 
         while has_next_page:
-            response = requests.post(
-                'https://api.github.com/graphql',
-                headers=self.graphql_headers,
-                json={'query': query, 'variables': variables},
-                timeout=10
-            )
-            response.raise_for_status()
+            try:
+                response = requests.post(
+                    'https://api.github.com/graphql',
+                    headers=self.graphql_headers,
+                    json={'query': query, 'variables': req_credentials},
+                    timeout=10
+                )
+                if response is None:
+                    logging.error("Received null res while fetching PRs")
+                    return {}
 
-            data = response.json()
-            pull_requests = data['data']['repository']['pullRequests']
+                if response.status_code != 200:
+                    logging.error(
+                        'Failed to fetch PRs from GraphQL query: %s',
+                        response.json()
+                )
 
-            for pr in pull_requests['nodes']:
-                pr_number = pr['number']
-                linked_issues = pr['closingIssuesReferences']['nodes']
+                data = response.json()
+                pull_requests = data['data']['repository']['pullRequests']
 
-                if linked_issues:
-                    issue_number = linked_issues[0]['number']
-                    issue_to_pr[issue_number] = pr_number
+                for pr in pull_requests['nodes']:
+                    pr_number = pr['number']
+                    linked_issues = pr['closingIssuesReferences']['nodes']
+                    if linked_issues:
+                        for issue in linked_issues:
+                            issue_number = issue['number']
+                            if issue_number not in issue_to_prs:
+                                issue_to_prs[issue_number] = set()
+                            issue_to_prs[issue_number].add(pr_number)
 
-            page_info = pull_requests['pageInfo']
-            has_next_page = page_info['hasNextPage']
-            variables['cursor'] = page_info['endCursor']
+                page_info = pull_requests['pageInfo']
+                has_next_page = page_info['hasNextPage']
+                req_credentials['cursor'] = page_info['endCursor']
 
-        return issue_to_pr
+            except Exception as e:
+                logging.error(f'Error while fetching PRs: {str(e)}')
+                return {}
+
+        return issue_to_prs
 
     def unassign_issue(self, issue: Issue) -> bool:
         """Unassigns a user from an issue.
@@ -268,15 +332,29 @@ class GitHubService:
             return False
 
         url = f'{self.base_url}/issues/{issue.number}/assignees'
-        response = requests.delete(
-            url,
-            headers=self.rest_headers,
-            json={'assignees': [issue.assignee_username]},
-            timeout=10
-        )
-        return response.status_code == 200
+        try: 
+            response = requests.delete(
+                url,
+                headers=self.rest_headers,
+                json={'assignees': [issue.assignee_username]},
+                timeout=10
+            )
+            if response is None:
+                logging.error("Received null res while unassigning issue")
+                return []
 
-    def alerting_comment_on_issue(self, issue: Issue) -> None:
+            if response.status_code != 200:
+                logging.error(
+                    'Failed to delete assignees from issue: %s',
+                    response.json()
+            )
+            return response.status_code == 200
+
+        except Exception as e:
+            logging.error(f'Error while unassigning issue: {str(e)}')
+            return False
+
+    def add_alert_comment_on_issue(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
@@ -286,23 +364,31 @@ class GitHubService:
         comment = (
             f'Hi @{issue.assignee_username} this PR is inactive '
             f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
-            f'unassigned soon if no activity is done. '
+            f'unassigned soon if no activity is done.\n '
             f'If you are still working on this PR, '
             f'please make a follow-up commit within'
             f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
             f'(and submit it for review, if applicable). '
             f'Please also let us know if you are stuck so we can help you!'
         )
+        try: 
+            response = requests.post(
+                url,
+                headers=self.rest_headers,
+                json={'body': comment},
+                timeout=10
+            )
+            if response is None:
+                logging.error("Received null res while adding alert comment")
+                return None
 
-        response = requests.post(
-            url,
-            headers=self.rest_headers,
-            json={'body': comment},
-            timeout=10
-        )
-        response.raise_for_status()
+            response.raise_for_status()
+            return None
 
-    def unassinging_comment_on_issue(self, issue: Issue) -> None:
+        except Exception as e:
+            logging.error(f'Error while adding alert comment: {str(e)}')
+
+    def remove_assignee_comment_on_issue(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
@@ -315,14 +401,21 @@ class GitHubService:
             f'If you would like to continue working on this issue, please '
             f'request to be reassigned.'
         )
+        try: 
+            response = requests.post(
+                url,
+                headers=self.rest_headers,
+                json={'body': comment},
+                timeout=10
+            )
+            if response is None:
+                logging.error("Received null res while commenting on issue")
+                return None
 
-        response = requests.post(
-            url,
-            headers=self.rest_headers,
-            json={'body': comment},
-            timeout=10
-        )
-        response.raise_for_status()
+            response.raise_for_status()
+            return None
+        except Exception as e:
+            logging.error(f'Error while adding alert comment: {str(e)}')
 
 
 class IssueManager:
@@ -343,7 +436,7 @@ class IssueManager:
             List[Issue]. List of inactive issues.
         """
         issues = self.github.get_open_issues()
-        collaborators = self.github.get_collaborators()
+        collaborators = self.github.get_repo_collaborators()
         issues_with_prs = self.github.get_issues_with_prs()
 
         inactive_issues = []
@@ -368,7 +461,7 @@ class IssueManager:
             issue.last_active_date = self.github.get_issue_events(issue)
 
             if issue.is_inactive_for_seven_days():
-                self.github.alerting_comment_on_issue(issue)
+                self.github.add_alert_comment_on_issue(issue)
                 logging.info(
                     'Issue #%d has been inactive for >%d days',
                     issue.number, INACTIVE_DAYS_THRESHOLD
@@ -392,7 +485,7 @@ class IssueManager:
         for issue in issues:
             try:
                 if self.github.unassign_issue(issue):
-                    self.github.unassinging_comment_on_issue(issue)
+                    self.github.remove_assignee_comment_on_issue(issue)
                     logging.info(
                         'Unassigned issue #%d from %s',
                         issue.number, issue.assignee_username
