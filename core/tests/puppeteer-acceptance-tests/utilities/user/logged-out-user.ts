@@ -4231,22 +4231,42 @@ export class LoggedOutUser extends BaseUser {
    * Answers practice question in session
    */
   async answerPracticeQuestions(): Promise<void> {
+    var isFirstQuestion = true;
     try {
       await this.page.waitForSelector(answerInputSelector);
 
-      // Answer each question.
       while (await this.page.$(answerInputSelector)) {
+        await this.page.waitForSelector(answerInputSelector);
+
         const input = await this.page.$(answerInputSelector);
         if (!input) {
           throw new Error('Answer input not found');
         }
-        await input.type('3'); // Default test answer.
-        await this.page.click(submitButtonSelector);
+
+        await input.focus();
+
+        if (isFirstQuestion) {
+          // First submit wrong answer.
+          await input.evaluate(el => ((el as HTMLInputElement).value = '999'));
+          await this.page.waitForTimeout(500);
+          await this.page.click(submitButtonSelector);
+          await this.page.waitForTimeout(1000);
+          // Clear and submit correct answer.
+          await input.focus();
+          await input.evaluate(el => ((el as HTMLInputElement).value = ''));
+          await this.page.waitForTimeout(500);
+          await input.type('3');
+          await this.page.waitForTimeout(500);
+          await this.page.click(submitButtonSelector);
+          isFirstQuestion = false;
+        } else {
+          await input.type('3');
+          await this.page.waitForTimeout(500);
+          await this.page.click(submitButtonSelector);
+        }
         await this.page.waitForSelector(nextButtonSelector);
         await this.page.click(nextButtonSelector);
-
-        // Wait for next question or completion.
-        // await this.page.waitForNavigation();
+        await this.page.waitForTimeout(1000);
       }
     } catch (error) {
       throw new Error(`Failed to answer practice questions: ${error}`);

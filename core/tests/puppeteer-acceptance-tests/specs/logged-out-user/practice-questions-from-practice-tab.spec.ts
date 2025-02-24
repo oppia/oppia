@@ -63,9 +63,6 @@ describe('Logged-out User', function () {
 
     // Step 4: Complete questions.
     await loggedOutUser.answerAllQuestion();
-
-    // Step 5: Verify completion.
-    // await loggedOutUser.verifyPracticeScore();
   }, 420000);
 
   afterAll(async function () {
