@@ -30,6 +30,7 @@ describe('Topic Preview Tab Component', () => {
   let componentInstance: TopicPreviewTabComponent;
   let testName = 'test_name';
   let mockUrl = 'mock_url';
+  let topicUrl = 'topicUrl';
   let storySummaries = [
     new StorySummary(
       'id',
@@ -63,7 +64,9 @@ describe('Topic Preview Tab Component', () => {
         getSubtopics() {
           return [];
         },
-        _urlFragment: 'topic_url',
+        getUrlFragment() {
+          return topicUrl;
+        },
       };
     }
 
