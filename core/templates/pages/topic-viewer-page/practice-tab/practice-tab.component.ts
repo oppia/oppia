@@ -47,12 +47,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() startButtonIsDisabled: boolean = true;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
   @Input() subtopicMastery: Record<string, number> = {};
   @Input() topicId!: string;
+  startButtonIsDisabled: boolean = true;
   topicNameTranslationKey!: string;
   translatedTopicName!: string;
   selectedSubtopics: Subtopic[] = [];
