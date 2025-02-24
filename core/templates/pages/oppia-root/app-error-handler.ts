@@ -98,10 +98,9 @@ export class AppErrorHandler extends ErrorHandler {
         error = errorInstance;
       }
     }
-
     // Retrieveing the last recorded clicks.
-
     const clickHistory = this.clickTracker.getClickHistory();
+    // Format the click history for easier reading in logs.
     const formattedClickHistory = clickHistory.length
       ? `Last ${clickHistory.length} clicks: [${clickHistory.join(', ')}]`
       : 'No recorded clicks.';
@@ -112,9 +111,9 @@ export class AppErrorHandler extends ErrorHandler {
       '',
       '    at URL: ' + window.location.href,
       '',
-      formattedClickHistory, // Appended click history here.
+      formattedClickHistory, // Show recent user interactions (clicks).
       '',
-      'Stacktrace :' + error?.stack,
+      `Stacktrace :\n${error?.stack}`, // Append the stack trace.
     ].join('\n');
     let timeDifference = Date.now() - this.timeOfLastPostedError;
     // To prevent an overdose of errors, throttle to at most 1 error

@@ -46,6 +46,7 @@ import {
 } from '@angular/fire/auth';
 import {AngularFireModule} from '@angular/fire';
 import {AuthService} from 'services/auth.service';
+import {ClickTrackerService} from 'services/contextual/click-tracker.service';
 // This throws "TS2307". We need to
 // suppress this error because hammer come from hammerjs
 // dependency. We can't import it directly.
@@ -53,10 +54,6 @@ import {AuthService} from 'services/auth.service';
 import * as hammer from 'hammerjs';
 import {AppErrorHandlerProvider} from './app-error-handler';
 import {I18nModule} from 'i18n/i18n.module';
-
-// Services .
-import {ClickTrackerService} from 'services/contextual/click-tracker.service';
-
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
   allowHtml: false,
