@@ -1232,17 +1232,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         original_component_counts = suggestion_services.count_rte_components(
             updated_suggestion.change_cmd.translation_html
         )
-        
-        rte_tags_with_attrs = rte_component_registry.Registry.get_tag_list_with_attrs()
+
+        rte_tags_with_attrs = (
+            rte_component_registry.Registry.get_tag_list_with_attrs()
+        )
         rte_tags = list(rte_tags_with_attrs.keys())
-        
+
         expected_counts = {tag: 0 for tag in rte_tags}
-        
+
         expected_counts['oppia-noninteractive-image'] = 2
         expected_counts['oppia-noninteractive-math'] = 0
-        
-        self.assertEqual(expected_counts, original_component_counts)
 
+        self.assertEqual(expected_counts, original_component_counts)
 
     def test_update_translation_suggestion_error_when_component_types_mismatch(
             self
