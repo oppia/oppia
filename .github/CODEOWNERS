@@ -287,7 +287,6 @@
 /core/templates/components/language-banner/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
-/core/templates/directives/angular-html-bind.directive*.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/directives.module.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/focus-on.directive*.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/headroom.directive.ts @oppia/lace-frontend-reviewers
