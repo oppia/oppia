@@ -196,9 +196,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 with self.swap_check_frontend_coverage, os_path_exists_swap:
                     run_frontend_tests.main(
                         args=['--check_coverage', '--specs_to_run='
-                              'about-page.component.spec.ts,'
+                              'about-page.component.ts,'
                               'home-page.component.spec.ts,'
-                              'test-module.spec.js'])
+                              'test-module.js'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
