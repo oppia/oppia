@@ -567,7 +567,6 @@
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ckeditor4.module.ts @oppia/lace-frontend-reviewers
-/core/templates/directives/mathjax-bind.directive.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/mathjax.directive.ts @oppia/lace-frontend-reviewers
 /core/templates/mathjaxConfig.ts @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts @oppia/lace-frontend-reviewers
