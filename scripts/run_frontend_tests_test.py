@@ -204,12 +204,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+            '--specs_to_run='
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js']
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
+            '--specs_to_run='
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'
