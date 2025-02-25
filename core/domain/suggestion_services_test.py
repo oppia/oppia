@@ -1119,8 +1119,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 1 oppia-noninteractive-image component\(s\), but '
-            r'translation has 0.\s*Original text preview: .*\s*'
+            r'Original text has 1 oppia-noninteractive-image component\(s\), '
+            r'but translation has 0.\s*Original text preview: .*\s*'
             r'Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
@@ -1153,8 +1153,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 0 oppia-noninteractive-image component\(s\), but '
-            r'translation has 1.\s*Original text preview: .*\s*'
+            r'Original text has 0 oppia-noninteractive-image component\(s\), '
+            r'but translation has 1.\s*Original text preview: .*\s*'
             r'Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
@@ -1215,9 +1215,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 2 oppia-noninteractive-image component\(s\), but '
-            r'translation has 1\. Original text has 0 oppia-noninteractive-math '
-            r'component\(s\), but translation has 2\.'
+            r'Original text has 2 oppia-noninteractive-image component\(s\), '
+            r'but translation has 1\. Original text has 0 '
+            r'oppia-noninteractive-math component\(s\), but translation has 2\.'
             r'\s*Original text preview: .*'
             r'\s*Translated text preview: .*'
         ):
@@ -1284,9 +1284,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 1 oppia-noninteractive-image component\(s\), but '
-            r'translation has 0\. Original text has 0 oppia-noninteractive-math '
-            r'component\(s\), but translation has 1\.'
+            r'Original text has 1 oppia-noninteractive-image component\(s\), '
+            r'but translation has 0\. Original text has 0 '
+            r'oppia-noninteractive-math component\(s\), but translation has 1\.'
             r'\s*Original text preview: .*'
             r'\s*Translated text preview: .*'
         ):

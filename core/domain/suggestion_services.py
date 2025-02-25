@@ -2158,7 +2158,9 @@ def count_rte_components(html_content: str) -> Dict[str, int]:
     """
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
     component_counts = {}
-    rte_tags_with_attrs = rte_component_registry.Registry.get_tag_list_with_attrs()
+    rte_tags_with_attrs = (
+        rte_component_registry.Registry.get_tag_list_with_attrs()
+    )
     rte_tags = list(rte_tags_with_attrs.keys())
 
     for tag in rte_tags:
@@ -2201,7 +2203,9 @@ def update_translation_suggestion(
     # We use a sorted approach to compare component counts because it ensures
     # consistency in comparison regardless of the order components appear.
 
-    all_components = sorted(set(list(original_rte_counts.keys()) + list(updated_rte_counts.keys())))
+    all_components = sorted(
+        set(list(original_rte_counts.keys()) + list(updated_rte_counts.keys()))
+    )
 
     discrepancies = []
     max_error_text_length = 200
@@ -2221,8 +2225,8 @@ def update_translation_suggestion(
         translation_text_preview = translation_html[:max_error_text_length]
 
         raise utils.InvalidInputException(
-            ' '.join(discrepancies) + '\n' +
-            f'Original text preview: {original_text_preview}\n' +
+            f'{" ".join(discrepancies)}\n'
+            f'Original text preview: {original_text_preview}\n'
             f'Translated text preview: {translation_text_preview}'
         )
 
