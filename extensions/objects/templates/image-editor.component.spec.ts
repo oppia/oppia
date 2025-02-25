@@ -389,6 +389,7 @@ describe('ImageEditor', () => {
           useClass: MockImageUploadHelperService,
         },
         ImageLocalStorageService,
+        GifFramesService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
