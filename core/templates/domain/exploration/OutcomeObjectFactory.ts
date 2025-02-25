@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   SubtitledHtmlBackendDict,
@@ -145,7 +144,3 @@ export class OutcomeObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('OutcomeObjectFactory', downgradeInjectable(OutcomeObjectFactory));

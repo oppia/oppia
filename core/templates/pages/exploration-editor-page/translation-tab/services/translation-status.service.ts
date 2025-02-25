@@ -18,7 +18,6 @@
  */
 
 import {Injectable, OnInit} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -463,10 +462,3 @@ export class TranslationStatusService implements OnInit {
     return this._getActiveStateContentIdNeedsUpdateStatus(contentId);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslationStatusService',
-    downgradeInjectable(TranslationStatusService)
-  );

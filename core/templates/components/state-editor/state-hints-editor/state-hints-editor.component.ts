@@ -19,7 +19,6 @@
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Hint} from 'domain/exploration/hint-object.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -240,10 +239,3 @@ export class StateHintsEditorComponent implements OnInit {
     this.stateEditorService.updateStateHintsEditorInitialised();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateHintsEditor',
-  downgradeComponent({
-    component: StateHintsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

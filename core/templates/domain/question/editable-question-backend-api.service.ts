@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {HttpClient} from '@angular/common/http';
 import {
@@ -287,10 +286,3 @@ export class EditableQuestionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableQuestionBackendApiService',
-    downgradeInjectable(EditableQuestionBackendApiService)
-  );
