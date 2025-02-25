@@ -15,75 +15,75 @@
 /**
  * @fileoverview Unit tests for ClickTrackerService.
  */
-
 import {TestBed} from '@angular/core/testing';
 import {ClickTrackerService} from './click-tracker.service';
 
 describe('ClickTrackerService', () => {
-  let cts: ClickTrackerService;
+  let service: ClickTrackerService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    cts = TestBed.inject(ClickTrackerService);
+    TestBed.configureTestingModule({
+      providers: [ClickTrackerService],
+    });
+    service = TestBed.get(ClickTrackerService);
   });
 
-  it('should be instantiated', () => {
-    expect(cts).toBeTruthy();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
   it('should track clicks with .e2e-* class', () => {
-    const button = document.createElement('button');
-    button.classList.add('e2e-test-button');
-    document.body.appendChild(button);
+    const element = document.createElement('div');
+    element.classList.add('e2e-test-button');
+    document.body.appendChild(element);
 
-    button.click();
+    element.click();
 
-    expect(cts.getClickHistory()).toContain('e2e-test-button');
-
-    document.body.removeChild(button);
+    const clickHistory = service.getClickHistory();
+    expect(clickHistory).toContain('e2e-test-button');
+    document.body.removeChild(element);
   });
 
   it('should not track clicks without .e2e-* class', () => {
-    const div = document.createElement('div');
-    div.classList.add('non-e2e-class');
-    document.body.appendChild(div);
+    const element = document.createElement('div');
+    element.classList.add('non-e2e-button');
+    document.body.appendChild(element);
 
-    div.click();
+    element.click();
 
-    expect(cts.getClickHistory()).not.toContain('non-e2e-class');
-
-    document.body.removeChild(div);
+    const clickHistory = service.getClickHistory();
+    expect(clickHistory).not.toContain('non-e2e-button');
+    document.body.removeChild(element);
   });
 
-  it('should respect maxLength and data size constraints', () => {
-    for (let i = 0; i < 100; i++) {
-      const div = document.createElement('div');
-      div.classList.add(`e2e-test-${i}`);
-      document.body.appendChild(div);
-      div.click();
-      document.body.removeChild(div);
+  it('should limit click history to maxLength', () => {
+    for (let i = 0; i < 60; i++) {
+      const element = document.createElement('div');
+      element.classList.add(`e2e-test-button-${i}`);
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
     }
 
-    const history = cts.getClickHistory();
-    expect(history.length).toBeLessThanOrEqual(50); // MaxLength is 50.
+    const clickHistory = service.getClickHistory();
+    expect(clickHistory.length).toBe(50);
+    expect(clickHistory).toContain('e2e-test-button-59');
+    expect(clickHistory).not.toContain('e2e-test-button-0');
   });
 
-  it('should handle errors gracefully', () => {
-    spyOn(console, 'error'); // Spy on console.error to check error logging.
-
-    // Pass an invalid event to trigger the error handling logic.
-    const faultyEvent = {target: null} as unknown as Event;
-
-    try {
-      cts.trackClick(faultyEvent);
-    } catch (err) {
-      // Ensure the error is logged even if thrown.
-      console.error('Error tracking click:', err);
+  it('should limit click history size to 16KB', () => {
+    const largeClass = 'e2e-' + 'a'.repeat(10000); // Create a large class name.
+    for (let i = 0; i < 10; i++) {
+      const element = document.createElement('div');
+      element.classList.add(largeClass);
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
     }
 
-    expect(console.error).toHaveBeenCalledWith(
-      'Error tracking click:',
-      jasmine.any(Error)
+    const clickHistory = service.getClickHistory();
+    expect(new Blob([JSON.stringify(clickHistory)]).size).toBeLessThanOrEqual(
+      16 * 1024
     );
   });
 });
