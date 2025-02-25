@@ -30,6 +30,7 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -1118,11 +1119,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            (
-                r'\s*The number of RTE components \(images, math, concept '
-                r'cards, videos\) in the updated translation must match the '
-                r'original content\s*'
-            )
+            r'Original text has 1 oppia-noninteractive-image component\(s\), but '
+            r'translation has 0.\s*Original text preview: .*\s*'
+            r'Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1154,11 +1153,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            (
-                r'\s*The number of RTE components \(images, math, concept '
-                r'cards, videos\) in the updated translation must match the '
-                r'original content\s*'
-            )
+            r'Original text has 0 oppia-noninteractive-image component\(s\), but '
+            r'translation has 1.\s*Original text preview: .*\s*'
+            r'Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1218,11 +1215,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            (
-                r'\s*The number of RTE components \(images, math, concept '
-                r'cards, videos\) in the updated translation must match the '
-                r'original content\s*'
-            )
+            r'Original text has 2 oppia-noninteractive-image component\(s\), but '
+            r'translation has 1\. Original text has 0 oppia-noninteractive-math '
+            r'component\(s\), but translation has 2\.'
+            r'\s*Original text preview: .*'
+            r'\s*Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1235,15 +1232,17 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         original_component_counts = suggestion_services.count_rte_components(
             updated_suggestion.change_cmd.translation_html
         )
-        self.assertEqual(
-            original_component_counts,
-            {
-                'oppia-noninteractive-image': 2,
-                'oppia-noninteractive-math': 0,
-                'oppia-noninteractive-concept-card': 0,
-                'oppia-noninteractive-video': 0
-            }
-        )
+        
+        rte_tags_with_attrs = rte_component_registry.Registry.get_tag_list_with_attrs()
+        rte_tags = list(rte_tags_with_attrs.keys())
+        
+        expected_counts = {tag: 0 for tag in rte_tags}
+        
+        expected_counts['oppia-noninteractive-image'] = 2
+        expected_counts['oppia-noninteractive-math'] = 0
+        
+        self.assertEqual(expected_counts, original_component_counts)
+
 
     def test_update_translation_suggestion_error_when_component_types_mismatch(
             self
@@ -1285,11 +1284,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            (
-                r'\s*The number of RTE components \(images, math, concept '
-                r'cards, videos\) in the updated translation must match the '
-                r'original content\s*'
-            )
+            r'Original text has 1 oppia-noninteractive-image component\(s\), but '
+            r'translation has 0\. Original text has 0 oppia-noninteractive-math '
+            r'component\(s\), but translation has 1\.'
+            r'\s*Original text preview: .*'
+            r'\s*Translated text preview: .*'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,

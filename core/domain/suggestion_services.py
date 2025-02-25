@@ -34,6 +34,7 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import rte_component_registry
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
@@ -2157,13 +2158,8 @@ def count_rte_components(html_content: str) -> Dict[str, int]:
     """
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
     component_counts = {}
-
-    rte_tags = [
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-math',
-        'oppia-noninteractive-concept-card',
-        'oppia-noninteractive-video'
-    ]
+    rte_tags_with_attrs = rte_component_registry.Registry.get_tag_list_with_attrs()
+    rte_tags = list(rte_tags_with_attrs.keys())
 
     for tag in rte_tags:
         component_counts[tag] = len(soup.find_all(tag))
@@ -2183,9 +2179,9 @@ def update_translation_suggestion(
         translation_html: str. The new translated HTML content.
 
     Raises:
-        InvalidInputException. Raised if the RTE component counts in
+        InvalidInputException. The RTE component counts in
             the updated translation do not match the original content.
-        Exception. Raised if the suggestion is not of type
+        Exception. The suggestion is not of type
             SuggestionTranslateContent.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
@@ -2202,11 +2198,32 @@ def update_translation_suggestion(
     original_rte_counts = count_rte_components(original_text_html)
     updated_rte_counts = count_rte_components(translation_html)
 
-    if original_rte_counts != updated_rte_counts:
+    # We use a sorted approach to compare component counts because it ensures
+    # consistency in comparison regardless of the order components appear.
+
+    all_components = sorted(set(list(original_rte_counts.keys()) + list(updated_rte_counts.keys())))
+
+    discrepancies = []
+    max_error_text_length = 200
+
+    for component in all_components:
+        original_count = original_rte_counts.get(component, 0)
+        updated_count = updated_rte_counts.get(component, 0)
+
+        if original_count != updated_count:
+            discrepancies.append(
+                f'Original text has {original_count} {component} '
+                f'component(s), but translation has {updated_count}.'
+            )
+
+    if discrepancies:
+        original_text_preview = original_text_html[:max_error_text_length]
+        translation_text_preview = translation_html[:max_error_text_length]
+
         raise utils.InvalidInputException(
-            'The number of RTE components (images, math, concept cards, '
-            'videos) in the updated translation must match the original '
-            'content.'
+            ' '.join(discrepancies) + '\n' +
+            f'Original text preview: {original_text_preview}\n' +
+            f'Translated text preview: {translation_text_preview}'
         )
 
     suggestion.change_cmd.translation_html = (

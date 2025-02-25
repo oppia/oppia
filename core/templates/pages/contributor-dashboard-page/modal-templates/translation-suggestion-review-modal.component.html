@@ -27,7 +27,7 @@
 </div>
 
 
-<div *ngIf="isUpdateDisabled" tabindex="0" class="alert alert-danger oppia-input-error">
+<div *ngIf="updateIsDisabled" tabindex="0" class="alert alert-danger oppia-input-error">
   <strong>Warning:</strong> Please ensure all components (images, math formulas, concept cards) in your translation match
   the original content to proceed.
 </div>
@@ -112,7 +112,7 @@
         <button class="btn btn-success ml-2"
                 *ngIf="startedEditing"
                 (click)="updateSuggestion()"
-                [disabled]="isUpdateDisabled">
+                [disabled]="updateIsDisabled">
           Update
         </button>
       </div>

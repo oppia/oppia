@@ -436,7 +436,7 @@ export class TranslationModalComponent {
     );
   }
 
-  translatedTextCanBeSubmitted(): boolean {
+  canTranslatedTextBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
       const translationError =
         this.translationValidationService.validateTranslationFromHtmlStrings(
@@ -467,7 +467,7 @@ export class TranslationModalComponent {
   }
 
   suggestTranslatedText(): void {
-    if (!this.translatedTextCanBeSubmitted()) {
+    if (!this.canTranslatedTextBeSubmitted()) {
       return;
     }
 
@@ -509,7 +509,7 @@ export class TranslationModalComponent {
     }
   }
   updateTranslatedText(): void {
-    if (!this.translatedTextCanBeSubmitted()) {
+    if (!this.canTranslatedTextBeSubmitted()) {
       return;
     }
     this.activeModal.close(this.activeWrittenTranslation);

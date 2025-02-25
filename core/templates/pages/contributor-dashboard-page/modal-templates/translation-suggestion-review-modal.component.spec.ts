@@ -2882,7 +2882,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
-      expect(component.isComponentsMismatched()).toBeTrue();
+      expect(component.areComponentsMismatched()).toBeTrue();
       expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
@@ -2904,7 +2904,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
-      expect(component.isComponentsMismatched()).toBeTrue();
+      expect(component.areComponentsMismatched()).toBeTrue();
       expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
@@ -2924,7 +2924,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithComponents);
 
-      expect(component.isComponentsMismatched()).toBeFalse();
+      expect(component.areComponentsMismatched()).toBeFalse();
       expect(component.incompleteTranslationErrorIsShown).toBeFalse();
     });
 
@@ -2946,7 +2946,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithMultipleComponents);
 
-      expect(component.isComponentsMismatched()).toBeFalse();
+      expect(component.areComponentsMismatched()).toBeFalse();
       expect(component.incompleteTranslationErrorIsShown).toBeFalse();
     });
 
@@ -2970,7 +2970,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.editedContent).toBeDefined();
       expect(component.editedContent.html).toBe(htmlWithoutComponents);
 
-      expect(component.isUpdateDisabled).toBeTrue();
+      expect(component.updateIsDisabled).toBeTrue();
       expect(component.incompleteTranslationErrorIsShown).toBeTrue();
     });
 
