@@ -193,8 +193,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/interactions/base-validator.spec.ts',
     'extensions/interactions/rules.spec.ts',
     'extensions/objects/object-components.module.ts',
-    'extensions/objects/templates/graph-property-editor.component.spec.ts',
-    'extensions/objects/templates/graph-property-editor.component.ts',
     'extensions/objects/templates/image-editor.component.spec.ts',
     'extensions/objects/templates/image-editor.component.ts',
     'extensions/objects/templates/parameter-name-editor.component.ts',
