@@ -129,68 +129,56 @@ class GitHubService:
 
         Returns:
             List[Issue]. List of open issues.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         url = f'{self.base_url}/issues?state=open'
 
-        try: 
-            response = requests.get(url, headers=self.rest_headers, timeout=10)
-            if response is None:
-                logging.error("Received null res while fetching issues")
-                return []
+        response = requests.get(url, headers=self.rest_headers, timeout=10)
+        if response is None:
+            raise AssertionError('Received null res while fetching issues')
+        response.raise_for_status()
 
-            if response.status_code != 200:
-                logging.error(
-                    'Failed to fetch issues from GitHub: %s',
-                    response.json()
-            )
+        issues_list = []
+        for issue_data in response.json():
+            if isinstance(issue_data, dict):
+                typed_issue_data: IssueDict = {
+                    'number': issue_data['number'],
+                    'assignee': issue_data.get('assignee'),
+                    'events_url': issue_data['events_url']
+                }
+                issue = Issue.from_github_data(typed_issue_data)
+                issues_list.append(issue)
 
-            issues_list = []
-            for issue_data in response.json():
-                if isinstance(issue_data, dict):
-                    typed_issue_data: IssueDict = {
-                        'number': issue_data['number'],
-                        'assignee': issue_data.get('assignee'),
-                        'events_url': issue_data['events_url']
-                    }
-                    issue = Issue.from_github_data(typed_issue_data)
-                    issues_list.append(issue)
-
-            return issues_list
-
-        except Exception as e:
-            logging.error(f'Error while fetching open issues: {str(e)}')
-            return []
+        return issues_list
 
     def get_repo_collaborators(self) -> set[str]:
         """Fetches repository collaborators.
 
         Returns:
             set[str]. Set of collaborator usernames.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         url = f'{self.base_url}/collaborators'
+        response = requests.get(url, headers=self.rest_headers, timeout=10)
 
-        try:
-            response = requests.get(url, headers=self.rest_headers, timeout=10)
-            if response is None:
-                logging.error("Received null res while fetching collaborators")
-                return set()
-
-            if response.status_code != 200:
-                logging.error(
-                    'Failed to fetch collaborators from GitHub: %s',
-                    response.json()
+        if response is None:
+            raise AssertionError(
+                'Received null res while fetching collaborators'
             )
+        response.raise_for_status()
 
-            collaborators = set()
-            for collaborator_dict in response.json():
-                if isinstance(collaborator_dict, dict):
-                    collaborators.add(collaborator_dict['login'])
+        collaborators = set()
+        for collaborator_dict in response.json():
+            if isinstance(collaborator_dict, dict):
+                collaborators.add(collaborator_dict['login'])
 
-            return collaborators
-
-        except Exception as e:
-            logging.error(f'Error while fetching collaborators: {str(e)}')
-            return set()
+        return collaborators
 
     def get_issue_events(self, issue: Issue) -> Optional[datetime.datetime]:
         """Fetches and processes events for an issue.
@@ -200,53 +188,51 @@ class GitHubService:
 
         Returns:
             Optional[datetime.datetime]. The date of the latest event, if any.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
-        try: 
-            response = requests.get(
-                issue.events_url,
-                headers=self.rest_headers,
-                timeout=10
-            )
-            if response is None:
-                logging.error("Received null res while fetching issue events")
-                return None
+        response = requests.get(
+            issue.events_url,
+            headers=self.rest_headers,
+            timeout=10
+        )
+        if response is None:
+            raise AssertionError('Received null res while fetching events')
+        response.raise_for_status()
 
-            if response.status_code != 200:
-                logging.error(
-                    'Failed to fetch issue events from GitHub: %s',
-                    response.json()
-            )
-            events_dict = response.json()
+        events_dict = response.json()
 
-            if not events_dict:
-                return None
-
-            assignee_events = []  
-            for event in events_dict:  
-                if event.get("actor", {}).get("login") == issue.assignee_username:  
-                    assignee_events.append(event)
-
-            if not assignee_events:
-                return None
-
-            latest_event_date = max(
-                datetime.datetime.strptime(
-                    event['created_at'],
-                    '%Y-%m-%dT%H:%M:%SZ'
-                ).replace(tzinfo=datetime.timezone.utc)
-                for event in assignee_events
-            )
-            return latest_event_date
-
-        except Exception as e: 
-            logging.error(f'Error while fetching issue events: {str(e)}')
+        if not events_dict:
             return None
+
+        assignee_events = []
+        for event in events_dict:
+            if event.get('actor', {}).get('login') == issue.assignee_username:
+                assignee_events.append(event)
+
+        if not assignee_events:
+            return None
+
+        latest_event_date = max(
+            datetime.datetime.strptime(
+                event['created_at'],
+                '%Y-%m-%dT%H:%M:%SZ'
+            ).replace(tzinfo=datetime.timezone.utc)
+            for event in assignee_events
+        )
+        return latest_event_date
 
     def get_issues_with_prs(self) -> Dict[int, Set[int]]:
         """Fetches mapping of issues to their linked PRs using GraphQL.
 
         Returns:
             Dict[int, int]. Mapping of issue numbers to PR numbers.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         query = """
         query($owner: String!, $name: String!, $cursor: String) {
@@ -279,43 +265,32 @@ class GitHubService:
         has_next_page = True
 
         while has_next_page:
-            try:
-                response = requests.post(
-                    'https://api.github.com/graphql',
-                    headers=self.graphql_headers,
-                    json={'query': query, 'variables': req_credentials},
-                    timeout=10
-                )
-                if response is None:
-                    logging.error("Received null res while fetching PRs")
-                    return {}
+            response = requests.post(
+                'https://api.github.com/graphql',
+                headers=self.graphql_headers,
+                json={'query': query, 'variables': req_credentials},
+                timeout=10
+            )
+            if response is None:
+                raise AssertionError('Received null res while fetching PRs')
+            response.raise_for_status()
 
-                if response.status_code != 200:
-                    logging.error(
-                        'Failed to fetch PRs from GraphQL query: %s',
-                        response.json()
-                )
+            data = response.json()
+            pull_requests = data['data']['repository']['pullRequests']
 
-                data = response.json()
-                pull_requests = data['data']['repository']['pullRequests']
+            for pr in pull_requests['nodes']:
+                pr_number = pr['number']
+                linked_issues = pr['closingIssuesReferences']['nodes']
+                if linked_issues:
+                    for issue in linked_issues:
+                        issue_number = issue['number']
+                        if issue_number not in issue_to_prs:
+                            issue_to_prs[issue_number] = set()
+                        issue_to_prs[issue_number].add(pr_number)
 
-                for pr in pull_requests['nodes']:
-                    pr_number = pr['number']
-                    linked_issues = pr['closingIssuesReferences']['nodes']
-                    if linked_issues:
-                        for issue in linked_issues:
-                            issue_number = issue['number']
-                            if issue_number not in issue_to_prs:
-                                issue_to_prs[issue_number] = set()
-                            issue_to_prs[issue_number].add(pr_number)
-
-                page_info = pull_requests['pageInfo']
-                has_next_page = page_info['hasNextPage']
-                req_credentials['cursor'] = page_info['endCursor']
-
-            except Exception as e:
-                logging.error(f'Error while fetching PRs: {str(e)}')
-                return {}
+            page_info = pull_requests['pageInfo']
+            has_next_page = page_info['hasNextPage']
+            req_credentials['cursor'] = page_info['endCursor']
 
         return issue_to_prs
 
@@ -327,38 +302,37 @@ class GitHubService:
 
         Returns:
             bool. Whether the unassignment was successful.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         if not issue.assignee_username:
             return False
 
         url = f'{self.base_url}/issues/{issue.number}/assignees'
-        try: 
-            response = requests.delete(
-                url,
-                headers=self.rest_headers,
-                json={'assignees': [issue.assignee_username]},
-                timeout=10
-            )
-            if response is None:
-                logging.error("Received null res while unassigning issue")
-                return []
+        response = requests.delete(
+            url,
+            headers=self.rest_headers,
+            json={'assignees': [issue.assignee_username]},
+            timeout=10
+        )
+        if response is None:
+            raise AssertionError('Received null res while unassigning issue')
 
-            if response.status_code != 200:
-                logging.error(
-                    'Failed to delete assignees from issue: %s',
-                    response.json()
-            )
-            return response.status_code == 200
+        response.raise_for_status()
 
-        except Exception as e:
-            logging.error(f'Error while unassigning issue: {str(e)}')
-            return False
+        return response.status_code == 200
 
     def add_alert_comment_on_issue(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
             issue: Issue. The issue to comment on.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
@@ -371,28 +345,25 @@ class GitHubService:
             f'(and submit it for review, if applicable). '
             f'Please also let us know if you are stuck so we can help you!'
         )
-        try: 
-            response = requests.post(
-                url,
-                headers=self.rest_headers,
-                json={'body': comment},
-                timeout=10
-            )
-            if response is None:
-                logging.error("Received null res while adding alert comment")
-                return None
-
-            response.raise_for_status()
-            return None
-
-        except Exception as e:
-            logging.error(f'Error while adding alert comment: {str(e)}')
+        response = requests.post(
+            url,
+            headers=self.rest_headers,
+            json={'body': comment},
+            timeout=10
+        )
+        if response is None:
+            raise AssertionError('Received null res while commenting on issue')
+        response.raise_for_status()
 
     def remove_assignee_comment_on_issue(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
             issue: Issue. The issue to comment on.
+
+        Raises:
+            AssertionError. Raised if the response from the request is None.
+            requests.HTTPError. Raised if the request fails.
         """
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
@@ -401,21 +372,15 @@ class GitHubService:
             f'If you would like to continue working on this issue, please '
             f'request to be reassigned.'
         )
-        try: 
-            response = requests.post(
-                url,
-                headers=self.rest_headers,
-                json={'body': comment},
-                timeout=10
-            )
-            if response is None:
-                logging.error("Received null res while commenting on issue")
-                return None
-
-            response.raise_for_status()
-            return None
-        except Exception as e:
-            logging.error(f'Error while adding alert comment: {str(e)}')
+        response = requests.post(
+            url,
+            headers=self.rest_headers,
+            json={'body': comment},
+            timeout=10
+        )
+        if response is None:
+            raise AssertionError('Received null res while commenting on issue')
+        response.raise_for_status()
 
 
 class IssueManager:
