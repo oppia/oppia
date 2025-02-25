@@ -196,9 +196,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 with self.swap_check_frontend_coverage, os_path_exists_swap:
                     run_frontend_tests.main(
                         args=['--check_coverage', '--specs_to_run='
+                              'about-page.component.spec.ts,'
                               'home-page.component.spec.ts,'
-                              'about-page.component.ts,'
-                              'test-module.js,'])
+                              'test-module.spec.js'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
@@ -211,7 +211,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
-            '--specs_to_run='
+            '--files_to_check='
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'
