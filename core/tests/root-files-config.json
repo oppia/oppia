@@ -80,7 +80,5 @@
     "extensions/visualizations/visualizationsRequires.ts",
     "extensions/interactions/interactionsQuestionsRequires.ts",
     "extensions/value_generators/valueGeneratorsRequires.ts",
-    "extensions/objects/objectComponentsRequires.ts",
-    "extensions/objects/objectComponentsRequiresForPlayers.ts"
   ]
 }
