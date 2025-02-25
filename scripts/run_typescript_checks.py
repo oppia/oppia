@@ -70,7 +70,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
     'core/templates/domain/exploration/StatesObjectFactorySpec.ts',
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
-    'core/templates/domain/question/QuestionObjectFactorySpec.ts',
     'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/statistics/learner-answer-info.model.ts',
