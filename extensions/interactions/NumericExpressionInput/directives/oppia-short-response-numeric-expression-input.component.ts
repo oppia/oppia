@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -42,10 +41,3 @@ export class ShortResponseNumericExpressionInput implements OnInit {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseNumericExpressionInput',
-  downgradeComponent({
-    component: ShortResponseNumericExpressionInput,
-  }) as angular.IDirectiveFactory
-);

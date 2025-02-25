@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
@@ -278,10 +278,3 @@ export class LostChangeObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LostChangeObjectFactory',
-    downgradeInjectable(LostChangeObjectFactory)
-  );

@@ -24,7 +24,6 @@ import {
   SecurityContext,
 } from '@angular/core';
 import {Location} from '@angular/common';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -627,10 +626,3 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.componentSubscription.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionPlayer',
-  downgradeComponent({
-    component: QuestionPlayerComponent,
-  }) as angular.IDirectiveFactory
-);
