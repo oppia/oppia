@@ -256,6 +256,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'logged-out-user/play-lesson-in-different-languages-and-listen-'
     'to-voiceovers',
+    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
