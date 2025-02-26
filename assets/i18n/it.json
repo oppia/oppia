@@ -259,6 +259,8 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL": "L'impostazione di un obiettivo consente a Oppia di darti consigli migliori nella tua dashboard che contribuiscono al tuo percorso di apprendimento.",
 	"I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL": "fissare un obiettivo!&nbsp;",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION": "Obiettivi",
+	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Annulla",
+	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE": "Salva",
 	"I18N_LEARNER_DASHBOARD_GOLD_BADGE": "Oro",
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "In corso",
 	"I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "Sembra che tu non abbia ancora provato nessuna esplorazione.",
