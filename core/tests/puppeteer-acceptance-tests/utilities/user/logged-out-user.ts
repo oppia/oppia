@@ -4217,58 +4217,57 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Answers all practice questions in session
-   */
-  async answerAllQuestion(): Promise<void> {
-    var i = 0;
-
-    while (i < 10) {
-      await this.answerPracticeQuestions();
-      i++;
-    }
-  }
-  /**
-   * Answers practice question in session
+   * Answers practice questions in session
    */
   async answerPracticeQuestions(): Promise<void> {
-    var isFirstQuestion = true;
+    let questionCount = 0;
+    const maxQuestions = 10;
+
     try {
-      await this.page.waitForSelector(answerInputSelector);
+      // Wait for the first question to load.
+      await this.page.waitForSelector(answerInputSelector, {timeout: 10000});
 
-      while (await this.page.$(answerInputSelector)) {
-        await this.page.waitForSelector(answerInputSelector);
-
-        const input = await this.page.$(answerInputSelector);
-        if (!input) {
-          throw new Error('Answer input not found');
-        }
-
-        await input.focus();
-
-        if (isFirstQuestion) {
-          // First submit wrong answer.
-          await input.evaluate(el => ((el as HTMLInputElement).value = '999'));
+      while (questionCount < maxQuestions) {
+        // For the first question, submit wrong answer first then correct answer.
+        if (questionCount === 0) {
+          // Submit wrong answer.
+          await this.page.waitForSelector(answerInputSelector);
+          await this.page.type(answerInputSelector, '2');
           await this.page.waitForTimeout(500);
+
+          await this.page.waitForSelector(submitButtonSelector);
           await this.page.click(submitButtonSelector);
-          await this.page.waitForTimeout(1000);
-          // Clear and submit correct answer.
-          await input.focus();
-          await input.evaluate(el => ((el as HTMLInputElement).value = ''));
+          await this.page.waitForTimeout(2000);
+
+          // Clear the input - get a fresh reference.
+          await this.page.waitForSelector(answerInputSelector);
+          await this.page.click(answerInputSelector, {clickCount: 3});
+          await this.page.keyboard.press('Backspace');
+
+          // Submit correct answer.
+          await this.page.type(answerInputSelector, '3');
           await this.page.waitForTimeout(500);
-          await input.type('3');
-          await this.page.waitForTimeout(500);
+
+          await this.page.waitForSelector(submitButtonSelector);
           await this.page.click(submitButtonSelector);
-          isFirstQuestion = false;
         } else {
-          await input.type('3');
+          // For other questions, just submit correct answer.
+          await this.page.waitForSelector(answerInputSelector);
+          await this.page.type(answerInputSelector, '3');
           await this.page.waitForTimeout(500);
+
+          await this.page.waitForSelector(submitButtonSelector);
           await this.page.click(submitButtonSelector);
         }
-        await this.page.waitForSelector(nextButtonSelector);
+
+        await this.page.waitForSelector(nextButtonSelector, {timeout: 10000});
         await this.page.click(nextButtonSelector);
-        await this.page.waitForTimeout(1000);
+        await this.page.waitForTimeout(2000);
+
+        questionCount++;
       }
     } catch (error) {
+      console.error(`Failed to answer practice questions: ${error}`);
       throw new Error(`Failed to answer practice questions: ${error}`);
     }
   }

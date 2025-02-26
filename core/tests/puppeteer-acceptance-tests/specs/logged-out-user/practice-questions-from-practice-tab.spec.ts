@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,11 +58,8 @@ describe('Logged-out User', function () {
     await loggedOutUser.selectAndOpenTopic('Algebra I');
 
     await loggedOutUser.clickPracticeTab();
-    // Step 3: Configure & start session.
     await loggedOutUser.startPracticeSession();
-
-    // Step 4: Complete questions.
-    await loggedOutUser.answerAllQuestion();
+    await loggedOutUser.answerPracticeQuestions();
   }, 420000);
 
   afterAll(async function () {
