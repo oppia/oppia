@@ -284,13 +284,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   generateDummyChapters(selectedStoryForChapter: string): void {
     const selectedIndex = Number(selectedStoryForChapter);
     let selectedStory = this.storyList[selectedIndex];
+    let id = selectedStory._id;
     this.adminTaskManagerService.startTask();
     this.setStatusMessage.emit('Processing...');
     this.adminBackendApiService
-      .generateDummyChaptersAsync(
-        selectedStory.getId(),
-        this.numDummyChaptersToGenerate
-      )
+      .generateDummyChaptersAsync(id, this.numDummyChaptersToGenerate)
       .then(
         () => {
           this.setStatusMessage.emit('Dummy chapters generated successfully.');

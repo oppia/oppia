@@ -122,45 +122,24 @@ describe('Admin backend api service', () => {
     ],
     story_list: [
       {
-        id: 'storyid',
-        title: 'dummy story',
+        id: 'bpqKYtmRl7xE',
+        title: 'dummy_title0',
         description: 'description',
-        notes: 'notes',
-        story_contents: [
-          {
-            initial_node_id: 'node_1',
-            nodes: [
-              {
-                id: 'node_1',
-                title: 'dummy node',
-                description: '',
-                destinationNodeIds: ['node_2'],
-                prerequisiteSkillIds: ['ByBjUvYOITCJ'],
-                acquiredSkillIds: ['TybOaLMmNeO1'],
-                outline: '',
-                outlineIsFinalized: false,
-                explorationId: null,
-                thumbnailBgColor: null,
-                thumbnailFilename: null,
-                status: '',
-                plannedPublicationDateMsecs: null,
-                lastModifiedMsecs: null,
-                firstPublicationDateMsecs: null,
-                unpublishingReason: null
-              }
-            ],
-            next_node_id: 'node_2'
-          }
-        ],
+        notes: '',
+        story_contents: {
+          initial_node_id: null,
+          nodes: [],
+          next_node_id: 'node_1',
+        },
         language_code: 'en',
         version: 1,
-        corresponding_topic_id: 'VqgPTpt7JyJy',
-        thumbnail_bg_color: null,
-        thumbnail_filename: null,
-        url_fragment: 'a',
-        meta_tag_content: 'fragm'
+        corresponding_topic_id: 'SZOdEWYZ7QE5',
+        thumbnail_bg_color: '#B3D8F1',
+        thumbnail_filename: 'thumbnail.svg',
+        url_fragment: 'tjbtqqfejb',
+        meta_tag_content: 'dummy_meta',
       },
-    ]
+    ],
   };
   let adminDataObject: AdminPageData;
 

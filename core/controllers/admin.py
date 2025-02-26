@@ -1893,9 +1893,10 @@ class AdminHandler(
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name':
-                        (exp_domain
-                         .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+                        'property_name': (
+                            exp_domain
+                            .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                        ),
                         'new_value': None
                     }),
                 ]
@@ -1929,9 +1930,6 @@ class AdminHandler(
                     suffix = node_index
                     node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
 
-                # random_suffix = ''.join(
-                #     random.choices(string.ascii_lowercase, k=22)
-                # )
                 chapter_title = f'dummy chapter {suffix}'
 
                 story_change_list = [
@@ -1942,26 +1940,30 @@ class AdminHandler(
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain
-                                         .STORY_NODE_PROPERTY_EXPLORATION_ID,
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
                         'new_value': exp_id,
                         'node_id': node_id,
                         'old_value': 'exploration_id'
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name':
-                        (story_domain
-                         .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                        ),
                         'new_value': 'thumbnail.svg',
                         'node_id': node_id,
                         'old_value': 'thumbnail_filename'
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name':
-                        (story_domain
-                         .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR),
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                        ),
                         'new_value': '#B3D8F1',
                         'node_id': node_id,
                         'old_value': 'thumbnail_bg_color'
