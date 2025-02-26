@@ -2173,12 +2173,12 @@ def update_translation_suggestion(
     suggestion_id: str,
     translation_html: str
 ) -> None:
-    """Updates a translation suggestion while ensuring RTE components
-    remain unchanged.
+    """Updates the translation_html of a suggestion with the given
+    suggestion_id.
 
     Args:
-        suggestion_id: str. The ID of the suggestion being updated.
-        translation_html: str. The new translated HTML content.
+        suggestion_id: str. The id of the suggestion to be updated.
+        translation_html: str. The new translation_html string.
 
     Raises:
         InvalidInputException. The RTE component counts in
