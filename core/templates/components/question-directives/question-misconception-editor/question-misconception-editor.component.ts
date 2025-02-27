@@ -95,8 +95,10 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
           this.initValues();
         })
       );
+      if (this.feedbackIsUsed !== false) {
+        this.feedbackIsUsed = true;
+      }
     }
-    this.feedbackIsUsed = true;
   }
 
   initValues(): void {
@@ -115,6 +117,10 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
             this.misconceptionName = misconceptions[i].getName();
             this.selectedMisconception = misconceptions[i];
             this.selectedMisconceptionSkillId = skillId;
+            // Initialize feedbackIsUsed based on the outcome feedback.
+            this.feedbackIsUsed =
+              this.outcome.feedback.html.trim() ===
+              misconceptions[i].getFeedback().trim();
           }
         }
       } else {
@@ -190,9 +196,14 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
       outcome.feedback.html = this.selectedMisconception.getFeedback();
-      this.saveAnswerGroupFeedback.emit(outcome);
-      this.externalSaveService.onExternalSave.emit();
+    } else {
+      if (outcome.feedback.html === this.selectedMisconception.getFeedback()) {
+        outcome.feedback.html = '';
+      }
     }
+
+    this.saveAnswerGroupFeedback.emit(outcome);
+    this.externalSaveService.onExternalSave.emit();
     this.misconceptionEditorIsOpen = false;
   }
 
