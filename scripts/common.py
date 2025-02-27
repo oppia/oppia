@@ -225,7 +225,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/edit-profile-preferences-and-export-their-account',
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
-    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/profile-menu-navigation',
+    'logged-in-user/access-dashboards-from-profile-menu.spec.ts'
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
