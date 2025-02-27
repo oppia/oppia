@@ -120,6 +120,17 @@ const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
+const profileMenuButton = '.e2e-test-profile-menu-btn';
+const learnerDashboardLink = '.e2e-test-learner-dashboard-link';
+const creatorDashboardLink = '.e2e-test-creator-dashboard-link';
+const contributorDashboardLink = '.e2e-test-contributor-dashboard-link';
+const profilePageLink = '.e2e-test-profile-page-link';
+const topicsAndSkillsDashboardLink =
+  '.e2e-test-topics-and-skills-dashboard-link';
+const preferencesPageLink = '.e2e-test-preferences-page-link';
+
+const preferredDashboardUrl = testConstants.URLs.PreferredDashboard;
+
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1312,5 +1323,89 @@ export class LoggedInUser extends BaseUser {
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 }
+
+  /**
+   * Navigates to the correct dashboard based on user preferences.
+   */
+  async navigateToPreferredDashboard(): {
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(learnerDashboardUrl);
+  
+    try {
+      await this.page.waitForSelector('.e2e-test-dashboard-redirect', { timeout: 5000 });
+      await this.page.click('.e2e-test-dashboard-redirect');
+      await this.page.waitForNavigation({ waitUntil: ['networkidle2', 'load'] });
+    } catch (error) {
+      console.error('Navigation to dashboard failed:', error);
+    }
+  }
+  
+
+  /**
+   * Opens the profile dropdown menu and clicks on the specified page link.
+   * @param {string} menuItemSelector - The selector for the menu item.
+   */
+  /**
+ * Navigates to the correct dashboard based on user preferences.
+ */
+async navigateToPreferredDashboard(): Promise<void> {
+  await this.page.bringToFront();
+  await this.waitForNetworkIdle();
+  await this.goto(learnerDashboardUrl);
+
+  try {
+    await this.page.waitForSelector('.e2e-test-dashboard-redirect', { timeout: 5000 });
+    await this.page.click('.e2e-test-dashboard-redirect');
+    await this.page.waitForNavigation({ waitUntil: ['networkidle2', 'load'] });
+  } catch (error) {
+    console.log('No preferred dashboard redirect found, staying on learner dashboard.');
+  }
+}
+
+/**
+ * Opens the profile dropdown menu and clicks on the specified page link.
+ * @param {string} menuItemSelector - The selector for the menu item.
+ */
+async navigateFromProfileMenu(menuItemSelector: string): Promise<void> {
+  if (!menuItemSelector) {
+    throw new Error('Invalid menu item selector');
+  }
+
+  await this.page.waitForSelector('.e2e-test-profile-dropdown');
+  await this.page.click('.e2e-test-profile-dropdown');
+
+  await this.page.waitForSelector(menuItemSelector);
+  await Promise.all([
+    this.page.waitForNavigation({ waitUntil: ['networkidle2', 'load'] }),
+    this.page.click(menuItemSelector),
+  ]);
+}
+
+/**
+ * Navigates to different dashboards and pages from the profile dropdown menu.
+ */
+async navigateToAllProfilePages(): Promise<void> {
+  const pages: { selector: string; name: string }[] = [
+    { selector: '.e2e-test-creator-dashboard', name: 'Creator Dashboard' },
+    { selector: '.e2e-test-contributor-dashboard', name: 'Contributor Dashboard' },
+    { selector: '.e2e-test-learner-dashboard', name: 'Learner Dashboard' },
+    { selector: '.e2e-test-profile-page', name: 'Profile Page' },
+    { selector: '.e2e-test-topic-skill-dashboard', name: 'Topics & Skills Dashboard' },
+    { selector: '.e2e-test-preferences-page', name: 'Preferences Page' },
+  ];
+
+  for (const page of pages) {
+    try {
+      console.log(`Navigating to ${page.name}...`);
+      await this.navigateFromProfileMenu(page.selector);
+    } catch (error) {
+      console.error(`Failed to navigate to ${page.name}:`, error);
+    }
+  }
+}
+
+
+
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

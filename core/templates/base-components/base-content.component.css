@@ -19,6 +19,7 @@
   display: flex;
   float: left;
   height: 56px;
+  transform: translateX(50%);
   width: 20px;
 }
 .navbar-mobile-container {
