@@ -84,7 +84,6 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const preferencesPageUrl = testConstants.URLs.Preferences;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
-const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -4154,17 +4153,6 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(pauseVoiceoverButton);
   }
 
-  async clickonPracticeCheckbox(): Promise<void> {
-    // Navigate to topic and skills dashboard.
-    await this.page.bringToFront();
-    await this.waitForNetworkIdle();
-    await this.goto(topicAndSkillsDashboardUrl);
-    // Click on the topic button.
-    await this.clickOn('.e2e-test-topic-name');
-    // Click on practice button checkbox.
-    await this.clickOn('.e2e-test-toggle-practice');
-  }
-
   /**
    * Clicks on the practice tab in topic page.
    */
@@ -4269,31 +4257,6 @@ export class LoggedOutUser extends BaseUser {
     } catch (error) {
       console.error(`Failed to answer practice questions: ${error}`);
       throw new Error(`Failed to answer practice questions: ${error}`);
-    }
-  }
-
-  /**
-   * Verifies practice session score is displayed
-   */
-  async verifyPracticeScore(): Promise<void> {
-    const scoreSelector = '.practice-score';
-    const completionMsgSelector = '.completion-message';
-
-    try {
-      await this.page.waitForSelector(scoreSelector);
-      await this.page.waitForSelector(completionMsgSelector);
-
-      const scoreElement = await this.page.$(scoreSelector);
-      const score = await this.page.evaluate(
-        el => el.textContent,
-        scoreElement
-      );
-
-      if (!score) {
-        throw new Error('Practice score not found');
-      }
-    } catch (error) {
-      throw new Error(`Failed to verify practice score: ${error}`);
     }
   }
 }

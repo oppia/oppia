@@ -197,7 +197,7 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/subscribe-to-newsletter-and-click-all-buttons.spec.ts"
     },
     {
-      "name": "logged-out-user/subscribe-to-newsletter-and-click-all-buttons",
+      "name": "logged-out-user/practice-questions-from-practice-tab",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/practice-questions-from-practice-tab.spec.ts"
     },
     {

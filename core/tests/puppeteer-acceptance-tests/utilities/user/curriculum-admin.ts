@@ -221,6 +221,7 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const togglePracticeButton = '.e2e-test-toggle-practice-tab';
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -673,9 +674,12 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
   }
+  /**
+   * Click on the show practice question checkbox on the topic editor page.
+   */
   async clickShowPracticeButton(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
-    await this.clickOn('.e2e-test-toggle-practice-tab');
+    await this.clickOn(togglePracticeButton);
     await this.saveTopicDraft(topicName);
   }
   async publishDraftTopic(topicName: string): Promise<void> {
@@ -1600,6 +1604,8 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} topicName - The name of the topic.
    * @param {string} subtopicName - The name of the subtopic.
    * @param {string} skillName - The name of the skill.
+   * Creates 10 practice questions for the skill used to show all questions in practice tab.
+   * Number of question is kept 10 because minimum number of questions required to show in practice tab is 10.
    */
   async createAndPublishTopicForPracticeQues(
     topicName: string,

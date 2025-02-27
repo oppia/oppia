@@ -14,6 +14,7 @@
 
 /**
  * @fileoverview Acceptance tests for practice questions session workflow.
+ * Logged-out user should be able to complete a practice questions session.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -24,6 +25,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {QuestionAdmin} from '../../utilities/user/question-admin';
 
 const ROLES = testConstants.Roles;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
@@ -51,16 +53,22 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   }, 420000);
 
-  it('should complete a practice questions session as logged-out user', async function () {
-    // Step 1: Navigate to topic.
-    await loggedOutUser.navigateToClassroomPage('math');
-    await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
-    await loggedOutUser.selectAndOpenTopic('Algebra I');
-
-    await loggedOutUser.clickPracticeTab();
-    await loggedOutUser.startPracticeSession();
-    await loggedOutUser.answerPracticeQuestions();
-  }, 420000);
+  it(
+    'should complete a practice questions session as logged-out user',
+    async function () {
+      // Step 1: Navigate to topic.
+      await loggedOutUser.navigateToClassroomPage('math');
+      await loggedOutUser.expectTopicsToBePresent(['Algebra I']);
+      await loggedOutUser.selectAndOpenTopic('Algebra I');
+      // Step 2: Click on practice tab.
+      await loggedOutUser.clickPracticeTab();
+      // Step 3: Start practice session.
+      await loggedOutUser.startPracticeSession();
+      // Step 4: Answer practice questions.
+      await loggedOutUser.answerPracticeQuestions();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
