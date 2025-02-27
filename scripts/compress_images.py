@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import pathlib
 import subprocess
+import sys
 import tempfile
 
 from PIL import Image
@@ -113,7 +114,7 @@ def get_compressible_images(
 
 if __name__ == '__main__':  # pragma: no cover
     repo_path = pathlib.Path('./assets')
-    compressed_images = get_compressible_images(str(repo_path))
+    compressed_images = get_compressible_images(repo_path)
 
     if compressed_images:
         TOTAL_SPACE_SAVED = 0
@@ -135,5 +136,7 @@ if __name__ == '__main__':  # pragma: no cover
         )
 
         print(f'\nTotal space saved: {TOTAL_SPACE_SAVED} bytes\n')
+        sys.exit(1)
     else:
         print('No images could be compressed further.')
+        sys.exit(0)
