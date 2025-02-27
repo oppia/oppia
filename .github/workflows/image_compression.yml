@@ -27,9 +27,6 @@ jobs:
         with:
           python-version: '3.9'
           architecture: 'x64'
-      
-      - name: Add GraphicsMagick to PATH
-        run: echo "$(dirname $(which gm))" >> $GITHUB_PATH
 
       - name: Run Image Compression Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

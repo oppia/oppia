@@ -51,7 +51,8 @@ def get_compressible_images(
     images that achieve at least a 1% reduction are considered compressible.
 
     Args:
-        input_path (Union[str, pathlib.Path]): Path to the directory containing images.
+        path (Union[str, pathlib.Path]):
+        Path to the directory containing images.
 
     Returns:
         List[CompressedImageInfo]: A list of images that can be compressed, 
@@ -68,60 +69,59 @@ def get_compressible_images(
         if file_extension not in ALL_IMAGES_EXTENSIONS:
             continue
 
-        try:
-            with Image.open(file_path):
-                with tempfile.TemporaryDirectory() as tmpdir:
-                    temp_compressed = (
-                        pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
+        with Image.open(file_path):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                temp_compressed = (
+                    pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
+                )
+
+                compression_type = (
+                    'Zip' if file_extension in
+                    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
+                    else 'LZW'
+                )
+
+                cmd = [
+                    'gm', 'convert',
+                    str(file_path),
+                    '-strip',
+                    '-compress', compression_type,
+                    str(temp_compressed)
+                ]
+
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, check=False
+                )
+                if result.returncode == 0 and temp_compressed.exists():
+                    original_size = file_path.stat().st_size
+                    new_size = temp_compressed.stat().st_size
+
+                    if new_size < original_size * TOLERANCE:
+                        result_images.append({
+                            'path': file_path,
+                            'original_size': original_size,
+                            'new_size': new_size
+                        })
+                else:
+                    logging.info(
+                        'Compressed image > original image'
                     )
+                    continue
 
-                    compression_type = (
-                        'Zip' if file_extension in IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
-                        else 'LZW'
-                    )
-
-                    cmd = [
-                        'gm', 'convert',
-                        str(file_path),
-                        '-strip',
-                        '-compress', compression_type,
-                        str(temp_compressed)
-                    ]
-
-                    result = subprocess.run(
-                        cmd, capture_output=True, text=True, check=False
-                    )
-                    if result.returncode == 0 and temp_compressed.exists():
-                        original_size = file_path.stat().st_size
-                        new_size = temp_compressed.stat().st_size
-
-                        if new_size < original_size * TOLERANCE:
-                            result_images.append({
-                                'path': file_path,
-                                'original_size': original_size,
-                                'new_size': new_size
-                            })
-                    else:
-                        logging.info(
-                            'Compressed image > original image'
-                        )
-                        continue
-        except Exception as e:
-            print(f'[ERROR] Could not process {file_path}: {e}')
     return result_images
 
 
 if __name__ == '__main__':  # pragma: no cover
     repo_path = pathlib.Path('./assets')
     compressed_images = get_compressible_images(str(repo_path))
-    
+
     if compressed_images:
-        space = 0
+        TOTAL_SPACE_SAVED = 0
         print(len(compressed_images), 'images could be compressed further:\n')
         for image in compressed_images:
             print(image['path'])
             saved = image['original_size'] - image['new_size']
-            space += saved
+            TOTAL_SPACE_SAVED += saved
         print('Use the following command to compress the images:\n')
 
         print(
@@ -134,6 +134,6 @@ if __name__ == '__main__':  # pragma: no cover
             'gm convert <input_file> -strip -compress LZW <output_file>'
         )
 
-        print(f'\nTotal space saved: {space} bytes\n')
+        print(f'\nTotal space saved: {TOTAL_SPACE_SAVED} bytes\n')
     else:
         print('No images could be compressed further.')

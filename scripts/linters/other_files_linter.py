@@ -24,6 +24,7 @@ import os
 import re
 
 from core import utils
+from scripts import compress_images
 
 from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
@@ -327,6 +328,48 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             for job in jobs_with_unnamed_step
         ]
 
+    def check_compressible_images(self) -> concurrent_task_utils.TaskResult:
+        """Checks if any images in the assets 
+        directory can be compressed further.
+
+        Returns:
+            TaskResult. A TaskResult object 
+            representing the result of the lint check.
+        """
+
+        name = 'Compressible images'
+        repo_path = os.path.join(os.getcwd(), 'assets')
+
+        compressed_images = compress_images.get_compressible_images(repo_path)
+
+        failed = bool(compressed_images)
+        error_messages = []
+
+        if compressed_images:
+            error_messages.append(
+                f'Found {len(compressed_images)} images that could be '
+                'compressed further:')
+            for image in compressed_images:
+                saved = image['original_size'] - image['new_size']
+                saved_percentage = (
+                    (image['original_size'] - image['new_size']) /
+                    image['original_size']) * 100
+                error_messages.append(
+                    f'{image["path"]} - Could save {saved} bytes '
+                    f'({saved_percentage:.2f}%)')
+
+            error_messages.append(
+                '\nUse the following commands to compress the images:')
+            error_messages.append(
+                'For PNG images: gm convert <input_file> -strip '
+                '-compress Zip <output_file>')
+            error_messages.append(
+                'For JPG and WebP images: gm convert <input_file> -strip '
+                '-compress LZW <output_file>')
+
+        return concurrent_task_utils.TaskResult(
+            name, failed, error_messages, error_messages)
+
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -341,6 +384,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
         linter_stdout.append(self.check_github_workflows_have_name())
+        linter_stdout.append(self.check_compressible_images())
 
         return linter_stdout
 
