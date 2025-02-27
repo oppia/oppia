@@ -34,7 +34,7 @@ jobs:
       - name: Run Image Compression Check
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         id: compression
-        run: make image_compression_check
+        run: make compress_images
 
       - name: Send failure notification
         if: ${{ failure() }}

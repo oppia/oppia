@@ -30,6 +30,8 @@ ALL_IMAGES_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp'}
 IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION = {'.png'}
 IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION = {'.jpg', '.jpeg', '.webp'}
 TOLERANCE = 0.99
+
+
 class CompressedImageInfo(TypedDict):
     """Type definition for compressed image information."""
 
@@ -109,11 +111,10 @@ def get_compressible_images(
     return result_images
 
 
-def main() -> None: # pragma: no cover
-    """Main function to compress images in the repository."""
+if __name__ == '__main__':  # pragma: no cover
     repo_path = pathlib.Path('./assets')
     compressed_images = get_compressible_images(str(repo_path))
-
+    
     if compressed_images:
         space = 0
         print(len(compressed_images), 'images could be compressed further:\n')
@@ -136,7 +137,3 @@ def main() -> None: # pragma: no cover
         print(f'\nTotal space saved: {space} bytes\n')
     else:
         print('No images could be compressed further.')
-
-
-if __name__ == '__main__':  # pragma: no cover
-    main()

@@ -46,7 +46,7 @@ build: ## Builds the all docker setup.
 	$(MAKE) install_hooks
 	docker compose build
 
-image_compression_check: ## Runs the image compression checks
+compress_images: ## Runs the image compression checks
 	sudo apt install graphicsmagick -y
 	pip install pillow
 	python -m scripts.compress_images
