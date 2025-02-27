@@ -27,11 +27,6 @@ jobs:
         with:
           python-version: '3.9'
           architecture: 'x64'
-
-      - name: Install GraphicsMagick
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y graphicsmagick
       
       - name: Add GraphicsMagick to PATH
         run: echo "$(dirname $(which gm))" >> $GITHUB_PATH

@@ -49,7 +49,7 @@ build: ## Builds the all docker setup.
 image_compression_check: ## Runs the image compression checks
 	sudo apt install graphicsmagick -y
 	pip install pillow
-	python -m scripts.image_compression
+	python -m scripts.compress_images
 
 run-devserver: ## Runs the dev-server
 # TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.

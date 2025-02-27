@@ -23,10 +23,13 @@ import pathlib
 import subprocess
 import tempfile
 
-from PIL import Image # pylint: disable=import-error
+from PIL import Image
 from typing import List, TypedDict, Union
 
-
+ALL_IMAGES_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp'}
+IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION = {'.png'}
+IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION = {'.jpg', '.jpeg', '.webp'}
+TOLERANCE = 0.99
 class CompressedImageInfo(TypedDict):
     """Type definition for compressed image information."""
 
@@ -35,16 +38,32 @@ class CompressedImageInfo(TypedDict):
     new_size: int
 
 
-def check_compressable_images(
+def get_compressible_images(
         input_path: Union[str, pathlib.Path]
     ) -> List[CompressedImageInfo]:
-    """Check and compress images using GraphicsMagick."""
+    """Find images that can be compressed further.
+
+    This function scans a directory for images, attempts to compress them using 
+    GraphicsMagick, and identifies those that can be reduced in size. The 
+    compression benchmark is set to 99% of the original file size, meaning only 
+    images that achieve at least a 1% reduction are considered compressible.
+
+    Args:
+        input_path (Union[str, pathlib.Path]): Path to the directory containing images.
+
+    Returns:
+        List[CompressedImageInfo]: A list of images that can be compressed, 
+        including their original and new sizes.
+
+    Raises:
+        Exception: If an error occurs while processing an image.
+    """
 
     result_images: List[CompressedImageInfo] = []
-    supported_extensions = {'.png', '.jpg', '.jpeg', '.webp'}
 
     for file_path in pathlib.Path(input_path).glob('**/*.*'):
-        if file_path.suffix.lower() not in supported_extensions:
+        file_extension = file_path.suffix.lower()
+        if file_extension not in ALL_IMAGES_EXTENSIONS:
             continue
 
         try:
@@ -54,31 +73,27 @@ def check_compressable_images(
                         pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
                     )
 
-                    if file_path.suffix.lower() == '.png':
-                        cmd = [
-                            'gm', 'convert',
-                            str(file_path),
-                            '-strip',
-                            '-compress', 'Zip',
-                            str(temp_compressed)
-                        ]
-                    elif file_path.suffix.lower() in {'.jpg', '.webp'}:
-                        cmd = [
-                            'gm', 'convert',
-                            str(file_path),
-                            '-strip',
-                            '-compress', 'LZW',
-                            str(temp_compressed)
-                        ]
+                    compression_type = (
+                        'Zip' if file_extension in IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
+                        else 'LZW'
+                    )
+
+                    cmd = [
+                        'gm', 'convert',
+                        str(file_path),
+                        '-strip',
+                        '-compress', compression_type,
+                        str(temp_compressed)
+                    ]
 
                     result = subprocess.run(
                         cmd, capture_output=True, text=True, check=False
-                        )
+                    )
                     if result.returncode == 0 and temp_compressed.exists():
                         original_size = file_path.stat().st_size
                         new_size = temp_compressed.stat().st_size
 
-                        if new_size < original_size * 0.99:
+                        if new_size < original_size * TOLERANCE:
                             result_images.append({
                                 'path': file_path,
                                 'original_size': original_size,
@@ -97,7 +112,7 @@ def check_compressable_images(
 def main() -> None: # pragma: no cover
     """Main function to compress images in the repository."""
     repo_path = pathlib.Path('./assets')
-    compressed_images = check_compressable_images(str(repo_path))
+    compressed_images = get_compressible_images(str(repo_path))
 
     if compressed_images:
         space = 0
