@@ -148,6 +148,7 @@ class ValidModelNames(enum.Enum):
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
     CLASSROOM = 'classroom'
+    CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
     CONFIG = 'CONFIG'
     EMAIL = 'email'

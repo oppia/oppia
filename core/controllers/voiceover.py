@@ -20,8 +20,10 @@ from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import voiceover_services
+from core.domain import taskqueue_services
 
 from typing import Dict, TypedDict
+from datetime import datetime
 
 
 class VoiceoverAdminDataHandler(
@@ -271,5 +273,60 @@ class EntityVoiceoversBulkHandler(
 
         self.values.update({
             'entity_voiceovers_list': entity_voiceovers_dicts
+        })
+        self.render_json(self.values)
+
+
+class AutomaticVoiceoverRegenerationRecordHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'start_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'end_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self, start_date: str, end_date: str) -> None:
+        """Gets the automatic voiceover regeneration records between the
+        given start and end date.
+
+        Args:
+            start_date: str. The start date in the format of
+                "Day Month Date Year".
+            end_date: str. The end date in the format of
+                "Day Month Date Year".
+        """
+        # Convert start_date and end_date to datetime objects
+        start_date_obj = datetime.strptime(start_date, "%a %b %d %Y")
+        end_date_obj = datetime.strptime(end_date, "%a %b %d %Y")
+
+        # TODO: Add a filter based on the queue name for voiceover regeneration.
+        cloud_task_models = taskqueue_services.get_all_cloud_task_models()
+
+        filtered_models = [
+            model for model in cloud_task_models
+            if start_date_obj <= model.last_updated <= end_date_obj
+        ]
+
+        cloud_task_run_objects = [
+            taskqueue_services.convert_cloud_task_run_model_to_domain_object(
+                model) for model in filtered_models
+        ]
+
+        self.values.update({
+            'automatic_voiceover_regeneration_records': [
+                cloud_task_run.to_dict()
+                for cloud_task_run in cloud_task_run_objects
+            ]
         })
         self.render_json(self.values)

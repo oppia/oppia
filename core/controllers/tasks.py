@@ -267,7 +267,33 @@ class DeferredTasksHandler(
             raise Exception(
                 'The function id, %s, is not valid.' % payload['fn_identifier'])
 
-        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
-            payload['fn_identifier']]
-        deferred_task_function(*payload['args'], **payload['kwargs'])
+        cloud_task_model_id = payload['cloud_task_model_id']
+        cloud_task_model = taskqueue_services.get_cloud_task_run_by_model_id(
+            cloud_task_model_id)
+        cloud_task_model.latest_job_state = 'RUNNING'
+
+        try:
+            deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
+                payload['fn_identifier']]
+            deferred_task_function(*payload['args'], **payload['kwargs'])
+
+            cloud_task_model.latest_job_state = 'SUCCEEDED'
+
+            taskqueue_services.update_cloud_task_run_model(cloud_task_model)
+        except Exception as e:
+            if (
+                cloud_task_model.current_retry_attempt ==
+                taskqueue_services.CLOUD_TASK_MAX_RETRIES
+            ):
+                cloud_task_model.latest_job_state = 'PERMANENTLY_FAILED'
+            else:
+                cloud_task_model.current_retry_attempt += 1
+                cloud_task_model.latest_job_state = 'FAILED_AND_AWAITING_RETRY'
+
+            cloud_task_model.exception_messages_for_failed_runs.append(str(e))
+
+            taskqueue_services.update_cloud_task_run_model(cloud_task_model)
+
+            raise Exception('Error running deferred task: %s' % e)
+
         self.render_json({})
