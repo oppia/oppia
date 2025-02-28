@@ -18,7 +18,7 @@
 
 // Remove the global assignment if it exists:
 // (window as Window).GifFrames = require('gif-frames');
-
+import {Injectable} from '@angular/core';
 import * as gifFrames from 'gif-frames';
 
 export type GifFramesOptions = Record<string, unknown>;
@@ -30,6 +30,9 @@ interface GifFrame {
   };
 }
 
+@Injectable({
+  providedIn: 'root', // This ensures that the service is available application-wide.
+})
 export class GifFramesService {
   getFrames(options: GifFramesOptions): Promise<GifFrame[]> {
     return gifFrames(options);
