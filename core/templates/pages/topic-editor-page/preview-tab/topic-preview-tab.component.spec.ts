@@ -30,6 +30,7 @@ describe('Topic Preview Tab Component', () => {
   let componentInstance: TopicPreviewTabComponent;
   let testName = 'test_name';
   let mockUrl = 'mock_url';
+  let topicUrl = 'topic_1';
   let storySummaries = [
     new StorySummary(
       'id',
@@ -64,17 +65,21 @@ describe('Topic Preview Tab Component', () => {
           return [];
         },
         getUrlFragment() {
-          return 'topic_1';
+          return topicUrl;
         },
       };
     }
 
-    getCanonicalStorySummaries() {
-      return storySummaries;
+    getClassroomName() {
+      return 'classroom_name';
     }
 
     getClassroomUrlFragment() {
       return 'classroom_1';
+    }
+
+    getCanonicalStorySummaries() {
+      return storySummaries;
     }
   }
 
@@ -117,7 +122,7 @@ describe('Topic Preview Tab Component', () => {
     expect(componentInstance.topicUrlFragment).toEqual('topic_1');
     expect(componentInstance.topicName).toEqual(testName);
     expect(componentInstance.subtopics).toEqual([]);
-    expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
+    expect(componentInstance.canonicalStorySummaries).toEqual(storySummaries);
     expect(componentInstance.chapterCount).toEqual(0);
   });
 
