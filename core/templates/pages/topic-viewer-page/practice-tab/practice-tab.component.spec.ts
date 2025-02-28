@@ -405,7 +405,6 @@ describe('Practice tab component', function () {
     function () {
       spyOn(loaderService, 'showLoadingScreen');
 
-      component.displayArea = 'progressTab';
       component.topicUrlFragment = 'topic_1';
       component.classroomUrlFragment = 'classroom_1';
 
