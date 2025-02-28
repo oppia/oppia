@@ -21,6 +21,7 @@ from __future__ import annotations
 import logging
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -85,10 +86,10 @@ def get_compressible_images(
 
                 cmd = [
                     'gm', 'convert',
-                    str(file_path),
+                    file_path,
                     '-strip',
                     '-compress', compression_type,
-                    str(temp_compressed)
+                    temp_compressed
                 ]
 
                 result = subprocess.run(
@@ -117,11 +118,20 @@ def compressing_images_for_workflow(
     ) -> None:
     """Compresses the images using GraphicsMagick."""
 
+    if os.path.exists(OUTPUT_DIR):
+        shutil.rmtree(OUTPUT_DIR)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     for images in result_images:
         file_extension = images['path'].suffix.lower()
         file_path = images['path']
+
+        rel_path = os.path.relpath(file_path)
+        output_file_path = os.path.join(OUTPUT_DIR, rel_path)
+
+        # Create the directory structure for the output file
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+
         if file_extension not in ALL_IMAGES_EXTENSIONS:
             continue
 
@@ -139,10 +149,10 @@ def compressing_images_for_workflow(
 
                 cmd = [
                     'gm', 'convert',
-                    str(file_path),
+                    file_path,
                     '-strip',
                     '-compress', compression_type,
-                    str(temp_compressed)
+                    output_file_path
                 ]
 
                 result = subprocess.run(

@@ -33,15 +33,15 @@ jobs:
         id: compression
         run: make compress_images
 
-      - name: Send failure notification
-        if: ${{ failure() }}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "Image compression check failed on ${{ github.ref }} in ${{ github.repository }}"
-      
       - name: Upload output files as artifacts
         uses: actions/upload-artifact@v4
         with:
           name: script-output
           path: compressed_images/
           retention-days: 7
+
+      - name: Send failure notification
+        if: ${{ failure() }}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Image compression check failed on ${{ github.ref }} in ${{ github.repository }}"
