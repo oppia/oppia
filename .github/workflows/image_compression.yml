@@ -34,6 +34,7 @@ jobs:
         run: make compress_images
 
       - name: Upload output files as artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: script-output
