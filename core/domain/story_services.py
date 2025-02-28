@@ -934,11 +934,6 @@ def get_model_keys_And_delete_story(
     if story_model is not None:
         story = story_fetchers.get_story_from_model(story_model)
         exp_ids = story.story_contents.get_all_linked_exp_ids()
-        # story_model.delete(
-        #     committer_id,
-        #     feconf.COMMIT_MESSAGE_STORY_DELETED,
-        #     force_deletion=force_deletion
-        # )
         model_to_put.append(story_model.get_models_for_deletion(
             committer_id,
             feconf.COMMIT_MESSAGE_STORY_DELETED))
@@ -955,9 +950,6 @@ def get_model_keys_And_delete_story(
         ).fetch()
     )
     model_to_put.append(list(exploration_context_models))
-    # exp_models.ExplorationContextModel.delete_multi(
-    #     list(exploration_context_models)
-    # )
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -966,7 +958,6 @@ def get_model_keys_And_delete_story(
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
-    # delete_story_summary(story_id)
     keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_keys_for_delete())
 
     # Delete the opportunities available.

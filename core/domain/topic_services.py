@@ -1039,9 +1039,7 @@ def delete_topic_transactional(
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_keys = topic_rights_model.get_datastore_keys_for_delete()
     keys_to_delete.append(topic_rights_keys)
-    # topic_summary_model =topic_models.TopicSummaryModel.get(topic_id)
-    # topic_summary_keys = topic_summary_model.get_datastore_keys_for_delete()
-    # keys_to_delete.append(topic_summary_keys)
+    delete_topic_summary(topic_id)
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         
@@ -1093,20 +1091,12 @@ def delete_topic(
         model_to_put: List[base_models.BaseModel] = []
         keys_to_delete: List[datastore_services.Key] = []
         topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
-        # topic_rights_model.delete(
-        #     committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
-        #     force_deletion=force_deletion)
         model_to_put.append(topic_rights_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
 
-        # Delete the summary of the topic (regardless of whether
-        # force_deletion is True or not).
-        # delete_topic_summary(topic_id)
-        keys_to_delete.append(topic_models.TopicSummaryModel.get(topic_id).get_datastore_keys_for_delete())
+        delete_topic_summary(topic_id)
         topic_model = topic_models.TopicModel.get(topic_id)
         for subtopic in topic_model.subtopics:
-            # subtopic_page_services.delete_subtopic_page(
-            #     committer_id, topic_id, subtopic['id'])
             model_to_put.append(subtopic_page_services.get_model_instances_for_delete_subtopic_page(
                 committer_id, topic_id, subtopic['id']))
 
