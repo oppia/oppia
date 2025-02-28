@@ -30,10 +30,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {BlogDashboardPageRootComponent} from './blog-dashboard-page-root.component';
 import {BlogAuthorDetailsEditorComponent} from './modal-templates/author-detail-editor-modal.component';
 import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
-import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {RequestInterceptor} from 'services/request-interceptor.service';
 import {RteHelperService} from 'services/rte-helper.service';
-
 @NgModule({
   imports: [
     SharedComponentsModule,
@@ -60,13 +57,6 @@ import {RteHelperService} from 'services/rte-helper.service';
     BlogDashboardPageComponent,
     BlogAuthorDetailsEditorComponent,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    RteHelperService,
-  ],
+  providers: [RteHelperService],
 })
 export class BlogDashboardPageModule {}
