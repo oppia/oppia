@@ -532,6 +532,9 @@ def get_model_for_delete_exp_opportunities_corresponding_to_story(story_id: str)
 
     Args:
         story_id: str. The ID of the story.
+
+    Returns:
+        list(BaseModel). List of BaseModel.
     """
     exp_opprtunity_model_class = (
         opportunity_models.ExplorationOpportunitySummaryModel)

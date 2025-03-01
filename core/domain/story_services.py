@@ -926,6 +926,12 @@ def get_model_keys_And_delete_story(
             its history are marked as deleted, but the corresponding models are
             still retained in the datastore. This last option is the preferred
             one.
+    
+    Returns:
+        Dict[str, Union[List[base_models.BaseModel], List[datastore_services.Key]]]: 
+        A dictionary containing:
+            - "model_to_put": A list of BaseModel instances to be updated.
+            - "keys_to_delete": A list of datastore key instances to be deleted.
     """
 
     story_model = story_models.StoryModel.get(story_id, strict=False)

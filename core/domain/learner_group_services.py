@@ -742,6 +742,9 @@ def get_model_remove_story_reference_from_learner_groups(story_id: str) -> List[
 
     Args:
         story_id: str. Story id to remove.
+
+    Returns:
+        list(BaseModel). List of BaseModel.
     """
     found_models: Sequence[learner_group_models.LearnerGroupModel] = (
         learner_group_models.LearnerGroupModel.get_all().filter(
@@ -799,6 +802,9 @@ def get_instance_for_subtopic_page_removal(
     Args:
         topic_id: str. Id of the topic of the subtopic page.
         subtopic_id: int. Id of the subtopic of the subtopic page.
+
+    Returns:
+        list(BaseModel). List of BaseModel.
     """
     subtopic_page_id = '{}:{}'.format(topic_id, subtopic_id)
 

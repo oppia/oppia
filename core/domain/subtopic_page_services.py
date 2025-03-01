@@ -353,6 +353,9 @@ def get_model_instances_for_delete_subtopic_page(
         committer_id: str. The user who is deleting the subtopic page.
         topic_id: str. The ID of the topic that this subtopic belongs to.
         subtopic_id: int. ID of the subtopic which was removed.
+    
+    Returns:
+        list(BaseModel). List of BaseModel.
     """
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
