@@ -395,3 +395,46 @@ class EntityVoiceoversBulkHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             len(json_response['entity_voiceovers_list']), 2)
+
+
+class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
+    """Test to regenerate voiceover for the given exploration data."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+
+        self.exploration = self.save_new_valid_exploration(
+            'exp_id', 'user_id', title='Exploration 1')
+
+    def test_should_be_able_to_regenerate_voiceovers(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'exploration_id': self.exploration.id,
+            'language_accent_code': 'en-US',
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'exploration_version': 1
+        }
+
+        response_dict = self.put_json(
+            feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+            payload, csrf_token=csrf_token)
+
+        expected_sentence_tokens_with_durations = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0}
+        ]
+
+        self.assertEqual(
+            response_dict['sentence_tokens_with_durations'],
+            expected_sentence_tokens_with_durations)
+        self.assertTrue(response_dict['filename'].startswith('content_0-en-US'))
+
+        self.logout()

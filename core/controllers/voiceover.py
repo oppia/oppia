@@ -19,8 +19,8 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import voiceover_services
 from core.domain import voiceover_regeneration_services
+from core.domain import voiceover_services
 
 from typing import Dict, TypedDict
 
@@ -319,7 +319,7 @@ class RegenerateAutomaticVoiceoverHandler(
 
     @acl_decorators.open_access
     def put(self) -> None:
-        """Updates voice artist data from the voiceover admin page."""
+        """Regenerates the voiceover for the given exploration data."""
         assert self.normalized_payload is not None
         exploration_id = self.normalized_payload['exploration_id']
         state_name = self.normalized_payload['state_name']
