@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import collections
 import datetime
 import logging
 import os
@@ -143,14 +144,14 @@ class GitHubService:
 
         issues_list = []
         for issue_data in response.json():
-            if isinstance(issue_data, dict):
-                typed_issue_data: IssueDict = {
-                    'number': issue_data['number'],
-                    'assignee': issue_data.get('assignee'),
-                    'events_url': issue_data['events_url']
-                }
-                issue = Issue.from_github_data(typed_issue_data)
-                issues_list.append(issue)
+            assert isinstance(issue_data, dict)
+            typed_issue_data: IssueDict = {
+                'number': issue_data['number'],
+                'assignee': issue_data.get('assignee'),
+                'events_url': issue_data['events_url']
+            }
+            issue = Issue.from_github_data(typed_issue_data)
+            issues_list.append(issue)
 
         return issues_list
 
@@ -175,8 +176,8 @@ class GitHubService:
 
         collaborators = set()
         for collaborator_dict in response.json():
-            if isinstance(collaborator_dict, dict):
-                collaborators.add(collaborator_dict['login'])
+            assert isinstance(collaborator_dict, dict)
+            collaborators.add(collaborator_dict['login'])
 
         return collaborators
 
@@ -261,7 +262,7 @@ class GitHubService:
             'cursor': None
         }
 
-        issue_to_prs: Dict[int, Set[int]] = {}
+        issue_to_prs = collections.defaultdict(set)
         has_next_page = True
 
         while has_next_page:
@@ -280,13 +281,10 @@ class GitHubService:
 
             for pr in pull_requests['nodes']:
                 pr_number = pr['number']
-                linked_issues = pr['closingIssuesReferences']['nodes']
-                if linked_issues:
-                    for issue in linked_issues:
-                        issue_number = issue['number']
-                        if issue_number not in issue_to_prs:
-                            issue_to_prs[issue_number] = set()
-                        issue_to_prs[issue_number].add(pr_number)
+                linked_issues = pr['closingIssuesReferences']['nodes'] or []
+                for issue in linked_issues:
+                    issue_number = issue['number']
+                    issue_to_prs[issue_number].add(pr_number)
 
             page_info = pull_requests['pageInfo']
             has_next_page = page_info['hasNextPage']
@@ -338,7 +336,7 @@ class GitHubService:
         comment = (
             f'Hi @{issue.assignee_username} this PR is inactive '
             f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
-            f'unassigned soon if no activity is done.\n '
+            f'unassigned soon if no activity is done.\n\n '
             f'If you are still working on this PR, '
             f'please make a follow-up commit within'
             f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
@@ -355,7 +353,7 @@ class GitHubService:
             raise AssertionError('Received null res while commenting on issue')
         response.raise_for_status()
 
-    def remove_assignee_comment_on_issue(self, issue: Issue) -> None:
+    def post_unassignment_comment(self, issue: Issue) -> None:
         """Posts unassignment comment on an issue.
 
         Args:
@@ -450,7 +448,7 @@ class IssueManager:
         for issue in issues:
             try:
                 if self.github.unassign_issue(issue):
-                    self.github.remove_assignee_comment_on_issue(issue)
+                    self.github.post_unassignment_comment(issue)
                     logging.info(
                         'Unassigned issue #%d from %s',
                         issue.number, issue.assignee_username

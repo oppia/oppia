@@ -651,7 +651,7 @@ class TestGitHubService(unittest.TestCase):
         mock_post.assert_called_once()
 
     @mock.patch('requests.post')
-    def test_remove_assignee_comment_on_issue(
+    def test_post_unassignment_comment(
         self, mock_post: mock.MagicMock
     ) -> None:
         """Test posting unassignment comment on an issue."""
@@ -660,7 +660,7 @@ class TestGitHubService(unittest.TestCase):
         mock_post.return_value = mock_response
 
         issue = checker.Issue(1, 'user1', 'events_url')
-        self.service.remove_assignee_comment_on_issue(issue)
+        self.service.post_unassignment_comment(issue)
 
         expected_comment = (
             f'@user1 has been unassigned from this issue '
@@ -677,7 +677,7 @@ class TestGitHubService(unittest.TestCase):
         )
 
     @mock.patch('requests.post')
-    def test_remove_assignee_comment_on_issue_error(
+    def test_post_unassignment_comment_error(
         self, mock_post: mock.MagicMock
     ) -> None:
         """Test posting unassignment comment on an issue with error."""
@@ -685,7 +685,7 @@ class TestGitHubService(unittest.TestCase):
 
         issue = checker.Issue(1, 'user1', 'events_url')
         with self.assertRaises(Exception) as context:
-            self.service.remove_assignee_comment_on_issue(issue)
+            self.service.post_unassignment_comment(issue)
         self.assertEqual(
             str(context.exception),
             'Network error'
@@ -750,7 +750,7 @@ class TestIssueManager(unittest.TestCase):
 
         self.assertEqual(self.github_service.unassign_issue.call_count, 2)
         self.assertEqual(
-            self.github_service.remove_assignee_comment_on_issue.call_count, 1
+            self.github_service.post_unassignment_comment.call_count, 1
         )
 
     def test_unassign_issues_error(self) -> None:
@@ -761,7 +761,7 @@ class TestIssueManager(unittest.TestCase):
         self.manager.unassign_issues([issue])
 
         self.github_service.unassign_issue.assert_called_once_with(issue)
-        self.github_service.remove_assignee_comment_on_issue.assert_not_called()
+        self.github_service.post_unassignment_comment.assert_not_called()
 
 
 if __name__ == '__main__':
