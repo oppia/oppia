@@ -16,7 +16,7 @@
  * @fileoverview Component for exploration metadata modal.
  */
 
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
@@ -71,8 +71,7 @@ export class ExplorationMetadataModalComponent
     private explorationStatesService: ExplorationStatesService,
     private explorationTagsService: ExplorationTagsService,
     private explorationTitleService: ExplorationTitleService,
-    private ngbActiveModal: NgbActiveModal,
-    private changeDetectorRef: ChangeDetectorRef
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
@@ -103,13 +102,17 @@ export class ExplorationMetadataModalComponent
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
     let tagRegex = new RegExp(AppConstants.TAG_REGEX);
-    const currentTags = this.explorationTagsService.displayed as string[];
 
     // Add our explorationTags.
     if (value) {
-      if (!currentTags || currentTags.length < 10) {
+      if (
+        !this.explorationTagsService.displayed ||
+        (this.explorationTagsService.displayed as []).length < 10
+      ) {
         if (
-          currentTags.includes(value.toLowerCase()) ||
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
           !value.match(tagRegex)
         ) {
           // Clear the input value.
@@ -121,6 +124,7 @@ export class ExplorationMetadataModalComponent
         this.explorationTags.push(value.toLowerCase());
       }
     }
+
     // Clear the input value.
     event.input.value = '';
     this.tagIsInvalid = false;
@@ -138,7 +142,7 @@ export class ExplorationMetadataModalComponent
     this.explorationTagsService.displayed = this.explorationTags;
   }
 
-  async save(): Promise<void> {
+  save(): void {
     if (!this.areRequiredFieldsFilled()) {
       return;
     }
@@ -161,12 +165,12 @@ export class ExplorationMetadataModalComponent
       metadataList.push('tags');
     }
 
-    // Save displayed values sequentially to prevent race conditions.
-    await this.explorationTitleService.saveDisplayedValue();
-    await this.explorationObjectiveService.saveDisplayedValue();
-    await this.explorationCategoryService.saveDisplayedValue();
-    await this.explorationLanguageCodeService.saveDisplayedValue();
-    await this.explorationTagsService.saveDisplayedValue();
+    // Save all the displayed values.
+    this.explorationTitleService.saveDisplayedValue();
+    this.explorationObjectiveService.saveDisplayedValue();
+    this.explorationCategoryService.saveDisplayedValue();
+    this.explorationLanguageCodeService.saveDisplayedValue();
+    this.explorationTagsService.saveDisplayedValue();
 
     this.ngbActiveModal.close(metadataList);
   }
@@ -184,6 +188,7 @@ export class ExplorationMetadataModalComponent
       this.alertsService.addWarning('Please specify a category');
       return false;
     }
+
     return true;
   }
 
@@ -230,6 +235,7 @@ export class ExplorationMetadataModalComponent
           );
         }
       );
+
       // If the current category is not in the dropdown, add it
       // as the first option.
       if (
@@ -245,7 +251,11 @@ export class ExplorationMetadataModalComponent
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     this.explorationTags = this.explorationTagsService.displayed as string[];
-    this.isValueHasbeenUpdated = true;
-    this.changeDetectorRef.detectChanges();
+
+    // This logic has been used here to
+    // solve ExpressionChangedAfterItHasBeenCheckedError error.
+    setTimeout(() => {
+      this.isValueHasbeenUpdated = true;
+    });
   }
 }
