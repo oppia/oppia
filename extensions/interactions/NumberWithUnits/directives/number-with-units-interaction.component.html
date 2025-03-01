@@ -2,6 +2,7 @@
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <input type="text"
          name="answer"
+         aria-label="Your answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
          class="form-control"
