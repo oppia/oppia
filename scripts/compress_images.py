@@ -29,9 +29,12 @@ import tempfile
 from PIL import Image
 from typing import List, TypedDict, Union
 
-ALL_IMAGES_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp'}
 IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION = {'.png'}
 IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION = {'.jpg', '.jpeg', '.webp'}
+ALL_IMAGES_EXTENSIONS = Union[
+    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION,
+    IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION
+]
 TOLERANCE = 0.99
 OUTPUT_DIR = 'compressed_images'
 
@@ -51,7 +54,7 @@ def get_compressible_images(
     This function scans a directory for images, attempts to compress them using 
     GraphicsMagick, and identifies those that can be reduced in size. The 
     compression benchmark is set to 99% of the original file size, meaning only 
-    images that achieve at least a 1% reduction are considered compressible.
+    images that admit at least a 1% reduction are considered compressible.
 
     Args:
         path (Union[str, pathlib.Path]):
@@ -113,7 +116,7 @@ def get_compressible_images(
 
     return result_images
 
-def compressing_images_for_workflow(
+def compress_images_for_workflow(
         result_images: List[CompressedImageInfo]
     ) -> None:
     """Compresses the images using GraphicsMagick."""
@@ -189,7 +192,17 @@ if __name__ == '__main__':  # pragma: no cover
 
         print(f'\nTotal space saved: {TOTAL_SPACE_SAVED} bytes\n')
         #  compressing images for CI workflow artifacts. 
-        compressing_images_for_workflow(compressed_images); 
+        compress_images_for_workflow(compressed_images); 
+        print(
+            f'\nCompressed images have been saved to the compressed_images directory.'
+            f'These images will be uploaded as GitHub workflow artifacts.'
+            f'\nTo use these compressed images in your PR:'
+            f'1. Go to the GitHub Actions tab in your repository.'
+            f'2. Find the workflow run for your PR.'
+            f'3. Download the script-output artifact.'
+            f'4. Extract the downloaded zip file.'
+            f'5. Copy the compressed images to their respective locations in your repository.'
+        )
         sys.exit(1)
     else:
         print('No images could be compressed further.')

@@ -15,34 +15,27 @@ on:
 
 jobs:
   run_compression_check:
-    name: Run Image Compression Check
+    name: Check for any compressible images
     runs-on: ubuntu-22.04
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          architecture: 'x64'
-
-      - name: Run Image Compression Check
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run compress_images script to get compressible images, if any
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         id: compression
         run: make compress_images
-
       - name: Upload output files as artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: script-output
+          name: compressed-images
           path: compressed_images/
           retention-days: 7
-
-      - name: Send failure notification
-        if: ${{ failure() }}
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "Image compression check failed on ${{ github.ref }} in ${{ github.repository }}"
+          message: "Check compressible images failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
