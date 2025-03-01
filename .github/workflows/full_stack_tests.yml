@@ -163,7 +163,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
           python -m scripts.run_acceptance_tests 
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
-      - name: Uploading Desktop test screenshots as Artifacts
+      - name: Upload desktop test screenshots as artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
@@ -190,7 +190,7 @@ jobs:
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
-      - name: Uploading Mobile test screenshots as Artifacts
+      - name: Upload mobile test screenshots as artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:

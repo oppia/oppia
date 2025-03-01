@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Custom jest environment file.
+ * @fileoverview Custom Jest environment for enhanced test failure handling.
+ * 
+ * This custom Jest environment extends NodeEnvironment to detect test failures
+ * in real-time and trigger actions like capturing screenshots for debugging.
  */
 
 const fs = require('fs');
@@ -25,14 +28,12 @@ const CONFIG_FILE = path.resolve(__dirname, 'jest-runtime-config.json');
 
 class CustomJestEnvironment extends NodeEnvironment {
   async handleTestEvent(event) {
-    if (event.name === 'test_done') {
-      if (event.test.errors.length > 0) {
-        showMessage('Test failed: Capturing screenshots...');
-        fs.writeFileSync(
-          CONFIG_FILE,
-          JSON.stringify({testFailureDetected: true})
-        );
-      }
+    if (event.name === 'test_done' && event.test.errors.length > 0) {
+      showMessage('Test failed: Capturing screenshots...');
+      fs.writeFileSync(
+        CONFIG_FILE,
+        JSON.stringify({testFailureDetected: true})
+      );
     }
   }
 }
