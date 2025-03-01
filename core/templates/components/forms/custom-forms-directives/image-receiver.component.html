@@ -92,7 +92,7 @@
     border-radius: 2px;
     bottom: 6px;
     cursor: pointer;
-    display: inline;
+    display: inline-block;
     font-size: 16px;
     font-weight: normal;
     padding: 4px 8px;
@@ -126,7 +126,7 @@
   .image-receiver-error-message {
     color: red;
     display: inline-block;
-    font-size: 16;
+    font-size: 16px;
     padding: 4px;
   }
 
@@ -157,38 +157,59 @@
     width: 100%;
   }
 
-  @media(max-width:768px) {
+  @media (max-width: 768px) {
     .mat-icon {
       font-size: 30px;
       height: 30px;
       width: 30px;
     }
 
-    .font-weight-light {
-      font-size: 12px;
-      font-weight: 300 !important;
-    }
-
     .image-receiver-license-warning {
-      bottom: 50px;
+      bottom: auto;
+      left: auto;
+      margin: 10px auto;
+      padding: 8px;
+      position: relative;
+      right: auto;
+      width: calc(100% - 20px);
     }
 
     .image-receiver-drop-area {
-      padding-top: 8px;
-      text-align: left;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      justify-content: flex-start;
+      min-height: 320px;
+      padding: 15px 10px;
+    }
+
+    .image-receiver-text {
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    .image-upload-instructions {
+      padding-left: 15px;
+    }
+
+    .image-upload-instructions li {
+      margin-bottom: 3px;
     }
 
     label.image-receiver-upload-label-button {
-      left: 8px;
+      bottom: auto;
+      display: block;
+      margin: 10px auto;
+      max-width: 200px;
+      position: relative;
       right: auto;
-    }
-
-    .image-receiver-drop-area.image-receiver-is-narrow {
-      height: 35px;
+      width: 80%;
     }
 
     .image-receiver-error-message {
       font-size: 10px;
+      margin: 5px 0;
     }
 
     .image-receiver-error-message i {
