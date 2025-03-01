@@ -1,4 +1,3 @@
-// Declaration file for the 'gif-frames' module.
-//  This file declares the module 'gif-frames' so that TypeScript does not throw errors when importing it. The module is treated with an 'any' type.
+//  This file declares the module 'gif-frames' so that TypeScript does not throw errors when importing it.
 
 declare module 'gif-frames';

@@ -43,12 +43,6 @@ import {GifFramesService} from '../../../core/templates/third-party-imports/gif-
 
 let gifshot = require('gifshot');
 
-// Declare global {
-//   interface Window {
-//     GifFrames: Function;
-//   }
-// }
-
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
   let fixture: ComponentFixture<ImageEditorComponent>;
