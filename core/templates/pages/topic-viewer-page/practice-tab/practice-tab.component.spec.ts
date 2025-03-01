@@ -268,6 +268,7 @@ describe('Practice tab component', function () {
     fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen');
 
+      component.displayArea = 'progressTab';
       component.selectedSubtopicIndices[0] = true;
       component.topicUrlFragment = 'topic_1';
       component.classroomUrlFragment = 'classroom_1';
