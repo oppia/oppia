@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Custom Jest environment for enhanced test failure handling.
- * 
+ *
  * This custom Jest environment extends NodeEnvironment to detect test failures
  * in real-time and trigger actions like capturing screenshots for debugging.
  */
