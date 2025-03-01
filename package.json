@@ -89,7 +89,7 @@
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.0.3",
     "htmllint": "^0.8.0",
-    "htmllint-cli": "git+https://github.com/oppia/htmllint-cli#01a8b74",
+    "htmllint-cli": "git+https://github.com/oppia/htmllint-cli.git#01a8b74",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^7.0.0",
@@ -189,7 +189,7 @@
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "globalthis": "^1.0.2",
-    "guppy-dev": "git+https://github.com/oppia/guppy#f509e",
+    "guppy-dev": "git+https://github.com/oppia/guppy.git#f509e",
     "hammerjs": "^2.0.8",
     "hash-wasm": "^4.4.1",
     "headroom.js": "^0.12.0",
@@ -200,7 +200,7 @@
     "lodash": "^4.17.14",
     "mathjs": "^9.0.0",
     "messageformat": "^2.3.0",
-    "midi": "git+https://github.com/oppia/miDI.js#c26eb",
+    "midi": "git+https://github.com/oppia/miDI.js.git#c26eb",
     "mousetrap": "^1.6.5",
     "nerdamer": "^1.1.4",
     "ng-circle-progress": "1.6.0",
@@ -218,12 +218,14 @@
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
-    "skulpt-dist": "git+https://github.com/skulpt/skulpt-dist#7b61d",
+    "skulpt-dist": "git+https://github.com/skulpt/skulpt-dist.git#7b61d",
     "stream-browserify": "^3.0.0",
     "ts-morph": "^22.0.0",
     "tslib": "^2.0.0",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
     "wdio-intercept-service": "^4.2.2"
-  }
+  },
+  "main": ".lighthouserc-accessibility.js",
+  "type": "commonjs"
 }
