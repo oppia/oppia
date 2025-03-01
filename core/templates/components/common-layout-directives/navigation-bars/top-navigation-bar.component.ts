@@ -70,7 +70,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      year: '2023',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      year: '2022',
+    },
+  ];
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -219,11 +228,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    this.learnerGroupBackendApiService
-      .isLearnerGroupFeatureEnabledAsync()
-      .then(featureIsEnabled => {
-        this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-      });
+    if (this.currentUrl !== 'signup') {
+      this.learnerGroupBackendApiService
+        .isLearnerGroupFeatureEnabledAsync()
+        .then(featureIsEnabled => {
+          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
+        });
+    }
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();

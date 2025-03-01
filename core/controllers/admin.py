@@ -961,7 +961,8 @@ class AdminHandler(
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1, 'help-jamie-win-arcade')
+                topic_id_1, 'help-jamie-win-arcade', 'dummy-meta-content',
+                'thumbnail.svg', '#F8BF74')
 
             story_node_dicts = [{
                 'exp_id': '6',

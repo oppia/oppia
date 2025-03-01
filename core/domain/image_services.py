@@ -24,7 +24,7 @@ from PIL import Image
 from typing import Tuple
 
 
-def _get_pil_image_dimensions(pil_image: Image) -> Tuple[int, int]:
+def _get_pil_image_dimensions(pil_image: Image.Image) -> Tuple[int, int]:
     """Gets the dimensions of the Pillow Image.
 
     Args:
@@ -78,7 +78,7 @@ def compress_image(image_content: bytes, scaling_factor: float) -> bytes:
 
     # NOTE: image.thumbnail() function does not work when the scale factor
     # is greater than 1.
-    image.thumbnail(new_image_dimensions, Image.LANCZOS)
+    image.thumbnail(new_image_dimensions, Image.Resampling.LANCZOS)
     with io.BytesIO() as output:
         image.save(output, format=image_format)
         new_image_content = output.getvalue()
