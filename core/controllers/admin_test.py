@@ -1795,6 +1795,63 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(generated_chapters_count, 7)
         self.logout()
 
+    def test_generate_dummy_chapters_when_story_contents_is_not_none(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story.story_contents.next_node_id = 'node_4'
+
+        def reload_exploration(user_id, exploration_id: str) -> None:
+            if constants.DEV_MODE:
+                logging.info(
+                    '[ADMIN] %s reloaded exploration %s' %
+                    (user_id, exploration_id))
+                exp_services.load_demo(exploration_id)
+                rights_manager.release_ownership_of_exploration(
+                    user_services.get_system_user(), exploration_id)
+            else:
+                raise Exception('Cannot reload an exploration in production.')
+
+        reload_exploration(self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL), '6'
+        )
+        story.add_node('node_4', 'title')
+        story.update_node_exploration_id('node_4', '6')
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+                ), story
+        )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+                ), 'topic', 'story_id'
+        )
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 2
+            }, csrf_token=csrf_token)
+
+        self.assertNotEqual(len(story.story_contents.nodes), 3)
+        self.logout()
+
     def test_raises_error_if_not_curriculum_admin(# pylint: disable=line-too-long
             self
         ) -> None:

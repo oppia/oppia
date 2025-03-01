@@ -1973,14 +1973,6 @@ class AdminHandler(
                     self.user_id, story_id, story_change_list,
                     'add node', story.corresponding_topic_id
                 )
-
-            if (
-                not story_services
-                    .is_story_published_and_present_in_topic(story)
-                ):
-                topic_id = story.corresponding_topic_id
-                topic_services.publish_story(
-                    topic_id, story_id, str(self.user_id))
         else:
             raise Exception(
                 'Cannot generate dummy chapters in production.')
