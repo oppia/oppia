@@ -1088,11 +1088,10 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
         """
         translation_contribution_stats = list(translation_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
-        invalid_topic_ids_with_contribution_stats: List[str] = []
         for stat in translation_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
-                invalid_topic_ids_with_contribution_stats.append(stat.topic_id)
+                translation_contribution_stats.remove(stat)
             else:
                 valid_topic_ids_with_contribution_stats.append(stat.topic_id)
 
@@ -1105,57 +1104,73 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
 
         with datastore_services.get_ndb_context():
             for s in general_suggestion_models:
+
                 story_id = exp_services.get_story_id_linked_to_exploration(
                     s.target_id)
-                if story_id is not None:
-                    story = story_fetchers.get_story_by_id(story_id)
-                    if story is not None:
-                        topic_id = story.corresponding_topic_id
-                        if topic_id not in (
-                            valid_topic_ids_with_contribution_stats):
-                            # Valid stats model does not exists.
-                            logged_suggestions_count += 1
-                            debug_logs += (
-                                '{\n'
-                                f'suggestion_id: {s.id},\n'
-                                f'suggestion_type: {s.suggestion_type},\n'
-                                f'target_type: {s.target_type},\n'
-                                f'traget_id: {s.target_id},\n'
-                                'target_verion_at_submission: '
-                                f'{s.target_version_at_submission},\n'
-                                f'status: {s.status},\n'
-                                f'language_code: {s.language_code},\n'
-                                f'corresponding_topic_id: [\n'
-                                )
-                            if topic_id in (
-                                invalid_topic_ids_with_contribution_stats):
-                                debug_logs += (
-                                    '{'
-                                    f'topic_id: {topic_id}, '
-                                    'problem: invalid_topic},\n' 
-                                )
-                            else:
-                                debug_logs += (
-                                    '{'
-                                    f'topic_id: {topic_id}, '
-                                    'problem: no_stats_model},\n' 
-                                )
-                            debug_logs += (
-                                '],\n')
+                if story_id is None:
+                    logged_suggestions_count += 1
+                    debug_logs += (
+                        # No exp context model exists.
+                        '{\n'
+                        f'suggestion_id: {s.id},\n'
+                        f'suggestion_type: {s.suggestion_type},\n'
+                        f'target_type: {s.target_type},\n'
+                        f'traget_id: {s.target_id},\n'
+                        'target_verion_at_submission: '
+                        f'{s.target_version_at_submission},\n'
+                        f'status: {s.status},\n'
+                        f'language_code: {s.language_code},\n'
+                        'corresponding_topic_id: [\n{'
+                        f'topic_id: None, '
+                        'problem: no_exp_context_model},\n],\n')
 
-                            # Check if xploration opportunity model exists.
-                            opportunity_model_exists = (
-                                opportunity_models
-                                    .ExplorationOpportunitySummaryModel
-                                        .get_by_id(
-                                            s.target_id) is not (
-                                                None)
-                            )
-                            debug_logs += (
-                                'exp_opportunity_model_exists: '
-                                f'{opportunity_model_exists},\n'
-                                '},\n'
-                            )
+                    # Check if xploration opportunity model exists.
+                    opportunity_model_exists = (
+                        opportunity_models
+                            .ExplorationOpportunitySummaryModel
+                                .get_by_id(
+                                    s.target_id) is not (
+                                        None)
+                    )
+                    debug_logs += (
+                        'exp_opportunity_model_exists: '
+                        f'{opportunity_model_exists},\n'
+                        '},\n'
+                    )
+                else:
+                    story = story_fetchers.get_story_by_id(story_id)
+                    topic_id = story.corresponding_topic_id
+                    if topic_id not in (
+                        valid_topic_ids_with_contribution_stats):
+                        # Valid stats model does not exists.
+                        logged_suggestions_count += 1
+                        debug_logs += (
+                            '{\n'
+                            f'suggestion_id: {s.id},\n'
+                            f'suggestion_type: {s.suggestion_type},\n'
+                            f'target_type: {s.target_type},\n'
+                            f'traget_id: {s.target_id},\n'
+                            'target_verion_at_submission: '
+                            f'{s.target_version_at_submission},\n'
+                            f'status: {s.status},\n'
+                            f'language_code: {s.language_code},\n'
+                            'corresponding_topic_id: [\n{'
+                            f'topic_id: {topic_id}, '
+                            'problem: no_stats_model},\n],\n')
+
+                        # Check if xploration opportunity model exists.
+                        opportunity_model_exists = (
+                            opportunity_models
+                                .ExplorationOpportunitySummaryModel
+                                    .get_by_id(
+                                        s.target_id) is not (
+                                            None)
+                        )
+                        debug_logs += (
+                            'exp_opportunity_model_exists: '
+                            f'{opportunity_model_exists},\n'
+                            '},\n'
+                        )
 
         if logged_suggestions_count == 0:
             return None
@@ -1191,11 +1206,10 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
         """
         question_contribution_stats = list(question_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
-        invalid_topic_ids_with_contribution_stats: List[str] = []
         for stat in question_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
-                invalid_topic_ids_with_contribution_stats.append(stat.topic_id)
+                question_contribution_stats.remove(stat)
             else:
                 valid_topic_ids_with_contribution_stats.append(stat.topic_id)
 
@@ -1225,23 +1239,9 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             'target_verion_at_submission: '
                             f'{s.target_version_at_submission},\n'
                             f'status: {s.status},\n'
-                            f'corresponding_topic_id: [\n'
-                            )
-                        if t.topic_id in (
-                            invalid_topic_ids_with_contribution_stats):
-                            debug_logs += (
-                                '{'
-                                f'topic_id: {t.topic_id}, '
-                                'problem: invalid_topic},\n' 
-                            )
-                        else:
-                            debug_logs += (
-                                '{'
-                                f'topic_id: {t.topic_id}, '
-                                'problem: no_stats_model},\n' 
-                            )
-                        debug_logs += (
-                            '],\n')
+                            'corresponding_topic_id: [\n{'
+                            f'topic_id: {t.topic_id}, '
+                            'problem: no_stats_model},\n],\n')
 
                         # Check if xploration opportunity model exists.
                         opportunity_model_exists = (
@@ -1259,21 +1259,3 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             return None
         else:
             return (logged_suggestions_count, debug_logs)
-
-    @staticmethod
-    def not_validate_topic(topic_id: str) -> bool:
-        """Validates if there exist a topic with a given topic ID.
-
-        Args:
-            topic_id: str. The id of the topic that needs to be validated.
-
-        Returns:
-            bool. True if topic doesn't exist and False if topic exists.
-        """
-        with datastore_services.get_ndb_context():
-            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-
-        if topic is None:
-            return True
-
-        return False

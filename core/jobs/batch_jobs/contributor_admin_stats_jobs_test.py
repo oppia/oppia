@@ -716,6 +716,22 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
 
+        self.transaltion_suggestion_model_with_none_story_id = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            id=39,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp5',
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user5',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
         self.exp_1 = self.create_model(
             exp_models.ExplorationModel,
             id=self.target_id,
@@ -1977,15 +1993,18 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
     def test_job_audits_admin_stats(self) -> None:
 
         self.translation_contribution_model_3.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps() # pylint: disable=line-too-long
         self.translation_review_model_1.update_timestamps()
         self.translation_review_model_2.update_timestamps()
         self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
         self.question_review_model_1.update_timestamps()
         self.question_review_model_2.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
         self.question_suggestion_accepted_model_user2.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
         self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.transaltion_suggestion_model_with_none_story_id.update_timestamps() # pylint: disable=line-too-long
         self.topic_model_1.update_timestamps()
         self.topic_model_2.update_timestamps()
         self.exp_1.update_timestamps()
@@ -1997,15 +2016,18 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
 
         self.put_multi([
             self.translation_contribution_model_3,
+            self.translation_contribution_model_with_invalid_topic,
             self.translation_review_model_1,
             self.translation_review_model_2,
             self.question_contribution_model_1,
+            self.question_contribution_model_with_invalid_topic,
             self.question_review_model_1,
             self.question_review_model_2,
             self.question_suggestion_accepted_model,
             self.question_suggestion_accepted_model_user2,
             self.translation_suggestion_rejected_model_user1,
             self.translation_suggestion_rejected_model_user2,
+            self.transaltion_suggestion_model_with_none_story_id,
             self.topic_model_1,
             self.topic_model_2,
             self.exp_1,
@@ -2025,6 +2047,13 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
                 'topic_id: topic1, problem: no_stats_model},\n],\n'
                 'exp_opportunity_model_exists: False,\n},\n')),
             job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 39,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp5,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' review,\nlanguage_code: hi,\ncorresponding_topic_id: [\n{'
+                'topic_id: None, problem: no_exp_context_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
                 '<====QUESTION_CONTRIBUTION====>\n{\nsuggestion_id: 27,\n'
                 'suggestion_type: add_question,\ntarget_type: exploration,'
                 '\ntraget_id: exp1,\ntarget_verion_at_submission: 1,\nstatus:'
@@ -2041,5 +2070,5 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
             job_run_result.JobRunResult(stdout=(
                 'LOGGED QUESTION SUGGESTION COUNT SUCCESS: 2')),
             job_run_result.JobRunResult(stdout=(
-                'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 1'))
+                'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 2'))
         ])
