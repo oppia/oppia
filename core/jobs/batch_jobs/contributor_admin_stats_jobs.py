@@ -35,10 +35,11 @@ from typing import Iterable, List, Optional, Tuple
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
+    from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([
-    models.Names.SUGGESTION
+(opportunity_models, suggestion_models, ) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -883,932 +884,400 @@ class AuditGenerateContributorAdminStatsJob(
     DATASTORE_UPDATES_ALLOWED = False
 
 
-class LogSuggestionAndStatsJob(base_jobs.JobBase):
-    """Job that returns suggestion models and their corresponding contribution
-    and reviewer stats as job run results.
+class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
+    """Job that finds the suggestion models for which stats models are missing
+    and log them as job run results. Also then verify whether there are
+    opportunity models for these suggestions and log them along with the
+    suggestion model.
     """
 
-    # We're not updating any datastore.
     DATASTORE_UPDATES_ALLOWED = False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns suggestion models and corresponding contribution and
-        reviewer stats.
+        """Return the suggestion models for which stats models are missing
+        contribution stats models along with a boolean field, showing the
+        existence of corresponding opportunity model.
 
         Returns:
-            PCollection. A PCollection of JobRunResult containing formatted
-            output.
+            PCollection. A PCollection of 'SUCCESS x' results, where x is
+            the number of suggestion models for which stats models are missing
+            , and such suggestion models with a boolean field, showing the
+            existence of corresponding opportunity model
         """
 
-        # Fetch all non-deleted GeneralSuggestionModels.
-        general_suggestion_models = (
+        general_suggestions_models = (
             self.pipeline
-            | 'Get non-deleted GeneralSuggestionModels' >> ndb_io.GetModels(
+            | 'Get non-deleted GeneralSuggestionModel' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
                     include_deleted=False))
         )
 
-        # Fetch all non-deleted TranslationContributionStatsModels.
-        translation_contribution_stats_models = (
-            self.pipeline
-            | 'Get TranslationContributionStatsModels' >> ndb_io.GetModels(
-                suggestion_models.TranslationContributionStatsModel.get_all(
-                    include_deleted=False))
+        translation_general_suggestions_stats = (
+            general_suggestions_models
+             | 'Filter reviewed translate suggestions' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ))
+            | 'Group by language and user' >> beam.Map(
+                lambda stats: ((stats.language_code, stats.author_id), stats)
+            )
         )
 
-        # Fetch all non-deleted QuestionContributionStatsModels.
-        question_contribution_stats_models = (
-            self.pipeline
-            | 'Get QuestionContributionStatsModels' >> ndb_io.GetModels(
-                suggestion_models.QuestionContributionStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted TranslationReviewStatsModels.
-        translation_review_stats_models = (
-            self.pipeline
-            | 'Get TranslationReviewStatsModels' >> ndb_io.GetModels(
-                suggestion_models.TranslationReviewStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted QuestionReviewStatsModels.
-        question_review_stats_models = (
-            self.pipeline
-            | 'Get QuestionReviewStatsModels' >> ndb_io.GetModels(
-                suggestion_models.QuestionReviewStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Pair translation suggestions with their stats.
-        translation_suggestions = (
-            general_suggestion_models
-            | 'Filter Translation Suggestions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-            | 'Key Translation Suggestions' >> beam.Map(
-                lambda m: ((m.language_code, m.author_id), m))
+        question_general_suggestions_stats = (
+            general_suggestions_models
+             | 'Filter reviewed questions suggestions' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION
+                ))
+            | 'Group by user' >> beam.Map(
+                lambda stats: (stats.author_id, stats)
+            )
         )
 
         translation_contribution_stats = (
-            translation_contribution_stats_models
-            | 'Key Translation Contribution Stats' >> beam.Map(
-                lambda m: ((m.language_code, m.contributor_user_id), m))
-        )
-
-        translation_review_stats = (
-            translation_review_stats_models
-            | 'Key Translation Review Stats' >> beam.Map(
-                lambda m: ((m.language_code, m.reviewer_user_id), m))
-        )
-
-        translation_contribution = (
-            {
-                'suggestion': translation_suggestions,
-                'contribution_stats': translation_contribution_stats,
-            }
-            | 'Join Translation Suggestions and Stats' >> beam.CoGroupByKey()
-            | 'Format Translation Contribution Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_translation_contribution_output(
-                        key, value['suggestion'], value['contribution_stats']
-                    ))
-        )
-
-        translation_review = (
-            {
-                'review_stats': translation_review_stats
-            }
-            | 'Join Translation review Stats' >> beam.CoGroupByKey()
-            | 'Format Translation Review Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_translation_review_output(
-                        key, value['review_stats']
-                    ))
-        )
-
-        # Pair question suggestions with their stats.
-        question_suggestions = (
-            general_suggestion_models
-            | 'Filter Question Suggestions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
-            | 'Key Question Suggestions' >> beam.Map(
-                lambda m: (m.author_id, m))
+            self.pipeline
+            | 'Get all non-deleted TranslationContributionStatsModel models' >>
+                ndb_io.GetModels(
+                suggestion_models.TranslationContributionStatsModel.get_all(
+                    include_deleted=False))
+            | 'Filter translation contribution with no topic' >> beam.Filter(
+                lambda m: m.topic_id != '')
+            | 'Group TranslationContributionStatsModel by language and contributor' # pylint: disable=line-too-long
+                >> beam.Map(
+                lambda stats: (
+                    (stats.language_code, stats.contributor_user_id), stats
+                )
+            )
         )
 
         question_contribution_stats = (
-            question_contribution_stats_models
-            | 'Key Question Contribution Stats' >> beam.Map(
-                lambda m: (m.contributor_user_id, m))
+            self.pipeline
+            | 'Get all non-deleted QuestionContributionStatsModel models' >>
+                ndb_io.GetModels(
+                suggestion_models.QuestionContributionStatsModel.get_all(
+                    include_deleted=False))
+            | 'Group QuestionContributionStatsModel by contributor'
+                >> beam.Map(
+                lambda stats: (
+                    stats.contributor_user_id, stats
+                )
+            )
         )
 
-        question_review_stats = (
-            question_review_stats_models
-            | 'Key Question Review Stats' >> beam.Map(
-                lambda m: (m.reviewer_user_id, m))
-        )
-
-        question_contribution = (
+        translation_suggestion_counts_and_logs = (
             {
-                'suggestion': question_suggestions,
-                'contribution_stats': question_contribution_stats,
+                'translation_contribution_stats':
+                    translation_contribution_stats,
+                'translation_general_suggestions_stats':
+                    translation_general_suggestions_stats
             }
-            | 'Join Question Suggestions and Stats' >> beam.CoGroupByKey()
-            | 'Format Question Contribution Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_question_contribution_output(
-                        key, value['suggestion'], value['contribution_stats']
-                    ))
+            | 'Merge Translation models' >> beam.CoGroupByKey()
+            | 'Get translation suggestion count and logs' >>
+                beam.MapTuple(
+                    lambda key, value:
+                        self.log_translation_contribution(
+                            value['translation_contribution_stats'],
+                            value['translation_general_suggestions_stats']
+                        )
+                )
+            | 'Filter out None values from translation suggestion' >>
+                beam.Filter(lambda x: x is not None)
         )
 
-        question_review = (
+        translation_suggestion_count_result = (
+            translation_suggestion_counts_and_logs
+            | 'Unpack translation suggestion counts' >> beam.Map(
+                lambda element: element[0])
+            | 'Total translation suggestion count' >> beam.CombineGlobally(sum)
+            | 'Report translation suggestion count' >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: '
+                        f'{result}'
+                    )))
+        )
+
+        translation_suggestion_logs = (
+            translation_suggestion_counts_and_logs
+            | 'Unpack translation suggestion logs' >> beam.Map(
+                lambda element: (
+                    job_run_result.JobRunResult.as_stdout(element[1])
+                ))
+        )
+
+        question_suggestion_counts_and_logs = (
             {
-                'review_stats': question_review_stats
+                'question_contribution_stats':
+                    question_contribution_stats,
+                'question_general_suggestions_stats':
+                    question_general_suggestions_stats
             }
-            | 'Join Question review Stats' >> beam.CoGroupByKey()
-            | 'Format Question Review Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_question_review_output(
-                        key, value['review_stats']
-                    ))
+            | 'Merge Question models' >> beam.CoGroupByKey()
+            | 'Get question suggestion count and logs' >>
+                beam.MapTuple(
+                    lambda key, value:
+                        self.log_question_contribution(
+                            value['question_contribution_stats'],
+                            value['question_general_suggestions_stats']
+                        )
+                )
+            | 'Filter out None values from question suggestion' >>
+                beam.Filter(lambda x: x is not None)
         )
 
-        # Merge both translation and question outputs.
-        all_outputs = (
-            [
-                translation_contribution,
-                question_contribution,
-                translation_review,
-                question_review
-            ]
-            | 'Flatten All Outputs' >> beam.Flatten()
+        question_suggestion_count_result = (
+            question_suggestion_counts_and_logs
+            | 'Unpack question suggestion counts' >> beam.Map(
+                lambda element: element[0])
+            | 'Total question suggestion count' >> beam.CombineGlobally(sum)
+            | 'Report question suggestion count' >> beam.Map(
+                lambda result: (
+                    job_run_result.JobRunResult.as_stdout(
+                        f'LOGGED QUESTION SUGGESTION COUNT SUCCESS: {result}'
+                    )))
         )
 
-        # Convert outputs to JobRunResult.
-        log_results = (
-            all_outputs
-            | 'Convert to JobRunResult' >> beam.Map(
-            lambda output: job_run_result.JobRunResult(stdout=output))
-        )
-
-        # Count the number of elements in each PCollection.
-        translation_contribution_stats_count = (
-            translation_contribution_stats_models
-            | 'Count Translation Contribution Stats Result' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Contribution Stats Models'
-                ))
-        )
-
-        question_contribution_stats_count = (
-            question_contribution_stats_models
-            | 'Count Question Contribution Stats Results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Contribution Stats Models'
-                ))
-        )
-
-        translation_review_stats_count = (
-            translation_review_stats_models
-            | 'Count Translation Review Stats Models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Review Stats Models'
-                ))
-        )
-
-        question_review_stats_count = (
-            question_review_stats_models
-            | 'Count Question Review Stats Models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Review Stats Models'
-                ))
-        )
-
-        translation_suggestion_count = (
-            general_suggestion_models
-            | 'Filter Translations' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-            | 'Count Translation Suggestions' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Suggestions Models'
-                ))
-        )
-
-        question_suggestion_count = (
-            general_suggestion_models
-            | 'Filter Questions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
-            | 'Count Question Suggestions' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Suggestions Models'
-                ))
-        )
-
-        output_logs_count = (
-            all_outputs
-            | 'Count Output Logs' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Output Logs'
-                ))
+        question_suggestion_logs = (
+            question_suggestion_counts_and_logs
+            | 'Unpack question suggestion logs' >> beam.Map(
+                lambda element: (
+                    job_run_result.JobRunResult.as_stdout(element[1])
+                )
+            )
         )
 
         return (
             (
-            log_results,
-            translation_contribution_stats_count,
-            question_contribution_stats_count,
-            translation_review_stats_count,
-            question_review_stats_count,
-            translation_suggestion_count,
-            question_suggestion_count,
-            output_logs_count
+                translation_suggestion_count_result,
+                question_suggestion_count_result,
+                translation_suggestion_logs,
+                question_suggestion_logs
             )
-            | 'Merge all results' >> beam.Flatten()
+            | 'Merge job run results' >> beam.Flatten()
         )
 
-    def format_translation_contribution_output(
-        self,
-        key: Tuple[str, str],
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        contribution_stats: List[
-            suggestion_models.TranslationContributionStatsModel]
-    ) -> str:
-        """Formats the output for translation suggestions and contribution
-        stats.
+    @staticmethod
+    def log_translation_contribution(
+        translation_contribution_stats:
+            Iterable[suggestion_models.TranslationContributionStatsModel],
+        translation_general_suggestions_stats:
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> Optional[
+                Tuple[int, str]]:
+        """Returns number and logs of translation suggestion models for which
+        translation contribution stats models are missing or invalid, for a
+        particular language code and contributor user id.
 
         Args:
-            key: tuple(str, str). A tuple containing the language code and
-                contributor ID.
-            suggestions: list(GeneralSuggestionModel). A lists of translation
-                suggestion models.
-            contribution_stats: list(TranslationContributionStatsModel). A
-                lists of translation contribution stats models.
+            translation_contribution_stats:
+                Iterable[suggestion_models.TranslationContributionStatsModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, contributor_user_id).
+            translation_general_suggestions_stats:
+                Iterable[suggestion_models.GeneralSuggestionModel].
+                TranslationReviewStatsModel grouped by
+                (language_code, author_id).
 
         Returns:
-            str. A formatted log string.
+            Either a 2-tuple with the following elements:
+            - int. The number of suggestion models for which stats models are
+            missing or invalid.
+            - str. The debug logs, containing information about suggestion
+            models for which stats models are missing or invalid.
+            or None
         """
-        output_logs = []
+        translation_contribution_stats = list(translation_contribution_stats)
+        valid_topic_ids_with_contribution_stats: List[str] = []
+        invalid_topic_ids_with_contribution_stats: List[str] = []
+        for stat in translation_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
+                invalid_topic_ids_with_contribution_stats.append(stat.topic_id)
+            else:
+                valid_topic_ids_with_contribution_stats.append(stat.topic_id)
 
-        output_logs.append(
-            '<==Translation Suggestion and Contribution Stats (Language: '
-            f'{key[0]}, Contributor ID: {key[1]}):==>')
+        general_suggestion_models = list(
+            translation_general_suggestions_stats)
 
-        for suggestion in suggestions:
-            output_logs.append(f'-Suggestion ID: {suggestion.id}')
-            output_logs.append(f'--Target ID: {suggestion.target_id}')
-            output_logs.append(
-                '--Target Version (at submission): '
-                f'{suggestion.target_version_at_submission}')
-            output_logs.append(f'--Status: {suggestion.status}')
+        debug_logs = ('<====TRANSLATION_CONTRIBUTION====>\n')
 
-        for stat in contribution_stats:
-            output_logs.append(f'-Contribution Stats Model ID: {stat.id}')
-            output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append(
-                '--Submitted Translations: '
-                f'{stat.submitted_translations_count}')
-            output_logs.append(
-                f'--Accepted Translations: {stat.accepted_translations_count}')
-            output_logs.append(
-                '--Accepted Translations (without edits): '
-                f'{stat.accepted_translations_without_reviewer_edits_count}')
-            output_logs.append(
-                f'--Rejected Translations: {stat.rejected_translations_count}')
-            output_logs.append(
-                f'--Contribution Dates: {stat.contribution_dates}')
+        logged_suggestions_count = 0
 
-        output_logs.append(
-            '------------------------------------------------------------')
-
-        return '\n'.join(output_logs)
-
-    def format_translation_review_output(
-        self,
-        key: Tuple[str, str],
-        review_stats: List[suggestion_models.TranslationReviewStatsModel]
-    ) -> str:
-        """Formats the output for translation review stats.
-
-        Args:
-            key: tuple(str, str). A tuple containing the language code and
-                contributor ID.
-            review_stats: list(TranslationReviewStatsModel). A lists of
-                translation review stats models.
-
-        Returns:
-            str. A formatted log string.
-        """
-        output_logs = []
-
-        output_logs.append(
-            f'<==Translation Review Stats (Language: {key[0]}, Reviewer ID: '
-            f'{key[1]}):==>')
-
-        for stat in review_stats:
-            output_logs.append(f'-Reviewer Stats Model ID: {stat.id}')
-            output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append(
-                f'--Reviewed Translations: {stat.reviewed_translations_count}')
-            output_logs.append(
-                f'--Accepted Translations: {stat.accepted_translations_count}')
-            output_logs.append(
-                '--Accepted Translations (reviewer edits): '
-                f'{stat.accepted_translations_with_reviewer_edits_count}')
-            output_logs.append(
-                f'--First Date: {stat.first_contribution_date}')
-            output_logs.append(f'--Last Date: {stat.last_contribution_date}')
-
-        output_logs.append(
-            '------------------------------------------------------------')
-
-        return '\n'.join(output_logs)
-
-    def format_question_contribution_output(
-        self,
-        key: Tuple[str, str],
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        contribution_stats: List[
-            suggestion_models.QuestionContributionStatsModel]
-    ) -> str:
-        """Formats the output for question suggestions and contribution stats.
-
-        Args:
-            key: str. Contributor ID.
-            suggestions: list(GeneralSuggestionModel). A lists of question
-                suggestion models.
-            contribution_stats: List(QuestionContributionStatsModel). A lists
-                of question contribution stats models.
-
-        Returns:
-            str. A formatted log string.
-        """
-        output_logs = []
-
-        output_logs.append(
-            '<==Question Suggestion and Contribution Stats (Contributor ID: '
-            f'{key}):==>')
-
-        for suggestion in suggestions:
-            output_logs.append(f'-Suggestion ID: {suggestion.id}')
-            output_logs.append(f'--Target ID: {suggestion.target_id}')
-            output_logs.append(
-                '--Target Version (at submission): '
-                f'{suggestion.target_version_at_submission}')
-            output_logs.append(f'--Status: {suggestion.status}')
-
-        for stat in contribution_stats:
-            output_logs.append(f'-Contribution Stats Model ID: {stat.id}')
-            output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append(
-                f'--Submitted Questions: {stat.submitted_questions_count}')
-            output_logs.append(
-                f'--Accepted Questions: {stat.accepted_questions_count}')
-            output_logs.append(
-                '--Accepted Questions (without edits): '
-                f'{stat.accepted_questions_without_reviewer_edits_count}')
-            output_logs.append(
-                f'--First Date: {stat.first_contribution_date}')
-            output_logs.append(f'--Last Date: {stat.last_contribution_date}')
-
-        output_logs.append(
-            '------------------------------------------------------------')
-
-        return '\n'.join(output_logs)
-
-    def format_question_review_output(
-        self,
-        key: Tuple[str, str],
-        review_stats: List[suggestion_models.QuestionReviewStatsModel]
-    ) -> str:
-        """Formats the output for question review stats.
-
-        Args:
-            key: str. Contributor ID.
-            review_stats: list(QuestionReviewStatsModel). A lists of question
-                review stats models.
-
-        Returns:
-            str. A formatted log string.
-        """
-        output_logs = []
-
-        output_logs.append(
-            f'<==Question Review Stats (Reviewer ID: {key}):==>')
-
-        for stat in review_stats:
-            output_logs.append(f'-Review Stats Model ID: {stat.id}')
-            output_logs.append(f'--Topic ID: {stat.topic_id}')
-            output_logs.append(
-                f'--Reviewed Questions: {stat.reviewed_questions_count}')
-            output_logs.append(
-                f'--Accepted Questions: {stat.accepted_questions_count}')
-            output_logs.append(
-                '--Accepted Questions (reviewer edits): '
-                f'{stat.accepted_questions_with_reviewer_edits_count}')
-            output_logs.append(
-                f'--First Date: {stat.first_contribution_date}')
-            output_logs.append(f'--Last Date: {stat.last_contribution_date}')
-
-        output_logs.append(
-            '------------------------------------------------------------')
-
-        return '\n'.join(output_logs)
-
-
-class LogTopicIDsAssociatedToSuggestionAndStatsJob(base_jobs.JobBase):
-    """Job that returns topic ids associated to suggestion models and
-    their corresponding contribution and reviewer stats as job run results.
-    """
-
-    # We're not updating any datastore.
-    DATASTORE_UPDATES_ALLOWED = False
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns topic ids accociated to suggestion models and
-        corresponding contribution and reviewer stats.
-
-        Returns:
-            PCollection. A PCollection of JobRunResult containing formatted
-            output.
-        """
-
-        # Fetch all non-deleted GeneralSuggestionModels.
-        general_suggestion_models = (
-            self.pipeline
-            | 'Get non-deleted GeneralSuggestionModels' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted TranslationContributionStatsModels.
-        translation_contribution_stats_models = (
-            self.pipeline
-            | 'Get TranslationContributionStatsModels' >> ndb_io.GetModels(
-                suggestion_models.TranslationContributionStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted QuestionContributionStatsModels.
-        question_contribution_stats_models = (
-            self.pipeline
-            | 'Get QuestionContributionStatsModels' >> ndb_io.GetModels(
-                suggestion_models.QuestionContributionStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted TranslationReviewStatsModels.
-        translation_review_stats_models = (
-            self.pipeline
-            | 'Get TranslationReviewStatsModels' >> ndb_io.GetModels(
-                suggestion_models.TranslationReviewStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Fetch all non-deleted QuestionReviewStatsModels.
-        question_review_stats_models = (
-            self.pipeline
-            | 'Get QuestionReviewStatsModels' >> ndb_io.GetModels(
-                suggestion_models.QuestionReviewStatsModel.get_all(
-                    include_deleted=False))
-        )
-
-        # Pair translation suggestions with their stats.
-        translation_suggestions = (
-            general_suggestion_models
-            | 'Filter Translation Suggestions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-            | 'Key Translation Suggestions' >> beam.Map(
-                lambda m: ((m.language_code, m.author_id), m))
-        )
-
-        translation_contribution_stats = (
-            translation_contribution_stats_models
-            | 'Key Translation Contribution Stats' >> beam.Map(
-                lambda m: ((m.language_code, m.contributor_user_id), m))
-        )
-
-        translation_review_stats = (
-            translation_review_stats_models
-            | 'Key Translation Review Stats' >> beam.Map(
-                lambda m: ((m.language_code, m.reviewer_user_id), m))
-        )
-
-        translation_contribution = (
-            {
-                'suggestion': translation_suggestions,
-                'contribution_stats': translation_contribution_stats,
-            }
-            | 'Join Translation Suggestions and Stats' >> beam.CoGroupByKey()
-            | 'Format Translation Contribution Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_translation_contribution_output(
-                        key, value['suggestion'], value['contribution_stats']
-                    ))
-        )
-
-        translation_review = (
-            {
-                'review_stats': translation_review_stats
-            }
-            | 'Join Translation review Stats' >> beam.CoGroupByKey()
-            | 'Format Translation Review Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_translation_review_output(
-                        key, value['review_stats']
-                    ))
-        )
-
-        # Pair question suggestions with their stats.
-        question_suggestions = (
-            general_suggestion_models
-            | 'Filter Question Suggestions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
-            | 'Key Question Suggestions' >> beam.Map(
-                lambda m: (m.author_id, m))
-        )
-
-        question_contribution_stats = (
-            question_contribution_stats_models
-            | 'Key Question Contribution Stats' >> beam.Map(
-                lambda m: (m.contributor_user_id, m))
-        )
-
-        question_review_stats = (
-            question_review_stats_models
-            | 'Key Question Review Stats' >> beam.Map(
-                lambda m: (m.reviewer_user_id, m))
-        )
-
-        question_contribution = (
-            {
-                'suggestion': question_suggestions,
-                'contribution_stats': question_contribution_stats,
-            }
-            | 'Join Question Suggestions and Stats' >> beam.CoGroupByKey()
-            | 'Format Question Contribution Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_question_contribution_output(
-                        key, value['suggestion'], value['contribution_stats']
-                    ))
-        )
-
-        question_review = (
-            {
-                'review_stats': question_review_stats
-            }
-            | 'Join Question review Stats' >> beam.CoGroupByKey()
-            | 'Format Question Review Output' >> beam.MapTuple(
-                lambda key, value:
-                    self.format_question_review_output(
-                        key, value['review_stats']
-                    ))
-        )
-
-        # Merge both translation and question outputs.
-        all_outputs = (
-            [
-                translation_contribution,
-                question_contribution,
-                translation_review,
-                question_review
-            ]
-            | 'Flatten All Outputs' >> beam.Flatten()
-        )
-
-        # Convert outputs to JobRunResult.
-        log_results = (
-            all_outputs
-            | 'Convert to JobRunResult' >> beam.Map(
-            lambda output: job_run_result.JobRunResult(stdout=output))
-        )
-
-        # Count the number of elements in each PCollection.
-        translation_contribution_stats_count = (
-            translation_contribution_stats_models
-            | 'Count Translation Contribution Stats Result' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Contribution Stats Models'
-                ))
-        )
-
-        question_contribution_stats_count = (
-            question_contribution_stats_models
-            | 'Count Question Contribution Stats Results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Contribution Stats Models'
-                ))
-        )
-
-        translation_review_stats_count = (
-            translation_review_stats_models
-            | 'Count Translation Review Stats Models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Review Stats Models'
-                ))
-        )
-
-        question_review_stats_count = (
-            question_review_stats_models
-            | 'Count Question Review Stats Models' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Review Stats Models'
-                ))
-        )
-
-        translation_suggestion_count = (
-            general_suggestion_models
-            | 'Filter Translations' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-            | 'Count Translation Suggestions' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Translation Suggestions Models'
-                ))
-        )
-
-        question_suggestion_count = (
-            general_suggestion_models
-            | 'Filter Questions' >> beam.Filter(
-                lambda m: m.suggestion_type == (
-                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
-            | 'Count Question Suggestions' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Question Suggestions Models'
-                ))
-        )
-
-        output_logs_count = (
-            all_outputs
-            | 'Count Output Logs' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Output Logs'
-                ))
-        )
-
-        return (
-            (
-            log_results,
-            translation_contribution_stats_count,
-            question_contribution_stats_count,
-            translation_review_stats_count,
-            question_review_stats_count,
-            translation_suggestion_count,
-            question_suggestion_count,
-            output_logs_count
-            )
-            | 'Merge all results' >> beam.Flatten()
-        )
-
-    def format_translation_contribution_output(
-        self,
-        key: Tuple[str, str],
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        contribution_stats: List[
-            suggestion_models.TranslationContributionStatsModel]
-    ) -> str:
-        """Formats the output for translation suggestions and contribution
-        stats.
-
-        Args:
-            key: tuple(str, str). A tuple containing the language code and
-                contributor ID.
-            suggestions: list(GeneralSuggestionModel). A lists of translation
-                suggestion models.
-            contribution_stats: list(TranslationContributionStatsModel). A
-                lists of translation contribution stats models.
-
-        Returns:
-            str. A formatted log string.
-        """
-        output_logs = []
-
-        exp_ids_with_translation_suggestions = sorted(
-            {v.target_id for v in suggestions})
-
-        topic_ids_with_translation_submissions_list = []
         with datastore_services.get_ndb_context():
-            for exp_id in exp_ids_with_translation_suggestions:
+            for s in general_suggestion_models:
                 story_id = exp_services.get_story_id_linked_to_exploration(
-                    exp_id)
+                    s.target_id)
                 if story_id is not None:
                     story = story_fetchers.get_story_by_id(story_id)
                     if story is not None:
-                        topic_ids_with_translation_submissions_list.append(
-                            story.corresponding_topic_id)
+                        topic_id = story.corresponding_topic_id
+                        if topic_id not in (
+                            valid_topic_ids_with_contribution_stats):
+                            # Valid stats model does not exists.
+                            logged_suggestions_count += 1
+                            debug_logs += (
+                                '{\n'
+                                f'suggestion_id: {s.id},\n'
+                                f'suggestion_type: {s.suggestion_type},\n'
+                                f'target_type: {s.target_type},\n'
+                                f'traget_id: {s.target_id},\n'
+                                'target_verion_at_submission: '
+                                f'{s.target_version_at_submission},\n'
+                                f'status: {s.status},\n'
+                                f'language_code: {s.language_code},\n'
+                                f'corresponding_topic_id: [\n'
+                                )
+                            if topic_id in (
+                                invalid_topic_ids_with_contribution_stats):
+                                debug_logs += (
+                                    '{'
+                                    f'topic_id: {topic_id}, '
+                                    'problem: invalid_topic},\n' 
+                                )
+                            else:
+                                debug_logs += (
+                                    '{'
+                                    f'topic_id: {topic_id}, '
+                                    'problem: no_stats_model},\n' 
+                                )
+                            debug_logs += (
+                                '],\n')
 
-        topic_ids_with_translation_submissions = sorted(
-            set(topic_ids_with_translation_submissions_list))
+                            # Check if xploration opportunity model exists.
+                            opportunity_model_exists = (
+                                opportunity_models
+                                    .ExplorationOpportunitySummaryModel
+                                        .get_by_id(
+                                            s.target_id) is not (
+                                                None)
+                            )
+                            debug_logs += (
+                                'exp_opportunity_model_exists: '
+                                f'{opportunity_model_exists},\n'
+                                '},\n'
+                            )
 
-        topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in contribution_stats})
+        if logged_suggestions_count == 0:
+            return None 
+        else:                   
+            return (logged_suggestions_count, debug_logs)
 
-        for stat in contribution_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
-                stat.topic_id):
-                contribution_stats.remove(stat)
-
-        valid_topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in contribution_stats})
-
-        output_logs.append('{\n')
-        output_logs.append('  type: translation_contribution,\n')
-        output_logs.append(f'  language_code: {key[0]},\n')
-        output_logs.append(f'  contributor_id: {key[1]},\n')
-        output_logs.append('  topic_ids_with_translation_suggestions: [')
-        for topic_id in topic_ids_with_translation_submissions:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_translation_suggestions_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_translation_submissions)},\n')
-        output_logs.append('  topic_ids_with_contribution_stats: [')
-        for topic_id in topic_ids_with_contribution_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_contribution_stats_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_contribution_stats)},\n')
-        output_logs.append('  valid_topic_ids_with_contribution_stats: [')
-        for topic_id in valid_topic_ids_with_contribution_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  valid_topic_ids_with_contribution_stats_COUNT: ')
-        output_logs.append(f'{len(valid_topic_ids_with_contribution_stats)},')
-        output_logs.append('\n')
-        output_logs.append('},\n')
-
-        return ''.join(output_logs)
-
-    def format_translation_review_output(
-        self,
-        key: Tuple[str, str],
-        review_stats: List[suggestion_models.TranslationReviewStatsModel]
-    ) -> str:
-        """Formats the output for translation review stats.
-
-        Args:
-            key: tuple(str, str). A tuple containing the language code and
-                contributor ID.
-            review_stats: list(TranslationReviewStatsModel). A lists of
-                translation review stats models.
-
-        Returns:
-            str. A formatted log string.
-        """
-        output_logs = []
-
-        topic_ids_with_review_stats = sorted(
-            {v.topic_id for v in review_stats})
-
-        for stat in review_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
-                stat.topic_id):
-                review_stats.remove(stat)
-
-        valid_topic_ids_with_review_stats = sorted(
-            {v.topic_id for v in review_stats})
-
-        output_logs.append('{\n')
-        output_logs.append('  type: translation_review,\n')
-        output_logs.append(f'  language_code: {key[0]},\n')
-        output_logs.append(f'  reviewer_id: {key[1]},\n')
-        output_logs.append('  topic_ids_with_review_stats: [')
-        for topic_id in topic_ids_with_review_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_review_stats_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_review_stats)},\n')
-        output_logs.append('  valid_topic_ids_with_review_stats: [')
-        for topic_id in valid_topic_ids_with_review_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  valid_topic_ids_with_review_stats_COUNT: ')
-        output_logs.append(f'{len(valid_topic_ids_with_review_stats)},\n')
-        output_logs.append('},\n')
-
-        return ''.join(output_logs)
-
-    def format_question_contribution_output(
-        self,
-        key: Tuple[str, str],
-        suggestions: List[suggestion_models.GeneralSuggestionModel],
-        contribution_stats: List[
-            suggestion_models.QuestionContributionStatsModel]
-    ) -> str:
-        """Formats the output for question suggestions and contribution stats.
+    @staticmethod
+    def log_question_contribution(
+        question_contribution_stats:
+            Iterable[suggestion_models.QuestionContributionStatsModel],
+        question_general_suggestions_stats:
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> Optional[
+                Tuple[int, str]]:
+        """Returns number and logs of questions suggestion models for which
+        quesion contribution stats models are missing or invalid, for a
+        particular contributor user id.
 
         Args:
-            key: str. Contributor ID.
-            suggestions: list(GeneralSuggestionModel). A lists of question
-                suggestion models.
-            contribution_stats: List(QuestionContributionStatsModel). A lists
-                of question contribution stats models.
+            question_contribution_stats:
+                Iterable[suggestion_models.QuestionContributionStatsModel].
+                QuestionContributionStatsModel grouped by
+                contributor_user_id.
+            question_general_suggestions_stats:
+                Iterable[suggestion_models.GeneralSuggestionModel].
+                GeneralSuggestionModel grouped by author_id.
 
         Returns:
-            str. A formatted log string.
+            Either a 2-tuple with the following elements:
+            - int. The number of suggestion models for which stats models are
+            missing or invalid.
+            - str. The debug logs, containing information about suggestion
+            models for which stats models are missing or invalid.
+            or None
         """
-        output_logs = []
-        by_topic_id = lambda m: m.topic_id
+        question_contribution_stats = list(question_contribution_stats)
+        valid_topic_ids_with_contribution_stats: List[str] = []
+        invalid_topic_ids_with_contribution_stats: List[str] = []
+        for stat in question_contribution_stats:
+            if GenerateContributorAdminStatsJob.not_validate_topic(
+                stat.topic_id):
+                invalid_topic_ids_with_contribution_stats.append(stat.topic_id)
+            else: 
+                valid_topic_ids_with_contribution_stats.append(stat.topic_id)
 
-        skill_ids_with_question_suggestions = sorted(
-            {v.target_id for v in suggestions})
+        general_suggestion_stats = list(
+            question_general_suggestions_stats)
 
-        topic_ids_with_question_submissions_list = []
+        debug_logs = ('<====QUESTION_CONTRIBUTION====>\n')
+
+        logged_suggestions_count = 0
+
         with datastore_services.get_ndb_context():
-            for skill_id in skill_ids_with_question_suggestions:
-                topic_assignments = sorted(
+            for s in general_suggestion_stats:
+                topic_assignments = list(
                     skill_services.get_all_topic_assignments_for_skill(
-                        skill_id), key=by_topic_id)
-                for topic_assignment in topic_assignments:
-                    topic_ids_with_question_submissions_list.append(
-                        topic_assignment.topic_id)
+                        s.target_id))
+                for t in topic_assignments:
+                    if t.topic_id not in (
+                        valid_topic_ids_with_contribution_stats):
+                        # Valid stats model does not exists.
+                        logged_suggestions_count += 1
+                        debug_logs += (
+                            '{\n'
+                            f'suggestion_id: {s.id},\n'
+                            f'suggestion_type: {s.suggestion_type},\n'
+                            f'target_type: {s.target_type},\n'
+                            f'traget_id: {s.target_id},\n'
+                            'target_verion_at_submission: '
+                            f'{s.target_version_at_submission},\n'
+                            f'status: {s.status},\n'
+                            f'corresponding_topic_id: [\n'
+                            )
+                        if t.topic_id in (
+                            invalid_topic_ids_with_contribution_stats):
+                            debug_logs += (
+                                '{'
+                                f'topic_id: {t.topic_id}, '
+                                'problem: invalid_topic},\n' 
+                            )
+                        else:
+                            debug_logs += (
+                                '{'
+                                f'topic_id: {t.topic_id}, '
+                                'problem: no_stats_model},\n' 
+                            )
+                        debug_logs += (
+                            '],\n')
 
-        topic_ids_with_question_submissions = sorted(
-            set(topic_ids_with_question_submissions_list))
+                        # Check if xploration opportunity model exists.
+                        opportunity_model_exists = (
+                            opportunity_models.SkillOpportunityModel
+                                .get_by_id(s.target_id) is not None
+                        )
 
-        topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in contribution_stats})
+                        debug_logs += (
+                            'skill_opportunity_model_exists: '
+                            f'{opportunity_model_exists},\n'
+                            '},\n'
+                        )
 
-        for stat in contribution_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
-                stat.topic_id):
-                contribution_stats.remove(stat)
+        if logged_suggestions_count == 0:
+            return None 
+        else:                   
+            return (logged_suggestions_count, debug_logs)
 
-        valid_topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in contribution_stats})
-
-        output_logs.append('{\n')
-        output_logs.append('  type: question_contribution,\n')
-        output_logs.append(f'  contributor_id: {key},\n')
-        output_logs.append('  topic_ids_with_question_suggestions: [')
-        for topic_id in topic_ids_with_question_submissions:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_question_suggestions_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_question_submissions)},\n')
-        output_logs.append('  topic_ids_with_contribution_stats: [')
-        for topic_id in topic_ids_with_contribution_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_contribution_stats_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_contribution_stats)},\n')
-        output_logs.append('  valid_topic_ids_with_contribution_stats: [')
-        for topic_id in valid_topic_ids_with_contribution_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  valid_topic_ids_with_contribution_stats_COUNT: ')
-        output_logs.append(f'{len(valid_topic_ids_with_contribution_stats)},')
-        output_logs.append('\n')
-        output_logs.append('},\n')
-
-        return ''.join(output_logs)
-
-    def format_question_review_output(
-        self,
-        key: Tuple[str, str],
-        review_stats: List[suggestion_models.QuestionReviewStatsModel]
-    ) -> str:
-        """Formats the output for question review stats.
+    @staticmethod
+    def not_validate_topic(topic_id: str) -> bool:
+        """Validates if there exist a topic with a given topic ID.
 
         Args:
-            key: str. Contributor ID.
-            review_stats: list(QuestionReviewStatsModel). A lists of question
-                review stats models.
+            topic_id: str. The id of the topic that needs to be validated.
 
         Returns:
-            str. A formatted log string.
+            bool. True if topic doesn't exist and False if topic exists.
         """
-        output_logs = []
+        with datastore_services.get_ndb_context():
+            topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
-        topic_ids_with_review_stats = sorted(
-            {v.topic_id for v in review_stats})
+        if topic is None:
+            return True
 
-        for stat in review_stats:
-            if GenerateContributorAdminStatsJob.not_validate_topic(
-                stat.topic_id):
-                review_stats.remove(stat)
+        return False
 
-        valid_topic_ids_with_review_stats = sorted(
-            {v.topic_id for v in review_stats})
 
-        output_logs.append('{\n')
-        output_logs.append('  type: question_review,\n')
-        output_logs.append(f'  reviewer_id: {key},\n')
-        output_logs.append('  topic_ids_with_review_stats: [')
-        for topic_id in topic_ids_with_review_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  topic_ids_with_review_stats_COUNT: ')
-        output_logs.append(f'{len(topic_ids_with_review_stats)},\n')
-        output_logs.append('  valid_topic_ids_with_review_stats: [')
-        for topic_id in valid_topic_ids_with_review_stats:
-            output_logs.append(f'{topic_id},')
-        output_logs.append('],\n')
-        output_logs.append('  valid_topic_ids_with_review_stats_COUNT: ')
-        output_logs.append(f'{len(valid_topic_ids_with_review_stats)},\n')
-        output_logs.append('},\n')
-
-        return ''.join(output_logs)
