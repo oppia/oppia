@@ -961,7 +961,8 @@ class AdminHandler(
 
             story = story_domain.Story.create_default_story(
                 story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1, 'help-jamie-win-arcade')
+                topic_id_1, 'help-jamie-win-arcade', 'dummy-meta-content',
+                'thumbnail.svg', '#F8BF74')
 
             story_node_dicts = [{
                 'exp_id': '6',
@@ -1624,6 +1625,7 @@ class AdminHandler(
                             topic_id_to_prerequisite_topic_ids=(
                                 topic_dependency_for_classroom_1),
                             is_published=True,
+                            is_diagnostic_test_enabled=False,
                             thumbnail_data=classroom_config_domain.ImageData(
                                 'thumbnail.svg', 'transparent', 1000
                             ),

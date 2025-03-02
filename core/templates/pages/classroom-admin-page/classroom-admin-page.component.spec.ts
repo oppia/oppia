@@ -71,6 +71,7 @@ let dummyClassroomDict = {
   topicListIntro: 'Start from the basics with our first topic.',
   topicIdToPrerequisiteTopicIds: {},
   isPublished: true,
+  isDiagnosticTestEnabled: false,
   thumbnailData: dummyThumbnailData,
   bannerData: dummyBannerData,
 };
@@ -491,6 +492,7 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
+      is_diagnostic_test_enabled: false,
       thumbnail_data: dummyThumbnailData,
       banner_data: dummyBannerData,
     };
@@ -503,6 +505,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      isDiagnosticTestEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -579,6 +582,7 @@ describe('Classroom Admin Page component ', () => {
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {},
         isPublished: true,
+        isDiagnosticTestEnabled: false,
         thumbnailData: dummyThumbnailData,
         bannerData: dummyBannerData,
       });
@@ -874,6 +878,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      isDiagnosticTestEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -1411,6 +1416,29 @@ describe('Classroom Admin Page component ', () => {
     component.saveClassroomData();
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
+
+  it('should toggle diagnostic test status', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    expect(
+      component.tempClassroomData.getIsDiagnosticTestEnabled()
+    ).toBeFalse();
+
+    component.toggleDiagnosticTestStatus();
+
+    expect(component.tempClassroomData.getIsDiagnosticTestEnabled()).toBeTrue();
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
 
   it('should not be able to publish classroom due to validation errors', () => {
     const response = {
