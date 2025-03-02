@@ -47,9 +47,7 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 compress_images: ## Runs the image compression checks
-	sudo apt install graphicsmagick -y
-	pip install pillow
-	python -m scripts.compress_images
+	docker compose run --no-deps --rm --entrypoint "python -m scripts.compress_images" dev-server
 
 run-devserver: ## Runs the dev-server
 # TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.
