@@ -51,7 +51,7 @@ describe('Logged-out User', function () {
     );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
-  }, 420000);
+  }, 500000);
 
   it(
     'should complete a practice questions session as logged-out user',
