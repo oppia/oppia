@@ -54,6 +54,7 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -232,7 +233,9 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     num_dummy_translation_opportunities_to_generate: Optional[int]
     data: Optional[str]
     num_dummy_stories_to_generate: Optional[int]
+    num_dummy_chapters_to_generate: Optional[int]
     topic_id: Optional[str]
+    story_id: Optional[str]
     platform_param_name: Optional[str]
     commit_message: Optional[str]
     new_rules: Optional[List[parameter_domain.PlatformParameterRule]]
@@ -263,6 +266,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
+                        'generate_dummy_chapters',
                         'generate_dummy_question_suggestions',
                         'generate_dummy_stories',
                         'upload_topic_similarities',
@@ -306,6 +310,12 @@ class AdminHandler(
                 },
                 'default_value': None
             },
+            'num_dummy_chapters_to_generate': {
+                'schema': {
+                    'type': 'int'
+                },
+                'default_value': None
+            },
             'num_dummy_exps_to_publish': {
                 'schema': {
                     'type': 'int'
@@ -331,6 +341,12 @@ class AdminHandler(
                 'default_value': None
             },
             'topic_id': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
+            'story_id': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -399,6 +415,19 @@ class AdminHandler(
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
 
+        story_ids = []
+        for topic_summary in topic_summaries:
+            topic = topic_fetchers.get_topic_by_id(topic_summary.id)
+            story_references = topic.get_all_story_references()
+            for story_reference in story_references:
+                story_ids.append(story_reference.story_id)
+
+        story_dicts = [
+            story.to_dict() for story in
+            story_fetchers.get_stories_by_ids(story_ids) if
+            story is not None
+        ]
+
         platform_params_dicts = (
             parameter_services.
             get_all_platform_parameters_dicts()
@@ -425,6 +454,7 @@ class AdminHandler(
             'topic_summaries': topic_summary_dicts,
             'platform_params_dicts': platform_params_dicts,
             'skill_list': skill_summary_dicts,
+            'story_list': story_dicts,
         })
 
     @acl_decorators.can_access_admin_page
@@ -467,6 +497,10 @@ class AdminHandler(
                 the action is generate_dummy_stories.
             Exception. The num_dummy_question_stories must be 
                 provided when the action is generate_dummy_stories.
+            Exception. The story_id must be provided when
+                the action is generate_dummy_chapters.
+            Exception. The num_dummy_chapters_to_generate must be 
+                provided when the action is generate_dummy_chapters.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -582,6 +616,25 @@ class AdminHandler(
                     )
                 self._generate_dummy_stories(
                     topic_id, num_dummy_stories_to_generate)
+            elif action == 'generate_dummy_chapters':
+                story_id = self.normalized_payload.get('story_id')
+                if story_id is None:
+                    raise Exception(
+                        'The \'story_id\' must be provided when'
+                        ' the action is generate_dummy_chapters.'
+                    )
+                num_dummy_chapters_to_generate = (
+                    self.normalized_payload.get(
+                        'num_dummy_chapters_to_generate')
+                )
+                if num_dummy_chapters_to_generate is None:
+                    raise Exception(
+                        'The \'num_dummy_chapters_to_generate\' must'
+                        ' be provided when the action is '
+                        'generate_dummy_chapters.'
+                    )
+                self._generate_dummy_chapters(
+                    story_id, num_dummy_chapters_to_generate)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -1783,6 +1836,145 @@ class AdminHandler(
         else:
             raise Exception(
                 'Cannot generate dummy stories in production.')
+
+    def _generate_dummy_chapters(
+            self, story_id: str,
+            num_dummy_chapters_to_generate: int) -> None:
+        """Generates and loads the database with a specified number of
+            chapters for the selected story.
+
+        Raises:
+            Exception. Cannot load chapters in production mode.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception((
+                    'User \'%s\' must be a curriculum admin'
+                    ' in order to generate chapters.'
+                    ) % self.username)
+
+            category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
+            story = story_fetchers.get_story_by_id(story_id)
+            exp_ids = story.story_contents.get_all_linked_exp_ids()
+
+            if len(exp_ids) > 0:
+                category = exp_services.get_exploration_titles_and_categories(
+                    exp_ids)[exp_ids[0]]['category']
+            exp_ids_to_publish = []
+
+            for i in range(num_dummy_chapters_to_generate):
+                title = f'dummy exp title {i + 1}'
+                new_exp_id = exp_fetchers.get_new_exploration_id()
+
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    new_exp_id, title, category=category,
+                    objective='Dummy Objective')
+                exp_services.save_new_exploration(self.user_id, exploration)
+
+                exp_change_list = [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': exp_domain
+                                         .STATE_PROPERTY_INTERACTION_ID,
+                        'new_value': 'EndExploration'
+                    }),
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': exp_domain
+                                         .STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                        'new_value': {
+                            'recommendedExplorationIds': {
+                                'value': []
+                            }
+                        }
+                    }),
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': (
+                            exp_domain
+                            .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                        ),
+                        'new_value': None
+                    }),
+                ]
+
+                exp_services.update_exploration(
+                    self.user_id, new_exp_id,
+                    exp_change_list, 'Change Interaction')
+
+                exp_ids_to_publish.append(new_exp_id)
+                rights_manager.publish_exploration(
+                    self.user, new_exp_id)
+
+            exp_services.index_explorations_given_ids(
+                exp_ids_to_publish)
+
+            raw_image = b''
+            with open(
+                'core/tests/data/thumbnail.svg', 'rt',
+                encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                raw_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg', feconf.ENTITY_TYPE_STORY, story_id,
+                raw_image, 'thumbnail', False)
+
+            for i, exp_id in enumerate(exp_ids_to_publish):
+                suffix = i + 1
+                node_index = int(story.story_contents.next_node_id[5:]) + i
+                suffix = node_index
+                node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
+                chapter_title = f'dummy chapter {suffix}'
+
+                story_change_list = [
+                    story_domain.StoryChange({
+                        'cmd': 'add_story_node',
+                        'title': chapter_title,
+                        'node_id': node_id
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_EXPLORATION_ID
+                        ),
+                        'new_value': exp_id,
+                        'node_id': node_id,
+                        'old_value': 'exploration_id'
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                        ),
+                        'new_value': 'thumbnail.svg',
+                        'node_id': node_id,
+                        'old_value': 'thumbnail_filename'
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': (
+                            story_domain
+                            .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                        ),
+                        'new_value': '#B3D8F1',
+                        'node_id': node_id,
+                        'old_value': 'thumbnail_bg_color'
+                    }),
+                ]
+                topic_services.update_story_and_topic_summary(
+                    self.user_id, story_id, story_change_list,
+                    'add node', story.corresponding_topic_id
+                )
+        else:
+            raise Exception(
+                'Cannot generate dummy chapters in production.')
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
