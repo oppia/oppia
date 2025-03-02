@@ -1924,12 +1924,9 @@ class AdminHandler(
 
             for i, exp_id in enumerate(exp_ids_to_publish):
                 suffix = i + 1
-                node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
-                if story.story_contents is not None:
-                    node_index = int(story.story_contents.next_node_id[5:]) + i
-                    suffix = node_index
-                    node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
-
+                node_index = int(story.story_contents.next_node_id[5:]) + i
+                suffix = node_index
+                node_id = f'{story_domain.NODE_ID_PREFIX}{node_index}'
                 chapter_title = f'dummy chapter {suffix}'
 
                 story_change_list = [

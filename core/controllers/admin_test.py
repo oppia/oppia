@@ -932,6 +932,45 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    def test_get_handler_includes_all_stories(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+        num_stories = 4
+        created_story_ids = []
+        for i in range(num_stories):
+            url_fragement = ['url-a', 'url-b', 'url-c', 'url-d']
+            story = story_domain.Story.create_default_story(
+                'story_id_%s' % i,
+                'Title %s' % i,
+                'Description %s' % i,
+                'topic', url_fragement[i]
+            )
+            story_services.save_new_story(
+                self.get_user_id_from_email(
+                    self.CURRICULUM_ADMIN_EMAIL
+                ), story
+            )
+            created_story_ids.append('story_id_%s' % i)
+            topic_services.add_canonical_story(
+                self.get_user_id_from_email(
+                    self.CURRICULUM_ADMIN_EMAIL
+                ), 'topic', 'story_id_%s' % i
+            )
+        response = self.get_json('/adminhandler')
+        story_list = response['story_list']
+        returned_story_ids = [story['id'] for story in story_list]
+        self.assertEqual(set(returned_story_ids), set(created_story_ids))
+        self.logout()
+
     def test_post_with_rules_changes_updates_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1816,7 +1855,9 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         )
         story.story_contents.next_node_id = 'node_4'
 
-        def reload_exploration(user_id, exploration_id: str) -> None:
+        def reload_exploration(
+                user_id: str, exploration_id: str
+        ) -> None:
             if constants.DEV_MODE:
                 logging.info(
                     '[ADMIN] %s reloaded exploration %s' %
@@ -1830,7 +1871,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         reload_exploration(self.get_user_id_from_email(
                 self.CURRICULUM_ADMIN_EMAIL), '6'
         )
-        story.add_node('node_4', 'title')
+        story.add_node('node_4', 'dummy chapter 4')
         story.update_node_exploration_id('node_4', '6')
         story_services.save_new_story(
             self.get_user_id_from_email(
@@ -1849,6 +1890,13 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'num_dummy_chapters_to_generate': 2
             }, csrf_token=csrf_token)
 
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        chapter_titles = [
+            node.title for node in updated_story.story_contents.nodes
+        ]
+        self.assertIn('dummy chapter 4', chapter_titles)
+        self.assertIn('dummy chapter 5', chapter_titles)
+        self.assertIn('dummy chapter 6', chapter_titles)
         self.assertNotEqual(len(story.story_contents.nodes), 3)
         self.logout()
 
