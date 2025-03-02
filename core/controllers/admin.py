@@ -1625,6 +1625,7 @@ class AdminHandler(
                             topic_id_to_prerequisite_topic_ids=(
                                 topic_dependency_for_classroom_1),
                             is_published=True,
+                            is_diagnostic_test_enabled=False,
                             thumbnail_data=classroom_config_domain.ImageData(
                                 'thumbnail.svg', 'transparent', 1000
                             ),
