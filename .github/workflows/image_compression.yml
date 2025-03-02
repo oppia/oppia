@@ -25,7 +25,9 @@ jobs:
       - name: Run compress_images script to get compressible images, if any
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         id: compression
-        run: make compress_images
+        run: |
+          pip install graphicsmagick
+          python -m scripts.compress_images
       - name: Upload output files as artifacts
         if: always()
         uses: actions/upload-artifact@v4
