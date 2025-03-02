@@ -25,7 +25,7 @@ module.exports = {
   testMatch: ['**/?(*.)+(spec).[t]s'],
   transform: {'^.+\\.ts?$': 'ts-jest'},
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: './custom-jest-environment.js',
   testTimeout: 300000,
   bail: 0,
   transformIgnorePatterns: ['node_modules/(?!expect/)'],
