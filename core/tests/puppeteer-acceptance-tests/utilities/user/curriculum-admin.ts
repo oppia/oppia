@@ -679,6 +679,13 @@ export class CurriculumAdmin extends BaseUser {
    */
   async clickShowPracticeButton(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.page.waitForSelector(togglePracticeButton, {
+        visible: true,
+        timeout: 10000,
+      });
+    }
     await this.clickOn(togglePracticeButton);
     await this.saveTopicDraft(topicName);
   }
