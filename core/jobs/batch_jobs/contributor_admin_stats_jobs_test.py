@@ -1962,7 +1962,8 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
     JOB_CLASS: Type[
         contributor_admin_stats_jobs
             .AuditAndLogIncorretDataInContributorAdminStatsJob
-    ] = (contributor_admin_stats_jobs
+    ] = (
+        contributor_admin_stats_jobs
             .AuditAndLogIncorretDataInContributorAdminStatsJob)
 
     def test_empty_storage(self) -> None:

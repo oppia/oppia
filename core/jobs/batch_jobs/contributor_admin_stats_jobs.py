@@ -896,13 +896,13 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Return the suggestion models for which stats models are missing
         contribution stats models along with a boolean field, showing the
-        existence of corresponding opportunity model.
+        existence of corresponding opportunity model
 
         Returns:
             PCollection. A PCollection of 'SUCCESS x' results, where x is
             the number of suggestion models for which stats models are missing
-            , and such suggestion models with a boolean field, showing the
-            existence of corresponding opportunity model
+            and such suggestion models with a boolean field showing the
+            existence of corresponding opportunity model.
         """
 
         general_suggestions_models = (
@@ -1067,7 +1067,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                 Tuple[int, str]]:
         """Returns number and logs of translation suggestion models for which
         translation contribution stats models are missing or invalid, for a
-        particular language code and contributor user id.
+        particular language code and contributor user id
 
         Args:
             translation_contribution_stats:
@@ -1080,12 +1080,11 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                 (language_code, author_id).
 
         Returns:
-            Either a 2-tuple with the following elements:
+            A 2-tuple (if any) with the following elements:
             - int. The number of suggestion models for which stats models are
             missing or invalid.
             - str. The debug logs, containing information about suggestion
             models for which stats models are missing or invalid.
-            or None
         """
         translation_contribution_stats = list(translation_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
@@ -1100,7 +1099,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
         general_suggestion_models = list(
             translation_general_suggestions_stats)
 
-        debug_logs = ('<====TRANSLATION_CONTRIBUTION====>\n')
+        debug_logs = '<====TRANSLATION_CONTRIBUTION====>\n'
 
         logged_suggestions_count = 0
 
@@ -1159,8 +1158,8 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             )
 
         if logged_suggestions_count == 0:
-            return None 
-        else:                   
+            return None
+        else:
             return (logged_suggestions_count, debug_logs)
 
     @staticmethod
@@ -1172,7 +1171,7 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                 Tuple[int, str]]:
         """Returns number and logs of questions suggestion models for which
         quesion contribution stats models are missing or invalid, for a
-        particular contributor user id.
+        particular contributor user id
 
         Args:
             question_contribution_stats:
@@ -1184,12 +1183,11 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                 GeneralSuggestionModel grouped by author_id.
 
         Returns:
-            Either a 2-tuple with the following elements:
+            A 2-tuple (if any) with the following elements:
             - int. The number of suggestion models for which stats models are
             missing or invalid.
             - str. The debug logs, containing information about suggestion
             models for which stats models are missing or invalid.
-            or None
         """
         question_contribution_stats = list(question_contribution_stats)
         valid_topic_ids_with_contribution_stats: List[str] = []
@@ -1198,13 +1196,13 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 invalid_topic_ids_with_contribution_stats.append(stat.topic_id)
-            else: 
+            else:
                 valid_topic_ids_with_contribution_stats.append(stat.topic_id)
 
         general_suggestion_stats = list(
             question_general_suggestions_stats)
 
-        debug_logs = ('<====QUESTION_CONTRIBUTION====>\n')
+        debug_logs = '<====QUESTION_CONTRIBUTION====>\n'
 
         logged_suggestions_count = 0
 
@@ -1258,8 +1256,8 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                         )
 
         if logged_suggestions_count == 0:
-            return None 
-        else:                   
+            return None
+        else:
             return (logged_suggestions_count, debug_logs)
 
     @staticmethod
@@ -1279,5 +1277,3 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             return True
 
         return False
-
-
