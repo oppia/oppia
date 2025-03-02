@@ -22,11 +22,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Install GraphicsMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphicsmagick
       - name: Run compress_images script to get compressible images, if any
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         id: compression
         run: |
-          pip install graphicsmagick
           python -m scripts.compress_images
       - name: Upload output files as artifacts
         if: always()
