@@ -2175,11 +2175,15 @@ def highlight_differences(
         return original[:max_length], updated[:max_length]
 
     min_length = min(len(original), len(updated))
-    diff_index = next((i for i in range(min_length) if original[i] != updated[i]), min_length)
-
+    diff_index = next(
+        (i for i in range(min_length) if original[i] != updated[i]), min_length
+    )
     start_index = max(0, diff_index - 10)
-    truncated_original = ('...' if start_index > 0 else '') + original[start_index: start_index + max_length]
-    truncated_updated = ('...' if start_index > 0 else '') + updated[start_index: start_index + max_length]
+    truncated_original = (
+        '...' if start_index > 0 else '') + original[start_index: start_index + max_length]
+    truncated_updated = (
+        '...' if start_index > 0 else '') + updated[start_index: start_index + max_length]
+
 
     return truncated_original, truncated_updated
 
@@ -2241,7 +2245,8 @@ def update_translation_suggestion(
     # We use a sorted approach to compare component counts because it ensures
     # consistency in comparison regardless of the order components appear.
     all_component_names = sorted(
-        {strip_prefix(name) for name in original_rte_counts.keys() | updated_rte_counts.keys()}
+        {strip_prefix(name)
+        for name in original_rte_counts.keys() | updated_rte_counts.keys()}
     )
 
     discrepancy_components = []
@@ -2252,11 +2257,17 @@ def update_translation_suggestion(
         updated_count = updated_rte_counts.get(full_name, 0)
 
         if original_count != updated_count:
-            discrepancy_components.append((component_name, original_count, updated_count))
+            discrepancy_components.append((
+                component_name, original_count, updated_count
+            ))
 
     if discrepancy_components:
-        original_summary = [f'{count} {name}' for name, count, _ in discrepancy_components]
-        updated_summary = [f'{count} {name}' for name, _, count in discrepancy_components]
+        original_summary = [
+            f'{count} {name}' for name, count, _ in discrepancy_components
+        ]
+        updated_summary = [
+            f'{count} {name}' for name, _, count in discrepancy_components
+        ]
 
         original_summary_text = (
             'Components in original text: ' + ', '.join(original_summary) + '.'
