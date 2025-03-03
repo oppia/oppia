@@ -2304,7 +2304,7 @@ describe('Contributions and review component', () => {
   // review questions here.
   describe('when user is not allowed to review questions', () => {
     it(
-      'should initialize $scope properties after controller is' +
+      'should initialize component properties after component is' +
         ' initialized',
       () => {
         expect(component.activeTabType).toBe('reviews');
