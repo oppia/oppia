@@ -2155,7 +2155,7 @@ def strip_prefix(component_name: str) -> str:
     Returns:
         str. The component name without the prefix.
     """
-    return component_name.removeprefix("oppia-noninteractive-")
+    return component_name.removeprefix('oppia-noninteractive-')
 
 
 def highlight_differences(
@@ -2177,10 +2177,9 @@ def highlight_differences(
     min_length = min(len(original), len(updated))
     diff_index = next((i for i in range(min_length) if original[i] != updated[i]), min_length)
 
-    # Keeping some context before the differing part
     start_index = max(0, diff_index - 10)
-    truncated_original = ("..." if start_index > 0 else "") + original[start_index: start_index + max_length]
-    truncated_updated = ("..." if start_index > 0 else "") + updated[start_index: start_index + max_length]
+    truncated_original = ('...' if start_index > 0 else '') + original[start_index: start_index + max_length]
+    truncated_updated = ('...' if start_index > 0 else '') + updated[start_index: start_index + max_length]
 
     return truncated_original, truncated_updated
 
@@ -2245,11 +2244,10 @@ def update_translation_suggestion(
         {strip_prefix(name) for name in original_rte_counts.keys() | updated_rte_counts.keys()}
     )
 
-    # To collect components with discrepancies
     discrepancy_components = []
 
     for component_name in all_component_names:
-        full_name = f"oppia-noninteractive-{component_name}"
+        full_name = f'oppia-noninteractive-{component_name}'
         original_count = original_rte_counts.get(full_name, 0)
         updated_count = updated_rte_counts.get(full_name, 0)
 
@@ -2257,15 +2255,14 @@ def update_translation_suggestion(
             discrepancy_components.append((component_name, original_count, updated_count))
 
     if discrepancy_components:
-        # Format the components with discrepancies
-        original_summary = [f"{count} {name}" for name, count, _ in discrepancy_components]
-        updated_summary = [f"{count} {name}" for name, _, count in discrepancy_components]
+        original_summary = [f'{count} {name}' for name, count, _ in discrepancy_components]
+        updated_summary = [f'{count} {name}' for name, _, count in discrepancy_components]
 
         original_summary_text = (
-            "Components in original text: " + ", ".join(original_summary) + "."
+            'Components in original text: ' + ', '.join(original_summary) + '.'
         )
         updated_summary_text = (
-            "Components in translated text: " + ", ".join(updated_summary) + "."
+            'Components in translated text: ' + ', '.join(updated_summary) + '.'
         )
 
         original_text_preview, translation_text_preview = highlight_differences(
