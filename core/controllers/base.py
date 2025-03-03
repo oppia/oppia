@@ -762,6 +762,41 @@ class BaseHandler(
                 feconf.HANDLER_TYPE_JSON, values
             )
 
+    def _log_exception_message(
+        self, exception_type: str, log_type: str, error_message: str
+    ) -> None:
+        """Logs exception details.
+
+        Args:
+            exception_type: str. Name of the exception.
+            log_type: str. Log level ('warning', 'exception').
+            error_message: str. Detailed error message.
+        """
+
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url = self.request.uri
+
+        msg = (
+            'Type Exception: %s\n'
+            'Error Message: %s\n'
+            'URL requested: %s\n'
+            'Request method: %s\n'
+            'Handler class name: %s\n'
+            % (
+                exception_type,
+                error_message,
+                url,
+                request_method,
+                handler_class_name
+            )
+        )
+
+        if log_type == 'warning':
+            logging.warning(msg)
+        elif log_type == 'exception':
+            logging.exception(msg)
+
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
     ) -> None:
@@ -774,6 +809,7 @@ class BaseHandler(
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
+        exception_type = type(exception).__name__
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
@@ -787,6 +823,11 @@ class BaseHandler(
             payload_exists = (
                 self.payload is not None and
                 not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            self._log_exception_message(
+                exception_type,
+                'warning',
+                'Unauthenticated user'
             )
             if (
                     payload_exists or
@@ -804,7 +845,11 @@ class BaseHandler(
             return
 
         if isinstance(exception, self.NotFoundException):
-            logging.warning('Invalid URL requested: %s', self.request.uri)
+            self._log_exception_message(
+                exception_type,
+                'warning',
+                'Invalid URL requested'
+            )
             self.error(404)
             values = {
                 'error': 'Could not find the resource %s.' % self.request.uri,
@@ -813,8 +858,11 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        logging.exception(
-            'Exception raised at %s: %s', self.request.uri, exception)
+        self._log_exception_message(
+            exception_type,
+            'exception',
+            'Exception raised'
+        )
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
