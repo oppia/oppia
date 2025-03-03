@@ -73,12 +73,6 @@ NOT_FULLY_COVERED_FILENAMES = [
         'services/voiceover-recording.service.ts',
     'core/templates/pages/exploration-player-page/services/'
         'learner-answer-info.service.ts',
-    'core/templates/pages/topic-editor-page/modal-templates/'
-        'questions-list-select-skill-and-difficulty-modal.component.ts',
-    # TODO(#16656): This file will be covered by angular migration team.
-    'core/templates/pages/topic-editor-page/modal-templates/'
-        'questions-opportunities-select-difficulty-modal.component.ts',
-    # TODO(#16656): This file will be covered by angular migration team.
     'core/templates/services/rte-helper-modal.component.ts',
     # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
     'core/templates/services/'
