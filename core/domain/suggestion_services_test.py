@@ -1290,12 +1290,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_highlight_differences_identical_strings(self) -> None:
-        original = "This is a test string."
-        updated = "This is a test string."
+        original = 'This is a test string.'
+        updated = 'This is a test string.'
         max_length = 50
 
-        truncated_original, truncated_updated = suggestion_services.highlight_differences(
-            original, updated, max_length
+        truncated_original, truncated_updated = (
+            suggestion_services.highlight_differences(
+                original,
+                updated,
+                max_length
+            )
         )
 
         self.assertEqual(truncated_original, original[:max_length])
