@@ -1289,6 +1289,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             translation_html_with_image
         )
 
+    def test_highlight_differences_identical_strings(self) -> None:
+        original = "This is a test string."
+        updated = "This is a test string."
+        max_length = 50
+
+        truncated_original, truncated_updated = suggestion_services.highlight_differences(
+            original, updated, max_length
+        )
+
+        self.assertEqual(truncated_original, original[:max_length])
+        self.assertEqual(truncated_updated, updated[:max_length])
+
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
     ) -> None:
