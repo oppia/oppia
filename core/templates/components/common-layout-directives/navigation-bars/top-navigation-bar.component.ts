@@ -228,11 +228,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    this.learnerGroupBackendApiService
-      .isLearnerGroupFeatureEnabledAsync()
-      .then(featureIsEnabled => {
-        this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-      });
+    if (this.currentUrl !== 'signup') {
+      this.learnerGroupBackendApiService
+        .isLearnerGroupFeatureEnabledAsync()
+        .then(featureIsEnabled => {
+          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
+        });
+    }
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();

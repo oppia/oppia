@@ -836,4 +836,19 @@ describe('TopNavigationBarComponent', () => {
       ).toBeTrue();
     }
   );
+
+  it('should not check learner groups feature on signup page', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    const learnerGroupSpy = spyOn(
+      learnerGroupBackendApiService,
+      'isLearnerGroupFeatureEnabledAsync'
+    );
+
+    mockWindowRef.nativeWindow.location.pathname = '/signup';
+    component.ngOnInit();
+    tick();
+
+    expect(learnerGroupSpy).not.toHaveBeenCalled();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+  }));
 });

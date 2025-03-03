@@ -328,6 +328,11 @@ jobs:
       - name: Fail if workflow status is failure
         if: ${{ steps.check_workflow_status.outputs.WORKFLOW_STATUS == 'failure' }}
         run: |
+          echo ""
+          echo "NOTE TO DEVELOPERS: This CI check is failing because another e2e/acceptance/lighthouse full-stack test workflow has failed. Please see that other workflow for the relevant logs to investigate. When all full-stack workflows pass, this CI check will automatically pass."
+          echo ""
+          echo "If all other full-stack workflows have passed and this is the only failure, please file an issue on our issue tracker and link to this log. Thanks!"
+          echo ""
           exit 1
         shell: bash
     permissions:
