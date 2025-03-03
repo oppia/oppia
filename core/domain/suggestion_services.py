@@ -2146,6 +2146,45 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
+def strip_prefix(component_name: str) -> str:
+    """Removes the 'oppia-noninteractive-' prefix from component names.
+
+    Args:
+        component_name: str. The full component name.
+
+    Returns:
+        str. The component name without the prefix.
+    """
+    return component_name.removeprefix("oppia-noninteractive-")
+
+
+def highlight_differences(
+    original: str, updated: str, max_length: int = 200
+    ) -> tuple:
+    """Finds the first difference between two strings and truncates accordingly.
+
+    Args:
+        original: str. The original string.
+        updated: str. The updated string.
+        max_length: int. Maximum length of the returned snippets.
+
+    Returns:
+        tuple. A pair of truncated strings highlighting where they differ.
+    """
+    if original == updated:
+        return original[:max_length], updated[:max_length]
+
+    min_length = min(len(original), len(updated))
+    diff_index = next((i for i in range(min_length) if original[i] != updated[i]), min_length)
+
+    # Keeping some context before the differing part
+    start_index = max(0, diff_index - 10)
+    truncated_original = ("..." if start_index > 0 else "") + original[start_index: start_index + max_length]
+    truncated_updated = ("..." if start_index > 0 else "") + updated[start_index: start_index + max_length]
+
+    return truncated_original, truncated_updated
+
+
 def count_rte_components(html_content: str) -> Dict[str, int]:
     """Counts the number of each RTE component in the provided HTML content.
 
@@ -2202,30 +2241,38 @@ def update_translation_suggestion(
 
     # We use a sorted approach to compare component counts because it ensures
     # consistency in comparison regardless of the order components appear.
-
-    all_components = sorted(
-        set(list(original_rte_counts.keys()) + list(updated_rte_counts.keys()))
+    all_component_names = sorted(
+        {strip_prefix(name) for name in original_rte_counts.keys() | updated_rte_counts.keys()}
     )
 
-    discrepancies = []
-    max_error_text_length = 200
+    # To collect components with discrepancies
+    discrepancy_components = []
 
-    for component in all_components:
-        original_count = original_rte_counts.get(component, 0)
-        updated_count = updated_rte_counts.get(component, 0)
+    for component_name in all_component_names:
+        full_name = f"oppia-noninteractive-{component_name}"
+        original_count = original_rte_counts.get(full_name, 0)
+        updated_count = updated_rte_counts.get(full_name, 0)
 
         if original_count != updated_count:
-            discrepancies.append(
-                f'Original text has {original_count} {component} '
-                f'component(s), but translation has {updated_count}.'
-            )
+            discrepancy_components.append((component_name, original_count, updated_count))
 
-    if discrepancies:
-        original_text_preview = original_text_html[:max_error_text_length]
-        translation_text_preview = translation_html[:max_error_text_length]
+    if discrepancy_components:
+        # Format the components with discrepancies
+        original_summary = [f"{count} {name}" for name, count, _ in discrepancy_components]
+        updated_summary = [f"{count} {name}" for name, _, count in discrepancy_components]
+
+        original_summary_text = (
+            "Components in original text: " + ", ".join(original_summary) + "."
+        )
+        updated_summary_text = (
+            "Components in translated text: " + ", ".join(updated_summary) + "."
+        )
+
+        original_text_preview, translation_text_preview = highlight_differences(
+            original_text_html, translation_html)
 
         raise utils.InvalidInputException(
-            f'{" ".join(discrepancies)}\n'
+            f'{original_summary_text} {updated_summary_text}\n'
             f'Original text preview: {original_text_preview}\n'
             f'Translated text preview: {translation_text_preview}'
         )

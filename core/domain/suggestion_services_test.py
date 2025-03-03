@@ -1074,9 +1074,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'exploration1', self.target_version_at_submission,
             self.author_id, add_translation_change_dict, 'test description')
 
-    def test_update_translation_suggestion_error_on_rte_removal(
-            self
-        ) -> None:
+    def test_update_translation_suggestion_error_on_rte_removal(self) -> None:
+        """Tests that an InvalidInputException is raised when a translation suggestion
+        update removes an RTE component.
+        """
         content_html_with_rte_components = (
             '<p>Original content with image.</p>'
             '<oppia-noninteractive-image '
@@ -1119,9 +1120,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 1 oppia-noninteractive-image component\(s\), '
-            r'but translation has 0.\s*Original text preview: .*\s*'
-            r'Translated text preview: .*'
+            'Components in original text: 1 image. Components in translated text: 0 image.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1153,9 +1152,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 0 oppia-noninteractive-image component\(s\), '
-            r'but translation has 1.\s*Original text preview: .*\s*'
-            r'Translated text preview: .*'
+            'Components in original text: 0 image. Components in translated text: 1 image.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1215,11 +1212,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 2 oppia-noninteractive-image component\(s\), '
-            r'but translation has 1\. Original text has 0 '
-            r'oppia-noninteractive-math component\(s\), but translation has 2\.'
-            r'\s*Original text preview: .*'
-            r'\s*Translated text preview: .*'
+            'Components in original text: 2 image, 0 math. '
+            'Components in translated text: 1 image, 2 math.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1241,16 +1235,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         expected_counts = {tag: 0 for tag in rte_tags}
 
         expected_counts['oppia-noninteractive-image'] = 2
-        expected_counts['oppia-noninteractive-math'] = 0
 
         self.assertEqual(expected_counts, original_component_counts)
 
     def test_update_translation_suggestion_error_when_component_types_mismatch(
-            self
-        ) -> None:
-        """Test that updating a translation raises an error when RTE components
-        are replaced with different types, even if total count remains same.
-        """
+        self
+    ) -> None:
         content_html_with_image = (
             '<p>Original content with image.</p>'
             '<oppia-noninteractive-image '
@@ -1271,25 +1261,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             content_html_with_image,
             translation_html_with_image
         )
-
         updated_translation_with_math = (
             '<p>Updated translation with math instead of image.</p>'
             '<oppia-noninteractive-math '
             'math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)'
-            '&amp;quot;, '
-            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg'
-            '&amp;quot;}">'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
             '</oppia-noninteractive-math>'
         )
-
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            r'Original text has 1 oppia-noninteractive-image component\(s\), '
-            r'but translation has 0\. Original text has 0 '
-            r'oppia-noninteractive-math component\(s\), but translation has 1\.'
-            r'\s*Original text preview: .*'
-            r'\s*Translated text preview: .*'
+            'Components in original text: 1 image, 0 math. '
+            'Components in translated text: 0 image, 1 math.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
