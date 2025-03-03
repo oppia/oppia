@@ -65,6 +65,7 @@ describe('Classroom data model', () => {
       'Topics Covered',
       'Learn math',
       true,
+      false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
@@ -78,6 +79,7 @@ describe('Classroom data model', () => {
     );
     expect(classroomData.getTeaserText()).toEqual('Learn math');
     expect(classroomData.getIsPublished()).toBeTrue();
+    expect(classroomData.getIsDiagnosticTestEnabled()).toBeFalse();
     expect(classroomData.getThumbnailData().filename).toEqual('thumbnail.svg');
     expect(classroomData.getThumbnailData().size_in_bytes).toEqual(100);
     expect(classroomData.getThumbnailData().bg_color).toEqual('transparent');
