@@ -67,7 +67,8 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_valid_classroom()
         self.save_new_valid_classroom(
-            'history', 'history', 'history', is_published=False
+            'history', 'history', 'history',
+            is_published=False,
         )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
@@ -176,6 +177,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                         topic_id_to_prerequisite_topic_ids=(
                             topic_dependency_for_classroom_1),
                         is_published=True,
+                        is_diagnostic_test_enabled=False,
                         thumbnail_data=classroom_config_domain.ImageData(
                             'thumbnail.svg', 'transparent', 1000
                         ),
