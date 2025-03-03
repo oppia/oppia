@@ -1075,8 +1075,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, add_translation_change_dict, 'test description')
 
     def test_update_translation_suggestion_error_on_rte_removal(self) -> None:
-        """Tests that an InvalidInputException is raised when a translation suggestion
-        update removes an RTE component.
+        """Tests that an InvalidInputException is raised when a translation
+        suggestion update removes an RTE component.
         """
         content_html_with_rte_components = (
             '<p>Original content with image.</p>'
@@ -1120,7 +1120,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            'Components in original text: 1 image. Components in translated text: 0 image.'
+            'Components in original text: 1 image. '
+            'Components in translated text: 0 image.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
@@ -1152,7 +1153,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            'Components in original text: 0 image. Components in translated text: 1 image.'
+            'Components in original text: 0 image. '
+            'Components in translated text: 1 image.'
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id,
