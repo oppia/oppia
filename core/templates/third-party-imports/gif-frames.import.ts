@@ -30,7 +30,7 @@ interface GifFrame {
 }
 
 // Angular service that directly imports the gif-frames library.
-// utilize its functionality for use in the application.
+// And utilize its functionality for use in the application.
 
 @Injectable({
   providedIn: 'root',
