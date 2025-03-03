@@ -87,6 +87,7 @@ describe('Classroom backend API service', function () {
     course_details: 'Course Details',
     topic_list_intro: 'Topics Covered',
     is_published: true,
+    is_diagnostic_test_enabled: false,
     teaser_text: 'learn math',
     thumbnail_data: {
       filename: 'thumbnail.svg',
@@ -109,6 +110,7 @@ describe('Classroom backend API service', function () {
     topic_id_to_prerequisite_topic_ids: {},
     teaser_text: 'Teaser text of the classroom',
     is_published: true,
+    is_diagnostic_test_enabled: false,
     thumbnail_data: {
       filename: 'thumbnail.svg',
       bg_color: 'transparent',
@@ -139,6 +141,7 @@ describe('Classroom backend API service', function () {
       responseDictionaries.topic_list_intro,
       responseDictionaries.teaser_text,
       responseDictionaries.is_published,
+      responseDictionaries.is_diagnostic_test_enabled,
       responseDictionaries.thumbnail_data,
       responseDictionaries.banner_data,
       responseDictionaries.public_classrooms_count
@@ -321,6 +324,7 @@ describe('Classroom backend API service', function () {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
+      is_diagnostic_test_enabled: false,
       thumbnail_data: {
         filename: 'thumbnail.svg',
         bg_color: 'transparent',
@@ -341,6 +345,7 @@ describe('Classroom backend API service', function () {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      isDiagnosticTestEnabled: false,
       thumbnailData: {
         filename: 'thumbnail.svg',
         bg_color: 'transparent',

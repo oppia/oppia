@@ -62,6 +62,10 @@ class ClassroomModel(base_models.BaseModel):
     # False if classroom is hidden, True if published.
     is_published = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
+    # Whether this classroom is published or not.
+    # False if classroom is hidden, True if published.
+    is_diagnostic_test_enabled = datastore_services.BooleanProperty(
+        indexed=True, required=True, default=False)
     # The thumbnail filename of the classroom.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the classroom.
@@ -100,6 +104,8 @@ class ClassroomModel(base_models.BaseModel):
             'topic_id_to_prerequisite_topic_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'is_diagnostic_test_enabled': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -136,7 +142,8 @@ class ClassroomModel(base_models.BaseModel):
         cls, classroom_id: str, name: str, url_fragment: str,
         course_details: str, teaser_text: str, topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, thumbnail_filename: str, thumbnail_bg_color: str,
+        is_published: bool, is_diagnostic_test_enabled: bool,
+        thumbnail_filename: str, thumbnail_bg_color: str,
         thumbnail_size_in_bytes: int, banner_filename: str,
         banner_bg_color: str, banner_size_in_bytes: int, index: int
     ) -> ClassroomModel:
@@ -154,6 +161,8 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
+            is_diagnostic_test_enabled: bool. Whether diagnostic test 
+                is enabled.
             thumbnail_filename: str. Classroom's thumbnail filename.
             thumbnail_bg_color: str. Classroom's thumbnail background color.
             thumbnail_size_in_bytes: int. The thumbnail size in bytes.
@@ -182,6 +191,7 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids=(
                 topic_id_to_prerequisite_topic_ids),
             is_published=is_published,
+            is_diagnostic_test_enabled=is_diagnostic_test_enabled,
             thumbnail_filename=thumbnail_filename,
             thumbnail_bg_color=thumbnail_bg_color,
             thumbnail_size_in_bytes=thumbnail_size_in_bytes,
