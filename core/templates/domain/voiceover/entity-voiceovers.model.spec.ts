@@ -116,6 +116,16 @@ describe('EntityVoiceovers model class', function () {
     expect(retrievedManualVoiceover).toEqual(manualVoiceover);
   });
 
+  it('should be able to get automatic voiceovers', () => {
+    let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+      entityVoiceoversBackendDict
+    );
+
+    let retrievedAutomaticVoiceover =
+      entityVoiceovers.getAutomaticVoiceover('content0');
+    expect(retrievedAutomaticVoiceover).toEqual(automaticVoiceover);
+  });
+
   it('should get undefined for unknown content IDs', () => {
     let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict

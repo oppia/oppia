@@ -248,9 +248,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   updateSupportsAutogenerationField(
-    languageAccentCode,
-    supportsAutogeneration
-  ) {
+    languageAccentCode: string,
+    supportsAutogeneration: string
+  ): void {
     const languageCode =
       this.languageAccentCodeToLanguageCode[languageAccentCode];
 

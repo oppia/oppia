@@ -8,7 +8,7 @@
     </div>
     <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers">
       <i>
-        Content is not available for voiceovers in the selected language.
+        Content is not available for voiceover in the selected language.
       </i>
     </div>
   </div>
@@ -21,13 +21,16 @@
           <mat-icon *ngIf="!isManualVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
           <mat-icon *ngIf="isManualVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
         </button>
-          <mat-progress-bar mode="determinate"
-                            [value]="manualVoiceoverProgress"
-                            class="voiceover-progress">
-          </mat-progress-bar>
+
+        <mat-progress-bar mode="determinate"
+                          [value]="manualVoiceoverProgress"
+                          class="voiceover-progress">
+        </mat-progress-bar>
+
         <span class="voiceover-timer">
           {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
+
         <button (click)="deleteManualVoiceover()"
                 mat-icon-button
                 mat-button>
@@ -48,6 +51,7 @@
           </mat-icon>
         </button>
       </div>
+
       <div *ngIf="manualVoiceover">
         <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
       </div>

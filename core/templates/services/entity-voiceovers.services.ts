@@ -164,7 +164,8 @@ export class EntityVoiceoversService {
         }
 
         if (Object.keys(contentIdToVoiceovers).indexOf(contentId) !== -1) {
-          contentIdToVoiceovers[contentId].concat(voiceovers);
+          contentIdToVoiceovers[contentId] =
+            contentIdToVoiceovers[contentId].concat(voiceovers);
         } else {
           contentIdToVoiceovers[contentId] = voiceovers;
         }

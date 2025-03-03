@@ -115,16 +115,13 @@ export class TranslationStatusService implements OnInit {
     let manualVoiceover = entityVoiceovers.getManualVoiceover(contentId);
     let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(contentId);
 
+    // Manual voiceovers is given higher priority than automatic voiceovers.
     if (manualVoiceover) {
       availabilityStatus.available = true;
       availabilityStatus.needsUpdate = manualVoiceover.needsUpdate;
     } else if (automaticVoiceover) {
       availabilityStatus.available = true;
       availabilityStatus.needsUpdate = automaticVoiceover.needsUpdate;
-    }
-
-    if (manualVoiceover === undefined) {
-      return availabilityStatus;
     }
 
     return availabilityStatus;
