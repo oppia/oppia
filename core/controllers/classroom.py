@@ -131,6 +131,7 @@ class ClassroomDataHandler(
             'url_fragment': classroom.url_fragment,
             'teaser_text': classroom.teaser_text,
             'is_published': classroom.is_published,
+            'is_diagnostic_test_enabled': classroom.is_diagnostic_test_enabled,
             'thumbnail_data': classroom.thumbnail_data.to_dict(),
             'banner_data': classroom.banner_data.to_dict(),
             'public_classrooms_count': public_classrooms_count,
@@ -571,6 +572,8 @@ class AllClassroomsSummaryHandler(
                 'url_fragment': classroom.url_fragment,
                 'teaser_text': classroom.teaser_text,
                 'is_published': classroom.is_published,
+                'is_diagnostic_test_enabled': (
+                    classroom.is_diagnostic_test_enabled),
                 'thumbnail_filename': classroom.thumbnail_data.filename,
                 'thumbnail_bg_color': classroom.banner_data.bg_color,
                 'index': 0 if classroom.index is None else classroom.index
