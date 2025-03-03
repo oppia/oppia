@@ -52,8 +52,6 @@ EXCLUDED_DIRECTORIES = [
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
-    'core/templates/App.ts',
-    'core/templates/base-components/oppia-root.directive.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
         'ck-editor-4-widgets.initializer.ts',
@@ -61,12 +59,10 @@ NOT_FULLY_COVERED_FILENAMES = [
         'object-editor.directive.ts',
     'core/templates/components/state-directives/rule-editor/'
         'rule-type-selector.directive.ts',
-    'core/templates/directives/angular-html-bind.directive.ts',
-    'core/templates/directives/mathjax-bind.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
+    'core/templates/domain/question/QuestionObjectFactory.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
-    'core/templates/pages/Base.ts',
     'core/templates/pages/exploration-editor-page/services/'
         'exploration-states.service.ts',
     'core/templates/pages/exploration-editor-page/translation-tab/'
@@ -75,10 +71,8 @@ NOT_FULLY_COVERED_FILENAMES = [
         'learner-answer-info.service.ts',
     'core/templates/services/rte-helper-modal.component.ts',
     # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
-    'core/templates/services/'
-        'translation-file-hash-loader-backend-api.service.ts',
-    # Please don't try to cover unit-test-utils.ajs.ts file.
     'core/templates/tests/unit-test-utils.ajs.ts',
+    # Please don't try to cover unit-test-utils.ajs.ts file.
     'extensions/interactions/MusicNotesInput/directives/'
         'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
