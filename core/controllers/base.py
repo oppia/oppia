@@ -581,7 +581,9 @@ class BaseHandler(
         return (
             self.current_user_is_super_admin or
             feconf.ROLE_ID_RELEASE_COORDINATOR in self.roles)
-
+        
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'get' method with different number of arguments and types.
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
         request_method = self.request.environ.get('REQUEST_METHOD', 'UNKNOWN')
@@ -599,6 +601,8 @@ class BaseHandler(
         }
         self._render_exception(values)
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'post' method with different number of arguments and types.
     def post(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle POST requests.
 
@@ -607,6 +611,8 @@ class BaseHandler(
         """
         raise self.NotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'put' method with different number of arguments and types.
     def put(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle PUT requests.
 
@@ -615,6 +621,8 @@ class BaseHandler(
         """
         raise self.NotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'delete' method with different number of arguments and types.
     def delete(self, *args: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle DELETE requests.
 
@@ -623,12 +631,19 @@ class BaseHandler(
         """
         raise self.NotFoundException
 
+    # Here we use type Any because the sub-classes of 'Basehandler' can have
+    # 'head' method with different number of arguments and types.
     def head(self, *args: Any, **kwargs: Any) -> None:
         """Method to handle HEAD requests. The webapp library automatically
         makes sure that HEAD only returns the headers of GET request.
         """
         return self.get(*args, **kwargs)
 
+    # TODO(#16539): Once all the places are fixed with the type of value
+    # that is rendered to JSON, then please remove Sequence[Mapping[str, Any]]
+    # from render_json's argument type.
+    # Here we use type Any because the argument 'values' can accept various
+    # kinds of dictionaries that needs to be sent as a JSON response.
     def render_json(
         self, values: Union[str, Sequence[Mapping[str, Any]], Mapping[str, Any]]
     ) -> None:
@@ -647,6 +662,7 @@ class BaseHandler(
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
+        # Write expects bytes, thus we need to encode the JSON output.
         self.response.write(
             b'%s%s' % (feconf.XSSI_PREFIX, json_output.encode('utf-8')))
 
@@ -664,6 +680,14 @@ class BaseHandler(
         self.response.headers['Content-Disposition'] = (
             'attachment; filename=%s' % filename)
         self.response.charset = 'utf-8'
+                # Here we use MyPy ignore because according to MyPy super can
+        # accept 'super class and self' as arguments but here we are passing
+        # 'webapp2.Response, and self.response' which confuses MyPy about the
+        # typing of super, and due to this MyPy is unable to recognize the
+        # 'write' method and throws an error. This change in arguments is
+        # done because we use 'super' method in order to bypass the write
+        # method in webapp2.Response, since webapp2.Response doesn't support
+        # writing bytes.
         super(webapp2.Response, self.response).write(file.getvalue())  # type: ignore[misc] # pylint: disable=bad-super-call
 
     def render_template(
@@ -690,6 +714,8 @@ class BaseHandler(
             Exception. Invalid iframe restriction value.
         """
 
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
         self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers['Strict-Transport-Security'] = (
@@ -728,6 +754,9 @@ class BaseHandler(
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
             if values['status_code'] == 404:
+                # Only 404 routes can be handled with angular router as it only
+                # has access to the path, not to the status code.
+                # That's why 404 status code is treated differently.
                 self.render_template('oppia-root.mainpage.html')
         else:
             if return_type not in (
@@ -744,6 +773,8 @@ class BaseHandler(
         Args:
             values: dict. The key-value pairs to include in the response.
         """
+        # The error codes here should be in sync with the error pages
+        # generated via webpack.common.config.ts.
         assert values['status_code'] in [400, 401, 404, 405, 500]
         method = self.request.environ['REQUEST_METHOD']
 
@@ -778,6 +809,15 @@ class BaseHandler(
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
         if isinstance(exception, self.NotLoggedInException):
+            # This checks if the response should be JSON or HTML.
+            # For GET requests, there is no payload, so we check against
+            # GET_HANDLER_ERROR_RETURN_TYPE.
+            # Otherwise, we check whether self.payload exists.
+
+            # This check is to avoid throwing of 401 when payload doesn't
+            # exists and self.payload is replaced by RaiseErrorOnGet object.
+            # TODO(#13155): Change this to self.normalized_payload
+            #  once schema is implemented for all handlers.
             self._log_exception_message(
                 401,
                 "NotLoggedInException: Request to %s with method %s" %
@@ -904,6 +944,8 @@ class RaiseErrorOnGet:
 
     def __init__(self, message: str) -> None:
         self.error_message = message
+    # Here we use type Any because the 'get' method can accept arbitrary number
+    # of arguments with different types.
 
     def get(self, *args: Any, **kwargs: Any) -> None:
         """Raises an error when invoked."""
@@ -913,7 +955,9 @@ class RaiseErrorOnGet:
 class CsrfTokenManager:
     """Manages page/user tokens in memcache to protect against CSRF."""
 
+    # Max age of the token (48 hours).
     _CSRF_TOKEN_AGE_SECS: Final = 60 * 60 * 48
+    # Default user id for non-logged-in users.
     _USER_ID_DEFAULT: Final = 'non_logged_in_user'
 
     @classmethod
@@ -933,11 +977,21 @@ class CsrfTokenManager:
         Returns:
             str. The generated CSRF token.
         """
+        # The token has 4 parts: hash of the actor user id, hash of the page
+        # name, hash of the time issued and plain text of the time issued.
+
         if user_id is None:
             user_id = cls._USER_ID_DEFAULT
 
+        # Round time to seconds.
         issued_on_str = str(int(issued_on))
 
+        # Generate a nonce (number used once) to ensure that even two
+        # consecutive calls to the same endpoint in the same second generate
+        # different tokens. Note that this nonce is just for anti-collision
+        # purposes, so it's okay that the nonce is stored in the CSRF token and
+        # therefore can be controlled by an attacker. See OWASP guidance here:
+        # https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#signed-double-submit-cookie.
         if nonce is None:
             nonce = base64.urlsafe_b64encode(os.urandom(20)).decode('utf-8')
 
@@ -952,6 +1006,8 @@ class CsrfTokenManager:
         digester.update(nonce.encode('utf-8'))
 
         digest = digester.digest()
+        # The b64encode returns bytes, so we first need to decode the returned
+        # bytes to string.
         token = '%s/%s/%s' % (
             issued_on_str, nonce,
             base64.urlsafe_b64encode(digest).decode('utf-8'))
@@ -1021,6 +1077,8 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
+    # Here we use MyPy ignore because the signature of 'get' method is not
+    # compatible with super class's (BaseHandler) 'get' method.
     def get(self) -> None:  # type: ignore[override]
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
