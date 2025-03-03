@@ -2179,11 +2179,14 @@ def highlight_differences(
         (i for i in range(min_length) if original[i] != updated[i]), min_length
     )
     start_index = max(0, diff_index - 10)
-    truncated_original = (
-        '...' if start_index > 0 else '') + original[start_index: start_index + max_length]
-    truncated_updated = (
-        '...' if start_index > 0 else '') + updated[start_index: start_index + max_length]
 
+    truncated_original = (
+    '...' if start_index > 0 else '')
+    + original[start_index: start_index + max_length]
+
+    truncated_updated = (
+    '...' if start_index > 0 else '')
+    + updated[start_index: start_index + max_length]
 
     return truncated_original, truncated_updated
 
@@ -2270,10 +2273,10 @@ def update_translation_suggestion(
         ]
 
         original_summary_text = (
-            'Components in original text: ' + ', '.join(original_summary) + '.'
+            f'Components in original text: {", ".join(original_summary)}.'
         )
         updated_summary_text = (
-            'Components in translated text: ' + ', '.join(updated_summary) + '.'
+            f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
         original_text_preview, translation_text_preview = highlight_differences(
