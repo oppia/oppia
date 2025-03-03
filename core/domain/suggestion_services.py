@@ -2160,7 +2160,7 @@ def strip_prefix(component_name: str) -> str:
 
 def highlight_differences(
     original: str, updated: str, max_length: int = 200
-    ) -> tuple:
+    ) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
 
     Args:
