@@ -323,11 +323,13 @@ class RegenerateAutomaticVoiceoverHandler(
     def put(self) -> None:
         """Regenerates the voiceover for the given exploration data."""
         assert self.normalized_payload is not None
-        exploration_id = self.normalized_payload['exploration_id']
-        state_name = self.normalized_payload['state_name']
-        content_id = self.normalized_payload['content_id']
-        language_accent_code = self.normalized_payload['language_accent_code']
-        exploration_version = self.normalized_payload['exploration_version']
+        exploration_id: str = self.normalized_payload['exploration_id']
+        state_name: str = self.normalized_payload['state_name']
+        content_id: str = self.normalized_payload['content_id']
+        language_accent_code: str = self.normalized_payload[
+            'language_accent_code']
+        exploration_version: int = int(self.normalized_payload[
+            'exploration_version'])
 
         generated_voiceover, sentence_tokens_with_durations = (
             voiceover_regeneration_services.

@@ -40,7 +40,7 @@ from core.platform import models
 import bs4
 from mutagen import mp3
 from pylatexenc import latex2text
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -184,7 +184,7 @@ def synthesize_voiceover_for_html_string(
         voiceover_models.CachedAutomaticVoiceoversModel.
         generate_hash_from_text(processed_text_for_voiceover_regeneration)
     )
-    cached_model = (
+    cached_model: Optional[voiceover_models.CachedAutomaticVoiceoversModel] = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         get_cached_automatic_voiceover_model(
             content_hash_code,
@@ -322,10 +322,12 @@ def get_content_html_in_requested_language(
     language_code = (
         voiceover_services.
         get_language_code_from_language_accent_code(language_accent_code))
+    assert isinstance(language_code, str)
 
     if language_code == 'en':
         exploration = exp_fetchers.get_exploration_by_id(exploration_id)
         content_html = exploration.get_content_html(state_name, content_id)
+        assert isinstance(content_html, str)
         return content_html
     else:
         entity_translations = translation_fetchers.get_entity_translation(
@@ -337,6 +339,7 @@ def get_content_html_in_requested_language(
         try:
             translated_content_html = entity_translations.translations[
                 content_id].content_value
+            assert isinstance(translated_content_html, str)
         except Exception as e:
             raise Exception(
                 'Translation for content_id %s not found in language %s' % (
