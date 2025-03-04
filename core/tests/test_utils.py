@@ -828,10 +828,10 @@ class ElasticSearchStub:
             filtered_docs = []
             for term in terms:
                     # Previously, the mock_search function assumed that
-                    # all terms in the 'must' clause had a 'query' key. This assumption
-                    # worked for 'multi_match' queries but failed for 'match_all'
-                    # queries, which do not have a 'query' key. 
-                    # This caused a KeyError when processing
+                    # all terms in the 'must' clause had a 'query' key.
+                    # This assumption worked for 'multi_match' queries
+                    # but failed for 'match_all' queries, which do not have
+                    # a 'query' key. This caused a KeyError when processing
                     # 'match_all' queries. To fix this, we now explicitly check
                     # for the presence of 'match_all' or 'multi_match'
                     # in the term and handle them accordingly.

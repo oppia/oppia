@@ -290,9 +290,8 @@ def search(
         # a `multi_match` query is appended to the `must` clause.
         # The `multi_match` query searches across multiple fields
         # with boosting applied to certain fields (`title^3`, `category^2`).
-        # Additional parameters like `fuzziness`, `prefix_length`, `max_expansions`,
-        # and `minimum_should_match` are used to improve search results.
-        # Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
+        # Additional parameters are used to improve search results.
+        # https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
         query_definition['query']['bool']['must'].append({
             'multi_match': {
                 'query': query_string,
