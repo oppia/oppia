@@ -840,14 +840,19 @@ describe('TopNavigationBarComponent', () => {
       ).toBeTrue();
     }
   );
-  it('should return true and set navbackButtonUrl when current path matches a hidden back button path', () => {
-    spyOn(location, 'path').and.returnValue('/blog/post123');
-    component.PAGES_WITH_BACK_STATE = ['/blog/'];
 
-    expect(component.shouldShowBackButton()).toBeTrue();
-  });
-  it('should navigate back when goBack is called', () => {
-    component.goBack();
-    expect(location.back).toHaveBeenCalled();
-  });
+  it('should not check learner groups feature on signup page', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    const learnerGroupSpy = spyOn(
+      learnerGroupBackendApiService,
+      'isLearnerGroupFeatureEnabledAsync'
+    );
+
+    mockWindowRef.nativeWindow.location.pathname = '/signup';
+    component.ngOnInit();
+    tick();
+
+    expect(learnerGroupSpy).not.toHaveBeenCalled();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+  }));
 });

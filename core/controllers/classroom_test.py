@@ -395,6 +395,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
                 self.public_topic_id_3: []
             },
             'is_published': True,
+            'is_diagnostic_test_enabled': False,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
             'banner_data': dummy_banner_data.to_dict(),
             'index': 0
@@ -417,6 +418,7 @@ class ClassroomAdminTests(BaseClassroomControllerTests):
                 self.public_topic_id_2: []
             },
             'is_published': True,
+            'is_diagnostic_test_enabled': False,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
             'banner_data': dummy_banner_data.to_dict(),
             'index': 1
@@ -788,6 +790,7 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
                 'used_topic_1': []
             },
             'is_published': True,
+            'is_diagnostic_test_enabled': False,
             'thumbnail_data': dummy_thumbnail_data.to_dict(),
             'banner_data': dummy_banner_data.to_dict(),
             'index': 0
@@ -921,6 +924,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'url_fragment': 'history',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
+                'is_diagnostic_test_enabled': False,
                 'thumbnail_filename': 'thumbnail.svg',
                 'thumbnail_bg_color': 'transparent', 'index': 0
             },
@@ -930,6 +934,7 @@ class AllClassroomsSummaryHandlerTests(test_utils.GenericTestBase):
                 'url_fragment': 'english',
                 'teaser_text': 'Teaser Text',
                 'is_published': True,
+                'is_diagnostic_test_enabled': False,
                 'thumbnail_filename': 'thumbnail.svg',
                 'thumbnail_bg_color': 'transparent', 'index': 1
             }
