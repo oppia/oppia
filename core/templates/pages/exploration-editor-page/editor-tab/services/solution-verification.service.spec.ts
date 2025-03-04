@@ -247,8 +247,6 @@ describe('Solution Verification Service', () => {
         explorationStatesService.getState('First State').interaction.solution
           .correctAnswer
       )
-    ).toBe(
-      state.interaction.answerGroups[0].outcome.labelledAsCorrect
-    );
+    ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);
   });
 });
