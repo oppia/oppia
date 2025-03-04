@@ -164,7 +164,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'Equals' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -193,7 +193,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'IsEquivalent' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -222,13 +222,13 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasNumberOfTermsEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 3 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
     ]);
 
@@ -247,7 +247,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasNumberOfTermsEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -287,13 +287,13 @@ describe('RatioExpressionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 3 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
     ]);
 
@@ -312,7 +312,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasSpecificTermEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -338,7 +338,7 @@ describe('RatioExpressionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be matched' +
-          ' because it expects more terms than the answer allows.',
+          ' because it expects more terms than the answer allows',
       },
     ]);
   });
@@ -355,7 +355,7 @@ describe('RatioExpressionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The number of terms should be a non-negative integer other than 1.',
+          'The number of terms should be a non-negative integer other than 1',
       },
     ]);
   });
@@ -372,7 +372,7 @@ describe('RatioExpressionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The number of terms should be a non-negative integer other than 1.',
+          'The number of terms should be a non-negative integer other than 1',
       },
     ]);
   });
@@ -388,7 +388,7 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The number of terms in a ratio should be greater than 1.',
+        message: 'The number of terms in a ratio should be greater than 1',
       },
     ]);
   });

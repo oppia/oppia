@@ -249,11 +249,11 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Multiple items in a single position are not allowed.',
+        message: 'Multiple items in a single position are not allowed',
       },
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Multiple items in a single position are not allowed.',
+        message: 'Multiple items in a single position are not allowed',
       },
     ]);
     customizationArgs.allowMultipleItemsInSamePosition.value = true;
@@ -290,13 +290,13 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Please ensure the items are unique.',
+        message: 'Please ensure the items are unique',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 options do not match ' +
-          'customization argument choices.',
+          'customization argument choices',
       },
     ]);
   });
@@ -386,7 +386,7 @@ describe('DragAndDropSortInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -405,7 +405,7 @@ describe('DragAndDropSortInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be ' +
-          'matched because both the selected elements are same.',
+          'matched because both the selected elements are same',
       },
     ]);
   });
@@ -428,7 +428,7 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 contains choices ' +
             'that do not match any of the choices in the customization ' +
-            'arguments.',
+            'arguments',
         },
       ]);
     }
@@ -452,13 +452,13 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 contains a choice ' +
             'that does not match any of the choices in the customization ' +
-            'arguments.',
+            'arguments',
         },
         {
           type: WARNING_TYPES.ERROR,
           message:
             'Learner answer 1 from Oppia response 1 refers to an ' +
-            'invalid choice position.',
+            'invalid choice position',
         },
       ]);
     }
@@ -483,7 +483,7 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 will never be ' +
             'matched because there will be at least 2 elements at incorrect ' +
-            'positions if multiple elements cannot occupy the same position.',
+            'positions if multiple elements cannot occupy the same position',
         },
       ]);
       customizationArgs.allowMultipleItemsInSamePosition.value = true;

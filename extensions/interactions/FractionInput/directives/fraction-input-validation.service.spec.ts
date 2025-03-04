@@ -340,7 +340,7 @@ describe('FractionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be matched' +
-          ' because it is made redundant by answer 1 from Oppia response 1.',
+          ' because it is made redundant by answer 1 from Oppia response 1',
       },
     ]);
   });
@@ -365,7 +365,7 @@ describe('FractionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           `Learner answer ${index + 1} from Oppia response 1 will never be matched` +
-          ' because it is not in simplest form.',
+          ' because it is not in simplest form',
       })
     );
     var warningsMessages = warnings.map(warning => warning.message);
@@ -413,7 +413,7 @@ describe('FractionInputValidationService', () => {
           message:
             'Learner answer 2 from Oppia response 1 will never be ' +
             'matched because it is made redundant by answer 1 from ' +
-            'Oppia response 1.',
+            'Oppia response 1',
         },
       ]);
 
@@ -433,7 +433,7 @@ describe('FractionInputValidationService', () => {
           message:
             'Learner answer 2 from Oppia response 1 will never be ' +
             'matched because it is made redundant by answer 1 from ' +
-            'Oppia response 1.',
+            'Oppia response 1',
         },
       ]);
     }
@@ -455,7 +455,7 @@ describe('FractionInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be ' +
           'matched because it is made redundant by answer 1 from ' +
-          'Oppia response 1.',
+          'Oppia response 1',
       },
     ]);
   });
@@ -474,7 +474,7 @@ describe('FractionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           'matched because it is made redundant by answer 1 from ' +
-          'Oppia response 1.',
+          'Oppia response 1',
       },
     ]);
   });
@@ -496,7 +496,7 @@ describe('FractionInputValidationService', () => {
           ' from Oppia response ' +
           1 +
           ' is invalid: input should be an ' +
-          'integer.',
+          'integer',
       },
     ]);
   });
@@ -519,7 +519,7 @@ describe('FractionInputValidationService', () => {
           ' from Oppia response ' +
           1 +
           ' is invalid: input should be an ' +
-          'integer.',
+          'integer',
       },
     ]);
   });
@@ -542,7 +542,7 @@ describe('FractionInputValidationService', () => {
           ' from Oppia response ' +
           1 +
           ' is invalid: input should be an ' +
-          'integer.',
+          'integer',
       },
     ]);
   });
@@ -564,7 +564,7 @@ describe('FractionInputValidationService', () => {
           ' from Oppia response ' +
           1 +
           ' is invalid: denominator should be ' +
-          'greater than zero.',
+          'greater than zero',
       },
     ]);
   });
@@ -779,7 +779,7 @@ describe('FractionInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be ' +
           'matched because it is made redundant by ' +
-          'answer 1 from Oppia response 1.',
+          'answer 1 from Oppia response 1',
       },
     ]);
   });

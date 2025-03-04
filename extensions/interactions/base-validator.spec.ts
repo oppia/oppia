@@ -141,7 +141,7 @@ describe('Interaction validator', function () {
       expect(warnings).toEqual([
         {
           type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in Oppia response 2.',
+          message: 'Please specify what Oppia should do in Oppia response 2',
         },
       ]);
     });
@@ -159,7 +159,7 @@ describe('Interaction validator', function () {
           {
             type: WARNING_TYPES.ERROR,
             message:
-              'In answer group 1, self-loops should not be labelled as correct.',
+              'In answer group 1, self-loops should not be labelled as correct',
           },
         ]);
       }
@@ -202,7 +202,7 @@ describe('Interaction validator', function () {
           type: WARNING_TYPES.ERROR,
           message:
             'Please add feedback for the user in the [All other ' +
-            'answers] rule.',
+            'answers] rule',
         },
       ]);
     });
@@ -221,7 +221,7 @@ describe('Interaction validator', function () {
             type: WARNING_TYPES.ERROR,
             message:
               'In the [All other answers] group, self-loops should not be ' +
-              'labelled as correct.',
+              'labelled as correct',
           },
         ]);
       }
@@ -253,16 +253,16 @@ describe('Interaction validator', function () {
         expect(warnings).toEqual([
           {
             type: WARNING_TYPES.ERROR,
-            message: 'Please specify what Oppia should do in Oppia response 2.',
+            message: 'Please specify what Oppia should do in Oppia response 2',
           },
           {
             type: WARNING_TYPES.ERROR,
-            message: 'Please specify what Oppia should do in Oppia response 3.',
+            message: 'Please specify what Oppia should do in Oppia response 3',
           },
           {
             type: WARNING_TYPES.ERROR,
             message:
-              'Please add feedback for the user in the [All other answers] rule.',
+              'Please add feedback for the user in the [All other answers] rule',
           },
         ]);
       }

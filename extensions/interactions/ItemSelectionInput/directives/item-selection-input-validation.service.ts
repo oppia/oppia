@@ -170,7 +170,7 @@ export class ItemSelectionInputValidationService {
               'Learner answer ' +
               (ruleIndex + 1) +
               ', ' +
-              'please select only one answer choice.',
+              'please select only one answer choice',
           });
         }
 
@@ -191,7 +191,7 @@ export class ItemSelectionInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         });
       }
     }
@@ -214,7 +214,7 @@ export class ItemSelectionInputValidationService {
           message:
             `Learner answer ${ruleIndex + 1} from Oppia response ` +
             `${answerIndex + 1} options do not match customization ` +
-            'argument choices.',
+            'argument choices',
         });
       }
     });
@@ -234,7 +234,7 @@ export class ItemSelectionInputValidationService {
           message:
             `The rule ${ruleIndex} of answer group ` +
             `${answerGroupIndex} of ItemSelectionInput interaction ` +
-            'is a duplicate.',
+            'is a duplicate',
         });
       }
       this.rulesSet.add(ruleStr);
@@ -307,7 +307,7 @@ export class ItemSelectionInputValidationService {
                 'learner answer ' +
                 (ruleIndex + 1) +
                 ', the "proper ' +
-                'subset" learner answer must include at least 2 options.',
+                'subset" learner answer must include at least 2 options',
             });
           }
         } else if (rule.type === 'Equals') {
@@ -329,7 +329,7 @@ export class ItemSelectionInputValidationService {
                 minAllowedCount +
                 ' and ' +
                 maxAllowedCount +
-                ' (the minimum and maximum allowed selection counts).',
+                ' (the minimum and maximum allowed selection counts)',
             });
           }
         }
@@ -343,7 +343,7 @@ export class ItemSelectionInputValidationService {
                 ', learner answer ' +
                 (ruleIndex + 1) +
                 ', the "ContainsAtLeastOneOf" learner ' +
-                'answer should have at least one option.',
+                'answer should have at least one option',
             });
           }
         }

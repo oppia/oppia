@@ -130,7 +130,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -168,7 +168,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -206,7 +206,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'MatchesExactlyWith' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
   });

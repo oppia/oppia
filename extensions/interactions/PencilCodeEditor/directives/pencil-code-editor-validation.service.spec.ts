@@ -70,7 +70,7 @@ describe('Pencil Code Editor Validation Service', () => {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please add feedback for the user in the [All other answers] ' +
-          'rule.',
+          'rule',
       });
 
       // It returns the error when feedback is not provided.
@@ -206,7 +206,7 @@ describe('Pencil Code Editor Validation Service', () => {
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.',
+        message: 'The initialCode must be a string',
       });
       expect(
         pcevs.getAllWarnings(

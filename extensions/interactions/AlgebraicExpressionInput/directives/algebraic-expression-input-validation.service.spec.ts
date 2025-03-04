@@ -126,7 +126,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer with " +
-          'a matching input.',
+          'a matching input',
       },
     ]);
 
@@ -164,7 +164,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer with " +
-          'a matching input.',
+          'a matching input',
       },
     ]);
 
@@ -202,7 +202,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'MatchesExactlyWith' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
   });
@@ -311,7 +311,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The number of custom letters cannot be more than 10.',
+        message: 'The number of custom letters cannot be more than 10',
       },
     ]);
   });

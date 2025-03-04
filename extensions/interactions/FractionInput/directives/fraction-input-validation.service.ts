@@ -57,7 +57,7 @@ export class FractionInputValidationService {
         ' from Oppia response ' +
         (i + 1) +
         ' is invalid: input should be an ' +
-        'integer.',
+        'integer',
     };
   }
 
@@ -177,7 +177,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -232,7 +232,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -251,7 +251,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -272,7 +272,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -293,7 +293,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -335,7 +335,7 @@ export class FractionInputValidationService {
                   ' from Oppia response ' +
                   (i + 1) +
                   ' is invalid: denominator ' +
-                  'should be greater than zero.',
+                  'should be greater than zero',
               });
             }
             matchedDenominator.denominator = rule.inputs.x as number;
@@ -401,8 +401,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (ranges[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (ranges[k].answerGroupIndex + 1) +
-                  '.',
+                  (ranges[k].answerGroupIndex + 1),
               });
             }
           }
@@ -428,8 +427,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (matchedDenominators[k].answerGroupIndex + 1) +
-                  '.',
+                  (matchedDenominators[k].answerGroupIndex + 1),
               });
             }
           }

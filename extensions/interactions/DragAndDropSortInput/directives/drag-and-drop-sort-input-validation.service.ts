@@ -134,7 +134,7 @@ export class DragAndDropSortInputValidationService {
             if (xInputs[k].length > 1) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Multiple items in a single position are not allowed.',
+                message: 'Multiple items in a single position are not allowed',
               });
               break;
             }
@@ -166,7 +166,7 @@ export class DragAndDropSortInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'contains a choice that does not match any of ' +
-                  'the choices in the customization arguments.',
+                  'the choices in the customization arguments',
               });
             }
             if (inputs.y > customizationArgs.choices.value.length) {
@@ -174,7 +174,7 @@ export class DragAndDropSortInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
-                  'refers to an invalid choice position.',
+                  'refers to an invalid choice position',
               });
             }
             break;
@@ -185,7 +185,7 @@ export class DragAndDropSortInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because both the selected ' +
-                  'elements are same.',
+                  'elements are same',
               });
             }
             if (
@@ -197,7 +197,7 @@ export class DragAndDropSortInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'contains choices that do not match any of ' +
-                  'the choices in the customization arguments.',
+                  'the choices in the customization arguments',
               });
             }
             break;
@@ -221,14 +221,14 @@ export class DragAndDropSortInputValidationService {
             if (areAnyItemsEmpty || xInputs.length === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the list is nonempty.',
+                message: 'Please ensure the list is nonempty',
               });
             }
 
             if (areAnyItemsDuplicated) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are unique.',
+                message: 'Please ensure the items are unique',
               });
             }
 
@@ -263,7 +263,7 @@ export class DragAndDropSortInputValidationService {
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
-                  'options do not match customization argument choices.',
+                  'options do not match customization argument choices',
               });
             }
             break;
@@ -285,7 +285,7 @@ export class DragAndDropSortInputValidationService {
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because it is made redundant by ' +
                   `answer ${ranges[k].ruleIndex + 1} from response ` +
-                  `${ranges[k].answerGroupIndex + 1}.`,
+                  `${ranges[k].answerGroupIndex + 1}`,
               });
             }
           }

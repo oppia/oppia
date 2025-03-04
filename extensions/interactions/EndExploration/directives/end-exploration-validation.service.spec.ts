@@ -119,13 +119,13 @@ describe('EndExplorationValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.',
+          'have any Oppia responses',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have a default outcome.',
+          'have a default outcome',
       },
     ]);
   });
@@ -138,7 +138,7 @@ describe('EndExplorationValidationService', () => {
     };
     let invalidExplorationIdsWarning = {
       type: WARNING_TYPES.ERROR,
-      message: 'Recommended exploration ID must be non-empty.',
+      message: 'Recommended exploration ID must be non-empty',
     };
 
     var warnings = validatorService.getAllWarnings(
@@ -209,7 +209,7 @@ describe('EndExplorationValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Recommended exploration ID must be a string.',
+        message: 'Recommended exploration ID must be a string',
       },
     ]);
   });
@@ -229,7 +229,7 @@ describe('EndExplorationValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.',
+        message: 'Set of recommended exploration IDs must be list',
       },
     ]);
   });

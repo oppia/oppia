@@ -145,8 +145,7 @@ export class NumberWithUnitsValidationService {
                   'is made redundant by answer ' +
                   (ranges[k].ruleIndex + 1) +
                   ' from response ' +
-                  (ranges[k].answerGroupIndex + 1) +
-                  '.',
+                  (ranges[k].answerGroupIndex + 1),
               });
             }
           }
@@ -164,8 +163,7 @@ export class NumberWithUnitsValidationService {
                   'is made redundant by answer ' +
                   (ranges[k].ruleIndex + 1) +
                   ' from response ' +
-                  (ranges[k].answerGroupIndex + 1) +
-                  '.',
+                  (ranges[k].answerGroupIndex + 1),
               });
             }
           }

@@ -111,7 +111,7 @@ describe('SetInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: WARNING_TYPES.ERROR,
-          message: 'Button text must be a string.',
+          message: 'Button text must be a string',
         },
       ]);
     });
@@ -130,7 +130,7 @@ describe('SetInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: WARNING_TYPES.ERROR,
-          message: 'Label for this button should not be empty.',
+          message: 'Label for this button should not be empty',
         },
       ]);
     });
@@ -735,7 +735,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });
@@ -804,7 +804,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });
@@ -873,7 +873,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });
@@ -942,7 +942,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });
@@ -1011,7 +1011,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });
@@ -1080,7 +1080,7 @@ describe('SetInputValidationService', () => {
               message:
                 'Learner answer 2 from Oppia response 1 will never ' +
                 'be matched because it is made redundant by answer 1 from Oppia ' +
-                'response 1.',
+                'response 1',
             },
           ]);
         });

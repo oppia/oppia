@@ -272,7 +272,7 @@ describe('MultipleChoiceInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         },
       ]);
       warnings = validatorService.getAllWarnings(
@@ -286,7 +286,7 @@ describe('MultipleChoiceInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         },
       ]);
     }
