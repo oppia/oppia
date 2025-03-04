@@ -379,7 +379,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  componentsAreMismatched(): boolean {
+  areComponentsMismatched(): boolean {
     const translationError =
       this.translationValidationService.validateTranslationFromHtmlStrings(
         this.activeSuggestion.change_cmd.content_html as string,
@@ -393,7 +393,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.editedContent && this.editedContent) {
-      const componentMismatch = this.componentsAreMismatched();
+      const componentMismatch = this.areComponentsMismatched();
 
       if (!componentMismatch) {
         this.errorMessage = '';
@@ -403,14 +403,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   get updateIsDisabled(): boolean {
-    return this.startedEditing && this.componentsAreMismatched();
+    return this.startedEditing && this.areComponentsMismatched();
   }
 
   updateSuggestion(): void {
     const updatedTranslation = this.editedContent.html;
     const suggestionId = this.activeSuggestion.suggestion_id;
 
-    if (this.componentsAreMismatched()) {
+    if (this.areComponentsMismatched()) {
       this.errorMessage =
         'Please ensure all components (images, math formulas, concept cards, videos) ' +
         'in your translation match the original content.';
