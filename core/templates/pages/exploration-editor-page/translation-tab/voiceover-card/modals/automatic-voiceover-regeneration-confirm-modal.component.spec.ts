@@ -18,23 +18,25 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {VoiceoverRemovalConfirmModalComponent} from './voiceover-removal-confirm-modal.component';
+import {AutomaticVoiceoverRegenerationConfirmModalComponent} from './automatic-voiceover-regeneration-confirm-modal.component';
 
 describe('Language Accent Removal Confirmation Modal', () => {
-  let fixture: ComponentFixture<VoiceoverRemovalConfirmModalComponent>;
-  let componentInstance: VoiceoverRemovalConfirmModalComponent;
+  let fixture: ComponentFixture<AutomaticVoiceoverRegenerationConfirmModalComponent>;
+  let componentInstance: AutomaticVoiceoverRegenerationConfirmModalComponent;
   let closeSpy: jasmine.Spy;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [VoiceoverRemovalConfirmModalComponent],
+      declarations: [AutomaticVoiceoverRegenerationConfirmModalComponent],
       providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VoiceoverRemovalConfirmModalComponent);
+    fixture = TestBed.createComponent(
+      AutomaticVoiceoverRegenerationConfirmModalComponent
+    );
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();

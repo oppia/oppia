@@ -285,6 +285,8 @@ class EntityVoiceoversBulkHandler(
 class RegenerateAutomaticVoiceoverHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
+    """Regenerates the automatic voiceover for the given exploration data."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {

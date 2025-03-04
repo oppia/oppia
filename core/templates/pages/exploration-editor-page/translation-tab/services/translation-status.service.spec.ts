@@ -448,8 +448,8 @@ describe('Translation status service', () => {
       },
     } as FeatureStatusChecker);
 
-    let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
-    let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
+    let voiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+    let voiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
 
     let entityVoiceovers = new EntityVoiceovers(
       'exp_id',
@@ -458,10 +458,11 @@ describe('Translation status service', () => {
       'en-US',
       {
         content_0: {
-          manual: manualVoiceover1,
+          manual: undefined,
+          auto: voiceover1,
         },
         content_8: {
-          manual: manualVoiceover2,
+          manual: voiceover2,
         },
       }
     );

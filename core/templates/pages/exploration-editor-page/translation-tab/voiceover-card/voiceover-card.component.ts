@@ -266,11 +266,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       );
     }
 
-    if (this.isContentAvaiableForVoiceover()) {
-      this.contentAvailableForVoiceovers = true;
-    } else {
-      this.contentAvailableForVoiceovers = false;
-    }
+    this.updateContentAvailabilityStatusForVoiceovers();
   }
 
   updateContentAvailabilityStatusForVoiceovers(): void {
@@ -324,12 +320,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       }
     }
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
-
-    if (this.isContentAvaiableForVoiceover()) {
-      this.contentAvailableForVoiceovers = true;
-    } else {
-      this.contentAvailableForVoiceovers = false;
-    }
+    this.updateContentAvailabilityStatusForVoiceovers();
   }
 
   updateLanguageAccentCode(languageAccentCode: string): void {
@@ -367,12 +358,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       }
     }
 
-    if (this.isContentAvaiableForVoiceover()) {
-      this.contentAvailableForVoiceovers = true;
-    } else {
-      this.contentAvailableForVoiceovers = false;
-    }
-
+    this.updateContentAvailabilityStatusForVoiceovers();
     this.updateManualVoiceoverWithChangeList();
     this.setActiveContentManualVoiceover();
     this.setActiveContentAutomaticVoiceover();
@@ -445,7 +431,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   }
 
   playAndPauseVoiceover(filename: string, voiceoverType: string): void {
-    if (voiceoverType == AppConstants.VOICEOVER_TYPE_MANUAL) {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
       if (this.isAutomaticVoiceoverPlaying === true) {
         this.isAutomaticVoiceoverPlaying = false;
         this.audioPlayerService.clear();
@@ -454,7 +440,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.automaticVoiceoverProgress = 0;
     }
 
-    if (voiceoverType == AppConstants.VOICEOVER_TYPE_AUTO) {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_AUTO) {
       if (this.isManualVoiceoverPlaying === true) {
         this.isManualVoiceoverPlaying = false;
         this.audioPlayerService.clear();
@@ -620,7 +606,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     );
   }
 
-  isContentAvaiableForVoiceover() {
+  isContentAvaiableForVoiceover(): boolean {
     if (this.languageCode === 'en') {
       return true;
     }
@@ -634,7 +620,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     );
   }
 
-  generateVoiceover() {
+  generateVoiceover(): void {
     const modalRef = this.ngbModal.open(
       AutomaticVoiceoverRegenerationConfirmModalComponent,
       {

@@ -358,7 +358,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeTrue();
   });
 
-  it('should check whether given language accent code supports autogeneration', () => {
+  it('should check whether given language accent supports cloud auto regeneration', () => {
     component.cloudSupportedLanguageAccentCodes = ['en-US', 'hi-IN'];
     expect(
       component.isAutogenerationSupportedByCloudService('en-US')
@@ -366,6 +366,15 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       component.isAutogenerationSupportedByCloudService('en-IN')
     ).toBeFalse();
+  });
+
+  it('should return correct string for autogeneration support', () => {
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': true,
+      'hi-IN': false,
+    };
+    expect(component.isAutogenerationSupported('en-US')).toBe('Yes');
+    expect(component.isAutogenerationSupported('hi-IN')).toBe('No');
   });
 
   it('should be able to update cloud supported language accent codes', () => {
