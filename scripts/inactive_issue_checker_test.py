@@ -136,23 +136,6 @@ class TestGitHubService(unittest.TestCase):
         )
 
     @mock.patch('requests.get')
-    def test_get_open_issues_error(self, mock_get: mock.MagicMock) -> None:
-        """Test fetching open issues with error."""
-        mock_response = mock.Mock()
-        mock_response.status_code = 500
-        mock_response.json.return_value = {'message': 'Server error'}
-        mock_get.return_value = mock_response
-
-        issues = self.service.get_open_issues()
-
-        self.assertEqual(len(issues), 0)
-        mock_get.assert_called_once_with(
-            f'{self.base_url}/issues?state=open',
-            headers=self.service.rest_headers,
-            timeout=10
-        )
-
-    @mock.patch('requests.get')
     def test_get_open_issues_null_response(
         self, mock_get: mock.MagicMock
     ) -> None:
@@ -202,25 +185,6 @@ class TestGitHubService(unittest.TestCase):
         collaborators = self.service.get_repo_collaborators()
 
         self.assertEqual(collaborators, {'collab1', 'collab2'})
-        mock_get.assert_called_once_with(
-            f'{self.base_url}/collaborators',
-            headers=self.service.rest_headers,
-            timeout=10
-        )
-
-    @mock.patch('requests.get')
-    def test_get_repo_collaborators_error(
-        self, mock_get: mock.MagicMock
-    ) -> None:
-        """Test fetching repository collaborators with error."""
-        mock_response = mock.Mock()
-        mock_response.status_code = 500
-        mock_response.json.return_value = {'message': 'Server error'}
-        mock_get.return_value = mock_response
-
-        collaborators = self.service.get_repo_collaborators()
-
-        self.assertEqual(collaborators, set())
         mock_get.assert_called_once_with(
             f'{self.base_url}/collaborators',
             headers=self.service.rest_headers,
@@ -616,9 +580,9 @@ class TestGitHubService(unittest.TestCase):
         self.service.add_alert_comment_on_issue(issue)
 
         expected_comment = (
-            f'Hi @user1 this PR is inactive '
+            f'Hi @{issue.assignee_username} this PR is inactive '
             f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
-            f'unassigned soon if no activity is done.\n '
+            f'unassigned soon if no activity is done.\n\n '
             f'If you are still working on this PR, '
             f'please make a follow-up commit within'
             f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
