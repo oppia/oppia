@@ -1710,14 +1710,18 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
+   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    flag: boolean = true
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    await this.dismissWelcomeModal();
+    if (flag) {
+      await this.dismissWelcomeModal();
+    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2064,11 +2068,14 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to create and save a new untitled exploration containing only the EndExploration interaction.
+   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
-  async createAndSaveAMinimalExploration(): Promise<void> {
+  async createAndSaveAMinimalExploration(flag: boolean = true): Promise<void> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    await this.dismissWelcomeModal();
+    if (flag) {
+      await this.dismissWelcomeModal();
+    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2174,7 +2181,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationName - The name of the exploration.
    * @param {number} numberOfOccurrence - The expected occurrence count of the exploration.
    */
-  async expectNoOfTimesExplorationNameToBePresent(
+  async expectExplorationNameToAppearNTimes(
     explorationName: string,
     numberOfOccurrence: number = 1
   ): Promise<void> {

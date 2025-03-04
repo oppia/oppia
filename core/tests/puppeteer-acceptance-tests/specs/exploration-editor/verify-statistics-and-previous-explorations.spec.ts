@@ -25,7 +25,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User', function () {
+describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
 
@@ -39,25 +39,27 @@ describe('Logged-in User', function () {
       'Rational Numbers'
     );
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-      'Real Numbers'
+      'Real Numbers',
+      'Algebra',
+      false
     );
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-      'Fractions'
+      'Fractions',
+      'Algebra',
+      false
     );
     // These explorations are not published but are saved as drafts.
-    await explorationEditor.createAndSaveAMinimalExploration();
-    await explorationEditor.createAndSaveAMinimalExploration();
+    await explorationEditor.createAndSaveAMinimalExploration(false);
+    await explorationEditor.createAndSaveAMinimalExploration(false);
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
       'logged_in_user@example.com'
     );
-
-    // Setup taking longer than 300000ms.
-  }, 480000);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should display created explorations and their statistics on the creator dashboard',
+    'should display created explorations and their statistics on the creator dashboard after creating, playing, and rating as a logged-in user',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
       await loggedInUser.searchForLessonInSearchBar('Rational Numbers');
@@ -67,23 +69,20 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.rateExploration(3, 'Nice!', false);
 
-      await explorationEditor.page.bringToFront();
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.expectAverageRatingAndUsersToBe(3, 1);
       await explorationEditor.expectTotalPlaysToBe(1);
       await explorationEditor.expectOpenFeedbacksToBe(1);
       await explorationEditor.expectNumberOfSubscribersToBe(0);
       await explorationEditor.expectNumberOfExplorationsToBe(5);
-      await explorationEditor.expectNoOfTimesExplorationNameToBePresent(
+      await explorationEditor.expectExplorationNameToAppearNTimes(
         'Rational Numbers'
       );
-      await explorationEditor.expectNoOfTimesExplorationNameToBePresent(
+      await explorationEditor.expectExplorationNameToAppearNTimes(
         'Real Numbers'
       );
-      await explorationEditor.expectNoOfTimesExplorationNameToBePresent(
-        'Fractions'
-      );
-      await explorationEditor.expectNoOfTimesExplorationNameToBePresent(
+      await explorationEditor.expectExplorationNameToAppearNTimes('Fractions');
+      await explorationEditor.expectExplorationNameToAppearNTimes(
         'Untitled',
         2
       );
