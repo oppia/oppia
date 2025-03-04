@@ -83,6 +83,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     },
   ];
   PAGES_WITH_BACK_STATE: string[] = ['/blog/'];
+  menuIconIsShown: boolean = false;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -212,6 +213,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
     this.inClassroomPage = false;
     this.pageIsIframed = this.urlService.isIframed();
+    this.menuIconIsShown = !this.shouldShowBackButton();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;

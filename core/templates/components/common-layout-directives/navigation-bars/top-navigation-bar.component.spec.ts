@@ -858,6 +858,6 @@ describe('TopNavigationBarComponent', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
 
-    expect(component.shouldShowBackButton()).toBeTrue();
+    expect(component.menuIconIsShown).toBeFalse();
   });
 });
