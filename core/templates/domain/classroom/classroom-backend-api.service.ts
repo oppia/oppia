@@ -89,7 +89,7 @@ export interface ClassroomDict {
     [topicId: string]: string[];
   };
   isPublished: boolean;
-  isDiagnosticTestEnabled: boolean;
+  diagnosticTestIsEnabled: boolean;
   thumbnailData: ImageData;
   bannerData: ImageData;
 }
@@ -245,7 +245,7 @@ export class ClassroomBackendApiService {
                 topicIdToPrerequisiteTopicIds:
                   response.classroom_dict.topic_id_to_prerequisite_topic_ids,
                 isPublished: response.classroom_dict.is_published,
-                isDiagnosticTestEnabled:
+                diagnosticTestIsEnabled:
                   response.classroom_dict.diagnostic_test_is_enabled,
                 thumbnailData: response.classroom_dict.thumbnail_data,
                 bannerData: response.classroom_dict.banner_data,

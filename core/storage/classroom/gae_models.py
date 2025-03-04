@@ -62,8 +62,10 @@ class ClassroomModel(base_models.BaseModel):
     # False if classroom is hidden, True if published.
     is_published = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
-    # Whether this classroom is published or not.
-    # False if classroom is hidden, True if published.
+    # Whether this classroom's diagnostic test
+    #  functionality is enabled or not.
+    # False if diagnostic test functionality
+    #  is hidden, True if enabled.
     diagnostic_test_is_enabled = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
     # The thumbnail filename of the classroom.

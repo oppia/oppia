@@ -31,7 +31,7 @@ export class ClassroomData {
   _topicListIntro: string;
   _teaserText: string;
   _isPublished: boolean;
-  _isDiagnosticTestEnabled: boolean;
+  _diagnosticTestIsEnabled: boolean;
   _thumbnailData: ImageData;
   _bannerData: ImageData;
   _publicClassroomsCount: number;
@@ -45,7 +45,7 @@ export class ClassroomData {
     topicListIntro: string,
     teaserText: string,
     isPublished: boolean,
-    isDiagnosticTestEnabled: boolean,
+    diagnosticTestIsEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData,
     publicClassroomsCount: number
@@ -58,7 +58,7 @@ export class ClassroomData {
     this._topicListIntro = topicListIntro;
     this._teaserText = teaserText;
     this._isPublished = isPublished;
-    this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
+    this._diagnosticTestIsEnabled = diagnosticTestIsEnabled;
     this._thumbnailData = thumbnailData;
     this._bannerData = bannerData;
     this._publicClassroomsCount = publicClassroomsCount;
@@ -73,7 +73,7 @@ export class ClassroomData {
     topicListIntro: string,
     teaserText: string,
     isPublished: boolean,
-    isDiagnosticTestEnabled: boolean,
+    diagnosticTestIsEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData,
     publicClassroomsCount: number
@@ -90,7 +90,7 @@ export class ClassroomData {
       topicListIntro,
       teaserText,
       isPublished,
-      isDiagnosticTestEnabled,
+      diagnosticTestIsEnabled,
       thumbnailData,
       bannerData,
       publicClassroomsCount
@@ -133,8 +133,8 @@ export class ClassroomData {
     return this._isPublished;
   }
 
-  getIsDiagnosticTestEnabled(): boolean {
-    return this._isDiagnosticTestEnabled;
+  getDiagnosticTestIsEnabled(): boolean {
+    return this._diagnosticTestIsEnabled;
   }
 
   getPublicClassroomsCount(): number {
