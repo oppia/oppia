@@ -141,9 +141,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             }
         }], correct_index_name)
 
-        result, new_offset=(
+        result, new_offset = (
             elastic_search_services.search(
-            '',correct_index_name,[],[],offset=0,
+            '', correct_index_name, [], [], offset=0,
             size=50
             )
         )

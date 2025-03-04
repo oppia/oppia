@@ -278,15 +278,20 @@ def search(
             }
         }]
     }
-    # If the `query_string` is empty or consists only of whitespace, a `match_all` query is appended to the `must` clause.
-    # The `match_all` query ensures that all documents in the index are returned when no specific search terms are provided.
+    # If the `query_string` is empty or consists only of whitespace, 
+    # a `match_all` query is appended to the `must` clause.
+    # The `match_all` query ensures that all documents in the index are returned
+    # when no specific search terms are provided.
     # Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html
     if query_string.strip() == '':
         query_definition['query']['bool']['must'].append({'match_all': {}})
     else:
-    # If the `query_string` is not empty, a `multi_match` query is appended to the `must` clause.
-    # The `multi_match` query searches across multiple fields (`title`, `description`, `category`) with boosting applied to certain fields (`title^3`, `category^2`).
-    # Additional parameters like `fuzziness`, `prefix_length`, `max_expansions`, and `minimum_should_match` are used to improve search results.
+    # If the `query_string` is not empty, 
+    # a `multi_match` query is appended to the `must` clause.
+    # The `multi_match` query searches across multiple fields (`title`, `description`, `category`) 
+    # with boosting applied to certain fields (`title^3`, `category^2`).
+    # Additional parameters like `fuzziness`, `prefix_length`, `max_expansions`, and `minimum_should_match` 
+    # are used to improve search results.
     # Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
         query_definition['query']['bool']['must'].append({
             'multi_match': {
