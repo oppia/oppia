@@ -28,11 +28,12 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   providedIn: 'root',
 })
 export class ExpressionInterpolationService {
+  private convertHtmlToUnicodePipe = new ConvertHtmlToUnicodePipe();
+
   constructor(
     private expressionEvaluatorService: ExpressionEvaluatorService,
     private expressionParserService: ExpressionParserService,
     private expressionSyntaxTreeService: ExpressionSyntaxTreeService,
-    private convertHtmlToUnicodePipe: ConvertHtmlToUnicodePipe,
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
