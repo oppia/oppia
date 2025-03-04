@@ -216,4 +216,39 @@ describe('Solution Verification Service', () => {
       );
     }).toThrowError('Interaction ID must not be null');
   });
+
+  it('should return outcome.labelledAsCorrect when in question mode', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+
+    const state = explorationStatesService.getState('First State');
+    stateInteractionIdService.init(
+      'First State',
+      state.interaction.id,
+      state.interaction,
+      'widget_id'
+    );
+    stateCustomizationArgsService.init(
+      'First State',
+      state.interaction.customizationArgs,
+      state.interaction,
+      'widget_customization_args'
+    );
+
+    stateInteractionIdService.savedMemento = 'TextInput';
+    explorationStatesService.saveSolution(
+      'First State',
+      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+    );
+
+    expect(
+      solutionVerificationService.verifySolution(
+        'First State',
+        state.interaction,
+        explorationStatesService.getState('First State').interaction.solution
+          .correctAnswer
+      )
+    ).toBe(
+      state.interaction.answerGroups[0].outcome.labelledAsCorrect
+    );
+  });
 });

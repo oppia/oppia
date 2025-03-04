@@ -35,7 +35,7 @@ describe('UndoRedoService', () => {
   };
 
   const createChangeDomainObject = (
-    backendObj: any,
+    backendObj: Record<string, unknown>,
     applyFunc: () => void = () => {},
     reverseFunc: () => void = () => {}
   ) => {
