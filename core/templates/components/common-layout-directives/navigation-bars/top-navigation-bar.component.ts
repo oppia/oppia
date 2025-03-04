@@ -51,8 +51,6 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
-import {Location} from '@angular/common';
-
 import './top-navigation-bar.component.css';
 
 interface LanguageInfo {
@@ -200,8 +198,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private languageBannerService: LanguageBannerService,
-    private location: Location
+    private languageBannerService: LanguageBannerService
   ) {}
 
   ngOnInit(): void {
