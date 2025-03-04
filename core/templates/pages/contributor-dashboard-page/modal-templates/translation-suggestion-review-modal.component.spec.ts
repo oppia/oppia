@@ -450,7 +450,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       flush();
     }));
 
-    it('should initialize $scope properties after controller is initialized', function () {
+    it('should initialize component properties after component is initialized', function () {
       component.ngOnInit();
       expect(component.subheading).toBe(subheading);
       expect(component.reviewable).toBe(reviewable);
@@ -1304,7 +1304,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       flush();
     }));
 
-    it('should initialize $scope properties after controller is initialized', function () {
+    it('should initialize component properties after component is initialized', function () {
       component.ngOnInit();
       expect(component.subheading).toBe(subheading);
       expect(component.reviewable).toBe(reviewable);
@@ -2020,7 +2020,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
-    it('should initialize $scope properties after controller is initialized', fakeAsync(function () {
+    it('should initialize component properties after component is initialized', fakeAsync(function () {
       const messages = [
         {
           author_username: '',
@@ -2230,7 +2230,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       );
     });
 
-    it('should initialize $scope properties after controller is initialized', fakeAsync(function () {
+    it('should initialize component properties after component is initialized', fakeAsync(function () {
       const messages = [
         {
           author_username: '',

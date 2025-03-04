@@ -46,89 +46,6 @@ const ROUTING_MODULE_FILE_PATHS = [
   ),
 ];
 
-// List of routes that are not defined in routing modules. These routes are
-// manually mapped to their corresponding modules. These routes are currently not
-// covered by the routing module scraping logic since they are loaded by webpack and
-// not definied in the above routing modules. This list should not be updated unless
-// the routes are removed from the webpack configuration.
-const MANUAL_ROUTE_TO_MODULE_MAPPING: Map<Route, string> = new Map([
-  [
-    {
-      path: 'create/:exploration_id',
-    },
-    'core/templates/pages/exploration-editor-page/exploration-editor-page.import.ts',
-  ],
-  [
-    {
-      path: 'topics-and-skills-dashboard',
-    },
-    'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.import.ts',
-  ],
-  [
-    {
-      path: 'topic_editor/:topic_id',
-    },
-    'core/templates/pages/topic-editor-page/topic-editor-page.import.ts',
-  ],
-  [
-    {
-      path: 'story_editor/:story_id',
-    },
-    'core/templates/pages/story-editor-page/story-editor-page.import.ts',
-  ],
-  [
-    {
-      path: 'contributor-dashboard',
-    },
-    'core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.import.ts',
-  ],
-  [
-    {
-      path: 'skill_editor/:skill_id',
-    },
-    'core/templates/pages/skill-editor-page/skill-editor-page.import.ts',
-  ],
-  [
-    {
-      path: 'learn/:classroom_url_fragment/:topic_url_fragment/review-test/:story_id',
-    },
-    'core/templates/pages/review-test-page/review-test-page.import.ts',
-  ],
-  [
-    {
-      path: 'learn/:classroom_url_fragment/:topic_url_fragment/revision/:story_id',
-    },
-    'core/templates/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-  ],
-  [
-    {
-      path: 'learn/:classroom_url_fragment/:topic_url_fragment',
-    },
-    'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',
-  ],
-  [
-    {
-      path: 'learn/:classroom_url_fragment/:topic_url_fragment/story',
-    },
-    'core/templates/pages/topic-viewer-page/topic-viewer-page.import.ts',
-  ],
-  [
-    {
-      path: 'blog-dashboard',
-    },
-    'core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
-  ],
-]);
-
-// List of page modules which aren't scraped from routing modules. These page modules are manually
-// added to the list of page modules. These modules are not covered by the routing module scraping
-// or the manual route to module mapping since they don't have any concrete path associated with them.
-const MANUAL_PAGE_MODULES = [
-  'core/templates/pages/error-pages/error-page.import.ts',
-  'core/templates/pages/maintenance-page/maintenance-page.import.ts',
-  'core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts',
-];
-
 /**
  * Extends two maps while avoiding duplicates.
  */
@@ -404,9 +321,7 @@ const validateRouteToModuleMapping = (
  * Gets the full codebase's route to module mapping.
  */
 export const getRouteToModuleMapping = (): Map<Route, string> => {
-  let routeToModuleMapping: Map<Route, string> = new Map([
-    ...MANUAL_ROUTE_TO_MODULE_MAPPING,
-  ]);
+  let routeToModuleMapping: Map<Route, string> = new Map([]);
 
   for (const routingModuleFilePath of ROUTING_MODULE_FILE_PATHS) {
     const routingModuleRouteToModuleMapping =
@@ -434,5 +349,5 @@ export const getPageModulesCoveredByRouteMapping = (): string[] => {
 export const getPageModules = (): string[] => {
   const pageModulesCoveredByRouteMapping =
     getPageModulesCoveredByRouteMapping();
-  return [...pageModulesCoveredByRouteMapping, ...MANUAL_PAGE_MODULES];
+  return [...pageModulesCoveredByRouteMapping];
 };
