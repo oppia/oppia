@@ -492,7 +492,7 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
-      is_diagnostic_test_enabled: false,
+      diagnostic_test_is_enabled: false,
       thumbnail_data: dummyThumbnailData,
       banner_data: dummyBannerData,
     };

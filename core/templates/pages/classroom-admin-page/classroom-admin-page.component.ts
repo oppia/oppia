@@ -386,7 +386,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       topic_id_to_prerequisite_topic_ids:
         classroomDict.topicIdToPrerequisiteTopicIds,
       is_published: classroomDict.isPublished,
-      is_diagnostic_test_enabled: classroomDict.isDiagnosticTestEnabled,
+      diagnostic_test_is_enabled: classroomDict.isDiagnosticTestEnabled,
       thumbnail_data: classroomDict.thumbnailData,
       banner_data: classroomDict.bannerData,
     };
