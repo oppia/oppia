@@ -827,17 +827,29 @@ class ElasticSearchStub:
         if terms:
             filtered_docs = []
             for term in terms:
-                for _, v in term.items():
-                    values = v['query'].split(' ')
-                    for doc in result_docs:
-                        strs = [
-                            val for val in doc.values() if isinstance(val, str)
-                        ]
-                        words = []
-                        for s in strs:
-                            words += s.split(' ')
-                        if all(value in words for value in values):
-                            filtered_docs.append(doc)
+                    # Previously, the mock_search function assumed that all terms in the
+                    # 'must' clause had a 'query' key. This assumption worked for
+                    # 'multi_match' queries but failed for 'match_all' queries, which
+                    # do not have a 'query' key. This caused a KeyError when processing
+                    # 'match_all' queries.
+                    # To fix this, we now explicitly check for the presence of
+                    # 'match_all' or 'multi_match' in the term and handle them
+                    # accordingly.
+
+                    if 'match_all' in term:
+                        filtered_docs = result_docs
+                        break
+                    elif 'multi_match' in term:
+                        values = term['multi_match']['query'].split(' ')
+                        for doc in result_docs:
+                            strs = [
+                                val for val in doc.values() if isinstance(val, str)
+                            ]
+                            words = []
+                            for s in strs:
+                                words += s.split(' ')
+                            if all(value in words for value in values):
+                                filtered_docs.append(doc)
             result_docs = filtered_docs
 
         formatted_result_docs: List[ResultDocumentDict] = [{

@@ -219,20 +219,28 @@ def search(
     categories: List[str],
     language_codes: List[str],
     offset: Optional[int] = None,
-    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE
+    size: int = feconf.SEARCH_RESULTS_PAGE_SIZE,
 ) -> Tuple[List[str], Optional[int]]:
     """Searches for documents (explorations or collections) matching the given
     query in the given index.
+
+    This function also creates the index if it does not exist yet.
 
     Args:
         query_string: str. The terms that the user is searching for.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
         categories: list(str). The list of categories to query for. If it is
-            empty, no category filter is applied to the results.
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
         language_codes: list(str). The list of language codes to query for. If
-            it is empty, no language code filter is applied to the results.
-        offset: int|None. The offset into the index.
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: int|None. The offset into the index. Pass this in to start at
+            the 'offset' when searching through a list of results of max length
+            'size'. Leave as None to start at the beginning.
         size: int. The maximum number of documents to return.
 
     Returns:
@@ -259,7 +267,7 @@ def search(
         'query': {
             'bool': {
                 'must': [],
-                'filter': []
+                'filter': [],
             }
         },
         'sort': [{
@@ -270,9 +278,16 @@ def search(
             }
         }]
     }
+    # If the `query_string` is empty or consists only of whitespace, a `match_all` query is appended to the `must` clause.
+    # The `match_all` query ensures that all documents in the index are returned when no specific search terms are provided.
+    # Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html
     if query_string.strip() == '':
         query_definition['query']['bool']['must'].append({'match_all': {}})
     else:
+    # If the `query_string` is not empty, a `multi_match` query is appended to the `must` clause.
+    # The `multi_match` query searches across multiple fields (`title`, `description`, `category`) with boosting applied to certain fields (`title^3`, `category^2`).
+    # Additional parameters like `fuzziness`, `prefix_length`, `max_expansions`, and `minimum_should_match` are used to improve search results.
+    # Reference: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
         query_definition['query']['bool']['must'].append({
             'multi_match': {
                 'query': query_string,

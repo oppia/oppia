@@ -140,50 +140,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'param2': 4
             }
         }], correct_index_name)
-        # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
-        def mock_search(
-            body: Dict[str, Any], index: str, params: Dict[str, int]
-        ) -> Dict[str, Any]:
-            self.assertEqual(body, {
-                'query': {
-                    'bool': {
-                        'must': [{
-                            'match_all': {}
-                        }],
-                        'filter': []
-                    }
-                },
-                'sort': [{
-                    'rank': {
-                        'order': 'desc',
-                        'missing': '_last',
-                        'unmapped_type': 'float'
-                    }
-                }]
-            })
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(params, {
-                'from': 0,
-                'size': 51
-            })
-            return {
-                'hits': {
-                    'hits': [
-                        {'_id': '1'},
-                        {'_id': '12'}
-                    ]
-                }
-            }
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
-        with swap_search:
-            result, new_offset = elastic_search_services.search(
-                '', correct_index_name, [], [], offset=0, size=50
+
+        result, new_offset=(
+            elastic_search_services.search(
+            '',correct_index_name,[],[],offset=0,
+            size=50
             )
-        self.assertEqual(result, ['1', '12'])
+        )
+        self.assertEqual(result, [1, 12])
         self.assertIsNone(new_offset)
 
     def test_search_returns_none_when_response_is_empty(self) -> None:
@@ -206,26 +170,26 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
-                    'query': {
-                        'bool': {
-                            'must': [{
-                                'match_all': {}
-                            }],
-                            'filter': [{
-                                'terms': {'category.keyword': ['my_category']}
-                            }, {
-                                'terms': {'language_code.keyword': ['en', 'es']}
-                            }]
-                        }
-                    },
-                    'sort': [{
-                        'rank': {
-                            'order': 'desc',
-                            'missing': '_last',
-                            'unmapped_type': 'float'
-                        }
-                    }]
-                })
+                'query': {
+                    'bool': {
+                        'must': [{
+                            'match_all': {}
+                        }],
+                        'filter': [{
+                            'terms': {'category.keyword': ['my_category']}
+                        }, {
+                            'terms': {'language_code.keyword': ['en', 'es']}
+                        }]
+                    }
+                },
+                'sort': [{
+                    'rank': {
+                        'order': 'desc',
+                        'missing': '_last',
+                        'unmapped_type': 'float'
+                    }
+                }]
+            })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params, {
                 'from': 0,
