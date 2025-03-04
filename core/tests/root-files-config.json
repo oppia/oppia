@@ -17,7 +17,6 @@
     "core/templates/domain/exploration/ExplorationObjectFactorySpec.ts",
     "extensions/rich_text_components/richTextComponentsRequires.ts",
     "core/templates/domain/exploration/LostChangeObjectFactorySpec.ts",
-    "core/templates/domain/question/QuestionObjectFactorySpec.ts",
     "core/templates/domain/skill/SkillObjectFactorySpec.ts",
     "core/templates/domain/exploration/StatesObjectFactorySpec.ts",
     "core/templates/domain/state/StateObjectFactorySpec.ts",
@@ -58,7 +57,6 @@
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-short-response.component.html",
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md",
-    "core/templates/AppSpec.ts",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
@@ -68,6 +66,7 @@
     "extensions/ckeditor_plugins/pre/plugin.js",
     "core/templates/pages/oppia-root/index.ts",
     "core/templates/pages/lightweight-oppia-root/index.ts",
+    "core/templates/third-party-imports/dnd-lists.import.ts",
     "src/main.ts",
     "src/index.html",
     "src/index.prod.html",
@@ -75,18 +74,10 @@
     "src/environments/environment.ts",
     "extensions/extensions.module.ts",
     "core/templates/domain/state/state-version-history.model.ts",
-    "core/templates/directives/angular-html-bind.directive.ts",
-    "core/templates/directives/mathjax-bind.directive.ts",
     "core/templates/third-party-imports/select2.import.ts",
     "core/templates/domain/utilities/classifier-file.model.ts",
     "extensions/visualizations/visualizationsRequires.ts",
     "extensions/interactions/interactionsQuestionsRequires.ts",
-    "extensions/value_generators/valueGeneratorsRequires.ts",
-    "extensions/objects/objectComponentsRequires.ts",
-    "extensions/objects/objectComponentsRequiresForPlayers.ts",
-    "core/templates/pages/error-pages/error-page.import.ts",
-    "core/templates/pages/error-pages/error-iframed-page/error-iframed-page.import.ts",
-    "core/templates/pages/maintenance-page/maintenance-page.import.ts",
-    "core/templates/pages/blog-dashboard-page/blog-dashboard-page.import.ts"
+    "extensions/value_generators/valueGeneratorsRequires.ts"
   ]
 }
