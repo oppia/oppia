@@ -50,7 +50,7 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {Location} from '@angular/common';
+import {UrlService} from 'services/contextual/url.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -110,7 +110,7 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
-  let location: Location;
+  let urlService: UrlService;
   let threadSummaryList = [
     {
       status: 'open',
@@ -161,7 +161,6 @@ describe('TopNavigationBarComponent', () => {
         AlertsService,
         FeedbackUpdatesBackendApiService,
         UserService,
-        Location,
         {
           provide: I18nService,
           useClass: MockI18nService,
@@ -198,8 +197,7 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
-    location = TestBed.inject(Location);
-    spyOn(location, 'back').and.stub();
+    urlService = TestBed.inject(UrlService);
     feedbackUpdatesBackendApiService = TestBed.inject(
       FeedbackUpdatesBackendApiService
     );
@@ -855,4 +853,11 @@ describe('TopNavigationBarComponent', () => {
     expect(learnerGroupSpy).not.toHaveBeenCalled();
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
   }));
+
+  it('should return true and set navbackButtonUrl when current path matches a hidden back button path', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
+    component.PAGES_WITH_BACK_STATE = ['/blog/'];
+
+    expect(component.shouldShowBackButton()).toBeTrue();
+  });
 });

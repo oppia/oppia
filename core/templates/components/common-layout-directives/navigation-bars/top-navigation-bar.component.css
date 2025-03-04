@@ -109,10 +109,6 @@
   display: flex;
 }
 
-.oppia-top-navigation-bar .oppia-navbar-back-button {
-  margin-right: 9px;
-  margin-top: 10px;
-}
 .oppia-top-navigation-bar .top-section .heading-text {
   display: inline-block;
   margin-left: 7px;
@@ -432,7 +428,7 @@
   display: block;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:focus {
   outline: 1px dotted #212121;

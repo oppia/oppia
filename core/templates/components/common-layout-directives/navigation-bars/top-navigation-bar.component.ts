@@ -232,13 +232,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    if (this.currentUrl !== 'signup') {
-      this.learnerGroupBackendApiService
-        .isLearnerGroupFeatureEnabledAsync()
-        .then(featureIsEnabled => {
-          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-        });
-    }
+    this.learnerGroupBackendApiService
+      .isLearnerGroupFeatureEnabledAsync()
+      .then(featureIsEnabled => {
+        this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
+      });
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
@@ -587,11 +585,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   shouldShowBackButton(): boolean {
-    let currentPath = this.location.path();
+    let currentPath = this.urlService.getPathname();
     return this.PAGES_WITH_BACK_STATE.some(path => currentPath.includes(path));
-  }
-
-  goBack(): void {
-    this.location.back();
   }
 }
