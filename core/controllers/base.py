@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import base64
 import datetime
+import enum
 import functools
 import hmac
 import io
@@ -59,6 +60,15 @@ AUTH_HANDLER_PATHS: Final = (
     '/session_begin',
     '/session_end',
 )
+
+
+class LogType(str, enum.Enum):
+    """Enum for logging types.
+    """
+
+    WARNING = 'warning'
+    EXCEPTION = 'exception'
+    ERROR = 'error'
 
 
 class ResponseValueDict(TypedDict):
@@ -763,7 +773,7 @@ class BaseHandler(
             )
 
     def _log_exception_message(
-        self, exception_type: str, log_type: str, error_message: str
+        self, exception_type: str, log_type: LogType, error_message: str
     ) -> None:
         """Logs exception details.
 
@@ -792,10 +802,14 @@ class BaseHandler(
             )
         )
 
-        if log_type == 'warning':
+        if log_type == LogType.WARNING:
             logging.warning(msg)
-        elif log_type == 'exception':
+        elif log_type == LogType.EXCEPTION:
             logging.exception(msg)
+        elif log_type == LogType.ERROR:
+            logging.error(msg)
+        else:
+            logging.info(msg)
 
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
@@ -826,7 +840,7 @@ class BaseHandler(
             )
             self._log_exception_message(
                 exception_type,
-                'warning',
+                LogType.WARNING,
                 'Unauthenticated user'
             )
             if (
@@ -847,7 +861,7 @@ class BaseHandler(
         if isinstance(exception, self.NotFoundException):
             self._log_exception_message(
                 exception_type,
-                'warning',
+                LogType.WARNING,
                 'Invalid URL requested'
             )
             self.error(404)
@@ -860,7 +874,7 @@ class BaseHandler(
 
         self._log_exception_message(
             exception_type,
-            'exception',
+            LogType.EXCEPTION,
             'Exception raised'
         )
 
