@@ -404,8 +404,7 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message:
-          'The number of terms in a ratio should not be greater than 10.',
+        message: 'The number of terms in a ratio should not be greater than 10',
       },
     ]);
   });

@@ -74,7 +74,7 @@ export class ContinueValidationService {
         type: AppConstants.WARNING_TYPES.CRITICAL,
         message:
           'Only the default outcome is necessary for a continue' +
-          ' interaction.',
+          ' interaction',
       });
     }
 
@@ -82,7 +82,7 @@ export class ContinueValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
-          'Please specify what Oppia should do after the button is clicked.',
+          'Please specify what Oppia should do after the button is clicked',
       });
     }
 

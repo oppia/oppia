@@ -245,7 +245,7 @@ export class DragAndDropSortInputValidationService {
                   (i + 1) +
                   ' will never be matched because there will be ' +
                   'at least 2 elements at incorrect positions if multiple ' +
-                  'elements cannot occupy the same position.',
+                  'elements cannot occupy the same position',
               });
             }
             var sortedCustomArgsChoices = choiceValues.sort();

@@ -68,8 +68,8 @@ export const AppConstants = {
     ADD_INTERACTION: 'Please add an interaction to this card',
     STATE_UNREACHABLE: 'This card is unreachable',
     UNABLE_TO_END_EXPLORATION:
-      "There's no way to complete the exploration starting from this card. " +
-      'To fix this, make sure that the last card in the chain starting from' +
+      "There's no way to complete the exploration starting from this card -- " +
+      'ensure that the last card in the chain starting from' +
       " this one has an 'End Exploration' question type",
     INCORRECT_SOLUTION: 'The current solution does not lead to another card',
     UNRESOLVED_ANSWER:

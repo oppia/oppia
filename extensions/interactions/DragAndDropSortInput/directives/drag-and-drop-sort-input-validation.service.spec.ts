@@ -272,7 +272,7 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Please ensure the list is nonempty.',
+        message: 'Please ensure the list is nonempty',
       },
     ]);
   });

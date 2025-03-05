@@ -176,7 +176,7 @@ describe('Interaction validator', function () {
           message:
             "The answer group 1 is labelled as 'correct', " +
             "but includes a 'destination for really stuck learners'. " +
-            'The latter is unnecessary and should be removed.',
+            'The latter is unnecessary and should be removed',
         },
       ]);
     });

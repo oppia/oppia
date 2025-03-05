@@ -116,7 +116,7 @@ export class baseInteractionValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please add feedback for the user in the [All other answers] ' +
-          'rule.',
+          'rule',
       });
     }
     if (
