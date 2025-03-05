@@ -17,11 +17,9 @@
  * potentially supported by Oppia for both manual and automatic voiceovers.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
-import {Voiceover} from 'domain/exploration/voiceover.model';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {LanguageAccentMasterList} from 'domain/voiceover/voiceover-backend-api.service';
 
 export interface LanguageCodesMapping {
   [languageCode: string]: {
@@ -33,15 +31,14 @@ export interface LanguageCodesMapping {
   providedIn: 'root',
 })
 export class VoiceoverLanguageManagementService {
-  public languageAccentMasterList;
-  public autoGeneratableLanguageAccentCodes;
-  public languageCodesMapping: LanguageCodesMapping;
-
+  public languageAccentMasterList!: LanguageAccentMasterList;
+  public autoGeneratableLanguageAccentCodes!: string[];
+  public languageCodesMapping!: LanguageCodesMapping;
   public cloudSupportedLanguageAccentCodes: string[] = [];
 
   init(
-    languageAccentMasterList,
-    autoGeneratableLanguageAccentCodes,
+    languageAccentMasterList: LanguageAccentMasterList,
+    autoGeneratableLanguageAccentCodes: string[],
     languageCodesMapping: LanguageCodesMapping
   ): void {
     this.languageAccentMasterList = languageAccentMasterList;
@@ -68,7 +65,9 @@ export class VoiceoverLanguageManagementService {
     this.cloudSupportedLanguageAccentCodes = supportedLanguageAccents;
   }
 
-  isAutogenerationSupportedGivenLanguageAccent(languageAccentCode): boolean {
+  isAutogenerationSupportedGivenLanguageAccent(
+    languageAccentCode: string
+  ): boolean {
     return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
   }
 }

@@ -44,7 +44,6 @@ import {GraphDataService} from 'pages/exploration-editor-page/services/graph-dat
 import {
   LanguageAccentToDescription,
   VoiceoverBackendApiService,
-  TokensWithDurationType,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -64,18 +63,18 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   currentVoiceoverLoadedType!: string | undefined;
 
   isVoiceoverSupportedForSelectedLanguage: boolean = false;
-  isVoiceoverAutogenerationSupportedForSelectedAccent: boolean;
+  isVoiceoverAutogenerationSupportedForSelectedAccent: boolean = false;
   contentAvailableForVoiceovers: boolean = false;
 
   manualVoiceover!: Voiceover | undefined;
   manualVoiceoverCurrentDuration: number = 0;
-  manualVoiceoverTotalDuration: number = 0;
+  manualVoiceoverTotalDuration!: number;
   manualVoiceoverProgress: number = 0;
   isManualVoiceoverPlaying: boolean = false;
 
   automaticVoiceover!: Voiceover | undefined;
   automaticVoiceoverCurrentDuration: number = 0;
-  automaticVoiceoverTotalDuration: number = 0;
+  automaticVoiceoverTotalDuration!: number;
   automaticVoiceoverProgress: number = 0;
   isAutomaticVoiceoverPlaying: boolean = false;
 
@@ -93,7 +92,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   isAutomaticVoiceoverGenerating: boolean = false;
   isGenerateAutomaticVoiceoverOptionEnabled = false;
-  automaticVoiceoverSentenceTokenWithDurations: TokensWithDurationType[];
 
   constructor(
     private audioPlayerService: AudioPlayerService,
@@ -390,7 +388,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
     this.manualVoiceover = voiceoverTypeToVoiceovers.manual;
     this.manualVoiceoverTotalDuration = Math.round(
-      this.manualVoiceover?.durationSecs
+      (this.manualVoiceover as Voiceover).durationSecs
     );
   }
 
@@ -419,7 +417,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
     this.automaticVoiceover = voiceoverTypeToVoiceovers.auto;
     this.automaticVoiceoverTotalDuration = Math.round(
-      this.automaticVoiceover?.durationSecs
+      (this.automaticVoiceover as Voiceover).durationSecs
     );
   }
 
@@ -525,9 +523,10 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
         this.languageAccentCode
       ) as EntityVoiceovers;
-    entityVoiceovers.voiceoversMapping[
-      this.activeContentId
-    ].manual.needsUpdate = (this.manualVoiceover as Voiceover).needsUpdate;
+    (
+      entityVoiceovers.voiceoversMapping[this.activeContentId as string]
+        .manual as Voiceover
+    ).needsUpdate = (this.manualVoiceover as Voiceover).needsUpdate;
 
     this.entityVoiceoversService.removeEntityVoiceovers(
       this.languageAccentCode
@@ -636,7 +635,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           .generateAutotmaticVoiceoverAsync(
             this.contextService.getExplorationId(),
             this.contextService.getExplorationVersion() as number,
-            this.stateEditorService.getActiveStateName(),
+            this.stateEditorService.getActiveStateName() as string,
             this.activeContentId,
             this.languageAccentCode
           )

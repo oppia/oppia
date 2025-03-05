@@ -23,7 +23,7 @@ import {
 } from 'domain/exploration/voiceover.model';
 
 export interface VoiceoverTypeToVoiceovers {
-  [voiceoverType: string]: Voiceover;
+  [voiceoverType: string]: Voiceover | undefined;
 }
 
 export interface VoiceoverTypeToVoiceoversBackendDict {
@@ -98,8 +98,8 @@ export class EntityVoiceovers {
       let voiceoverTypeToVoiceovers =
         entityVoiceoversBackendDict.voiceovers_mapping[contentId];
 
-      let manualVoiceovers: Voiceover | undefined;
-      let automaticVoiceovers: Voiceover | undefined;
+      let manualVoiceovers!: Voiceover;
+      let automaticVoiceovers!: Voiceover;
 
       if (voiceoverTypeToVoiceovers.manual) {
         manualVoiceovers = Voiceover.createFromBackendDict(
