@@ -210,7 +210,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
     this.inClassroomPage = false;
     this.pageIsIframed = this.urlService.isIframed();
-    this.menuIconIsShown = !this.shouldShowBackButton();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;
@@ -238,6 +237,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
         });
     }
+
+    this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
+      this.urlService.getPathname().includes(path)
+    );
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
@@ -583,10 +586,5 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
     return this.platformFeatureService.status
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
-  }
-
-  shouldShowBackButton(): boolean {
-    let currentPath = this.urlService.getPathname();
-    return this.PAGES_WITH_BACK_STATE.some(path => currentPath.includes(path));
   }
 }

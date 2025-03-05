@@ -857,7 +857,6 @@ describe('TopNavigationBarComponent', () => {
   it('should return true and set navbackButtonUrl when current path matches a hidden back button path', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
-    expect(component.shouldShowBackButton()).toBeTrue();
     expect(component.menuIconIsShown).toBeFalse();
   });
 });
