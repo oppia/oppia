@@ -806,10 +806,6 @@ class BaseHandler(
             logging.warning(msg)
         elif log_type == LogType.EXCEPTION:
             logging.exception(msg)
-        elif log_type == LogType.ERROR:
-            logging.error(msg)
-        else:
-            logging.info(msg)
 
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
