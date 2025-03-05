@@ -579,7 +579,7 @@ class TestGitHubService(unittest.TestCase):
             self.service.add_alert_comment_on_issue(issue)
 
         self.assertEqual(
-            str(context.exception), 
+            str(context.exception),
             'Received null res while commenting on issue'
         )
 
@@ -644,7 +644,7 @@ class TestGitHubService(unittest.TestCase):
             self.service.post_unassignment_comment(issue)
 
         self.assertEqual(
-            str(context.exception), 
+            str(context.exception),
             'Received null res while commenting on issue'
         )
 
