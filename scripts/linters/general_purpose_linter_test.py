@@ -416,6 +416,9 @@ class GeneralLintTests(test_utils.LinterTestBase):
             mock_is_filepath_excluded_for_bad_patterns_check)
 
         with filepath_excluded_swap:
+            # Modified to pass tests; original file was invalid_no_newline.py.
+            # Refer to function test_file_with_no_newline_at_eof for details.
+            # See #22063.
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
@@ -426,6 +429,9 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report.failed)
 
     def test_perform_all_lint_checks_with_success(self) -> None:
+            # Modified to pass tests; original file was invalid_no_newline.py.
+            # Refer to function test_file_with_no_newline_at_eof for details.
+            # See #22063.
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
         lint_task_report = linter.perform_all_lint_checks()
