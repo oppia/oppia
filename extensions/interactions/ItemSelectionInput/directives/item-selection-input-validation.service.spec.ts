@@ -840,8 +840,7 @@ describe('ItemSelectionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The rule 1 of answer group 0 of ItemSelectionInput interaction ' +
-          'is a duplicate',
+          'The rule 2 of answer group 1 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
       },
     ]);
   });

@@ -28,6 +28,7 @@ import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
+import {ItemSelectionRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root',
@@ -221,27 +222,6 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 
-  private getWarningsForRulesDuplicates(
-    rules: Rule[],
-    answerGroupIndex: number
-  ): Warning[] {
-    const warningsList: Warning[] = [];
-    rules.forEach((rule, ruleIndex) => {
-      const ruleStr = JSON.stringify(rule.toBackendDict());
-      if (this.rulesSet.has(ruleStr)) {
-        warningsList.push({
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message:
-            `The rule ${ruleIndex} of answer group ` +
-            `${answerGroupIndex} of ItemSelectionInput interaction ` +
-            'is a duplicate',
-        });
-      }
-      this.rulesSet.add(ruleStr);
-    });
-    return warningsList;
-  }
-
   getAllWarnings(
     stateName: string,
     customizationArgs: ItemSelectionInputCustomizationArgs,
@@ -281,10 +261,6 @@ export class ItemSelectionInputValidationService {
     this.rulesSet.clear();
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
-      warningsList = warningsList.concat(
-        this.getWarningsForRulesDuplicates(rules, answerIndex)
-      );
-
       rules.forEach((rule, ruleIndex) => {
         const ruleInputs = rule.inputs.x as string[];
         warningsList = warningsList.concat(
@@ -349,6 +325,36 @@ export class ItemSelectionInputValidationService {
         }
       });
     });
+    const ruleTypes = new Set([
+      'IsProperSubsetOf',
+      'Equals',
+      'ContainsAtLeastOneOf',
+    ]);
+    const typeToInputMap = new Map<string, Set<string>>();
+    const ruleToAnswerGroup = new Map<string, number>();
+    ruleTypes.forEach(type => {
+      typeToInputMap.set(type, new Set());
+    });
+    for (let [answerGroupIndex, group] of answerGroups.entries()) {
+      for (let [ruleIndex, rule] of group.rules.entries()) {
+        const itemSelectionInputs =
+          rule.inputs as unknown as ItemSelectionRuleInputs;
+        const input = JSON.stringify([...itemSelectionInputs.x].sort());
+        const inputsSet = typeToInputMap.get(rule.type) || new Set();
+        if (inputsSet.has(input)) {
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message:
+              `The rule ${ruleIndex + 1} of answer group ` +
+              `${answerGroupIndex + 1} is already present in answer group ${(ruleToAnswerGroup.get(input) ?? 0) + 1} -- ` +
+              'please remove or edit the rule in the answer group to avoid duplicate rules',
+          });
+        }
+
+        (typeToInputMap.get(rule.type) || new Set()).add(input);
+        ruleToAnswerGroup.set(input, answerGroupIndex);
+      }
+    }
 
     return warningsList;
   }
