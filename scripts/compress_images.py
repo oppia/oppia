@@ -29,14 +29,6 @@ import tempfile
 from PIL import Image
 from typing import List, TypedDict, Union
 
-IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION = {'.png'}
-IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION = {'.jpg', '.jpeg', '.webp'}
-ALL_IMAGES_EXTENSIONS = (
-    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION |
-    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
-)
-TOLERANCE = 0.99
-OUTPUT_DIR = 'compressed_images'
 
 class CompressedImageInfo(TypedDict):
     """Type definition for compressed image information."""
@@ -46,113 +38,133 @@ class CompressedImageInfo(TypedDict):
     new_size: int
 
 
-def get_compressible_images(
-        input_path: Union[str, pathlib.Path]
-    ) -> List[CompressedImageInfo]:
-    """Find images that can be compressed further.
+class ImageCompressor:
+    """A class to handle image compression using GraphicsMagick."""
 
-    This function scans a directory for images, attempts to compress them using 
-    GraphicsMagick, and identifies those that can be reduced in size. The 
-    compression benchmark is set to 99% of the original file size, meaning only 
-    images that admit at least a 1% reduction are considered compressible.
+    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION = {'.png'}
+    IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION = {'.jpg', '.jpeg', '.webp'}
+    ALL_IMAGES_EXTENSIONS = (
+        IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION |
+        IMAGE_EXTENSIONS_SUPPORTING_LZW_COMPRESSION
+    )
+    TOLERANCE = 0.99
+    OUTPUT_DIR = 'compressed_images'
 
-    Args:
-        path (Union[str, pathlib.Path]):
-        Path to the directory containing images.
+    def __init__(
+        self,
+        input_path: Union[str, pathlib.Path],
+        output_dir: str = OUTPUT_DIR,
+        tolerance: float = TOLERANCE
+    ):
+        """Initialize the ImageCompressor.
 
-    Returns:
-        List[CompressedImageInfo]: A list of images that can be compressed, 
-        including their original and new sizes.
+        Args:
+            input_path: str. Images directory.
+            output_dir: str. Directory to store compressed images.
+            tolerance: float. Compression threshold.
+        """
+        self.input_path = pathlib.Path(input_path)
+        self.output_dir = output_dir
+        self.tolerance = tolerance
+        self.logger = logging.getLogger(__name__)
 
-    Raises:
-        Exception: If an error occurs while processing an image.
-    """
+    def get_compression_type(self, file_extension: str) -> str:
+        """Determine compression type based on file extension.
 
-    result_images: List[CompressedImageInfo] = []
+        Args:
+            file_extension: str. The file extension of the image.
 
-    for file_path in pathlib.Path(input_path).glob('**/*.*'):
-        file_extension = file_path.suffix.lower()
-        if file_extension not in ALL_IMAGES_EXTENSIONS:
-            continue
+        Returns:
+            type: str. Compression type (Zip or LZW).
+        """
+        return (
+            'Zip' if file_extension in 
+            self.IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
+            else 'LZW'
+        )
 
-        with Image.open(file_path):
-            with tempfile.TemporaryDirectory() as tmpdir:
-                temp_compressed = (
-                    pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
-                )
+    def find_compressible_images(self) -> List[CompressedImageInfo]:
+        """Find images that can be compressed further.
 
-                compression_type = (
-                    'Zip' if file_extension in
-                    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
-                    else 'LZW'
-                )
+        Returns:
+            result_images: List[]. List of compressible images.
+        """
+        result_images: List[CompressedImageInfo] = []
 
-                cmd = [
-                    'gm', 'convert',
-                    file_path,
-                    '-strip',
-                    '-compress', compression_type,
-                    temp_compressed
-                ]
+        for file_path in self.input_path.glob('**/*.*'):
+            file_extension = file_path.suffix.lower()
+            if file_extension not in self.ALL_IMAGES_EXTENSIONS:
+                continue
 
-                result = subprocess.run(
-                    cmd, capture_output=True, text=True, check=False
-                )
-                if result.returncode == 0 and temp_compressed.exists():
-                    original_size = file_path.stat().st_size
-                    new_size = temp_compressed.stat().st_size
-
-                    if new_size < original_size * TOLERANCE:
-                        result_images.append({
-                            'path': file_path,
-                            'original_size': original_size,
-                            'new_size': new_size
-                        })
-                else:
-                    logging.info(
-                        'Compressed image > original image'
+            with Image.open(file_path):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    temp_compressed = (
+                        pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
                     )
-                    continue
 
-    return result_images
+                    compression_type = self.get_compression_type(file_extension)
 
-def compress_images_for_workflow(
-        result_images: List[CompressedImageInfo]
-    ) -> None:
-    """Compresses the images using GraphicsMagick."""
+                    cmd = [
+                        'gm', 'convert',
+                        str(file_path),
+                        '-strip',
+                        '-compress', compression_type,
+                        str(temp_compressed)
+                    ]
 
-    if os.path.exists(OUTPUT_DIR):
-        shutil.rmtree(OUTPUT_DIR)
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+                    result = subprocess.run(
+                        cmd, capture_output=True, text=True, check=False
+                    )
+                    if result.returncode == 0 and temp_compressed.exists():
+                        original_size = file_path.stat().st_size
+                        new_size = temp_compressed.stat().st_size
 
-    for images in result_images:
-        file_extension = images['path'].suffix.lower()
-        file_path = images['path']
+                        if new_size < original_size * self.tolerance:
+                            result_images.append({
+                                'path': file_path,
+                                'original_size': original_size,
+                                'new_size': new_size
+                            })
+                    else:
+                        logging.info(
+                            'Could not compress %s', {file_path}
+                        )
 
-        rel_path = os.path.relpath(file_path)
-        output_file_path = os.path.join(OUTPUT_DIR, rel_path)
+        return result_images
 
-        # Create the directory structure for the output file
-        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+    def compress_images(
+            self, result_images: List[CompressedImageInfo]
+        ) -> None:
+        """Compress the identified images.
 
-        if file_extension not in ALL_IMAGES_EXTENSIONS:
-            continue
+        Args:
+            result_images: List. List of images to compress.
+        """
+        # Remove existing output directory and create a new one.
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
+        os.makedirs(self.output_dir, exist_ok=True)
 
-        with Image.open(file_path):
-            with tempfile.TemporaryDirectory() as tmpdir:
-                temp_compressed = (
-                    pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
-                )
+        for image in result_images:
+            file_path = image['path']
+            file_extension = file_path.suffix.lower()
 
-                compression_type = (
-                    'Zip' if file_extension in
-                    IMAGE_EXTENSIONS_SUPPORTING_ZIP_COMPRESSION
-                    else 'LZW'
-                )
+            # Maintain original directory structure.
+            rel_path = os.path.relpath(file_path)
+            output_file_path = os.path.join(self.output_dir, rel_path)
+
+            # Create necessary directories.
+            os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+
+            if file_extension not in self.ALL_IMAGES_EXTENSIONS:
+                continue
+
+            with Image.open(file_path):
+                compression_type = self.get_compression_type(file_extension)
 
                 cmd = [
                     'gm', 'convert',
-                    file_path,
+                    str(file_path),
                     '-strip',
                     '-compress', compression_type,
                     output_file_path
@@ -161,49 +173,61 @@ def compress_images_for_workflow(
                 result = subprocess.run(
                     cmd, capture_output=True, text=True, check=False
                 )
-                if result.returncode == 0 and temp_compressed.exists():
-                    with open(temp_compressed, 'rb') as f:
-                        compressed_data = f.read()
-                    # adding compressed images to OUTPUT_DIR.
-                    with open(OUTPUT_DIR, 'wb') as f:
-                        f.write(compressed_data)
-
-                else:
-                    logging.info(
-                        'Compressed image > original image'
+                if result.returncode != 0:
+                    logging.error(
+                        'Compression failed for %s: %s',
+                        file_path, result.stderr
                     )
-                    continue
+
+    def run(self) -> int:
+        """Main method to run the image compression process.
+
+        Returns: int. Exit code.
+        """
+        compressed_images = self.find_compressible_images()
+
+        if compressed_images:
+            space_saved = sum(
+                image['original_size'] - image['new_size']
+                for image in compressed_images
+            )
+
+            print(
+                f'{len(compressed_images)} images'
+                'could be compressed further:\n'
+            )
+            for image in compressed_images:
+                print('    ', image['path'])
+
+            print(f'\nTotal space saved: {space_saved} bytes\n')
+
+            i = 0
+            while i < 10:
+                self.compress_images(compressed_images)
+                i += 1
+
+            print(
+                '\nCompressed images have been saved '
+                'to the compressed_images directory. '
+                '\nTo use these compressed images in your PR:\n'
+                '1. Go to the GitHub Actions tab in your repository.\n'
+                '2. Find the workflow run for your PR.\n'
+                '3. Download the script-output artifact.\n'
+                '4. Extract the downloaded zip file.\n'
+                '5. Copy the compressed images to their '
+                'respective locations in your repository.\n'
+            )
+            return 1
+        else:
+            print('No images could be compressed further.')
+            return 0
 
 
 if __name__ == '__main__':  # pragma: no cover
-    # I recommend to do not use this script in local development, as it may
-    # compress images that are not meant to be compressed.
-    # This is only made for CI workflow artifacts.
-    repo_path = pathlib.Path('./assets')
-    compressed_images = get_compressible_images(repo_path)
-
-    if compressed_images:
-        TOTAL_SPACE_SAVED = 0
-        print(len(compressed_images), 'images could be compressed further:\n')
-        for image in compressed_images:
-            print(image['path'])
-            saved = image['original_size'] - image['new_size']
-            TOTAL_SPACE_SAVED += saved
-
-        print(f'\nTotal space saved: {TOTAL_SPACE_SAVED} bytes\n')
-        #  compressing images for CI workflow artifacts. 
-        compress_images_for_workflow(compressed_images); 
-        print(
-            f'\nCompressed images have been saved to the compressed_images directory.'
-            f'These images will be uploaded as GitHub workflow artifacts.'
-            f'\nTo use these compressed images in your PR:'
-            f'1. Go to the GitHub Actions tab in your repository.'
-            f'2. Find the workflow run for your PR.'
-            f'3. Download the script-output artifact.'
-            f'4. Extract the downloaded zip file.'
-            f'5. Copy the compressed images to their respective locations in your repository.'
-        )
-        sys.exit(1)
-    else:
-        print('No images could be compressed further.')
-        sys.exit(0)
+    images_dir = pathlib.Path('./assets')
+    compressor = ImageCompressor(images_dir)
+    print(
+        '[IMPORTANT NOTE]: Make sure to delete /compressed folder '
+        'after replacing images in the repository. '
+    )
+    sys.exit(compressor.run())

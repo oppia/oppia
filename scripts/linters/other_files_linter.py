@@ -337,12 +337,10 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             representing the result of the lint check.
         """
 
-        name = 'Compressible images'
         repo_path = os.path.join(os.getcwd(), 'assets')
+        image_compressor = compress_images.ImageCompressor(repo_path)
+        compressed_images = image_compressor.find_compressible_images()
 
-        compressed_images = compress_images.get_compressible_images(repo_path)
-
-        failed = bool(compressed_images)
         error_messages = []
 
         if compressed_images:
@@ -359,16 +357,20 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                     f'({saved_percentage:.2f}%)')
 
             error_messages.append(
-                '\nUse the following commands to compress the images:')
+                '\nRun python -m scripts.compress_images to compress the '
+                'images, and replace images with compressed ones '
+                'generated in /compressed directory.')
             error_messages.append(
-                'For PNG images: gm convert <input_file> -strip '
-                '-compress Zip <output_file>')
-            error_messages.append(
-                'For JPG and WebP images: gm convert <input_file> -strip '
-                '-compress LZW <output_file>')
+                '\n[IMPORTANT]: Make sure to remove /compressed directory'
+                ' before committing the changes.'
+            )
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            'Compressible images',
+            bool(compressed_images),
+            error_messages,
+            error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all

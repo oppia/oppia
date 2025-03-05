@@ -42,5 +42,5 @@ jobs:
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "Check compressible images failed on the upstream develop branch."
+          message: "Image compression check failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}

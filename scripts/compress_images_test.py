@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2023 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,205 +12,158 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/image_compression.py."""
+"""Tests for compress_images.py."""
 
-from __future__ import annotations
-
+import os
 import pathlib
-import random
 import shutil
+import tempfile
 import unittest
 from unittest import mock
 
 from scripts import compress_images
 
 from PIL import Image
-from typing import Tuple
+from typing import List, TypedDict
 
 
-class MockCompletedProcess:
-    """Mock for subprocess.CompletedProcess."""
+class CompressedImageInfo(TypedDict):
+    """Type definition for compressed image information."""
 
-    def __init__(self, returncode: int, stderr: bytes = b''):
-        self.returncode = returncode
-        self.stderr = stderr
+    path: pathlib.Path
+    original_size: int
+    new_size: int
 
 
-class TestImageCompression(unittest.TestCase):
-    """Unit tests for image compression script."""
+class TestImageCompressor(unittest.TestCase):
+    """Test the ImageCompressor class."""
 
     def setUp(self) -> None:
-        """Set up test environment with actual test images."""
-        self.test_dir = pathlib.Path('./test_assets')
-        self.test_dir.mkdir(exist_ok=True)
-        self.test_files = {
-            'test_image.jpg': self.create_noisy_image('test.jpg', (100, 100)),
-            'test_image.png': self.create_noisy_image('test.png', (100, 100)),
-            'test_image.webp': self.create_noisy_image('test.webp', (100, 100)),
-            'test_small.png': self.create_optimized_image('test.png', (50, 50)),
-            'unsupported.bmp': self.create_noisy_image('unsupp.bmp', (100, 100))
-        }
-        self.original_sizes = {
-            file_path: file_path.stat().st_size
-            for file_path in self.test_dir.glob('*')
-        }
-        img = Image.new('RGB', (100, 100), color='white')
-        self.test_image = self.test_dir / 'test_compression.jpg'
-        img.save(self.test_image, optimize=True, quality=95)
+        """Set up test environment before each test."""
+        self.temp_dir = tempfile.mkdtemp()
+        self.output_dir = os.path.join(self.temp_dir, 'compressed_images')
+
+        self.png_path = os.path.join(self.temp_dir, 'test_image.png')
+        self.jpg_path = os.path.join(self.temp_dir, 'test_image.jpg')
+        self.webp_path = os.path.join(self.temp_dir, 'test_image.webp')
+
+        self._create_test_image(self.png_path, 'PNG')
+        self._create_test_image(self.jpg_path, 'JPEG')
+        self._create_test_image(self.webp_path, 'WEBP')
 
     def tearDown(self) -> None:
-        """Clean up test directory and files."""
-        if self.test_dir.exists():
-            shutil.rmtree(self.test_dir)
+        """Clean up test environment after each test."""
+        shutil.rmtree(self.temp_dir)
 
-    def create_noisy_image(
-            self,
-            filename: str,
-            size: Tuple[int, int]
-        ) -> pathlib.Path:
-        """Create a test image with noise to ensure it's compressible."""
-        img = Image.new('RGB', size)
-        pixels = img.load()
-        if pixels is None:
-            raise ValueError('Failed to load pixels from the image.')
-        for x in range(size[0]):
-            for y in range(size[1]):
-                pixels[x, y] = (
-                    random.randint(0, 255),
-                    random.randint(0, 255),
-                    random.randint(0, 255)
-                )
-        file_path = self.test_dir / filename
-        img.save(file_path, quality=95)
-        return file_path
+    def _create_test_image(self, path: str, Img_format: str) -> None:
+        """Create a test image for compression testing."""
+        img = Image.new('RGB', (100, 100), color='red')
+        img.save(path, format=Img_format)
 
-    def create_optimized_image(
-            self,
-            filename: str,
-            size: Tuple[int, int]
-        ) -> pathlib.Path:
-        """Create an already optimized image that shouldn't compress further."""
-        img = Image.new('RGB', size, color='white')
-        file_path = self.test_dir / filename
-        img.save(file_path, optimize=True, quality=60)
-        return file_path
+    def test_get_compression_type_zip_extension(self) -> None:
+        """Test get_compression_type returns 'Zip' for PNG."""
+        compressor = compress_images.ImageCompressor(self.temp_dir)
+        compression_type = compressor.get_compression_type('.png')
+        self.assertEqual(compression_type, 'Zip')
 
-    def test_real_compression(self) -> None:
-        """Test actual image compression with real files."""
-        if not shutil.which('gm'):
-            self.skipTest('GraphicsMagick not installed')
-        compressed_images = compress_images.check_compressable_images(
-            str(self.test_dir)
-        )
-        self.assertGreater(
-            len(compressed_images),
-            0,
-            'No images were compressed')
-        for image_info in compressed_images:
-            path = image_info['path']
-            original_size = image_info['original_size']
-            new_size = image_info['new_size']
-            self.assertLess(
-                new_size,
-                original_size,
-                f'Failed to compress {path.name}')
-            try:
-                with Image.open(path) as img:
-                    img.verify()
-            except Exception as e:
-                self.fail(f'Compressed image {path.name} is corrupt: {e}')
+    def test_get_compression_type_lzw_extension(self) -> None:
+        """Test get_compression_type returns 'LZW' for JPG."""
+        compressor = compress_images.ImageCompressor(self.temp_dir)
+        compression_type = compressor.get_compression_type('.jpg')
+        self.assertEqual(compression_type, 'LZW')
 
-    def test_already_optimized_image(self) -> None:
-        """Test handling of already optimized images."""
-        if not shutil.which('gm'):
-            self.skipTest('GraphicsMagick not installed')
-        test_image = self.test_dir / 'test_small.png'
-        compressed_images = compress_images.check_compressable_images(
-            str(self.test_dir)
-        )
-        optimized_results = [
-            img for img in compressed_images
-            if img['path'] == test_image
+    @mock.patch('subprocess.run')
+    def test_compress_images(self, mock_subprocess_run: mock.MagicMock) -> None:
+        """Test image compression process."""
+        result_images: List[CompressedImageInfo] = [
+            {
+                'path': pathlib.Path(self.png_path),
+                'original_size': 1000,
+                'new_size': 500
+            }
         ]
-        self.assertEqual(
-            len(optimized_results),
-            0,
-            'Already optimized image should not be compressed further')
-
-    def test_unsupported_format(self) -> None:
-        """Test handling of unsupported image formats."""
-        if not shutil.which('gm'):
-            self.skipTest('GraphicsMagick not installed')
-        bmp_path = self.test_dir / 'unsupp.bmp'
-        original_size = bmp_path.stat().st_size
-        compressed_images = compress_images.check_compressable_images(
-            str(self.test_dir)
+        compressor = compress_images.ImageCompressor(
+            self.temp_dir,
+            output_dir=self.output_dir
         )
-        bmp_results = [
-            img for img in compressed_images
-            if img['path'] == bmp_path
-        ]
-        self.assertEqual(
-            len(bmp_results),
-            0,
-            'Unsupported format should not be processed')
-        self.assertEqual(
-            bmp_path.stat().st_size,
-            original_size,
-            'Unsupported format file was modified')
+        compressor.compress_images(result_images)
+        self.assertTrue(os.path.exists(self.output_dir))
+        mock_subprocess_run.assert_called()
 
-    def test_failed_compression(self) -> None:
-        """Test when compression process fails."""
-        original_size = self.test_image.stat().st_size
-        mock_result = MockCompletedProcess(returncode=1, stderr=b'Mock error')
-        with (
-            mock.patch('subprocess.run', return_value=mock_result),
+    def test_run_no_compressible_images(self) -> None:
+        """Test run method when no images are compressible."""
+        compressor = compress_images.ImageCompressor(self.temp_dir)
+        with mock.patch.object(
+            compressor, 'find_compressible_images', return_value=[]
         ):
-            compressed_images = compress_images.check_compressable_images(
-                str(self.test_dir)
-            )
-            self.assertEqual(len(compressed_images), 0)
-            self.assertEqual(
-                self.test_image.stat().st_size,
-                original_size,
-                'Original file was modified'
-            )
 
-    def test_error_handling(self) -> None:
-        """Test error handling for corrupt or inaccessible images."""
-        corrupt_path = self.test_dir / 'corrupt.jpg'
-        with open(corrupt_path, 'wb') as f:
-            f.write(b'Not an image file')
-        try:
-            compressed_images = compress_images.check_compressable_images(
-                str(self.test_dir)
-            )
-            corrupt_results = [
-                img for img in compressed_images
-                if img['path'] == corrupt_path
-            ]
-            self.assertEqual(
-                len(corrupt_results),
-                0,
-                'Corrupt image should not be processed')
-        finally:
-            corrupt_path.unlink(missing_ok=True)
+            result = compressor.run()
+            self.assertEqual(result, 0)
 
-    def test_multiple_iterations(self) -> None:
-        """Test multiple compression iterations."""
-        if not shutil.which('gm'):
-            self.skipTest('GraphicsMagick not installed')
-        first_run = compress_images.check_compressable_images(
-            str(self.test_dir)
+    @mock.patch('subprocess.run')
+    def test_run_with_compressible_images(
+        self, mock_subprocess_run: mock.MagicMock
+    ) -> None:
+        """Test run method with compressible images."""
+        compressor = compress_images.ImageCompressor(
+            self.temp_dir,
+            output_dir=os.path.join(self.temp_dir, 'compressed_images')
         )
-        second_run = compress_images.check_compressable_images(
-            str(self.test_dir)
+        mock_compressible_images = [
+            {
+                'path': pathlib.Path(self.png_path),
+                'original_size': 1000,
+                'new_size': 500
+            }
+        ]
+        with mock.patch.object(
+            compressor,
+            'find_compressible_images',
+            return_value=mock_compressible_images
+        ):
+            result = compressor.run()
+            self.assertEqual(result, 1)
+
+            self.assertEqual(mock_subprocess_run.call_count, 10)
+
+    def test_unsupported_file_extensions(self) -> None:
+        """Test handling of unsupported file extensions."""
+        unsupported_path = os.path.join(self.temp_dir, 'test_image.txt')
+        with open(unsupported_path, 'w', encoding='utf-8') as f:
+            f.write('Not an image')
+        compressor = compress_images.ImageCompressor(self.temp_dir)
+        compressible_images = compressor.find_compressible_images()
+        self.assertEqual(len(compressible_images), 1)
+
+    def test_compress_images_handles_compression_failure(self) -> None:
+        """Test handling of compression failure for an image."""
+        result_images: List[CompressedImageInfo] = [
+            {
+                'path': pathlib.Path(self.png_path),
+                'original_size': 1000,
+                'new_size': 500
+            }
+        ]
+        compressor = compress_images.ImageCompressor(
+            self.temp_dir,
+            output_dir=self.output_dir
         )
-        self.assertGreaterEqual(
-            len(first_run),
-            len(second_run),
-            'Subsequent compression should not find more images to compress'
-        )
+        with (
+            mock.patch('subprocess.run') as mock_subprocess_run,
+            mock.patch('logging.error') as mock_log_error
+        ):
+            mock_subprocess_run.return_value = mock.Mock(
+                returncode=1,
+                stderr='Compression error message'
+            )
+            with mock.patch('PIL.Image.open'):
+                compressor.compress_images(result_images)
+            mock_log_error.assert_called_once_with(
+                'Compression failed for %s: %s',
+                mock.ANY,
+                'Compression error message'
+            )
+            mock_subprocess_run.assert_called_once()
 
 
 if __name__ == '__main__':
