@@ -567,6 +567,23 @@ class TestGitHubService(unittest.TestCase):
         )
 
     @mock.patch('requests.post')
+    def test_add_alert_comment_on_issue_none_response(
+        self,
+        mock_post: mock.MagicMock
+    ) -> None:
+        """Test handling of None response when adding alert comment."""
+        mock_post.return_value = None
+        issue = checker.Issue(1, 'user1', 'events_url')
+
+        with self.assertRaises(AssertionError) as context:
+            self.service.add_alert_comment_on_issue(issue)
+
+        self.assertEqual(
+            str(context.exception), 
+            'Received null res while commenting on issue'
+        )
+
+    @mock.patch('requests.post')
     def test_add_alert_comment_on_issue(
         self,
         mock_post: mock.MagicMock
@@ -613,6 +630,23 @@ class TestGitHubService(unittest.TestCase):
         )
 
         mock_post.assert_called_once()
+
+    @mock.patch('requests.post')
+    def test_post_unassignment_comment_none_response(
+        self,
+        mock_post: mock.MagicMock
+    ) -> None:
+        """Test handling of None response when posting unassignment comment."""
+        mock_post.return_value = None
+        issue = checker.Issue(1, 'user1', 'events_url')
+
+        with self.assertRaises(AssertionError) as context:
+            self.service.post_unassignment_comment(issue)
+
+        self.assertEqual(
+            str(context.exception), 
+            'Received null res while commenting on issue'
+        )
 
     @mock.patch('requests.post')
     def test_post_unassignment_comment(
