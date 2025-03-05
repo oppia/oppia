@@ -21,7 +21,7 @@ from __future__ import annotations
 import multiprocessing
 import os
 import re
-
+import tempfile
 from core.tests import test_utils
 
 from typing import Final, Pattern, Tuple
@@ -68,8 +68,6 @@ VALID_SERVICE_FILE_PATH = os.path.join(
 INVALID_REQUEST_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_request.py'
 )
-INVALID_NO_NEWLINE_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_no_newline.py')
 INVALID_URLOPEN_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
 INVALID_AUTHOR_FILEPATH: Final = os.path.join(
@@ -326,14 +324,40 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
 
     def test_file_with_no_newline_at_eof(self) -> None:
+        temp_file = tempfile.NamedTemporaryFile(
+            mode='w+', suffix='.py', delete=False)
+
+        content = """from __future__ import annotations
+
+
+                    class FakeClass:
+                        \"\"\"Fake docstring for valid syntax purposes.\"\"\"
+
+                        def __init__(self, fake_arg):
+                            self.fake_arg = fake_arg
+
+                        def fake_method(self, name):
+                                \"\"\"This doesn't do anything.
+
+                                Args:
+                                    name: str. Means nothing.
+
+                                Yields:
+                                    tuple(str, str).
+                                \"\"\"
+                                yield (name, name)
+                        """
+        temp_file.write(content)
+        temp_file.close()
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_NO_NEWLINE_FILEPATH], FILE_CACHE)
+            [temp_file.name], FILE_CACHE)
         lint_task_report = linter.check_newline_at_eof()
         self.assert_same_list_elements(
             ['There should be a single newline at the end of file.'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Newline at EOF', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+        self.addCleanup(temp_file.close)
 
     def test_file_with_newline_at_eof(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
@@ -393,7 +417,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
 
         with filepath_excluded_swap:
             linter = general_purpose_linter.GeneralPurposeLinter(
-                [INVALID_NO_NEWLINE_FILEPATH], FILE_CACHE)
+                [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
         self.assertEqual(
             ['SUCCESS  Bad pattern check passed'],
@@ -403,7 +427,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_success(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_NO_NEWLINE_FILEPATH], FILE_CACHE)
+            [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
         lint_task_report = linter.perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
