@@ -36,8 +36,6 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 })
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
-  private diagnosticTestsStarted: number = 0;
-  private diagnosticTestsCompleted: number = 0;
 
   constructor(
     private windowRef: WindowRef,
@@ -674,17 +672,14 @@ export class SiteAnalyticsService {
   }
 
   registerDiagnosticTestStartedEvent(classroomName: string): void {
-    this.diagnosticTestsStarted++;
     this._sendEventToGoogleAnalytics('diagnostic_test_started', {
       classroom_name: classroomName,
     });
   }
 
   registerDiagnosticTestCompletionEvent(classroomName: string): void {
-    this.diagnosticTestsCompleted++;
     this._sendEventToGoogleAnalytics('diagnostic_test_completion', {
       classroom_name: classroomName,
-      page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
 

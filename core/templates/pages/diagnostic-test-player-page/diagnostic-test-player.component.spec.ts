@@ -314,6 +314,16 @@ describe('Diagnostic test player component', () => {
     );
   });
 
+  it('should return correct topic URL when classroomUrlFragment is set', () => {
+    windowRef.nativeWindow.location.search = '?classroom=science';
+    component.classroomUrlFragment = 'science';
+    let topicUrlFragment = 'physics';
+
+    expect(component.getTopicUrlFromUrlFragment(topicUrlFragment)).toEqual(
+      '/learn/science/physics'
+    );
+  });
+
   it('should be able to get topic recommendations', fakeAsync(() => {
     windowRef.nativeWindow.location.search = '?classroom=math';
 
