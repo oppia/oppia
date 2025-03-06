@@ -132,7 +132,7 @@ describe('Training Panel Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize $scope properties after controller is initialized', () => {
+  it('should initialize component properties after component is initialized', () => {
     expect(component.addingNewResponse).toBe(false);
     expect(component.allOutcomes.length).toBe(0);
     expect(component.selectedAnswerGroupIndex).toBe(0);
