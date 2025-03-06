@@ -107,7 +107,7 @@
         "scripts.install_python_prod_dependencies_test",
         "scripts.install_python_dev_dependencies_test",
         "scripts.common_test",
-        "scripts.image_compression_test",
+        "scripts.compress_image_test",
         "core.controllers.beam_jobs_test",
         "core.controllers.contributor_dashboard_admin_test",
         "core.controllers.oppia_root_test",

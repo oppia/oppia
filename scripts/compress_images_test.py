@@ -93,6 +93,9 @@ class TestImageCompressor(unittest.TestCase):
     def test_run_no_compressible_images(self) -> None:
         """Test run method when no images are compressible."""
         compressor = compress_images.ImageCompressor(self.temp_dir)
+        # Here we use object because a single compressible image
+        # dict needs to be wrapped in a list to match the
+        # method's expected return type and testing scenario.
         with mock.patch.object(
             compressor, 'find_compressible_images', return_value=[]
         ):
@@ -116,6 +119,9 @@ class TestImageCompressor(unittest.TestCase):
                 'new_size': 500
             }
         ]
+        # Here we use object because a single compressible image
+        # dict needs to be wrapped in a list to match the
+        # method's expected return type and testing scenario.
         with mock.patch.object(
             compressor,
             'find_compressible_images',
