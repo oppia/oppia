@@ -31,6 +31,7 @@ import {AppConstants} from 'app.constants';
 import {Router} from '@angular/router';
 import {LoaderService} from 'services/loader.service';
 import {AlertsService} from 'services/alerts.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -58,7 +59,8 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private windowRef: WindowRef,
     private router: Router,
     private loaderService: LoaderService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -139,6 +141,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
             response.classroomDict.topicIdToPrerequisiteTopicIds
           );
         this.diagnosticTestIsStarted = true;
+        this.siteAnalyticsService.registerDiagnosticTestStartedEvent(
+          this.classroomData.getName()
+        );
       })
       .catch(() => {
         this.isStartTestButtonDisabled = true;
@@ -156,7 +161,14 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .filter(topicSummary => {
         return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
       });
+    this.siteAnalyticsService.registerRecommendationAcceptedEvent(
+      this.classroomData.getName()
+    );
     this.diagnosticTestIsFinished = true;
+
+    this.siteAnalyticsService.registerDiagnosticTestCompletionEvent(
+      this.classroomData.getName()
+    );
   }
 
   getTopicButtonText(topicName: string): string {

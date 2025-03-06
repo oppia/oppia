@@ -46,6 +46,7 @@ describe('Site Analytics Service', () => {
     ]);
     TestBed.configureTestingModule({
       providers: [
+        SiteAnalyticsService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -66,6 +67,8 @@ describe('Site Analytics Service', () => {
   describe('when tested using gtag spy', () => {
     beforeEach(() => {
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
+      (sas as any).diagnosticTestsStarted = 0;
+      (sas as any).diagnosticTestsCompleted = 0;
     });
 
     it('should register start login event', () => {
@@ -938,6 +941,56 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: 'Math',
           topic_name: 'Addition',
+        }
+      );
+    });
+
+    it('should register diagnostic test completion event with 0% rate when no tests started', () => {
+      const classroomName = 'Math101';
+
+      sas.registerDiagnosticTestCompletionEvent(classroomName);
+
+      expect((sas as any).diagnosticTestsCompleted).toBe(1);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'diagnostic_test_completion',
+        {
+          classroom_name: classroomName,
+          page_path: pathname,
+          completion_rate: '0.00',
+        }
+      );
+    });
+
+    it('should register diagnostic test completion event with correct completion rate', () => {
+      const classroomName = 'Math101';
+      (sas as any).diagnosticTestsStarted = 2;
+
+      sas.registerDiagnosticTestCompletionEvent(classroomName);
+
+      expect((sas as any).diagnosticTestsCompleted).toBe(1);
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'diagnostic_test_completion',
+        {
+          classroom_name: classroomName,
+          page_path: pathname,
+          completion_rate: '50.00',
+        }
+      );
+    });
+
+    it('should register recommendation accepted event', () => {
+      const classroomName = 'Math101';
+
+      sas.registerRecommendationAcceptedEvent(classroomName);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'diagnostic_test_recommendation_accepted',
+        {
+          classroom_name: classroomName,
+          page_path: pathname,
         }
       );
     });

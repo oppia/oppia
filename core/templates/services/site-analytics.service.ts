@@ -36,6 +36,8 @@ import {NavbarAndFooterGATrackingPages} from 'app.constants';
 })
 export class SiteAnalyticsService {
   static googleAnalyticsIsInitialized: boolean = false;
+  private diagnosticTestsStarted: number = 0;
+  private diagnosticTestsCompleted: number = 0;
 
   constructor(
     private windowRef: WindowRef,
@@ -669,5 +671,36 @@ export class SiteAnalyticsService {
       classroom_name: classroomName,
       topic_name: topicName,
     });
+  }
+
+  registerDiagnosticTestStartedEvent(classroomName: string): void {
+    this.diagnosticTestsStarted++;
+    this._sendEventToGoogleAnalytics('diagnostic_test_started', {
+      classroom_name: classroomName,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+    });
+  }
+
+  registerDiagnosticTestCompletionEvent(classroomName: string): void {
+    this.diagnosticTestsCompleted++;
+    const completionRate =
+      this.diagnosticTestsStarted > 0
+        ? (this.diagnosticTestsCompleted / this.diagnosticTestsStarted) * 100
+        : 0;
+    this._sendEventToGoogleAnalytics('diagnostic_test_completion', {
+      classroom_name: classroomName,
+      page_path: this.windowRef.nativeWindow.location.pathname,
+      completion_rate: completionRate.toFixed(2),
+    });
+  }
+
+  registerRecommendationAcceptedEvent(classroomName: string): void {
+    this._sendEventToGoogleAnalytics(
+      'diagnostic_test_recommendation_accepted',
+      {
+        classroom_name: classroomName,
+        page_path: this.windowRef.nativeWindow.location.pathname,
+      }
+    );
   }
 }
