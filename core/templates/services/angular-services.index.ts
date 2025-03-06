@@ -140,6 +140,7 @@ import { ExpressionInterpolationService } from 'expressions/expression-interpola
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { ConvertHtmlToUnicodePipe } from 'filters/convert-html-to-unicode.pipe';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
@@ -637,6 +638,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
+  ['ConvertHtmlToUnicodePipe', ConvertHtmlToUnicodePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
   ['GenerateContentIdService', GenerateContentIdService],
