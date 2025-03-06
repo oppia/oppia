@@ -79,7 +79,7 @@ export class Question {
   }
 
   setStateData(newStateData: State): void {
-    this._stateData = angular.copy(newStateData);
+    this._stateData = newStateData;
   }
 
   getLanguageCode(): string {

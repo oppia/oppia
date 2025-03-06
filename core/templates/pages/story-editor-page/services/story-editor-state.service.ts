@@ -83,7 +83,7 @@ export class StoryEditorStateService {
   }
 
   private _setSkillSummaries(skillSummaries: SkillSummaryBackendDict[]): void {
-    this._skillSummaries = angular.copy(skillSummaries);
+    this._skillSummaries = [...skillSummaries];
   }
 
   private _setTopicName(topicName: string): void {

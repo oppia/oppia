@@ -135,7 +135,7 @@ export class EditableQuestionBackendApiService {
               this.questionObjectFactory.createFromBackendDict(
                 response.question_dict
               );
-            let skillDicts = angular.copy(response.associated_skill_dicts);
+            let skillDicts = { ...response.associated_skill_dicts };
             successCallback({
               questionObject: questionObject,
               associated_skill_dicts: skillDicts,
@@ -177,7 +177,7 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionDict = angular.copy(response.questionDict);
+            let questionDict = { ...response.questionDict };
             successCallback(
               // The returned data is an updated question dict.
               questionDict

@@ -305,8 +305,8 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_exploration_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: structuredClone(newValue),
+      old_value: structuredClone(oldValue),
       property_name: backendName,
     } as ExplorationChangeEditExplorationProperty);
   }
@@ -333,34 +333,34 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_state_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: structuredClone(newValue),
+      old_value: structuredClone(oldValue),
       property_name: backendName,
       state_name: stateName,
     });
   }
 
   getChangeList(): ExplorationChange[] {
-    return angular.copy(this.explorationChangeList);
+    return structuredClone(this.explorationChangeList);
   }
 
   getTranslationChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return structuredClone(
       this.explorationChangeList.filter(change => {
-        return [
-          'edit_translation',
-          'remove_translations',
-          'mark_translations_needs_update',
-          'mark_translation_needs_update_for_language',
-        ].includes(change.cmd);
+      return [
+        'edit_translation',
+        'remove_translations',
+        'mark_translations_needs_update',
+        'mark_translation_needs_update_for_language',
+      ].includes(change.cmd);
       })
     );
   }
 
   getVoiceoverChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return structuredClone(
       this.explorationChangeList.filter(change => {
-        return change.cmd === 'update_voiceovers';
+      return change.cmd === 'update_voiceovers';
       })
     );
   }

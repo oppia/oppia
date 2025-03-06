@@ -142,7 +142,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should not save changes to content when edit is cancelled', function () {
     component.ngOnInit();
-    var contentBeforeEdit = angular.copy(stateContentService.savedMemento);
+    const contentBeforeEdit = { ...stateContentService.savedMemento };
 
     stateContentService.displayed = _getContent('content', 'Test Content');
 

@@ -284,10 +284,10 @@ export class QuestionPlayerEngineService {
           .taggedSkillMisconceptionId;
     }
 
-    // Use angular.copy() to clone the object
+    // Use structuredClone() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    const outcome = angular.copy(classificationResult.outcome);
+    const outcome = structuredClone(classificationResult.outcome);
     // Compute the data for the next state.
     const oldParams = {
       answer: answerString,
