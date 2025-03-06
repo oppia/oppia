@@ -161,9 +161,6 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       .filter(topicSummary => {
         return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
       });
-    this.siteAnalyticsService.registerRecommendationAcceptedEvent(
-      this.classroomData.getName()
-    );
     this.diagnosticTestIsFinished = true;
 
     this.siteAnalyticsService.registerDiagnosticTestCompletionEvent(
@@ -187,5 +184,19 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         topicUrlFragment: urlFragment,
       }
     );
+  }
+  getRecommendationAcceptanceEvent(topicName: string): void {
+    if (this.classroomData) {
+      const topicSummary = this.recommendedTopicSummaries.find(
+        summary => summary.getName() === topicName
+      );
+      if (topicSummary) {
+        const topicId = topicSummary.getId();
+        this.siteAnalyticsService.registerRecommendationAcceptedEvent(
+          this.classroomData.getName(),
+          topicId
+        );
+      }
+    }
   }
 }

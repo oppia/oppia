@@ -677,29 +677,26 @@ export class SiteAnalyticsService {
     this.diagnosticTestsStarted++;
     this._sendEventToGoogleAnalytics('diagnostic_test_started', {
       classroom_name: classroomName,
-      page_path: this.windowRef.nativeWindow.location.pathname,
     });
   }
 
   registerDiagnosticTestCompletionEvent(classroomName: string): void {
     this.diagnosticTestsCompleted++;
-    const completionRate =
-      this.diagnosticTestsStarted > 0
-        ? (this.diagnosticTestsCompleted / this.diagnosticTestsStarted) * 100
-        : 0;
     this._sendEventToGoogleAnalytics('diagnostic_test_completion', {
       classroom_name: classroomName,
       page_path: this.windowRef.nativeWindow.location.pathname,
-      completion_rate: completionRate.toFixed(2),
     });
   }
 
-  registerRecommendationAcceptedEvent(classroomName: string): void {
+  registerRecommendationAcceptedEvent(
+    classroomName: string,
+    topicId: string
+  ): void {
     this._sendEventToGoogleAnalytics(
       'diagnostic_test_recommendation_accepted',
       {
         classroom_name: classroomName,
-        page_path: this.windowRef.nativeWindow.location.pathname,
+        topic_id: topicId,
       }
     );
   }

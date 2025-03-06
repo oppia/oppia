@@ -964,7 +964,6 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: classroomName,
           page_path: pathname,
-          completion_rate: '0.00',
         }
       );
     });
@@ -987,22 +986,22 @@ describe('Site Analytics Service', () => {
         {
           classroom_name: classroomName,
           page_path: pathname,
-          completion_rate: '50.00',
         }
       );
     });
 
-    it('should register recommendation accepted event', () => {
+    it('should register recommendation accepted event with topic ID', () => {
       const classroomName = 'Math101';
+      const topicId = 'algebra-fundamentals';
 
-      sas.registerRecommendationAcceptedEvent(classroomName);
+      sas.registerRecommendationAcceptedEvent(classroomName, topicId);
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'diagnostic_test_recommendation_accepted',
         {
           classroom_name: classroomName,
-          page_path: pathname,
+          topic_id: topicId,
         }
       );
     });
