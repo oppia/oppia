@@ -976,6 +976,7 @@ describe('Site Analytics Service', () => {
     it('should register diagnostic test started event', () => {
       const classroomName = 'Math101';
 
+      expect(gtagSpy).not.toHaveBeenCalled();
       sas.registerDiagnosticTestStartedEvent(classroomName);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'diagnostic_test_started', {
