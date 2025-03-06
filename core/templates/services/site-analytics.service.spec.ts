@@ -943,7 +943,7 @@ describe('Site Analytics Service', () => {
       );
     });
 
-    it('should correctly calculate diagnostic test completion rate', () => {
+    it('should register diagnostic test completion event', () => {
       const classroomName = 'Math101';
 
       sas.registerDiagnosticTestCompletionEvent(classroomName);
@@ -972,18 +972,15 @@ describe('Site Analytics Service', () => {
         }
       );
     });
-    it('should not register completion event if no test was started', () => {
+
+    it('should register diagnostic test started event', () => {
       const classroomName = 'Math101';
 
-      sas.registerDiagnosticTestCompletionEvent(classroomName);
+      sas.registerDiagnosticTestStartedEvent(classroomName);
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event',
-        'diagnostic_test_completion',
-        {
-          classroom_name: classroomName,
-        }
-      );
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'diagnostic_test_started', {
+        classroom_name: classroomName,
+      });
     });
   });
 });
