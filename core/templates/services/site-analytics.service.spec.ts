@@ -67,8 +67,12 @@ describe('Site Analytics Service', () => {
   describe('when tested using gtag spy', () => {
     beforeEach(() => {
       gtagSpy = spyOn(ws.nativeWindow, 'gtag');
-      (sas as any).diagnosticTestsStarted = 0;
-      (sas as any).diagnosticTestsCompleted = 0;
+      (
+        sas as unknown as {diagnosticTestsStarted: number}
+      ).diagnosticTestsStarted = 0;
+      (
+        sas as unknown as {diagnosticTestsCompleted: number}
+      ).diagnosticTestsCompleted = 0;
     });
 
     it('should register start login event', () => {
@@ -950,7 +954,10 @@ describe('Site Analytics Service', () => {
 
       sas.registerDiagnosticTestCompletionEvent(classroomName);
 
-      expect((sas as any).diagnosticTestsCompleted).toBe(1);
+      expect(
+        (sas as unknown as {diagnosticTestsCompleted: number})
+          .diagnosticTestsCompleted
+      ).toBe(1);
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'diagnostic_test_completion',
@@ -964,11 +971,16 @@ describe('Site Analytics Service', () => {
 
     it('should register diagnostic test completion event with correct completion rate', () => {
       const classroomName = 'Math101';
-      (sas as any).diagnosticTestsStarted = 2;
+      (
+        sas as unknown as {diagnosticTestsStarted: number}
+      ).diagnosticTestsStarted = 2;
 
       sas.registerDiagnosticTestCompletionEvent(classroomName);
 
-      expect((sas as any).diagnosticTestsCompleted).toBe(1);
+      expect(
+        (sas as unknown as {diagnosticTestsCompleted: number})
+          .diagnosticTestsCompleted
+      ).toBe(1);
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
         'diagnostic_test_completion',
