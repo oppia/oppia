@@ -71,7 +71,7 @@ let dummyClassroomDict = {
   topicListIntro: 'Start from the basics with our first topic.',
   topicIdToPrerequisiteTopicIds: {},
   isPublished: true,
-  isDiagnosticTestEnabled: false,
+  diagnosticTestIsEnabled: false,
   thumbnailData: dummyThumbnailData,
   bannerData: dummyBannerData,
 };
@@ -492,7 +492,7 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
-      is_diagnostic_test_enabled: false,
+      diagnostic_test_is_enabled: false,
       thumbnail_data: dummyThumbnailData,
       banner_data: dummyBannerData,
     };
@@ -505,7 +505,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
-      isDiagnosticTestEnabled: false,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -582,7 +582,7 @@ describe('Classroom Admin Page component ', () => {
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {},
         isPublished: true,
-        isDiagnosticTestEnabled: false,
+        diagnosticTestIsEnabled: false,
         thumbnailData: dummyThumbnailData,
         bannerData: dummyBannerData,
       });
@@ -878,7 +878,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
-      isDiagnosticTestEnabled: false,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -1431,12 +1431,12 @@ describe('Classroom Admin Page component ', () => {
     );
 
     expect(
-      component.tempClassroomData.getIsDiagnosticTestEnabled()
+      component.tempClassroomData.getDiagnosticTestIsEnabled()
     ).toBeFalse();
 
     component.toggleDiagnosticTestStatus();
 
-    expect(component.tempClassroomData.getIsDiagnosticTestEnabled()).toBeTrue();
+    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBeTrue();
     expect(component.classroomDataIsChanged).toBeTrue();
   });
 
