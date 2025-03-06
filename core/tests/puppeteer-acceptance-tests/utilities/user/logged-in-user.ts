@@ -29,6 +29,12 @@ const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
+const siteAdminPageUrl = testConstants.URLs.AdminPage;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -119,6 +125,7 @@ const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
+const matFormTextSelector = '.oppia-form-text';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -802,12 +809,26 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Updates the user's subject interests in preference page.
-   * @param {string[]} interests - The new interests to set for the user.
+   * @param {string[]} interests - The new interests to set for the user after each interest is entered in the input field, followed by pressing the Enter key.
    */
-  async updateSubjectInterests(interests: string[]): Promise<void> {
+  async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
+    }
+  }
+  /**
+   * Updates the user's subject interests in the preferences page
+   * when the input field loses focus.
+   *
+   * @param {string[]} interests - The new interests to set for the user when the input field is blurred (i.e., focus is moved away).
+   */
+  async updateSubjectInterestsWhenBlurringField(
+    interests: string[]
+  ): Promise<void> {
+    for (const interest of interests) {
+      await this.type(subjectInterestsInputSelector, interest);
+      await this.page.click(matFormTextSelector);
     }
   }
 
@@ -1295,6 +1316,59 @@ export class LoggedInUser extends BaseUser {
       }
     }
     throw new Error(`Lesson not found: ${lessonName}`);
+  }
+
+  /**
+   * Checks if the error page with the given status code is displayed.
+   * @param {number} statusCode - The expected error status code.
+   */
+  async expectErrorPage(statusCode: number): Promise<void> {
+    const isErrorPresent = await this.isTextPresentOnPage(
+      `Error ${statusCode}`
+    );
+
+    if (!isErrorPresent) {
+      throw new Error(
+        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
   }
 }
 

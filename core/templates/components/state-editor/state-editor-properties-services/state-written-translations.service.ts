@@ -15,7 +15,6 @@
 /**
  * @fileoverview A data service that stores the written translations.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -35,10 +34,3 @@ export class StateWrittenTranslationsService extends StatePropertyService<Writte
     this.setterMethodKey = 'saveWrittenTranslation';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateWrittenTranslationsService',
-    downgradeInjectable(StateWrittenTranslationsService)
-  );

@@ -29,7 +29,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {Subscription} from 'rxjs';
@@ -308,10 +307,3 @@ export class InteractiveCodeReplComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveCodeRepl',
-  downgradeComponent({
-    component: InteractiveCodeReplComponent,
-  }) as angular.IDirectiveFactory
-);

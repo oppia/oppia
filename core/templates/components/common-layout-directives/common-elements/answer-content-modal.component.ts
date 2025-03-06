@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from './confirm-or-cancel-modal.component';
 
@@ -36,10 +35,3 @@ export class AnswerContentModalComponent extends ConfirmOrCancelModal {
     this.ngbActiveModal.close();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAnswerContentModal',
-  downgradeComponent({
-    component: AnswerContentModalComponent,
-  }) as angular.IDirectiveFactory
-);

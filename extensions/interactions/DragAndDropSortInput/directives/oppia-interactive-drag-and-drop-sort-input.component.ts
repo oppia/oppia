@@ -24,7 +24,6 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   CdkDragDrop,
   CdkDragExit,
@@ -384,10 +383,3 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveDragAndDropSortInput',
-  downgradeComponent({
-    component: InteractiveDragAndDropSortInputComponent,
-  }) as angular.IDirectiveFactory
-);

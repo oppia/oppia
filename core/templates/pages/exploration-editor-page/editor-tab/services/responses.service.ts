@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -718,7 +717,3 @@ export class ResponsesService {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ResponsesService', downgradeInjectable(ResponsesService));
