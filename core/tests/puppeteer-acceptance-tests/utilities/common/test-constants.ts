@@ -244,6 +244,6 @@ export default {
     '../oppia_full_stack_test_video_recordings/acceptance'
   ),
   TEST_SCREENSHOT_DIR: path.resolve(
-    '../oppia_full_stack_test_screenshots/acceptance'
+    '../oppia_full_stack_test_failure_screenshots/acceptance'
   ),
 };
