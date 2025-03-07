@@ -192,7 +192,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
       );
       if (topicSummary) {
         const topicId = topicSummary.getId();
-        this.siteAnalyticsService.registerRecommendationAcceptedEvent(
+        this.siteAnalyticsService.registerDiagnosticTestRecommendationAcceptedEvent(
           this.classroomData.getName(),
           topicId
         );
