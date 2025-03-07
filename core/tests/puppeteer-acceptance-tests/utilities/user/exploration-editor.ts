@@ -2068,14 +2068,10 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to create and save a new untitled exploration containing only the EndExploration interaction.
-   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
-  async createAndSaveAMinimalExploration(flag: boolean = true): Promise<void> {
+  async createAndSaveAMinimalExploration(): Promise<void> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'

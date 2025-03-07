@@ -49,8 +49,8 @@ describe('Exploration Editor', function () {
       false
     );
     // These explorations are not published but are saved as drafts.
-    await explorationEditor.createAndSaveAMinimalExploration(false);
-    await explorationEditor.createAndSaveAMinimalExploration(false);
+    await explorationEditor.createAndSaveAMinimalExploration();
+    await explorationEditor.createAndSaveAMinimalExploration();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
