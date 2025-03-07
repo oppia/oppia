@@ -670,4 +670,29 @@ export class SiteAnalyticsService {
       topic_name: topicName,
     });
   }
+
+  registerDiagnosticTestStartedEvent(classroomName: string): void {
+    this._sendEventToGoogleAnalytics('diagnostic_test_started', {
+      classroom_name: classroomName,
+    });
+  }
+
+  registerDiagnosticTestCompletionEvent(classroomName: string): void {
+    this._sendEventToGoogleAnalytics('diagnostic_test_completion', {
+      classroom_name: classroomName,
+    });
+  }
+
+  registerRecommendationAcceptedEvent(
+    classroomName: string,
+    topicId: string
+  ): void {
+    this._sendEventToGoogleAnalytics(
+      'diagnostic_test_recommendation_accepted',
+      {
+        classroom_name: classroomName,
+        topic_id: topicId,
+      }
+    );
+  }
 }
