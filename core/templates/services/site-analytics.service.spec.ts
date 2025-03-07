@@ -46,6 +46,7 @@ describe('Site Analytics Service', () => {
     ]);
     TestBed.configureTestingModule({
       providers: [
+        SiteAnalyticsService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -940,6 +941,47 @@ describe('Site Analytics Service', () => {
           topic_name: 'Addition',
         }
       );
+    });
+
+    it('should register diagnostic test completion event', () => {
+      const classroomName = 'Math101';
+
+      sas.registerDiagnosticTestCompletionEvent(classroomName);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'diagnostic_test_completion',
+        {
+          classroom_name: classroomName,
+        }
+      );
+    });
+
+    it('should register recommendation accepted event with topic ID', () => {
+      const classroomName = 'Math101';
+      const topicId = 'algebra-fundamentals';
+
+      sas.registerRecommendationAcceptedEvent(classroomName, topicId);
+
+      expect(gtagSpy).toHaveBeenCalledWith(
+        'event',
+        'diagnostic_test_recommendation_accepted',
+        {
+          classroom_name: classroomName,
+          topic_id: topicId,
+        }
+      );
+    });
+
+    it('should register diagnostic test started event', () => {
+      const classroomName = 'Math101';
+
+      expect(gtagSpy).not.toHaveBeenCalled();
+      sas.registerDiagnosticTestStartedEvent(classroomName);
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'diagnostic_test_started', {
+        classroom_name: classroomName,
+      });
     });
   });
 });

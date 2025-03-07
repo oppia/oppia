@@ -39,6 +39,7 @@ import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {AlertsService} from 'services/alerts.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
@@ -155,6 +156,7 @@ describe('Diagnostic test player component', () => {
   let router: Router;
   let windowRef: MockWindowRef;
   let alertsService: AlertsService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   class MockDiagnosticTestPlayerStatusService {
     onDiagnosticTestSessionCompleted = sessionCompleteEmitter;
@@ -193,6 +195,7 @@ describe('Diagnostic test player component', () => {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -388,5 +391,18 @@ describe('Diagnostic test player component', () => {
     tick();
 
     expect(component.isStartTestButtonDisabled).toBeTrue();
+  }));
+
+  it('should register recommendation acceptance event', fakeAsync(() => {
+    spyOn(siteAnalyticsService, 'registerRecommendationAcceptedEvent');
+
+    component.recommendedTopicSummaries = [topicData2];
+    component.classroomData = dummyClassroomData;
+
+    component.getRecommendationAcceptanceEvent(topicData2.getName());
+
+    expect(
+      siteAnalyticsService.registerRecommendationAcceptedEvent
+    ).toHaveBeenCalledWith('math', 'dummy2');
   }));
 });
