@@ -135,7 +135,7 @@ jobs:
                   owner,
                   repo,
                   issue_number: prNumber,
-                  body: `@${sender} Removed invalid label: ${label}`
+                  body: `@${sender}, I've removed an invalid label: ${label}`
                 });
                 break;
             }
