@@ -25,7 +25,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AddAnswerGroupModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
@@ -851,10 +850,3 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateResponses',
-  downgradeComponent({
-    component: StateResponsesComponent,
-  }) as angular.IDirectiveFactory
-);

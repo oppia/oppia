@@ -109,6 +109,9 @@
     left: -o-calc(50% - 200px);
     left: calc(50% - 200px);
   }
+  .oppia-splash-section-five-left-testimonial {
+    height: 410px;
+  }
 }
 
 @media (min-width: 575px) {
@@ -235,6 +238,12 @@
   margin-left: 10vw;
   margin-top: auto;
   width: 50vw;
+}
+
+.oppia-splash-section-five-left-testimonial {
+  height: 300px;
+  overflow: hidden; 
+  transition: height 0.3s ease;
 }
 
 .splash-page .oppia-splash-section-seven-left {
@@ -551,6 +560,7 @@
   }
 
   .splash-page .splash-arrows-container {
+    cursor: pointer;
     position: relative;
   }
 

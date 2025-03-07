@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching and resolving suggestions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {
@@ -511,10 +510,3 @@ export class ContributionAndReviewService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributionAndReviewService',
-    downgradeInjectable(ContributionAndReviewService)
-  );

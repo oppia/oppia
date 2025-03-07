@@ -23,6 +23,8 @@ from typing import Optional, Sequence
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(
+    CURR_DIR, '..', 'oppia_full_stack_test_video_recordings')
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -58,6 +60,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     unused_parsed_args = _PARSER.parse_args(args=args)
 
     delete_directory_tree(OPPIA_TOOLS_DIR)
+    delete_directory_tree(FULL_STACK_TEST_VIDEO_RECORDING_DIR)
     delete_directory_tree('node_modules/')
     delete_directory_tree('third_party/')
     delete_directory_tree('build/')

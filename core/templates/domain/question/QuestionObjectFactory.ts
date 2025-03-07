@@ -17,7 +17,6 @@
  * question domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {
   State,
@@ -228,7 +227,3 @@ export class QuestionObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('QuestionObjectFactory', downgradeInjectable(QuestionObjectFactory));
