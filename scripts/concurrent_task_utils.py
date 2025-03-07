@@ -97,9 +97,9 @@ class TaskThread(threading.Thread):
         func: Callable[..., Any],
         verbose: bool,
         semaphore: threading.Semaphore,
+        errors_to_retry_on: List[str],
         name: Optional[str],
-        report_enabled: bool,
-        errors_to_retry_on: Optional[List[str]] = None
+        report_enabled: bool
     ) -> None:
         super().__init__()
         self.func = func
@@ -242,9 +242,9 @@ def create_task(
     func: Callable[..., Any],
     verbose: bool,
     semaphore: threading.Semaphore,
+    errors_to_retry_on: List[str],
     name: Optional[str] = None,
-    report_enabled: bool = True,
-    errors_to_retry_on: Optional[List[str]] = None
+    report_enabled: bool = True
 ) -> TaskThread:
     """Create a Task in its Thread.
 
@@ -264,5 +264,5 @@ def create_task(
         task: TaskThread object. Created task.
     """
     task = TaskThread(
-        func, verbose, semaphore, name, report_enabled, errors_to_retry_on)
+        func, verbose, semaphore, errors_to_retry_on, name, report_enabled)
     return task

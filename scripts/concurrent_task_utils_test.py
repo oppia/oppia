@@ -82,7 +82,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
 
     def test_create_task_with_success(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function, True, self.semaphore)
+            test_function, True, self.semaphore, errors_to_retry_on=[])
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -92,7 +92,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_success(self) -> None:
         task = concurrent_task_utils.TaskThread(
             test_function('unused_arg'), False, self.semaphore, name='test',
-            report_enabled=True)
+            report_enabled=True, errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -104,7 +104,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_exception(self) -> None:
         task = concurrent_task_utils.TaskThread(
             test_function, True, self.semaphore, name='test',
-            report_enabled=True)
+            report_enabled=True, errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -130,7 +130,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=True)
+            self.semaphore, name='test', report_enabled=True,
+            errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -156,7 +157,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=False)
+            self.semaphore, name='test', report_enabled=False,
+            errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -171,7 +173,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_single_task(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test',
+            errors_to_retry_on=[])
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -181,7 +184,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), False, self.semaphore)
+                test_function('unused_arg'), False, self.semaphore,
+                errors_to_retry_on=[])
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -192,7 +196,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function, True, self.semaphore)
+                test_function, True, self.semaphore, errors_to_retry_on=[])
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
