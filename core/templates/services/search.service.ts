@@ -16,7 +16,6 @@
  * @fileoverview Search service for activityTilesInfinityGrid.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {
@@ -305,7 +304,3 @@ export class SearchService {
     return this._initialSearchResultsLoadedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SearchService', downgradeInjectable(SearchService));

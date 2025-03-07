@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ContextService} from 'services/context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 
@@ -57,10 +56,3 @@ export class PreviewThumbnailComponent {
       );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPreviewThumbnail',
-  downgradeComponent({
-    component: PreviewThumbnailComponent,
-  }) as angular.IDirectiveFactory
-);

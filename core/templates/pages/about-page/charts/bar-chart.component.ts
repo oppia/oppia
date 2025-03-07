@@ -23,7 +23,6 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import './bar-chart.component.css';
 
 interface DataPoint {
@@ -88,10 +87,3 @@ export class BarChartComponent implements OnInit, AfterViewInit {
     tableElement.setAttribute('style', `--color: ${this.barsColor};`);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBarChart',
-  downgradeComponent({
-    component: BarChartComponent,
-  }) as angular.IDirectiveFactory
-);

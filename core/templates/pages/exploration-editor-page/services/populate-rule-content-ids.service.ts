@@ -16,7 +16,6 @@
  * @fileoverview Service that populates rule content ids.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -64,10 +63,3 @@ export class PopulateRuleContentIdsService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PopulateRuleContentIdsService',
-    downgradeInjectable(PopulateRuleContentIdsService)
-  );

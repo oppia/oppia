@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -57,10 +56,3 @@ export class TestInteractionPanel implements OnInit {
         .display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTestInteractionPanel',
-  downgradeComponent({
-    component: TestInteractionPanel,
-  }) as angular.IDirectiveFactory
-);
