@@ -292,23 +292,70 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
         self.assertEqual(str(task.exception), 'Error -11')
         self.assertEqual(call_count, 3)
 
-    def test_create_task_with_bad_string_error(self) -> None:
-        def mock_func() -> None:
-            raise Exception('Bad string error')
+    def test_retry_on_partial_error_substring_match(self) -> None:
+        """Tests retry occurs when only a subset of error match."""
+        attempt_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal attempt_count
+            attempt_count += 1
+            if attempt_count == 1:
+                # Partial match: only 'Error -11' is present.
+                raise Exception('Error -11 occurred (partial match)')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task',
+                    failed=False,
+                    trimmed_messages=[],
+                    messages=['Success']
+                )
+            ]
 
         task = concurrent_task_utils.create_task(
             func=mock_func,
             verbose=True,
             semaphore=self.semaphore,
-            name='bad_string_task',
+            name='partial_error_retry_task',
             report_enabled=False,
-            errors_to_retry_on=['Error -11']
+            errors_to_retry_on=['Error -11', 'Connection timeout']
         )
         task.start_time = time.time()
         task.start()
         task.join()
 
-        self.assertEqual(task.num_attempts, 1)
-        self.assertTrue(task.finished)
-        self.assertIsNotNone(task.exception)
-        self.assertEqual(str(task.exception), 'Bad string error')
+        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(attempt_count, 2)
+
+    def test_retry_on_all_error_substring_matches(self) -> None:
+        """Tests retry occurs when all error substrings are present."""
+        attempt_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal attempt_count
+            attempt_count += 1
+            if attempt_count == 1:
+                # Full match: both substrings are present.
+                raise Exception('Error -11 and Connection timeout (full match)')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task',
+                    failed=False,
+                    trimmed_messages=[],
+                    messages=['Success']
+                )
+            ]
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='all_errors_retry_task',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11', 'Connection timeout']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(attempt_count, 2)

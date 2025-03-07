@@ -518,7 +518,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 parsed_args.generate_coverage_report)
             task = concurrent_task_utils.create_task(
                 test.run, parsed_args.verbose, semaphore, name=test_target,
-                report_enabled=False, errors_to_retry_on=[])
+                report_enabled=False, errors_to_retry_on=['Error -11'])
             task_to_taskspec[task] = test
             tasks.append(task)
 

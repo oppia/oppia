@@ -249,7 +249,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         test_cmd = 'python -m scripts.run_backend_tests'
         task1 = concurrent_task_utils.create_task(
             test_function('unused_arg'), False, self.semaphore, name='test',
-              errors_to_retry_on=['Error -11'])
+            errors_to_retry_on=['Error -11'])
         task1.exception = subprocess.CalledProcessError(
             returncode=1, cmd=test_cmd
         )
