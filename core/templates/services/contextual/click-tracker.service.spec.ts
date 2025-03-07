@@ -86,4 +86,9 @@ describe('ClickTrackerService', () => {
       16 * 1024
     );
   });
+
+  it('should handle errors gracefully during click tracking', () => {
+    const invalidEvent = {} as Event;
+    expect(() => service.trackClick(invalidEvent)).not.toThrowError();
+  });
 });

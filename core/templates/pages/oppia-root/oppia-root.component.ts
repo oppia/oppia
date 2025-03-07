@@ -24,5 +24,8 @@ import {ClickTrackerService} from 'services/contextual/click-tracker.service';
   templateUrl: './oppia-root.component.html',
 })
 export class OppiaRootComponent {
+  // The constructor is used to inject dependencies into the component.
+  // Angular's dependency injection system automatically provides an instance of
+  // `ClickTrackerService` when this component is created.
   constructor(private clickTracker: ClickTrackerService) {}
 }
