@@ -114,85 +114,67 @@ class TaskThread(threading.Thread):
         self.errors_to_retry_on = errors_to_retry_on or []
         self.num_attempts = 0
 
-    # def run(self) -> None:
-    #     """Executes the task and retries on specified errors."""
-    #     try:
-    #         while self.num_attempts < MAX_ATTEMPTS:
-    #             self.num_attempts += 1
-    #             try:
-    #                 self.task_results = self.func()
-    #                 log(
-    #                     f'FINISHED {self.name}: '
-    #                     f'{time.time() - self.start_time:.1f} secs',
-    #                     show_time=True
-    #                 )
-    #                 return
-    #             except Exception as e:
-    #                 # Check if the error is in the list of retryable errors.
-    #                 if any(err in str(e) for err in self.errors_to_retry_on):
-    #                     log(
-    #                         f'Retrying {self.name} due to error: {e}. '
-    #                         f'Attempt {self.num_attempts}/{MAX_ATTEMPTS}.'
-    #                     )
-    #                     if self.num_attempts >= MAX_ATTEMPTS:
-    #                         self.exception = e
-    #                         self.stacktrace = traceback.format_exc()
-    #                         break
-    #                     continue
-    #                 self.exception = e
-    #                 self.stacktrace = traceback.format_exc()
-    #                 break
-    #     finally:
-    #         self.semaphore.release()
-    #         self.finished = True
-def run(self) -> None:
-    """Executes the task and retries on specified errors."""
-    try:
-        while self.num_attempts < MAX_ATTEMPTS:
-            self.num_attempts += 1
-            try:
-                self.task_results = self.func()
-                if self.verbose:
-                    for task_result in self.task_results:
-                        if self.report_enabled:
+    def run(self) -> None:
+        try:
+            while self.num_attempts < MAX_ATTEMPTS:
+                self.num_attempts += 1
+                try:
+                    self.task_results = self.func()
+
+                    if self.verbose:
+                        for task_result in self.task_results:
+                            # The following section will print the output of the
+                            # lint checks.
+                            if self.report_enabled:
+                                log(
+                                    'Report from %s check\n'
+                                    '----------------------------------------\n'
+                                    '%s' % (
+                                        task_result.name, '\n'.join(
+                                            task_result.get_report())),
+                                    show_time=True)
+                            # The following section will print the output of
+                            # backend tests.
+                            else:
+                                log(
+                                    'LOG %s:\n%s'
+                                    '----------------------------------------' %
+                                    (self.name, task_result.messages[0]),
+                                    show_time=True)
+
+                    log(
+                        'FINISHED %s: %.1f secs' % (
+                            self.name, time.time() - self.start_time),
+                        show_time=True)
+                    return
+                except Exception as e:
+                    log(
+                        'Attempt {} of {} failed for {}'.format(
+                            self.num_attempts, MAX_ATTEMPTS, self.name))
+
+                    is_last_attempt = self.num_attempts >= MAX_ATTEMPTS
+                    should_retry = any(
+                        err in str(e)
+                        for err in self.errors_to_retry_on)
+
+                    if is_last_attempt or not should_retry:
+                        # This is either the last attempt
+                        # or not a retryable error.
+                        self.exception = e
+                        self.stacktrace = traceback.format_exc()
+                        if 'KeyboardInterrupt' not in str(e):
+                            log(str(e))
                             log(
-                                'Report from %s check\n'
-                                '----------------------------------------\n'
-                                '%s' % (task_result.name, '\n'.join(
-                                    task_result.get_report())), show_time=True)
-                        else:
-                            log(
-                                'LOG %s:\n%s'
-                                '----------------------------------------' %
-                                (self.name, task_result.messages[0]),
+                                'ERROR {} - {:.1f} secs'.format(
+                                    self.name,
+                                    time.time() - self.start_time),
                                 show_time=True)
-                log(
-                    f'FINISHED {self.name}: '
-                    f'{time.time() - self.start_time:.1f} secs',
-                    show_time=True
-                )
-                return
-            except Exception as e:
-                log(
-                    f'Attempt {self.num_attempts}/{MAX_ATTEMPTS} failed for {self.name}.'
-                )
-                if self.num_attempts >= MAX_ATTEMPTS or not any(err in str(e) for err in self.errors_to_retry_on):
-                    self.exception = e
-                    self.stacktrace = traceback.format_exc()
-                    if 'KeyboardInterrupt' not in str(e):
-                        log(str(e))
-                        log(
-                            f'ERROR {self.name}: '
-                            f'{time.time() - self.start_time:.1f} secs',
-                            show_time=True
-                        )
-                    break
-                log(
-                    f'Retrying {self.name} due to error: {e}.'
-                )
-    finally:
-        self.semaphore.release()
-        self.finished = True    
+                        break
+                    log('Retrying {} - error: {}'.format(self.name, e))
+        finally:
+            self.semaphore.release()
+            self.finished = True
+
 
 def _check_all_tasks(tasks: List[TaskThread]) -> None:
     """Checks the results of all tasks."""
@@ -230,7 +212,8 @@ def execute_tasks(
         semaphore: threading.Semaphore. The object that controls how many tasks
             can run at any time.
     """
-    remaining_tasks: List[TaskThread] = tasks.copy()
+    empty_tasks_list: List[TaskThread] = []
+    remaining_tasks: List[TaskThread] = empty_tasks_list + tasks
     currently_running_tasks = []
 
     while remaining_tasks:
@@ -272,7 +255,10 @@ def create_task(
             can run at any time.
         name: str|None. Name of the task that is going to be created.
         report_enabled: bool. Decide whether task result will print or not.
-        errors_to_retry_on: str|None. Specifies which errors on retry.
+        errors_to_retry_on: List[str]. List of error message substrings that
+            will trigger retry attempts when they appear in exceptions. If an
+            error contains any of these substrings, the task will be retried
+            up to MAX_ATTEMPTS times.
 
     Returns:
         task: TaskThread object. Created task.
