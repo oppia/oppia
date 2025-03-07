@@ -450,10 +450,10 @@ describe('Voiceover backend API service', function () {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/regenerate_automatic_voiceover'
+      '/regenerate_automatic_voiceover/' + explorationId
     );
+
     let payload = {
-      exploration_id: explorationId,
       exploration_version: explorationVersion,
       state_name: stateName,
       content_id: contentId,
@@ -514,10 +514,9 @@ describe('Voiceover backend API service', function () {
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/regenerate_automatic_voiceover'
+      '/regenerate_automatic_voiceover/' + explorationId
     );
     let payload = {
-      exploration_id: explorationId,
       exploration_version: explorationVersion,
       state_name: stateName,
       content_id: contentId,

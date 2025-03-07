@@ -346,7 +346,7 @@ export class ChangeListService {
 
   isOnlyVoiceoverChangeListPresent(): boolean {
     for (let change of this.explorationChangeList) {
-      if (change.cmd != 'update_voiceovers') {
+      if (change.cmd !== 'update_voiceovers') {
         return false;
       }
     }

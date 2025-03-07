@@ -64,7 +64,8 @@
       </div>
     </div>
 
-    <div class="automatic-voiceovers" *ngIf="isVoiceoverAutogenerationSupportedForSelectedAccent">
+    <div class="automatic-voiceovers"
+         *ngIf="isVoiceoverAutogenerationSupportedForSelectedAccent && isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
       <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
       <div class="voiceovers-component" *ngIf="automaticVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
@@ -81,7 +82,8 @@
         <button (click)="generateVoiceover()"
                 mat-icon-button
                 mat-button
-                *ngIf="!isAutomaticVoiceoverGenerating">
+                *ngIf="!isAutomaticVoiceoverGenerating"
+                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled">
           <mat-icon matTooltip="Regenerate voiceover">sync</mat-icon>
         </button>
         <div *ngIf="isAutomaticVoiceoverGenerating">

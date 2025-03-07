@@ -49,6 +49,9 @@ class MockPlatformFeatureService {
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -442,9 +445,18 @@ describe('Translation status service', () => {
   );
 
   it('should return a correct count of missing audio with accent in an exploration', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+    let platformFeatureServiceSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    );
+
+    platformFeatureServiceSpy.and.returnValue({
       AddVoiceoverWithAccent: {
         isEnabled: true,
+      },
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
       },
     } as FeatureStatusChecker);
 
@@ -476,10 +488,23 @@ describe('Translation status service', () => {
     expect(tss.getExplorationContentRequiredCount()).toBe(8);
 
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
+
+    tss.refresh();
+    expect(tss.getExplorationContentNotAvailableCount()).toEqual(7);
+    let color = tss.getActiveStateContentIdStatusColor('content_0');
+    expect(tss.NO_ASSETS_AVAILABLE_COLOR).toEqual(color);
+
+    platformFeatureServiceSpy.and.returnValue({
+      AddVoiceoverWithAccent: {
+        isEnabled: true,
+      },
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
     tss.refresh();
     expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
-
-    let color = tss.getActiveStateContentIdStatusColor('content_0');
+    color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.ALL_ASSETS_AVAILABLE_COLOR).toEqual(color);
 
     color = tss.getActiveStateContentIdStatusColor('content_1');
@@ -750,4 +775,28 @@ describe('Translation status service', () => {
       expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
     }
   );
+
+  it('should disable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeFalse();
+  });
+
+  it('should enable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeTrue();
+  });
 });

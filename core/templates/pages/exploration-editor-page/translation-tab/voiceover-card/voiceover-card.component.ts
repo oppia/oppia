@@ -50,6 +50,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {AppConstants} from 'app.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -109,7 +110,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private stateEditorService: StateEditorService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
-    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -199,6 +201,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
+  }
+
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
   updateManualVoiceoverWithChangeList(): void {
@@ -387,9 +394,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.manualVoiceover = voiceoverTypeToVoiceovers.manual;
-    this.manualVoiceoverTotalDuration = Math.round(
-      (this.manualVoiceover as Voiceover).durationSecs
-    );
+    if (this.manualVoiceover) {
+      this.manualVoiceoverTotalDuration = Math.round(
+        (this.manualVoiceover as Voiceover).durationSecs
+      );
+    }
   }
 
   setActiveContentAutomaticVoiceover(): void {
@@ -416,9 +425,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.automaticVoiceover = voiceoverTypeToVoiceovers.auto;
-    this.automaticVoiceoverTotalDuration = Math.round(
-      (this.automaticVoiceover as Voiceover).durationSecs
-    );
+    if (this.automaticVoiceover) {
+      this.automaticVoiceoverTotalDuration = Math.round(
+        (this.automaticVoiceover as Voiceover).durationSecs
+      );
+    }
   }
 
   updateStatusGraph(): void {

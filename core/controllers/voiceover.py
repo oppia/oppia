@@ -288,14 +288,15 @@ class RegenerateAutomaticVoiceoverHandler(
     """Regenerates the automatic voiceover for the given exploration data."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'exploration_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
             'exploration_version': {
                 'schema': {
                     'type': 'int'
@@ -319,11 +320,10 @@ class RegenerateAutomaticVoiceoverHandler(
         }
     }
 
-    @acl_decorators.open_access
-    def put(self) -> None:
+    @acl_decorators.can_voiceover_exploration
+    def put(self, exploration_id: str) -> None:
         """Regenerates the voiceover for the given exploration data."""
         assert self.normalized_payload is not None
-        exploration_id: str = self.normalized_payload['exploration_id']
         state_name: str = self.normalized_payload['state_name']
         content_id: str = self.normalized_payload['content_id']
         language_accent_code: str = self.normalized_payload[
