@@ -857,6 +857,14 @@ describe('TopNavigationBarComponent', () => {
   it('should return true and set navbackButtonUrl when current path matches a hidden back button path', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
+    component.ngOnInit();
     expect(component.menuIconIsShown).toBeFalse();
+  });
+
+  it('should return true for menuIconIsShown when current path does not match a hidden back button path', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
+    component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
+    component.ngOnInit();
+    expect(component.menuIconIsShown).toBeTrue();
   });
 });
