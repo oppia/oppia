@@ -208,7 +208,7 @@ export class BaseUser {
   /**
    * This function takes the screenshot of all the instances of browser during a test failure.
    */
-  async captureScreenshots(): Promise<void> {
+  async captureScreenshotsForFailedTest(): Promise<void> {
     let i: number = 0;
     const specName = process.env.SPEC_NAME;
     const outputDir = testConstants.TEST_SCREENSHOT_DIR;
@@ -564,7 +564,7 @@ export class BaseUser {
       const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
       if (configData.testFailureDetected) {
         // Signal all BaseUser instances to take screenshots.
-        await this.captureScreenshots();
+        await this.captureScreenshotsForFailedTest();
       }
     }
     await this.browserObject.close();
