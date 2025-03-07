@@ -114,38 +114,85 @@ class TaskThread(threading.Thread):
         self.errors_to_retry_on = errors_to_retry_on or []
         self.num_attempts = 0
 
-    def run(self) -> None:
-        """Executes the task and retries on specified errors."""
-        try:
-            while self.num_attempts < MAX_ATTEMPTS:
-                self.num_attempts += 1
-                try:
-                    self.task_results = self.func()
-                    log(
-                        f'FINISHED {self.name}: '
-                        f'{time.time() - self.start_time:.1f} secs',
-                        show_time=True
-                    )
-                    return
-                except Exception as e:
-                    # Check if the error is in the list of retryable errors.
-                    if any(err in str(e) for err in self.errors_to_retry_on):
-                        log(
-                            f'Retrying {self.name} due to error: {e}. '
-                            f'Attempt {self.num_attempts}/{MAX_ATTEMPTS}.'
-                        )
-                        if self.num_attempts >= MAX_ATTEMPTS:
-                            self.exception = e
-                            self.stacktrace = traceback.format_exc()
-                            break
-                        continue
+    # def run(self) -> None:
+    #     """Executes the task and retries on specified errors."""
+    #     try:
+    #         while self.num_attempts < MAX_ATTEMPTS:
+    #             self.num_attempts += 1
+    #             try:
+    #                 self.task_results = self.func()
+    #                 log(
+    #                     f'FINISHED {self.name}: '
+    #                     f'{time.time() - self.start_time:.1f} secs',
+    #                     show_time=True
+    #                 )
+    #                 return
+    #             except Exception as e:
+    #                 # Check if the error is in the list of retryable errors.
+    #                 if any(err in str(e) for err in self.errors_to_retry_on):
+    #                     log(
+    #                         f'Retrying {self.name} due to error: {e}. '
+    #                         f'Attempt {self.num_attempts}/{MAX_ATTEMPTS}.'
+    #                     )
+    #                     if self.num_attempts >= MAX_ATTEMPTS:
+    #                         self.exception = e
+    #                         self.stacktrace = traceback.format_exc()
+    #                         break
+    #                     continue
+    #                 self.exception = e
+    #                 self.stacktrace = traceback.format_exc()
+    #                 break
+    #     finally:
+    #         self.semaphore.release()
+    #         self.finished = True
+def run(self) -> None:
+    """Executes the task and retries on specified errors."""
+    try:
+        while self.num_attempts < MAX_ATTEMPTS:
+            self.num_attempts += 1
+            try:
+                self.task_results = self.func()
+                if self.verbose:
+                    for task_result in self.task_results:
+                        if self.report_enabled:
+                            log(
+                                'Report from %s check\n'
+                                '----------------------------------------\n'
+                                '%s' % (task_result.name, '\n'.join(
+                                    task_result.get_report())), show_time=True)
+                        else:
+                            log(
+                                'LOG %s:\n%s'
+                                '----------------------------------------' %
+                                (self.name, task_result.messages[0]),
+                                show_time=True)
+                log(
+                    f'FINISHED {self.name}: '
+                    f'{time.time() - self.start_time:.1f} secs',
+                    show_time=True
+                )
+                return
+            except Exception as e:
+                log(
+                    f'Attempt {self.num_attempts}/{MAX_ATTEMPTS} failed for {self.name}.'
+                )
+                if self.num_attempts >= MAX_ATTEMPTS or not any(err in str(e) for err in self.errors_to_retry_on):
                     self.exception = e
                     self.stacktrace = traceback.format_exc()
+                    if 'KeyboardInterrupt' not in str(e):
+                        log(str(e))
+                        log(
+                            f'ERROR {self.name}: '
+                            f'{time.time() - self.start_time:.1f} secs',
+                            show_time=True
+                        )
                     break
-        finally:
-            self.semaphore.release()
-            self.finished = True
-
+                log(
+                    f'Retrying {self.name} due to error: {e}.'
+                )
+    finally:
+        self.semaphore.release()
+        self.finished = True    
 
 def _check_all_tasks(tasks: List[TaskThread]) -> None:
     """Checks the results of all tasks."""
