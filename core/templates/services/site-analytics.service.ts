@@ -683,7 +683,7 @@ export class SiteAnalyticsService {
     });
   }
 
-  registerRecommendationAcceptedEvent(
+  registerDiagnosticTestRecommendationAcceptedEvent(
     classroomName: string,
     topicId: string
   ): void {
