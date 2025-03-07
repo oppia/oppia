@@ -134,6 +134,13 @@ describe('Question Misconception Editor Component', () => {
     expect(component.feedbackIsUsed).toBeFalse();
   });
 
+  it('should initialize feedbackIsUsed to the previous state if it exists', () => {
+    component.previousFeedbackIsUsed = false;
+    component.ngOnInit();
+
+    expect(component.feedbackIsUsed).toBeFalse();
+  });
+
   it('should update feedbackIsUsed and store the previous state', () => {
     component.feedbackIsUsed = true;
 
@@ -146,13 +153,6 @@ describe('Question Misconception Editor Component', () => {
 
     expect(component.feedbackIsUsed).toBeFalse();
     expect(component.previousFeedbackIsUsed).toBeTrue();
-  });
-
-  it('should initialize feedbackIsUsed to the previous state if it exists', () => {
-    component.previousFeedbackIsUsed = false;
-    component.ngOnInit();
-
-    expect(component.feedbackIsUsed).toBeFalse();
   });
 
   it('should clear outcome feedback if feedbackIsUsed is false and feedback matches misconception feedback', () => {
