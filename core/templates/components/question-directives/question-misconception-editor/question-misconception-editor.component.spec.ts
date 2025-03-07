@@ -148,6 +148,31 @@ describe('Question Misconception Editor Component', () => {
     expect(component.previousFeedbackIsUsed).toBeTrue();
   });
 
+  it('should initialize feedbackIsUsed to the previous state if it exists', () => {
+    component.previousFeedbackIsUsed = false;
+    component.ngOnInit();
+
+    expect(component.feedbackIsUsed).toBeFalse();
+  });
+
+  it('should clear outcome feedback if feedbackIsUsed is false and feedback matches misconception feedback', () => {
+    component.selectedMisconception = mockMisconceptionObject.abc[0];
+    component.selectedMisconceptionSkillId = 'abc';
+    component.feedbackIsUsed = false;
+    component.outcome.feedback.html =
+      mockMisconceptionObject.abc[0].getFeedback();
+
+    const saveAnswerGroupFeedbackSpy = spyOn(
+      component.saveAnswerGroupFeedback,
+      'emit'
+    );
+
+    component.updateMisconception();
+
+    const emittedOutcome = saveAnswerGroupFeedbackSpy.calls.first().args[0];
+    expect(emittedOutcome.feedback.html).toEqual('');
+  });
+
   it('should enable edit mode correctly', () => {
     expect(component.misconceptionEditorIsOpen).toBeFalse();
 
