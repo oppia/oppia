@@ -97,6 +97,25 @@ VALID_PY_IGNORE_PRAGMA_FILEPATH: Final = os.path.join(
 VALID_PY_FILE_PATH = os.path.join(
     LINTER_TESTS_DIR, 'valid.py')
 
+INVALID_NO_NEWLINE_FILE_CONTENT = """from __future__ import annotations
+
+class FakeClass:
+    \"\"\"Fake docstring for valid syntax purposes.\"\"\"
+
+    def __init__(self, fake_arg):
+        self.fake_arg = fake_arg
+
+    def fake_method(self, name):
+        \"\"\"This doesn't do anything.
+
+        Args:
+            name: str. Means nothing.
+
+        Yields:
+            tuple(str, str).
+        \"\"\"
+        yield (name, name)"""
+
 
 class HTMLLintTests(test_utils.LinterTestBase):
     """Test the HTML lint functions."""
@@ -327,27 +346,9 @@ class GeneralLintTests(test_utils.LinterTestBase):
         temp_file = tempfile.NamedTemporaryFile(
             mode='w+', suffix='.py', delete=False)
 
-        content = """from __future__ import annotations
-
-
-                    class FakeClass:
-                        \"\"\"Fake docstring for valid syntax purposes.\"\"\"
-
-                        def __init__(self, fake_arg):
-                            self.fake_arg = fake_arg
-
-                        def fake_method(self, name):
-                                \"\"\"This doesn't do anything.
-
-                                Args:
-                                    name: str. Means nothing.
-
-                                Yields:
-                                    tuple(str, str).
-                                \"\"\"
-                                yield (name, name)
-                        """
-        temp_file.write(content)
+        # We use a temporary file here instead of a real one because
+        # the Black formatter auto-fixes newlines at the end of files.
+        temp_file.write(INVALID_NO_NEWLINE_FILE_CONTENT)
         temp_file.close()
         linter = general_purpose_linter.GeneralPurposeLinter(
             [temp_file.name], FILE_CACHE)
@@ -416,9 +417,6 @@ class GeneralLintTests(test_utils.LinterTestBase):
             mock_is_filepath_excluded_for_bad_patterns_check)
 
         with filepath_excluded_swap:
-            # Modified to pass tests; original file was invalid_no_newline.py.
-            # Refer to function test_file_with_no_newline_at_eof for details.
-            # See #22063.
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
             lint_task_report = linter.check_bad_patterns()
@@ -429,9 +427,6 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report.failed)
 
     def test_perform_all_lint_checks_with_success(self) -> None:
-            # Modified to pass tests; original file was invalid_no_newline.py.
-            # Refer to function test_file_with_no_newline_at_eof for details.
-            # See #22063.
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)
         lint_task_report = linter.perform_all_lint_checks()
