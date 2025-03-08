@@ -29,6 +29,12 @@ const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
+const siteAdminPageUrl = testConstants.URLs.AdminPage;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -1310,6 +1316,59 @@ export class LoggedInUser extends BaseUser {
       }
     }
     throw new Error(`Lesson not found: ${lessonName}`);
+  }
+
+  /**
+   * Checks if the error page with the given status code is displayed.
+   * @param {number} statusCode - The expected error status code.
+   */
+  async expectErrorPage(statusCode: number): Promise<void> {
+    const isErrorPresent = await this.isTextPresentOnPage(
+      `Error ${statusCode}`
+    );
+
+    if (!isErrorPresent) {
+      throw new Error(
+        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
   }
 }
 
