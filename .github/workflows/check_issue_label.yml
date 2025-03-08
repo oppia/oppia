@@ -108,7 +108,7 @@ jobs:
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: `@${actorUsername}, the ${sanitizedLabel} label is reserved for pull requests.`
+                  body: `@${actorUsername}, the "${sanitizedLabel}" label is reserved for pull requests.`
                 });
               }
             }
