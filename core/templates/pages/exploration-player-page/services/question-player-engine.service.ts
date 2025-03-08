@@ -38,6 +38,7 @@ import {ContextService} from 'services/context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root',
@@ -284,10 +285,10 @@ export class QuestionPlayerEngineService {
           .taggedSkillMisconceptionId;
     }
 
-    // Use structuredClone() to clone the object
+    // Use cloneDeep() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    const outcome = structuredClone(classificationResult.outcome);
+    const outcome = cloneDeep(classificationResult.outcome);
     // Compute the data for the next state.
     const oldParams = {
       answer: answerString,

@@ -24,11 +24,11 @@
  * tests to ensure it is working properly.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { BaseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import {TestBed} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 
 describe('Interaction Validator', () => {
   let bivs: BaseInteractionValidationService;
@@ -45,7 +45,11 @@ describe('Interaction Validator', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [BaseInteractionValidationService, AnswerGroupObjectFactory, OutcomeObjectFactory],
+      providers: [
+        BaseInteractionValidationService,
+        AnswerGroupObjectFactory,
+        OutcomeObjectFactory,
+      ],
     });
 
     bivs = TestBed.inject(BaseInteractionValidationService);
@@ -58,7 +62,7 @@ describe('Interaction Validator', () => {
     goodOutcomeDest = oof.createFromBackendDict({
       dest: otherState,
       dest_if_really_stuck: null,
-      feedback: { html: '', audio_translations: {} },
+      feedback: {html: '', audio_translations: {}},
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
@@ -67,7 +71,7 @@ describe('Interaction Validator', () => {
     goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
-      feedback: { html: 'Feedback', audio_translations: {} },
+      feedback: {html: 'Feedback', audio_translations: {}},
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
@@ -76,7 +80,7 @@ describe('Interaction Validator', () => {
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
-      feedback: { html: '', audio_translations: {} },
+      feedback: {html: '', audio_translations: {}},
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
@@ -91,7 +95,10 @@ describe('Interaction Validator', () => {
 
   describe('baseValidator', () => {
     it('should have no warnings for good answer groups with no confusing outcomes', () => {
-      const warnings = bivs.getAnswerGroupWarnings(goodAnswerGroups, currentState);
+      const warnings = bivs.getAnswerGroupWarnings(
+        goodAnswerGroups,
+        currentState
+      );
       expect(warnings).toEqual([]);
     });
 
@@ -109,13 +116,17 @@ describe('Interaction Validator', () => {
 
     it('should validate customization arguments properly', () => {
       const warnings = bivs.requireCustomizationArguments({}, ['levelone']);
-      expect(warnings).toContain('Expected customization arguments to have property: levelone');
+      expect(warnings).toContain(
+        'Expected customization arguments to have property: levelone'
+      );
     });
 
     it('should validate multiple missing top-level fields in customization arguments', () => {
       const expectedArgs = ['first', 'second'];
       const warnings = bivs.requireCustomizationArguments({}, expectedArgs);
-      expect(warnings).toContain('Expected customization arguments to have properties: first, second');
+      expect(warnings).toContain(
+        'Expected customization arguments to have properties: first, second'
+      );
     });
   });
 });

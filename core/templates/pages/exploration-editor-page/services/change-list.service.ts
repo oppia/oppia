@@ -61,6 +61,7 @@ import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
+import cloneDeep from 'lodash/cloneDeep';
 
 export type StatePropertyValues =
   | AnswerGroup[]
@@ -305,8 +306,8 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_exploration_property',
-      new_value: structuredClone(newValue),
-      old_value: structuredClone(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
     } as ExplorationChangeEditExplorationProperty);
   }
@@ -333,34 +334,34 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_state_property',
-      new_value: structuredClone(newValue),
-      old_value: structuredClone(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
       state_name: stateName,
     });
   }
 
   getChangeList(): ExplorationChange[] {
-    return structuredClone(this.explorationChangeList);
+    return cloneDeep(this.explorationChangeList);
   }
 
   getTranslationChangeList(): ExplorationChange[] {
-    return structuredClone(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
-      return [
-        'edit_translation',
-        'remove_translations',
-        'mark_translations_needs_update',
-        'mark_translation_needs_update_for_language',
-      ].includes(change.cmd);
+        return [
+          'edit_translation',
+          'remove_translations',
+          'mark_translations_needs_update',
+          'mark_translation_needs_update_for_language',
+        ].includes(change.cmd);
       })
     );
   }
 
   getVoiceoverChangeList(): ExplorationChange[] {
-    return structuredClone(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
-      return change.cmd === 'update_voiceovers';
+        return change.cmd === 'update_voiceovers';
       })
     );
   }
