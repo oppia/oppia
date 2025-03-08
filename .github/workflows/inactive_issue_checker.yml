@@ -26,7 +26,7 @@ jobs:
       uses: ./.github/actions/merge-develop-and-set-up-dependencies
     - name: Add production dependencies to Python path
       run: |
-        echo "PYTHONPATH=$PYTHONPATH:/home/runner/work/oppia/oppia/third_party/python_libs" >> $GITHUB_ENV
+        echo "PYTHONPATH=$PYTHONPATH:$(pwd)/third_party/python_libs" >> $GITHUB_ENV
       shell: bash
 
     - name: Check inactive issues
