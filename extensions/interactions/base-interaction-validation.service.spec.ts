@@ -24,10 +24,13 @@
  * tests to ensure it is working properly.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { BaseInteractionValidationService, Warning } from './base-interaction-validation.service';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {TestBed} from '@angular/core/testing';
+import {
+  BaseInteractionValidationService,
+  Warning,
+} from './base-interaction-validation.service';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 describe('BaseInteractionValidationService', () => {
   let bivs: BaseInteractionValidationService;
@@ -42,70 +45,97 @@ describe('BaseInteractionValidationService', () => {
       const customizationArguments = {};
       const argNames = ['arg1'];
 
-      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames))
-        .toThrowError('Expected customization arguments to have property: arg1');
+      expect(() =>
+        bivs.requireCustomizationArguments(customizationArguments, argNames)
+      ).toThrowError('Expected customization arguments to have property: arg1');
     });
 
     it('should throw an error if multiple required arguments are missing', () => {
       const customizationArguments = {};
       const argNames = ['arg1', 'arg2'];
 
-      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames))
-        .toThrowError('Expected customization arguments to have properties: arg1, arg2');
+      expect(() =>
+        bivs.requireCustomizationArguments(customizationArguments, argNames)
+      ).toThrowError(
+        'Expected customization arguments to have properties: arg1, arg2'
+      );
     });
 
     it('should not throw an error if all required arguments are present', () => {
-      const customizationArguments = { arg1: 'value1', arg2: 'value2' };
+      const customizationArguments = {arg1: 'value1', arg2: 'value2'};
       const argNames = ['arg1', 'arg2'];
 
-      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames)).not.toThrowError();
+      expect(() =>
+        bivs.requireCustomizationArguments(customizationArguments, argNames)
+      ).not.toThrowError();
     });
   });
 
   describe('getAnswerGroupWarnings', () => {
     it('should return warnings for confusing outcomes', () => {
-      const answerGroups: AnswerGroup[] = [{
-        outcome: {
-          isConfusing: (stateName: string) => true,
-          dest: 'someState',
-          labelledAsCorrect: false,
-          destIfReallyStuck: null
-        }
-      }] as unknown as AnswerGroup[];
+      const answerGroups: AnswerGroup[] = [
+        {
+          outcome: {
+            isConfusing: (stateName: string) => true,
+            dest: 'someState',
+            labelledAsCorrect: false,
+            destIfReallyStuck: null,
+          },
+        },
+      ] as unknown as AnswerGroup[];
 
-      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(
+        answerGroups,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
-      expect(warnings[0].message).toContain('Please specify what Oppia should do in Oppia response 1.');
+      expect(warnings[0].message).toContain(
+        'Please specify what Oppia should do in Oppia response 1.'
+      );
     });
 
     it('should return warnings for self-loops labelled as correct', () => {
-      const answerGroups: AnswerGroup[] = [{
-        outcome: {
-          isConfusing: (stateName: string) => false,
-          dest: 'someState',
-          labelledAsCorrect: true,
-          destIfReallyStuck: null
-        }
-      }] as unknown as AnswerGroup[];
+      const answerGroups: AnswerGroup[] = [
+        {
+          outcome: {
+            isConfusing: (stateName: string) => false,
+            dest: 'someState',
+            labelledAsCorrect: true,
+            destIfReallyStuck: null,
+          },
+        },
+      ] as unknown as AnswerGroup[];
 
-      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(
+        answerGroups,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
-      expect(warnings[0].message).toContain('In answer group 1, self-loops should not be labelled as correct.');
+      expect(warnings[0].message).toContain(
+        'In answer group 1, self-loops should not be labelled as correct.'
+      );
     });
 
     it('should return warnings for answer groups with a destination for really stuck learners', () => {
-      const answerGroups: AnswerGroup[] = [{
-        outcome: {
-          isConfusing: (stateName: string) => false,
-          dest: 'anotherState',
-          labelledAsCorrect: true,
-          destIfReallyStuck: 'someState'
-        }
-      }] as unknown as AnswerGroup[];
+      const answerGroups: AnswerGroup[] = [
+        {
+          outcome: {
+            isConfusing: (stateName: string) => false,
+            dest: 'anotherState',
+            labelledAsCorrect: true,
+            destIfReallyStuck: 'someState',
+          },
+        },
+      ] as unknown as AnswerGroup[];
 
-      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(
+        answerGroups,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
-      expect(warnings[0].message).toContain("The answer group 1 is labelled as 'correct', but includes a 'destination for really stuck learners'. The latter is unnecessary and should be removed.");
+      expect(warnings[0].message).toContain(
+        "The answer group 1 is labelled as 'correct', but includes a 'destination for really stuck learners'. The latter is unnecessary and should be removed."
+      );
     });
   });
 
@@ -114,45 +144,61 @@ describe('BaseInteractionValidationService', () => {
       const defaultOutcome: Outcome = {
         isConfusing: (stateName: string) => true,
         dest: 'someState',
-        labelledAsCorrect: false
+        labelledAsCorrect: false,
       } as unknown as Outcome;
 
-      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(defaultOutcome, 'someState');
+      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(
+        defaultOutcome,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
-      expect(warnings[0].message).toContain('Please add feedback for the user in the [All other answers] rule.');
+      expect(warnings[0].message).toContain(
+        'Please add feedback for the user in the [All other answers] rule.'
+      );
     });
 
     it('should return a warning for self-loops labelled as correct in default outcome', () => {
       const defaultOutcome: Outcome = {
         isConfusing: (stateName: string) => false,
         dest: 'someState',
-        labelledAsCorrect: true
+        labelledAsCorrect: true,
       } as unknown as Outcome;
 
-      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(defaultOutcome, 'someState');
+      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(
+        defaultOutcome,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
-      expect(warnings[0].message).toContain('In the [All other answers] group, self-loops should not be labelled as correct.');
+      expect(warnings[0].message).toContain(
+        'In the [All other answers] group, self-loops should not be labelled as correct.'
+      );
     });
   });
 
   describe('getAllOutcomeWarnings', () => {
     it('should combine warnings from answer groups and default outcome', () => {
-      const answerGroups: AnswerGroup[] = [{
-        outcome: {
-          isConfusing: (stateName: string) => false,
-          dest: 'someState',
-          labelledAsCorrect: false,
-          destIfReallyStuck: null
-        }
-      }] as unknown as AnswerGroup[];
+      const answerGroups: AnswerGroup[] = [
+        {
+          outcome: {
+            isConfusing: (stateName: string) => false,
+            dest: 'someState',
+            labelledAsCorrect: false,
+            destIfReallyStuck: null,
+          },
+        },
+      ] as unknown as AnswerGroup[];
 
       const defaultOutcome: Outcome = {
         isConfusing: (stateName: string) => true,
         dest: 'someState',
-        labelledAsCorrect: false
+        labelledAsCorrect: false,
       } as unknown as Outcome;
 
-      const warnings: Warning[] = bivs.getAllOutcomeWarnings(answerGroups, defaultOutcome, 'someState');
+      const warnings: Warning[] = bivs.getAllOutcomeWarnings(
+        answerGroups,
+        defaultOutcome,
+        'someState'
+      );
       expect(warnings.length).toBe(1);
     });
   });
