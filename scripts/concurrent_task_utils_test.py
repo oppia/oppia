@@ -246,9 +246,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
         self.assertEqual(task.task_results[0].messages[0], 'Success')
 
     def test_create_task_with_non_retryable_errors(self) -> None:
-        """Tests that retries only occur for specific 
-           transient errors (e.g., 'Error -11').
-        """
+        """Tests that retries only occur for specific errors ('Error -11')."""
         def mock_func() -> None:
             raise Exception('Non-retryable error')
 
@@ -297,8 +295,8 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
         self.assertEqual(call_count, 3)
 
     def test_retry_on_partial_error_substring_match(self) -> None:
-        """Test that retrying occurs when 
-           only a subset of the error messages match.
+        """Tests that retrying occurs when only a subset of the error messages
+        match.
         """
         attempt_count = 0
 
@@ -333,8 +331,8 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
         self.assertEqual(attempt_count, 2)
 
     def test_retry_on_all_error_substring_matches(self) -> None:
-        """Tests that retrying occurs when the
-           error message contains all of the retryable error substrings.
+        """Tests that retrying occurs when the error message contains all of the
+        retryable error substrings.
         """
         attempt_count = 0
 
