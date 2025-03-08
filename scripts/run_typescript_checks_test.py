@@ -179,9 +179,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 """
                 self.call_counter = self.call_counter + 1
                 return_values = {
-                    1: 'core/templates/App.ts',
-                    2: 'core/new_directory/new_file.ts',
-                    3: ''
+                    1: 'core/new_directory/new_file.ts',
+                    2: ''
                 }
                 return return_values[self.call_counter]
 
@@ -197,7 +196,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(SystemExit, '1'), swap_path_exists:
                 run_typescript_checks.compile_temp_strict_tsconfig(
                     run_typescript_checks.STRICT_TSCONFIG_FILEPATH,
-                    ['core/templates/App.ts', 'core/new_directory/new_file.ts']
+                    ['core/new_directory/new_file.ts']
                 )
 
     def test_config_path_when_no_arg_is_used(self) -> None:

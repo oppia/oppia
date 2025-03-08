@@ -28,7 +28,6 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Subscription} from 'rxjs';
@@ -602,10 +601,3 @@ export class StateGraphVisualization implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'stateGraphVisualization',
-  downgradeComponent({
-    component: StateGraphVisualization,
-  }) as angular.IDirectiveFactory
-);

@@ -3,6 +3,7 @@
     background-color: white;
     border: 1px solid black;
     cursor: default;
+    position: relative;
   }
   .oppia-graph-button-label {
     font-family: 'Font Awesome 5 Free', Arial, sans-serif;
@@ -25,10 +26,21 @@
     float: right;
     height: 35px;
   }
+  .oppia-cursor-for-add-node {
+    background: red;
+    border: 1px solid #000;
+    border-radius: 50%;
+    height: 10px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    z-index: 10;
+  }
 </style>
 <div class="graph-viz">
   <div class="oppia-graph-input-viz-container e2e-test-graph-input-viz-container">
     <svg class="oppia-graph-viz-svg"
+         #graphArea
          width="100%"
          height="250"
          (mousemove)="mousemoveGraphSVG($event)"
@@ -38,8 +50,9 @@
       <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
         <text>{{canEditOptions}}</text>
         <ng-container *ngIf="canEditOptions">
-          <g *ngFor="let button of graphOptions; let idx = index" tabindex="0">
+          <g *ngFor="let button of graphOptions; let idx = index">
             <rect *ngIf="graph"
+                  tabindex="0"
                   attr.class="{{button.text.toLowerCase()}}"
                   width="70"
                   height="30"
@@ -61,15 +74,18 @@
         </ng-container>
       </svg>
 
-      <g *ngFor="let button of buttons; let idx = index" tabindex="0">
-        <rect attr.class="e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
+      <g *ngFor="let button of buttons; let idx = index" #optionButtons>
+        <rect attr.class="graph-button e2e-test-{{(button.description | translate).replace(' ','-')}}-button"
+              tabindex="0"
               width="140"
+              (keydown)="handleKeyDown($event)"
               height="30"
               x="10"
               attr.y="{{10 + 50 * idx}}"
               rx="5"
               ry="5"
               (click)="onClickModeButton(button.mode, $event)"
+              (keydown.enter)="onClickModeButton(button.mode, $event)"
               (mouseenter)="state.hoveredModeButton = button.mode"
               (mouseleave)="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
               [style.fill]="'white'"
@@ -91,16 +107,18 @@
         </text>
       </g>
 
-      <line *ngIf="state.addEdgeVertex !== null && !isMobile"
+      <line *ngIf="state.addEdgeVertex !== null && !usingMobileDevice"
             [attr.x1]="graph?.vertices[state.addEdgeVertex].x"
             [attr.y1]="graph?.vertices[state.addEdgeVertex].y"
             [attr.x2]="state.mouseX"
             [attr.y2]="state.mouseY"
             [ngStyle]="{'stroke': 'black', 'stroke-width': EDGE_WIDTH_PX}">
       </line>
-      <g *ngFor="let edge of graph?.edges; let idx = index" tabindex="0">
+      <g *ngFor="let edge of graph?.edges; let idx = index">
         <line class="e2e-test-graph-edge"
               (click)="onClickEdge(idx)"
+              (keydown.enter)="onClickEdge(idx)"
+              tabindex="0"
               (mouseenter)="state.hoveredEdge = idx"
               (mouseleave)="state.hoveredEdge = (idx === state.hoveredEdge) ? null : state.hoveredEdge"
               attr.x1="{{graph.vertices[edge.src].x}}"
@@ -142,7 +160,11 @@
         <circle attr.class="e2e-test-graph-vertex-{{idx}}"
                 (mouseenter)="state.hoveredVertex = idx"
                 (mouseleave)="onMouseleaveVertex(idx)"
+                (focus)="onFocusVertex(idx)"
+                (blur)="onBlurVertex(idx)"
                 (click)="onClickVertex(idx)"
+                (keydown.enter)="onClickVertex(idx)"
+                tabindex="0"
                 (mousedown)="onMousedownVertex(idx)"
                 attr.style="{{'fill: ' + getVertexColor(idx)}}"
                 cx="0"
@@ -151,8 +173,14 @@
         </circle>
       </g>
     </svg>
+    <div class="oppia-cursor-for-add-node"
+         #dotCursor
+         (click)="onClickGraphSVG()"
+         (keydown.enter)="onClickGraphSVG()"
+         *ngIf="state.currentMode === 2">
+    </div>
   </div>
-  <div [hidden]="isMobile">
+  <div [hidden]="usingMobileDevice">
       {{helpText | translate}}
   </div>
   <br>

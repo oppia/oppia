@@ -21,7 +21,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-response-end-exploration',
@@ -29,10 +28,3 @@ import {downgradeComponent} from '@angular/upgrade/static';
   styleUrls: [],
 })
 export class ResponseEndExplorationComponent {}
-
-angular.module('oppia').directive(
-  'oppiaResponseEndExploration',
-  downgradeComponent({
-    component: ResponseEndExplorationComponent,
-  }) as angular.IDirectiveFactory
-);
