@@ -90,7 +90,7 @@ jobs:
                     owner,
                     repo,
                     issue_number: issueNumber,
-                    body: `@${actorUsername}, only [oppia-good-first-issue-labelers team members](https://github.com/orgs/oppia/teams/oppia-good-first-issue-labelers) can apply this label.`
+                    body: `@${actorUsername}, only [oppia-good-first-issue-labelers team members](https://github.com/orgs/oppia/teams/oppia-good-first-issue-labelers) can apply the good first issue label.`
                   });
                 }
                 return;
