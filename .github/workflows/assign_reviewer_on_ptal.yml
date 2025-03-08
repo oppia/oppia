@@ -35,15 +35,10 @@ jobs:
               return Number.isInteger(n) && n > 0 ? n : NaN;
             };
 
-            const validateContext = () => {
-              if (!context.payload || !context.payload.issue || !context.payload.repository) {
-                core.setFailed('Invalid event payload structure');
-                return false;
-              }
-              return true;
-            };
-
-            if (!validateContext()) return;
+          if (!context.payload || !context.payload.issue || !context.payload.repository) {
+            core.setFailed('Invalid event payload structure');
+            return;
+          }
 
             const rawPrNumber = context.payload.issue?.number;
             const prNumber = sanitizePrNumber(rawPrNumber);
