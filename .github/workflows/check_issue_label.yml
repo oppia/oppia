@@ -36,7 +36,7 @@ jobs:
             const { owner, repo } = context.repo;
             // Validation checks
             if (!/^[\w\s-:]+$/i.test(sanitizedLabel)) {
-              throw new Error(`Invalid label format: ${sanitizedLabel}`);
+              throw new Error(`Invalid label: ${sanitizedLabel}`);
             }
             if (!/^[a-z\d-]+$/.test(actorUsername)) {
               throw new Error(`Invalid username: ${actorUsername}`);
