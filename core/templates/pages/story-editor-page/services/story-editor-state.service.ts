@@ -27,7 +27,7 @@ import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {LoaderService} from 'services/loader.service';
-import {cloneDeep} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root',

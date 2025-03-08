@@ -32,7 +32,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SubtopicValidationService} from '../services/subtopic-validation.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-import {cloneDeep} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
