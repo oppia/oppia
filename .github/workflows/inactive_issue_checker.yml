@@ -24,6 +24,18 @@ jobs:
         
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge-develop-and-set-up-dependencies
+    - name: Find production dependencies location
+      run: |
+        find /home/runner/work/oppia -name "requests" -type d | grep -v "node_modules"
+      shell: bash
+    - name: Add production dependencies to Python path
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:/home/runner/work/oppia/oppia/third_party/python_libs" >> $GITHUB_ENV
+      shell: bash
+    - name: Add third_party to Python path
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:$(pwd)/third_party/python_libs" >> $GITHUB_ENV
+      shell: bash
 
     - name: Check inactive issues
       env:
