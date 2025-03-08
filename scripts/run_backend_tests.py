@@ -96,9 +96,9 @@ TIME_REPORT_PATH: Final = os.path.join(
 AVERAGE_TEST_CASE_TIME: Final = 2
 
 # Error code indicating a segmentation fault, which can occur transiently due to
-# instability in gRPC (a dependency of apache-beam[gcp]).This error was observed
-# after upgrading apache-beam[gcp] in PR #20752. Tests encountering this error
-# are retried to handle potential flakiness.
+# instability in gRPC (a dependency of apache-beam[gcp]). This error was first
+# observed after upgrading apache-beam[gcp] in PR #20752. Tests encountering
+# this error are retried to handle potential flakiness.
 ERROR_RETRY_CODE: Final = 'Error -11'
 
 _PARSER: Final = argparse.ArgumentParser(
