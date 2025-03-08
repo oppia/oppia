@@ -288,7 +288,7 @@ class RegenerateAutomaticVoiceoverHandler(
     """Regenerates the automatic voiceover for the given exploration data."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
                 'type': 'basestring'

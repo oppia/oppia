@@ -26,8 +26,9 @@ import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
+from core.domain import voiceover_services
 from core.platform import models
-
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -50,11 +51,7 @@ SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS = """
 """
 
 # A string template block representing the math content within the SSML.
-MATH_TEMPLATE_SSML_BLOCK = """
-    <say-as interpret-as="math">
-        %s
-    </say-as>
-"""
+MATH_TEMPLATE_SSML_BLOCK = """<say-as interpret-as="math">%s</say-as>"""
 
 # A string template block representing the non math content within the SSML.
 SSML_TEMPLATE_BLOCK = """
@@ -162,21 +159,51 @@ def convert_plaintext_to_ssml_content(
     """
     content_list = plaintext.split(feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code))
+
+    math_symbol_pronounciations = (
+        constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            language_code, {}))
+
     main_ssml_content = ''
     for content in content_list:
+        # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
             content = content.replace(
-                ' - ',
-                MATH_TEMPLATE_SSML_BLOCK % ' - ')
-        if '×' in content or ' * ' in content:
+                '-',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['-'])
+
+        # Update the content to pronounce `+` correctly in the given language.
+        if ' * ' in content:
             content = content.replace(
-                ' * ',
-                MATH_TEMPLATE_SSML_BLOCK % ' * ')
-        if ' / ' in content or '÷' in content:
-            main_ssml_content += (MATH_TEMPLATE_SSML_BLOCK % content)
+                '*',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['*'])
+
+        # Update the content to pronounce `×` correctly in the given language.
+        if '×' in content:
             content = content.replace(
-                ' - ',
-                MATH_TEMPLATE_SSML_BLOCK % ' / ')
+                '×',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['×'])
+
+        # Update the content to pronounce `/` correctly in the given language.
+        if ' / ' in content:
+            content = content.replace(
+                '/',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `÷` correctly in the given language.
+        if '÷' in content:
+            content = content.replace(
+                '÷',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `=` correctly in the given language.
+        if ' = ' in content:
+            content = content.replace(
+                ' = ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['='])
 
         main_ssml_content += (SSML_TEMPLATE_BLOCK % content)
 
