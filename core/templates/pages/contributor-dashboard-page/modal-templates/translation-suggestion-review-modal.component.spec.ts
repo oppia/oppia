@@ -2415,7 +2415,9 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should correctly set variables if there is only one item', () => {
-      component.suggestionIdToContribution = {...suggestionIdToContributionOne};
+      component.suggestionIdToContribution = cloneDeep(
+        suggestionIdToContributionOne
+      );
       component.ngOnInit();
 
       expect(component.isFirstItem).toBeTrue();
@@ -2603,7 +2605,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
-
       component.editedContent = editedContent;
       component.ngOnInit();
       tick();

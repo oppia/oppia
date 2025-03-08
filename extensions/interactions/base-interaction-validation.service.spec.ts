@@ -24,109 +24,159 @@
  * tests to ensure it is working properly.
  */
 
-import {TestBed} from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
-import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import { TestBed } from '@angular/core/testing';
+import { BaseInteractionValidationService, Warning } from './base-interaction-validation.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 
-describe('Interaction Validator', () => {
+describe('BaseInteractionValidationService', () => {
   let bivs: BaseInteractionValidationService;
-  let WARNING_TYPES;
-  let agof: AnswerGroupObjectFactory;
-  let oof: OutcomeObjectFactory;
-
-  let currentState: string;
-  let otherState: string;
-  let goodOutcomeDest;
-  let goodOutcomeFeedback;
-  let badOutcome;
-  let goodAnswerGroups;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        BaseInteractionValidationService,
-        AnswerGroupObjectFactory,
-        OutcomeObjectFactory,
-      ],
-    });
-
+    TestBed.configureTestingModule({});
     bivs = TestBed.inject(BaseInteractionValidationService);
-    WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.inject(AnswerGroupObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
-
-    currentState = 'First State';
-    otherState = 'Second State';
-    goodOutcomeDest = oof.createFromBackendDict({
-      dest: otherState,
-      dest_if_really_stuck: null,
-      feedback: {html: '', audio_translations: {}},
-      labelled_as_correct: false,
-      param_changes: [],
-      refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null,
-    });
-    goodOutcomeFeedback = oof.createFromBackendDict({
-      dest: currentState,
-      dest_if_really_stuck: null,
-      feedback: {html: 'Feedback', audio_translations: {}},
-      labelled_as_correct: false,
-      param_changes: [],
-      refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null,
-    });
-    badOutcome = oof.createFromBackendDict({
-      dest: currentState,
-      dest_if_really_stuck: null,
-      feedback: {html: '', audio_translations: {}},
-      labelled_as_correct: false,
-      param_changes: [],
-      refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null,
-    });
-
-    goodAnswerGroups = [
-      agof.createNew([], goodOutcomeDest, false, null),
-      agof.createNew([], goodOutcomeFeedback, false, null),
-    ];
   });
 
-  describe('baseValidator', () => {
-    it('should have no warnings for good answer groups with no confusing outcomes', () => {
-      const warnings = bivs.getAnswerGroupWarnings(
-        goodAnswerGroups,
-        currentState
-      );
-      expect(warnings).toEqual([]);
+  describe('requireCustomizationArguments', () => {
+    it('should throw an error if one required argument is missing', () => {
+      const customizationArguments = {};
+      const argNames = ['arg1'];
+
+      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames))
+        .toThrowError('Expected customization arguments to have property: arg1');
     });
 
-    it('should have a warning for an answer group with a confusing outcome', () => {
-      const answerGroups = [
-        agof.createNew([], goodOutcomeDest, false, null),
-        agof.createNew([], badOutcome, false, null),
-        agof.createNew([], goodOutcomeFeedback, false, null),
-      ];
-      const warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+    it('should throw an error if multiple required arguments are missing', () => {
+      const customizationArguments = {};
+      const argNames = ['arg1', 'arg2'];
+
+      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames))
+        .toThrowError('Expected customization arguments to have properties: arg1, arg2');
+    });
+
+    it('should not throw an error if all required arguments are present', () => {
+      const customizationArguments = { arg1: 'value1', arg2: 'value2' };
+      const argNames = ['arg1', 'arg2'];
+
+      expect(() => bivs.requireCustomizationArguments(customizationArguments, argNames)).not.toThrowError();
+    });
+  });
+
+  describe('getAnswerGroupWarnings', () => {
+    it('should return warnings for confusing outcomes', () => {
+      const answerGroups: AnswerGroup[] = [{
+        outcome: {
+          isConfusing: (stateName: string) => true,
+          dest: 'someState',
+          labelledAsCorrect: false,
+          destIfReallyStuck: null
+        }
+      }] as unknown as AnswerGroup[];
+
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
       expect(warnings.length).toBe(1);
-      expect(warnings[0].type).toBe(WARNING_TYPES.ERROR);
-      expect(warnings[0].message).toContain('Oppia response 2');
+      expect(warnings[0].message).toContain('Please specify what Oppia should do in Oppia response 1.');
     });
 
-    it('should validate customization arguments properly', () => {
-      const warnings = bivs.requireCustomizationArguments({}, ['levelone']);
-      expect(warnings).toContain(
-        'Expected customization arguments to have property: levelone'
-      );
+    it('should return warnings for self-loops labelled as correct', () => {
+      const answerGroups: AnswerGroup[] = [{
+        outcome: {
+          isConfusing: (stateName: string) => false,
+          dest: 'someState',
+          labelledAsCorrect: true,
+          destIfReallyStuck: null
+        }
+      }] as unknown as AnswerGroup[];
+
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].message).toContain('In answer group 1, self-loops should not be labelled as correct.');
     });
 
-    it('should validate multiple missing top-level fields in customization arguments', () => {
-      const expectedArgs = ['first', 'second'];
-      const warnings = bivs.requireCustomizationArguments({}, expectedArgs);
-      expect(warnings).toContain(
-        'Expected customization arguments to have properties: first, second'
-      );
+    it('should return warnings for answer groups with a destination for really stuck learners', () => {
+      const answerGroups: AnswerGroup[] = [{
+        outcome: {
+          isConfusing: (stateName: string) => false,
+          dest: 'anotherState',
+          labelledAsCorrect: true,
+          destIfReallyStuck: 'someState'
+        }
+      }] as unknown as AnswerGroup[];
+
+      const warnings: Warning[] = bivs.getAnswerGroupWarnings(answerGroups, 'someState');
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].message).toContain("The answer group 1 is labelled as 'correct', but includes a 'destination for really stuck learners'. The latter is unnecessary and should be removed.");
+    });
+  });
+
+  describe('getDefaultOutcomeWarnings', () => {
+    it('should return a warning if the default outcome is confusing', () => {
+      const defaultOutcome: Outcome = {
+        isConfusing: (stateName: string) => true,
+        dest: 'someState',
+        labelledAsCorrect: false
+      } as unknown as Outcome;
+
+      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(defaultOutcome, 'someState');
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].message).toContain('Please add feedback for the user in the [All other answers] rule.');
+    });
+
+    it('should return a warning for self-loops labelled as correct in default outcome', () => {
+      const defaultOutcome: Outcome = {
+        isConfusing: (stateName: string) => false,
+        dest: 'someState',
+        labelledAsCorrect: true
+      } as unknown as Outcome;
+
+      const warnings: Warning[] = bivs.getDefaultOutcomeWarnings(defaultOutcome, 'someState');
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].message).toContain('In the [All other answers] group, self-loops should not be labelled as correct.');
+    });
+  });
+
+  describe('getAllOutcomeWarnings', () => {
+    it('should combine warnings from answer groups and default outcome', () => {
+      const answerGroups: AnswerGroup[] = [{
+        outcome: {
+          isConfusing: (stateName: string) => false,
+          dest: 'someState',
+          labelledAsCorrect: false,
+          destIfReallyStuck: null
+        }
+      }] as unknown as AnswerGroup[];
+
+      const defaultOutcome: Outcome = {
+        isConfusing: (stateName: string) => true,
+        dest: 'someState',
+        labelledAsCorrect: false
+      } as unknown as Outcome;
+
+      const warnings: Warning[] = bivs.getAllOutcomeWarnings(answerGroups, defaultOutcome, 'someState');
+      expect(warnings.length).toBe(1);
+    });
+  });
+
+  describe('isHTMLEmpty', () => {
+    it('should return true for empty HTML', () => {
+      expect(bivs.isHTMLEmpty('')).toBe(true);
+      expect(bivs.isHTMLEmpty('   ')).toBe(true);
+      expect(bivs.isHTMLEmpty('&nbsp;')).toBe(true);
+    });
+
+    it('should return false for non-empty HTML', () => {
+      expect(bivs.isHTMLEmpty('<p>Content</p>')).toBe(false);
+      expect(bivs.isHTMLEmpty('<strong>Text</strong>')).toBe(false);
+    });
+
+    it('should return false for HTML with mismatched tags', () => {
+      expect(bivs.isHTMLEmpty('<p><strong>Text</p>')).toBe(false);
+      expect(bivs.isHTMLEmpty('<div><span></div>')).toBe(false);
+    });
+
+    it('should return true for HTML with matching tags but empty content', () => {
+      expect(bivs.isHTMLEmpty('<p></p>')).toBe(true);
+      expect(bivs.isHTMLEmpty('<strong></strong>')).toBe(true);
     });
   });
 });

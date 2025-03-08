@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -56,7 +56,7 @@ interface Warning {
   providedIn: 'root',
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
     customizationArgs: TextInputCustomizationArgs
