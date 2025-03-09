@@ -32,7 +32,6 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {SkillEditorRoutingService} from './services/skill-editor-routing.service';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
 import {SkillEditorStateService} from './services/skill-editor-state.service';
-import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 
 @Component({
   selector: 'oppia-skill-editor-page',
@@ -63,10 +62,14 @@ export class SkillEditorPageComponent implements OnInit {
 
   navigationWithConfirmation(navigateFunction: () => void): void {
     if (this.skillEditorRoutingService.questionIsBeingCreated) {
-      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
         backdrop: 'static',
         keyboard: false,
       });
+
+      modalRef.componentInstance.body =
+        'Please save or discard all pending changes ' +
+        'before navigating to a different tab.';
       modalRef.result.then(
         () => {
           navigateFunction();

@@ -362,13 +362,14 @@ describe('Skill editor page', () => {
   });
 
   it(
-    "should show 'confirm question exit' modal and navigate to " +
+    'should show save pending changes modal and navigate to ' +
       'main editor tab when user confirms',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
       let routingSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return {
+          componentInstance: MockNgbModalRef,
           result: Promise.resolve('confirm'),
         } as NgbModalRef;
       });
@@ -381,13 +382,14 @@ describe('Skill editor page', () => {
   );
 
   it(
-    "should show 'confirm question exit' modal and navigate to " +
+    'should show save pending changes modal and navigate to ' +
       'preview editor tab when user confirms',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
       let routingSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return {
+          componentInstance: MockNgbModalRef,
           result: Promise.resolve('confirm'),
         } as NgbModalRef;
       });
@@ -400,12 +402,13 @@ describe('Skill editor page', () => {
   );
 
   it(
-    "should show 'confirm question exit' modal and should not navigate to " +
+    'should show save pending changes modal and should not navigate to ' +
       'preview editor tab when user cancels',
     fakeAsync(() => {
       skillEditorRoutingService.questionIsBeingCreated = true;
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         return {
+          componentInstance: MockNgbModalRef,
           result: Promise.reject(),
         } as NgbModalRef;
       });
