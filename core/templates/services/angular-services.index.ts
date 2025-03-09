@@ -140,6 +140,7 @@ import { ExpressionInterpolationService } from 'expressions/expression-interpola
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { ConvertHtmlToUnicodePipe } from 'filters/convert-html-to-unicode.pipe';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
@@ -441,6 +442,7 @@ import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-ad
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
 import { ExplorationPlayerPageAuthGuard } from 'pages/exploration-player-page/exploration-player-page-auth.guard';
+import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.guard';
 import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
@@ -450,8 +452,11 @@ import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-play
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
+import { ExplorationEditorPageAuthGuard } from 'pages/exploration-editor-page/exploration-editor-page-auth.guard';
 import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
+
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -564,6 +569,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardAuthGuard', EmailDashboardAuthGuard],
   ['EmailDashboardBackendApiService', EmailDashboardBackendApiService],
   ['EmailDashboardDataService', EmailDashboardDataService],
+  ['ExplorationEditorPageAuthGuard', ExplorationEditorPageAuthGuard],
   ['EndExplorationBackendApiService', EndExplorationBackendApiService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
@@ -632,6 +638,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
+  ['ConvertHtmlToUnicodePipe', ConvertHtmlToUnicodePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
   ['GenerateContentIdService', GenerateContentIdService],
@@ -672,6 +679,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['IsLoggedInGuard', IsLoggedInGuard],
   ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
+  ['LanguageBannerService', LanguageBannerService],
   ['LanguageUtilService', LanguageUtilService],
   ['LearnerAnswerDetailsBackendApiService',
     LearnerAnswerDetailsBackendApiService],
@@ -865,6 +873,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicCreationService', TopicCreationService],
   ['TopicEditorRoutingService', TopicEditorRoutingService],
+  ['TopicEditorAuthGuard', TopicEditorAuthGuard],
   ['TopicEditorStateService', TopicEditorStateService],
   ['TopicViewerAccessGuard', TopicViewerAccessGuard],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],

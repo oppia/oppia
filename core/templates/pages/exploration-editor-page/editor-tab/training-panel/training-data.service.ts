@@ -19,7 +19,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -270,7 +269,3 @@ export class TrainingDataService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TrainingDataService', downgradeInjectable(TrainingDataService));

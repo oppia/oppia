@@ -16,8 +16,7 @@
  * @fileoverview Service for storing all upgraded services
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
 import {
   // eslint-disable-next-line oppia/disallow-httpclient
@@ -384,6 +383,7 @@ export class UpgradedServices {
     /* eslint-disable dot-notation */
 
     // Topological level: 0.
+    upgradedServices['Injector'] = Injector;
     upgradedServices['AdminRouterService'] = new AdminRouterService();
     upgradedServices['AdminTaskManagerService'] = new AdminTaskManagerService();
     upgradedServices['AlgebraicExpressionInputRulesService'] =
@@ -648,7 +648,8 @@ export class UpgradedServices {
     upgradedServices['QuestionValidationService'] =
       new QuestionValidationService(
         upgradedServices['ResponsesService'],
-        upgradedServices['StateEditorService']
+        upgradedServices['StateEditorService'],
+        upgradedServices['Injector']
       );
     upgradedServices['RatioExpressionInputValidationService'] =
       new RatioExpressionInputValidationService(
@@ -1210,7 +1211,3 @@ export class UpgradedServices {
     return upgradedServices;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('UpgradedServices', downgradeInjectable(UpgradedServices));

@@ -27,7 +27,6 @@ import {SetInputRulesService} from './set-input-rules.service';
 import eq from 'lodash/eq';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {Schema} from 'services/schema-default-value.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SetInputAnswer} from 'interactions/answer-defs';
 
 @Component({
@@ -136,10 +135,3 @@ export class InteractiveSetInputComponent implements OnInit {
     return this.answer.length > 0 && !this.hasBlankOption(this.answer);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveSetInput',
-  downgradeComponent({
-    component: InteractiveSetInputComponent,
-  })
-);

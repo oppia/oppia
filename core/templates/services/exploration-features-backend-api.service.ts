@@ -17,7 +17,6 @@
  * configured to support.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -66,10 +65,3 @@ export class ExplorationFeaturesBackendApiService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationFeaturesBackendApiService',
-    downgradeInjectable(ExplorationFeaturesBackendApiService)
-  );

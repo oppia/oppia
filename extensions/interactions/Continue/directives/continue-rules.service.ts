@@ -17,13 +17,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContinueRulesService {}
-
-angular
-  .module('oppia')
-  .factory('ContinueRulesService', downgradeInjectable(ContinueRulesService));

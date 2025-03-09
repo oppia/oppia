@@ -1,0 +1,1029 @@
+<p class="topic-dashboard-link">
+  <a href="/topics-and-skills-dashboard">
+    Back to Topics Dashboard <i class="fa fa-angle-left"></i>
+  </a>
+  <span>{{ editableName }}</span>
+</p>
+<a class="oppia-mobile-back-to-parent" href="/topics-and-skills-dashboard">
+  <i class="fa fa-angle-left"></i>
+  <span>Back to Topics Dashboard</span>
+</a>
+<div role="form" class="form-horizontal topic-editor">
+  <div class="topic-content-container">
+    <mat-card class="oppia-long-text topic-item-card oppia-mobile-collapsible-card">
+      <div class="topic-editor-main-container">
+        <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+             (click)="togglePreviewListCards()">
+          <h3 class="topic-card-header">Details</h3>
+          <i class="fa fa-caret-down"
+             *ngIf="!mainTopicCardIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="mainTopicCardIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+        <div *ngIf="mainTopicCardIsShown">
+          <div class="oppia-mobile-collapsible-card-content">
+            <div class="topic-name" tabindex="0">
+              <label for="topicName"
+                     class="form-heading e2e-test-topic-name-heading">
+                Name
+              </label>
+              <input id="topicName"
+                     type="text"
+                     class="form-control e2e-test-topic-name-field"
+                     [disabled]="!topicRights.canEditTopic()"
+                     [(ngModel)]="editableName"
+                     (blur)="updateTopicName(editableName)"
+                     placeholder="Enter a name for the topic."
+                     [maxlength]="maxCharsInTopicName"
+                     [ngClass]="{'is-invalid': topicNameExists}">
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Topic name should be at most {{ maxCharsInTopicName }} characters.
+                </em>
+              </span>
+              <div *ngIf="topicNameExists" class="oppia-input-box-subtitle text-danger">
+                <em>
+                  A topic with this name already exists.
+                </em>
+              </div>
+            </div>
+            <div class="topic-url-fragment e2e-test-topic-url-fragment-field">
+              <url-fragment-editor-component label="Topic URL Fragment"
+                                             placeholder="Enter the URL fragment for the topic."
+                                             maxLength="{{MAX_CHARS_IN_TOPIC_URL_FRAGMENT}}"
+                                             fragmentType="topic"
+                                             [generatedUrlPrefix]="generatedUrlPrefix"
+                                             [fragmentIsDuplicate]="topicUrlFragmentExists"
+                                             [disabled]="!topicRights.canEditTopic()"
+                                             [(urlFragment)]="editableTopicUrlFragment"
+                                             (urlFragmentChange)="onChangeTopicEditorUrlFragment($event)"
+                                             (blur)="updateTopicUrlFragment(editableTopicUrlFragment)">
+              </url-fragment-editor-component>
+            </div>
+            <div class="topic-description" [ngClass]="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}" tabindex="0">
+              <label for="topicDescription"
+                     class="form-heading e2e-test-topic-description-heading">
+                Description
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-description-field"
+                        [(ngModel)]="editableDescription"
+                        [maxlength]="maxCharsInTopicDescription"
+                        (change)="updateTopicDescriptionStatus(editableDescription)"
+                        (blur)="updateTopicDescription(editableDescription)"
+                        [disabled]="!topicRights.canEditTopic()"
+                        aria-label="Topic Description"
+                        placeholder="Enter the description of the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Topic description should be at most {{ maxCharsInTopicDescription }} characters.
+                </em>
+              </span>
+              <span *ngIf="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
+                What does this topic contain?
+              </span>
+            </div>
+            <div class="topic-page-title"
+                 tabindex="0"
+                 [ngClass]="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
+              <label for="topicPageTitleFragmentForWeb"
+                     class="form-heading e2e-test-topic-page-title-fragment-label">
+                Page Title Fragment For Web
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-page-title-fragment-field"
+                        [(ngModel)]="editablePageTitleFragmentForWeb"
+                        [maxlength]="maxCharsInPageTitleFragmentForWeb"
+                        (blur)="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        [disabled]="!topicRights.canEditTopic()"
+                        aria-label="Page Title Fragment"
+                        placeholder="Enter the page title for the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ editableName }} | Add, Subtract, Multiply and Divide | Oppia".
+                  It should be at least {{ minCharsInPageTitleFragmentForWeb }} and at most {{ maxCharsInPageTitleFragmentForWeb }} characters.
+                </em>
+              </span>
+            </div>
+            <div class="topic-meta-tag-content"
+                 tabindex="0"
+                 [ngClass]="{'has-error': editableMetaTagContent.length === 0}">
+              <label for="topicMetaTagContent"
+                     class="form-heading e2e-test-topic-meta-tag-content-label">Meta Tag Content
+              </label>
+              <textarea type="text"
+                        class="form-control topic-description e2e-test-topic-meta-tag-content-field"
+                        [(ngModel)]="editableMetaTagContent"
+                        [maxlength]="maxCharsInMetaTagContent"
+                        (blur)="updateTopicMetaTagContent(editableMetaTagContent)"
+                        [disabled]="!topicRights.canEditTopic()"
+                        placeholder="Enter the meta tag content for the topic"
+                        aria-label="Meta Tag Content">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Meta tags provide information about the webpage. This information will not displayed on the page but it can be read by search engines and web crawlers. This text will be shown to users in seach engine results.
+                  Topic meta tag content should be at most {{ maxCharsInMetaTagContent }} characters.
+                </em>
+              </span>
+            </div>
+            <label class="form-heading">Thumbnail</label>
+            <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
+                                      [useLocalStorage]="false"
+                                      [filename]="topic.getThumbnailFilename()"
+                                      (updateFilename)="updateTopicThumbnailFilename($event)"
+                                      [bgColor]="topic.getThumbnailBgColor()"
+                                      (updateBgColor)="updateTopicThumbnailBgColor($event)"
+                                      [allowedBgColors]="allowedBgColors"
+                                      [aspectRatio]="'4:3'"
+                                      [previewTitle]="editableName"
+                                      previewDescriptionBgColor="#2F6687"
+                                      [previewFooter]="topic.getCanonicalStoryIds().length + ' Lessons'">
+            </oppia-thumbnail-uploader>
+            <div class="topic-classroom-container">
+              <label>Classroom</label>
+              <span *ngIf="isAssignedToAClassroom()">
+                <a rel="noopener" [href]="'/learn/' + classroomUrlFragment" target="_blank">{{ classroomName }}</a>
+              </span>
+              <em *ngIf="!isAssignedToAClassroom()">No classroom assigned</em>
+              <div *ngIf="isAssignedToAClassroom()" class="oppia-input-box-subtitle">
+                <em>To change the assigned classroom, please contact one of the curriculum admins:</em>
+                <em *ngFor="let username of curriculumAdminUsernames; let last = last">
+                  {{ username }}<ng-container *ngIf="!last">, </ng-container>
+                </em>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="topic.getThumbnailFilename() && mainTopicCardIsShown">
+        <div *ngIf="!topicPreviewCardIsShown" >
+          <button class="btn btn-default show-topic-preview-button"
+                  (click)="togglePreview()">
+            Expand Preview
+            <i class="fa fa-angle-down"></i>
+          </button>
+        </div>
+        <div *ngIf="topicPreviewCardIsShown">
+          <button class="btn btn-default show-topic-preview-button"
+                  (click)="togglePreview()">
+            Collapse Preview
+            <i class="fa fa-angle-up"></i>
+          </button>
+        </div>
+        <div *ngIf="topic.getId() && topicPreviewCardIsShown">
+          <oppia-preview-thumbnail [name]="editableName"
+                                   [aspectRatio]="'4:3'"
+                                   [previewFooter]="getPreviewFooter()"
+                                   [filename]="topic.getThumbnailFilename()"
+                                   [thumbnailBgColor]="topic.getThumbnailBgColor()"
+                                   [bgColor]="'#2F6687'">
+          </oppia-preview-thumbnail>
+        </div>
+      </div>
+    </mat-card>
+    <mat-card class="item-list-card subtopic-skill-card-container topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           (click)="togglePreviewListCards(SUBTOPIC_LIST)">
+        <div class="subtopic-reassign-header">
+          <h3>Subtopics</h3>
+          <button class="reassign-button e2e-test-reassign-skill-button"
+                  (click)="reassignSkillsInSubtopics()"
+                  *ngIf="topicRights.canEditTopic()">
+            REASSIGN
+          </button>
+          <i class="fa fa-caret-down"
+             *ngIf="!subtopicsListIsShown"
+             aria-hidden="true">
+          </i>
+          <i class="fa fa-caret-up"
+             *ngIf="subtopicsListIsShown"
+             aria-hidden="true">
+          </i>
+        </div>
+      </div>
+      <div *ngIf="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
+        <div>
+          <label>
+            <input class="practice-tab-checkbox e2e-test-toggle-practice-tab"
+                   type="checkbox"
+                   tabindex="0"
+                   [(ngModel)]="editablePracticeIsDisplayed"
+                   aria-label="Show Practice Tab to learners"
+                   role="checkbox"
+                   aria-labelled="Show practice tab to learners"
+                   (change)="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)"
+                   [disabled]="!topicRights.canEditTopic() || (!editablePracticeIsDisplayed && !doesTopicHaveMinimumPracticeQuestions())">
+            <span class="practice-tab-text"> Show Practice Tab to learners.</span>
+          </label>
+          <i class="fas fa-info-circle practice-tab-info-circle"
+             title="This setting show/hides the practice tab in the topic viewer page. This can only be enabled if there are at least 10 questions attached to the topic.">
+          </i>
+        </div>
+        <button class="btn add-subtopic-btn e2e-test-add-subtopic-button puppeteer-test-add-subtopic-button"
+                (click)="createSubtopic()"
+                *ngIf="topicRights.canEditTopic()">
+          + ADD SUBTOPIC
+        </button>
+        <button *ngIf="skillCreationIsAllowed"
+                class="btn add-skill-btn e2e-test-add-skill-button puppeteer-test-add-skill-button"
+                (click)="createSkill()">
+          + ADD SKILL
+        </button>
+        <div *ngIf="(subtopics.length || uncategorizedSkillSummaries.length) && subtopicsListIsShown" tabindex="0">
+          <div class="list-header">
+            <span>Name</span>
+            <span class="number-skills-header"># of Questions</span>
+          </div>
+          <div class="subtopic-name-header skills-invalid"
+               *ngIf="uncategorizedSkillSummaries.length" tabindex="0">
+            <span>Uncategorized Skills</span>
+          </div>
+          <div *ngFor="let skillSummary of uncategorizedSkillSummaries; index as $index"
+               class="subtopic-skill skills-list-item e2e-test-skill-item">
+            <a [href]="getSkillEditorUrl(skillSummary.getId())"
+               target="_blank"
+               rel="noopener">
+              <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
+            </a>
+            <div class="edit-options-container">
+              <i class="fa fa-ellipsis-v e2e-test-skill-item-edit-btn"
+                 (click)="toggleUncategorizedSkillOptions($index)"
+                 tabindex="0"
+                 role="button"
+                 aria-label="More options"
+                 (keydown.enter)="toggleUncategorizedSkillOptions($index)"
+                 *ngIf="topicRights.canEditTopic()">
+              </i>
+            </div>
+            <div class="uncategorized-skill-option-box"
+                 *ngIf="uncategorizedEditOptionsIndex === $index"
+                 (mouseleave)="toggleUncategorizedSkillOptions(null)"
+                 (click)="toggleUncategorizedSkillOptions(null)">
+              <div class="uncategorized-skill-edit-option" tabindex="0" role="button" (keydown.enter)="deleteUncategorizedSkillFromTopic(skillSummary)" (click)="deleteUncategorizedSkillFromTopic(skillSummary)">
+                <i class="fa fa-trash" *ngIf="topicRights.canEditTopic()"></i>
+                <span>Remove from topic</span>
+              </div>
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic"
+                   tabindex="0"
+                   role="button"
+                   (keydown.enter)="changeSubtopicAssignment(null, skillSummary)"
+                   (click)="changeSubtopicAssignment(null, skillSummary)"
+                   (blur)="toggleUncategorizedSkillOptions(null)">
+                <i class="fa fa-plus" *ngIf="topicRights.canEditTopic()"></i>
+                <span>Assign to Subtopic</span>
+              </div>
+            </div>
+          </div>
+          <div cdkDropList
+               (cdkDropListDropped)="drop($event)">
+            <div *ngFor="let subtopic of subtopics;index as subtopicIndex"
+                cdkDrag>
+              <div class="subtopics-list-item">
+                <div class="subtopic-name-header subtopic-name-card-header" tabindex="0" (click)="toggleSubtopicCard(subtopicIndex)" (focus)="toggleSubtopicCard(subtopicIndex)">
+                  <div class="subtopic-drag-and-title-container">
+                    <span class="fas fa-grip-vertical draggable-icon-indicator"></span>
+                    <span class="clickable-item" (click)="navigateToSubtopic(subtopic.getId(), subtopic.getTitle())">
+                      <span class="e2e-test-subtopic">{{ subtopic.getTitle() }}</span>
+                    </span>
+                  </div>
+                  <div class="subtopic-edit-options-container edit-options-container" [attr.aria-label]="'Number of questions: ' + subtopicQuestionCountDict[subtopic.getId()]">
+                    <span>{{ subtopicQuestionCountDict[subtopic.getId()] }}</span>
+                    <i class="fa fa-ellipsis-v e2e-test-show-subtopic-options"
+                       (click)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
+                       tabindex="0"
+                       aria-label="More options"
+                       role="button"
+                       (keydown.enter)="showSubtopicEditOptions(subtopicIndex);$event.stopPropagation()"
+                       *ngIf="topicRights.canEditTopic()">
+                    </i>
+                    <div *ngIf="subtopicEditOptionsAreShown === subtopicIndex"
+                         class="subtopic-edit-options"
+                         (click)="deleteSubtopic(subtopic.getId())"
+                         tabindex="0"
+                         (blur)="showSubtopicEditOptions(null)"
+                         (keydown.enter)="deleteSubtopic(subtopic.getId())"
+                         (mouseleave)="showSubtopicEditOptions(null)">
+                      <i class="fa fa-trash e2e-test-delete-subtopic-button"></i>
+                      <span>Delete</span>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="subtopicCardSelectedIndexes[subtopicIndex]">
+                  <div *ngIf="subtopic.getSkillSummaries().length">
+                    <div *ngFor="let skillSummary of subtopic.getSkillSummaries(); index as idx"
+                         class="subtopic-skill skills-list-item skill-description-container">
+                      <a [href]="getSkillEditorUrl(skillSummary.getId())"
+                         target="_blank"
+                         rel="noopener">
+                        <span class="clickable-item">{{ skillSummary.getDescription() }}</span>
+                      </a>
+                      <div class="edit-options-container" tabindex="0" [attr.aria-label]="'Number of questions: ' + skillQuestionCountDict[skillSummary.getId()]">
+                        <span>{{ skillQuestionCountDict[skillSummary.getId()]  }}</span>
+                        <i class="fa fa-ellipsis-v"
+                           tabindex="0"
+                           aria-label="More options"
+                           (keydown.enter)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
+                           (click)="showSkillEditOptions(subtopicIndex, idx); $event.stopPropagation()"
+                           *ngIf="topicRights.canEditTopic()">
+                        </i>
+                      </div>
+                      <div class="skill-option-box"
+                           *ngIf="!skillOptionDialogueBox && selectedSkillEditOptionsIndex && selectedSkillEditOptionsIndex[subtopicIndex] && selectedSkillEditOptionsIndex[subtopicIndex][idx]"
+                           (mouseleave)="showSkillEditOptions()"
+                           (click)="showSkillEditOptions()">
+                        <div class="skill-edit-option"
+                             tabindex="0"
+                             (keydown.enter)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)"
+                             (click)="removeSkillFromSubtopic(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from subtopic</span>
+                        </div>
+                        <div class="skill-edit-option"
+                             tabindex="0"
+                             (keydown.enter)="changeSubtopicAssignment(subtopic.getId(), skillSummary)"
+                             (click)="changeSubtopicAssignment(subtopic.getId(), skillSummary)">
+                          <i class="fa fa-plus"></i>
+                          <span>Change Subtopic</span>
+                        </div>
+                        <div class="skill-edit-option remove-from-topic-option"
+                             tabindex="0"
+                             (keydown.enter)="removeSkillFromTopic(subtopic.getId(), skillSummary)"
+                             (click)="removeSkillFromTopic(subtopic.getId(), skillSummary)"
+                             (blur)="showSkillEditOptions()">
+                          <i class="fa fa-trash"></i>
+                          <span>Remove from topic</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="!subtopic.getSkillSummaries().length">
+                    <span class="subtopic-skill">There are no skills associated to this subtopic.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+    <mat-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card" tabindex="0">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           (click)="togglePreviewListCards()">
+        <h3>Diagnostic test</h3>
+      </div>
+      <div>
+        <p>
+          Add up to 3 key skills (the order doesn't matter) that a learner who
+          has completed this topic should have mastered. These skills will be
+          used to generate the diagnostic test that determines whether to
+          recommend this topic to new learners.
+        </p>
+        <p>Note that skills with fewer than three questions are not eligible for
+          getting assigned to the diagnostic test.
+        </p>
+      </div>
+      <div class="oppia-diagnostic-test-skill-list-header"
+           *ngIf="selectedSkillSummariesForDiagnosticTest.length">
+        <strong>Diagnostic test skills</strong>
+      </div>
+      <mat-list>
+        <mat-list-item class="oppia-diagnostic-test-skill_items-container"
+                       *ngFor="let skill of selectedSkillSummariesForDiagnosticTest">
+          <div class="oppia-diagnostic-test-skill-items">
+            <span>
+              {{skill.getDescription()}}
+            </span>
+            <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
+                    (click)="removeSkillFromDiagnosticTest(skill)"
+                    mat-button
+                    mat-icon-button
+                    aria-label="Clear"
+                    *ngIf="topicRights.canEditTopic()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+        <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
+          <select [formControl]="skillForDiagnosticTestFormControl"
+                  class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  (change)="addSkillForDiagnosticTest()"
+                  aria-label="selection dropdown">
+            <option [ngValue]="null">Please select a skill...</option>
+            <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
+                    class="e2e-test-diagnostic-test-skill-option"
+                    [ngValue]="skillSummary">
+                    {{ skillSummary.getDescription()  }}
+            </option>
+          </select>
+
+          <button class="oppia-remove-diagnostic-test-skill-button"
+                  mat-button mat-icon-button
+                  aria-label="Clear"
+                  (click)="removeDiagnosticTestSkillDropdown()"
+                  *ngIf="topicRights.canEditTopic()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+      <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
+              mat-button
+              (click)="presentDiagnosticTestSkillDropdown()"
+              [hidden]="diagnosticTestSkillsDropdownIsShown"
+              [disabled]="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
+        <div class="oppia-flex">
+          <mat-icon aria-label="icon-button with a plus icon" *ngIf="topicRights.canEditTopic()">add_circle</mat-icon>
+          <h4 class="oppia-button-text" *ngIf="topicRights.canEditTopic()">Add diagnostic test skill</h4>
+        </div>
+      </button>
+      <div class="oppia-diagnostic-test-card-note">
+        <span *ngIf="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
+          <em>No more skills left for assignment.</em>
+        </span>
+        <span *ngIf="selectedSkillSummariesForDiagnosticTest.length === 3">
+          <em>The maximum limit was reached for adding skills to the diagnostic test.</em>
+        </span>
+        <span *ngIf="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
+          <em>Please add at least 1 skill for the diagnostic test.</em>
+        </span>
+      </div>
+    </mat-card>
+  </div>
+  <div class="topic-info-container">
+    <mat-card class="item-list-card topic-item-card topic-bottom-card oppia-mobile-collapsible-card">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-stories-collapsible-card-header"
+           (click)="togglePreviewListCards(STORY_LIST)">
+        <h3 tabindex="0">Canonical Stories</h3>
+        <i class="fa fa-caret-down e2e-test-story-dropdown"
+           *ngIf="!storiesListIsShown"
+           aria-hidden="true">
+        </i>
+        <i class="fa fa-caret-up e2e-test-story-dropdown"
+           *ngIf="storiesListIsShown"
+           aria-hidden="true">
+        </i>
+      </div>
+      <div *ngIf="storiesListIsShown" class="oppia-mobile-collapsible-card-content stories-list-container">
+        <button class="btn add-story-btn e2e-test-create-story-button oppia-autofocus"
+                (click)="createCanonicalStory()"
+                [oppiaFocusOn]="addStoryBtn"
+                *ngIf="topicRights.canEditTopic()">
+          + ADD STORY
+        </button>
+        <div class="canonical-stories">
+          <oppia-topic-editor-stories-list *ngIf="topic.getCanonicalStoryIds().length > 0"
+                                           [storySummaries]="canonicalStorySummaries"
+                                           [topic]="topic">
+          </oppia-topic-editor-stories-list>
+        </div>
+      </div>
+    </mat-card>
+    <mat-card class="entity-count" tabindex="0">
+      <div class="subtopic-count">
+        <span class="subtopic-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="subtopic-count-value" *ngIf="topicDataHasLoaded">{{ topic.getSubtopics().length }}</span>
+        <span class="subtopic-count-text">Subtopics</span>
+      </div>
+      <div class="skill-count">
+        <span class="skill-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="skill-count-value" *ngIf="topicDataHasLoaded">{{ topic.getSkillIds().length }}</span>
+        <span class="skill-count-text">Skills</span>
+      </div>
+      <div class="story-count">
+        <span class="story-count-value" *ngIf="!topicDataHasLoaded"><loading-dots></loading-dots></span>
+        <span class="story-count-value" *ngIf="topicDataHasLoaded">{{ topic.getCanonicalStoryIds().length }}</span>
+        <span class="story-count-text">Stories</span>
+      </div>
+    </mat-card>
+  </div>
+  <div>
+  </div>
+</div>
+<style>
+  .topic-editor thumbnail-uploader {
+    margin-bottom: 15px;
+  }
+
+  .topic-editor textarea {
+    resize: vertical;
+  }
+
+  .topic-editor {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    width: 95%;
+  }
+
+  .topic-editor .topic-content-container {
+    margin-right: 3%;
+    width: 50%;
+  }
+
+  .topic-editor .topic-info-container {
+    width: 35%;
+  }
+
+  .topic-editor .topic-item-card {
+    margin: 0;
+  }
+
+  .topic-editor .add-entity-text {
+    color: #808080;
+    margin-top: 20px;
+  }
+
+  .topic-dashboard-link {
+    font-size: 15px;
+    margin-bottom: 35px;
+    margin-left: 4%;
+  }
+
+  .topic-dashboard-link a {
+    color: #015f9c;
+    text-decoration: none;
+  }
+
+  .topic-editor .topic-preview-container {
+    text-align: center;
+  }
+
+  .topic-editor .topic-preview-container button {
+    margin: 15px 0;
+  }
+
+  .topic-editor .entity-count {
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #aaaac1;
+    border-radius: 6px;
+    box-shadow: none;
+    display: flex;
+    flex-wrap: wrap;
+    height: 110px;
+    justify-content: center;
+    margin: 30px auto 0;
+    width: 97%;
+  }
+
+  .topic-editor .subtopic-count,
+  .topic-editor .skill-count,
+  .topic-editor .story-count {
+    border-right: 2px solid #aaaac1;
+    display: inline-block;
+    text-align: center;
+    width: 33%;
+  }
+
+  .topic-editor .story-count {
+    border-right: none;
+  }
+  .topic-editor .topic-card-header {
+    margin-bottom: 30px;
+    margin-left: -20px;
+  }
+
+  .topic-editor .skills-list-item {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .topic-editor .skills-list-item a {
+    color: inherit;
+    text-decoration: none;
+    width: 75%;
+  }
+
+  .topic-editor .edit-options-container {
+    margin-right: 14px;
+  }
+
+  .topic-editor .edit-options-container span {
+    margin-right: 38px;
+  }
+
+  .topic-editor .number-skills-header {
+    margin-right: 30px;
+  }
+
+  .topic-editor .subtopic-count-value,
+  .topic-editor .skill-count-value,
+  .topic-editor .story-count-value {
+    display: block;
+    font-size: 26px;
+    height: 40px;
+  }
+
+  .topic-editor .topic-editor-main-container {
+    font-family: Roboto, Arial, sans-serif;
+    padding: 30px 55px 30px 45px;
+  }
+
+  .topic-editor .show-topic-preview-button {
+    border-top: 1px solid #c1c1c1;
+    color: #33776c;
+    font-size: 15px;
+    padding: 10px 0;
+    width: 100%;
+  }
+
+  .topic-editor .form-heading {
+    font-size: 15px;
+  }
+
+  .topic-editor .topic-name,
+  .topic-editor .topic-url-fragment,
+  .topic-editor .topic-meta-tag-content,
+  .topic-editor .topic-page-title {
+    margin-bottom: 25px;
+    margin-top: 32px;
+  }
+
+  .topic-editor .canonical-stories {
+    margin-top: 20px;
+  }
+
+  .topic-editor .topic-description textarea,
+  .topic-editor .topic-meta-tag-content textarea {
+    height: 10vh;
+  }
+
+  .topic-editor .add-subtopic-btn,
+  .topic-editor .add-skill-btn,
+  .topic-editor .add-story-btn {
+    background-color: #008098;
+    color: #fff;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .topic-editor .add-subtopic-btn {
+    width: 140px;
+  }
+
+  .topic-editor .add-skill-btn {
+    margin-left: 3%;
+    width: 108px;
+  }
+
+  .topic-editor .add-story-btn {
+    width: 120px;
+  }
+
+  .topic-editor .item-list-card {
+    font-family: Roboto, Arial, sans-serif;
+    padding: 20px 20px 20px 25px;
+  }
+
+  .topic-editor .list-header {
+    border-bottom: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+  }
+
+  .topic-editor .list-header span {
+    font-weight: bold;
+  }
+
+  .topic-editor .subtopics-list-item {
+    margin: 7px 0;
+  }
+
+  .topic-editor .subtopics-list-item .draggable-icon-indicator {
+    padding-right: 5px;
+  }
+
+  .topic-editor .subtopic-name-header {
+    align-items: center;
+    background-color: #e3e3e3;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+
+  .topic-editor .skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: -6px;
+    width: 210px;
+    z-index: 1;
+  }
+
+  .topic-editor .uncategorized-skill-option-box {
+    background-color: #e1dcdc;
+    border: 1px solid #000;
+    padding: 0;
+    position: absolute;
+    right: 7px;
+    width: 210px;
+    z-index: 1;
+  }
+
+  .topic-editor .skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+
+  .topic-editor .uncategorized-skill-edit-option {
+    border-bottom: 1px solid #000;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px;
+  }
+
+  .topic-editor .edit-option-assign {
+    border-bottom: none;
+  }
+
+  .topic-editor .remove-from-topic-option {
+    border-bottom: none;
+  }
+
+  .topic-editor .reassign-button {
+    background: none;
+    border: none;
+    color: #0b6c63;
+  }
+
+  .topic-editor .subtopic-reassign-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .topic-editor .subtopic-edit-options-container {
+    position: relative;
+  }
+
+  .topic-editor .subtopic-edit-options {
+    background-color: #e1dcdc;
+    border: 1px solid #2e2626;
+    padding: 2px;
+    position: absolute;
+    right: -7px;
+    top: 0;
+    width: 120px;
+  }
+
+  .topic-editor .skill-description-container {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .topic-editor .skills-invalid {
+    background-color: #c55f4533;
+    border: 2px solid #c55f45;
+  }
+
+  .topic-editor .clickable-item:hover {
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .topic-editor .subtopic-skill {
+    border-bottom: 1px solid #e3e3e3;
+    padding: 8px 10px 8px 32px;
+  }
+
+  .topic-editor .item-list-card-header i {
+    display: none;
+  }
+
+  .topic-editor .subtopic-skill-card-container {
+    margin-top: 64px;
+  }
+
+  .topic-editor .diagnostic-test-card-container {
+    margin-bottom: 64px;
+    margin-top: 64px;
+  }
+
+  .topic-editor .practice-tab-info-circle {
+    background: #000;
+    border-radius: 10px;
+    color: #fff;
+    margin-left: 3px;
+    padding: 1px;
+  }
+
+  .topic-editor .practice-tab-checkbox {
+    box-shadow: rgb(102, 102, 102) 0 0 0 2px inset;
+  }
+
+  .topic-editor .practice-tab-text {
+    font-weight: normal;
+    padding-left: 5px;
+  }
+
+  .oppia-add-diagnostic-test-skills-button {
+    color: #00695e;
+    margin-left: 0;
+    padding-left: 0;
+    width: fit-content;
+  }
+
+  .oppia-flex {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    width: fit-content;
+  }
+
+  .oppia-button-text {
+    margin-bottom: 0;
+    padding: 10px;
+  }
+
+  .oppia-diagnostic-test-dropdown {
+    width: 50%;
+  }
+
+  .oppia-remove-diagnostic-test-skill-button {
+    border-radius: 25px;
+    color: #00695e;
+    position: relative;
+  }
+
+  .oppia-diagnostic-test-skill-description {
+    width: 85%;
+  }
+
+  .oppia-diagnostic-test-skill-list-header {
+    margin-top: 20px;
+  }
+
+  .oppia-diagnostic-test-card-note {
+    display: block;
+  }
+
+  mat-list-item.oppia-diagnostic-test-skill_items-container {
+    background-color: #e3e3e3;
+    height: auto;
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+  .oppia-diagnostic-test-skill-items {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: -webkit-fill-available;
+  }
+
+  .topic-classroom-container {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .topic-classroom-container label {
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 1200px) {
+    .topic-editor .topic-content-container {
+      width: 50%;
+    }
+
+    .topic-editor .topic-info-container {
+      margin-top: 34px;
+      width: 40%;
+    }
+  }
+
+  @media screen and (max-width: 1000px) {
+    .topic-editor .topic-content-container {
+      width: 55%;
+    }
+
+    .topic-editor .topic-info-container {
+      margin-top: 34px;
+      width: 45%;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .topic-editor {
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    .topic-dashboard-link {
+      display: none;
+    }
+
+    .topic-editor .topic-bottom-card {
+      margin-top: 40px;
+    }
+
+    .topic-editor .item-list-card {
+      padding: 0;
+    }
+
+    .topic-editor .entity-count {
+      padding-right: 5px;
+    }
+
+    .topic-editor .subtopic-skill-card-container {
+      margin-top: inherit;
+    }
+
+    .topic-editor .item-list-card-header {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .topic-editor .topic-editor-main-container {
+      padding: 0;
+    }
+
+    .topic-editor .skills-list-item a {
+      color: inherit;
+      text-decoration: none;
+      width: 65%;
+    }
+
+    .topic-editor .topic-card-header,
+    .topic-editor .subtopic-reassign-header,
+    .topic-editor .item-list-card-header h3 {
+      font-size: 19px;
+      margin: 0;
+    }
+
+    .topic-editor .subtopic-skill {
+      border-bottom: 1px solid #e3e3e3;
+      padding: 8px 10px 8px 20px;
+    }
+
+    .topic-editor .item-list-card-header i {
+      display: inline-block;
+      font-size: 18px;
+    }
+
+    .topic-editor .topic-content-container {
+      margin-right: 0;
+      margin-top: 30px;
+      width: 100%;
+    }
+
+    .topic-editor .subtopic-reassign-header {
+      width: 100%;
+    }
+
+    .topic-editor .reassign-button {
+      display: none;
+    }
+
+    .topic-editor .topic-info-container {
+      margin-top: 0;
+      padding-bottom: 50px;
+      width: 100%;
+    }
+
+    .topic-editor .add-subtopic-btn {
+      width: 44%;
+    }
+
+    .topic-editor .add-skill-btn {
+      margin-left: 3%;
+    }
+
+    .topic-editor .skill-option-box {
+      right: 40px;
+    }
+
+    .topic-editor .subtopic-edit-options {
+      right: 13px;
+    }
+
+    .topic-editor .uncategorized-skill-option-box {
+      right: 43px;
+    }
+  }
+
+  @media screen and (max-width: 375px) {
+    .stories-list-container {
+      padding: 20px 15px 15px;
+    }
+  }
+</style>

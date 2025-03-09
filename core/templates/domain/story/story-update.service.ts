@@ -19,7 +19,6 @@
  * undo/redo service.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -1152,7 +1151,3 @@ export class StoryUpdateService {
     return this._storyChapterUpdateEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StoryUpdateService', downgradeInjectable(StoryUpdateService));

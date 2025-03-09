@@ -18,7 +18,6 @@
 
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -68,8 +67,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
-  maxCharsInSubtopicUrlFragment!: number;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
+  generatedUrlPrefix: string;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -90,6 +90,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.topic = this.topicEditorStateService.getTopic();
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment();
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${this.topic.getUrlFragment()}/revision`;
     this.subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
     this.subtopic = this.topic.getSubtopicById(this.subtopicId);
     if (!this.subtopic) {
@@ -164,6 +165,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       event.previousIndex,
       event.currentIndex
     );
+  }
+
+  onSubtopicUrlFragmentChange(urlFragment: string): void {
+    this.editableUrlFragment = urlFragment;
+    this.updateSubtopicUrlFragment(urlFragment);
   }
 
   updateSubtopicUrlFragment(urlFragment: string): void {
@@ -341,7 +347,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.initEditor();
     }
     this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
-    this.maxCharsInSubtopicUrlFragment =
+    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 
@@ -349,10 +355,3 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSubtopicEditorTab',
-  downgradeComponent({
-    component: SubtopicEditorTabComponent,
-  }) as angular.IDirectiveFactory
-);

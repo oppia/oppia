@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import './full-expand-accordion.component.css';
 import {AccordionPanelData} from '../data.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -60,10 +59,3 @@ export class FullExpandAccordionComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFullExpandAccordion',
-  downgradeComponent({
-    component: FullExpandAccordionComponent,
-  }) as angular.IDirectiveFactory
-);
