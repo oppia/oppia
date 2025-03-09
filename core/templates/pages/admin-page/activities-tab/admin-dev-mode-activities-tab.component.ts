@@ -25,6 +25,7 @@ import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-mana
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {Story} from 'domain/story/story.model';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
@@ -39,9 +40,12 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   numDummySuggestionQuesToGenerate: number = 0;
   numDummyStoriesToGenerate: number = 0;
   topicList: CreatorTopicSummary[] = [];
+  numDummyChaptersToGenerate: number = 0;
+  storyList: Story[] = [];
   skillList: SkillSummary[] = [];
   selectedOption: string = '';
   selectedTopicForStory: string = '';
+  selectedStoryForChapter: string = '';
   numDummyTranslationOpportunitiesToGenerate: number = 0;
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
@@ -277,6 +281,25 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.adminTaskManagerService.finishTask();
   }
 
+  generateDummyChapters(selectedStoryForChapter: string): void {
+    const selectedIndex = Number(selectedStoryForChapter);
+    let selectedStory = this.storyList[selectedIndex];
+    let id = selectedStory._id;
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummyChaptersAsync(id, this.numDummyChaptersToGenerate)
+      .then(
+        () => {
+          this.setStatusMessage.emit('Dummy chapters generated successfully.');
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
+    this.adminTaskManagerService.finishTask();
+  }
+
   generateNewBlogPost(blogPostTitle: string): void {
     if (!blogPostTitle) {
       this.setStatusMessage.emit('Internal error: blogPostTitle is empty');
@@ -348,6 +371,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.reloadingAllExplorationPossible = true;
     this.skillList = adminDataObject.skillList;
     this.topicList = adminDataObject.topicSummaries;
+    this.storyList = adminDataObject.storyList;
   }
 
   ngOnInit(): void {
