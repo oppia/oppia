@@ -854,7 +854,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
   }));
 
-  it('should return true and set navbackButtonUrl when current path matches a hidden back button path', () => {
+  it('should hide menu icon when page contains a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
     component.ngOnInit();
