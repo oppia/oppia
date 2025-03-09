@@ -861,7 +861,7 @@ describe('TopNavigationBarComponent', () => {
     expect(component.menuIconIsShown).toBeFalse();
   });
 
-  it('should return true for menuIconIsShown when current path does not match a hidden back button path', () => {
+  it('should show menu icon when page does not contain a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
