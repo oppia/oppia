@@ -1209,7 +1209,6 @@ export class SvgEditorComponent implements OnInit {
           ),
           unsafeUrl: reader.result as string,
         };
-        //  $scope.$apply();
       };
       img.src = reader.result as string;
     };
