@@ -223,10 +223,6 @@ export class BaseUser {
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
-    if (fs.existsSync(CONFIG_FILE)) {
-      // Deletes the config file.
-      fs.unlinkSync(CONFIG_FILE);
-    }
     for (const instance of BaseUser.instances) {
       if (instance.page) {
         await instance.page.screenshot({
@@ -235,7 +231,6 @@ export class BaseUser {
         showMessage(
           `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
         );
-        await instance.browserObject.close();
         i = i + 1;
       }
     }
@@ -563,6 +558,7 @@ export class BaseUser {
     ) {
       const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
       if (configData.testFailureDetected) {
+        fs.unlinkSync(CONFIG_FILE);
         // Signal all BaseUser instances to take screenshots.
         await this.captureScreenshotsForFailedTest();
       }
