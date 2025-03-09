@@ -212,10 +212,6 @@ export class BaseUser {
     let i: number = 0;
     const specName = process.env.SPEC_NAME;
     const outputDir = testConstants.TEST_SCREENSHOT_DIR;
-    const CONFIG_FILE = path.resolve(
-      __dirname,
-      '../../jest-runtime-config.json'
-    );
     const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
       /[^a-z0-9.-]/gi,
       '_'
