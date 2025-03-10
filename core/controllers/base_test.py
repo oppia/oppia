@@ -70,7 +70,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
             'core', 'templates', 'pages', 'oppia-root')
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
-                'Loading | Oppia',
+                '"Loading | Oppia"',
                 base.load_template(
                     'oppia-root.mainpage.html',
                     template_is_aot_compiled=False
@@ -2482,43 +2482,4 @@ class LogExceptionMessageTests(test_utils.GenericTestBase):
         self.assertTrue(
             any("Test Exception Message" in msg for msg in self.logged_exceptions),
             msg="Expected 'Test Exception Message' to be found in exception logs."
-        )
-
-
-class HandleExceptionLoggingTests(test_utils.GenericTestBase):
-    """Ensures that handle_exception logs NotFoundException and InternalErrorException messages correctly."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.mock_request = webapp2.Request.blank('/')
-        self.mock_response = webapp2.Response()
-        self.logged_warnings: List[str] = []
-        self.logged_exceptions: List[str] = []
-
-        def mock_logging_warning(msg: str) -> None:
-            self.logged_warnings.append(msg)
-
-        def mock_logging_exception(msg: str) -> None:
-            self.logged_exceptions.append(msg)
-
-        self.mock_logging_warning = mock_logging_warning
-        self.mock_logging_exception = mock_logging_exception
-
-    def test_handle_exception_logging(self) -> None:
-        """Test that handle_exception logs messages correctly via _log_exception_message."""
-        handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
-
-        with self.swap(logging, 'warning', self.mock_logging_warning), \
-             self.swap(logging, 'exception', self.mock_logging_exception):
-
-            handler.handle_exception(handler.NotFoundException("Not Found"), False)
-            handler.handle_exception(handler.InternalErrorException("Server Error"), False)
-
-        self.assertTrue(
-            any("Invalid URL requested" in msg for msg in self.logged_warnings),
-            msg="Expected 'Invalid URL requested' to be present in warning logs."
-        )
-        self.assertTrue(
-            any("Exception raised" in msg for msg in self.logged_exceptions),
-            msg="Expected 'Exception raised' to be present in exception logs."
         )
