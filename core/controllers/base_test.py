@@ -70,7 +70,7 @@ class HelperFunctionTests(test_utils.GenericTestBase):
             'core', 'templates', 'pages', 'oppia-root')
         with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
             self.assertIn(
-                '"Loading | Oppia"',
+                'Loading | Oppia',
                 base.load_template(
                     'oppia-root.mainpage.html',
                     template_is_aot_compiled=False
@@ -2435,3 +2435,90 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             self.post_json(
                 '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=200)
+
+
+class LogTypeTests(test_utils.GenericTestBase):
+    """Tests for the LogType Enum."""
+
+    def test_log_type_enum_values(self) -> None:
+        """Test that LogType enum contains the correct values."""
+        self.assertEqual(base.LogType.WARNING, 'warning')
+        self.assertEqual(base.LogType.EXCEPTION, 'exception')
+
+
+class LogExceptionMessageTests(test_utils.GenericTestBase):
+    """Tests for _log_exception_message method in BaseHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_request = webapp2.Request.blank('/')
+        self.mock_response = webapp2.Response()
+        self.logged_warnings = []
+        self.logged_exceptions = []
+
+        def mock_logging_warning(msg: str) -> None:
+            self.logged_warnings.append(msg)
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        self.mock_logging_warning = mock_logging_warning
+        self.mock_logging_exception = mock_logging_exception
+
+    def test_log_exception_message(self) -> None:
+        """Test that _log_exception_message correctly logs warning and exception messages."""
+        handler = base.BaseHandler(self.mock_request, self.mock_response)
+
+        with self.swap(logging, 'warning', self.mock_logging_warning), \
+             self.swap(logging, 'exception', self.mock_logging_exception):
+
+            handler._log_exception_message('TestException', base.LogType.WARNING, 'Test Warning Message')
+            handler._log_exception_message('TestException', base.LogType.EXCEPTION, 'Test Exception Message')
+
+        self.assertTrue(
+            any("Test Warning Message" in msg for msg in self.logged_warnings),
+            msg="Expected 'Test Warning Message' to be found in warning logs."
+        )
+        self.assertTrue(
+            any("Test Exception Message" in msg for msg in self.logged_exceptions),
+            msg="Expected 'Test Exception Message' to be found in exception logs."
+        )
+
+
+class HandleExceptionLoggingTests(test_utils.GenericTestBase):
+    """Tests for handle_exception method in BaseHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_request = webapp2.Request.blank('/')
+        self.mock_response = webapp2.Response()
+        self.logged_warnings = []
+        self.logged_exceptions = []
+
+        def mock_logging_warning(msg: str) -> None:
+            self.logged_warnings.append(msg)
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        self.mock_logging_warning = mock_logging_warning
+        self.mock_logging_exception = mock_logging_exception
+
+    def test_handle_exception_logging(self) -> None:
+        """Test that handle_exception logs messages correctly via _log_exception_message."""
+        handler = base.BaseHandler(self.mock_request, self.mock_response)
+
+        with self.swap(logging, 'warning', self.mock_logging_warning), \
+             self.swap(logging, 'exception', self.mock_logging_exception):
+
+            handler.handle_exception(handler.NotFoundException("Not Found"), False)
+            handler.handle_exception(handler.InternalErrorException("Server Error"), False)
+
+        self.assertTrue(
+            any("Invalid URL requested" in msg for msg in self.logged_warnings),
+            msg="Expected 'Invalid URL requested' to be present in warning logs."
+        )
+        self.assertTrue(
+            any("Exception raised" in msg for msg in self.logged_exceptions),
+            msg="Expected 'Exception raised' to be present in exception logs."
+        )

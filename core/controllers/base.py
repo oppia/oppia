@@ -66,9 +66,10 @@ class LogType(str, enum.Enum):
     """Enum for logging types.
     """
 
+    # Represents the warning logging level.
     WARNING = 'warning'
+    # Represents the exception logging level.
     EXCEPTION = 'exception'
-    ERROR = 'error'
 
 
 class ResponseValueDict(TypedDict):
@@ -779,7 +780,7 @@ class BaseHandler(
 
         Args:
             exception_type: str. Name of the exception.
-            log_type: str. Log level ('warning', 'exception').
+            log_type: LogType. Log level ('warning', 'exception').
             error_message: str. Detailed error message.
         """
 
@@ -788,7 +789,7 @@ class BaseHandler(
         url = self.request.uri
 
         msg = (
-            'Type Exception: %s\n'
+            '\n\nType Exception: %s\n'
             'Error Message: %s\n'
             'URL requested: %s\n'
             'Request method: %s\n'
@@ -804,7 +805,7 @@ class BaseHandler(
 
         if log_type == LogType.WARNING:
             logging.warning(msg)
-        elif log_type == LogType.EXCEPTION:
+        else:
             logging.exception(msg)
 
     def handle_exception(
