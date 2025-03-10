@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 
 @Component({
@@ -45,10 +44,3 @@ export class CompletionGraphComponent implements OnInit {
     };
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaCompletionGraph',
-  downgradeComponent({
-    component: CompletionGraphComponent,
-  }) as angular.IDirectiveFactory
-);

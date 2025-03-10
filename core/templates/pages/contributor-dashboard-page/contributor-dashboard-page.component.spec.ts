@@ -247,7 +247,7 @@ describe('Contributor dashboard page', () => {
     });
 
     it(
-      'should initialize $scope properties after controller is initialized' +
+      'should initialize component properties after component is initialized' +
         ' and get data from backend',
       () => {
         spyOn(

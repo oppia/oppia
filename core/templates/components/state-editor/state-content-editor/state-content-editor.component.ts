@@ -24,7 +24,6 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
@@ -150,10 +149,3 @@ export class StateContentEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateContentEditor',
-  downgradeComponent({
-    component: StateContentEditorComponent,
-  }) as angular.IDirectiveFactory
-);

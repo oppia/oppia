@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {FractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
@@ -448,10 +447,3 @@ export class FractionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FractionInputValidationService',
-    downgradeInjectable(FractionInputValidationService)
-  );

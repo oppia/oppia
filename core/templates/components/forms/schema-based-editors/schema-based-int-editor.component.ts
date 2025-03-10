@@ -32,7 +32,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {validate} from 'components/forms/validators/schema-validators';
@@ -117,10 +116,3 @@ export class SchemaBasedIntEditorComponent
     this.onChange(val);
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedIntEditor',
-  downgradeComponent({
-    component: SchemaBasedIntEditorComponent,
-  }) as angular.IDirectiveFactory
-);
