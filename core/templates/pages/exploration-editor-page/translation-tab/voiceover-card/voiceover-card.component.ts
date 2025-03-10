@@ -387,9 +387,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.manualVoiceover = voiceoverTypeToVoiceovers.manual;
-    this.manualVoiceoverTotalDuration = Math.round(
-      (this.manualVoiceover as Voiceover).durationSecs
-    );
+    if (this.manualVoiceover) {
+      this.manualVoiceoverTotalDuration = Math.round(
+        (this.manualVoiceover as Voiceover).durationSecs
+      );
+    }
   }
 
   setActiveContentAutomaticVoiceover(): void {
@@ -416,9 +418,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.automaticVoiceover = voiceoverTypeToVoiceovers.auto;
-    this.automaticVoiceoverTotalDuration = Math.round(
-      (this.automaticVoiceover as Voiceover).durationSecs
-    );
+    if (this.automaticVoiceover) {
+      this.automaticVoiceoverTotalDuration = Math.round(
+        (this.automaticVoiceover as Voiceover).durationSecs
+      );
+    }
   }
 
   updateStatusGraph(): void {

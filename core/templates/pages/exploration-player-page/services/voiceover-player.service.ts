@@ -52,7 +52,19 @@ export class VoiceoverPlayerService {
         this.entityVoiceoversService.getActiveEntityVoiceovers();
       let voiceoverTypeToVoiceovers =
         activeEntityVoiceover.voiceoversMapping[contentId];
-      this.activeVoiceover = voiceoverTypeToVoiceovers.manual;
+
+      let manualVoiceover = voiceoverTypeToVoiceovers.manual;
+      let automaticVoiceover = voiceoverTypeToVoiceovers.auto;
+
+      if (manualVoiceover && manualVoiceover.needsUpdate === false) {
+        this.activeVoiceover = manualVoiceover;
+      } else if (
+        automaticVoiceover &&
+        automaticVoiceover.needsUpdate === false
+      ) {
+        this.activeVoiceover = automaticVoiceover;
+      } else {
+      }
     } catch (e: unknown) {
       this.activeVoiceover = undefined;
     }

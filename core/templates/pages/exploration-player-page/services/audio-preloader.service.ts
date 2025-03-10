@@ -20,6 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
@@ -33,6 +34,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
   private filenamesOfAudioToBeDownloaded: string[] = [];
+  public contentIdsToVoiceovers: {[contentId: string]: Voiceover[]} = {};
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -127,11 +129,8 @@ export class AudioPreloaderService {
       if (this.isVoiceoverContributionWithAccentEnabled()) {
         let contentIds = this.getAllContentIdsFromState(stateName) as string[];
 
-        let contentIdsToVoiceovers =
-          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
-
         for (let contentId of contentIds) {
-          let voiceovers = contentIdsToVoiceovers[contentId];
+          let voiceovers = this.contentIdsToVoiceovers[contentId];
 
           if (voiceovers === undefined) {
             continue;

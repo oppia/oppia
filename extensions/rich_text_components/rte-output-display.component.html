@@ -16,6 +16,12 @@
     </ng-container>
   </p>
 </ng-template>
+<!-- <ng-template #highlight let-childNode>
+  <span>
+    <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
+    </ng-container>
+  </span>
+</ng-template> -->
 <ng-template #h1 let-childNode>
   <h1>
     <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
@@ -23,7 +29,7 @@
   </h1>
 </ng-template>
 <ng-template #span let-childNode>
-  <span>
+  <span class="highlight-block" [attr.id]="getId(childNode)">
     <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
     </ng-container>
   </span>
@@ -111,3 +117,10 @@
                               [videoIdWithValue]="attrs.videoIdWithValue" attr.video_id-with-value="{{attrs.videoIdWithValue}}">
   </oppia-noninteractive-video>
 </ng-template>
+
+<style>
+  .highlight {
+    background-color: yellow;
+    transition: background-color 0.3s ease;
+  }
+</style>

@@ -412,6 +412,8 @@ export class TutorCardComponent {
         this.displayedCard.getInteractionInstructions();
       this.contentAudioTranslations = this.displayedCard.getVoiceovers();
 
+      console.log('Updating displayed card');
+      console.log(this.displayedCard.contentId);
       this.voiceoverPlayerService.setActiveVoiceover(
         this.displayedCard.contentId
       );

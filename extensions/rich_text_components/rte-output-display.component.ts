@@ -24,11 +24,16 @@ import {
   Directive,
   ElementRef,
   Input,
+  OnInit,
   SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import {ConstantNodeDependencies} from 'mathjs';
+import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {
   OppiaRteParserService,
   OppiaRteNode,
@@ -42,7 +47,7 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
   templateUrl: './rte-output-display.component.html',
   styleUrls: [],
 })
-export class RteOutputDisplayComponent implements AfterViewInit {
+export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
   @ViewChild('p') pTagPortal: TemplateRef<unknown>;
   @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
@@ -64,20 +69,113 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  @ViewChild('treeContainer', {static: false}) treeContainer: ElementRef;
+  @ViewChild('highlight') highlightTagPortal: ElementRef;
   @Input() rteString: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
+  private highlightInterval: number = 3000; // Time interval in milliseconds
+  private highlightClass: string = 'highlight';
+  private currentHighlightIndex: number = -1;
+  audioPlaybackHighlightIntervals = [];
+  highlighIdToSentenceText = {};
+  wrapped = false;
 
   constructor(
     private _viewContainerRef: ViewContainerRef,
     private cdRef: ChangeDetectorRef,
     public elementRef: ElementRef,
-    private oppiaHtmlParserService: OppiaRteParserService
+    private oppiaHtmlParserService: OppiaRteParserService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
+    private audioPlayerService: AudioPlayerService
   ) {}
 
+  wrapSentencesInSpans(htmlString: string): string {
+    if (this.wrapped) {
+      return htmlString;
+    }
+    this.wrapped = true;
+    // Create a temporary DOM element
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+    let index = 1;
+    let highlighIdToSentenceText = {};
+
+    // Recursive function to traverse and wrap sentences
+    function traverse(node: Node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const textContent = node.textContent || '';
+        const sentences = textContent.split(/(?<=[.!?])\s+/); // Split by punctuation and space
+        const fragment = document.createDocumentFragment();
+
+        sentences.forEach(sentence => {
+          if (sentence.trim()) {
+            const wordsToHighlight = document.createElement('span');
+            let id = `highlightBlock${index}`;
+            wordsToHighlight.id = id;
+            wordsToHighlight.textContent = sentence;
+            highlighIdToSentenceText[id] = sentence;
+            fragment.appendChild(wordsToHighlight);
+            index++;
+          }
+        });
+
+        node.parentNode?.replaceChild(fragment, node);
+      } else {
+        // Recursively traverse child nodes
+        node.childNodes.forEach(traverse);
+      }
+    }
+
+    // Start traversing from the root of the temporary div
+    traverse(tempDiv);
+    this.highlighIdToSentenceText = highlighIdToSentenceText;
+
+    // Return the modified HTML string
+    return tempDiv.innerHTML;
+  }
+
+  startHighlighting(): void {
+    // Select all <p>, <h1>, <span>, etc. elements inside the treeContainer
+    const sentences = this.treeContainer.nativeElement.querySelectorAll(
+      'p, h1, span, li',
+      'ul'
+    );
+    // sentences.forEach(element => {
+    //   let subsentences = element.textContent;
+    //   let listOfSubSentences = subsentences.split(/[.?!]/)
+    // });
+
+    // this.highlightNextSentence(sentences);
+  }
+
+  highlightNextSentence(sentences: NodeListOf<HTMLElement>): void {
+    setInterval(() => {
+      // Clear previous highlights
+      this.clearHighlight(sentences);
+
+      // Move to the next sentence
+      this.currentHighlightIndex++;
+      if (this.currentHighlightIndex >= sentences.length) {
+        this.currentHighlightIndex = 0;
+      }
+
+      // Add the highlight class to the current sentence
+      sentences[this.currentHighlightIndex].classList.add(this.highlightClass);
+    }, this.highlightInterval);
+  }
+
+  clearHighlight(sentences: NodeListOf<HTMLElement>): void {
+    sentences.forEach(sentence =>
+      sentence.classList.remove(this.highlightClass)
+    );
+  }
+
   private _updateNode(): void {
+    console.log('update node');
     if (this.rteString === undefined || this.rteString === null) {
       return;
     }
@@ -96,6 +194,8 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
     this.rteString = this.rteString.replace(/\n/g, '');
+    this.rteString = this.wrapSentencesInSpans(this.rteString);
+
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
     try {
@@ -145,7 +245,111 @@ export class RteOutputDisplayComponent implements AfterViewInit {
     });
   }
 
+  ngOnInit(): void {
+    console.log('ng on init');
+    console.log(this.rteString);
+    let x = false;
+    // this.rteString = this.wrapSentencesInSpans(this.rteString);
+    console.log(this.node);
+
+    this.getSentenceAudioOffset();
+    setInterval(() => {
+      if (this.audioPlayerService.isPlaying()) {
+        let currentIdToHighlight = this.getCurrentSentenceIdToHighlight();
+        console.log(this.node);
+
+        let a = document.getElementById(currentIdToHighlight);
+        console.log(a);
+
+        const elements = document.querySelectorAll('.highlight-block');
+
+        elements.forEach(element => {
+          if (
+            element.textContent ===
+            this.highlighIdToSentenceText[currentIdToHighlight]
+          ) {
+            (element as HTMLElement).style.backgroundColor = 'yellow';
+          } else {
+            (element as HTMLElement).style.backgroundColor = '';
+          }
+        });
+      }
+
+      // if (currentIdToHighlight) {
+      //   const highlightElement = document.getElementById(currentIdToHighlight);
+      //   if (highlightElement) {
+      //     highlightElement.style.backgroundColor = 'yellow';
+      //   } else {
+      //   }
+      // }
+    }, 500);
+  }
+
+  getId(attribute) {
+    // console.log(attribute);
+    // console.log('Checking attribute!')
+    if (Object.keys(attribute).includes('id')) {
+      return attribute.id;
+    }
+    return '';
+  }
+
+  getCurrentSentenceIdToHighlight(): string {
+    let currentTimeInSecs = this.audioPlayerService.getCurrentTimeInSecs();
+    let currentSentenceId = this.audioPlaybackHighlightIntervals.find(
+      interval => {
+        if (
+          currentTimeInSecs >= interval.startTimeInSecs &&
+          currentTimeInSecs <= interval.endTimeInSecs
+        ) {
+          return interval.sentenceId;
+        }
+      }
+    );
+    return currentSentenceId.sentenceId;
+  }
+
+  getSentenceAudioOffset() {
+    let automatedVoiceoversAudioOffsetsMsecs =
+      this.entityVoiceoversService.getActiveEntityVoiceovers()
+        .automatedVoiceoversAudioOffsetsMsecs;
+
+    let contentId =
+      this.translationTabActiveContentIdService.getActiveContentId();
+
+    let audioOffsets = automatedVoiceoversAudioOffsetsMsecs[contentId];
+
+    let lastIndex = 0;
+    Object.entries(this.highlighIdToSentenceText).map(([key, text]) => {
+      const words =
+        (typeof text === 'string' ? text.match(/\w+|[^\s\w]+/g) : []) ?? [];
+      let minOffset = Number.MAX_VALUE;
+      let maxOffset = 0;
+
+      words.forEach(word => {
+        for (let i = lastIndex; i < audioOffsets.length; i++) {
+          const {token, audioOffsetMsecs} = audioOffsets[i];
+
+          if (token.toLowerCase() === word.toLowerCase()) {
+            if (audioOffsetMsecs < minOffset) minOffset = audioOffsetMsecs;
+            if (audioOffsetMsecs > maxOffset) maxOffset = audioOffsetMsecs;
+            lastIndex = i;
+            break;
+          }
+        }
+      });
+
+      this.audioPlaybackHighlightIntervals.push({
+        sentenceId: key,
+        startTimeInSecs:
+          minOffset === Number.MAX_VALUE ? 0 : Math.round(minOffset / 1000),
+        endTimeInSecs: Math.round(maxOffset / 1000),
+      });
+    });
+  }
+
   ngAfterViewInit(): void {
+    console.log('ng after view init');
     this._updateNode();
     this.show = true;
     this.cdRef.detectChanges();
@@ -176,6 +380,8 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    console.log('ng on changes');
+    console.log(this.rteString);
     if (
       changes.rteString &&
       changes.rteString.previousValue !== changes.rteString.currentValue
