@@ -2447,14 +2447,14 @@ class LogTypeTests(test_utils.GenericTestBase):
 
 
 class LogExceptionMessageTests(test_utils.GenericTestBase):
-    """Tests for _log_exception_message method in BaseHandler."""
+    """Ensures that _log_exception_message correctly logs warnings and exceptions in BaseHandler."""  
 
     def setUp(self) -> None:
         super().setUp()
         self.mock_request = webapp2.Request.blank('/')
         self.mock_response = webapp2.Response()
-        self.logged_warnings = []
-        self.logged_exceptions = []
+        self.logged_warnings: List[str] = []
+        self.logged_exceptions: List[str] = []
 
         def mock_logging_warning(msg: str) -> None:
             self.logged_warnings.append(msg)
@@ -2467,7 +2467,7 @@ class LogExceptionMessageTests(test_utils.GenericTestBase):
 
     def test_log_exception_message(self) -> None:
         """Test that _log_exception_message correctly logs warning and exception messages."""
-        handler = base.BaseHandler(self.mock_request, self.mock_response)
+        handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
 
         with self.swap(logging, 'warning', self.mock_logging_warning), \
              self.swap(logging, 'exception', self.mock_logging_exception):
@@ -2486,14 +2486,14 @@ class LogExceptionMessageTests(test_utils.GenericTestBase):
 
 
 class HandleExceptionLoggingTests(test_utils.GenericTestBase):
-    """Tests for handle_exception method in BaseHandler."""
+    """Ensures that handle_exception logs NotFoundException and InternalErrorException messages correctly."""
 
     def setUp(self) -> None:
         super().setUp()
         self.mock_request = webapp2.Request.blank('/')
         self.mock_response = webapp2.Response()
-        self.logged_warnings = []
-        self.logged_exceptions = []
+        self.logged_warnings: List[str] = []
+        self.logged_exceptions: List[str] = []
 
         def mock_logging_warning(msg: str) -> None:
             self.logged_warnings.append(msg)
@@ -2506,7 +2506,7 @@ class HandleExceptionLoggingTests(test_utils.GenericTestBase):
 
     def test_handle_exception_logging(self) -> None:
         """Test that handle_exception logs messages correctly via _log_exception_message."""
-        handler = base.BaseHandler(self.mock_request, self.mock_response)
+        handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
 
         with self.swap(logging, 'warning', self.mock_logging_warning), \
              self.swap(logging, 'exception', self.mock_logging_exception):
