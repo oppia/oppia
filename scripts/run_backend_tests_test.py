@@ -38,8 +38,6 @@ from scripts import install_third_party_libs
 from scripts import run_backend_tests
 from scripts import servers
 
-
-
 from typing import Callable, Final, List, Set, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
