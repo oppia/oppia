@@ -26,39 +26,58 @@ jobs:
               );
             };
 
-            // Core PR metadata with fallbacks
-            const prContext = context.payload.pull_request;
+            // Core PR metadata with validation
+            const prContext = context.payload.pull_request || {};
             const repositoryContext = context.repo;
             
-            const prAuthor = safeGet(prContext, 'user.login', 'unknown-user');
-            const repoOwner = safeGet(repositoryContext, 'owner', 'unknown-owner');
-            const repoName = safeGet(repositoryContext, 'repo', 'unknown-repo');
-            const prNumber = safeGet(prContext, 'number', 0);
-            const prHtmlUrl = safeGet(prContext, 'html_url', '');
+            // Validate repository context
+            const repoOwner = (repositoryContext.owner || '').replace(/[^a-zA-Z0-9-]/g, '');
+            const repoName = (repositoryContext.repo || '').replace(/[^a-zA-Z0-9-]/g, '');
+            if (!repoOwner || !repoName) {
+              throw new Error('Invalid repository context');
+            }
+
+            // Validate PR number
+            const prNumber = Number.isInteger(prContext.number) ? prContext.number : 0;
+            if (prNumber <= 0) {
+              throw new Error(`Invalid PR number: ${prNumber}`);
+            }
+
+            // Sanitize PR author
+            const prAuthor = safeGet(prContext, 'user.login', '') || '';
+            const sanitizedAuthor = prAuthor.replace(/[^a-zA-Z0-9_-]/g, '');
 
             // ======================
             // CONTRIBUTOR CHECK
             // ======================
             const isNewContributor = await (async () => {
               try {
+                const encodedAuthor = encodeURIComponent(`user:${sanitizedAuthor}`);
                 const searchResults = await github.rest.search.issuesAndPullRequests({
-                  q: `repo:${repoOwner}/${repoName} type:pr is:merged author:${prAuthor}`
+                  q: `repo:${repoOwner}/${repoName} type:pr is:merged ${encodedAuthor}`
                 });
                 return safeGet(searchResults, 'data.total_count', 0) === 0;
               } catch (error) {
-                console.error('Contributor check failed:', error);
-                return false; // Fail safe assumption
+                console.error('Contributor check failed:', error.message);
+                return false;
               }
             })();
 
             // ======================
             // REVIEWER VALIDATION
             // ======================
+            const validateGitHubUsername = (username) => 
+              /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(username);
+
             const requestedIndividualReviewers = 
-              safeGet(prContext, 'requested_reviewers', []).map(r => r?.login).filter(Boolean);
-              
+              (safeGet(prContext, 'requested_reviewers', []) || [])
+                .map(r => r?.login)
+                .filter(username => validateGitHubUsername(username));
+
             const requestedTeamReviewers = 
-              safeGet(prContext, 'requested_teams', []).map(t => t?.slug).filter(Boolean);
+              (safeGet(prContext, 'requested_teams', []) || [])
+                .map(t => t?.slug)
+                .filter(slug => /^[a-z\d](?:-?[a-z\d])+$/.test(slug));
 
             const hasIndividualReviewers = requestedIndividualReviewers.length > 0;
             const hasTeamReviewers = requestedTeamReviewers.length > 0;
@@ -67,62 +86,73 @@ jobs:
             // REVIEWER ASSIGNMENT
             // ======================
             if (hasIndividualReviewers) {
-              try {
-                await github.rest.issues.addAssignees({
-                  owner: repoOwner,
-                  repo: repoName,
-                  issue_number: prNumber,
-                  assignees: requestedIndividualReviewers
-                });
-                console.log(`Assigned reviewers: ${requestedIndividualReviewers.join(', ')}`);
+              // No need for try-catch here as the error will be logged automatically
+              // and the job will fail appropriately
+              // Validate at least one valid reviewer exists
+              const validReviewers = requestedIndividualReviewers
+                .filter(username => validateGitHubUsername(username));
 
-                // Add assignment confirmation message
-                const assignmentMessage = `Assigning @${requestedIndividualReviewers[0]} for the first pass review of this PR. Thanks!`;
-                await github.rest.issues.createComment({
-                  owner: repoOwner,
-                  repo: repoName,
-                  issue_number: prNumber,
-                  body: assignmentMessage
-                });
-              } catch (error) {
-                console.error('Failed to assign reviewers:', error);
+              if (validReviewers.length === 0) {
+                throw new Error('No valid reviewers found');
               }
+
+              await github.rest.issues.addAssignees({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                assignees: validReviewers
+              });
+
+              // Create comment with sanitized content
+              const firstReviewer = validReviewers[0];
+              const assignmentMessage = `Assigning @${firstReviewer} for the first pass review of this PR. Thanks!`;
+              
+              await github.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: assignmentMessage
+              });
             }
 
             // ======================
             // NOTIFICATION SYSTEM
             // ======================
             if (!hasIndividualReviewers && !hasTeamReviewers) {
-              const notificationMessage = `@oppia/dev-workflow-reviewers, could you please review this PR? No individual reviewers or teams were assigned. Thank you!`;
+              const notificationMessage = `@oppia/dev-workflow-reviewers, could you please review this PR? No valid reviewers were assigned. Thank you!`;
 
-              try {
-                await github.rest.issues.createComment({
-                  owner: repoOwner,
-                  repo: repoName,
-                  issue_number: prNumber,
-                  body: notificationMessage
-                });
-              } catch (error) {
-                console.error('Failed to create notification comment:', error);
-              }
+              await github.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: notificationMessage
+              });
             }
 
             // ======================
             // NEW CONTRIBUTOR GUIDANCE
             // ======================
-            if (isNewContributor) {
-              const guidanceMessage = `Hello @${prAuthor}! Thank you for making a PR. 
+            if (isNewContributor && sanitizedAuthor) {
+              const guidanceMessage = `Hello @${sanitizedAuthor}! Thank you for making a PR.
               Please ensure your PR is assigned to the correct reviewers -- check the "Assignees" section in the sidebar on the right. Typically, this should match the "Reviewers" section.
               If it's not correct, you can leave a comment with the syntax \`@reviewer_username PTAL\` to request that a specific reviewer be assigned.`;
 
-              try {
-                await github.rest.issues.createComment({
-                  owner: repoOwner,
-                  repo: repoName,
-                  issue_number: prNumber,
-                  body: guidanceMessage
-                });
-              } catch (error) {
-                console.error('Failed to create guidance comment:', error);
-              }
+              await github.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: guidanceMessage
+              });
             }
+
+  report-failure:
+    needs: manage_reviewers
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.manage_reviewers.result == 'failure' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send notification
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Failed to Handle Reviewers and Notifications"
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
