@@ -249,7 +249,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         test_cmd = 'python -m scripts.run_backend_tests'
         task1 = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11'])
         task1.exception = subprocess.CalledProcessError(
             returncode=1, cmd=test_cmd
         )
@@ -272,7 +273,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception('No tests were run.')
         task1.finished = True
@@ -295,7 +297,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception(
             'Test suite failed: 6 tests run, 0 errors, '
@@ -321,7 +324,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception('Some internal error.')
         task1.finished = True
@@ -348,7 +352,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task.finished = False
         task_output = ['Ran 9 tests in 1.244s', '98']
@@ -373,7 +378,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.finished = True
         task1_output = ['Ran 9 tests in 1.234s', '100']
@@ -382,7 +388,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         task1.task_results.append(task1_result)
 
         task2 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task2.finished = True
         task2_output = ['Ran 9 tests in 2.542s', '100']
@@ -457,7 +464,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             from scripts import run_backend_tests
 
         task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task.finished = True
         task_output = ['XYZ', '100']
