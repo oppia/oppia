@@ -939,7 +939,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Task result', results[0].messages)
         self.assertEqual(len(results[0].messages), 1)
 
-    def test_run_backend_tests_with_skip_install_flag_skips_third_party_installation(self) -> None:
+    def test_skip_install_with_third_party_installation_skipped(self) -> None:
         with unittest.mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
@@ -954,7 +954,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     with swap_coverage, self.swap_execute_task:
                         run_backend_tests.main(args=['--skip-install'])
             mock_third_party_install.assert_not_called()
-    def test_run_backend_tests_without_skip_install_flag_installs_third_party_libs(self) -> None:
+
+    def test_third_party_install_with_skip_flag_not_set(self) -> None:
         with unittest.mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
