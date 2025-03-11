@@ -1,8 +1,5 @@
 name: Check Inactive Issues
 on:
-  push: 
-    branches:
-      - issue#21294
   schedule:
     # Each midnight.
     - cron: '0 0 * * *'
