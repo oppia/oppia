@@ -30,6 +30,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 from core.domain import subtopic_page_domain
+from core.domain import skill_fetchers
 
 from typing import Dict, List, Literal, Optional, TypedDict
 
@@ -1562,6 +1563,12 @@ class Topic:
                         'linked.' % subtopic.title)
 
         all_skill_ids = self.get_all_skill_ids()
+        for skill_id in all_skill_ids:
+            skill = skill_fetchers.get_skill_by_id(skill_id)
+            if(skill.superseding_skill_id != None):
+                raise utils.ValidationError(
+                'The skill %s has a superseding skill %s' %
+                skill_id, skill.superseding_skill_id)
         skill_ids_for_diagnostic_that_are_not_in_topic = (
             set(self.skill_ids_for_diagnostic_test) -
             set(all_skill_ids))
