@@ -52,7 +52,6 @@ export interface TopicBackendDict {
 }
 
 import {AppConstants} from 'app.constants';
-
 export class Topic {
   _id: string;
   _name: string;

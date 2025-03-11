@@ -32,6 +32,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',
@@ -58,6 +59,7 @@ export class TopicEditorNavbarComponent
   totalWarningsCount: number;
 
   constructor(
+    private skillBackendApiService: SkillBackendApiService,
     private topicEditorStateService: TopicEditorStateService,
     private ngbModal: NgbModal,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
@@ -91,6 +93,38 @@ export class TopicEditorNavbarComponent
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );
+    this.checkSupersedingSkills().then(supersedingIssues => {
+      this.validationIssues = this.validationIssues.concat(supersedingIssues);
+    });
+  }
+
+  async checkSupersedingSkills(): Promise<string[]> {
+    let skillIDsToBeChecked = this.topic.getSkillIds();
+    const promises = skillIDsToBeChecked.map(async skillId => {
+      return this.skillBackendApiService
+        .fetchSkillAsync(skillId)
+        .then(skillData => {
+          const supersedingSkillId = skillData.skill.getSupersedingSkillId();
+          if (supersedingSkillId !== null && supersedingSkillId !== undefined) {
+            return (
+              'The skill with id ' +
+              skillId +
+              ' has superseding skill ' +
+              supersedingSkillId
+            );
+          }
+          return null;
+        })
+        .catch(error => {
+          return (
+            'Error fetching skill with id ' + skillId + ': ' + error.message
+          );
+        });
+    });
+
+    return Promise.all(promises).then(results => {
+      return results.filter(result => result !== null);
+    });
   }
 
   publishTopic(): void {

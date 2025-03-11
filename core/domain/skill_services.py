@@ -594,6 +594,63 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
                 'Removed skill with id %s and name %s from the topic' % (
                     skill_id, skill_name))
 
+def remove_prerequisite_skill_id_from_all_skills(skill_id: str) -> None:
+    """Removes the given skill ID from all skills' prerequisite lists.
+    
+    Args:
+        skill_id (str): The ID of the prerequisite skill to be removed.
+    """
+
+    skills_with_prerequisite_skill_id = skill_models.SkillModel.get_by_prerequisite_skill_id(skill_id)
+
+    updated_skills = []
+
+    for skill in skills_with_prerequisite_skill_id:
+        skill.prerequisite_skill_ids = [
+            prerequisite_skill_id for prerequisite_skill_id in skill.prerequisite_skill_ids
+            if prerequisite_skill_id != skill_id
+        ]
+
+        updated_skills.append(skill)
+
+    if updated_skills:
+        skill_models.SkillModel.update_timestamps_multi(updated_skills)
+        skill_models.SkillModel.put_multi(updated_skills)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL,
+            None,
+            [skill.id for skill in updated_skills]
+        )
+
+def replace_prerequisite_skill_id_from_all_skills(
+    old_skill_id: str, new_skill_id: str
+) -> None:
+    """Replaces the old skill ID with the new one in all the associated skills' prerequisites.
+    
+    Args:
+        old_skill_id (str): The ID of the skill to be replaced.
+        new_skill_id (str): The ID of the skill that replaces the old skill.
+    """
+    skills_with_old_prerequisite_skill_id = skill_models.SkillModel.get_by_prerequisite_skill_id(old_skill_id)
+    updated_skills = []
+
+    for skill in skills_with_old_prerequisite_skill_id:
+        skill.prerequisite_skill_ids = [
+            prerequisite_skill_id for prerequisite_skill_id in skill.prerequisite_skill_ids
+            if prerequisite_skill_id != old_skill_id
+        ]
+        if new_skill_id not in skill.prerequisite_skill_ids:
+            skill.prerequisite_skill_ids.append(new_skill_id)
+        updated_skills.append(skill)
+
+    if updated_skills:
+        skill_models.SkillModel.update_timestamps_multi(updated_skills)
+        skill_models.SkillModel.put_multi(updated_skills)
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_SKILL,
+            None,
+            [skill.id for skill in updated_skills]
+        )
 
 @overload
 def get_skill_summary_by_id(
@@ -1117,6 +1174,7 @@ def delete_skill(
             still retained in the datastore. This last option is the preferred
             one.
     """
+    remove_prerequisite_skill_id_from_all_skills(skill_id)
     skill_models.SkillModel.delete_multi(
         [skill_id], committer_id, '', force_deletion=force_deletion)
 

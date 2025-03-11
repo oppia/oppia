@@ -33,6 +33,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Component, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 
 @Component({
   selector: 'oppia-skill-prerequisite-skills-editor',
@@ -54,6 +55,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
   windowIsNarrow!: boolean;
 
   constructor(
+    private skillBackendApiService: SkillBackendApiService,
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,
     private alertsService: AlertsService,
@@ -79,54 +81,111 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
     );
     const allowSkillsFromOtherTopics = true;
 
-    const modalRef: NgbModalRef = this.ngbModal.open(
-      SelectSkillModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'skill-select-modal',
-        size: 'xl',
+    const allSkillIds = new Set<string>();
+
+    sortedSkillSummaries.forEach(summary => allSkillIds.add(summary.id));
+
+    for (let topic in this.categorizedSkills) {
+      for (let subtopic in this.categorizedSkills[topic]) {
+        this.categorizedSkills[topic][subtopic].forEach(skill =>
+          allSkillIds.add(skill.id)
+        );
       }
+    }
+
+    this.untriagedSkillSummaries.forEach(summary =>
+      allSkillIds.add(summary.id)
     );
 
-    modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-    modalRef.componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
-    modalRef.componentInstance.categorizedSkills = this.categorizedSkills;
-    modalRef.componentInstance.allowSkillsFromOtherTopics =
-      allowSkillsFromOtherTopics;
-    modalRef.componentInstance.untriagedSkillSummaries =
-      this.untriagedSkillSummaries;
+    const uniqueSkillIds = Array.from(allSkillIds);
 
-    const whenResolved = (summary: SkillSummary): void => {
-      let skillId = summary.id;
-      if (skillId === this.skill.getId()) {
-        this.alertsService.addInfoMessage(
-          'A skill cannot be a prerequisite of itself',
-          5000
-        );
-        return;
+    Promise.all(
+      uniqueSkillIds.map(skillId =>
+        this.skillBackendApiService.fetchSkillAsync(skillId)
+      )
+    ).then(skills => {
+      const skillSupersededMap = {};
+      skills.forEach(skill => {
+        skillSupersededMap[skill.skill.getId()] =
+          skill.skill.getSupersedingSkillId() !== null;
+      });
+
+      const filteredSortedSkillSummaries = sortedSkillSummaries.filter(
+        summary => !skillSupersededMap[summary.id]
+      );
+
+      const filteredSkillsInSameTopicCount = Math.min(
+        this.groupedSkillSummaries.current.filter(
+          summary => !skillSupersededMap[summary.id]
+        ).length,
+        skillsInSameTopicCount
+      );
+
+      const filteredCategorizedSkills = {};
+      for (let topic in this.categorizedSkills) {
+        filteredCategorizedSkills[topic] = {};
+        for (let subtopic in this.categorizedSkills[topic]) {
+          filteredCategorizedSkills[topic][subtopic] = this.categorizedSkills[
+            topic
+          ][subtopic].filter(skill => !skillSupersededMap[skill.id]);
+        }
       }
-      for (let idx in this.skill.getPrerequisiteSkillIds()) {
-        if (this.skill.getPrerequisiteSkillIds()[idx] === skillId) {
+
+      const filteredUntriagedSkillSummaries =
+        this.untriagedSkillSummaries.filter(
+          summary => !skillSupersededMap[summary.id]
+        );
+
+      const modalRef: NgbModalRef = this.ngbModal.open(
+        SelectSkillModalComponent,
+        {
+          backdrop: 'static',
+          windowClass: 'skill-select-modal',
+          size: 'xl',
+        }
+      );
+
+      modalRef.componentInstance.skillSummaries = filteredSortedSkillSummaries;
+      modalRef.componentInstance.skillsInSameTopicCount =
+        filteredSkillsInSameTopicCount;
+      modalRef.componentInstance.categorizedSkills = filteredCategorizedSkills;
+      modalRef.componentInstance.allowSkillsFromOtherTopics =
+        allowSkillsFromOtherTopics;
+      modalRef.componentInstance.untriagedSkillSummaries =
+        filteredUntriagedSkillSummaries;
+
+      const whenResolved = (summary: SkillSummary): void => {
+        let skillId = summary.id;
+        if (skillId === this.skill.getId()) {
           this.alertsService.addInfoMessage(
-            'Given skill is already a prerequisite skill',
+            'A skill cannot be a prerequisite of itself',
             5000
           );
           return;
         }
-      }
-      this.skillUpdateService.addPrerequisiteSkill(this.skill, skillId);
-    };
+        for (let idx in this.skill.getPrerequisiteSkillIds()) {
+          if (this.skill.getPrerequisiteSkillIds()[idx] === skillId) {
+            this.alertsService.addInfoMessage(
+              'Given skill is already a prerequisite skill',
+              5000
+            );
+            return;
+          }
+        }
+        this.skillUpdateService.addPrerequisiteSkill(this.skill, skillId);
+      };
 
-    modalRef.result.then(
-      function (summary) {
-        whenResolved(summary);
-      },
-      function () {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      }
-    );
+      modalRef.result.then(
+        function (summary) {
+          whenResolved(summary);
+        },
+        function () {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
+    });
   }
 
   togglePrerequisiteSkills(): void {
