@@ -34,7 +34,7 @@ export interface ClassroomDataBackendDict {
   teaser_text: string;
   topic_list_intro: string;
   is_published: boolean;
-  is_diagnostic_test_enabled: boolean;
+  diagnostic_test_is_enabled: boolean;
   thumbnail_data: ImageData;
   banner_data: ImageData;
   public_classrooms_count: number;
@@ -73,7 +73,7 @@ export interface ClassroomBackendDict {
     [topicId: string]: string[];
   };
   is_published: boolean;
-  is_diagnostic_test_enabled: boolean;
+  diagnostic_test_is_enabled: boolean;
   thumbnail_data: ImageData;
   banner_data: ImageData;
 }
@@ -89,7 +89,7 @@ export interface ClassroomDict {
     [topicId: string]: string[];
   };
   isPublished: boolean;
-  isDiagnosticTestEnabled: boolean;
+  diagnosticTestIsEnabled: boolean;
   thumbnailData: ImageData;
   bannerData: ImageData;
 }
@@ -173,7 +173,7 @@ export class ClassroomBackendApiService {
             response.topic_list_intro,
             response.teaser_text,
             response.is_published,
-            response.is_diagnostic_test_enabled,
+            response.diagnostic_test_is_enabled,
             response.thumbnail_data,
             response.banner_data,
             response.public_classrooms_count
@@ -245,8 +245,8 @@ export class ClassroomBackendApiService {
                 topicIdToPrerequisiteTopicIds:
                   response.classroom_dict.topic_id_to_prerequisite_topic_ids,
                 isPublished: response.classroom_dict.is_published,
-                isDiagnosticTestEnabled:
-                  response.classroom_dict.is_diagnostic_test_enabled,
+                diagnosticTestIsEnabled:
+                  response.classroom_dict.diagnostic_test_is_enabled,
                 thumbnailData: response.classroom_dict.thumbnail_data,
                 bannerData: response.classroom_dict.banner_data,
               },
@@ -284,8 +284,8 @@ export class ClassroomBackendApiService {
               classroomDict.topic_id_to_prerequisite_topic_ids,
             teaser_text: classroomDict.teaser_text,
             is_published: classroomDict.is_published,
-            is_diagnostic_test_enabled:
-              classroomDict.is_diagnostic_test_enabled,
+            diagnostic_test_is_enabled:
+              classroomDict.diagnostic_test_is_enabled,
             thumbnail_data: {
               filename: classroomDict.thumbnail_data.filename,
               bg_color: classroomDict.thumbnail_data.bg_color,
