@@ -633,6 +633,16 @@ export class SuperAdmin extends BaseUser {
   }
 
   /**
+   * Generates N dummy blog posts.
+   */
+  async generateDummyBlogPosts(numBlogs: number): Promise<void> {
+    await this.navigateToAdminPageActivitiesTab();
+    for(let i = 0; i < numBlogs; i++) {
+      await this.clickOn(generateBlogPostButton);
+    }
+  }
+
+  /**
    * Checks if the blog post is present.
    * @param {string} expectedBlog - the title of the expected blog post.
    */

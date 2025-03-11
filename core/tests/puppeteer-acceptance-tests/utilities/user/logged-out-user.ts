@@ -539,6 +539,113 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the blog page
+   */
+  async navigateToBlogPage(): Promise<void> {
+    await this.goto(blogUrl);
+  }
+
+  /**
+   * Function to verify that the each blog post has a tag
+   * associated with it
+   */
+  async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
+    const allPostsHaveTags = await this.page.$$eval(
+      '.e2e-test-blog-tag-container',
+      posts =>
+        posts.every(
+          post => post.querySelector('.e2e-test-blog-post-tag') !== null
+        )
+    );
+    if (!allPostsHaveTags) {
+      throw new Error('Not all blog posts have tags');
+    }
+  }
+
+  /**
+   * Function to filter blog posts by a keyword
+   */
+  async filterBlogPostsByKeyword(keyword: string): Promise<void> {
+    await this.type('.e2e-test-search-input', keyword);
+    await this.clickAndWaitForNavigation('.e2e-test-search-submit-btn');
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the keyword
+   */
+  async expectBlogSearchResultsToContain(text: string): Promise<void> {
+    const contentFound = await this.page.$$eval(
+      '.e2e-test-blog-post-page-title-container, .e2e-test-blog-post-content',
+      (elements, searchText) =>
+        elements.some(el =>
+          el.textContent
+            ?.toLowerCase()
+            .includes((searchText as string).toLowerCase())
+        ),
+      text
+    );
+
+    if (!contentFound) {
+      throw new Error(`No results found containing "${text}"`);
+    }
+  }
+
+  /**
+   * Function to filter blog posts by a tag
+   */
+  async filterBlogPostsByTag(tagName: string): Promise<void> {
+    await this.clickOn('.e2e-test-tag-filter-component');
+    await this.clickOn(`.e2e-test-select-${tagName}`);
+    await this.page.waitForSelector('.e2e-test-tag-filter-selection-dropdown', {
+      hidden: true,
+    });
+    await this.clickAndWaitForNavigation('.e2e-test-search-submit-btn');
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the tag
+   */
+  async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
+    const tagFound = await this.page.$$eval(
+      '.e2e-test-blog-post-tag',
+      (elements, expectedTag) =>
+        elements.some(el => el.textContent?.trim() === expectedTag),
+      tagName
+    );
+
+    if (!tagFound) {
+      throw new Error(`No results found with tag "${tagName}"`);
+    }
+  }
+
+  /**
+   * Function to check whether the pagination controls are visible
+   */
+  async expectBlogPaginationControlsVisible(): Promise<void> {
+    try {
+      await this.page.waitForSelector('.e2e-test-pagination', {
+        visible: true,
+      });
+    } catch (error) {
+      throw new Error('Pagination controls not visible');
+    }
+  }
+
+  /**
+   * Function to click the next button in the pagination controls
+   */
+  async clickNextBlogPage(): Promise<void> {
+    await this.clickOn('.e2e-test-pagination-next-button');
+  }
+
+  /**
+   * Function to click the previous button in the pagination controls
+   */
+  async clickPreviousBlogPage(): Promise<void> {
+    await this.clickOn('.e2e-test-pagination-prev-button');
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   private async clickButtonToNavigateToNewPage(
