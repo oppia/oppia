@@ -294,7 +294,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       responseData => {
         this.completedExplorationsList = responseData.completedExplorationsList;
         this.incompleteExplorationsList =
-          responseData.incompleteExplorationsList;
+          responseData.incompleteExplorationsList || [];
         this.subscriptionsList = responseData.subscriptionList;
         this.explorationPlaylist = responseData.explorationPlaylist;
       },
