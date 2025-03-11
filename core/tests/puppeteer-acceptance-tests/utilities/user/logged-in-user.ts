@@ -35,6 +35,8 @@ const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
+const ContributorDashboardUrl = testConstants.URLs.ContributorDashboard;
+const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -126,6 +128,11 @@ const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
+const profileMenuLink = '.e2e-test-profile-link';
+const preferencesMenuLink = '.e2e-test-preferences-link';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1369,6 +1376,74 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToSiteAdminPage(): Promise<void> {
     await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(creatorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(creatorDashboardMenuLink);
+
+    await this.expectToBeOnPage(CreatorDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(contributorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(contributorDashboardMenuLink);
+
+    await this.expectToBeOnPage(ContributorDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(preferencesMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(preferencesMenuLink);
+
+    await this.expectToBeOnPage(PreferencesPageUrl);
+  }
+
+  /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToProfilePageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(profileMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(profileMenuLink);
+
+    await this.expectToBeOnPage(profilePageUrlPrefix);
   }
 }
 

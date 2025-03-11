@@ -219,6 +219,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
+    'logged-in-user/access-dashboards-from-profile-menu',
     'logged-in-user/create-and-delete-account',
     'logged-in-user/save-an-exploration-to-play-later',
     'logged-in-user/restart-or-continue-exploration-on-revisit',
