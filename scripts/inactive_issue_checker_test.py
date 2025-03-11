@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import os
 import unittest
 from unittest import mock
 
@@ -597,7 +598,7 @@ class TestGitHubService(unittest.TestCase):
         self.service.add_alert_comment_on_issue(issue)
 
         expected_comment = (
-            f'Hi @{issue.assignee_username} this PR is inactive '
+            f'Hi @user1 this PR is inactive '
             f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
             f'unassigned soon if no activity is done.\n\n '
             f'If you are still working on this PR, '
@@ -762,5 +763,84 @@ class TestIssueManager(unittest.TestCase):
         self.github_service.post_unassignment_comment.assert_not_called()
 
 
-if __name__ == '__main__':
-    unittest.main()
+class TestMainFunction(unittest.TestCase):
+    """Test main() function."""
+
+    def setUp(self) -> None:
+        """Set up tests."""
+        self.env_var = mock.patch.dict(os.environ, {
+            'GITHUB_TOKEN': 'fake-token',
+            'DEASSIGN_INACTIVE_CONTRIBUTORS': 'true'
+        })
+        self.env_var.start()
+
+        self.github_service_mock = mock.Mock()
+        self.github_service_patch = mock.patch(
+            'scripts.inactive_issue_checker.GitHubService',
+            return_value=self.github_service_mock
+        )
+        self.github_service_class_mock = self.github_service_patch.start()
+
+        self.issue_manager = mock.Mock()
+        self.issue_manager_patch = mock.patch(
+            'scripts.inactive_issue_checker.IssueManager',
+            return_value=self.issue_manager
+        )
+        self.issue_manager_class_mock = self.issue_manager_patch.start()
+
+    def tearDown(self) -> None:
+        """Clean up after tests."""
+        self.env_var.stop()
+        self.github_service_patch.stop()
+        self.issue_manager_patch.stop()
+
+    def test_main_with_inactive_issues_and_deassign_enabled(self) -> None:
+        """Test main function with inactive issues and deassignment enabled."""
+        issue1 = checker.Issue(1, 'user1', 'url1')
+        issue2 = checker.Issue(2, 'user2', 'url2')
+        self.issue_manager.get_inactive_issues.return_value = [issue1, issue2]
+
+        checker.main()
+        self.github_service_class_mock.assert_called_once_with(
+            'fake-token', checker.REPO_OWNER, checker.REPO_NAME
+        )
+        self.issue_manager_class_mock.assert_called_once_with(
+            self.github_service_mock
+        )
+        self.issue_manager.get_inactive_issues.assert_called_once()
+        self.issue_manager.unassign_issues.assert_called_once_with(
+            [issue1, issue2]
+        )
+
+    def test_main_with_inactive_issues_and_deassign_disabled(self) -> None:
+        """Test main function with inactive issues but deassignment disabled."""
+        os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS'] = 'false'
+        issue1 = checker.Issue(1, 'user1', 'url1')
+        issue2 = checker.Issue(2, 'user2', 'url2')
+        self.issue_manager.get_inactive_issues.return_value = [
+            issue1, issue2
+        ]
+
+        checker.main()
+        self.issue_manager.get_inactive_issues.assert_called_once()
+        self.issue_manager.unassign_issues.assert_not_called()
+
+    def test_main_with_no_inactive_issues(self) -> None:
+        """Test main function when no inactive issues are found."""
+        self.issue_manager.get_inactive_issues.return_value = []
+        checker.main()
+
+        self.issue_manager.get_inactive_issues.assert_called_once()
+        self.issue_manager.unassign_issues.assert_not_called()
+
+    def test_main_handles_multiple_inactive_issues(self) -> None:
+        """Test main function properly handles multiple inactive issues."""
+        issues = [
+            checker.Issue(i, f'user{i}', f'url{i}')
+            for i in range(1, 6)
+        ]
+        self.issue_manager.get_inactive_issues.return_value = issues
+        checker.main()
+
+        self.issue_manager.unassign_issues.assert_called_once_with(issues)
+        self.assertEqual(len(issues), 5)
