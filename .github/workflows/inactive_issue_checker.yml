@@ -24,10 +24,6 @@ jobs:
         
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge-develop-and-set-up-dependencies
-    - name: Add production dependencies to Python path
-      run: |
-        echo "PYTHONPATH=$PYTHONPATH:$(pwd)/third_party/python_libs" >> $GITHUB_ENV
-      shell: bash
 
     - name: Check inactive issues
       env:

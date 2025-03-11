@@ -22,6 +22,11 @@ import collections
 import datetime
 import logging
 import os
+from scripts import install_third_party_libs
+
+# This installs third party libraries before importing other files or importing
+# libraries that use the builtins python module (e.g. build, utils).
+install_third_party_libs.main()
 
 import requests
 from typing import Dict, List, Optional, Set, TypedDict
