@@ -1891,5 +1891,9 @@
     "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
     "I18N_WARNING_MODAL_TITLE": "Warning!",
     "I18N_WORKED_EXAMPLE": "Worked Example",
-    "I18N_YES": "Yes"
-}
+    "I18N_YES": "Yes",
+    "I18N_EXPLORATION_EDITOR_SAVE_CHANGES": "Save Changes",
+    "I18N_EXPLORATION_EDITOR_CANCEL_BUTTON": "Cancel",
+    "I18N_EXPLORATION_EDITOR_PUBLISH_BUTTON": "Publish"
+  }
+     
