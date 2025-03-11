@@ -10,7 +10,7 @@
                     (change)="onChange(topic.key)"
                     [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
                     [disabled]="checkedTopics.size === 5 && !checkedTopics.has(topic.key) || completedTopics.has(topic.key)">
-                   <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span> 
+        <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span>
       </mat-checkbox>
     </ng-container>
   </div>
@@ -37,11 +37,11 @@
   }
 
   .oppia-learner-dash-goals-checkbox-text {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
     white-space: normal;
     word-break: break-all;
   }
