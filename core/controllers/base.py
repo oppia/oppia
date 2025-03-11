@@ -63,8 +63,7 @@ AUTH_HANDLER_PATHS: Final = (
 
 
 class LogType(str, enum.Enum):
-    """Enum for logging types.
-    """
+    """Enum for logging types."""
 
     # Represents the warning logging level.
     WARNING = 'warning'
