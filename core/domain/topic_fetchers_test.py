@@ -675,7 +675,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results, [])
 
     def test_get_multiple_topics_by_ids_and_version_schema_versions(
-            self
+        self
     ) -> None:
         """Test fetching topics maintains correct schema versions."""
         topic_id = topic_fetchers.get_new_topic_id()

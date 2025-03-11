@@ -481,14 +481,16 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_question_skill_link_returns_correct_json(self) -> None:
+        # Create a question and link it to a skill.
         question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         skill_id = skill_services.get_new_skill_id()
         self.save_new_question(
             question_id, 'owner_id',
             self._create_valid_question_data(
-                'Test Question', content_id_generator), [skill_id],
-                content_id_generator.next_content_id_index)
+                'Test Question', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index)
         question_services.create_new_question_skill_link(
             'owner_id', question_id, skill_id, 0.1
         )
@@ -497,7 +499,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=question_skill_link&'
-                    'activities_data=[{"id": "%s"}]' % skill_id,
+                    'activities_data=[{"id": "%s"}]&question_count=100&offset=0'
+                    % skill_id,
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
@@ -510,12 +513,13 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_question_skill_link_with_version_fails(self) -> None:
-        """Test requesting question_skill_link with version parameter fails."""
+        """Test that supplying a version in activity data causes an error."""
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=question_skill_link&'
-                    'activities_data=[{"id": "skill_id", "version": 1}]',
+                    'activities_data=[{"id": "skill_id", '
+                    '"version": 1}]&question_count=100&offset=0',
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=400
                 )['error'],
@@ -523,14 +527,15 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_nonexistent_question_skill_link_returns_empty_list(
-            self
+        self
     ) -> None:
-        """Test requesting nonexistent skill returns empty question list."""
+        """Test that a nonexistent skill ID returns an empty question list."""
         with self.secrets_swap:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=question_skill_link&'
-                    'activities_data=[{"id": "nonexistent_skill_id"}]',
+                    'activities_data=[{"id": "nonexistent_skill_id"}]'
+                    '&question_count=100&offset=0',
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
                 ),
@@ -541,6 +546,135 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     }
                 }]
             )
+
+    def test_get_question_skill_link_multiple_skills_pagination(self) -> None:
+        """Test pagination with multiple skills returns correct question ids."""
+        # Create two skills.
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+
+        # Generate 3 questions for skill 1.
+        skill_1_question_ids = []
+        for i in range(3):
+            question_id = question_services.get_new_question_id()
+            skill_1_question_ids.append(question_id)
+            content_id_generator = translation_domain.ContentIdGenerator()
+            self.save_new_question(
+                question_id, 'owner_id',
+                self._create_valid_question_data(
+                    f'Skill 1 Question {i+1}', content_id_generator),
+                [skill_id_1],
+                content_id_generator.next_content_id_index
+            )
+            question_services.create_new_question_skill_link(
+                'owner_id', question_id, skill_id_1, 0.1)
+
+        # Generate 4 questions for skill 2.
+        skill_2_question_ids = []
+        for i in range(4):
+            question_id = question_services.get_new_question_id()
+            skill_2_question_ids.append(question_id)
+            content_id_generator = translation_domain.ContentIdGenerator()
+            self.save_new_question(
+                question_id, 'owner_id',
+                self._create_valid_question_data(
+                    f'Skill 2 Question {i+1}', content_id_generator),
+                [skill_id_2],
+                content_id_generator.next_content_id_index
+            )
+            question_services.create_new_question_skill_link(
+                'owner_id', question_id, skill_id_2, 0.1)
+
+        with self.secrets_swap:
+            # First request: offset=0, question_count=2.
+            response_1 = self.get_json(
+                f'/android_data?activity_type=question_skill_link&'
+                f'activities_data=[{{"id": "{skill_id_1}"}}, '
+                f'{{"id": "{skill_id_2}"}}]&'
+                'question_count=1&offset=0',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200
+            )
+
+            # Second request: offset=2, question_count=2.
+            response_2 = self.get_json(
+                f'/android_data?activity_type=question_skill_link&'
+                f'activities_data=[{{"id": "{skill_id_1}"}}, '
+                f'{{"id": "{skill_id_2}"}}]&'
+                'question_count=2&offset=2',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200
+            )
+
+            # Third request: offset=4, question_count=2.
+            response_3 = self.get_json(
+                f'/android_data?activity_type=question_skill_link&'
+                f'activities_data=[{{"id": "{skill_id_1}"}}, '
+                f'{{"id": "{skill_id_2}"}}]&'
+                'question_count=2&offset=4',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200
+            )
+
+            # Returns in the last updated order (skill 2, skill 1).
+            # Skill 2 has 4 questions, skill 1 has 3 questions.
+            # Question Count is the number of questions to return per skill.
+
+            # Since offset=0 and question_count=2
+            # The last two updated questions of skill 2 are returned.
+            # But an empty list is returned for skill 1.
+            # As more question are still there in last updated order of skill 2.
+            self.assertEqual(response_1, [
+                {
+                    'id': skill_id_1,
+                    'payload': {
+                        'question_ids': []
+                    }
+                },
+                {
+                    'id': skill_id_2,
+                    'payload': {
+                        'question_ids': skill_2_question_ids[2:][::-1]
+                    }
+                }
+            ])
+
+            # Since offset=2 and question_count=2
+            # The last two question for skill 2 are skipped.
+            # The first two questions of skill 2 are returned.
+            # The last 2 questions of skill 1 are returned.
+            self.assertEqual(response_2, [
+                {
+                    'id': skill_id_1,
+                    'payload': {
+                        'question_ids': skill_1_question_ids[1:][::-1]
+                    }
+                },
+                {
+                    'id': skill_id_2,
+                    'payload': {
+                        'question_ids': skill_2_question_ids[:2][::-1]
+                    }
+                }
+            ])
+
+            # Since offset=4 and question_count=2
+            # The 4 questions in skill_2 are skipped.
+            # All the questions in skill_1 are returned.
+            self.assertEqual(response_3, [
+                {
+                    'id': skill_id_1,
+                    'payload': {
+                        'question_ids': skill_1_question_ids[::-1]
+                    }
+                },
+                {
+                    'id': skill_id_2,
+                    'payload': {
+                        'question_ids': []
+                    }
+                }
+            ])
 
     def test_get_nonexistent_topic_returns_null_payload(self) -> None:
         """Test requesting nonexistent topic returns null payload."""

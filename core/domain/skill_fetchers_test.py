@@ -436,7 +436,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results, [])
 
     def test_get_multiple_skills_by_ids_and_version_schema_versions(
-            self
+        self
     ) -> None:
         """Test fetching skills maintains correct schema versions."""
         skill_id = skill_services.get_new_skill_id()

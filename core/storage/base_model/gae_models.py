@@ -1498,11 +1498,11 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_version_multi(
-        cls: Type[SELF_VERSIONED_MODEL],
-        entity_ids_and_versions: List[Tuple[str, Optional[int]]]
-    ) -> List[Optional[SELF_VERSIONED_MODEL]]:
+            cls: Type[SELF_VERSIONED_MODEL],
+            entity_ids_and_versions: List[Tuple[str, Optional[int]]]
+        ) -> List[Optional[SELF_VERSIONED_MODEL]]:
         """Gets model instances for each version specified in 
-            entity_ids_and_versions.
+        entity_ids_and_versions.
 
         Args:
             entity_ids_and_versions: list(tuple(str, int|None)). List of tuples
@@ -1531,9 +1531,7 @@ class VersionedModel(BaseModel):
 
         for idx, (entity_id, version_number) in enumerate(
             entity_ids_and_versions):
-            if entity_id not in latest_versions_by_id:
-                results[idx] = None
-            else:
+            if entity_id in latest_versions_by_id:
                 version = (
                     version_number if version_number is not None
                     else latest_versions_by_id[entity_id])
@@ -1547,10 +1545,8 @@ class VersionedModel(BaseModel):
             valid_snapshot_ids)
 
         for idx, snapshot_model in zip(valid_indices, snapshot_models):
-            entity_id, version_number = entity_ids_and_versions[idx]
-            if snapshot_model is None:
-                results[idx] = None
-            else:
+            if snapshot_model is not None:
+                entity_id, version_number = entity_ids_and_versions[idx]
                 version = (
                     version_number if version_number is not None
                     else latest_versions_by_id[entity_id])

@@ -90,7 +90,7 @@ class ActivityDataRequestDict(TypedDict):
 
     id: str
     version: Optional[int]
-    language_code: Optional[str]
+    language_code: str
 
 
 class _ActivityDataResponseDictRequiredFields(TypedDict):
@@ -121,7 +121,7 @@ class ActivityDataResponseDict(
     """Dict representation of items returned in the activities response list."""
 
     version: Optional[int]
-    language_code: str
+    language_code: Optional[str]
 
 
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
@@ -131,6 +131,8 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
 
     activity_type: str
     activities_data: List[ActivityDataRequestDict]
+    question_count: Optional[int]
+    offset: Optional[int]
 
 
 class AndroidActivityHandler(base.BaseHandler[
@@ -164,6 +166,26 @@ class AndroidActivityHandler(base.BaseHandler[
                     'type': 'custom',
                     'obj_type': 'JsonEncodedInString'
                 }
+            },
+            'question_count': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                },
+                'default_value': None
+            },
+            'offset': {
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least',
+                        'min_value': 0
+                    }]
+                },
+                'default_value': None
             }
         }
     }
@@ -178,6 +200,8 @@ class AndroidActivityHandler(base.BaseHandler[
         assert self.normalized_request is not None
         activities_data = self.normalized_request['activities_data']
         activity_type = self.normalized_request['activity_type']
+        question_count = self.normalized_request.get('question_count')
+        offset = self.normalized_request.get('offset')
         activities: List[ActivityDataResponseDict] = []
 
         hashed_activities_data = [
@@ -196,9 +220,16 @@ class AndroidActivityHandler(base.BaseHandler[
                 (activity_data['id'].split('-'), activity_data.get('version'))
                 for activity_data in activities_data]
             topic_subtopic_version_tuples = [
-                (topic_id, int(subtopic_index), subtopic_page_version)
-                for ((topic_id, subtopic_index), subtopic_page_version)
-                in split_ids_and_versions]
+                (
+                    topic_id,
+                    int(stringified_subtopic_index),
+                    subtopic_page_version
+                )
+                for (
+                    (topic_id, stringified_subtopic_index),
+                    subtopic_page_version
+                ) in split_ids_and_versions
+            ]
             subtopic_pages = (
                 subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
                     topic_subtopic_version_tuples))
@@ -218,12 +249,19 @@ class AndroidActivityHandler(base.BaseHandler[
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified for question_skill_link')
+                        'Version cannot be specified for '
+                        'question_skill_link')
+
+            if question_count is None or offset is None:
+                raise self.InvalidInputException(
+                    'Offset and question_count required '
+                    'for question_skill_link')                
+
             skill_ids = [
                 activity_data['id'] for activity_data in activities_data]
             question_ids_by_skill_id = (
                 question_fetchers.get_question_ids_by_skill_ids(
-                skill_ids, question_count=100))
+                skill_ids, question_count=question_count, offset=offset))
             for skill_id, question_ids in question_ids_by_skill_id.items():
                 activities.append({
                     'id': skill_id,
@@ -275,16 +313,14 @@ class AndroidActivityHandler(base.BaseHandler[
 
             for activity_data, translation in zip(
                 activities_data, translations):
-                lang_code = activity_data.get('language_code')
-                if lang_code is not None:
-                    activities.append({
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'language_code': lang_code,
-                        'payload': (
-                            translation.to_dict()['translations']
-                            if translation is not None else None)
-                    })
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'language_code': activity_data.get('language_code'),
+                    'payload': (
+                        translation.to_dict()['translations']
+                        if translation is not None else None)
+                })
 
         else:
             # All other activities are standard versioned models

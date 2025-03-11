@@ -463,7 +463,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results, [])
 
     def test_get_multiple_stories_by_ids_and_version_schema_versions(
-            self
+        self
     ) -> None:
         """Test fetching stories maintains correct schema versions."""
         story_id = story_services.get_new_story_id()

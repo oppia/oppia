@@ -51,7 +51,7 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     """Returns the questions linked to the given skill ids.
 
     Args:
-        question_count: int. The number of questions to return.
+        question_count: int. The number of questions to return per skill ID.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
         offset: int. Number of query results to skip.

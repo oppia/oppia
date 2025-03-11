@@ -230,6 +230,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(skill_1_id, self.admin_id)
         self.save_new_skill(skill_2_id, self.admin_id)
 
+        # For skill 1, create 3 questions.
         questions_skill_1 = []
         for i in range(3):
             question_id = question_services.get_new_question_id()
@@ -241,39 +242,53 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 ['skill_1'],
                 content_id_generator.next_content_id_index)
             questions_skill_1.append(question)
+            # Create the link between the question and skill 1.
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id, 'skill_1', 0.3)
 
+        # For skill 2, create 2 questions.
         questions_skill_2 = []
         for i in range(2):
             question_id = question_services.get_new_question_id()
             content_id_generator = translation_domain.ContentIdGenerator()
             question = self.save_new_question(
                 question_id, self.editor_id,
+                # Create a valid question with a unique title for skill 2.
                 self._create_valid_question_data(
                     f'Q{i+1} for Skill 2', content_id_generator),
                 ['skill_2'],
                 content_id_generator.next_content_id_index)
             questions_skill_2.append(question)
+            # Create the link between the question and skill 2.
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id, 'skill_2', 0.3)
 
+        # Fetch the first 2 questions for skill 1 (offset=0, question_count=2).
         result_1 = question_fetchers.get_question_ids_by_skill_ids(
             ['skill_1'], question_count=2, offset=0)
+        # Expecting 2 question IDs for skill 1.
         self.assertEqual(len(result_1['skill_1']), 2)
 
+        # Fetch the next 2 questions for skill 1 (offset=2, question_count=2).
+        # Since skill 1 has only 3 questions this should return only 1 question.
         result_2 = question_fetchers.get_question_ids_by_skill_ids(
             ['skill_1'], question_count=2, offset=2)
         self.assertEqual(len(result_2['skill_1']), 1)
 
+        # Fetch the first 2 questions for both skills simultaneously.
         result_both = question_fetchers.get_question_ids_by_skill_ids(
             ['skill_1', 'skill_2'], question_count=2, offset=0)
+        # For skill 1, expect 2 question IDs (first page).
         self.assertEqual(len(result_both['skill_1']), 2)
+        # For skill 2, since there are only 2 questions, expect 2 question IDs.
         self.assertEqual(len(result_both['skill_2']), 2)
 
+        # Fetch all questions for both skills by setting a high question_count.
         all_questions = question_fetchers.get_question_ids_by_skill_ids(
             ['skill_1', 'skill_2'], question_count=10, offset=0)
+        # Skill 1 should have all 3 questions.
         self.assertEqual(len(all_questions['skill_1']), 3)
+        # Skill 2 should have all 2 questions.
         self.assertEqual(len(all_questions['skill_2']), 2)
 
     def test_get_question_ids_by_skill_ids_nonexistent_skill(self) -> None:

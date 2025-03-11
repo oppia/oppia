@@ -32,8 +32,10 @@ from typing import Dict, List, Set, Union, cast
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -439,6 +441,8 @@ class TestVersionedModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
     COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
+    # Field to seed some content into different versions.
+    description = datastore_services.StringProperty(indexed=True)
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -949,9 +953,13 @@ class VersionedModelTests(test_utils.GenericTestBase):
             self.assertEqual(result.version, i)
 
     def test_get_version_multi_with_same_id_different_versions(self) -> None:
-        """Test fetching multiple versions of the same model."""
+        """Test fetching multiple versions of same model different content."""
         model = TestVersionedModel(id='model_id1')
+
+        model.description = 'Version 1 content'
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+
+        model.description = 'Version 2 content'
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'Second commit', [])
 
         results = TestVersionedModel.get_version_multi([
@@ -963,13 +971,19 @@ class VersionedModelTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 3)
 
         assert results[0] is not None
+        self.assertIsNotNone(results[0])
         assert results[1] is not None
+        self.assertIsNotNone(results[1])
         assert results[2] is not None
+        self.assertIsNotNone(results[2])
 
-        self.assertEqual(len(results), 3)
         self.assertEqual(results[0].version, 1)
         self.assertEqual(results[1].version, 1)
         self.assertEqual(results[2].version, 2)
+
+        self.assertEqual(results[0].description, 'Version 1 content')
+        self.assertEqual(results[1].description, 'Version 1 content')
+        self.assertEqual(results[2].description, 'Version 2 content')
 
 
 class TestBaseModel(base_models.BaseModel):

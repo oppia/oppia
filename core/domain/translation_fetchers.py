@@ -182,12 +182,12 @@ def get_multiple_entity_translations(
         to the given references. If a translation does not exist, the
         corresponding entry will be None.
     """
-    entity_translation_list = (
+    entity_translation_models = (
         translation_models.EntityTranslationsModel.get_model_multi(
             entity_references)
     )
     return [
         _get_entity_translation_from_model(entity_translation_model)
         if entity_translation_model is not None else None
-        for entity_translation_model in entity_translation_list
+        for entity_translation_model in entity_translation_models
     ]
