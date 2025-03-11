@@ -227,7 +227,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         self.assertIsNone(results[3])
 
     def test_get_multiple_entity_translations_different_entity_types(
-            self
+        self
     ) -> None:
         """Test fetching translations for different entity types."""
         exp_id = 'exp1'
@@ -287,7 +287,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
             translated_content.content_value, 'Question Translation')
 
     def test_get_multiple_entity_translations_with_invalid_version(
-            self
+        self
     ) -> None:
         """Test fetching translations with invalid version numbers."""
         exp_id = 'exp1'
@@ -314,7 +314,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         self.assertIsNone(results[0])
 
     def test_get_multiple_entity_translations_with_invalid_language(
-            self
+        self
     ) -> None:
         """Test fetching translations with invalid language codes."""
         exp_id = 'exp1'
