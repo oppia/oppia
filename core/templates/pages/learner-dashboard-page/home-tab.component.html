@@ -105,7 +105,7 @@
           </ng-container>
         </oppia-card-display>
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
-        <oppia-card-display *ngIf="partiallyLearntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
+        <oppia-card-display *ngIf="storySummariesWithAvailableNodes.size !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
           <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <lesson-card *ngIf="storySummariesWithAvailableNodes.has(storySummaryTile.getId())" [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)" [isRecommendation]="true"> </lesson-card>
