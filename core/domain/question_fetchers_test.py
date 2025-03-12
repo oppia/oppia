@@ -19,12 +19,10 @@
 from __future__ import annotations
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
-from core.domain import skill_services
 from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
@@ -223,87 +221,74 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
 
-    def test_get_question_ids_by_skill_ids_pagination(self) -> None:
-        """Test pagination for fetching question IDs by skill IDs."""
-        skill_1_id = skill_services.get_new_skill_id()
-        skill_2_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_1_id, self.admin_id)
-        self.save_new_skill(skill_2_id, self.admin_id)
+    def test_get_all_question_skill_links(self) -> None:
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        # For skill 1, create 3 questions.
-        questions_skill_1 = []
-        for i in range(3):
-            question_id = question_services.get_new_question_id()
-            content_id_generator = translation_domain.ContentIdGenerator()
-            question = self.save_new_question(
-                question_id, self.editor_id,
-                self._create_valid_question_data(
-                    f'Q{i+1} for Skill 1', content_id_generator),
-                ['skill_1'],
-                content_id_generator.next_content_id_index)
-            questions_skill_1.append(question)
-            # Create the link between the question and skill 1.
-            question_services.create_new_question_skill_link(
-                self.editor_id, question_id, 'skill_1', 0.3)
+        question_skill_links = (
+            question_fetchers.get_all_question_skill_links())
 
-        # For skill 2, create 2 questions.
-        questions_skill_2 = []
-        for i in range(2):
-            question_id = question_services.get_new_question_id()
-            content_id_generator = translation_domain.ContentIdGenerator()
-            question = self.save_new_question(
-                question_id, self.editor_id,
-                # Create a valid question with a unique title for skill 2.
-                self._create_valid_question_data(
-                    f'Q{i+1} for Skill 2', content_id_generator),
-                ['skill_2'],
-                content_id_generator.next_content_id_index)
-            questions_skill_2.append(question)
-            # Create the link between the question and skill 2.
-            question_services.create_new_question_skill_link(
-                self.editor_id, question_id, 'skill_2', 0.3)
+        self.assertEqual(len(question_skill_links), 1)
+        self.assertEqual(
+            question_skill_links,
+            {
+                'skill_1': [self.question_id]
+            }
+        )
 
-        # Fetch the first 2 questions for skill 1 (offset=0, question_count=2).
-        result_1 = question_fetchers.get_question_ids_by_skill_ids(
-            ['skill_1'], question_count=2, offset=0)
-        # Expecting 2 question IDs for skill 1.
-        self.assertEqual(len(result_1['skill_1']), 2)
+    def test_get_all_question_skill_links_pagination(self) -> None:
 
-        # Fetch the next 2 questions for skill 1 (offset=2, question_count=2).
-        # Since skill 1 has only 3 questions this should return only 1 question.
-        result_2 = question_fetchers.get_question_ids_by_skill_ids(
-            ['skill_1'], question_count=2, offset=2)
-        self.assertEqual(len(result_2['skill_1']), 1)
+        # Create two questions.
+        question_id_1 = question_services.get_new_question_id()
+        question_id_2 = question_services.get_new_question_id()
 
-        # Fetch the first 2 questions for both skills simultaneously.
-        result_both = question_fetchers.get_question_ids_by_skill_ids(
-            ['skill_1', 'skill_2'], question_count=2, offset=0)
-        # For skill 1, expect 2 question IDs (first page).
-        self.assertEqual(len(result_both['skill_1']), 2)
-        # For skill 2, since there are only 2 questions, expect 2 question IDs.
-        self.assertEqual(len(result_both['skill_2']), 2)
+        # Create two skills and link them to the questions.
+        self.save_new_question(
+            question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC', self.content_id_generator),
+            ['skill_1'],
+            self.content_id_generator.next_content_id_index)
+        self.save_new_question(
+            question_id_2, self.editor_id,
+            self._create_valid_question_data('DEF', self.content_id_generator),
+            ['skill_2'],
+            self.content_id_generator.next_content_id_index)
 
-        # Fetch all questions for both skills by setting a high question_count.
-        all_questions = question_fetchers.get_question_ids_by_skill_ids(
-            ['skill_1', 'skill_2'], question_count=10, offset=0)
-        # Skill 1 should have all 3 questions.
-        self.assertEqual(len(all_questions['skill_1']), 3)
-        # Skill 2 should have all 2 questions.
-        self.assertEqual(len(all_questions['skill_2']), 2)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_2, 'skill_2', 0.5)
 
-    def test_get_question_ids_by_skill_ids_nonexistent_skill(self) -> None:
-        """Test fetching question IDs for non-existent skill."""
-        result = question_fetchers.get_question_ids_by_skill_ids(
-            ['nonexistent_skill'], question_count=10, offset=0)
-        self.assertEqual(result, {'nonexistent_skill': []})
+        # Fetch the question-skill links with pagination.
+        # Question_skill_links are returned in the last updated order.
+        # question_count = 1, offset = 1.
+        question_skill_links = (
+            question_fetchers.get_all_question_skill_links(1, 1))
+
+        self.assertEqual(
+            question_skill_links,
+            {
+                'skill_1': [question_id_1]
+            }
+        )
+
+        question_skill_links_2 = (
+            question_fetchers.get_all_question_skill_links(0, 2))
+        self.assertEqual(len(question_skill_links_2), 2)
+        self.assertEqual(
+            question_skill_links_2,
+            {
+                'skill_1': [question_id_1],
+                'skill_2': [question_id_2]
+            }
+        )
 
     def test_get_question_ids_by_skill_ids_exceeds_limit(self) -> None:
         with self.assertRaisesRegex(
-            utils.InvalidInputException,
-            'question_count exceeds maximum allowed value of %d' %
+            ValueError,
+            'Requested question count exceeds the limit of %d' %
             constants.SKILL_QUESTION_LIMIT
         ):
-            question_fetchers.get_question_ids_by_skill_ids(
-                ['skill_1'],
+            question_fetchers.get_all_question_skill_links(
                 question_count=constants.SKILL_QUESTION_LIMIT + 1,
                 offset=0)

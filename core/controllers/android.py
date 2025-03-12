@@ -131,7 +131,6 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
 
     activity_type: str
     activities_data: List[ActivityDataRequestDict]
-    question_count: Optional[int]
     offset: Optional[int]
 
 
@@ -167,16 +166,6 @@ class AndroidActivityHandler(base.BaseHandler[
                     'obj_type': 'JsonEncodedInString'
                 }
             },
-            'question_count': {
-                'schema': {
-                    'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
-                },
-                'default_value': None
-            },
             'offset': {
                 'schema': {
                     'type': 'int',
@@ -200,7 +189,6 @@ class AndroidActivityHandler(base.BaseHandler[
         assert self.normalized_request is not None
         activities_data = self.normalized_request['activities_data']
         activity_type = self.normalized_request['activity_type']
-        question_count = self.normalized_request.get('question_count')
         offset = self.normalized_request.get('offset')
         activities: List[ActivityDataResponseDict] = []
 
@@ -252,16 +240,12 @@ class AndroidActivityHandler(base.BaseHandler[
                         'Version cannot be specified for '
                         'question_skill_link')
 
-            if question_count is None or offset is None:
+            if offset is None:
                 raise self.InvalidInputException(
-                    'Offset and question_count required '
-                    'for question_skill_link')                
+                    'Offset required for question_skill_link')          
 
-            skill_ids = [
-                activity_data['id'] for activity_data in activities_data]
             question_ids_by_skill_id = (
-                question_fetchers.get_question_ids_by_skill_ids(
-                skill_ids, question_count=question_count, offset=offset))
+                question_fetchers.get_all_question_skill_links(offset=offset))
             for skill_id, question_ids in question_ids_by_skill_id.items():
                 activities.append({
                     'id': skill_id,

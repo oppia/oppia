@@ -426,6 +426,22 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ).order(-cls.last_updated).fetch(question_skill_count, offset=offset)
 
     @classmethod
+    def get_all_question_links(
+        cls, question_count: int, offset: int
+    ) -> Sequence[QuestionSkillLinkModel]:
+        """Fetches the list of QuestionSkillLinkModels in batches.
+
+        Args:
+            question_count: int. The number of questions to be returned.
+            offset: int. Number of query results to skip.
+
+        Returns:
+            list(QuestionSkillLinkModel). The QuestionSkillLinkModels.
+        """
+        return cls.query().order(-cls.last_updated).fetch(
+            question_count, offset=offset)
+
+    @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
         cls,
         total_question_count: int,

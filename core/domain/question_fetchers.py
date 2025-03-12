@@ -21,7 +21,6 @@ from __future__ import annotations
 import copy
 
 from core import feconf
-from core import utils
 from core.constants import constants
 from core.domain import question_domain
 from core.domain import state_domain
@@ -225,43 +224,35 @@ def get_multiple_questions_by_ids_and_version(
     ]
 
 
-def get_question_ids_by_skill_ids(
-    skill_ids: List[str],
-    question_count: int = 100,
-    offset: int = 0
+def get_all_question_skill_links(
+    offset: int = 0,
+    question_count: int = constants.SKILL_QUESTION_LIMIT
 ) -> Dict[str, List[str]]:
-    """Returns a mapping of skill IDs to their corresponding question IDs.
+    """Returns all question skill links in a dictionary format.
 
     Args:
-        skill_ids: list(str). List of skill IDs to get questions for.
-        question_count: int. Maximum number of questions to fetch per skill.
-            Defaults to 100.
-        offset: int. Offset to start fetching questions from. Defaults to 0.
+        question_count: int. Max number of question skill links to fetch.
+            Defaults to constants.SKILL_QUESTION_LIMIT.
+        offset: int. Offset to start fetching question skill links from.
 
     Returns:
         dict(str, list(str)). A mapping of skill IDs to lists of question IDs.
 
     Raises:
-        InvalidInputException. 
-            If question_count exceeds the maximum allowed value.
+        ValueError. The requested question count exceeds the limit.
     """
     if question_count > constants.SKILL_QUESTION_LIMIT:
-        raise utils.InvalidInputException(
-            'question_count exceeds maximum allowed value of %d' %
-            constants.SKILL_QUESTION_LIMIT)
+        raise ValueError(
+            'Requested question count exceeds the limit of %d.'
+            % constants.SKILL_QUESTION_LIMIT)
 
-    question_skill_link_models = (
-        question_models.QuestionSkillLinkModel
-        .get_question_skill_links_by_skill_ids(
-            question_count=question_count,
-            skill_ids=skill_ids,
-            offset=offset))
+    qsl_models = question_models.QuestionSkillLinkModel.get_all_question_links(
+        question_count=question_count, offset=offset)
+
+    skill_ids = {model.skill_id for model in qsl_models}
 
     return {
-        skill_id: [
-            qsl_model.question_id
-            for qsl_model in question_skill_link_models
-            if qsl_model.skill_id == skill_id
-        ]
+        skill_id: [model.question_id for model in qsl_models
+                   if model.skill_id == skill_id]
         for skill_id in skill_ids
     }
