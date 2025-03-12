@@ -3677,3 +3677,22 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
             coordinator.
         """
         return cls.query(cls.coordinator_ids == user_id).fetch()
+    
+    def validate(self) -> None:
+        """ Validates TranslationCoordinatorsModel"""
+
+        for curr_id in self.coordinator_ids:
+            if not isinstance(curr_id, str):
+                raise utils.ValidationError(
+                    'All translation coordinators expected to be strings but invalid instance exists: %s' % curr_id
+                )
+
+        if not isinstance(self.coordinators_count, int):
+            raise utils.ValidationError('Translation coordinator count is expected to be an integer.')
+        else:
+            total_coordinator_ids = len(self.coordinator_ids)
+            if self.coordinators_count != self.coordinators_count:
+                raise utils.ValidationError(
+                    'Coordinator count does not match length of coordinator_ids. '
+                    'Expected coordinator count: %d   Actual: %d' % (self.coordinators_count, total_coordinator_ids)
+                )
