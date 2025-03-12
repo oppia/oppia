@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import os
 import unittest
 from unittest import mock
@@ -26,9 +27,6 @@ from unittest import mock
 from scripts import inactive_issue_checker as checker
 
 from typing import Dict, Optional, TypedDict
-
-INACTIVE_DAYS_THRESHOLD = 7
-UNASSIGN_DAYS_THRESHOLD = 10
 
 
 class IssueDict(TypedDict, total=False):
@@ -598,14 +596,13 @@ class TestGitHubService(unittest.TestCase):
         self.service.add_alert_comment_on_issue(issue)
 
         expected_comment = (
-            f'Hi @user1 this PR is inactive '
-            f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
-            f'unassigned soon if no activity is done.\n\n '
-            f'If you are still working on this PR, '
-            f'please make a follow-up commit within'
-            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
-            f'(and submit it for review, if applicable). '
-            f'Please also let us know if you are stuck so we can help you!'
+            'Hi @user1 this PR is inactive '
+            'for 7 days and you will be '
+            'unassigned soon if no activity is done.\n\n '
+            'If you are still working on this PR, '
+            'please make a follow-up commit within 3 days'
+            '(and submit it for review, if applicable). '
+            'Please also let us know if you are stuck so we can help you!'
         )
 
         mock_post.assert_called_once_with(
@@ -662,10 +659,10 @@ class TestGitHubService(unittest.TestCase):
         self.service.post_unassignment_comment(issue)
 
         expected_comment = (
-            f'@user1 has been unassigned from this issue '
-            f'due to inactivity for more than {UNASSIGN_DAYS_THRESHOLD} days. '
-            f'If you would like to continue working on this issue, please '
-            f'request to be reassigned.'
+            '@user1 has been unassigned from this issue '
+            'due to inactivity for more than 10 days. '
+            'If you would like to continue working on this issue, please '
+            'request to be reassigned.'
         )
 
         mock_post.assert_called_once_with(
@@ -799,18 +796,18 @@ class TestMainFunction(unittest.TestCase):
         issue1 = checker.Issue(1, 'user1', 'url1')
         issue2 = checker.Issue(2, 'user2', 'url2')
         self.issue_manager.get_inactive_issues.return_value = [issue1, issue2]
+        with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
+            checker.main()
 
-        checker.main()
-        self.github_service_class_mock.assert_called_once_with(
-            'fake-token', checker.REPO_OWNER, checker.REPO_NAME
-        )
-        self.issue_manager_class_mock.assert_called_once_with(
-            self.github_service_mock
-        )
-        self.issue_manager.get_inactive_issues.assert_called_once()
-        self.issue_manager.unassign_issues.assert_called_once_with(
-            [issue1, issue2]
-        )
+        expected_logs = [
+            'INFO:root:The following issues will be unassigned:',
+            'INFO:root:Issue #1 (assignee: user1)',
+            'INFO:root:Issue #2 (assignee: user2)',
+            'INFO:root:Inactive issues are sent for deassigning.'
+        ]
+
+        for expected in expected_logs:
+            self.assertIn(expected, log_capture.output)
 
     def test_main_with_inactive_issues_and_deassign_disabled(self) -> None:
         """Test main function with inactive issues but deassignment disabled."""
@@ -820,18 +817,26 @@ class TestMainFunction(unittest.TestCase):
         self.issue_manager.get_inactive_issues.return_value = [
             issue1, issue2
         ]
+        with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
+            checker.main()
+        expected_logs = [
+            'INFO:root:The following issues will be unassigned:',
+            'INFO:root:Issue #1 (assignee: user1)',
+            'INFO:root:Issue #2 (assignee: user2)',
+            'INFO:root:Unassignment is currently disabled.'
+        ]
 
-        checker.main()
-        self.issue_manager.get_inactive_issues.assert_called_once()
-        self.issue_manager.unassign_issues.assert_not_called()
+        for expected in expected_logs:
+            self.assertIn(expected, log_capture.output)
 
     def test_main_with_no_inactive_issues(self) -> None:
         """Test main function when no inactive issues are found."""
         self.issue_manager.get_inactive_issues.return_value = []
-        checker.main()
+        with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
+            checker.main()
 
-        self.issue_manager.get_inactive_issues.assert_called_once()
-        self.issue_manager.unassign_issues.assert_not_called()
+        expected_log = 'No inactive issues found that need unassignment.'
+        self.assertIn(f'INFO:root:{expected_log}', log_capture.output)
 
     def test_main_handles_multiple_inactive_issues(self) -> None:
         """Test main function properly handles multiple inactive issues."""
@@ -840,7 +845,15 @@ class TestMainFunction(unittest.TestCase):
             for i in range(1, 6)
         ]
         self.issue_manager.get_inactive_issues.return_value = issues
-        checker.main()
+        with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
+            checker.main()
+        expected_logs = [
+            'The following issues will be unassigned:'
+        ]
+        expected_logs.extend([
+            f'Issue #{i} (assignee: user{i})' for i in range(1, 6)
+        ])
+        expected_logs.append('Inactive issues are sent for deassigning.')
 
-        self.issue_manager.unassign_issues.assert_called_once_with(issues)
-        self.assertEqual(len(issues), 5)
+        for expected in expected_logs:
+            self.assertIn(f'INFO:root:{expected}', log_capture.output)

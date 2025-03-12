@@ -336,11 +336,11 @@ class GitHubService:
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
             f'Hi @{issue.assignee_username} this PR is inactive '
-            f'for {INACTIVE_DAYS_THRESHOLD} and you will be '
+            f'for {INACTIVE_DAYS_THRESHOLD} days and you will be '
             f'unassigned soon if no activity is done.\n\n '
             f'If you are still working on this PR, '
-            f'please make a follow-up commit within'
-            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} '
+            f'please make a follow-up commit within '
+            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} days'
             f'(and submit it for review, if applicable). '
             f'Please also let us know if you are stuck so we can help you!'
         )
@@ -467,15 +467,16 @@ class IssueManager:
 
 
 def main() -> None:
-    """Main function for collecting all
-    inactive issues and deassign them.
+    """Main function for collecting all inactive issues
+    and deassigning them.
     """
 
     github_token = os.environ['GITHUB_TOKEN']
 
     gh_service = GitHubService(github_token, REPO_OWNER, REPO_NAME)
     issue_manager = IssueManager(gh_service)
-
+    # all_inactive_issues means all those issues which are inactive from
+    # more than UNASSIGN_DAYS_THRESHOLD days.
     all_inactive_issues = issue_manager.get_inactive_issues()
 
     if all_inactive_issues:
@@ -489,6 +490,7 @@ def main() -> None:
 
         if os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS'] == 'true':
             issue_manager.unassign_issues(all_inactive_issues)
+            logging.info('Inactive issues are sent for deassigning.')
         else:
             logging.info('Unassignment is currently disabled.')
     else:
@@ -496,8 +498,8 @@ def main() -> None:
 
 
 if __name__ == '__main__': # pragma: no cover
-    # This installs third party libraries before importing
-    # other files or importing libraries that use
+    # This installs third party libraries(requests) before
+    # importing other files or importing libraries that use
     # the builtins python module (e.g. build, utils).
     install_third_party_libs.main()
     main()
