@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {
   TranslatableTexts,
   TranslatableTextsBackendDict,
@@ -99,10 +98,3 @@ export class TranslateTextBackendApiService {
     return this.http.post<void>('/suggestionhandler/', body).toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslateTextBackendApiService',
-    downgradeInjectable(TranslateTextBackendApiService)
-  );

@@ -17,7 +17,6 @@
  * exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ContextService} from 'services/context.service';
@@ -84,9 +83,3 @@ export class ExplorationRecommendationsService {
       });
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationRecommendationsService',
-    downgradeInjectable(ExplorationRecommendationsService)
-  );

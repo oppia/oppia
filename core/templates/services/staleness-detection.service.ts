@@ -22,7 +22,6 @@
  * before working further and avoid unnecessary data loss.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {LocalStorageService} from './local-storage.service';
 
@@ -83,10 +82,3 @@ export class StalenessDetectionService {
     return false;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StalenessDetectionService',
-    downgradeInjectable(StalenessDetectionService)
-  );

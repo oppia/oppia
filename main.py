@@ -469,6 +469,9 @@ URLS = [
         r'/gettranslatabletopicnames',
         contributor_dashboard.TranslatableTopicNamesHandler),
     get_redirect_route(
+        r'/gettranslatabletopicnamesperclassroom',
+        contributor_dashboard.TranslatableTopicNamesPerClassroomHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -1226,6 +1229,8 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
     get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'/collection/<collection_id>', oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),

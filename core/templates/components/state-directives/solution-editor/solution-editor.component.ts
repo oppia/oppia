@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -81,10 +80,3 @@ export class SolutionEditor implements OnInit {
     };
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSolutionEditor',
-  downgradeComponent({
-    component: SolutionEditor,
-  }) as angular.IDirectiveFactory
-);

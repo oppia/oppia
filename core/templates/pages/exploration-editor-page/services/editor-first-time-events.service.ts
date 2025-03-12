@@ -18,7 +18,6 @@
  * is opened for the first time for an exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -142,10 +141,3 @@ export class EditorFirstTimeEventsService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditorFirstTimeEventsService',
-    downgradeInjectable(EditorFirstTimeEventsService)
-  );
