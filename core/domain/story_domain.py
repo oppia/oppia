@@ -1938,8 +1938,12 @@ class Story:
                 raise ValueError(
                     'The node with id %s is the starting node for the story, '
                     'change the starting node before deleting it.' % node_id)
+        delete_node_destination_ids = self.story_contents.nodes[node_index].destination_node_ids
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
+                for dest_id in delete_node_destination_ids:
+                    if not dest_id in node.destination_node_ids:
+                        node.destination_node_ids.append(dest_id)
                 node.destination_node_ids.remove(node_id)
         del self.story_contents.nodes[node_index]
 
