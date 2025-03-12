@@ -115,10 +115,6 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
         if name == 'JobBase':
             return job_cls
 
@@ -132,10 +128,6 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
         return job_cls
 
     @classmethod

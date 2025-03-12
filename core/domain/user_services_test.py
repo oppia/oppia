@@ -3285,7 +3285,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
 
             last_logged_in = user_services.get_user_settings(
-                    self.viewer_id).last_logged_in
+                self.viewer_id).last_logged_in
             # Ruling out the possibility of None for mypy type checking.
             assert last_logged_in is not None
             assert previous_last_logged_in_datetime is not None
