@@ -352,10 +352,13 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
                 'exp_id_1'))
         self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
+        recommended_exp_ids = []
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_1', recommended_exp_ids)
         saved_recommendation_ids = (
             recommendations_services.get_exploration_recommendations(
-                'exp_id_0'))
-        self.assertEqual(saved_recommendation_ids, [])
+                'exp_id_1'))
+        self.assertEqual(recommended_exp_ids, saved_recommendation_ids)
 
     def test_delete_recommendations_for_exploration(self) -> None:
         recommendations_services.delete_explorations_from_recommendations([
@@ -385,3 +388,20 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             [], recommendations_1.recommended_exploration_ids)
         self.assertEqual(
             ['exp_id_1'], recommendations_2.recommended_exploration_ids)
+
+    def test_get_exploration_recommendations_by_id(self) -> None:
+        fake_eid = 'fake_eid'
+        fake_exp_recommendation = (
+            recommendations_services.get_exploration_recommendations_by_id(
+                fake_eid, strict=False))
+        self.assertIsNone(fake_exp_recommendation)
+
+        recommendations_services.set_exploration_recommendations(
+            'exp_id_1', ['exp_id_3', 'exp_id_4'])
+        exp_recommendations = (
+            recommendations_services.get_exploration_recommendations_by_id(
+            'exp_id_1', strict=False))
+        self.assertIsNotNone(exp_recommendations)
+        self.assertEqual(
+            ['exp_id_3', 'exp_id_4'],
+            exp_recommendations.recommended_exploration_ids)
