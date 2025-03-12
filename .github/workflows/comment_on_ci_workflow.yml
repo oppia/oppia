@@ -26,7 +26,7 @@ jobs:
           - test_name: "Full-Stack Tests"
             workflow_file: "full_stack_tests.yml"
             message: >
-              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the Full-Stack Tests are failing on your PR.
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the full-stack tests are failing on your PR.
               Please check the logs and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
               to fix the issues, or report the error as a flake. Thanks!
           - test_name: "Backend Coverage Tests"
