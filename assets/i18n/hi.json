@@ -751,7 +751,7 @@
 	"I18N_FOOTER_NEWSLETTER_TEXT": "ओपिया समुदाय का हिस्सा बनें! हमारा द्वि-साप्ताहिक न्यूज़लेटर आपको नई सुविधाओं, पाठों और ओपिया द्वारा विश्वव्यापी प्रभाव डालने के तरीके के बारे में सूचित करता रहता है।",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Oppia संस्थान",
 	"I18N_FOOTER_OPPIA_MISSION": "ओपिया का मिशन एक ऐसा शिक्षण मंच प्रदान करना है जो काम संसाधन वाले समुदायों की विशिष्ट आवश्यकताओं को पूरा कर सके।",
-	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "आज ही <a href=\"/donate\">दान करें</a> या <a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()\">स्वयंसेवा करें</a> !",
+	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "आज ही <a href=\"/donate\">दान करें</a> या <a href=\"/volunteer\">स्वयंसेवा करें</a> !",
 	"I18N_FOOTER_PRIVACY_POLICY": "गोपनीयता",
 	"I18N_FOOTER_TEACH": "Oppia के साथ  सिखाये",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "सिखाये/सीखे",

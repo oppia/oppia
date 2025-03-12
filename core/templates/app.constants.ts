@@ -125,7 +125,7 @@ export const AppConstants = {
   // length, in characters, for the name of each node label in the state graph.
   MAX_NODE_LABEL_LENGTH: 15,
 
-  // If an http request fails with the following error codes, a warning is
+  // If an $http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
 
@@ -427,4 +427,5 @@ export enum NavbarAndFooterGATrackingPages {
   ABOUT = 'About',
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
+  DONATE = 'Donate',
 }

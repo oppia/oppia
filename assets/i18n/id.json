@@ -749,7 +749,7 @@
 	"I18N_FOOTER_NEWSLETTER_TEXT": "Jadilah bagian dari komunitas Oppia! Buletin dua mingguan kami akan terus memberi Anda informasi mengenai fitur-fitur baru, pelajaran, dan bagaimana Oppia memberikan dampak di seluruh dunia.",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Yayasan Oppia",
 	"I18N_FOOTER_OPPIA_MISSION": "Misi Oppia adalah menyediakan platform pembelajaran yang memenuhi kebutuhan khusus bagi komunitas yang kekurangan sumber daya.",
-	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "<a href=\"/donate\">Donasikan</a> atau <a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()\">bersukarelawan</a> hari ini!",
+	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "<a href=\"/donate\">Donasikan</a> atau <a href=\"/volunteer\">bersukarelawan</a> hari ini!",
 	"I18N_FOOTER_PRIVACY_POLICY": "Kebijakan Privasi",
 	"I18N_FOOTER_TEACH": "Mengajar dengan Oppia",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "MENGAJAR/BELAJAR",
