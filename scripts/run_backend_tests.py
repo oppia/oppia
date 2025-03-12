@@ -95,6 +95,12 @@ TIME_REPORT_PATH: Final = os.path.join(
 )
 AVERAGE_TEST_CASE_TIME: Final = 2
 
+# Error code indicating a segmentation fault, which can occur transiently due to
+# instability in gRPC (a dependency of apache-beam[gcp]). This error was first
+# observed after upgrading apache-beam[gcp] in PR #20752. Tests encountering
+# this error are retried to handle potential flakiness.
+ERROR_RETRY_CODE: Final = 'Error -11'
+
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
@@ -518,7 +524,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 parsed_args.generate_coverage_report)
             task = concurrent_task_utils.create_task(
                 test.run, parsed_args.verbose, semaphore, name=test_target,
-                report_enabled=False)
+                report_enabled=False, errors_to_retry_on=[ERROR_RETRY_CODE])
             task_to_taskspec[task] = test
             tasks.append(task)
 
