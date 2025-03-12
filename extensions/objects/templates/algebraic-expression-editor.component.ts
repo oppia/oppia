@@ -21,7 +21,6 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
@@ -141,10 +140,3 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }
 }
-
-angular.module('oppia').directive(
-  'algebraicExpressionEditor',
-  downgradeComponent({
-    component: AlgebraicExpressionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

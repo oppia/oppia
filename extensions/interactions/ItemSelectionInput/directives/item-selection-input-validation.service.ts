@@ -16,7 +16,6 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -37,6 +36,8 @@ export class ItemSelectionInputValidationService {
   constructor(
     private baseInteractionValidationServiceInstance: baseInteractionValidationService
   ) {}
+
+  rulesSet = new Set<string>();
 
   getCustomizationArgsWarnings(
     customizationArgs: ItemSelectionInputCustomizationArgs
@@ -225,10 +226,9 @@ export class ItemSelectionInputValidationService {
     answerGroupIndex: number
   ): Warning[] {
     const warningsList: Warning[] = [];
-    const rulesSet = new Set<string>();
     rules.forEach((rule, ruleIndex) => {
       const ruleStr = JSON.stringify(rule.toBackendDict());
-      if (rulesSet.has(ruleStr)) {
+      if (this.rulesSet.has(ruleStr)) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
@@ -237,7 +237,7 @@ export class ItemSelectionInputValidationService {
             'is a duplicate.',
         });
       }
-      rulesSet.add(ruleStr);
+      this.rulesSet.add(ruleStr);
     });
     return warningsList;
   }
@@ -278,7 +278,7 @@ export class ItemSelectionInputValidationService {
     const choicesContentIds = new Set(
       customizationArgs.choices.value.map(choice => choice.contentId)
     );
-
+    this.rulesSet.clear();
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       warningsList = warningsList.concat(
@@ -353,10 +353,3 @@ export class ItemSelectionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ItemSelectionInputValidationService',
-    downgradeInjectable(ItemSelectionInputValidationService)
-  );

@@ -16,7 +16,6 @@
  * @fileoverview Base validation service for interactions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -81,7 +80,8 @@ export class baseInteractionValidationService {
       }
       if (
         answerGroup.outcome.dest === stateName &&
-        answerGroup.outcome.labelledAsCorrect
+        answerGroup.outcome.labelledAsCorrect &&
+        stateName !== null
       ) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -122,7 +122,8 @@ export class baseInteractionValidationService {
     if (
       defaultOutcome &&
       defaultOutcome.dest === stateName &&
-      defaultOutcome.labelledAsCorrect
+      defaultOutcome.labelledAsCorrect &&
+      stateName !== null
     ) {
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -193,10 +194,3 @@ export class baseInteractionValidationService {
     return html.trim().length === 0;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'baseInteractionValidationService',
-    downgradeInjectable(baseInteractionValidationService)
-  );

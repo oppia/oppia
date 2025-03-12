@@ -67,6 +67,7 @@ export class ExistingClassroomData
   _topicsCountInClassroom: number;
   _topicIdToTopicName!: TopicIdToTopicName;
   _isPublished: boolean;
+  _diagnosticTestIsEnabled: boolean;
   _thumbnail_data: ImageData;
   _banner_data: ImageData;
 
@@ -79,6 +80,7 @@ export class ExistingClassroomData
     topicListIntro: string,
     topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds,
     isPublished: boolean,
+    diagnosticTestIsEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData
   ) {
@@ -92,6 +94,7 @@ export class ExistingClassroomData
       this._topicIdToPrerequisiteTopicIds
     ).length;
     this._isPublished = isPublished;
+    this._diagnosticTestIsEnabled = diagnosticTestIsEnabled;
     this._thumbnail_data = thumbnailData;
     this._banner_data = bannerData;
   }
@@ -116,6 +119,10 @@ export class ExistingClassroomData
     return this._banner_data;
   }
 
+  getDiagnosticTestIsEnabled(): boolean {
+    return this._diagnosticTestIsEnabled;
+  }
+
   getTopicIdToPrerequisiteTopicId(): TopicIdToPrerequisiteTopicIds {
     return this._topicIdToPrerequisiteTopicIds;
   }
@@ -130,6 +137,10 @@ export class ExistingClassroomData
 
   setIsPublished(isPublished: boolean): void {
     this._isPublished = isPublished;
+  }
+
+  setdiagnosticTestIsEnabled(diagnosticTestIsEnabled: boolean): void {
+    this._diagnosticTestIsEnabled = diagnosticTestIsEnabled;
   }
 
   setTeaserText(teaserText: string): void {
@@ -166,6 +177,7 @@ export class ExistingClassroomData
       classroomDict.topicListIntro,
       classroomDict.topicIdToPrerequisiteTopicIds,
       classroomDict.isPublished,
+      classroomDict.diagnosticTestIsEnabled,
       classroomDict.thumbnailData,
       classroomDict.bannerData
     );
@@ -181,6 +193,7 @@ export class ExistingClassroomData
       topicListIntro: this._topicListIntro,
       topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds,
       isPublished: this._isPublished,
+      diagnosticTestIsEnabled: this._diagnosticTestIsEnabled,
       thumbnailData: this._thumbnail_data,
       bannerData: this._banner_data,
     };

@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -91,10 +90,3 @@ export class RuleTypeSelector implements OnInit {
     this.onSelectionChange.emit(this.localValue);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRuleTypeSelector',
-  downgradeComponent({
-    component: RuleTypeSelector,
-  }) as angular.IDirectiveFactory
-);

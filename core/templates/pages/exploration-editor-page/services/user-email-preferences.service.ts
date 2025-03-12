@@ -17,7 +17,6 @@
  */
 
 import {AlertsService} from 'services/alerts.service';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {UserEmailPreferencesBackendApiService} from './user-email-preferences-backend-api.service';
 
@@ -117,10 +116,3 @@ export class UserEmailPreferencesService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'UserEmailPreferencesService',
-    downgradeInjectable(UserEmailPreferencesService)
-  );

@@ -4,6 +4,7 @@
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
 apache-beam[gcp]==2.43.0
+azure-cognitiveservices-speech==1.41.1
 beautifulsoup4==4.10.0
 bleach==4.1.0
 certifi==2023.7.22
