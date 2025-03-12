@@ -63,7 +63,7 @@ SSML_TEMPLATE_BLOCK = """
 # Standard arithmetic operators used to separate text with math expressions in
 # an SSML string.
 COMMONLY_USED_ARITHMETIC_EXPRESSIONS = [
-    '+', ' - ', '*', ' / ', '×', '÷']
+    '+', ' - ', '*', ' / ', '×', '÷', '=']
 
 
 class WordBoundaryCollection:
@@ -139,7 +139,7 @@ def get_azure_voicecode_from_language_accent_code(
 
 
 def convert_plaintext_to_ssml_content(
-        plaintext: str, language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
