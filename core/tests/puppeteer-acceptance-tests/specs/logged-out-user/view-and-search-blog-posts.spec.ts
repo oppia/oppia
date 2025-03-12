@@ -24,7 +24,7 @@ import testConstants from '../../utilities/common/test-constants';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const NUM_OF_DUMMY_BLOGS = 30;
 
-describe('Logged-out User - Blog Posts', function () {
+describe('Logged-out User', function () {
   let loggedOutUser: LoggedOutUser;
   let superAdmin: SuperAdmin;
 
@@ -37,12 +37,12 @@ describe('Logged-out User - Blog Posts', function () {
     await superAdmin.navigateToBlogPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should display blog posts with tags', async function () {
+  it('should be able to view blog posts with tags', async function () {
     await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.expectBlogPostsToHaveAtLeastOneTag();
   });
 
-  it('should navigate through blog pages using pagination', async function () {
+  it('should be able to navigate through blog pages using pagination', async function () {
     await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.expectBlogPaginationControlsVisible();
 
@@ -50,13 +50,13 @@ describe('Logged-out User - Blog Posts', function () {
     await loggedOutUser.clickPreviousBlogPage();
   });
 
-  it('should search blog posts by tags', async function () {
+  it('should be able to search blog posts by tags', async function () {
     await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.filterBlogPostsByTag('Community');
     await loggedOutUser.expectBlogSearchResultsToHaveTag('Community');
   });
 
-  it('should search blog posts by keywords', async function () {
+  it('should be able to search blog posts by keywords', async function () {
     await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.filterBlogPostsByKeyword('Education');
     await loggedOutUser.expectBlogSearchResultsToContain('Education');
