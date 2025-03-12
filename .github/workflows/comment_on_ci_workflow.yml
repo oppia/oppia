@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Await Test Workflow Completion
         id: wait_for_completion_of_workflow
-        uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
+        uses: ArcticLampyrid/action-wait-for-workflow@7226d2d248ed9b7e231de31209d4f5f5d4c30295
         with:
           workflow: ${{ matrix.workflow_file }}
           sha: ${{ github.event.pull_request.head.sha }}
