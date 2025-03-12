@@ -33,31 +33,31 @@ describe('Logged-in User', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  // Checking User can navigate to Learner Dashboard from profile menu
+  // Checking User can navigate to Learner Dashboard from profile menu.
   it('should navigate to Learner Dashboard from profile menu', async function () {
     await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInUser.expectToBeOnPage('learner-dashboard');
   });
 
-  // Checking User can navigate to Contributor Dashboard from profile menu
+  // Checking User can navigate to Contributor Dashboard from profile menu.
   it('should navigate to Contributor Dashboard from profile menu', async function () {
     await loggedInUser.navigateToContributorDashboardUsingProfileDropdown();
     await loggedInUser.expectToBeOnPage('contributor-dashboard');
   });
 
-  // Checking User can navigate to Creator Dashboard from profile menu
+  // Checking User can navigate to Creator Dashboard from profile menu.
   it('should navigate to Creator Dashboard from profile menu', async function () {
     await loggedInUser.navigateToCreatorDashboardUsingProfileDropdown();
     await loggedInUser.expectToBeOnPage('creator-dashboard');
   });
 
-  // Checking User can navigate to Profile page from profile menu
+  // Checking User can navigate to Profile page from profile menu.
   it('should navigate to Profile page from profile menu', async function () {
     await loggedInUser.navigateToProfilePageUsingProfileDropdown();
     await loggedInUser.expectToBeOnPage('profile');
   });
 
-  // Checking User can navigate to Preferences page from profile menu
+  // Checking User can navigate to Preferences page from profile menu.
   it('should navigate to Preferences page from profile menu', async function () {
     await loggedInUser.navigateToPreferencesPageUsingProfileDropdown();
     await loggedInUser.expectToBeOnPage('preferences');
