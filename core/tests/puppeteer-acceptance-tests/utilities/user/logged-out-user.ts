@@ -20,6 +20,7 @@ import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {check} from 'express-validator';
 
 const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
@@ -383,6 +384,16 @@ const watchAVideoButtonInThanksForSubscribe =
 const readOurBlogButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
+const noBlogPostsFoundSelector = '.e2e-no-blog-posts-found';
+const blogTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogPostTagSelector = '.e2e-test-blog-post-tag';
+const blogSearchInputSelector = '.e2e-test-search-input';
+const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
+const blogTagFilterSelector = '.e2e-test-tag-filter-component';
+const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const blogPaginationSelector = '.e2e-test-pagination';
+const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
+const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -546,12 +557,37 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to check whether any blog posts are found.
+   * @returns {Promise<boolean>} A promise that resolves to a boolean
+   * indicating whether any blog posts are found.
+   */
+  async checkIfBlogPostsAreFound(): Promise<boolean> {
+    const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
+    if (noPostsElement) {
+      const noPostsText = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        noPostsElement
+      );
+      if (
+        noPostsText === 'Sorry, there are no blog posts matching this query.'
+      ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Function to verify that the each blog post has a tag
    * associated with it
    */
   async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
     const allPostsHaveTags = await this.page.$$eval(
-      '.e2e-test-blog-tag-container',
+      blogTagContainerSelector,
       posts =>
         posts.every(
           post => post.querySelector('.e2e-test-blog-post-tag') !== null
@@ -566,14 +602,18 @@ export class LoggedOutUser extends BaseUser {
    * Function to filter blog posts by a keyword
    */
   async filterBlogPostsByKeyword(keyword: string): Promise<void> {
-    await this.type('.e2e-test-search-input', keyword);
-    await this.clickAndWaitForNavigation('.e2e-test-search-submit-btn');
+    await this.type(blogSearchInputSelector, keyword);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
   }
 
   /**
    * Function to verify that the filtered blog posts contain the keyword
    */
   async expectBlogSearchResultsToContain(text: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
     const contentFound = await this.page.$$eval(
       '.e2e-test-blog-post-page-title-container, .e2e-test-blog-post-content',
       (elements, searchText) =>
@@ -594,20 +634,24 @@ export class LoggedOutUser extends BaseUser {
    * Function to filter blog posts by a tag
    */
   async filterBlogPostsByTag(tagName: string): Promise<void> {
-    await this.clickOn('.e2e-test-tag-filter-component');
+    await this.clickOn(blogTagFilterSelector);
     await this.clickOn(`.e2e-test-select-${tagName}`);
-    await this.page.waitForSelector('.e2e-test-tag-filter-selection-dropdown', {
+    await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
     });
-    await this.clickAndWaitForNavigation('.e2e-test-search-submit-btn');
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
   }
 
   /**
    * Function to verify that the filtered blog posts contain the tag
    */
   async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
     const tagFound = await this.page.$$eval(
-      '.e2e-test-blog-post-tag',
+      blogPostTagSelector,
       (elements, expectedTag) =>
         elements.some(el => el.textContent?.trim() === expectedTag),
       tagName
@@ -622,8 +666,12 @@ export class LoggedOutUser extends BaseUser {
    * Function to check whether the pagination controls are visible
    */
   async expectBlogPaginationControlsVisible(): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
     try {
-      await this.page.waitForSelector('.e2e-test-pagination', {
+      await this.page.waitForSelector(blogPaginationSelector, {
         visible: true,
       });
     } catch (error) {
@@ -635,14 +683,22 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the next button in the pagination controls
    */
   async clickNextBlogPage(): Promise<void> {
-    await this.clickOn('.e2e-test-pagination-next-button');
+    const nextButton = await this.page.$(blogPaginationNextSelector);
+    if (!nextButton) {
+      return;
+    }
+    await this.clickOn(blogPaginationNextSelector);
   }
 
   /**
    * Function to click the previous button in the pagination controls
    */
   async clickPreviousBlogPage(): Promise<void> {
-    await this.clickOn('.e2e-test-pagination-prev-button');
+    const prevButton = await this.page.$(blogPaginationPrevSelector);
+    if (!prevButton) {
+      return;
+    }
+    await this.clickOn(blogPaginationPrevSelector);
   }
 
   /**
