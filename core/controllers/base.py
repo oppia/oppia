@@ -788,11 +788,11 @@ class BaseHandler(
         url = self.request.uri
 
         msg = (
-            '\n\nType Exception: %s\n'
+            '\nType Exception: %s\n'
             'Error Message: %s\n'
             'URL requested: %s\n'
             'Request method: %s\n'
-            'Handler class name: %s\n'
+            'Handler class name: %s\n\n'
             % (
                 exception_type,
                 error_message,
