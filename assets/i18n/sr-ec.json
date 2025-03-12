@@ -115,6 +115,7 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Подели своје истраживање",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9": "Када они који уче прођу кроз истраживање, могу да пошаљу повратне информације да Вас обавесте о проблемима или поделе идеје за унапређивање.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Унапредите своје истраживање",
+	"I18N_LANGUAGE_BANNER_BUTTON_TEXT": "Разумео",
 	"I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO": "Понови",
 	"I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME": "Настави",
 	"I18N_LEARNER_DASHBOARD_CARD_BUTTON_START": "Започни",
@@ -143,5 +144,6 @@
 	"I18N_TEACH_PAGE_HEADING": "Oppia за родитеље, наставнике и старатеље",
 	"I18N_TOPIC_VIEWER_PRACTICE": "Пракса",
 	"I18N_TOPIC_VIEWER_STORY": "Прича",
-	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Пријава преко Google-а"
+	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Пријава преко Google-а",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATIONS_CONTENT": "Очекујемо од свих волонтера:"
 }
