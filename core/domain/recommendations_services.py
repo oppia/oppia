@@ -25,10 +25,11 @@ import json
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import recommendations_domain
 from core.domain import rights_domain
 from core.platform import models
 
-from typing import Dict, Final, List, Sequence, cast
+from typing import Dict, Final, List, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -104,6 +105,55 @@ RECOMMENDATION_CATEGORIES: Final = [
     'Statistics',
     'Welcome'
 ]
+
+
+def get_exploration_recommendations_by_id(
+    exploration_id: str,
+    strict: bool = True
+) -> Optional[recommendations_domain.ExplorationRecommendations]:
+    """Returns a domain object representing an exploration recommendations.
+
+    Args:
+        exploration_id: str. The id of the ExplorationRecommendations
+            to be returned.
+        strict: bool. Whether to fail noisily if no exploration with a given id
+            exists.
+
+    Returns:
+        ExplorationRecommendations|None. The domain object
+        corresponding to the given exploration, and none if
+        no ExplorationRecommendationsModel exists for given id.
+    """
+    exp_recommendations_model = (
+        recommendations_models.ExplorationRecommendationsModel.get(
+        exploration_id, strict=strict))
+    if exp_recommendations_model:
+        exp_recommendations = (
+            get_exploration_recommendations_from_model(
+                exp_recommendations_model))
+        return exp_recommendations
+    else:
+        return None
+
+
+def get_exploration_recommendations_from_model(
+    exp_recommendations_model: (
+        recommendations_models.ExplorationRecommendationsModel)
+) -> recommendations_domain.ExplorationRecommendations:
+    """Returns the exploration recommendation domain object given 
+    the exploration recommendation model loaded from the datastore.
+
+    Args:
+        exp_recommendations_model: ExplorationRecommendationsModel. 
+            The exploration recommendation model from the datastore.
+
+    Returns:
+        ExplorationRecommendations. The recommendation domain 
+        object corresponding to the given model.
+    """
+    return recommendations_domain.ExplorationRecommendations(
+        exp_recommendations_model.recommended_exploration_ids
+    )
 
 
 def get_topic_similarities_dict() -> Dict[str, Dict[str, float]]:
@@ -384,17 +434,17 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
         list(str). List of recommended explorations IDs.
     """
 
-    recommendations_model = (
-        recommendations_models.ExplorationRecommendationsModel.get(
-            exp_id, strict=False))
-    if recommendations_model is None:
+    recommendations = (
+        get_exploration_recommendations_by_id(
+            exp_id, strict=True))
+    if recommendations is None:
         return []
     else:
         # TODO(#15621): The explicit declaration of type for ndb properties
         # should be removed. Currently, these ndb properties are annotated with
         # Any return type. Once we have proper return type we can remove this.
         recommended_exploration_ids: List[str] = (
-            recommendations_model.recommended_exploration_ids
+            recommendations.recommended_exploration_ids
         )
         return recommended_exploration_ids
 
