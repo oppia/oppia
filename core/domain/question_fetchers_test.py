@@ -278,8 +278,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             question_skill_links_2,
             {
-                'skill_1': [question_id_1],
-                'skill_2': [question_id_2]
+                'skill_2': [question_id_2],
+                'skill_1': [question_id_1]
             }
         )
 

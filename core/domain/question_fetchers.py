@@ -243,16 +243,19 @@ def get_all_question_skill_links(
     """
     if question_count > constants.SKILL_QUESTION_LIMIT:
         raise ValueError(
-            'Requested question count exceeds the limit of %d.'
-            % constants.SKILL_QUESTION_LIMIT)
+            'Requested question count exceeds the limit of %d.' 
+            % constants.SKILL_QUESTION_LIMIT
+        )
 
     qsl_models = question_models.QuestionSkillLinkModel.get_all_question_links(
         question_count=question_count, offset=offset)
 
-    skill_ids = {model.skill_id for model in qsl_models}
+    unique_skill_ids = list(dict.fromkeys([
+        model.skill_id for model in qsl_models]))
 
     return {
-        skill_id: [model.question_id for model in qsl_models
-                   if model.skill_id == skill_id]
-        for skill_id in skill_ids
+        skill_id: [
+            model.question_id for model in qsl_models
+            if model.skill_id == skill_id]
+        for skill_id in unique_skill_ids
     }

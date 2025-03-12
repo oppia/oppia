@@ -586,7 +586,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
             self.assertEqual(response, [
-               {
+                {
                     'id': skill_id_2,
                     'payload': {
                         'question_ids': skill_2_question_ids[::-1]
@@ -597,7 +597,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'payload': {
                         'question_ids': skill_1_question_ids[::-1]
                     }
-                }
+                },
             ])
 
     def test_get_nonexistent_topic_returns_null_payload(self) -> None:
