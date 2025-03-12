@@ -20,7 +20,6 @@ import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {check} from 'express-validator';
 
 const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
