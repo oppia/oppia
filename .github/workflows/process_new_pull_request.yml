@@ -119,7 +119,7 @@ jobs:
             // NOTIFICATION SYSTEM
             // ======================
             if (!hasIndividualReviewers && !hasTeamReviewers) {
-              const notificationMessage = `@oppia/dev-workflow-reviewers, could you please review this PR? No valid reviewers were assigned. Thank you!`;
+              const notificationMessage = `No individual reviewers or teams were found by GitHub. @oppia/dev-workflow-reviewers, could you please review the issue and assign an appropriate reviewer? Thank you!`;
 
               await github.rest.issues.createComment({
                 owner: repoOwner,
