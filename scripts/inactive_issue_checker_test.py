@@ -596,13 +596,15 @@ class TestGitHubService(unittest.TestCase):
         self.service.add_alert_comment_on_issue(issue)
 
         expected_comment = (
-            'Hi @user1 this PR is inactive '
-            'for 7 days and you will be '
-            'unassigned soon if no activity is done.\n\n '
-            'If you are still working on this PR, '
-            'please make a follow-up commit within 3 days'
-            '(and submit it for review, if applicable). '
-            'Please also let us know if you are stuck so we can help you!'
+            'Hi @user1, it looks like you have been '
+            'assigned to this issue for 7 days, '
+            'but have not created a PR yet.\n If you are still planning to '
+            'work on this issue, please open a PR within the next 3 days and '
+            'submit it for review, making sure that it is linked to this '
+            'issue in the Development sidebar of the PR. Otherwise, '
+            'please unassign yourself from this issue so that someone '
+            'else can take it up.\n Also, if you are stuck, please let us '
+            'know, so that we can help you. Thanks!'
         )
 
         mock_post.assert_called_once_with(
@@ -659,10 +661,9 @@ class TestGitHubService(unittest.TestCase):
         self.service.post_unassignment_comment(issue)
 
         expected_comment = (
-            '@user1 has been unassigned from this issue '
-            'due to inactivity for more than 10 days. '
-            'If you would like to continue working on this issue, please '
-            'request to be reassigned.'
+            'Unassigning @user1 from this issue, '
+            'due to their inactivity for more than 10 days. '
+            'This issue is now open for other contributors to take up.'
         )
 
         mock_post.assert_called_once_with(
@@ -795,7 +796,8 @@ class TestMainFunction(unittest.TestCase):
         """Test main function with inactive issues and deassignment enabled."""
         issue1 = checker.Issue(1, 'user1', 'url1')
         issue2 = checker.Issue(2, 'user2', 'url2')
-        self.issue_manager.get_inactive_issues.return_value = [issue1, issue2]
+        issues = [issue1, issue2]
+        self.issue_manager.get_inactive_issues.return_value = issues
         with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
             checker.main()
 
@@ -809,14 +811,15 @@ class TestMainFunction(unittest.TestCase):
         for expected in expected_logs:
             self.assertIn(expected, log_capture.output)
 
+        self.issue_manager.unassign_issues.assert_called_once_with(issues)
+
     def test_main_with_inactive_issues_and_deassign_disabled(self) -> None:
         """Test main function with inactive issues but deassignment disabled."""
         os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS'] = 'false'
         issue1 = checker.Issue(1, 'user1', 'url1')
         issue2 = checker.Issue(2, 'user2', 'url2')
-        self.issue_manager.get_inactive_issues.return_value = [
-            issue1, issue2
-        ]
+        inactive_issues = [issue1, issue2]
+        self.issue_manager.get_inactive_issues.return_value = inactive_issues
         with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
             checker.main()
         expected_logs = [
@@ -829,6 +832,8 @@ class TestMainFunction(unittest.TestCase):
         for expected in expected_logs:
             self.assertIn(expected, log_capture.output)
 
+        self.issue_manager.unassign_issues.assert_not_called()
+
     def test_main_with_no_inactive_issues(self) -> None:
         """Test main function when no inactive issues are found."""
         self.issue_manager.get_inactive_issues.return_value = []
@@ -837,6 +842,7 @@ class TestMainFunction(unittest.TestCase):
 
         expected_log = 'No inactive issues found that need unassignment.'
         self.assertIn(f'INFO:root:{expected_log}', log_capture.output)
+        self.issue_manager.unassign_issues.assert_not_called()
 
     def test_main_handles_multiple_inactive_issues(self) -> None:
         """Test main function properly handles multiple inactive issues."""
@@ -857,3 +863,5 @@ class TestMainFunction(unittest.TestCase):
 
         for expected in expected_logs:
             self.assertIn(f'INFO:root:{expected}', log_capture.output)
+
+        self.issue_manager.unassign_issues.assert_called_once_with(issues)

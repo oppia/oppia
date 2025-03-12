@@ -335,14 +335,16 @@ class GitHubService:
         """
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
-            f'Hi @{issue.assignee_username} this PR is inactive '
-            f'for {INACTIVE_DAYS_THRESHOLD} days and you will be '
-            f'unassigned soon if no activity is done.\n\n '
-            f'If you are still working on this PR, '
-            f'please make a follow-up commit within '
-            f'{UNASSIGN_DAYS_THRESHOLD-INACTIVE_DAYS_THRESHOLD} days'
-            f'(and submit it for review, if applicable). '
-            f'Please also let us know if you are stuck so we can help you!'
+            f'Hi @{issue.assignee_username}, it looks like you have been '
+            f'assigned to this issue for {INACTIVE_DAYS_THRESHOLD} days, '
+            f'but have not created a PR yet.\n If you are still planning to '
+            f'work on this issue, please open a PR within the next '
+            f'{UNASSIGN_DAYS_THRESHOLD - INACTIVE_DAYS_THRESHOLD} days and '
+            f'submit it for review, making sure that it is linked to this '
+            f'issue in the Development sidebar of the PR. Otherwise, '
+            f'please unassign yourself from this issue so that someone '
+            f'else can take it up.\n Also, if you are stuck, please let us '
+            f'know, so that we can help you. Thanks!'
         )
         response = requests.post(
             url,
@@ -366,10 +368,9 @@ class GitHubService:
         """
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
-            f'@{issue.assignee_username} has been unassigned from this issue '
-            f'due to inactivity for more than {UNASSIGN_DAYS_THRESHOLD} days. '
-            f'If you would like to continue working on this issue, please '
-            f'request to be reassigned.'
+            f'Unassigning @{issue.assignee_username} from this issue, '
+            f'due to their inactivity for more than 10 days. \n'
+            f'This issue is now open for other contributors to take up.'
         )
         response = requests.post(
             url,
@@ -498,7 +499,7 @@ def main() -> None:
 
 
 if __name__ == '__main__': # pragma: no cover
-    # This installs third party libraries(requests) before
+    # This installs third party libraries (requests) before
     # importing other files or importing libraries that use
     # the builtins python module (e.g. build, utils).
     install_third_party_libs.main()
