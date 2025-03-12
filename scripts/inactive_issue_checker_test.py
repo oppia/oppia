@@ -662,7 +662,7 @@ class TestGitHubService(unittest.TestCase):
 
         expected_comment = (
             'Unassigning @user1 from this issue, '
-            'due to their inactivity for more than 10 days. '
+            'due to their inactivity for more than 10 days. \n'
             'This issue is now open for other contributors to take up.'
         )
 
