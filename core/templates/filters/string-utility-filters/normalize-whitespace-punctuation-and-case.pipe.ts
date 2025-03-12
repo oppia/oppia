@@ -30,42 +30,57 @@ export class NormalizeWhitespacePunctuationAndCasePipe
   implements PipeTransform
 {
   transform(input: string): string {
-    let isAlphanumeric = function (character: string) {
-      return (
-        'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
-          character.toLowerCase()
-        ) !== -1
-      );
-    };
+    // A helper to decide if a character is alphanumeric.
+    const isAlphanumeric = (character: string): boolean =>
+      'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+        character.toLowerCase()
+      ) !== -1;
 
+    // Process each line separately.
     input = input.trim();
-    let inputLines = input.split('\n');
-    let resultLines = [];
-    for (let i: number = 0; i < inputLines.length; i++) {
-      let result = '';
+    const inputLines = input.split('\n');
+    const resultLines = [];
 
-      let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
-      for (let j: number = 0; j < inputLine.length; j++) {
-        let currentChar: string = inputLine.charAt(j).toLowerCase();
-        if (currentChar === ' ') {
-          if (
-            j > 0 &&
-            j < inputLine.length - 1 &&
-            isAlphanumeric(inputLine.charAt(j - 1)) &&
-            isAlphanumeric(inputLine.charAt(j + 1))
-          ) {
-            result += currentChar;
-          }
+    for (const line of inputLines) {
+      // Replace multiple spaces with a single space and split into tokens.
+      const tokens = line
+        .trim()
+        .replace(/\s{2,}/g, ' ')
+        .split(' ');
+
+      // Process tokens to decide on case.
+      const processedTokens = tokens.map((token, index) => {
+        // For the first token, always lower-case.
+        if (index === 0) {
+          return token.toLowerCase();
+        }
+        // Determine if the previous token ends with punctuation.
+        // We treat a character as punctuation if it is not alphanumeric.
+        const previousToken = tokens[index - 1];
+        const lastChar = previousToken.slice(-1);
+        if (!isAlphanumeric(lastChar)) {
+          // If the previous token ended with punctuation,
+          // preserve the token's original case.
+          return token;
         } else {
-          result += currentChar;
+          // Otherwise, lower-case it.
+          return token.toLowerCase();
+        }
+      });
+
+      // Merge tokens that are purely punctuation with the previous token.
+      const mergedTokens: string[] = [];
+      for (const token of processedTokens) {
+        // A token that consists solely of non-alphanumeric characters is punctuation.
+        if (/^[^a-z0-9]+$/i.test(token) && mergedTokens.length > 0) {
+          mergedTokens[mergedTokens.length - 1] += token;
+        } else {
+          mergedTokens.push(token);
         }
       }
 
-      if (result) {
-        resultLines.push(result);
-      }
+      resultLines.push(mergedTokens.join(' '));
     }
-
     return resultLines.join('\n');
   }
 }
