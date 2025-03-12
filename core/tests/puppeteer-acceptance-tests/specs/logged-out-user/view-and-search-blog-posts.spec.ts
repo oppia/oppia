@@ -20,6 +20,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 import testConstants from '../../utilities/common/test-constants';
+import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const NUM_OF_DUMMY_BLOGS = 30;
@@ -32,8 +33,15 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
 
-    await superAdmin.navigateToAdminPageActivitiesTab();
-    await superAdmin.generateDummyBlogPosts(NUM_OF_DUMMY_BLOGS);
+    const isInProdMode = await superAdmin.isInProdMode();
+    if (!isInProdMode) {
+      await superAdmin.navigateToAdminPageActivitiesTab();
+      await superAdmin.generateDummyBlogPosts(NUM_OF_DUMMY_BLOGS);
+    } else {
+      showMessage(
+        'The application is currently running in production mode. Skipping dummy blog post generation.'
+      );
+    }
     await superAdmin.navigateToBlogPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 

@@ -638,13 +638,7 @@ export class SuperAdmin extends BaseUser {
   async generateDummyBlogPosts(numBlogs: number): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     for (let i = 0; i < numBlogs; i++) {
-      await this.page.waitForSelector(generateBlogPostButton, {
-        visible: true,
-      });
       await this.clickOn(generateBlogPostButton);
-      await this.page.waitForSelector(actionStatusMessageSelector, {
-        visible: true,
-      });
       await this.page.waitForFunction(
         (selector: string) => {
           const statusElem = document.querySelector(selector);
