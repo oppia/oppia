@@ -112,7 +112,8 @@ jobs:
     runs-on: ubuntu-24.04
     if: ${{ always() && needs.assign-reviewers.result == 'failure' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Send notification
         uses: ./.github/actions/send-webhook-notification
         with:
