@@ -2587,4 +2587,3 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 'Exception', 'Exception raised'  
             )  
             self.assertIn(expected_log_message, self.logged_exceptions)
-
