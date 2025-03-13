@@ -292,9 +292,6 @@ export class SkillsListComponent {
       (result: MergeModalResult) => {
         let skill: AugmentedSkillSummary = result.skill;
         let supersedingSkillId: string = result.supersedingSkillId;
-        console.log(skill.id);
-        console.log(supersedingSkillId);
-        console.trace();
         // Transfer questions from the old skill to the new skill.
         this.topicsAndSkillsDashboardBackendApiService
           .mergeSkillsAsync(skill.id, supersedingSkillId)

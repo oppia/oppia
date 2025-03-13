@@ -100,70 +100,42 @@ export class ConceptCardBackendApiService {
 
   async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
-      const skillIdsWithNoSupersedingSkills: string[] = [];
-      // We do not want skills with non null superseding_skill_id, so we fetch
-      // all skills in skillIds to check that.
-      Promise.all(
-        skillIds.map(skillId =>
-          this.skillBackendApiService.fetchSkillAsync(skillId)
-        )
-      ).then(skillObjects => {
-        skillObjects.forEach(skillObject => {
-          // Skill ID for current skill.
-          const skillId = skillObject.skill.getId();
-          // Skill ID for skill superseding the current skill. Null if no skill supersedes current skill.
-          const supersedingSkillId = skillObject.skill.getSupersedingSkillId();
-          if (supersedingSkillId !== null) {
-            // If current skill has a superseding skill, push the superseding skill to the
-            // skillIdsWithNoSupersedingSkills array and ignore current skill.
-            skillIdsWithNoSupersedingSkills.push(supersedingSkillId);
-          } else {
-            // If current skill does not have a superseding skill, push the current skill
-            // to the skillIdsWithNoSupersedingSkills array.
-            skillIdsWithNoSupersedingSkills.push(skillId);
-          }
-        });
-
-        var uncachedSkillIds = this._getUncachedSkillIds(
-          skillIdsWithNoSupersedingSkills
-        );
-        const conceptCards: ConceptCard[] = [];
-
-        if (uncachedSkillIds.length !== 0) {
-          // Case where only part (or none) of the concept cards are cached
-          // locally.
-          this._fetchConceptCards(
-            uncachedSkillIds,
-            uncachedConceptCards => {
-              skillIdsWithNoSupersedingSkills.forEach(skillId => {
-                if (uncachedSkillIds.includes(skillId)) {
-                  conceptCards.push(
-                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
-                  );
-                  // Save the fetched conceptCards to avoid future fetches.
-                  this._conceptCardCache[skillId] = cloneDeep(
-                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
-                  );
-                } else {
-                  conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
-                }
-              });
-              if (resolve) {
-                resolve(cloneDeep(conceptCards));
+      var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
+      const conceptCards: ConceptCard[] = [];
+      if (uncachedSkillIds.length !== 0) {
+        // Case where only part (or none) of the concept cards are cached
+        // locally.
+        this._fetchConceptCards(
+          uncachedSkillIds,
+          uncachedConceptCards => {
+            skillIds.forEach(skillId => {
+              if (uncachedSkillIds.includes(skillId)) {
+                conceptCards.push(
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                );
+                // Save the fetched conceptCards to avoid future fetches.
+                this._conceptCardCache[skillId] = cloneDeep(
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                );
+              } else {
+                conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
               }
-            },
-            reject
-          );
-        } else {
-          // Case where all of the concept cards are cached locally.
-          skillIdsWithNoSupersedingSkills.forEach(skillId => {
-            conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
-          });
-          if (resolve) {
-            resolve(cloneDeep(conceptCards));
-          }
+            });
+            if (resolve) {
+              resolve(cloneDeep(conceptCards));
+            }
+          },
+          reject
+        );
+      } else {
+        // Case where all of the concept cards are cached locally.
+        skillIds.forEach(skillId => {
+          conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+        });
+        if (resolve) {
+          resolve(cloneDeep(conceptCards));
         }
-      });
+      }
     });
   }
 }
