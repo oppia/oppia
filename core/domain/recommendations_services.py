@@ -29,7 +29,9 @@ from core.domain import recommendations_domain
 from core.domain import rights_domain
 from core.platform import models
 
-from typing import Dict, Final, List, Optional, Sequence, cast
+from typing import (
+    Dict, Final, List, Literal, Optional, Sequence, cast, overload
+    )
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -105,6 +107,24 @@ RECOMMENDATION_CATEGORIES: Final = [
     'Statistics',
     'Welcome'
 ]
+
+
+@overload
+def get_exploration_recommendations_by_id(
+    exploration_id: str
+) -> recommendations_domain.ExplorationRecommendations: ...
+
+
+@overload
+def get_exploration_recommendations_by_id(
+    exploration_id: str, *, strict: Literal[True]
+) -> recommendations_domain.ExplorationRecommendations: ...
+
+
+@overload
+def get_exploration_recommendations_by_id(
+    exploration_id: str, *, strict: Literal[False]
+) -> Optional[recommendations_domain.ExplorationRecommendations]: ...
 
 
 def get_exploration_recommendations_by_id(
