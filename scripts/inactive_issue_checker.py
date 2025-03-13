@@ -27,10 +27,10 @@ from scripts import install_third_party_libs
 import requests
 from typing import Dict, List, Optional, Set, TypedDict
 
-INACTIVE_DAYS_THRESHOLD = 7
-UNASSIGN_DAYS_THRESHOLD = 10
-REPO_OWNER = 'oppia'
-REPO_NAME = 'oppia'
+INACTIVE_DAYS_THRESHOLD = 0.000000000007
+UNASSIGN_DAYS_THRESHOLD = 0.00000000000010
+REPO_OWNER = 'Ashu463'
+REPO_NAME = 'grid6.0'
 
 
 class IssueDict(TypedDict, total=False):
@@ -336,11 +336,11 @@ class GitHubService:
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
             f'Hi @{issue.assignee_username}, it looks like you have been '
-            f'assigned to this issue for {INACTIVE_DAYS_THRESHOLD} days, '
+            f'assigned to this issue for {int(INACTIVE_DAYS_THRESHOLD)} days, '
             f'but have not created a PR yet.\n\n If you are still planning to '
             f'work on this issue, please open a PR within the next '
-            f'{UNASSIGN_DAYS_THRESHOLD - INACTIVE_DAYS_THRESHOLD} days and '
-            f'submit it for review, making sure that it is linked to this '
+            f'{int(UNASSIGN_DAYS_THRESHOLD - INACTIVE_DAYS_THRESHOLD)} days '
+            f'and submit it for review, making sure that it is linked to this '
             f'issue in the Development sidebar of the PR. Otherwise, '
             f'please unassign yourself from this issue so that someone '
             f'else can take it up.\n\n Also, if you are stuck, please let us '
