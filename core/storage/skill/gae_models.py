@@ -253,6 +253,21 @@ class SkillModel(base_models.VersionedModel):
             found.
         """
         return cls.get_all().filter(cls.description == description).get()
+    
+    @classmethod
+    def get_by_prerequisite_skill_id(cls, skill_id: str) -> Sequence[SkillModel]:
+        """Gets SkillModels that contain the given skill ID as a prerequisite.
+        Returns an empty sequence if none exist.
+
+        Args:
+            skill_id: str. The skill ID of the prerequisite skill.
+
+        Returns:
+            Sequence[SkillModel]. A sequence of all the skill models containing
+            the given skill ID as a prerequisite.
+        """
+        return cls.get_all().filter(
+        cls.prerequisite_skill_ids == skill_id).fetch()
 
 
 class SkillSummaryModel(base_models.BaseModel):

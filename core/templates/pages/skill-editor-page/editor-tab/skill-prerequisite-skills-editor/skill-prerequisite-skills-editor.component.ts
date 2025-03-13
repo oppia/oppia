@@ -103,11 +103,11 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       uniqueSkillIds.map(skillId =>
         this.skillBackendApiService.fetchSkillAsync(skillId)
       )
-    ).then(skills => {
+    ).then(skillObjects => {
       const skillSupersededMap = {};
-      skills.forEach(skill => {
-        skillSupersededMap[skill.skill.getId()] =
-          skill.skill.getSupersedingSkillId() !== null;
+      skillObjects.forEach(skillObject => {
+        skillSupersededMap[skillObject.skill.getId()] =
+          skillObject.skill.getSupersedingSkillId() !== null;
       });
 
       const filteredSortedSkillSummaries = sortedSkillSummaries.filter(

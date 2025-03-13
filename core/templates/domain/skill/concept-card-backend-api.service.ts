@@ -28,6 +28,7 @@ import {
 } from 'domain/skill/concept-card.model';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SkillBackendApiService} from './skill-backend-api.service';
 
 interface ConceptCardBackendDicts {
   concept_card_dicts: ConceptCardBackendDict[];
@@ -39,7 +40,8 @@ interface ConceptCardBackendDicts {
 export class ConceptCardBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService
+    private urlInterpolation: UrlInterpolationService,
+    private skillBackendApiService: SkillBackendApiService
   ) {}
 
   // Maps previously loaded concept cards to their IDs.
@@ -98,7 +100,33 @@ export class ConceptCardBackendApiService {
 
   async loadConceptCardsAsync(skillIds: string[]): Promise<ConceptCard[]> {
     return new Promise((resolve, reject) => {
-      var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
+      const skillIdsWithNoSupersedingSkills: string[] = [];
+      // We do not want skills with non null superseding_skill_id, so we fetch
+      // all skills in skillIds to check that.
+      Promise.all(
+        skillIds.map(skillId =>
+          this.skillBackendApiService.fetchSkillAsync(skillId)
+        )
+      ).then(skillObjects => {
+        skillObjects.forEach(skillObject => {
+          // Skill ID for current skill.
+          const skillId = skillObject.skill.getId();
+          // Skill ID for skill superseding the current skill. Null if no skill supersedes current skill.
+          const supersedingSkillId = skillObject.skill.getSupersedingSkillId();
+          if (supersedingSkillId !== null) {
+            // If current skill has a superseding skill, push the superseding skill to the
+            // skillIdsWithNoSupersedingSkills array and ignore current skill.
+            skillIdsWithNoSupersedingSkills.push(supersedingSkillId);
+          } else {
+            // If current skill does not have a superseding skill, push the current skill
+            // to the skillIdsWithNoSupersedingSkills array.
+            skillIdsWithNoSupersedingSkills.push(skillId);
+          }
+        });
+      });
+      var uncachedSkillIds = this._getUncachedSkillIds(
+        skillIdsWithNoSupersedingSkills
+      );
       const conceptCards: ConceptCard[] = [];
 
       if (uncachedSkillIds.length !== 0) {
@@ -107,7 +135,7 @@ export class ConceptCardBackendApiService {
         this._fetchConceptCards(
           uncachedSkillIds,
           uncachedConceptCards => {
-            skillIds.forEach(skillId => {
+            skillIdsWithNoSupersedingSkills.forEach(skillId => {
               if (uncachedSkillIds.includes(skillId)) {
                 conceptCards.push(
                   uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
@@ -128,7 +156,7 @@ export class ConceptCardBackendApiService {
         );
       } else {
         // Case where all of the concept cards are cached locally.
-        skillIds.forEach(skillId => {
+        skillIdsWithNoSupersedingSkills.forEach(skillId => {
           conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
         });
         if (resolve) {
