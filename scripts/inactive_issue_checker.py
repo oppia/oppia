@@ -337,13 +337,13 @@ class GitHubService:
         comment = (
             f'Hi @{issue.assignee_username}, it looks like you have been '
             f'assigned to this issue for {INACTIVE_DAYS_THRESHOLD} days, '
-            f'but have not created a PR yet.\n If you are still planning to '
+            f'but have not created a PR yet.\n\n If you are still planning to '
             f'work on this issue, please open a PR within the next '
             f'{UNASSIGN_DAYS_THRESHOLD - INACTIVE_DAYS_THRESHOLD} days and '
             f'submit it for review, making sure that it is linked to this '
             f'issue in the Development sidebar of the PR. Otherwise, '
             f'please unassign yourself from this issue so that someone '
-            f'else can take it up.\n Also, if you are stuck, please let us '
+            f'else can take it up.\n\n Also, if you are stuck, please let us '
             f'know, so that we can help you. Thanks!'
         )
         response = requests.post(
@@ -369,7 +369,7 @@ class GitHubService:
         url = f'{self.base_url}/issues/{issue.number}/comments'
         comment = (
             f'Unassigning @{issue.assignee_username} from this issue, '
-            f'due to their inactivity for more than 10 days. \n'
+            f'due to their inactivity for more than 10 days. \n\n'
             f'This issue is now open for other contributors to take up.'
         )
         response = requests.post(

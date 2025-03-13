@@ -598,12 +598,12 @@ class TestGitHubService(unittest.TestCase):
         expected_comment = (
             'Hi @user1, it looks like you have been '
             'assigned to this issue for 7 days, '
-            'but have not created a PR yet.\n If you are still planning to '
+            'but have not created a PR yet.\n\n If you are still planning to '
             'work on this issue, please open a PR within the next 3 days and '
             'submit it for review, making sure that it is linked to this '
             'issue in the Development sidebar of the PR. Otherwise, '
             'please unassign yourself from this issue so that someone '
-            'else can take it up.\n Also, if you are stuck, please let us '
+            'else can take it up.\n\n Also, if you are stuck, please let us '
             'know, so that we can help you. Thanks!'
         )
 
@@ -662,7 +662,7 @@ class TestGitHubService(unittest.TestCase):
 
         expected_comment = (
             'Unassigning @user1 from this issue, '
-            'due to their inactivity for more than 10 days. \n'
+            'due to their inactivity for more than 10 days. \n\n'
             'This issue is now open for other contributors to take up.'
         )
 
