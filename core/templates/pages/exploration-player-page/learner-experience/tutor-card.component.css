@@ -119,11 +119,6 @@ oppia-tutor-card .conversation-skin-tutor-card-middle-section .conversation-skin
   display: none;
 }
 
-oppia-tutor-card .oppia-learner-view-card.ng-hide {
-  opacity: 0;
-  transform: translateX(-1000px);
-}
-
 oppia-tutor-card .check-mark-hidden {
   display: none;
 }
