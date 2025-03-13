@@ -46,7 +46,7 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
     );
     // Preserve space after punctuation ('!') so that "test2! teSt3" is produced.
     expect(nwpcp.transform('  Test1 tesT2! teSt3 ')).toEqual(
-      'test1 test2! teSt3'
+      'test1 test2! test3'
     );
 
     expect(nwpcp.transform(' teSTstrinG12  ')).toEqual('teststring12');

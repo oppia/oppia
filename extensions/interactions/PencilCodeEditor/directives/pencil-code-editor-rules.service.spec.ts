@@ -277,7 +277,7 @@ describe('Pencil Code Editor rules service', () => {
 
   describe("'output roughly equals' rule", () => {
     var RULE_INPUT = {
-      x: '1\n      a W ? b\n',
+      x: '1\n      a w? b\n',
     };
 
     it('should compare normalized output', () => {
