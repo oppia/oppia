@@ -400,7 +400,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             'exp_id_1', ['exp_id_3', 'exp_id_4'])
         exp_recommendations = (
             recommendations_services.get_exploration_recommendations_by_id(
-            'exp_id_1', strict=False))
+            'exp_id_1'))
         self.assertIsNotNone(exp_recommendations)
         self.assertEqual(
             ['exp_id_3', 'exp_id_4'],
