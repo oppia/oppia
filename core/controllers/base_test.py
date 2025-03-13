@@ -2456,8 +2456,8 @@ class HandleExceptionLoggingTests(test_utils.GenericTestBase):
         self.mock_request.environ['REQUEST_METHOD'] = 'POST'
         self.mock_response = webapp2.Response()
 
-        self.logged_warnings = []
-        self.logged_exceptions = []
+        self.logged_warnings: List[str] = []
+        self.logged_exceptions: List[str] = []
 
         def mock_logging_warning(msg: str) -> None:
             self.logged_warnings.append(msg)
@@ -2468,7 +2468,7 @@ class HandleExceptionLoggingTests(test_utils.GenericTestBase):
         self.mock_logging_warning = mock_logging_warning
         self.mock_logging_exception = mock_logging_exception
 
-        self.handler = base.BaseHandler(self.mock_request, self.mock_response)
+        self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
 
     def _expected_log_message(self, exception_name: str, error_msg: str) -> str:
         """Returns the expected log message format for a given exception."""
