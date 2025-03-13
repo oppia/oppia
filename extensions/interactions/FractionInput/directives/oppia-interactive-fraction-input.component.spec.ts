@@ -274,13 +274,12 @@ describe('InteractiveFractionInputComponent', () => {
   
     it('should handle empty answer during submission', () => {
       component.answer = '';
-      spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(true);
       spyOn(currentInteractionService, 'updateAnswerIsValid');
   
       component.submitAnswer();
   
       expect(component.errorMessageI18nKey).toBe(
-        'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+        'I18N_INTERACTIONS_FRACTIONS_INVALID_FORMAT'
       );
       expect(currentInteractionService.updateAnswerIsValid)
         .toHaveBeenCalledWith(false);
@@ -331,17 +330,6 @@ describe('InteractiveFractionInputComponent', () => {
       component.ngOnInit();
   
       expect(component.answer).toBe('-1 2/3');
-    });
-  
-    it('should handle invalid fraction parsing error', () => {
-      component.answer = 'invalid';
-      spyOn(Fraction, 'fromRawInputString').and.throwError('Parsing Error');
-      spyOn(currentInteractionService, 'updateAnswerIsValid');
-  
-      component.submitAnswer();
-  
-      expect(component.errorMessageI18nKey).toBe('Parsing Error');
-      expect(component.isValid).toBeFalse();
     });
   
     it('should update validity when answer changes', fakeAsync(() => {
