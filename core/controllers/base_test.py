@@ -27,6 +27,7 @@ import logging
 import os
 import re
 import types
+import typing
 
 from core import feconf
 from core import handler_schema_constants
@@ -2576,7 +2577,7 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         """Tests that _log_exception_message raises an Exception when an 
         invalid log type is passed."""  
         with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):  
-            self.handler._log_exception_message('TestException', 'invalid', 'Test error')
+            self.handler._log_exception_message('TestException', typing.cast(base.LogType, "invalid"), 'Test error')
 
     def test_generic_exception_logging_logs_exception(self) -> None:
         """Tests that a generic exception logs using LogType.EXCEPTION."""  
