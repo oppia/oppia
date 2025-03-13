@@ -4,6 +4,8 @@ on:
   issue_comment:
     types: [created]
 
+permissions: read-all
+
 jobs:
   assign-reviewers:
     if: github.event.issue.pull_request != null
@@ -21,36 +23,30 @@ jobs:
               if (typeof input !== 'string') return '';
               return allowed.test(input) ? input : '';
             };
-
             const sanitizeRepo = (input) => {
               const allowed = /^[A-Za-z0-9_.-]{1,100}$/;
               if (typeof input !== 'string') return '';
               return allowed.test(input) ? input : '';
             };
-
             const sanitizePrNumber = (num) => {
               const n = Number(num);
               return Number.isInteger(n) && n > 0 ? n : NaN;
             };
-
             if (!context.payload?.issue || !context.payload.repository) {
               core.setFailed('Invalid event payload');
               return;
             }
-
             const prNumber = sanitizePrNumber(context.payload.issue.number);
             if (isNaN(prNumber)) {
               core.setFailed(`Invalid PR number: ${context.payload.issue.number}`);
               return;
             }
-
             const repo = sanitizeRepo(context.payload.repository.name);
             const owner = sanitizeUsername(context.payload.repository.owner.login);
             if (!repo || !owner) {
               core.setFailed(`Invalid repo (${repo}) or owner (${owner})`);
               return;
             }
-
             const comment = (context.payload.comment?.body || '').trim();
             const reviewerPattern = /^((?:@[\w-]+[\s,]*)+)\s+(ptal|take\s+a\s+pass|please\s+review)\b/i;
             const match = comment.match(reviewerPattern);
@@ -58,37 +54,31 @@ jobs:
               console.log('No PTAL pattern found');
               return;
             }
-
             const reviewers = match[1]
               .split(/@+/)
               .map(part => part.trim().replace(/[\s,]+/g, ''))
               .filter(part => part)
               .map(sanitizeUsername)
               .filter(u => u);
-
             if (!reviewers.length) {
               console.log('No valid reviewers');
               return;
             }
-
             const { data: prData } = await github.rest.issues.get({
               owner,
               repo,
               issue_number: prNumber
             });
-
             if (!prData.pull_request) {
               core.setFailed('Issue is not a PR');
               return;
             }
-
             await github.rest.issues.addAssignees({
               owner,
               repo,
               issue_number: prNumber,
               assignees: reviewers
             });
-
             const safeMessage = `Assigned reviewers: ${reviewers.map(u => `@${u}`).join(', ')}. Thank you!`;
             if (safeMessage.length <= 500) {
               await github.rest.issues.createComment({
@@ -106,7 +96,6 @@ jobs:
                 body: fallbackMessage
               });
             }
-
   report-failure:
     needs: assign-reviewers
     runs-on: ubuntu-24.04
