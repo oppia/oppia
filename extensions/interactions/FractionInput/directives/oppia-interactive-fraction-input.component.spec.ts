@@ -154,7 +154,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should update the current answer with debounce' +
-    'when user types valid input',
+      'when user types valid input',
     fakeAsync(() => {
       const updateCurrentAnswerSpy = spyOn(
         currentInteractionService,
@@ -172,7 +172,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should display invalid format error when' +
-    'empty answer after user submits.',
+      'empty answer after user submits.',
     () => {
       component.answer = '';
       spyOn(currentInteractionService, 'updateAnswerIsValid');
@@ -182,14 +182,15 @@ describe('InteractiveFractionInputComponent', () => {
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_INVALID_FORMAT'
       );
-      expect(currentInteractionService.updateAnswerIsValid)
-        .toHaveBeenCalledWith(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
   it(
     'should display invalid characters error when' +
-    ' invalid character are submitted and not allowed',
+      ' invalid character are submitted and not allowed',
     () => {
       component.answer = '3a/4';
       spyOn(currentInteractionService, 'updateAnswerIsValid');
@@ -205,7 +206,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should display invalid format error when' +
-    'double slashes are submitted and not allowed',
+      'double slashes are submitted and not allowed',
     () => {
       component.answer = '2//3';
       spyOn(currentInteractionService, 'updateAnswerIsValid');
@@ -221,7 +222,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should not display error message when negative' +
-    ' input fraction is valid after user submits',
+      ' input fraction is valid after user submits',
     () => {
       component.answer = '-1 2/3';
       spyOn(currentInteractionService, 'onSubmit');
@@ -235,13 +236,13 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should correctly initialize answer' +
-    'when saved solution contains negative mixed number',
+      'when saved solution contains negative mixed number',
     () => {
       component.savedSolution = {
         isNegative: true,
         wholeNumber: 1,
         numerator: 2,
-        denominator: 3
+        denominator: 3,
       };
 
       component.ngOnInit();
@@ -251,8 +252,7 @@ describe('InteractiveFractionInputComponent', () => {
   );
 
   it(
-    'should reset validity status' +
-    'when user modifies answer input',
+    'should reset validity status' + 'when user modifies answer input',
     fakeAsync(() => {
       component.answer = 'invalid';
       component.answerValueChanged();
@@ -264,7 +264,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should display proper fraction error' +
-    'when improper fraction is submitted and not allowed',
+      'when improper fraction is submitted and not allowed',
     () => {
       component.allowImproperFraction = false;
       component.answer = '4/3';
@@ -279,7 +279,7 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should display non-mixed error' +
-    'when mixed number is submitted and integer parts are disallowed',
+      'when mixed number is submitted and integer parts are disallowed',
     () => {
       component.allowNonzeroIntegerPart = false;
       component.answer = '1 1/2';
@@ -293,19 +293,18 @@ describe('InteractiveFractionInputComponent', () => {
   );
 
   it(
-    'should display invalid length error' +
-    'when number exceeds 7 digits',
+    'should display invalid length error' + 'when number exceeds 7 digits',
     () => {
       component.answer = '12345678/1';
 
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
+          .INVALID_CHARS_LENGTH
       );
     }
   );
-
 
   it(
     'should display simplest form error message when input' +
