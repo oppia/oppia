@@ -123,46 +123,47 @@ export class ConceptCardBackendApiService {
             skillIdsWithNoSupersedingSkills.push(skillId);
           }
         });
-      });
-      var uncachedSkillIds = this._getUncachedSkillIds(
-        skillIdsWithNoSupersedingSkills
-      );
-      const conceptCards: ConceptCard[] = [];
 
-      if (uncachedSkillIds.length !== 0) {
-        // Case where only part (or none) of the concept cards are cached
-        // locally.
-        this._fetchConceptCards(
-          uncachedSkillIds,
-          uncachedConceptCards => {
-            skillIdsWithNoSupersedingSkills.forEach(skillId => {
-              if (uncachedSkillIds.includes(skillId)) {
-                conceptCards.push(
-                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
-                );
-                // Save the fetched conceptCards to avoid future fetches.
-                this._conceptCardCache[skillId] = cloneDeep(
-                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
-                );
-              } else {
-                conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
-              }
-            });
-            if (resolve) {
-              resolve(cloneDeep(conceptCards));
-            }
-          },
-          reject
+        var uncachedSkillIds = this._getUncachedSkillIds(
+          skillIdsWithNoSupersedingSkills
         );
-      } else {
-        // Case where all of the concept cards are cached locally.
-        skillIdsWithNoSupersedingSkills.forEach(skillId => {
-          conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
-        });
-        if (resolve) {
-          resolve(cloneDeep(conceptCards));
+        const conceptCards: ConceptCard[] = [];
+
+        if (uncachedSkillIds.length !== 0) {
+          // Case where only part (or none) of the concept cards are cached
+          // locally.
+          this._fetchConceptCards(
+            uncachedSkillIds,
+            uncachedConceptCards => {
+              skillIdsWithNoSupersedingSkills.forEach(skillId => {
+                if (uncachedSkillIds.includes(skillId)) {
+                  conceptCards.push(
+                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                  );
+                  // Save the fetched conceptCards to avoid future fetches.
+                  this._conceptCardCache[skillId] = cloneDeep(
+                    uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                  );
+                } else {
+                  conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+                }
+              });
+              if (resolve) {
+                resolve(cloneDeep(conceptCards));
+              }
+            },
+            reject
+          );
+        } else {
+          // Case where all of the concept cards are cached locally.
+          skillIdsWithNoSupersedingSkills.forEach(skillId => {
+            conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
+          });
+          if (resolve) {
+            resolve(cloneDeep(conceptCards));
+          }
         }
-      }
+      });
     });
   }
 }
