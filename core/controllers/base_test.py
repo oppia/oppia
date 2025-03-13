@@ -2446,7 +2446,7 @@ class LogTypeTests(test_utils.GenericTestBase):
         self.assertEqual(base.LogType.EXCEPTION, 'exception')
 
 
-class HandleExceptionLoggingTests(test_utils.GenericTestBase):
+class ExceptionsLoggingTests(test_utils.GenericTestBase):
     """Tests the logging behavior of handle_exception in BaseHandler."""
 
     def setUp(self) -> None:
@@ -2571,3 +2571,20 @@ class HandleExceptionLoggingTests(test_utils.GenericTestBase):
             self.logged_exceptions,
             msg='InternalErrorException message not match'
         )
+
+    def test_invalid_log_type_raises_exception(self) -> None:
+        """Tests that _log_exception_message raises an Exception when an 
+        invalid log type is passed."""  
+        with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):  
+            self.handler._log_exception_message('TestException', 'invalid', 'Test error')
+
+    def test_generic_exception_logging_logs_exception(self) -> None:
+        """Tests that a generic exception logs using LogType.EXCEPTION."""  
+        with self.swap(logging, 'exception', self.mock_logging_exception):  
+            generic_exception = Exception('Generic error')  
+            self.handler.handle_exception(generic_exception, False)  
+            expected_log_message = self._expected_log_message(  
+                'Exception', 'Exception raised'  
+            )  
+            self.assertIn(expected_log_message, self.logged_exceptions)
+
