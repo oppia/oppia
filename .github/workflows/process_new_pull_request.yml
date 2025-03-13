@@ -86,8 +86,6 @@ jobs:
             // REVIEWER ASSIGNMENT
             // ======================
             if (hasIndividualReviewers) {
-              // No need for try-catch here as the error will be logged automatically
-              // and the job will fail appropriately
               // Validate at least one valid reviewer exists
               const validReviewers = requestedIndividualReviewers
                 .filter(username => validateGitHubUsername(username));
@@ -103,7 +101,6 @@ jobs:
                 assignees: validReviewers
               });
 
-              // Create comment with sanitized content
               const firstReviewer = validReviewers[0];
               const assignmentMessage = `Assigning @${firstReviewer} for the first pass review of this PR. Thanks!`;
               
@@ -150,7 +147,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ always() && needs.manage_reviewers.result == 'failure' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Send notification
         uses: ./.github/actions/send-webhook-notification
         with:
