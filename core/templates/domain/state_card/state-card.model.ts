@@ -357,4 +357,15 @@ export class StateCard {
       audioTranslationLanguageService
     );
   }
+
+  updateAnswerIsValid(value: boolean): void {
+    this.getInteraction().answerIsValid = value;
+  }
+
+  showInvalidResponseError(): boolean {
+    return (
+      !this.getInteraction().answerIsValid &&
+      this.getInteraction().submitClicked
+    );
+  }
 }

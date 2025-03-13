@@ -426,4 +426,34 @@ describe('State card object factory', () => {
     simulateInteraction(-1);
     expect(_sampleCard1.showNoResponseError()).toBeFalse();
   });
+  it('should update answer validity using updateAnswerIsValid', () => {
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+
+    _sampleCard1.updateAnswerIsValid(true);
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeTrue();
+
+    _sampleCard1.updateAnswerIsValid(false);
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+  });
+
+  it('should show invalid response error when answer is invalid and submit clicked', () => {
+    _sampleCard1.updateAnswerIsValid(false);
+    _sampleCard1.getInteraction().submitClicked = true;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeTrue();
+  });
+
+  it('should not show invalid response error when answer is valid', () => {
+    _sampleCard1.updateAnswerIsValid(true);
+    _sampleCard1.getInteraction().submitClicked = true;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
+  });
+
+  it('should not show invalid response error when submit not clicked', () => {
+    _sampleCard1.updateAnswerIsValid(false);
+    _sampleCard1.getInteraction().submitClicked = false;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
+  });
 });

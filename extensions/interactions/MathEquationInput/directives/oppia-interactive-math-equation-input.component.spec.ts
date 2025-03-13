@@ -77,6 +77,8 @@ describe('MathEquationInputInteractive', () => {
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
 
+    updateAnswerIsValid(isValid: boolean) {}
+
     registerCurrentInteraction(
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -127,8 +129,12 @@ describe('MathEquationInputInteractive', () => {
     component.value = '(x + y)) = 3';
 
     spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(mockCurrentInteractionService, 'updateAnswerIsValid');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(
+      mockCurrentInteractionService.updateAnswerIsValid
+    ).toHaveBeenCalledWith(false);
     expect(component.warningText).toBe(
       'It looks like your answer has an invalid bracket pairing.'
     );
@@ -145,8 +151,12 @@ describe('MathEquationInputInteractive', () => {
       'y',
     ]);
     spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(mockCurrentInteractionService, 'updateAnswerIsValid');
     component.submitAnswer();
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
+    expect(
+      mockCurrentInteractionService.updateAnswerIsValid
+    ).toHaveBeenCalledWith(true);
     expect(component.hasBeenTouched).toBeTrue();
   });
 
