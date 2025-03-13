@@ -40,7 +40,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        recommended_exploration_ids = 123 # type: ignore[assignment]
+        recommended_exploration_ids = 123  # type: ignore[assignment]
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
             recommended_exploration_ids))
@@ -52,7 +52,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        recommended_exploration_ids = True # type: ignore[assignment]
+        recommended_exploration_ids = True  # type: ignore[assignment]
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
             recommended_exploration_ids))
@@ -67,7 +67,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
     def test_validate_non_str_recommended_id_raises_exception(
         self
     ) -> None:
-        recommended_exploration_ids = [0] # type: ignore[list-item]
+        recommended_exploration_ids = [0]  # type: ignore[list-item]
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
             recommended_exploration_ids))
