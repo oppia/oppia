@@ -805,11 +805,15 @@ class ElasticSearchStub:
         filters = body.get('query', {}).get('bool', {}).get('filter', [])
         terms = body.get('query', {}).get('bool', {}).get('must', [])        
         for f in filters:
+            if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
+                if 'match' in f:
+                    for k, v in f['match'].items():
+                        result_docs = [doc for doc in result_docs if v in doc.get(k, [])]
             # Check for 'multi_match' in the filter to avoid KeyError.
             # This ensures that we only attempt to access 'multi_match' if it exists
             # in the current filter. This prevents errors when the query structure
             # does not match expectations.
-            if 'multi_match' in f:
+            elif 'multi_match' in f:
                 for k, v in f['multi_match'].items():
                     # In explorations and collections, 'doc[k]' is a single
                     # language or category to which the exploration or
