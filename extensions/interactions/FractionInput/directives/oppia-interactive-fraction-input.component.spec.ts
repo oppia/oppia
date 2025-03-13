@@ -19,9 +19,7 @@
 import {
   async,
   ComponentFixture,
-  fakeAsync,
   TestBed,
-  tick,
   waitForAsync,
 } from '@angular/core/testing';
 import {InteractiveFractionInputComponent} from './oppia-interactive-fraction-input.component';
@@ -29,7 +27,6 @@ import {InteractionAttributesExtractorService} from 'interactions/interaction-at
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
