@@ -3,7 +3,7 @@
   </schema-based-editor>
 </ng-form>
 
-<div ng-if="!isDisabled()">
+<div *ngIf="!isDisabled()">
   <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
   <button ng-click="cancelEdit()" class="btn btn-secondary">Cancel</button>
 </div>
