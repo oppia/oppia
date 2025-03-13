@@ -190,7 +190,7 @@ export class ObjectEditorComponent
   @Input() set value(val: SchemaDefaultValue) {
     const previousValue = this._value;
     this._value = val;
-    // Ng-model can call write-obj before we create the component. Hence a
+    // Angular can call writeValue before we create the component. Hence a
     // check to see if component has been created.
     if (this.componentRef) {
       this.componentRef.instance.value = this._value;

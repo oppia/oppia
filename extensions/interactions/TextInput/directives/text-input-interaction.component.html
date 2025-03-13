@@ -1,6 +1,6 @@
 <!-- This outer div is needed, otherwise the textarea will overlap the footer of the page. -->
 <div class="text-input-container">
-  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <!-- This form is needed for submitting the answer on hitting enter. -->
   <form (ngSubmit)="submitAnswer(answer)" role="form" class="form-horizontal">
     <schema-based-editor [schema]="getSchema()"
                          [localValue]="answer"
