@@ -226,15 +226,6 @@ export class CreatorDashboardPageComponent {
     let dashboardDataPromise =
       this.creatorDashboardBackendApiService.fetchDashboardDataAsync();
     dashboardDataPromise.then((response: CreatorDashboardData) => {
-      // The following condition is required for Karma testing. The
-      // Angular HttpClient returns an Observable which when converted
-      // to a promise does not have the 'data' key but the AngularJS
-      // mocks of services using HttpClient use $http which return
-      // promise and the content is contained in the 'data' key.
-      // Therefore the following condition checks for presence of
-      // 'response.data' which would be the case in AngularJS testing
-      // but assigns 'response' if the former is not present which is
-      // the case with HttpClient.
       let responseData = response;
       this.currentSortType =
         CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
