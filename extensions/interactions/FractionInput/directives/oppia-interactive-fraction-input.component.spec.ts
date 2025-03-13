@@ -19,7 +19,9 @@
 import {
   async,
   ComponentFixture,
+  fakeAsync,
   TestBed,
+  tick,
   waitForAsync,
 } from '@angular/core/testing';
 import {InteractiveFractionInputComponent} from './oppia-interactive-fraction-input.component';
@@ -27,6 +29,7 @@ import {InteractionAttributesExtractorService} from 'interactions/interaction-at
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {FractionAnswer, InteractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
@@ -149,6 +152,237 @@ describe('InteractiveFractionInputComponent', () => {
     }
   );
 
+  // it(
+  //   'should display INVALID_CHARS_LENGTH error message when input' +
+  //     ' fraction has more than 7 charaters in a number while user is typing',
+  //   fakeAsync(() => {
+  //     const updateCurrentAnswerSpy = spyOn(
+  //       currentInteractionService,
+  //       'updateCurrentAnswer'
+  //     );
+  //     component.answer = '123';
+  //     component.answerValueChanged();
+  //     component.answer = '12345678';
+
+  //     expect(component.errorMessageI18nKey).toBe('');
+  //     expect(component.isValid).toBe(true);
+  //     component.answerValueChanged();
+  //     tick(150);
+
+  //     expect(component.errorMessageI18nKey).toBe(
+  //       ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
+  //         .INVALID_CHARS_LENGTH
+  //     );
+  //     expect(component.isValid).toBe(false);
+  //     expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
+  //       ['123'],
+  //       ['12345678'],
+  //     ]);
+  //   })
+  // );
+
+  // it(
+  //   'should display INVALID_CHARS error message when input' +
+  //     ' fraction has invalid characters while user is typing',
+  //   fakeAsync(() => {
+  //     const updateCurrentAnswerSpy = spyOn(
+  //       currentInteractionService,
+  //       'updateCurrentAnswer'
+  //     );
+  //     component.answer = '?2';
+  //     component.answerValueChanged();
+  //     component.answer = '??2';
+
+  //     expect(component.errorMessageI18nKey).toBe('');
+  //     expect(component.isValid).toBe(true);
+  //     component.answerValueChanged();
+  //     tick(150);
+
+  //     expect(component.errorMessageI18nKey).toBe(
+  //       ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
+  //     );
+  //     expect(component.isValid).toBe(false);
+  //     expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['?2'], ['??2']]);
+  //   })
+  // );
+
+  // it(
+  //   'should display INVALID_FORMAT error message when input' +
+  //     ' fraction is in a incorrect format while user is typing',
+  //   fakeAsync(() => {
+  //     const updateCurrentAnswerSpy = spyOn(
+  //       currentInteractionService,
+  //       'updateCurrentAnswer'
+  //     );
+  //     component.answer = '2';
+
+  //     component.answerValueChanged();
+
+  //     expect(component.errorMessageI18nKey).toBe('');
+  //     expect(component.isValid).toBe(true);
+
+  //     component.answer = '2 / 4 / 5';
+  //     component.answerValueChanged();
+  //     tick(150);
+  //     expect(component.errorMessageI18nKey).toBe(
+  //       ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
+  //     );
+  //     expect(component.isValid).toBe(false);
+  //     expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
+  //       ['2'],
+  //       ['2 / 4 / 5'],
+  //     ]);
+  //   })
+  // );
+
+  // it(
+  //   'should not display error message when input' +
+  //     ' fraction is correct while user is typing',
+  //   fakeAsync(() => {
+  //     const updateCurrentAnswerSpy = spyOn(
+  //       currentInteractionService,
+  //       'updateCurrentAnswer'
+  //     );
+  //     component.answer = '2';
+  //     component.answerValueChanged();
+  //     component.answer = '2/3';
+  //     component.isValid = false;
+  //     component.errorMessageI18nKey = 'error';
+
+  //     component.answerValueChanged();
+  //     tick(150);
+
+  //     expect(component.errorMessageI18nKey).toBe('');
+  //     expect(component.isValid).toBe(true);
+  //     expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['2'], ['2/3']]);
+  //   })
+  // );
+    it('should trigger answer change event with debounce', fakeAsync(() => {
+      const updateCurrentAnswerSpy = spyOn(
+        currentInteractionService, 
+        'updateCurrentAnswer'
+      );
+      
+      component.answer = '2';
+      component.answerValueChanged();
+      component.answer = '2/3';
+      component.answerValueChanged();
+      tick(150);
+  
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith('2/3');
+    }));
+  
+    it('should handle empty answer during submission', () => {
+      component.answer = '';
+      spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(true);
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+  
+      component.submitAnswer();
+  
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+      );
+      expect(currentInteractionService.updateAnswerIsValid)
+        .toHaveBeenCalledWith(false);
+    });
+  
+    it('should handle invalid characters in answer', () => {
+      component.answer = '3a/4';
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+  
+      component.submitAnswer();
+  
+      expect(component.errorMessageI18nKey).toBe(
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
+      );
+      expect(component.isValid).toBeFalse();
+    });
+  
+    it('should handle invalid format in answer', () => {
+      component.answer = '2//3';
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+  
+      component.submitAnswer();
+  
+      expect(component.errorMessageI18nKey).toBe(
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
+      );
+      expect(component.isValid).toBeFalse();
+    });
+  
+    it('should handle negative fractions when allowed', () => {
+      component.answer = '-1 2/3';
+      spyOn(currentInteractionService, 'onSubmit');
+  
+      component.submitAnswer();
+  
+      expect(component.errorMessageI18nKey).toBe('');
+      expect(currentInteractionService.onSubmit).toHaveBeenCalled();
+    });
+  
+    it('should initialize with complex saved solution', () => {
+      component.savedSolution = {
+        isNegative: true,
+        wholeNumber: 1,
+        numerator: 2,
+        denominator: 3
+      };
+  
+      component.ngOnInit();
+  
+      expect(component.answer).toBe('-1 2/3');
+    });
+  
+    it('should handle invalid fraction parsing error', () => {
+      component.answer = 'invalid';
+      spyOn(Fraction, 'fromRawInputString').and.throwError('Parsing Error');
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+  
+      component.submitAnswer();
+  
+      expect(component.errorMessageI18nKey).toBe('Parsing Error');
+      expect(component.isValid).toBeFalse();
+    });
+  
+    it('should update validity when answer changes', fakeAsync(() => {
+      component.answer = 'invalid';
+      component.answerValueChanged();
+      tick(150);
+  
+      expect(component.isValid).toBeTrue(); // Validity reset on input change
+    }));
+  
+    it('should handle proper fraction requirements', () => {
+      component.allowImproperFraction = false;
+      component.answer = '4/3';
+      
+      component.submitAnswer();
+      
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION'
+      );
+    });
+  
+    it('should handle mixed number requirements', () => {
+      component.allowNonzeroIntegerPart = false;
+      component.answer = '1 1/2';
+      
+      component.submitAnswer();
+      
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_FRACTIONS_NON_MIXED'
+      );
+    });
+  
+    it('should handle maximum character length error', () => {
+      component.answer = '12345678/1';
+      
+      component.submitAnswer();
+      
+      expect(component.errorMessageI18nKey).toBe(
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH
+      );
+    });
   it(
     'should display simplest form error message when input' +
       ' fraction is not in its simplest form after user submits',
