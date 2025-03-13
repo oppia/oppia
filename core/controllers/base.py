@@ -781,6 +781,9 @@ class BaseHandler(
             exception_type: str. Name of the exception.
             log_type: LogType. Log level ('warning', 'exception').
             error_message: str. Detailed error message.
+
+        Raises:
+            Exception. Invalid log type value.
         """
 
         handler_class_name = self.__class__.__name__
@@ -804,8 +807,10 @@ class BaseHandler(
 
         if log_type == LogType.WARNING:
             logging.warning(msg)
-        else:
+        elif log_type == LogType.EXCEPTION:
             logging.exception(msg)
+        else:
+            raise Exception('Invalid log type value: %s' % log_type)
 
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool

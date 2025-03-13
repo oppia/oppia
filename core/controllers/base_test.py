@@ -2446,15 +2446,18 @@ class LogTypeTests(test_utils.GenericTestBase):
         self.assertEqual(base.LogType.EXCEPTION, 'exception')
 
 
-class LogExceptionMessageTests(test_utils.GenericTestBase):
-    """Ensures that _log_exception_message correctly logs warnings and exceptions in BaseHandler."""  
+class HandleExceptionLoggingTests(test_utils.GenericTestBase):
+    """Tests the logging behavior of handle_exception in BaseHandler."""
 
     def setUp(self) -> None:
+        """Creates a mock request, response, and logging methods for capturing log outputs."""
         super().setUp()
         self.mock_request = webapp2.Request.blank('/')
+        self.mock_request.environ['REQUEST_METHOD'] = 'POST'
         self.mock_response = webapp2.Response()
-        self.logged_warnings: List[str] = []
-        self.logged_exceptions: List[str] = []
+
+        self.logged_warnings = []
+        self.logged_exceptions = []
 
         def mock_logging_warning(msg: str) -> None:
             self.logged_warnings.append(msg)
@@ -2465,21 +2468,106 @@ class LogExceptionMessageTests(test_utils.GenericTestBase):
         self.mock_logging_warning = mock_logging_warning
         self.mock_logging_exception = mock_logging_exception
 
-    def test_log_exception_message(self) -> None:
-        """Test that _log_exception_message correctly logs warning and exception messages."""
-        handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
+        self.handler = base.BaseHandler(self.mock_request, self.mock_response)
 
-        with self.swap(logging, 'warning', self.mock_logging_warning), \
-             self.swap(logging, 'exception', self.mock_logging_exception):
-
-            handler._log_exception_message('TestException', base.LogType.WARNING, 'Test Warning Message')
-            handler._log_exception_message('TestException', base.LogType.EXCEPTION, 'Test Exception Message')
-
-        self.assertTrue(
-            any("Test Warning Message" in msg for msg in self.logged_warnings),
-            msg="Expected 'Test Warning Message' to be found in warning logs."
+    def _expected_log_message(self, exception_name: str, error_msg: str) -> str:
+        """Returns the expected log message format for a given exception."""
+        return (
+            '\nType Exception: %s\n'
+            'Error Message: %s\n'
+            'URL requested: %s\n'
+            'Request method: %s\n'
+            'Handler class name: %s\n\n'
+            % (
+                exception_name,
+                error_msg,
+                self.handler.request.uri,
+                self.handler.request.environ['REQUEST_METHOD'],
+                self.handler.__class__.__name__
+            )
         )
-        self.assertTrue(
-            any("Test Exception Message" in msg for msg in self.logged_exceptions),
-            msg="Expected 'Test Exception Message' to be found in exception logs."
+
+    def test_handle_not_logged_in_exception_logs_warning(self) -> None:
+        """Ensures NotLoggedInException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotLoggedInException('Unauthenticated user'),
+                False
+            )
+        expected_log_message = self._expected_log_message(
+            'NotLoggedInException',
+            'Unauthenticated user'
+        )
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotLoggedInException message not match'
+        )
+
+    def test_not_found_exception_logs_warning(self) -> None:
+        """Ensures NotFoundException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotFoundException('Invalid URL requested'),
+                False
+            )
+        expected_log_message = self._expected_log_message(
+            'NotFoundException',
+            'Invalid URL requested'
+        )
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotFoundException message not match'
+        )
+
+    def test_unauthorized_user_exception_logs_warning(self) -> None:
+        """Ensures UnauthorizedUserException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.UnauthorizedUserException('Unauthorized User'),
+                False
+            )
+        expected_log_message = self._expected_log_message(
+            'UnauthorizedUserException',
+            'Exception raised'
+        )
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='UnauthorizedUserException message not match'
+        )
+
+    def test_invalid_input_exception_logs_warning(self) -> None:
+        """Ensures InvalidInputException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InvalidInputException('Invalid Input'),
+                False
+            )
+        expected_log_message = self._expected_log_message(
+            'InvalidInputException',
+            'Exception raised'
+        )
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InvalidInputException message not match'
+        )
+
+    def test_internal_error_exception_logs_warning(self) -> None:
+        """Ensures InternalErrorException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InternalErrorException('Internal Error'),
+                False
+            )
+        expected_log_message = self._expected_log_message(
+            'InternalErrorException',
+            'Exception raised'
+        )
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InternalErrorException message not match'
         )
