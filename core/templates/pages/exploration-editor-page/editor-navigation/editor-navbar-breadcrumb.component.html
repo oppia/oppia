@@ -8,7 +8,7 @@
         <[getCurrentTabName()]>
       </span>
     </span>
-    <span *ngIf="navbarTitle === ''" ng-click="editTitle()" class="oppia-untitled-exploration-text">
+    <span *ngIf="navbarTitle === ''" (click)="editTitle()" class="oppia-untitled-exploration-text">
       Untitled Exploration
     </span>
     <span class="e2e-test-loading-message" *ngIf="navbarTitle === null">
