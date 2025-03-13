@@ -27,41 +27,32 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
-import {importAllAngularServices} from 'tests/unit-test-utils.ajs';
-
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 
 describe('Solution Verification Service', () => {
-  let ess, siis, scas, sof, svs, see;
-  let mockInteractionState;
-  importAllAngularServices();
+  let explorationStatesService: ExplorationStatesService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let stateCustomizationArgsService: StateCustomizationArgsService;
+  let solutionObjectFactory: SolutionObjectFactory;
+  let solutionVerificationService: SolutionVerificationService;
+  let stateEditorService: StateEditorService;
+  let mockInteractionState: Record<string, unknown>;
 
-  beforeEach(
-    angular.mock.module('oppia', function ($provide) {
-      $provide.value('NgbModal', {
-        open: () => {
-          return {
-            result: Promise.resolve(),
-          };
-        },
-      });
-    })
-  );
   beforeEach(() => {
     mockInteractionState = {
-      TextInput: {
-        display_mode: 'inline',
-        is_terminal: false,
-      },
-      TerminalInteraction: {
-        display_mode: 'inline',
-        is_terminal: true,
-      },
+      TextInput: {display_mode: 'inline', is_terminal: false},
+      TerminalInteraction: {display_mode: 'inline', is_terminal: true},
     };
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        StateInteractionIdService,
+        StateCustomizationArgsService,
+        SolutionObjectFactory,
+        StateEditorService,
+        SolutionVerificationService,
+        ExplorationStatesService,
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState,
@@ -70,231 +61,138 @@ describe('Solution Verification Service', () => {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeListAsync() {
-              return;
-            },
+            autosaveChangeListAsync: () => {},
           },
         },
       ],
     });
 
-    siis = TestBed.get(StateInteractionIdService);
-    scas = TestBed.get(StateCustomizationArgsService);
-    sof = TestBed.get(SolutionObjectFactory);
-    see = TestBed.get(StateEditorService);
-    svs = TestBed.get(SolutionVerificationService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService
+    );
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    solutionVerificationService = TestBed.inject(SolutionVerificationService);
+
+    explorationStatesService.init({
+      'First State': {
+        content: {content_id: 'content', html: 'First State Content'},
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            hint_1: {},
+            hint_2: {},
+          },
+        },
+        interaction: {
+          id: 'TextInput',
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'End State',
+                dest_if_really_stuck: null,
+                feedback: {content_id: 'feedback_1', html: ''},
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+              },
+              rule_specs: [
+                {
+                  rule_type: 'Contains',
+                  inputs: {
+                    x: {contentId: 'rule_input', normalizedStrSet: ['abc']},
+                  },
+                },
+              ],
+            },
+          ],
+          customization_args: {
+            placeholder: {
+              value: {content_id: 'ca_placeholder_0', unicode_str: ''},
+            },
+            rows: {value: 1},
+            catchMisspellings: {value: false},
+          },
+          default_outcome: {
+            dest: 'First State',
+            dest_if_really_stuck: null,
+            feedback: {content_id: 'default_outcome', html: ''},
+            labelled_as_correct: false,
+            param_changes: [],
+          },
+          hints: [
+            {hint_content: {content_id: 'hint_1', html: 'one'}},
+            {hint_content: {content_id: 'hint_2', html: 'two'}},
+          ],
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+      },
+    });
   });
 
-  // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
-  // block when ExplorationStateService has been migrated to Angular 8.
-  beforeEach(
-    angular.mock.inject(function ($injector) {
-      ess = $injector.get('ExplorationStatesService');
-      ess.init({
-        'First State': {
-          content: {
-            content_id: 'content',
-            html: 'First State Content',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              hint_1: {},
-              hint_2: {},
-            },
-          },
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [
-              {
-                outcome: {
-                  dest: 'End State',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '',
-                  },
-                  labelled_as_correct: false,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                },
-                rule_specs: [
-                  {
-                    rule_type: 'Contains',
-                    inputs: {
-                      x: {
-                        contentId: 'rule_input',
-                        normalizedStrSet: ['abc'],
-                      },
-                    },
-                  },
-                ],
-              },
-            ],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: '',
-                },
-              },
-              rows: {value: 1},
-              catchMisspellings: {
-                value: false,
-              },
-            },
-            default_outcome: {
-              dest: 'First State',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'default_outcome',
-                html: '',
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-            },
-            hints: [
-              {
-                hint_content: {
-                  content_id: 'hint_1',
-                  html: 'one',
-                },
-              },
-              {
-                hint_content: {
-                  content_id: 'hint_2',
-                  html: 'two',
-                },
-              },
-            ],
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-        },
-        'End State': {
-          content: {
-            content_id: 'content',
-            html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-            },
-          },
-          interaction: {
-            id: 'TextInput',
-            answer_groups: [
-              {
-                rule_specs: [],
-                outcome: {
-                  dest: 'default',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'feedback_1',
-                    html: '',
-                  },
-                  labelled_as_correct: false,
-                  param_changes: [],
-                  refresher_exploration_id: null,
-                },
-              },
-            ],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: '',
-                },
-              },
-              rows: {value: 1},
-              catchMisspellings: {
-                value: false,
-              },
-            },
-            default_outcome: {
-              dest: 'default',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'default_outcome',
-                html: '',
-              },
-              param_changes: [],
-            },
-            hints: [],
-          },
-          param_changes: [],
-          solicit_answer_details: false,
-        },
-      });
-    })
-  );
-
   it('should verify a correct solution', () => {
-    var state = ess.getState('First State');
-    siis.init(
+    const state = explorationStatesService.getState('First State');
+    stateInteractionIdService.init(
       'First State',
       state.interaction.id,
       state.interaction,
       'widget_id'
     );
-    scas.init(
+    stateCustomizationArgsService.init(
       'First State',
       state.interaction.customizationArgs,
       state.interaction,
       'widget_customization_args'
     );
 
-    siis.savedMemento = 'TextInput';
-    ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
+    stateInteractionIdService.savedMemento = 'TextInput';
+    explorationStatesService.saveSolution(
+      'First State',
+      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+    );
 
     expect(
-      svs.verifySolution(
+      solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer
-      )
-    ).toBe(true);
-
-    see.setInQuestionMode(true);
-    state.interaction.answerGroups[0].outcome.dest = 'First State';
-    state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
-    expect(
-      svs.verifySolution(
-        'First State',
-        state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer
+        explorationStatesService.getState('First State').interaction.solution
+          .correctAnswer
       )
     ).toBe(true);
   });
 
   it('should verify an incorrect solution', () => {
-    var state = ess.getState('First State');
-    siis.init(
+    const state = explorationStatesService.getState('First State');
+    stateInteractionIdService.init(
       'First State',
       state.interaction.id,
       state.interaction,
       'widget_id'
     );
-    scas.init(
+    stateCustomizationArgsService.init(
       'First State',
       state.interaction.customizationArgs,
       state.interaction,
       'widget_customization_args'
     );
 
-    siis.savedMemento = 'TextInput';
-    ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
+    stateInteractionIdService.savedMemento = 'TextInput';
+    explorationStatesService.saveSolution(
+      'First State',
+      solutionObjectFactory.createNew(false, 'xyz', 'nothing')
+    );
 
     expect(
-      svs.verifySolution(
+      solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        ess.getState('First State').interaction.solution.correctAnswer
+        explorationStatesService.getState('First State').interaction.solution
+          .correctAnswer
       )
     ).toBe(false);
   });
@@ -303,11 +201,7 @@ describe('Solution Verification Service', () => {
     const interaction = new Interaction(
       [],
       [],
-      {
-        choices: {
-          value: [new SubtitledHtml('This is a choice', '')],
-        },
-      },
+      {choices: {value: [new SubtitledHtml('This is a choice', '')]}},
       null,
       [],
       null,
@@ -315,7 +209,44 @@ describe('Solution Verification Service', () => {
     );
 
     expect(() => {
-      svs.verifySolution('State 1', interaction, 'Answer');
+      solutionVerificationService.verifySolution(
+        'State 1',
+        interaction,
+        'Answer'
+      );
     }).toThrowError('Interaction ID must not be null');
+  });
+
+  it('should return outcome.labelledAsCorrect when in question mode', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+
+    const state = explorationStatesService.getState('First State');
+    stateInteractionIdService.init(
+      'First State',
+      state.interaction.id,
+      state.interaction,
+      'widget_id'
+    );
+    stateCustomizationArgsService.init(
+      'First State',
+      state.interaction.customizationArgs,
+      state.interaction,
+      'widget_customization_args'
+    );
+
+    stateInteractionIdService.savedMemento = 'TextInput';
+    explorationStatesService.saveSolution(
+      'First State',
+      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+    );
+
+    expect(
+      solutionVerificationService.verifySolution(
+        'First State',
+        state.interaction,
+        explorationStatesService.getState('First State').interaction.solution
+          .correctAnswer
+      )
+    ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);
   });
 });
