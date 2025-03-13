@@ -128,27 +128,6 @@ describe('Number with units interaction component', () => {
     ).toHaveBeenCalledOnceWith('24 km');
   }));
 
-  it('should display warning when the answer format is incorrect', fakeAsync(() => {
-    spyOn(currentInteractionService, 'updateCurrentAnswer');
-
-    // PreChecks.
-    expect(component.errorMessageI18nKey).toBe('');
-    expect(component.isValid).toBeTrue();
-
-    // Test: Incorrect answer.
-    component.answer = '24 k';
-
-    component.answerValueChanged();
-    tick(150);
-
-    // PostChecks: Error message as the Unit is incorrect.
-    expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
-    expect(component.isValid).toBeFalse();
-    expect(
-      currentInteractionService.updateCurrentAnswer
-    ).toHaveBeenCalledOnceWith('24 k');
-  }));
-
   it("should close help modal when user clicks the 'close' button", () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('close'),

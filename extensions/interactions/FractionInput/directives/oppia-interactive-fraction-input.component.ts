@@ -219,7 +219,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
-    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   getPlaceholderText(): string {

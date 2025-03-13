@@ -154,108 +154,75 @@ describe('InteractiveFractionInputComponent', () => {
 
   it(
     'should display INVALID_CHARS_LENGTH error message when input' +
-      ' fraction has more than 7 charaters in a number while user is typing',
-    fakeAsync(() => {
+      ' fraction has more than 7 characters after user submits',
+    () => {
       const updateCurrentAnswerSpy = spyOn(
         currentInteractionService,
         'updateCurrentAnswer'
       );
-      component.answer = '123';
-      component.answerValueChanged();
       component.answer = '12345678';
 
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      component.answerValueChanged();
-      tick(150);
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
           .INVALID_CHARS_LENGTH
       );
       expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
-        ['123'],
-        ['12345678'],
-      ]);
-    })
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith('12345678');
+    }
   );
 
   it(
     'should display INVALID_CHARS error message when input' +
-      ' fraction has invalid characters while user is typing',
-    fakeAsync(() => {
+      ' fraction has invalid characters after user submits',
+    () => {
       const updateCurrentAnswerSpy = spyOn(
         currentInteractionService,
         'updateCurrentAnswer'
       );
-      component.answer = '?2';
-      component.answerValueChanged();
       component.answer = '??2';
 
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      component.answerValueChanged();
-      tick(150);
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
       );
       expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['?2'], ['??2']]);
-    })
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith('??2');
+    }
   );
 
   it(
     'should display INVALID_FORMAT error message when input' +
-      ' fraction is in a incorrect format while user is typing',
-    fakeAsync(() => {
+      ' fraction is in incorrect format after user submits',
+    () => {
       const updateCurrentAnswerSpy = spyOn(
         currentInteractionService,
         'updateCurrentAnswer'
       );
-      component.answer = '2';
-
-      component.answerValueChanged();
-
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-
       component.answer = '2 / 4 / 5';
-      component.answerValueChanged();
-      tick(150);
+
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
+
       expect(component.errorMessageI18nKey).toBe(
         ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
       );
       expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
-        ['2'],
-        ['2 / 4 / 5'],
-      ]);
-    })
-  );
-
-  it(
-    'should not display error message when input' +
-      ' fraction is correct while user is typing',
-    fakeAsync(() => {
-      const updateCurrentAnswerSpy = spyOn(
-        currentInteractionService,
-        'updateCurrentAnswer'
-      );
-      component.answer = '2';
-      component.answerValueChanged();
-      component.answer = '2/3';
-      component.isValid = false;
-      component.errorMessageI18nKey = 'error';
-
-      component.answerValueChanged();
-      tick(150);
-
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['2'], ['2/3']]);
-    })
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith('2 / 4 / 5');
+    }
   );
 
   it(
