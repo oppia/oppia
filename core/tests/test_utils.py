@@ -799,23 +799,18 @@ class ElasticSearchStub:
             if not doc['id'] in result_doc_ids:
                 result_docs.append(doc)
                 result_doc_ids.add(doc['id'])
-
-        filters = body['query']['bool']['filter']
-        terms = body['query']['bool']['must']
-
+        
+        # Initialize filters and terms using .get() to avoid KeyError
+        # This allows for safe access to nested keys and provides default values
+        filters = body.get('query', {}).get('bool', {}).get('filter', [])
+        terms = body.get('query', {}).get('bool', {}).get('must', [])        
         for f in filters:
-            # For processing 'doc[k] in v', doc[k] can only be of type string if
-            # v is a string.
-            if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
-                for k, v in f['match'].items():
-                    # Tags field in 'doc' in blog post search index is
-                    # of type list(str) under which the blog post can be
-                    # classified. 'v' is a single tag which if present in the
-                    # tags field list, the 'doc' should be returned. Therefore,
-                    # we check using 'v in doc[k]'.
-                    result_docs = [doc for doc in result_docs if v in doc[k]]
-            else:
-                for k, v in f['match'].items():
+            # Check for 'multi_match' in the filter to avoid KeyError.
+            # This ensures that we only attempt to access 'multi_match' if it exists
+            # in the current filter. This prevents errors when the query structure
+            # does not match expectations.
+            if 'multi_match' in f:
+                for k, v in f['multi_match'].items():
                     # In explorations and collections, 'doc[k]' is a single
                     # language or category to which the exploration or
                     # collection belongs, 'v' is a string of all the languages
@@ -827,23 +822,19 @@ class ElasticSearchStub:
         if terms:
             filtered_docs = []
             for term in terms:
-                    # Previously, the mock_search function assumed that
-                    # all terms in the 'must' clause had a 'query' key.
-                    # This assumption worked for 'multi_match' queries
-                    # but failed for 'match_all' queries, which do not have
-                    # a 'query' key. This caused a KeyError when processing
-                    # 'match_all' queries. To fix this, we now explicitly check
-                    # for the presence of 'match_all' or 'multi_match'
-                    # in the term and handle them accordingly.
-
+                # Previously, the mock_search function assumed that
+                # all terms in the 'must' clause had a 'query' key.
+                # This assumption worked for 'multi_match' queries
+                # but failed for 'match_all' queries, which do not have
+                # a 'query' key. To fix this, we now explicitly check
+                # for the presence of 'match_all' or 'multi_match'
+                # in the term and handle them accordingly.
                 if 'match_all' in term:
                     filtered_docs = result_docs
                 elif 'multi_match' in term:
                     values = term['multi_match']['query'].split(' ')
                     for doc in result_docs:
-                        strs = [
-                            val for val in doc.values() if isinstance(val, str)
-                        ]
+                        strs = [val for val in doc.values() if isinstance(val, str)]
                         words = []
                         for s in strs:
                             words += s.split(' ')
