@@ -21,12 +21,13 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DisplayHintModalComponent} from '../modals/display-hint-modal.component';
 import {DisplaySolutionInterstititalModalComponent} from '../modals/display-solution-interstitial-modal.component';
 import {DisplaySolutionModalComponent} from '../modals/display-solution-modal.component';
+import { ItemSelectionClearService } from './itemselection-clear.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HintAndSolutionModalService {
-  constructor(private ngbModal: NgbModal) {}
+  constructor(private ngbModal: NgbModal, private itemSelectionClearService: ItemSelectionClearService) {}
 
   displayHintModal(index: number): NgbModalRef {
     let modalRef: NgbModalRef = this.ngbModal.open(DisplayHintModalComponent, {
@@ -37,6 +38,7 @@ export class HintAndSolutionModalService {
   }
 
   displaySolutionModal(): NgbModalRef {
+    this.itemSelectionClearService.triggerClearSelection();
     return this.ngbModal.open(DisplaySolutionModalComponent, {
       backdrop: 'static',
     });

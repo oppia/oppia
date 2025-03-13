@@ -32,8 +32,10 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import { Subscription } from 'rxjs';
 
 import '../static/item_selection_input.css';
+import { ItemSelectionClearService } from 'pages/exploration-player-page/services/itemselection-clear.service';
 
 @Component({
   selector: 'oppia-interactive-item-selection-input',
@@ -61,6 +63,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   notEnoughSelections: boolean = false;
   preventAdditionalSelections: boolean = false;
   exactSelections: boolean = false;
+  private subscription: Subscription;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -69,7 +72,8 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService
+    private playerTranscriptService: PlayerTranscriptService,
+    private selectionService: ItemSelectionClearService,
   ) {}
 
   ngOnInit(): void {
@@ -143,6 +147,13 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.submitAnswer.bind(this),
       this.validityCheckFn.bind(this)
     );
+    this.subscription = this.selectionService.clearSelection$.subscribe((clear: boolean) => {
+      if (clear) {
+        setTimeout(() => {
+          this.clearSelection();
+        });
+      }
+    });
   }
 
   getContentId(): string {
@@ -215,5 +226,27 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
   validityCheckFn(): boolean {
     return !this.notEnoughSelections;
+  }
+
+  clearSelection(): void {
+    // Radio buttons get unselected when specifying a solution.
+    Object.keys(this.userSelections).forEach(key => {
+      this.userSelections[key] = false;
+    });
+    this.selectionCount = 0;
+    this.preventAdditionalSelections = false;
+    // Deselect for multiple choice answer.
+    var selectedElement = document.querySelector(
+      'button.multiple-choice-option.selected'
+    );
+    if (selectedElement) {
+      selectedElement.classList.remove('selected');
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
