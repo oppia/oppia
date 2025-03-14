@@ -17,6 +17,7 @@
  */
 
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {HttpClientModule} from '@angular/common/http';
 
 import {Subscription} from 'rxjs';
 import {Story} from 'domain/story/story.model';
@@ -144,6 +145,7 @@ describe('Story editor state service', () => {
     };
 
     TestBed.configureTestingModule({
+      imports: [HttpClientModule],
       providers: [
         {
           provide: EditableStoryBackendApiService,
@@ -408,7 +410,7 @@ describe('Story editor state service', () => {
     );
   }));
 
-  it('should warn user when user attepts to publish story before it loads', fakeAsync(() => {
+  it('should warn user when user attempts to publish story before it loads', fakeAsync(() => {
     storyEditorStateService.loadStory('storyId_0');
     tick(1000);
 
@@ -577,7 +579,7 @@ describe('Story editor state service', () => {
 
   it(
     "should warn user when user updates the storie's URL to an URL" +
-      ' that already exits',
+      ' that already exists',
     fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       var newStory = Story.createFromBackendDict(secondBackendStoryObject);
