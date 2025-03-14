@@ -801,7 +801,7 @@ class ElasticSearchStub:
                 result_doc_ids.add(doc['id'])
 
         # Initialize filters and terms using .get to avoid KeyError
-        # This allows for safe access to nested keys and 
+        # This allows for safe access to nested keys and
         # provides default values.
         filters = body.get('query', {}).get('bool', {}).get('filter', [])
         terms = body.get('query', {}).get('bool', {}).get('must', [])
@@ -809,7 +809,7 @@ class ElasticSearchStub:
             if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
                 if 'match' in f:
                     for k, v in f['match'].items():
-                        result_docs = [doc for doc in result_docs 
+                        result_docs = [doc for doc in result_docs
                                        if v in doc.get(k, [])]
             # Check for 'multi_match' in the filter to avoid KeyError.
             # This ensures that we only attempt to access 'multi_match'
