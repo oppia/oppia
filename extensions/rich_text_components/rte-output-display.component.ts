@@ -30,15 +30,19 @@ import {
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
+import {AppConstants} from 'app.constants';
 import {ConstantNodeDependencies} from 'mathjs';
 import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AudioPlayerService} from 'services/audio-player.service';
+import {ContextService} from 'services/context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {
   OppiaRteParserService,
   OppiaRteNode,
   TextNode,
 } from 'services/oppia-rte-parser.service';
+import {ServicesConstants} from 'services/services.constants';
 
 type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 
@@ -76,12 +80,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
-  private highlightInterval: number = 3000; // Time interval in milliseconds
-  private highlightClass: string = 'highlight';
-  private currentHighlightIndex: number = -1;
   audioPlaybackHighlightIntervals = [];
   highlighIdToSentenceText = {};
   wrapped = false;
+  previousHighlightedElementId!: string;
+  punctuationsForCurrentLanguage =
+    AppConstants.LANGUAGE_CODE_TO_PUNCTIONATION_MARKS['en'];
 
   constructor(
     private _viewContainerRef: ViewContainerRef,
@@ -90,25 +94,27 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     private oppiaHtmlParserService: OppiaRteParserService,
     private entityVoiceoversService: EntityVoiceoversService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
-    private audioPlayerService: AudioPlayerService
+    private audioPlayerService: AudioPlayerService,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private contextService: ContextService
   ) {}
 
-  wrapSentencesInSpans(htmlString: string): string {
+  wrapSentencesInSpansForHighlighting(htmlString: string): string {
+    // This prevents wrapping the sentences in spans multiple times.
     if (this.wrapped) {
       return htmlString;
     }
     this.wrapped = true;
-    // Create a temporary DOM element
+    // Create a temporary DOM element.
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
     let index = 1;
     let highlighIdToSentenceText = {};
 
-    // Recursive function to traverse and wrap sentences
     function traverse(node: Node) {
       if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
-        const sentences = textContent.split(/(?<=[.!?])\s+/); // Split by punctuation and space
+        const sentences = textContent.split(/(?<=[.!?])\s+/);
         const fragment = document.createDocumentFragment();
 
         sentences.forEach(sentence => {
@@ -122,60 +128,19 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             index++;
           }
         });
-
         node.parentNode?.replaceChild(fragment, node);
       } else {
-        // Recursively traverse child nodes
         node.childNodes.forEach(traverse);
       }
     }
 
-    // Start traversing from the root of the temporary div
     traverse(tempDiv);
     this.highlighIdToSentenceText = highlighIdToSentenceText;
 
-    // Return the modified HTML string
     return tempDiv.innerHTML;
   }
 
-  startHighlighting(): void {
-    // Select all <p>, <h1>, <span>, etc. elements inside the treeContainer
-    const sentences = this.treeContainer.nativeElement.querySelectorAll(
-      'p, h1, span, li',
-      'ul'
-    );
-    // sentences.forEach(element => {
-    //   let subsentences = element.textContent;
-    //   let listOfSubSentences = subsentences.split(/[.?!]/)
-    // });
-
-    // this.highlightNextSentence(sentences);
-  }
-
-  highlightNextSentence(sentences: NodeListOf<HTMLElement>): void {
-    setInterval(() => {
-      // Clear previous highlights
-      this.clearHighlight(sentences);
-
-      // Move to the next sentence
-      this.currentHighlightIndex++;
-      if (this.currentHighlightIndex >= sentences.length) {
-        this.currentHighlightIndex = 0;
-      }
-
-      // Add the highlight class to the current sentence
-      sentences[this.currentHighlightIndex].classList.add(this.highlightClass);
-    }, this.highlightInterval);
-  }
-
-  clearHighlight(sentences: NodeListOf<HTMLElement>): void {
-    sentences.forEach(sentence =>
-      sentence.classList.remove(this.highlightClass)
-    );
-  }
-
   private _updateNode(): void {
-    console.log('update node');
     if (this.rteString === undefined || this.rteString === null) {
       return;
     }
@@ -194,7 +159,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
     this.rteString = this.rteString.replace(/\n/g, '');
-    this.rteString = this.wrapSentencesInSpans(this.rteString);
+    this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
 
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
@@ -246,83 +211,96 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    console.log('ng on init');
-    console.log(this.rteString);
-    let x = false;
-    // this.rteString = this.wrapSentencesInSpans(this.rteString);
-    console.log(this.node);
-
-    this.getSentenceAudioOffset();
     setInterval(() => {
       if (this.audioPlayerService.isPlaying()) {
-        let currentIdToHighlight = this.getCurrentSentenceIdToHighlight();
-        console.log(this.node);
+        let previousHighlightedElement = document.getElementById(
+          this.previousHighlightedElementId
+        );
+        let currentElementIdToHighlight =
+          this.getCurrentSentenceIdToHighlight();
 
-        let a = document.getElementById(currentIdToHighlight);
-        console.log(a);
+        if (
+          previousHighlightedElement &&
+          previousHighlightedElement.textContent ===
+            this.highlighIdToSentenceText[currentElementIdToHighlight]
+        ) {
+          return;
+        }
 
-        const elements = document.querySelectorAll('.highlight-block');
+        if (previousHighlightedElement) {
+          previousHighlightedElement.style.backgroundColor = '';
+        }
 
-        elements.forEach(element => {
-          if (
-            element.textContent ===
-            this.highlighIdToSentenceText[currentIdToHighlight]
-          ) {
-            (element as HTMLElement).style.backgroundColor = 'yellow';
-          } else {
-            (element as HTMLElement).style.backgroundColor = '';
-          }
-        });
+        let elementToHighlight = document.getElementById(
+          currentElementIdToHighlight
+        );
+        if (elementToHighlight) {
+          elementToHighlight.style.backgroundColor = 'yellow';
+          this.previousHighlightedElementId = currentElementIdToHighlight;
+        }
+      } else {
+        let previousHighlightedElement = document.getElementById(
+          this.previousHighlightedElementId
+        );
+        if (previousHighlightedElement) {
+          previousHighlightedElement.style.backgroundColor = '';
+        }
       }
-
-      // if (currentIdToHighlight) {
-      //   const highlightElement = document.getElementById(currentIdToHighlight);
-      //   if (highlightElement) {
-      //     highlightElement.style.backgroundColor = 'yellow';
-      //   } else {
-      //   }
-      // }
-    }, 500);
+    }, 200);
   }
 
-  getId(attribute) {
-    // console.log(attribute);
-    // console.log('Checking attribute!')
+  getElementIdForGivenAttribute(attribute): string {
     if (Object.keys(attribute).includes('id')) {
       return attribute.id;
     }
     return '';
   }
 
-  getCurrentSentenceIdToHighlight(): string {
+  getCurrentSentenceIdToHighlight(): string | undefined {
     let currentTimeInSecs = this.audioPlayerService.getCurrentTimeInSecs();
-    let currentSentenceId = this.audioPlaybackHighlightIntervals.find(
-      interval => {
-        if (
-          currentTimeInSecs >= interval.startTimeInSecs &&
-          currentTimeInSecs <= interval.endTimeInSecs
-        ) {
-          return interval.sentenceId;
-        }
-      }
-    );
-    return currentSentenceId.sentenceId;
+    let currentsentenceIdAndInterval =
+      this.audioPlaybackHighlightIntervals.find(sentenceIdAndInterval => {
+        return (
+          currentTimeInSecs >= sentenceIdAndInterval.startTimeInSecs &&
+          currentTimeInSecs <= sentenceIdAndInterval.endTimeInSecs
+        );
+      });
+    return currentsentenceIdAndInterval?.sentenceId;
   }
 
   getSentenceAudioOffset() {
     let automatedVoiceoversAudioOffsetsMsecs =
       this.entityVoiceoversService.getActiveEntityVoiceovers()
-        .automatedVoiceoversAudioOffsetsMsecs;
+        ?.automatedVoiceoversAudioOffsetsMsecs || [];
 
-    let contentId =
-      this.translationTabActiveContentIdService.getActiveContentId();
+    if (Object.values(automatedVoiceoversAudioOffsetsMsecs).length === 0) {
+      return;
+    }
+
+    let contentId!: string;
+    if (
+      this.contextService.isInExplorationPlayerPage() ||
+      (this.contextService.isInExplorationEditorPage() &&
+        this.contextService.getEditorTabContext() ===
+          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
+    ) {
+      contentId = this.voiceoverPlayerService.getActiveContentId();
+    } else {
+      contentId =
+        this.translationTabActiveContentIdService.getActiveContentId();
+    }
 
     let audioOffsets = automatedVoiceoversAudioOffsetsMsecs[contentId];
+
+    if (audioOffsets === undefined) {
+      return;
+    }
 
     let lastIndex = 0;
     Object.entries(this.highlighIdToSentenceText).map(([key, text]) => {
       const words =
         (typeof text === 'string' ? text.match(/\w+|[^\s\w]+/g) : []) ?? [];
+
       let minOffset = Number.MAX_VALUE;
       let maxOffset = 0;
 
@@ -349,7 +327,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    console.log('ng after view init');
     this._updateNode();
     this.show = true;
     this.cdRef.detectChanges();
@@ -380,8 +357,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('ng on changes');
-    console.log(this.rteString);
     if (
       changes.rteString &&
       changes.rteString.previousValue !== changes.rteString.currentValue
@@ -403,6 +378,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
        * cycle and hence, we will still have the problem.
        */
       this.show = false;
+      this.wrapped = false;
       // The rte text node is inserted outside the bounds of ng container.
       // Hence, it needs to be removed manually otherwise resdiual text will
       // appear when rte text changes.
@@ -417,6 +393,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       textNodes.forEach(node => node.parentElement.removeChild(node));
 
       this._updateNode();
+      this.getSentenceAudioOffset();
       setTimeout(() => (this.show = true), 0);
     }
   }

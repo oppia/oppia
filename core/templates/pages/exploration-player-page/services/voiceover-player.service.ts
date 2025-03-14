@@ -72,6 +72,10 @@ export class VoiceoverPlayerService {
     this._activeVoiceoverChangedEventEmitter.emit();
   }
 
+  getActiveContentId(): string {
+    return this.activeContentId;
+  }
+
   setActiveComponentName(componentName: string): void {
     this.activeComponentName = componentName;
   }
