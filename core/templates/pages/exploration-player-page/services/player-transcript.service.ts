@@ -132,22 +132,6 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getLastAnswerOnDisplayedCard(
-    displayedCardIndex: number
-  ): {answerDetails: string} | string | null {
-    if (
-      this.isLastCard(displayedCardIndex) ||
-      this.transcript[displayedCardIndex].getStateName() === null ||
-      this.transcript[displayedCardIndex].getInputResponsePairs().length === 0
-    ) {
-      return null;
-    } else {
-      return this.transcript[displayedCardIndex]
-        .getInputResponsePairs()
-        .slice(-1)[0].learnerInput;
-    }
-  }
-
   isLastCard(index: number): boolean {
     return index === this.transcript.length - 1;
   }

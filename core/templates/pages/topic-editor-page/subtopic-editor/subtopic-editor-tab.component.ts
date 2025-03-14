@@ -32,6 +32,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SubtopicValidationService} from '../services/subtopic-validation.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -241,7 +242,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
 
   updateHtmlData(): void {
     if (this.htmlData !== this.subtopicPage.getPageContents().getHtml()) {
-      var subtitledHtml = angular.copy(
+      var subtitledHtml = cloneDeep(
         this.subtopicPage.getPageContents().getSubtitledHtml()
       );
       subtitledHtml.html = this.htmlData;
@@ -263,7 +264,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
 
   showSchemaEditor(): void {
     this.schemaEditorIsShown = true;
-    this.htmlDataBeforeUpdate = angular.copy(this.htmlData);
+    this.htmlDataBeforeUpdate = cloneDeep(this.htmlData);
   }
 
   toggleSubtopicPreview(): void {

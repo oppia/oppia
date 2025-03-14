@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
   Warning,
 } from 'interactions/base-interaction-validation.service';
 import {PencilCodeEditorCustomizationArgs} from 'extensions/interactions/customization-args-defs';
@@ -33,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class PencilCodeEditorValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
