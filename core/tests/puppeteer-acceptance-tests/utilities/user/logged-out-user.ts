@@ -563,15 +563,7 @@ export class LoggedOutUser extends BaseUser {
   async checkIfBlogPostsAreFound(): Promise<boolean> {
     const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
     if (noPostsElement) {
-      const noPostsText = await this.page.evaluate(
-        el => el.textContent?.trim(),
-        noPostsElement
-      );
-      if (
-        noPostsText === 'Sorry, there are no blog posts matching this query.'
-      ) {
-        return false;
-      }
+      return false;
     }
     return true;
   }
@@ -587,10 +579,9 @@ export class LoggedOutUser extends BaseUser {
     }
     const allPostsHaveTags = await this.page.$$eval(
       blogTagContainerSelector,
-      posts =>
-        posts.every(
-          post => post.querySelector('.e2e-test-blog-post-tag') !== null
-        )
+      (posts, tagSelector) =>
+        posts.every(post => post.querySelector(tagSelector as string) !== null),
+      blogPostTagSelector
     );
     if (!allPostsHaveTags) {
       throw new Error('Not all blog posts have tags');

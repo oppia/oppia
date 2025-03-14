@@ -42,33 +42,32 @@ describe('Logged-out User', function () {
         'The application is currently running in production mode. Skipping dummy blog post generation.'
       );
     }
-    await superAdmin.navigateToBlogPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  beforeEach(async function () {
+    await loggedOutUser.navigateToBlogPage();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to view blog posts with tags', async function () {
-    await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.expectBlogPostsToHaveAtLeastOneTag();
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to navigate through blog pages using pagination', async function () {
-    await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.expectBlogPaginationControlsVisible();
 
     await loggedOutUser.clickNextBlogPage();
     await loggedOutUser.clickPreviousBlogPage();
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to search blog posts by tags', async function () {
-    await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.filterBlogPostsByTag('Community');
     await loggedOutUser.expectBlogSearchResultsToHaveTag('Community');
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to search blog posts by keywords', async function () {
-    await loggedOutUser.navigateToBlogPage();
     await loggedOutUser.filterBlogPostsByKeyword('Education');
     await loggedOutUser.expectBlogSearchResultsToContain('Education');
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
