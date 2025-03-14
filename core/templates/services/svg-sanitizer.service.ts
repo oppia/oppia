@@ -198,7 +198,6 @@ export class SvgSanitizerService {
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
         node.remove();
       } else {
-        // Reversing the iteration to ensure no attribute gets skipped
         for (let i = node.attributes.length - 1; i >= 0; i--) {
           const nodeAttrName: string = node.attributes[i].name;
           // Check if the tag name and attribute combination matches any value
