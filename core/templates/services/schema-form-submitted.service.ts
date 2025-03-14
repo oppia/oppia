@@ -18,7 +18,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -30,10 +29,3 @@ export class SchemaFormSubmittedService {
     return this._submittedSchemaBasedFormEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SchemaFormSubmittedService',
-    downgradeInjectable(SchemaFormSubmittedService)
-  );

@@ -182,6 +182,25 @@ describe('Questions List Select Skill And Difficulty Modal Component', () => {
     component.selectOrDeselectSkill(summary);
   });
 
+  it('should change the skill difficulty', () => {
+    let summary = allSkillSummaries[0];
+    component.selectOrDeselectSkill(summary);
+
+    let newSummary = allSkillSummaries[1];
+    let newSkilldifficulty = SkillDifficulty.create(
+      newSummary.id,
+      newSummary.description,
+      0.6
+    );
+
+    component.changeSkillWithDifficulty(newSkilldifficulty, 0);
+
+    expect(component.linkedSkillsWithDifficulty.length).toBe(1);
+    expect(component.linkedSkillsWithDifficulty).toEqual([newSkilldifficulty]);
+
+    component.selectOrDeselectSkill(newSummary);
+  });
+
   it('should filter the skills', () => {
     component.filterSkills('Skill 1 description');
 

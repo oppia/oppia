@@ -16,13 +16,12 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -34,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class EndExplorationValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -107,10 +106,3 @@ export class EndExplorationValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EndExplorationValidationService',
-    downgradeInjectable(EndExplorationValidationService)
-  );

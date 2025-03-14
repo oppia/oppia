@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 export interface ParamDict {
@@ -115,10 +115,3 @@ export class SuggestionModalService {
     ngbActiveModal.dismiss('cancel');
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SuggestionModalService',
-    downgradeInjectable(SuggestionModalService)
-  );

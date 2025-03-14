@@ -36,7 +36,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import CodeMirror from 'codemirror';
 import 'components/code-mirror/codemirror.component';
@@ -223,10 +222,3 @@ export class SchemaBasedUnicodeEditor
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedUnicodeEditor',
-  downgradeComponent({
-    component: SchemaBasedUnicodeEditor,
-  })
-);

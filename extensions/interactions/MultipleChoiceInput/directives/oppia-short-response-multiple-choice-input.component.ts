@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -57,10 +56,3 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
     this.response = this.truncateAtFirstLine.transform(response);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseMultipleChoiceInput',
-  downgradeComponent({
-    component: ShortResponseMultipleChoiceInputComponent,
-  })
-);

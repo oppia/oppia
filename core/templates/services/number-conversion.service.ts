@@ -16,7 +16,6 @@
  * @fileoverview Service for providing conversion services to the numeric input.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {I18nLanguageCodeService} from './i18n-language-code.service';
@@ -65,10 +64,3 @@ export class NumberConversionService {
     return convertedNumber;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberConversionService',
-    downgradeInjectable(NumberConversionService)
-  );

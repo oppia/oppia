@@ -24,33 +24,17 @@
         </em>
       </div>
     </div>
-    <div class="create-new-topic-input-field">
-      <div><span class="create-new-topic-input-label">Topic URL Fragment*</span></div>
-      <input class="e2e-test-new-topic-url-fragment-field required"
-             [(ngModel)]="newlyCreatedTopic.urlFragment"
-             [ngModelOptions]="{standalone: true}"
-             [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
-             [ngClass]="{'invalid-field': topicUrlFragmentExists || !validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)}"
-             (change)="onTopicUrlFragmentChange()">
-      <div class="oppia-input-box-subtitle text-danger" [hidden]="newlyCreatedTopic.urlFragment === '' || validUrlFragmentRegex.test(newlyCreatedTopic.urlFragment)">
-        <b>
-          Please use only lowercase letters, optionally separated by hyphen.
-        </b>
-      </div>
-      <div>
-        <span class="oppia-input-box-subtitle">
-          <em>
-            The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-            This topic can be accessed at the following URL:<br>
-            {{ hostname }}/learn/staging/{{ newlyCreatedTopic.urlFragment }}
-          </em>
-        </span>
-        <div *ngIf="topicUrlFragmentExists" class="oppia-input-box-subtitle text-danger">
-          <em>
-            This topic URL fragment already exists.
-          </em>
-        </div>
-      </div>
+    <div class="e2e-test-new-topic-url-fragment-field">
+      <url-fragment-editor-component label="Topic URL Fragment"
+                                     placeholder="Enter url fragment for the topic."
+                                     maxLength="{{MAX_CHARS_IN_TOPIC_URL_FRAGMENT}}"
+                                     fragmentType="topic"
+                                     [generatedUrlPrefix]="generatedUrlPrefix"
+                                     [fragmentIsDuplicate]="topicUrlFragmentExists"
+                                     [disabled]="false"
+                                     [(urlFragment)]="newlyCreatedTopic.urlFragment"
+                                     (urlFragmentChange)="onUrlFragmentChange($event)">
+      </url-fragment-editor-component>
     </div>
     <div class="create-new-topic-input-field">
       <div><span class="create-new-topic-input-label">Web Title Fragment for Web*</span></div>
