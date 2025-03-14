@@ -71,10 +71,7 @@ export class SkillEditorPageComponent implements OnInit {
         'Please save or discard all pending changes ' +
         'before navigating to a different tab.';
       modalRef.result.then(
-        () => {
-          navigateFunction();
-          this.skillEditorRoutingService.creatingNewQuestion(false);
-        },
+        () => {},
         () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

@@ -362,63 +362,26 @@ describe('Skill editor page', () => {
   });
 
   it(
-    'should show save pending changes modal and navigate to ' +
-      'main editor tab when user confirms',
+    'should show save changes modal and ' +
+      'stay on "questions" tab if unsaved changes exists',
     fakeAsync(() => {
-      skillEditorRoutingService.questionIsBeingCreated = true;
-      let routingSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('confirm'),
-        } as NgbModalRef;
-      });
-      component.selectMainTab();
-      tick();
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(routingSpy).toHaveBeenCalled();
-      skillEditorRoutingService.questionIsBeingCreated = false;
-    })
-  );
-
-  it(
-    'should show save pending changes modal and navigate to ' +
-      'preview editor tab when user confirms',
-    fakeAsync(() => {
-      skillEditorRoutingService.questionIsBeingCreated = true;
-      let routingSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve('confirm'),
-        } as NgbModalRef;
-      });
-      component.selectPreviewTab();
-      tick();
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(routingSpy).toHaveBeenCalled();
-      skillEditorRoutingService.questionIsBeingCreated = false;
-    })
-  );
-
-  it(
-    'should show save pending changes modal and should not navigate to ' +
-      'preview editor tab when user cancels',
-    fakeAsync(() => {
-      skillEditorRoutingService.questionIsBeingCreated = true;
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.reject(),
-        } as NgbModalRef;
-      });
-      component.selectPreviewTab();
-      tick();
-      spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
-        'questions'
-      );
+      expect(component.getActiveTabName()).toBe('main');
+      component.selectQuestionsTab();
       expect(component.getActiveTabName()).toBe('questions');
+      skillEditorRoutingService.questionIsBeingCreated = true;
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
+      component.selectPreviewTab();
+      tick();
+      expect(component.getActiveTabName()).toBe('questions');
+      expect(modalSpy).toHaveBeenCalled();
       skillEditorRoutingService.questionIsBeingCreated = false;
+      component.selectPreviewTab();
+      expect(component.getActiveTabName()).toBe('preview');
     })
   );
 
