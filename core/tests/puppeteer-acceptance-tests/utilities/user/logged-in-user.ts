@@ -35,8 +35,6 @@ const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
-const ContributorDashboardUrl = testConstants.URLs.ContributorDashboard;
-const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
