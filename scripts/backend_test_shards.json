@@ -379,6 +379,7 @@
         "core.domain.topic_domain_test",
         "core.controllers.acl_decorators_test",
         "core.domain.question_domain_test",
+        "core.domain.recommendations_domain_test",
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
         "core.jobs.io.job_io_test",
