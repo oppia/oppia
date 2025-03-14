@@ -1,4 +1,3 @@
-
 name: Check Issue Labels
 
 on:
@@ -6,54 +5,58 @@ on:
     types:
       - labeled
 
-env:
-  PAT_TOKEN: ${{ secrets.TEAM_READ_PAT }}  # PAT with read:org scope
-
-permissions: {}
+permissions: read-all
 
 jobs:
   check-label:
     runs-on: ubuntu-22.04
     permissions:
-      issues: write
-
+      issues: write 
     steps:
       - name: Validate issue label
         uses: actions/github-script@v7
         with:
-          github-token: ${{ env.PAT_TOKEN }}
+          github-token: ${{ secrets.TEAM_READ_PAT }}
           script: |
             const { context } = require('@actions/github');
-            const octokit = require('@octokit/rest').Octokit.defaults({
-              auth: process.env.PAT_TOKEN
-            });
+            
             // ======================
             // SECURE INPUT HANDLING
             // ======================
-            const sanitizedLabel = (context.payload.label?.name || '').trim();
-            const actorUsername = (context.actor || '').trim().toLowerCase();
-            const issueNumber = Number(context.issue.number) || 0;
-            const { owner, repo } = context.repo;
-            // Validation checks
-            if (!/^[\w\s-:]+$/i.test(sanitizedLabel)) {
-              throw new Error(`Invalid label: ${sanitizedLabel}`);
+            const rawLabel = context.payload.label?.name || '';
+            const sanitizedLabel = rawLabel
+              .replace(/[^a-zA-Z0-9_\-.]/g, '')
+              .replace(/^[.-]+|[.-]+$/g, '')
+              .slice(0, 50);
+
+            const rawUsername = context.actor || '';
+            if (!/^[a-zA-Z\d](?:[a-zA-Z\d]-(?=[a-zA-Z\d])){0,38}$/.test(rawUsername)) {
+              throw new Error(`Invalid username : ${rawUsername}`);
             }
-            if (!/^[a-z\d-]+$/.test(actorUsername)) {
-              throw new Error(`Invalid username: ${actorUsername}`);
-            }
+            const actorUsername = rawUsername.toLowerCase();
+
+            // Issue number validation
+            const issueNumber = Number(context.issue.number);
             if (!Number.isSafeInteger(issueNumber) || issueNumber < 1) {
               throw new Error(`Invalid issue number: ${issueNumber}`);
             }
+
+            const { owner, repo } = context.repo;
+            function escapeForTemplate(str) {
+              return str.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+            }
+
             // ======================
             // TEAM MEMBERSHIP CHECK
             // ======================
-            async function getTeamMembers() {
+            async function getGoodFirstIssueLabelers() {
               try {
-                const result = await octokit.graphql({
+                const result = await github.graphql({
                   query: `query ($org: String!, $teamSlug: String!) {
                     organization(login: $org) {
                       team(slug: $teamSlug) {
                         members(first: 100) {
+                          totalCount
                           nodes { login }
                         }
                       }
@@ -62,54 +65,78 @@ jobs:
                   org: 'oppia',
                   teamSlug: 'oppia-good-first-issue-labelers'
                 });
+
+                const teamMembers = result.organization.team.members;
+                if (teamMembers.totalCount > 100) {
+                  throw new Error(`Team has ${teamMembers.totalCount} members (max 100 supported)`);
+                }
+
                 return new Set(
-                  result.organization.team.members.nodes
-                    .map(node => node.login.toLowerCase())
+                  teamMembers.nodes.map(node => node.login.toLowerCase())
                 );
               } catch (error) {
                 console.error('Team membership check failed:', error);
-                return new Set(); // Fail closed
+                throw new Error(`Team verification failed: ${error.message}`);
               }
             }
+
             // ======================
             // LABEL ENFORCEMENT
             // ======================
             async function enforceLabelRules() {
-              const authorizedMembers = await getTeamMembers();
+              const authorizedMembers = await getGoodFirstIssueLabelers();
               const prSpecificLabels = new Set(['dependencies', 'stale']);
+
               // Handle 'good first issue' label
               if (sanitizedLabel.toLowerCase() === 'good first issue') {
                 if (!authorizedMembers.has(actorUsername)) {
-                  await octokit.rest.issues.removeLabel({
+                  await github.rest.issues.removeLabel({
                     owner,
                     repo,
                     issue_number: issueNumber,
                     name: sanitizedLabel
                   });
-                  await octokit.rest.issues.createComment({
+                  const escapedLabel = escapeForTemplate(sanitizedLabel);
+                  await github.rest.issues.createComment({
                     owner,
                     repo,
                     issue_number: issueNumber,
-                    body: `@${actorUsername}, only [oppia-good-first-issue-labelers team members](https://github.com/orgs/oppia/teams/oppia-good-first-issue-labelers) can apply the good first issue label.`
+                    body: `@${actorUsername}, only [oppia-good-first-issue-labelers team members](https://github.com/orgs/oppia/teams/oppia-good-first-issue-labelers) can apply the "${escapedLabel}" label.`
                   });
                 }
                 return;
               }
+
               // Block PR-specific labels
               if (prSpecificLabels.has(sanitizedLabel.toLowerCase()) || 
                   sanitizedLabel.startsWith('PR:')) {
-                await octokit.rest.issues.removeLabel({
+                await github.rest.issues.removeLabel({
                   owner,
                   repo,
                   issue_number: issueNumber,
                   name: sanitizedLabel
                 });
-                await octokit.rest.issues.createComment({
+                const escapedLabel = escapeForTemplate(sanitizedLabel);
+                await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: issueNumber,
-                  body: `@${actorUsername}, the "${sanitizedLabel}" label is reserved for pull requests.`
+                  body: `@${actorUsername}, the "${escapedLabel}" label is reserved for pull requests.`
                 });
               }
             }
+
             await enforceLabelRules();
+  
+  report-failure:
+    needs: check-label
+    runs-on: ubuntu-22.04
+    if: ${{ always() && needs.check-label.result == 'failure' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Send notification
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Failed to Handle Label on Issues"
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
