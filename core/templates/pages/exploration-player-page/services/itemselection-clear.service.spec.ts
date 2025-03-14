@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for the Item selection clear service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import {ItemSelectionClearService} from 'pages/exploration-player-page/services/itemselection-clear.service';
-import { EventEmitter } from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {ItemSelectionClearService} from './itemselection-clear.service';
 
 describe('ItemSelectionClearService', () => {
   let service: ItemSelectionClearService;
@@ -30,13 +29,21 @@ describe('ItemSelectionClearService', () => {
     service = TestBed.inject(ItemSelectionClearService);
   });
 
-  it('should initialize with an EventEmitter', () => {
-    expect(service.clearSelections).toBeInstanceOf(EventEmitter);
+  it('should initialize with a default value of false', done => {
+    service.clearSelection$.subscribe(value => {
+      expect(value).toBeFalse();
+      done();
+    });
   });
 
-  it('should emit an event when clear method is called', () => {
-    spyOn(service.clearSelections, 'emit');
-    service.clear();
-    expect(service.clearSelections.emit).toHaveBeenCalled();
+  it('should emit true when triggerClearSelection is called', done => {
+    service.clearSelection$.subscribe(value => {
+      if (value) {
+        expect(value).toBeTrue();
+        done();
+      }
+    });
+
+    service.triggerClearSelection();
   });
 });
