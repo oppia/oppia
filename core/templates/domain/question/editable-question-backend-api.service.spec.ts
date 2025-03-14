@@ -16,11 +16,17 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { EditableQuestionBackendApiService, SkillLinkageModificationsArray } from 'domain/question/editable-question-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {
+  EditableQuestionBackendApiService,
+  SkillLinkageModificationsArray,
+} from 'domain/question/editable-question-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableQuestionBackendApiService', () => {
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
@@ -48,7 +54,7 @@ describe('EditableQuestionBackendApiService', () => {
                 unicode_str: '',
               },
             },
-            rows: { value: 1 },
+            rows: {value: 1},
             catchMisspellings: {
               value: false,
             },
@@ -95,17 +101,28 @@ describe('EditableQuestionBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableQuestionBackendApiService, QuestionObjectFactory, CsrfTokenService],
+      providers: [
+        EditableQuestionBackendApiService,
+        QuestionObjectFactory,
+        CsrfTokenService,
+      ],
     });
 
-    editableQuestionBackendApiService = TestBed.inject(EditableQuestionBackendApiService);
+    editableQuestionBackendApiService = TestBed.inject(
+      EditableQuestionBackendApiService
+    );
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(Promise.resolve('sample-csrf-token'));
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
-    sampleDataResultsObjects.questionObject = questionObjectFactory.createFromBackendDict(sampleDataResults.questionDict);
+    sampleDataResultsObjects.questionObject =
+      questionObjectFactory.createFromBackendDict(
+        sampleDataResults.questionDict
+      );
   });
 
   afterEach(() => {
@@ -116,7 +133,9 @@ describe('EditableQuestionBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    const imageBlob = new Blob(['data:image/png;base64,xyz'], { type: 'image/png' });
+    const imageBlob = new Blob(['data:image/png;base64,xyz'], {
+      type: 'image/png',
+    });
     const imageData = {
       filename: 'image.png',
       imageBlob: imageBlob,
@@ -125,15 +144,20 @@ describe('EditableQuestionBackendApiService', () => {
     const skillDifficulties = [1, 1, 2];
     const questionObject = sampleDataResultsObjects.questionObject;
 
-    editableQuestionBackendApiService.createQuestionAsync(skillsId, skillDifficulties, questionObject, [imageData])
+    editableQuestionBackendApiService
+      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
+        imageData,
+      ])
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/question_editor_handler/create_new');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/create_new'
+    );
     expect(req.request.method).toEqual('POST');
-    req.flush({ question_id: '0' });
+    req.flush({question_id: '0'});
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({ questionId: '0' });
+    expect(successHandler).toHaveBeenCalledWith({questionId: '0'});
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -144,19 +168,29 @@ describe('EditableQuestionBackendApiService', () => {
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
     const questionObject = sampleDataResultsObjects.questionObject;
-    const imageBlob = new Blob(['data:image/png;base64,xyz'], { type: 'image/png' });
+    const imageBlob = new Blob(['data:image/png;base64,xyz'], {
+      type: 'image/png',
+    });
     const imageData = {
       filename: 'image.png',
       imageBlob: imageBlob,
     };
 
-    editableQuestionBackendApiService.createQuestionAsync(skillsId, skillDifficulties, questionObject, [imageData])
+    editableQuestionBackendApiService
+      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
+        imageData,
+      ])
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/question_editor_handler/create_new');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/create_new'
+    );
     expect(req.request.method).toEqual('POST');
 
-    req.flush({ error: 'Error creating a new question.' }, { status: 500, statusText: 'Internal Server Error' });
+    req.flush(
+      {error: 'Error creating a new question.'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
@@ -167,10 +201,13 @@ describe('EditableQuestionBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableQuestionBackendApiService.fetchQuestionAsync('0')
+    editableQuestionBackendApiService
+      .fetchQuestionAsync('0')
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/question_editor_handler/data/0');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/0'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({
       question_dict: sampleDataResults.questionDict,
@@ -189,12 +226,18 @@ describe('EditableQuestionBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableQuestionBackendApiService.fetchQuestionAsync('1')
+    editableQuestionBackendApiService
+      .fetchQuestionAsync('1')
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/question_editor_handler/data/1');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/1'
+    );
     expect(req.request.method).toEqual('GET');
-    req.flush({ error: 'Error loading question 1.' }, { status: 500, statusText: 'Internal Server Error' });
+    req.flush(
+      {error: 'Error loading question 1.'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
@@ -210,7 +253,9 @@ describe('EditableQuestionBackendApiService', () => {
       question = data.questionObject.toBackendDict(false);
     });
 
-    const req = httpTestingController.expectOne('/question_editor_handler/data/0');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/0'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({
       question_dict: sampleDataResults.questionDict,
@@ -224,10 +269,18 @@ describe('EditableQuestionBackendApiService', () => {
       questionDict: question,
     };
 
-    editableQuestionBackendApiService.updateQuestionAsync(question.id, question.version, 'Question Data is updated', [])
+    editableQuestionBackendApiService
+      .updateQuestionAsync(
+        question.id,
+        question.version,
+        'Question Data is updated',
+        []
+      )
       .then(successHandler, failHandler);
 
-    const updateReq = httpTestingController.expectOne('/question_editor_handler/data/0');
+    const updateReq = httpTestingController.expectOne(
+      '/question_editor_handler/data/0'
+    );
     expect(updateReq.request.method).toEqual('PUT');
     updateReq.flush(questionWrapper);
     flushMicrotasks();
@@ -236,20 +289,28 @@ describe('EditableQuestionBackendApiService', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection handler if the question to update doesn\'t exist', fakeAsync(() => {
+  it("should use the rejection handler if the question to update doesn't exist", fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableQuestionBackendApiService.updateQuestionAsync('1', '1', 'Update an invalid question.', [])
+    editableQuestionBackendApiService
+      .updateQuestionAsync('1', '1', 'Update an invalid question.', [])
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/question_editor_handler/data/1');
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/1'
+    );
     expect(req.request.method).toEqual('PUT');
-    req.flush({ error: "Question with given id doesn't exist." }, { status: 404, statusText: 'Not Found' });
+    req.flush(
+      {error: "Question with given id doesn't exist."},
+      {status: 404, statusText: 'Not Found'}
+    );
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith("Question with given id doesn't exist.");
+    expect(failHandler).toHaveBeenCalledWith(
+      "Question with given id doesn't exist."
+    );
   }));
 
   it('should edit an existing question', fakeAsync(() => {
@@ -264,12 +325,15 @@ describe('EditableQuestionBackendApiService', () => {
       },
     ];
 
-    editableQuestionBackendApiService.editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
+    editableQuestionBackendApiService
+      .editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/manage_question_skill_link/${questionId}`);
+    const req = httpTestingController.expectOne(
+      `/manage_question_skill_link/${questionId}`
+    );
     expect(req.request.method).toEqual('PUT');
-    req.flush({ status: 200 });
+    req.flush({status: 200});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -288,12 +352,18 @@ describe('EditableQuestionBackendApiService', () => {
       },
     ];
 
-    editableQuestionBackendApiService.editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
+    editableQuestionBackendApiService
+      .editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/manage_question_skill_link/${questionId}`);
+    const req = httpTestingController.expectOne(
+      `/manage_question_skill_link/${questionId}`
+    );
     expect(req.request.method).toEqual('PUT');
-    req.flush({ error: 'Error loading question 0.' }, { status: 500, statusText: 'Internal Server Error' });
+    req.flush(
+      {error: 'Error loading question 0.'},
+      {status: 500, statusText: 'Internal Server Error'}
+    );
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();

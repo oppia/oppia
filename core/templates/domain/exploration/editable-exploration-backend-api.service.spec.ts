@@ -16,11 +16,15 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController, HttpErrorResponse } from '@angular/common/http/testing';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+  HttpErrorResponse,
+} from '@angular/common/http/testing';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
@@ -32,15 +36,25 @@ describe('EditableExplorationBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableExplorationBackendApiService, ReadOnlyExplorationBackendApiService, CsrfTokenService],
+      providers: [
+        EditableExplorationBackendApiService,
+        ReadOnlyExplorationBackendApiService,
+        CsrfTokenService,
+      ],
     });
 
-    editableExplorationBackendApiService = TestBed.inject(EditableExplorationBackendApiService);
-    readOnlyExplorationBackendApiService = TestBed.inject(ReadOnlyExplorationBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService
+    );
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService
+    );
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(Promise.resolve('sample-csrf-token'));
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token')
+    );
 
     // Sample exploration object returnable from the backend.
     sampleDataResults = {
@@ -86,7 +100,8 @@ describe('EditableExplorationBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableExplorationBackendApiService.fetchExplorationAsync('0')
+    editableExplorationBackendApiService
+      .fetchExplorationAsync('0')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
@@ -103,10 +118,13 @@ describe('EditableExplorationBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableExplorationBackendApiService.fetchApplyDraftExplorationAsync('0')
+    editableExplorationBackendApiService
+      .fetchApplyDraftExplorationAsync('0')
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne('/createhandler/data/0?apply_draft=true');
+    const req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -120,7 +138,8 @@ describe('EditableExplorationBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    editableExplorationBackendApiService.fetchExplorationAsync('1')
+    editableExplorationBackendApiService
+      .fetchExplorationAsync('1')
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/1');
@@ -143,7 +162,8 @@ describe('EditableExplorationBackendApiService', () => {
     const failHandler = jasmine.createSpy('fail');
     let exploration;
 
-    editableExplorationBackendApiService.fetchExplorationAsync('0')
+    editableExplorationBackendApiService
+      .fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -157,12 +177,14 @@ describe('EditableExplorationBackendApiService', () => {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExplorationAsync(
-      exploration.exploration_id,
-      exploration.version,
-      exploration.title,
-      []
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .updateExplorationAsync(
+        exploration.exploration_id,
+        exploration.version,
+        exploration.title,
+        []
+      )
+      .then(successHandler, failHandler);
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toEqual('PUT');
@@ -179,7 +201,8 @@ describe('EditableExplorationBackendApiService', () => {
     const failHandler = jasmine.createSpy('fail');
     let exploration;
 
-    readOnlyExplorationBackendApiService.loadLatestExplorationAsync('0')
+    readOnlyExplorationBackendApiService
+      .loadLatestExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -195,12 +218,14 @@ describe('EditableExplorationBackendApiService', () => {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExplorationAsync(
-      exploration.exploration_id,
-      exploration.version,
-      exploration.title,
-      []
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .updateExplorationAsync(
+        exploration.exploration_id,
+        exploration.version,
+        exploration.title,
+        []
+      )
+      .then(successHandler, failHandler);
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toEqual('PUT');
@@ -218,7 +243,8 @@ describe('EditableExplorationBackendApiService', () => {
     const failHandler = jasmine.createSpy('fail');
     let exploration;
 
-    editableExplorationBackendApiService.fetchExplorationAsync('0')
+    editableExplorationBackendApiService
+      .fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -232,12 +258,14 @@ describe('EditableExplorationBackendApiService', () => {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExplorationAsync(
-      exploration.exploration_id,
-      exploration.version,
-      'Minor edits',
-      []
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .updateExplorationAsync(
+        exploration.exploration_id,
+        exploration.version,
+        'Minor edits',
+        []
+      )
+      .then(successHandler, failHandler);
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toEqual('PUT');
@@ -248,7 +276,8 @@ describe('EditableExplorationBackendApiService', () => {
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    editableExplorationBackendApiService.deleteExplorationAsync(exploration.exploration_id)
+    editableExplorationBackendApiService
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(successHandler, failHandler);
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
@@ -271,22 +300,28 @@ describe('EditableExplorationBackendApiService', () => {
     const mostRecentlyReachedCheckpointStateName = 'State A';
 
     const payload = {
-      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
-      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
+      most_recently_reached_checkpoint_exp_version:
+        mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+        mostRecentlyReachedCheckpointStateName,
     };
 
-    editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
-      explorationId,
-      mostRecentlyReachedCheckpointExpVersion,
-      mostRecentlyReachedCheckpointStateName,
-      true
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .recordMostRecentlyReachedCheckpointAsync(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName,
+        true
+      )
+      .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached/${explorationId}`);
+    const req = httpTestingController.expectOne(
+      `/explorehandler/checkpoint_reached/${explorationId}`
+    );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({ status: 200, statusText: 'Success.' });
+    req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -303,23 +338,29 @@ describe('EditableExplorationBackendApiService', () => {
 
     const loggedOutPayload = {
       unique_progress_url_id: '123456',
-      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
-      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
+      most_recently_reached_checkpoint_exp_version:
+        mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+        mostRecentlyReachedCheckpointStateName,
     };
 
-    editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
-      explorationId,
-      mostRecentlyReachedCheckpointExpVersion,
-      mostRecentlyReachedCheckpointStateName,
-      false,
-      '123456'
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .recordMostRecentlyReachedCheckpointAsync(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName,
+        false,
+        '123456'
+      )
+      .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`);
+    const req = httpTestingController.expectOne(
+      `/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`
+    );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(loggedOutPayload);
 
-    req.flush({ status: 200, statusText: 'Success.' });
+    req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -335,21 +376,27 @@ describe('EditableExplorationBackendApiService', () => {
     const mostRecentlyReachedCheckpointStateName = 'State A';
 
     const payload = {
-      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
-      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
+      most_recently_reached_checkpoint_exp_version:
+        mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name:
+        mostRecentlyReachedCheckpointStateName,
     };
 
-    editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
-      explorationId,
-      mostRecentlyReachedCheckpointExpVersion,
-      mostRecentlyReachedCheckpointStateName
-    ).then(successHandler, failHandler);
+    editableExplorationBackendApiService
+      .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        explorationId,
+        mostRecentlyReachedCheckpointExpVersion,
+        mostRecentlyReachedCheckpointStateName
+      )
+      .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`);
+    const req = httpTestingController.expectOne(
+      `/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`
+    );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({ status: 200, statusText: 'Success.' });
+    req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -365,14 +412,17 @@ describe('EditableExplorationBackendApiService', () => {
       unique_progress_url_id: 'abcdef',
     };
 
-    editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(explorationId, 'abcdef')
+    editableExplorationBackendApiService
+      .changeLoggedOutProgressToLoggedInProgressAsync(explorationId, 'abcdef')
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/sync_logged_out_and_logged_in_progress/${explorationId}`);
+    const req = httpTestingController.expectOne(
+      `/sync_logged_out_and_logged_in_progress/${explorationId}`
+    );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({ status: 200, statusText: 'Success.' });
+    req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -388,14 +438,17 @@ describe('EditableExplorationBackendApiService', () => {
       most_recently_reached_checkpoint_state_name: null,
     };
 
-    editableExplorationBackendApiService.resetExplorationProgressAsync (explorationId)
+    editableExplorationBackendApiService
+      .resetExplorationProgressAsync(explorationId)
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(`/explorehandler/restart/${explorationId}`);
+    const req = httpTestingController.expectOne(
+      `/explorehandler/restart/${explorationId}`
+    );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({ status: 200, statusText: 'Success.' });
+    req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -410,14 +463,15 @@ describe('EditableExplorationBackendApiService', () => {
       user_has_viewed_lesson_info_modal_once: true,
     };
 
-    editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce()
+    editableExplorationBackendApiService
+      .recordLearnerHasViewedLessonInfoModalOnce()
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/userinfohandler/data');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({ status: 200 });
+    req.flush({status: 200});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -430,7 +484,8 @@ describe('EditableExplorationBackendApiService', () => {
 
     let exploration;
 
-    editableExplorationBackendApiService.fetchExplorationAsync('0')
+    editableExplorationBackendApiService
+      .fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
@@ -441,14 +496,15 @@ describe('EditableExplorationBackendApiService', () => {
 
     flushMicrotasks();
 
-    editableExplorationBackendApiService.deleteExplorationAsync(exploration.exploration_id)
+    editableExplorationBackendApiService
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(successHandler, failHandler);
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(deleteReq.request.method).toEqual('DELETE');
     deleteReq.flush(
-      { error: 'Error deleting exploration 1.' },
-      { status: 500, statusText: 'Internal Server Error' }
+      {error: 'Error deleting exploration 1.'},
+      {status: 500, statusText: 'Internal Server Error'}
     );
 
     flushMicrotasks();
