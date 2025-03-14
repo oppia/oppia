@@ -40,37 +40,36 @@ describe('Exploration Editor - Multiple States', function () {
   let explorationEditor: ExplorationEditor;
 
   beforeAll(async function () {
-      explorationEditor = await UserFactory.createNewUser(
-        'explorationEditor',
-        'exploration_editor@example.com'
-      );
-      // Navigate to the creator dashboard and create a new exploration.
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
-      await explorationEditor.dismissWelcomeModal();
-      await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
+    // Navigate to the creator dashboard and create a new exploration.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
-      // Add a new card with a question.
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard('Test Question');
-      await explorationEditor.saveExplorationDraft();
+    // Add a new card with a question.
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('Test Question');
+    await explorationEditor.saveExplorationDraft();
 
-      // Navigate to the new card and update its content.
-      await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-      await explorationEditor.updateCardContent(
-        'Enter a negative number greater than -100.'
-      );
-      await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-      await explorationEditor.addResponsesToTheInteraction(
-        INTERACTION_TYPES.NUMERIC_INPUT,
-        '-99',
-        'Prefect!',
-        CARD_NAME.FINAL_CARD,
-        true
-      );
-      await explorationEditor.saveExplorationDraft();
-
+    // Navigate to the new card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
+    await explorationEditor.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Prefect!',
+      CARD_NAME.FINAL_CARD,
+      true
+    );
+    await explorationEditor.saveExplorationDraft();
 
     // ✅ Add hints and solutions.
     await explorationEditor.addHintToState('Think of negative numbers.');
@@ -78,7 +77,7 @@ describe('Exploration Editor - Multiple States', function () {
       '-40',
       'Yes,that is correct.',
       true
-       );
+    );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -91,7 +90,7 @@ describe('Exploration Editor - Multiple States', function () {
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should allow users to complete an exploration with hints and solutions',
