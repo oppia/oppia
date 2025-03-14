@@ -27,7 +27,6 @@ import logging
 import os
 import re
 import types
-import typing
 
 from core import feconf
 from core import handler_schema_constants
@@ -46,7 +45,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 import webapp2
 from webapp2_extras import routes
 import webtest
@@ -2577,7 +2576,7 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         """Tests that _log_exception_message raises an Exception when an 
         invalid log type is passed."""  
         with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):  
-            self.handler._log_exception_message('TestException', typing.cast(base.LogType, "invalid"), 'Test error')
+            self.handler._log_exception_message('TestException', cast(base.LogType, "invalid"), 'Test error')
 
     def test_generic_exception_logging_logs_exception(self) -> None:
         """Tests that a generic exception logs using LogType.EXCEPTION."""  
@@ -2585,6 +2584,6 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
             generic_exception = Exception('Generic error')  
             self.handler.handle_exception(generic_exception, False)  
             expected_log_message = self._expected_log_message(  
-                'Exception', 'Exception raised'  
-            )  
+                'Exception', 'Exception raised'
+            )
             self.assertIn(expected_log_message, self.logged_exceptions)
