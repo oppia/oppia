@@ -59,7 +59,7 @@
     "core/tests",
     "**/*.spec.ts",
     "**/*Spec.ts",
-    "**/*.ajs.ts",
+    "**/*.ajs.ts"
   ],
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": false,

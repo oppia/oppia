@@ -20,8 +20,8 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
-  HttpErrorResponse,
 } from '@angular/common/http/testing';
+import {HttpErrorResponse} from '@angular/common/http';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
