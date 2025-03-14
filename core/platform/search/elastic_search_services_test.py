@@ -125,7 +125,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_delete_by_query:
             elastic_search_services.clear_index(correct_index_name)
 
-    def test_search_returns_ids_only_new(self) -> None:
+    def test_search_returns_ids_only(self) -> None:
         correct_index_name = 'index1'
         elastic_search_services.add_documents_to_index([{
             'id': 1,
@@ -210,7 +210,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
         self.assertIsNone(new_offset)
 
-    def test_search_constructs_nonempty_query_with_categories_and_langs_new(
+    def test_search_constructs_nonempty_query_with_categories_and_langs(
         self
     ) -> None:
         correct_index_name = 'index1'
