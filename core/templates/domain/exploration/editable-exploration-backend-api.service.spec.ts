@@ -2,7 +2,7 @@
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// you may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -16,46 +16,31 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {CsrfTokenService} from 'services/csrf-token.service';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController, HttpErrorResponse } from '@angular/common/http/testing';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-import {importAllAngularServices} from 'tests/unit-test-utils.ajs';
-import {
-  HttpTestingController,
-  HttpClientTestingModule,
-} from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
-import {HttpErrorResponse} from '@angular/common/http';
-
-describe('Editable exploration backend API service', function () {
-  let editableExplorationBackendApiService: EditableExplorationBackendApiService =
-    null;
-  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService =
-    null;
+describe('EditableExplorationBackendApiService', () => {
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults = null;
-  let csrfService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+  let sampleDataResults;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [EditableExplorationBackendApiService, ReadOnlyExplorationBackendApiService, CsrfTokenService],
     });
-    editableExplorationBackendApiService = TestBed.inject(
-      EditableExplorationBackendApiService
-    );
-    readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService
-    );
+
+    editableExplorationBackendApiService = TestBed.inject(EditableExplorationBackendApiService);
+    readOnlyExplorationBackendApiService = TestBed.inject(ReadOnlyExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
-      return Promise.resolve('sample-csrf-token');
-    });
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(Promise.resolve('sample-csrf-token'));
 
     // Sample exploration object returnable from the backend.
     sampleDataResults = {
@@ -97,39 +82,14 @@ describe('Editable exploration backend API service', function () {
     httpTestingController.verify();
   });
 
-  it(
-    'should successfully fetch an existing exploration from ' + 'the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch an existing exploration from the backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      editableExplorationBackendApiService
-        .fetchExplorationAsync('0')
-        .then(successHandler, failHandler);
-
-      const req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should fetch and apply the draft of an exploration', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService
-      .fetchApplyDraftExplorationAsync('0')
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
       .then(successHandler, failHandler);
 
-    const req = httpTestingController.expectOne(
-      '/createhandler/data/0?apply_draft=true'
-    );
+    const req = httpTestingController.expectOne('/createhandler/data/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -139,134 +99,56 @@ describe('Editable exploration backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should use the rejection handler if the backend ' + 'request failed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should fetch and apply the draft of an exploration', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      // Loading a exploration the first time should fetch it from the backend.
-      editableExplorationBackendApiService
-        .fetchExplorationAsync('1')
-        .then(successHandler, failHandler);
+    editableExplorationBackendApiService.fetchApplyDraftExplorationAsync('0')
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne('/createhandler/data/1');
-      const errorResponse = new HttpErrorResponse({
-        error: 'Error loading exploration 1.',
-        status: 500,
-        statusText: 'Internal Server Error',
-      });
-      expect(req.request.method).toEqual('GET');
-      req.error(new ErrorEvent('Error'), errorResponse);
+    const req = httpTestingController.expectOne('/createhandler/data/0?apply_draft=true');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it(
-    'should update a exploration after fetching it from ' + 'the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let exploration = null;
+  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      // Loading a exploration the first time should fetch it from the backend.
-      editableExplorationBackendApiService
-        .fetchExplorationAsync('0')
-        .then(function (data) {
-          exploration = data;
-        });
+    editableExplorationBackendApiService.fetchExplorationAsync('1')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    const req = httpTestingController.expectOne('/createhandler/data/1');
+    const errorResponse = new HttpErrorResponse({
+      error: 'Error loading exploration 1.',
+      status: 500,
+      statusText: 'Internal Server Error',
+    });
+    expect(req.request.method).toEqual('GET');
+    req.error(new ErrorEvent('Error'), errorResponse);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      exploration.title = 'New Title';
-      exploration.version = '2';
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
-      editableExplorationBackendApiService
-        .updateExplorationAsync(
-          exploration.exploration_id,
-          exploration.version,
-          exploration.title,
-          []
-        )
-        .then(successHandler, failHandler);
+  it('should update an exploration after fetching it from the backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    let exploration;
 
-      req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('PUT');
-      // Send a request to update exploration.
-      req.flush(exploration);
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(exploration);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should not cache exploration from backend into ' + 'read only service',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let exploration = null;
-
-      readOnlyExplorationBackendApiService
-        .loadLatestExplorationAsync('0')
-        .then(data => {
-          exploration = data;
-        });
-
-      let req = httpTestingController.expectOne('/explorehandler/init/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-
-      flushMicrotasks();
-
-      expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(true);
-
-      exploration.title = 'New Title';
-      exploration.version = '2';
-
-      editableExplorationBackendApiService
-        .updateExplorationAsync(
-          exploration.exploration_id,
-          exploration.version,
-          exploration.title,
-          []
-        )
-        .then(successHandler, failHandler);
-
-      req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('PUT');
-      req.flush(exploration);
-
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(exploration);
-      expect(failHandler).not.toHaveBeenCalled();
-      expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-    })
-  );
-
-  it('should delete exploration from the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let exploration = null;
-
-    editableExplorationBackendApiService
-      .fetchExplorationAsync('0')
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
       .then(data => {
         exploration = data;
       });
 
-    let req = httpTestingController.expectOne('/createhandler/data/0');
+    const req = httpTestingController.expectOne('/createhandler/data/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
 
@@ -275,32 +157,103 @@ describe('Editable exploration backend API service', function () {
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    // Send a request to update exploration.
-    editableExplorationBackendApiService
-      .updateExplorationAsync(
-        exploration.exploration_id,
-        exploration.version,
-        'Minor edits',
-        []
-      )
-      .then(successHandler, failHandler);
+    editableExplorationBackendApiService.updateExplorationAsync(
+      exploration.exploration_id,
+      exploration.version,
+      exploration.title,
+      []
+    ).then(successHandler, failHandler);
 
-    req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(exploration);
+    const updateReq = httpTestingController.expectOne('/createhandler/data/0');
+    expect(updateReq.request.method).toEqual('PUT');
+    updateReq.flush(exploration);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should not cache exploration from backend into read only service', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    let exploration;
+
+    readOnlyExplorationBackendApiService.loadLatestExplorationAsync('0')
+      .then(data => {
+        exploration = data;
+      });
+
+    const req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+
+    exploration.title = 'New Title';
+    exploration.version = '2';
+
+    editableExplorationBackendApiService.updateExplorationAsync(
+      exploration.exploration_id,
+      exploration.version,
+      exploration.title,
+      []
+    ).then(successHandler, failHandler);
+
+    const updateReq = httpTestingController.expectOne('/createhandler/data/0');
+    expect(updateReq.request.method).toEqual('PUT');
+    updateReq.flush(exploration);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(exploration);
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+  }));
+
+  it('should delete exploration from the backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    let exploration;
+
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
+      .then(data => {
+        exploration = data;
+      });
+
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    exploration.title = 'New Title';
+    exploration.version = '2';
+
+    editableExplorationBackendApiService.updateExplorationAsync(
+      exploration.exploration_id,
+      exploration.version,
+      'Minor edits',
+      []
+    ).then(successHandler, failHandler);
+
+    const updateReq = httpTestingController.expectOne('/createhandler/data/0');
+    expect(updateReq.request.method).toEqual('PUT');
+    updateReq.flush(exploration);
 
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    editableExplorationBackendApiService
-      .deleteExplorationAsync(exploration.exploration_id)
+    editableExplorationBackendApiService.deleteExplorationAsync(exploration.exploration_id)
       .then(successHandler, failHandler);
 
-    req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({});
+    const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
+    expect(deleteReq.request.method).toEqual('DELETE');
+    deleteReq.flush({});
 
     flushMicrotasks();
 
@@ -309,181 +262,140 @@ describe('Editable exploration backend API service', function () {
     expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   }));
 
-  it(
-    'should update most recently reached checkpoint state name and most' +
-      ' recently reached checkpoint exploration version for logged-in learner',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should update most recently reached checkpoint state name and most recently reached checkpoint exploration version for logged-in learner', fakeAsync(() => {
+    const successHandler = jasmine.createSpy(' success');
+    const failHandler = jasmine.createSpy('fail');
 
-      let explorationId = '0';
-      let mostRecentlyReachedCheckpointExpVersion = 1;
-      let mostRecentlyReachedCheckpointStateName = 'State A';
+    const explorationId = '0';
+    const mostRecentlyReachedCheckpointExpVersion = 1;
+    const mostRecentlyReachedCheckpointStateName = 'State A';
 
-      let payload = {
-        most_recently_reached_checkpoint_exp_version:
-          mostRecentlyReachedCheckpointExpVersion,
-        most_recently_reached_checkpoint_state_name:
-          mostRecentlyReachedCheckpointStateName,
-      };
-
-      editableExplorationBackendApiService
-        .recordMostRecentlyReachedCheckpointAsync(
-          explorationId,
-          mostRecentlyReachedCheckpointExpVersion,
-          mostRecentlyReachedCheckpointStateName,
-          true
-        )
-        .then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/explorehandler/checkpoint_reached/' + explorationId
-      );
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
-
-      req.flush({status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should update most recently reached checkpoint state name and most' +
-      ' recently reached checkpoint exploration version for logged-out learner',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let explorationId = '0';
-      let mostRecentlyReachedCheckpointExpVersion = 1;
-      let mostRecentlyReachedCheckpointStateName = 'State A';
-
-      editableExplorationBackendApiService
-        .recordMostRecentlyReachedCheckpointAsync(
-          explorationId,
-          mostRecentlyReachedCheckpointExpVersion,
-          mostRecentlyReachedCheckpointStateName,
-          false,
-          '123456'
-        )
-        .then(successHandler, failHandler);
-
-      let loggedOutPayload = {
-        unique_progress_url_id: '123456',
-        most_recently_reached_checkpoint_exp_version:
-          mostRecentlyReachedCheckpointExpVersion,
-        most_recently_reached_checkpoint_state_name:
-          mostRecentlyReachedCheckpointStateName,
-      };
-
-      let req = httpTestingController.expectOne(
-        '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId
-      );
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(loggedOutPayload);
-
-      req.flush({status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should record checkpoint progress and return unique progress' +
-      ' id of logged out learner',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let explorationId = '0';
-      let mostRecentlyReachedCheckpointExpVersion = 1;
-      let mostRecentlyReachedCheckpointStateName = 'State A';
-
-      let payload = {
-        most_recently_reached_checkpoint_exp_version:
-          mostRecentlyReachedCheckpointExpVersion,
-        most_recently_reached_checkpoint_state_name:
-          mostRecentlyReachedCheckpointStateName,
-      };
-
-      editableExplorationBackendApiService
-        .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
-          explorationId,
-          mostRecentlyReachedCheckpointExpVersion,
-          mostRecentlyReachedCheckpointStateName
-        )
-        .then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId
-      );
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-
-      req.flush({status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should convert logged out progress to logged in progress ' +
-      'successfully',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-
-      let explorationId = '0';
-      let payload = {
-        unique_progress_url_id: 'abcdef',
-      };
-
-      editableExplorationBackendApiService
-        .changeLoggedOutProgressToLoggedInProgressAsync(explorationId, 'abcdef')
-        .then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/sync_logged_out_and_logged_in_progress/' + explorationId
-      );
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(payload);
-
-      req.flush({status: 200, statusText: 'Success.'});
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should reset the exploration progress successfully', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    let explorationId = '0';
-
-    let payload = {
-      most_recently_reached_checkpoint_state_name: null,
+    const payload = {
+      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
     };
 
-    editableExplorationBackendApiService
-      .resetExplorationProgressAsync(explorationId)
-      .then(successHandler, failHandler);
+    editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
+      explorationId,
+      mostRecentlyReachedCheckpointExpVersion,
+      mostRecentlyReachedCheckpointStateName,
+      true
+    ).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/explorehandler/restart/' + explorationId
-    );
+    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached/${explorationId}`);
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({status: 200, statusText: 'Success.'});
+    req.flush({ status: 200, statusText: 'Success.' });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should update most recently reached checkpoint state name and most recently reached checkpoint exploration version for logged-out learner', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const explorationId = '0';
+    const mostRecentlyReachedCheckpointExpVersion = 1;
+    const mostRecentlyReachedCheckpointStateName = 'State A';
+
+    const loggedOutPayload = {
+      unique_progress_url_id: '123456',
+      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
+    };
+
+    editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
+      explorationId,
+      mostRecentlyReachedCheckpointExpVersion,
+      mostRecentlyReachedCheckpointStateName,
+      false,
+      '123456'
+    ).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(loggedOutPayload);
+
+    req.flush({ status: 200, statusText: 'Success.' });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should record checkpoint progress and return unique progress id of logged out learner', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const explorationId = '0';
+    const mostRecentlyReachedCheckpointExpVersion = 1;
+    const mostRecentlyReachedCheckpointStateName = 'State A';
+
+    const payload = {
+      most_recently_reached_checkpoint_exp_version: mostRecentlyReachedCheckpointExpVersion,
+      most_recently_reached_checkpoint_state_name: mostRecentlyReachedCheckpointStateName,
+    };
+
+    editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+      explorationId,
+      mostRecentlyReachedCheckpointExpVersion,
+      mostRecentlyReachedCheckpointStateName
+    ).then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(`/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`);
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({ status: 200, statusText: 'Success.' });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should convert logged out progress to logged in progress successfully', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const explorationId = '0';
+    const payload = {
+      unique_progress_url_id: 'abcdef',
+    };
+
+    editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(explorationId, 'abcdef')
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(`/sync_logged_out_and_logged_in_progress/${explorationId}`);
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({ status: 200, statusText: 'Success.' });
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should reset the exploration progress successfully', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    const explorationId = '0';
+    const payload = {
+      most_recently_reached_checkpoint_state_name: null,
+    };
+
+    editableExplorationBackendApiService.resetExplorationProgressAsync (explorationId)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(`/explorehandler/restart/${explorationId}`);
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({ status: 200, statusText: 'Success.' });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
@@ -491,63 +403,57 @@ describe('Editable exploration backend API service', function () {
   }));
 
   it('should mark lesson info viewed once by the learner', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-    let payload = {
+    const payload = {
       user_has_viewed_lesson_info_modal_once: true,
     };
 
-    editableExplorationBackendApiService
-      .recordLearnerHasViewedLessonInfoModalOnce()
+    editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce()
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/userinfohandler/data');
+    const req = httpTestingController.expectOne('/userinfohandler/data');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush({status: 200});
+    req.flush({ status: 200 });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should use the rejection handler if the backend ' + 'request failed',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      let exploration = null;
+    let exploration;
 
-      editableExplorationBackendApiService
-        .fetchExplorationAsync('0')
-        .then(data => {
-          exploration = data;
-        });
+    editableExplorationBackendApiService.fetchExplorationAsync('0')
+      .then(data => {
+        exploration = data;
+      });
 
-      let req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      editableExplorationBackendApiService
-        .deleteExplorationAsync(exploration.exploration_id)
-        .then(successHandler, failHandler);
+    editableExplorationBackendApiService.deleteExplorationAsync(exploration.exploration_id)
+      .then(successHandler, failHandler);
 
-      req = httpTestingController.expectOne('/createhandler/data/0');
-      expect(req.request.method).toEqual('DELETE');
-      req.flush(
-        {error: 'Error deleting exploration 1.'},
-        {status: 500, statusText: 'Internal Server Error'}
-      );
+    const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
+    expect(deleteReq.request.method).toEqual('DELETE');
+    deleteReq.flush(
+      { error: 'Error deleting exploration 1.' },
+      { status: 500, statusText: 'Internal Server Error' }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

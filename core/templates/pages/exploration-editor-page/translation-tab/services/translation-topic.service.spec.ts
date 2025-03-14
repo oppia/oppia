@@ -16,12 +16,12 @@
  * @fileoverview Unit test for the Translation topic service.
  */
 
-import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LoggerService } from 'services/contextual/logger.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {EventEmitter} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LoggerService} from 'services/contextual/logger.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
 describe('Translation topic service', () => {
   let loggerService: LoggerService;
@@ -34,15 +34,20 @@ describe('Translation topic service', () => {
       providers: [
         LoggerService,
         TranslationTopicService,
-        ContributionOpportunitiesService
-      ]
+        ContributionOpportunitiesService,
+      ],
     });
 
     loggerService = TestBed.inject(LoggerService);
     translationTopicService = TestBed.inject(TranslationTopicService);
-    contributionOpportunitiesService = TestBed.inject(ContributionOpportunitiesService);
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService
+    );
 
-    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync').and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslatableTopicNamesAsync'
+    ).and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
   });
 
   describe('Translation topic service', () => {
@@ -58,7 +63,9 @@ describe('Translation topic service', () => {
       translationTopicService.setActiveTopicName('Topic 3');
       tick();
       expect(translationTopicService.getActiveTopicName()).toBeUndefined();
-      expect(logErrorSpy).toHaveBeenCalledWith('Invalid active topic name: Topic 3');
+      expect(logErrorSpy).toHaveBeenCalledWith(
+        'Invalid active topic name: Topic 3'
+      );
 
       translationTopicService.setActiveTopicName(null);
       tick();
@@ -67,7 +74,9 @@ describe('Translation topic service', () => {
 
     it('should emit the new topic name', () => {
       const newTopicEventEmitter = new EventEmitter();
-      expect(translationTopicService.onActiveTopicChanged).toEqual(newTopicEventEmitter);
+      expect(translationTopicService.onActiveTopicChanged).toEqual(
+        newTopicEventEmitter
+      );
     });
   });
 });

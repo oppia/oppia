@@ -23,7 +23,6 @@ import {Story} from 'domain/story/story.model';
 import {StoryBackendDict} from 'domain/story/story.model';
 import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
-import {importAllAngularServices} from 'tests/unit-test-utils.ajs';
 import {AlertsService} from 'services/alerts.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 
@@ -98,8 +97,6 @@ describe('Story editor state service', () => {
   var fakeEditableStoryBackendApiService: MockEditableStoryBackendApiService;
   var secondBackendStoryObject: StoryBackendDict;
   var testSubscriptions: Subscription;
-
-  importAllAngularServices();
 
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
