@@ -194,7 +194,7 @@ import { SetInputRulesService } from 'interactions/SetInput/directives/set-input
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
-import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import { BaseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
@@ -919,7 +919,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['YamlService', YamlService],
-  ['baseInteractionValidationService', baseInteractionValidationService],
+  ['BaseInteractionValidationService', BaseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],
