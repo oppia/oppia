@@ -801,17 +801,19 @@ class ElasticSearchStub:
                 result_doc_ids.add(doc['id'])
 
         # Initialize filters and terms using .get to avoid KeyError
-        # This allows for safe access to nested keys and provides default values.
+        # This allows for safe access to nested keys and 
+        # provides default values.
         filters = body.get('query', {}).get('bool', {}).get('filter', [])
         terms = body.get('query', {}).get('bool', {}).get('must', [])
         for f in filters:
-          if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
-            if 'match' in f:
-              for k, v in f['match'].items():
-                result_docs = [doc for doc in result_docs if v in doc.get(k, [])]
+            if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
+                if 'match' in f:
+                    for k, v in f['match'].items():
+                        result_docs = [doc for doc in result_docs 
+                                       if v in doc.get(k, [])]
             # Check for 'multi_match' in the filter to avoid KeyError.
-            # This ensures that we only attempt to access 'multi_match' 
-            # if it exists , in the current filter. 
+            # This ensures that we only attempt to access 'multi_match'
+            # if it exists , in the current filter.
             # This prevents errors when the query structure
             # does not match expectations.
             elif 'multi_match' in f:
@@ -837,14 +839,15 @@ class ElasticSearchStub:
                 if 'match_all' in term:
                     filtered_docs = result_docs
                 elif 'multi_match' in term:
-                 values = term['multi_match']['query'].split(' ')
-                 for doc in result_docs:
-                     strs = [val for val in doc.values() if isinstance(val, str)]
-                     words = []
-                     for s in strs:
-                         words += s.split(' ')
-                     if all(value in words for value in values):
-                         filtered_docs.append(doc)
+                    values = term['multi_match']['query'].split(' ')
+                    for doc in result_docs:
+                        strs = [val for val in doc.values() 
+                                if isinstance(val, str)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all(value in words for value in values):
+                            filtered_docs.append(doc)
             result_docs = filtered_docs
 
         formatted_result_docs: List[ResultDocumentDict] = [{
