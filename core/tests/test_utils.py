@@ -841,7 +841,7 @@ class ElasticSearchStub:
                 elif 'multi_match' in term:
                     values = term['multi_match']['query'].split(' ')
                     for doc in result_docs:
-                        strs = [val for val in doc.values() 
+                        strs = [val for val in doc.values()
                                 if isinstance(val, str)]
                         words = []
                         for s in strs:
