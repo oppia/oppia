@@ -456,7 +456,7 @@ def get_exploration_recommendations(exp_id: str) -> List[str]:
 
     recommendations = (
         get_exploration_recommendations_by_id(
-            exp_id, strict=True))
+            exp_id, strict=False))
     if recommendations is None:
         return []
     else:
