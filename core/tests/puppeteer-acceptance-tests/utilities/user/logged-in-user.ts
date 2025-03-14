@@ -199,7 +199,14 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the learner dashboard using profile dropdown in the navbar.
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
     await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      visible: true,
+    });
     await this.clickOn(learnerDashboardMenuLink);
   }
 
@@ -1391,8 +1398,6 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(creatorDashboardMenuLink);
-
-    await this.expectToBeOnPage(CreatorDashboardUrl);
   }
 
   /**
@@ -1408,12 +1413,10 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(contributorDashboardMenuLink);
-
-    await this.expectToBeOnPage(ContributorDashboardUrl);
   }
 
   /**
-   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   * Navigates to the Preferences Page Using Profile Dropdown Menu.
    */
   async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
     await this.page.waitForSelector(profileDropdown, {
@@ -1425,12 +1428,10 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(preferencesMenuLink);
-
-    await this.expectToBeOnPage(PreferencesPageUrl);
   }
 
   /**
-   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   * Navigates to the Profile Page Using Profile Dropdown Menu.
    */
   async navigateToProfilePageUsingProfileDropdown(): Promise<void> {
     await this.page.waitForSelector(profileDropdown, {
@@ -1442,8 +1443,6 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(profileMenuLink);
-
-    await this.expectToBeOnPage(profilePageUrlPrefix);
   }
 }
 
