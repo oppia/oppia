@@ -492,7 +492,7 @@ describe('Exploration rights service', () => {
   }));
 
   it('should make exploration rights public', fakeAsync(() => {
-    let sampleDataResultsCopy = angular.copy(serviceData);
+    let sampleDataResultsCopy = cloneDeep(serviceData);
     sampleDataResultsCopy.rights.status = 'public';
 
     spyOn(explorationRightsBackendApiService, 'publishPutData').and.returnValue(
