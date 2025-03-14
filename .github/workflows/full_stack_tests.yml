@@ -102,14 +102,14 @@ jobs:
       - name: Run E2E Test ${{ matrix.suite.name }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=0
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading webdriverio-video as Artifacts
@@ -160,14 +160,14 @@ jobs:
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=0
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24" 
           python -m scripts.run_acceptance_tests 
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         run: >
           VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24" 
           python -m scripts.run_acceptance_tests 
           --skip-build --suite=${{ matrix.suite.name }} --prod_env
       - name: Uploading Desktop test recordings as Artifacts
@@ -183,14 +183,14 @@ jobs:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
+        run: xvfb-run -a --server-args="-screen 0, 1920x1080x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
-        # Numbers in 1285x1000x24 represents screen width, height and color depth respectively.
+        # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
         run: >
           VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24" 
           python -m scripts.run_acceptance_tests --skip-build 
           --suite=${{ matrix.suite.name }} --prod_env --mobile
       - name: Uploading Mobile test recordings as Artifacts
