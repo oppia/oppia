@@ -105,3 +105,13 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'recommended_exploration_ids contains duplicate values:'):
             exploration_recommendations.validate()
+
+    def test_validation_passes(
+        self
+    ) -> None:
+        recommended_exploration_ids = ['1', '2']
+        exploration_recommendations = (
+            recommendations_domain.ExplorationRecommendations(
+            recommended_exploration_ids))
+
+        exploration_recommendations.validate()
