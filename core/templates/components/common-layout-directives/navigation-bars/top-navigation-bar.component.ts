@@ -80,6 +80,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       year: '2022',
     },
   ];
+  PAGES_WITH_BACK_STATE: string[] = ['/blog/'];
+  menuIconIsShown: boolean = false;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -235,6 +237,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
           this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
         });
     }
+
+    this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
+      this.urlService.getPathname().includes(path)
+    );
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();

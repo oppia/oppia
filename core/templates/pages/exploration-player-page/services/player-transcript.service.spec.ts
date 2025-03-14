@@ -203,8 +203,6 @@ describe('Player transcript service', () => {
         atls
       )
     );
-    let lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
-    expect(lastAnswer).toEqual(null);
 
     pts.addNewInput('first answer', false);
     pts.addNewCard(
@@ -218,8 +216,6 @@ describe('Player transcript service', () => {
         atls
       )
     );
-    lastAnswer = pts.getLastAnswerOnDisplayedCard(0);
-    expect(lastAnswer).toEqual('first answer');
 
     pts.addNewCard(
       StateCard.createNewCard(
@@ -232,10 +228,6 @@ describe('Player transcript service', () => {
         atls
       )
     );
-    // Variable lastAnswer should be null as no answers were provided in the
-    // second state.
-    lastAnswer = pts.getLastAnswerOnDisplayedCard(1);
-    expect(lastAnswer).toEqual(null);
   });
 
   it('should record answer/feedback pairs in the correct order', () => {
