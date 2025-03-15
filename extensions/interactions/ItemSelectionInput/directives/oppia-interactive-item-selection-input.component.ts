@@ -32,10 +32,10 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
 import '../static/item_selection_input.css';
-import { ItemSelectionClearService } from 'pages/exploration-player-page/services/itemselection-clear.service';
+import {ItemSelectionClearService} from 'pages/exploration-player-page/services/itemselection-clear.service';
 
 @Component({
   selector: 'oppia-interactive-item-selection-input',
@@ -63,7 +63,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   notEnoughSelections: boolean = false;
   preventAdditionalSelections: boolean = false;
   exactSelections: boolean = false;
-  private subscription: Subscription;
+  private subscription!: Subscription;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -73,7 +73,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private selectionService: ItemSelectionClearService,
+    private selectionService: ItemSelectionClearService
   ) {}
 
   ngOnInit(): void {
@@ -147,13 +147,13 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.submitAnswer.bind(this),
       this.validityCheckFn.bind(this)
     );
-    this.subscription = this.selectionService.clearSelection$.subscribe((clear: boolean) => {
-      if (clear) {
-        setTimeout(() => {
+    this.subscription = this.selectionService.clearSelection$.subscribe(
+      (clear: boolean) => {
+        if (clear) {
           this.clearSelection();
-        });
+        }
       }
-    });
+    );
   }
 
   getContentId(): string {

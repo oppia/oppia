@@ -313,6 +313,19 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ).toHaveBeenCalledOnceWith(['ca_choices_1']);
       }
     );
+
+    it('should remove "selected" class from the selected button', function () {
+      const mockButton = document.createElement('button');
+      mockButton.classList.add('multiple-choice-option', 'selected');
+      spyOn(document, 'querySelector')
+        .withArgs('button.multiple-choice-option.selected')
+        .and.returnValue(mockButton);
+      component.userSelections = {
+        'choice 2': true,
+      };
+      component.clearSelection();
+      expect(mockButton.classList.contains('selected')).toBeFalse();
+    });
   });
 
   describe('when multiple choices are allowed to be selected', () => {
@@ -409,6 +422,22 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ).toHaveBeenCalledOnceWith(['ca_choices_1', 'ca_choices_2']);
       }
     );
+
+    it('should deselect all choices when solution button is clicked', () => {
+      component.maxAllowableSelectionCount = 2;
+      component.minAllowableSelectionCount = 1;
+      component.userSelections = {
+        'choice 1': true,
+        'choice 2': true,
+        'choice 3': false,
+      };
+      component.selectionCount = 2;
+      component.clearSelection();
+      expect(component.selectionCount).toBe(0);
+      expect(component.userSelections['choice 1']).toBeFalse();
+      expect(component.userSelections['choice 2']).toBeFalse();
+      expect(component.userSelections['choice 3']).toBeFalse();
+    });
   });
 
   describe('when an exact number of choices are allowed to be selected', () => {
@@ -512,5 +541,18 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ]);
       }
     );
+    it('should deselect all choices when solution button is clicked', () => {
+      component.userSelections = {
+        'choice 1': true,
+        'choice 2': true,
+        'choice 3': true,
+      };
+      component.selectionCount = 3;
+      component.clearSelection();
+      expect(component.selectionCount).toBe(0);
+      expect(component.userSelections['choice 1']).toBeFalse();
+      expect(component.userSelections['choice 2']).toBeFalse();
+      expect(component.userSelections['choice 3']).toBeFalse();
+    });
   });
 });

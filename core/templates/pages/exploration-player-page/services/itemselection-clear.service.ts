@@ -16,15 +16,17 @@
  * @fileoverview Utility service for clear selection in item-selection-input interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ItemSelectionClearService {
-  private clearSelectionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  clearSelection$: Observable<boolean> = this.clearSelectionSubject.asObservable();
+  private clearSelectionSubject: BehaviorSubject<boolean> =
+    new BehaviorSubject<boolean>(false);
+  clearSelection$: Observable<boolean> =
+    this.clearSelectionSubject.asObservable();
 
   triggerClearSelection(): void {
     this.clearSelectionSubject.next(true);
