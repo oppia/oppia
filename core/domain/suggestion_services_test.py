@@ -1363,7 +1363,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_translation_suggestion_identical_long_strings(self) -> None:
         """Test updating a translation suggestion with identical long strings
-        that need truncation."""
+        that need truncation.
+        """
         long_text = f'{"A" * 250}'
         original = long_text
         updated = long_text
