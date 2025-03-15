@@ -1020,6 +1020,7 @@ fdescribe('Translation Modal Component', () => {
         // Simulate user clicking "Discard changes"
         mockModalRef.result = Promise.resolve();
         tick();
+        flushMicrotasks();
 
         // Verify the translation was skipped
         expect(component.activeWrittenTranslation).toBe('');
@@ -1029,15 +1030,12 @@ fdescribe('Translation Modal Component', () => {
       it('should open confirmation modal and not skip on cancel', fakeAsync(() => {
         const originalText = 'Some unsaved text';
         component.activeWrittenTranslation = originalText;
-        spyOn(ngbModal, 'open').and.callThrough();
-        spyOn(translateTextService, 'getTextToTranslate').and.returnValue({
-          text: 'next text',
-          more: true,
-          status: 'active',
-          translation: '',
-          dataFormat: 'html',
-          contentType: 'content',
-        });
+
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const getTextSpy = spyOn(translateTextService, 'getTextToTranslate');
+
+        // Mock the modal result to be a rejected promise
+        mockModalRef.result = Promise.reject();
 
         // Call skipActiveTranslation which should trigger the modal
         component.skipActiveTranslation();
@@ -1049,15 +1047,13 @@ fdescribe('Translation Modal Component', () => {
           {backdrop: true}
         );
 
-        // Simulate user clicking "Continue editing" or closing modal
-        mockModalRef.result = Promise.reject('cancel');
+        // No need to simulate rejection again since we already set it up
         tick();
-        // Handle the rejection
         flushMicrotasks();
 
         // Verify the translation was not skipped
         expect(component.activeWrittenTranslation).toBe(originalText);
-        expect(translateTextService.getTextToTranslate).not.toHaveBeenCalled();
+        expect(getTextSpy).not.toHaveBeenCalled();
       }));
     });
 
@@ -1079,14 +1075,21 @@ fdescribe('Translation Modal Component', () => {
         // Simulate user clicking "Discard changes"
         mockModalRef.result = Promise.resolve();
         tick();
+        flushMicrotasks();
 
         // Verify the modal was closed
         expect(component.activeModal.close).toHaveBeenCalled();
       }));
 
       it('should open confirmation modal and not close on cancel', fakeAsync(() => {
-        spyOn(ngbModal, 'open').and.callThrough();
-        spyOn(component.activeModal, 'close');
+        // Set up unsaved changes
+        component.activeWrittenTranslation = 'Unsaved text';
+
+        spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+        const closeSpy = spyOn(component.activeModal, 'close');
+
+        // Mock the modal result to be a rejected promise
+        mockModalRef.result = Promise.reject();
 
         // Call close which should trigger the confirmation modal
         component.close();
@@ -1098,14 +1101,12 @@ fdescribe('Translation Modal Component', () => {
           {backdrop: true}
         );
 
-        // Simulate user clicking "Continue editing" or closing modal
-        mockModalRef.result = Promise.reject('cancel');
+        // No need to simulate rejection again since we already set it up
         tick();
-        // Handle the rejection
         flushMicrotasks();
 
         // Verify the modal was not closed
-        expect(component.activeModal.close).not.toHaveBeenCalled();
+        expect(closeSpy).not.toHaveBeenCalled();
       }));
     });
 
