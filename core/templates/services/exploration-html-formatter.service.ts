@@ -64,13 +64,9 @@ export class ExplorationHtmlFormatterService {
    * @param {string} interactionId - The interaction id.
    * @param {object} interactionCustomizationArgs - The various
    *   attributes that the interaction depends on.
-   * @param {boolean} parentHasLastAnswerProperty - If this function is
-   *   called in the exploration_player view (including the preview mode),
-   *   callers should ensure that parentHasLastAnswerProperty is set to
-   *   true and $scope.lastAnswer =
-   *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
-   *   the parent controller of the returned tag.
-   *   Otherwise, parentHasLastAnswerProperty should be set to false.
+   * @param {boolean} parentHasLastAnswerProperty - Indicates whether the parent
+   *   component has a property for the last answer. If true, the attribute
+   *   'last-answer' will be set to 'lastAnswer', otherwise it will be set to 'null'.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
    * @param {string} savedSolution - The name of property that needs to be bound
