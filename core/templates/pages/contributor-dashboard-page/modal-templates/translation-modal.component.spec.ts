@@ -30,11 +30,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {
-  NgbModal,
-  NgbActiveModal,
-  NgbModalRef,
-} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -58,7 +54,6 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {MockNgbModalRef} from '../../../components/forms/forms-templates/mark-translations-as-needing-update-modal.component.spec';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 
 enum ExpansionTabType {
@@ -72,12 +67,12 @@ class MockChangeDetectorRef {
 
 class MockConfirmTranslationExitModal {
   componentInstance = {};
-  result = Promise.resolve(); // Default to resolving the promise
+  result = Promise.resolve();
   close(): void {}
   dismiss(): void {}
 }
 
-fdescribe('Translation Modal Component', () => {
+describe('Translation Modal Component', () => {
   let contextService: ContextService;
   let translateTextService: TranslateTextService;
   let translationLanguageService: TranslationLanguageService;
@@ -734,7 +729,6 @@ fdescribe('Translation Modal Component', () => {
           files: {},
         };
 
-        // Mock the modal result to resolve immediately for each skip
         mockModalRef.result = Promise.resolve();
 
         component.skipActiveTranslation();
@@ -759,7 +753,6 @@ fdescribe('Translation Modal Component', () => {
           'getFilenameToBase64MappingAsync'
         ).and.returnValue(Promise.resolve({}));
 
-        // Mock the modal result to resolve immediately
         mockModalRef.result = Promise.resolve();
 
         component.suggestTranslatedText();
@@ -800,7 +793,6 @@ fdescribe('Translation Modal Component', () => {
         'getFilenameToBase64MappingAsync'
       ).and.returnValue(Promise.resolve(imageToBase64Mapping));
 
-      // Mock the modal result to resolve immediately
       mockModalRef.result = Promise.resolve();
 
       component.suggestTranslatedText();
@@ -854,7 +846,6 @@ fdescribe('Translation Modal Component', () => {
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
 
-      // Mock the modal result to resolve immediately
       mockModalRef.result = Promise.resolve();
 
       component.suggestTranslatedText();
@@ -871,7 +862,6 @@ fdescribe('Translation Modal Component', () => {
       );
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
 
-      // Mock the modal result to resolve immediately
       mockModalRef.result = Promise.resolve();
 
       component.suggestTranslatedText();
@@ -948,12 +938,10 @@ fdescribe('Translation Modal Component', () => {
         'of the text to translate',
       () => {
         it('should not submit the translation', () => {
-          // Original text contains math and skillreview custom tags.
           component.textToTranslate =
             '<p>First para</p><p>Second para</p><oppia-noninteractive-math>' +
             '</oppia-noninteractive-math><oppia-noninteractive-skillreview>' +
             '</oppia-noninteractive-skillreview>';
-          // Translated text contains only math custom tag.
           component.activeWrittenTranslation =
             '<p>First para</p>' +
             '<p><oppia-noninteractive-math></oppia-noninteractive-math></p>';
@@ -991,7 +979,6 @@ fdescribe('Translation Modal Component', () => {
 
   describe('when handling unsaved changes', () => {
     beforeEach(() => {
-      // Set up some unsaved changes
       component.activeWrittenTranslation = 'Some unsaved text';
     });
 
@@ -1007,22 +994,18 @@ fdescribe('Translation Modal Component', () => {
           contentType: 'content',
         });
 
-        // Call skipActiveTranslation which should trigger the modal
         component.skipActiveTranslation();
         tick();
 
-        // Verify modal was opened
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: true}
         );
 
-        // Simulate user clicking "Discard changes"
         mockModalRef.result = Promise.resolve();
         tick();
         flushMicrotasks();
 
-        // Verify the translation was skipped
         expect(component.activeWrittenTranslation).toBe('');
         expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
       }));
@@ -1034,24 +1017,19 @@ fdescribe('Translation Modal Component', () => {
         spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
         const getTextSpy = spyOn(translateTextService, 'getTextToTranslate');
 
-        // Mock the modal result to be a rejected promise
         mockModalRef.result = Promise.reject();
 
-        // Call skipActiveTranslation which should trigger the modal
         component.skipActiveTranslation();
         tick();
 
-        // Verify modal was opened
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: true}
         );
 
-        // No need to simulate rejection again since we already set it up
         tick();
         flushMicrotasks();
 
-        // Verify the translation was not skipped
         expect(component.activeWrittenTranslation).toBe(originalText);
         expect(getTextSpy).not.toHaveBeenCalled();
       }));
@@ -1062,50 +1040,40 @@ fdescribe('Translation Modal Component', () => {
         spyOn(ngbModal, 'open').and.callThrough();
         spyOn(component.activeModal, 'close');
 
-        // Call close which should trigger the confirmation modal
         component.close();
         tick();
 
-        // Verify modal was opened
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: true}
         );
 
-        // Simulate user clicking "Discard changes"
         mockModalRef.result = Promise.resolve();
         tick();
         flushMicrotasks();
 
-        // Verify the modal was closed
         expect(component.activeModal.close).toHaveBeenCalled();
       }));
 
       it('should open confirmation modal and not close on cancel', fakeAsync(() => {
-        // Set up unsaved changes
         component.activeWrittenTranslation = 'Unsaved text';
 
         spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
         const closeSpy = spyOn(component.activeModal, 'close');
 
-        // Mock the modal result to be a rejected promise
         mockModalRef.result = Promise.reject();
 
-        // Call close which should trigger the confirmation modal
         component.close();
         tick();
 
-        // Verify modal was opened
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: true}
         );
 
-        // No need to simulate rejection again since we already set it up
         tick();
         flushMicrotasks();
 
-        // Verify the modal was not closed
         expect(closeSpy).not.toHaveBeenCalled();
       }));
     });

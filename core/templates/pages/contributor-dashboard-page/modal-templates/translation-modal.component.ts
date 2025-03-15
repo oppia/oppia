@@ -328,14 +328,16 @@ export class TranslationModalComponent {
 
       modalRef.result.then(
         () => {
-          action(); // If user confirms, execute the passed action
+          // If user confirms, execute the passed action.
+          action();
         },
         () => {
-          // If user cancels or closes, no action is needed
+          // If user cancels or closes, no action is needed.
         }
       );
     } else {
-      action(); // No unsaved changes, directly execute the action
+      // No unsaved changes, directly execute the action.
+      action();
     }
   }
 
