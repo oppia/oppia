@@ -1338,8 +1338,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        self.assertIn("Alpha", original)
-        self.assertIn("Beta", updated_suggestion.change_cmd.translation_html)
+        self.assertIn('Alpha', original)
+        self.assertIn('Beta', updated_suggestion.change_cmd.translation_html)
 
     def test_update_translation_suggestion_with_truncation(self) -> None:
         original = f'{"A" * 300}XYZ'
@@ -1356,7 +1356,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertTrue(
-            updated_suggestion.change_cmd.translation_html.startswith("...")
+            updated_suggestion.change_cmd.translation_html.startswith('...')
         )
         self.assertIn('XYZ', original)
         self.assertIn('ABC', updated_suggestion.change_cmd.translation_html)
