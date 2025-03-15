@@ -87,4 +87,3 @@ describe('Logged-in User', function () {
     await UserFactory.closeAllBrowsers();
   });
 });
-
