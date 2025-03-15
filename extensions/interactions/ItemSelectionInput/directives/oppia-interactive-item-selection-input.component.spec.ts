@@ -31,6 +31,8 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ItemSelectionClearService} from 'pages/exploration-player-page/services/itemselection-clear.service';
 
 describe('oppiaInteractiveItemSelectionInput', function () {
   let component: InteractiveItemSelectionInputComponent;
@@ -38,6 +40,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
   let browserCheckerService: BrowserCheckerService;
   let currentInteractionService: CurrentInteractionService;
   let playerTranscriptService: PlayerTranscriptService;
+  let itemSelectionClearService: ItemSelectionClearService;
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
@@ -76,6 +79,16 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     }
   }
 
+  class MockItemSelectionClearService {
+    private clearSelectionSubject: BehaviorSubject<boolean> =
+      new BehaviorSubject<boolean>(false);
+    clearSelection$: Observable<boolean> =
+      this.clearSelectionSubject.asObservable();
+    triggerClearSelection(): void {
+      this.clearSelectionSubject.next(true);
+    }
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveItemSelectionInputComponent, MockTranslatePipe],
@@ -88,6 +101,10 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           provide: CurrentInteractionService,
           useClass: MockCurrentInteractionService,
         },
+        {
+          provide: ItemSelectionClearService,
+          useClass: MockItemSelectionClearService,
+        },
         BrowserCheckerService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -99,6 +116,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveItemSelectionInputComponent);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    itemSelectionClearService = TestBed.inject(ItemSelectionClearService);
     component = fixture.componentInstance;
 
     let contentId: string = 'content_id';
@@ -153,6 +171,25 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       expect(component.displayCheckboxes).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
+    });
+
+    it('should subscribe to clearSelection$ and call clearSelection when true is emitted', () => {
+      spyOn(component, 'clearSelection');
+      const serviceSpy = spyOn(
+        itemSelectionClearService.clearSelection$,
+        'subscribe'
+      ).and.callFake(callback => callback(true));
+      component.ngOnInit();
+      expect(serviceSpy).toHaveBeenCalled();
+      expect(component.clearSelection).toHaveBeenCalled();
+    });
+
+    it('should unsubscribe from clearSelection$ on destroy', () => {
+      component.subscription = jasmine.createSpyObj('Subscription', [
+        'unsubscribe',
+      ]);
+      component.ngOnDestroy();
+      expect(component.subscription.unsubscribe).toHaveBeenCalled();
     });
 
     it('should throw error if content id is null', () => {

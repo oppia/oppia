@@ -63,7 +63,7 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
   notEnoughSelections: boolean = false;
   preventAdditionalSelections: boolean = false;
   exactSelections: boolean = false;
-  private subscription!: Subscription;
+  subscription!: Subscription;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
