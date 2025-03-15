@@ -2146,7 +2146,7 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
-def strip_prefix(component_name: str) -> str:
+def _strip_prefix(component_name: str) -> str:
     """Removes the 'oppia-noninteractive-' prefix from component names.
 
     Args:
@@ -2158,7 +2158,7 @@ def strip_prefix(component_name: str) -> str:
     return component_name.removeprefix('oppia-noninteractive-')
 
 
-def highlight_differences(
+def _highlight_differences(
     original: str, updated: str, max_length: int = 200
     ) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
@@ -2248,7 +2248,7 @@ def update_translation_suggestion(
     # We use a sorted approach to compare component counts because it ensures
     # consistency in comparison regardless of the order components appear.
     all_component_names = sorted(
-        {strip_prefix(name)
+        {_strip_prefix(name)
         for name in original_rte_counts.keys() | updated_rte_counts.keys()}
     )
 
@@ -2279,7 +2279,7 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
-        original_text_preview, translation_text_preview = highlight_differences(
+        original_text_preview, translation_text_preview = _highlight_differences(
             original_text_html, translation_html)
 
         raise utils.InvalidInputException(
