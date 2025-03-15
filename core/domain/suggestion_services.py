@@ -2279,8 +2279,10 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
-        original_text_preview, translation_text_preview = _highlight_differences(
+        original_text_preview, translation_text_preview = (
+            _highlight_differences(
             original_text_html, translation_html)
+        )
 
         raise utils.InvalidInputException(
             f'{original_summary_text} {updated_summary_text}\n'

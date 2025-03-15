@@ -1295,15 +1295,18 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         max_length = 50
 
         truncated_original, truncated_updated = (
-            suggestion_services._highlight_differences(original, updated, max_length)
-        )
+            suggestion_services._highlight_differences(
+                original,
+                updated,
+                max_length
+            ))
 
         self.assertEqual(truncated_original, original[:max_length])
         self.assertEqual(truncated_updated, updated[:max_length])
 
     def test_highlight_differences_with_change_in_middle(self) -> None:
         original = 'This is a test string.'
-        updated = 'This is a best string.'  # "test" → "best"
+        updated = 'This is a best string.'
 
         truncated_original, truncated_updated = (
             suggestion_services._highlight_differences(original, updated, 50)
@@ -1314,7 +1317,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_highlight_differences_with_change_at_start(self) -> None:
         original = 'Alpha test string.'
-        updated = 'Beta test string.'  # First word changed
+        updated = 'Beta test string.'
 
         truncated_original, truncated_updated = (
             suggestion_services._highlight_differences(original, updated, 50)
