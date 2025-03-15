@@ -2874,7 +2874,9 @@ describe('Translation Suggestion Review Modal Component', function () {
         component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
           .content_html
       ).toBe(htmlWithComponents);
-      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(
+          component.incompleteTranslationErrorIsShown
+      ).toBeFalse();
 
       component.ngOnInit();
 
