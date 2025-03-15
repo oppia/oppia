@@ -23,7 +23,7 @@ import nerdamer from 'nerdamer';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MathEquationInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {MathEquationInputRulesService} from './math-equation-input-rules.service';
@@ -40,7 +40,7 @@ export class MathEquationInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
