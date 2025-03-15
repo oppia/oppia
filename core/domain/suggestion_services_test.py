@@ -1290,8 +1290,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_translation_suggestion_identical_strings(self) -> None:
-        original = "This is a test string."
-        updated = "This is a test string."
+        original = 'This is a test string.'
+        updated = 'This is a test string.'
 
         suggestion = self.create_translation_suggestion(original, updated)
 
@@ -1303,11 +1303,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        self.assertEqual(updated_suggestion.change_cmd.translation_html, updated)
+        self.assertEqual(
+            updated_suggestion.change_cmd.translation_html, updated
+        )
 
     def test_update_translation_suggestion_with_change_in_middle(self) -> None:
-        original = "This is a test string."
-        updated = "This is a best string."
+        original = 'This is a test string.'
+        updated = 'This is a best string.'
 
         suggestion = self.create_translation_suggestion(original, original)
 
@@ -1319,12 +1321,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        self.assertIn("test", original)
-        self.assertIn("best", updated_suggestion.change_cmd.translation_html)
+        self.assertIn('test', original)
+        self.assertIn('best', updated_suggestion.change_cmd.translation_html)
 
     def test_update_translation_suggestion_with_change_at_start(self) -> None:
-        original = "Alpha test string."
-        updated = "Beta test string."
+        original = 'Alpha test string.'
+        updated = 'Beta test string.'
 
         suggestion = self.create_translation_suggestion(original, original)
 
@@ -1353,9 +1355,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        self.assertTrue(updated_suggestion.change_cmd.translation_html.startswith("..."))
-        self.assertIn("XYZ", original)
-        self.assertIn("ABC", updated_suggestion.change_cmd.translation_html)
+        self.assertTrue(
+            updated_suggestion.change_cmd.translation_html.startswith("...")
+        )
+        self.assertIn('XYZ', original)
+        self.assertIn('ABC', updated_suggestion.change_cmd.translation_html)
 
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self

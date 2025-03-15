@@ -2183,7 +2183,9 @@ def _highlight_differences(
 
     prefix = '...' if start_index > 0 or min_length > max_length else ''
 
-    truncated_original = prefix + original[start_index: start_index + max_length]
+    truncated_original = prefix + (
+        original[start_index: start_index + max_length]
+    )
     truncated_updated = prefix + updated[start_index: start_index + max_length]
 
     return truncated_original, truncated_updated
