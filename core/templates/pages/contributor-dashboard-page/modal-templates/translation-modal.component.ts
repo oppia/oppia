@@ -25,7 +25,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -51,6 +51,7 @@ import {
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -188,6 +189,7 @@ export class TranslationModalComponent {
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,
     private readonly imageLocalStorageService: ImageLocalStorageService,
+    private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
@@ -312,11 +314,37 @@ export class TranslationModalComponent {
     this.editorIsShown = true;
   }
 
-  close(): void {
-    this.activeModal.close();
+  private checkForUnsavedChanges(action: () => void): void {
+    if (
+      this.activeWrittenTranslation &&
+      this.activeWrittenTranslation.length > 0
+    ) {
+      const modalRef = this.ngbModal.open(
+        ConfirmTranslationExitModalComponent,
+        {
+          backdrop: true,
+        }
+      );
 
-    // Reset copyMode to the default value and avoid console errors.
-    this.ckEditorCopyContentService.copyModeActive = false;
+      modalRef.result.then(
+        () => {
+          action(); // If user confirms, execute the passed action
+        },
+        () => {
+          // If user cancels or closes, no action is needed
+        }
+      );
+    } else {
+      action(); // No unsaved changes, directly execute the action
+    }
+  }
+
+  close(): void {
+    this.checkForUnsavedChanges(() => {
+      this.activeModal.close();
+      // Reset copyMode to the default value and avoid console errors.
+      this.ckEditorCopyContentService.copyModeActive = false;
+    });
   }
 
   getHtmlSchema(): HTMLSchema {
@@ -398,10 +426,12 @@ export class TranslationModalComponent {
   }
 
   skipActiveTranslation(): void {
-    const translatableItem = this.translateTextService.getTextToTranslate();
-    this.updateActiveState(translatableItem);
-    ({more: this.moreAvailable} = translatableItem);
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem = this.translateTextService.getTextToTranslate();
+      this.updateActiveState(translatableItem);
+      ({more: this.moreAvailable} = translatableItem);
+      this.resetEditor();
+    });
   }
 
   isSubmitted(): boolean {
@@ -409,11 +439,13 @@ export class TranslationModalComponent {
   }
 
   returnToPreviousTranslation(): void {
-    const translatableItem =
-      this.translateTextService.getPreviousTextToTranslate();
-    this.updateActiveState(translatableItem);
-    this.moreAvailable = true;
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem =
+        this.translateTextService.getPreviousTextToTranslate();
+      this.updateActiveState(translatableItem);
+      this.moreAvailable = true;
+      this.resetEditor();
+    });
   }
 
   isSetOfStringDataFormat(): boolean {
