@@ -139,7 +139,7 @@ export class BaseUser {
         // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const outputFileName =
-            `${specName}-${new Date().toISOString()}.mp4`.replace(
+            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
