@@ -61,6 +61,7 @@ import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
+import cloneDeep from 'lodash/cloneDeep';
 
 export type StatePropertyValues =
   | AnswerGroup[]
@@ -305,8 +306,8 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_exploration_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
     } as ExplorationChangeEditExplorationProperty);
   }
@@ -333,15 +334,15 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_state_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
       state_name: stateName,
     });
   }
 
   getChangeList(): ExplorationChange[] {
-    return angular.copy(this.explorationChangeList);
+    return cloneDeep(this.explorationChangeList);
   }
 
   isOnlyVoiceoverChangeListPresent(): boolean {
@@ -354,7 +355,7 @@ export class ChangeListService {
   }
 
   getTranslationChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
         return [
           'edit_translation',
@@ -367,7 +368,7 @@ export class ChangeListService {
   }
 
   getVoiceoverChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
         return change.cmd === 'update_voiceovers';
       })

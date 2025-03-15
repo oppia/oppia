@@ -22,7 +22,7 @@ import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -40,7 +40,7 @@ interface PreviousRule {
 })
 export class SetInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   /**
