@@ -102,6 +102,7 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
+MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION = 200
 
 
 @overload
@@ -2160,7 +2161,7 @@ def _strip_prefix(component_name: str) -> str:
 
 def _highlight_differences(
     original: str, updated: str, max_length: int = 200
-    ) -> Tuple[str, str]:
+) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
 
     Args:
@@ -2180,13 +2181,10 @@ def _highlight_differences(
     )
     start_index = max(0, diff_index - 10)
 
-    truncated_original = (
-        '...' if start_index > 0 else ''
-    ) + original[start_index: start_index + max_length]
+    prefix = '...' if start_index > 0 or min_length > max_length else ''
 
-    truncated_updated = (
-        '...' if start_index > 0 else ''
-    ) + updated[start_index: start_index + max_length]
+    truncated_original = prefix + original[start_index: start_index + max_length]
+    truncated_updated = prefix + updated[start_index: start_index + max_length]
 
     return truncated_original, truncated_updated
 
@@ -2289,6 +2287,12 @@ def update_translation_suggestion(
             f'Original text preview: {original_text_preview}\n'
             f'Translated text preview: {translation_text_preview}'
         )
+
+    if len(translation_html) > MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION:
+        _, truncated_translation = _highlight_differences(
+            original_text_html, translation_html
+        )
+        translation_html = truncated_translation
 
     suggestion.change_cmd.translation_html = (
         html_cleaner.clean(translation_html)

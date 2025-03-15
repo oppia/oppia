@@ -1289,55 +1289,73 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             translation_html_with_image
         )
 
-    def test_highlight_differences_identical_strings(self) -> None:
-        original = 'This is a test string.'
-        updated = 'This is a test string.'
-        max_length = 50
+    def test_update_translation_suggestion_identical_strings(self) -> None:
+        original = "This is a test string."
+        updated = "This is a test string."
 
-        truncated_original, truncated_updated = (
-            suggestion_services._highlight_differences(
-                original,
-                updated,
-                max_length
-            ))
+        suggestion = self.create_translation_suggestion(original, updated)
 
-        self.assertEqual(truncated_original, original[:max_length])
-        self.assertEqual(truncated_updated, updated[:max_length])
-
-    def test_highlight_differences_with_change_in_middle(self) -> None:
-        original = 'This is a test string.'
-        updated = 'This is a best string.'
-
-        truncated_original, truncated_updated = (
-            suggestion_services._highlight_differences(original, updated, 50)
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
         )
 
-        self.assertIn('test', truncated_original)
-        self.assertIn('best', truncated_updated)
-
-    def test_highlight_differences_with_change_at_start(self) -> None:
-        original = 'Alpha test string.'
-        updated = 'Beta test string.'
-
-        truncated_original, truncated_updated = (
-            suggestion_services._highlight_differences(original, updated, 50)
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
         )
 
-        self.assertIn('Alpha', truncated_original)
-        self.assertIn('Beta', truncated_updated)
+        self.assertEqual(updated_suggestion.change_cmd.translation_html, updated)
 
-    def test_highlight_differences_with_truncation(self) -> None:
-        original = 'A' * 300 + 'XYZ'
-        updated = 'A' * 300 + 'ABC'
+    def test_update_translation_suggestion_with_change_in_middle(self) -> None:
+        original = "This is a test string."
+        updated = "This is a best string."
 
-        truncated_original, truncated_updated = (
-            suggestion_services._highlight_differences(original, updated, 50)
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
         )
 
-        self.assertTrue(truncated_original.startswith('...'))
-        self.assertTrue(truncated_updated.startswith('...'))
-        self.assertIn('XYZ', truncated_original)
-        self.assertIn('ABC', truncated_updated)
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertIn("test", original)
+        self.assertIn("best", updated_suggestion.change_cmd.translation_html)
+
+    def test_update_translation_suggestion_with_change_at_start(self) -> None:
+        original = "Alpha test string."
+        updated = "Beta test string."
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertIn("Alpha", original)
+        self.assertIn("Beta", updated_suggestion.change_cmd.translation_html)
+
+    def test_update_translation_suggestion_with_truncation(self) -> None:
+        original = f'{"A" * 300}XYZ'
+        updated = f'{"A" * 300}ABC'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertTrue(updated_suggestion.change_cmd.translation_html.startswith("..."))
+        self.assertIn("XYZ", original)
+        self.assertIn("ABC", updated_suggestion.change_cmd.translation_html)
 
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
