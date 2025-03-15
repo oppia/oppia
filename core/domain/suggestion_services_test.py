@@ -1361,6 +1361,30 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertIn('XYZ', original)
         self.assertIn('ABC', updated_suggestion.change_cmd.translation_html)
 
+    def test_update_translation_suggestion_identical_long_strings(self) -> None:
+        """Test updating a translation suggestion with identical long strings
+        that need truncation."""
+        long_text = f'{"A" * 250}'
+        original = long_text
+        updated = long_text
+
+        suggestion = self.create_translation_suggestion(original, updated)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertEqual(
+            len(updated_suggestion.change_cmd.translation_html), 200
+        )
+        self.assertEqual(
+            updated_suggestion.change_cmd.translation_html, original[:200]
+        )
+
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
     ) -> None:
