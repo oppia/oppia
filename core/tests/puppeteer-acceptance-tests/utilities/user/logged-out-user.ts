@@ -3732,7 +3732,11 @@ export class LoggedOutUser extends BaseUser {
    * Saves the progress.(To be used when save progress modal is opened.)
    */
   async saveProgress(): Promise<void> {
-    await this.clickOn(saveProgressButton);
+    await this.page.waitForSelector(saveProgressButton, {
+      visible: true,
+      timeout: 3000,
+    });
+    await this.page.click(saveProgressButton);
   }
 
   /**
