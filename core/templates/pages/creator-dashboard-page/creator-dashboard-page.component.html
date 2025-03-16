@@ -23,7 +23,7 @@
             [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
-        <div [hidden]="!dashboardStats.numRatings">
+        <div class="e2e-test-oppia-total-users" [hidden]="!dashboardStats.numRatings">
           <p *ngIf="dashboardStats.numRatings === 1">
             (by {{ dashboardStats.numRatings }} user)
           </p>
