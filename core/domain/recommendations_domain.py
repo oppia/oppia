@@ -28,7 +28,7 @@ class ExplorationRecommendations:
 
     def __init__(
         self,
-        exp_id,
+        exp_id: str,
         recommended_exploration_ids: List[str]
     ) -> None:
         """Constructs an ExplorationRecommendations domain object.
@@ -56,14 +56,13 @@ class ExplorationRecommendations:
             raise utils.ValidationError(
                 'Expected recommended_exploration_ids to be a list, '
                 'received %s' % self.recommended_exploration_ids)   
-        without_dup = set()
-        dup = [x for x in self.recommended_exploration_ids
-                      if x in without_dup or without_dup.add(x)]
-        if len(self.recommended_exploration_ids) != len(without_dup):
-            raise utils.ValidationError(
-                'recommended_exploration_ids contains duplicate values: %s'
-                % dup)
+        without_duplicate = set()
         for recommended_exploration_id in self.recommended_exploration_ids:
+            if recommended_exploration_id in without_duplicate:
+                raise utils.ValidationError(
+                    'recommended_exploration_ids contains duplicate values: %s'
+                    % recommended_exploration_id)
+            without_duplicate.add(recommended_exploration_id)
             if not isinstance(recommended_exploration_id, str):
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be a string, '
