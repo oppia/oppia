@@ -184,6 +184,10 @@ class _Gae(Platform):
                 from core.storage.translation import (
                     gae_models as translation_models)
                 returned_models.append(translation_models)
+            elif name == Names.TRANSLATION_COUNT_DEBUG_TRACKER:
+                from core.storage.translation_count_debug_tracker import (
+                    gae_models as translation_count_debug_tracker_models)
+                returned_models.append(translation_count_debug_tracker_models)
             elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
