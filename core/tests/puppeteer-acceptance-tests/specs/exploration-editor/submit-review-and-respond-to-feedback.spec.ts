@@ -41,7 +41,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.dismissWelcomeModal();
     explorationId =
       await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-        'Feedback Test Exploration'
+        'Feedback Test'
       );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
@@ -52,6 +52,8 @@ describe('Exploration Editor', function () {
         'loggedInVisitor',
         'loggedInVisitor@example.com'
       );
+
+      // First user plays the exploration and gives non-anonymous feedback.
       await loggedInVisitor.playExploration(explorationId);
       await loggedInVisitor.giveFeedback(
         'This is helpful non-anonymous feedback',
@@ -59,12 +61,15 @@ describe('Exploration Editor', function () {
       );
 
       loggedOutVisitor = await UserFactory.createLoggedOutUser();
+
+      // Anonymous logged-out user plays the exploration and gives feedback.
       await loggedOutVisitor.playExploration(explorationId);
       await loggedOutVisitor.giveFeedback(
         'This is anonymous feedback from the first user',
         false
       );
 
+      // Logged-in user gives anonymous feedback (testing both feedback types).
       await loggedInVisitor.playExploration(explorationId);
       await loggedInVisitor.giveFeedback(
         'This is anonymous feedback from the second user',
@@ -80,8 +85,10 @@ describe('Exploration Editor', function () {
       await explorationEditor.page.bringToFront();
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
-        'Feedback Test Exploration'
+        'Feedback Test'
       );
+
+      // Go to the feedback tab and verify the count of feedback items.
       await explorationEditor.navigateToFeedbackTab();
       await explorationEditor.expectNoOfSuggestionsToBe(3);
     },
@@ -91,6 +98,7 @@ describe('Exploration Editor', function () {
   it(
     'should verify that each feedback report has the correct details',
     async function () {
+      // Verify first feedback thread (non-anonymous).
       await explorationEditor.viewFeedbackThread(1);
       await explorationEditor.expectSuggestionToBeAnonymous(
         'This is helpful non-anonymous feedback',
@@ -100,6 +108,7 @@ describe('Exploration Editor', function () {
         'Thank you for your non-anonymous feedback!'
       );
 
+      // Verify second feedback thread (anonymous).
       await explorationEditor.viewFeedbackThread(1);
       await explorationEditor.expectSuggestionToBeAnonymous(
         'This is anonymous feedback from the first user',
@@ -109,6 +118,7 @@ describe('Exploration Editor', function () {
         'Thank you for your anonymous feedback!'
       );
 
+      // Verify third feedback thread (anonymous).
       await explorationEditor.viewFeedbackThread(1);
       await explorationEditor.expectSuggestionToBeAnonymous(
         'This is anonymous feedback from the second user',
@@ -129,6 +139,8 @@ describe('Exploration Editor', function () {
       await loggedInVisitor.page.bringToFront();
       await loggedInVisitor.navigateToFeedbackUpdatesPage();
       await loggedInVisitor.viewFeedbackUpdateThread(1);
+
+      // Verify the feedback and response match what was expected.
       await loggedInVisitor.expectFeedbackAndResponseToMatch(
         'This is helpful non-anonymous feedback',
         'Thank you for your non-anonymous feedback!'
@@ -142,19 +154,22 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
-        'Feedback Test Exploration'
+        'Feedback Test'
       );
       await explorationEditor.navigateToFeedbackTab();
       await explorationEditor.page.bringToFront();
 
+      // Change status of the second feedback thread to "fixed".
       await explorationEditor.viewFeedbackThread(2);
       await explorationEditor.changeFeedbackStatus('fixed');
       await explorationEditor.expectFeedbackStatusToBe('fixed');
 
+      // Change status of the third feedback thread to "ignored".
       await explorationEditor.viewFeedbackThread(2);
       await explorationEditor.changeFeedbackStatus('ignored');
       await explorationEditor.expectFeedbackStatusToBe('ignored');
 
+      // Return to the feedback tab and verify statuses are displayed correctly.
       await explorationEditor.pressFeedbackThreadBackButton();
       await explorationEditor.page.reload();
       await explorationEditor.expectFeedbackStatusInList(1, 'Open');
