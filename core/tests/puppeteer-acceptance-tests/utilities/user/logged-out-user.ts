@@ -393,6 +393,9 @@ const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const blogPaginationSelector = '.e2e-test-pagination';
 const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
 const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
+const blogPostTitleContainerSelector =
+  '.e2e-test-blog-post-page-title-container';
+const blogPostContentSelector = '.e2e-test-blog-post-content';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -605,7 +608,7 @@ export class LoggedOutUser extends BaseUser {
       return;
     }
     const contentFound = await this.page.$$eval(
-      '.e2e-test-blog-post-page-title-container, .e2e-test-blog-post-content',
+      `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
       (elements, searchText) =>
         elements.some(el =>
           el.textContent
