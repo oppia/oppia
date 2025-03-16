@@ -1038,15 +1038,14 @@ def delete_topic_transactional(
     keys_to_delete = []
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_keys = topic_rights_model.get_datastore_keys_for_delete()
-    keys_to_delete.append(topic_rights_keys)
-    delete_topic_summary(topic_id)
+    keys_to_delete.extend(topic_rights_keys)
+    keys_to_delete.append(topic_models.TopicSummaryModel.get(topic_id).get_datastore_key())
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
-        
         subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic['id'])
         subtopic_page_keys = subtopic_models.SubtopicPageModel.get(subtopic_page_id).get_datastore_keys_for_delete()
-        keys_to_delete.append(subtopic_page_keys)
+        keys_to_delete.extend(subtopic_page_keys)
 
     all_story_references = (
         topic_model.canonical_story_references +
@@ -1057,11 +1056,11 @@ def delete_topic_transactional(
         if story_model is not None:
             story_model_list.append(story_model)
             story_model_keys = story_model.get_datastore_keys_for_delete()
-            keys_to_delete.append(story_model_keys)
+            keys_to_delete.extend(story_model_keys)
 
     topic_model_keys = topic_models.TopicModel.get(topic_id).get_datastore_keys_for_delete()
-    keys_to_delete.append(topic_model_keys)
-    keys_to_delete.append(feedback_services.get_delete_thread_keys_for_multiple_entities(
+    keys_to_delete.extend(topic_model_keys)
+    keys_to_delete.extend(feedback_services.get_delete_thread_keys_for_multiple_entities(
         feconf.ENTITY_TYPE_TOPIC, [topic_id]))
     cloud_datastore_services.delete_multi_transactional(keys_to_delete)
     for story in story_model_list:
@@ -1094,11 +1093,15 @@ def delete_topic(
         model_to_put.append(topic_rights_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
 
-        delete_topic_summary(topic_id)
+        # delete_topic_summary(topic_id)
+        model_to_put.append(topic_models.TopicSummaryModel.get(topic_id).get_instance())
         topic_model = topic_models.TopicModel.get(topic_id)
         for subtopic in topic_model.subtopics:
-            model_to_put.append(subtopic_page_services.get_model_instances_for_delete_subtopic_page(
+            subtopic_page_instances = (
+                subtopic_page_services
+                 .get_model_instances_for_delete_subtopic_page(
                 committer_id, topic_id, subtopic['id']))
+            model_to_put.extend(subtopic_page_instances)
 
         all_story_references = (
             topic_model.canonical_story_references +
@@ -1111,7 +1114,9 @@ def delete_topic(
         model_to_put.append(topic_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
 
-        datastore_services.update_timestamps_and_put_multi_transactional(model_to_put)
+        # datastore_services.update_timestamps_and_put_multi_transactional(model_to_put)
+        datastore_services.update_timestamps_multi(model_to_put)
+        datastore_services.put_multi(model_to_put)
         datastore_services.delete_multi_transactional(keys_to_delete)
     # This must come after the topic is retrieved. Otherwise the memcache
     # key will be reinstated.

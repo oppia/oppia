@@ -576,6 +576,19 @@ class BaseModel(datastore_services.Model):
             (next_cursor.urlsafe().decode('utf-8') if next_cursor else None),
             len(plus_one_query_models) == page_size + 1
         )
+    
+    def get_datastore_key(self) -> datastore_services.Key:
+        """Get datastore key of this instance.
+
+        Returns:
+            datastore_services.Key. The model associated datastore key.
+        """
+        return self.key;
+
+    def get_instance(self) -> SELF_BASE_MODEL:
+        """
+        """
+        return self;
 
 
 class BaseHumanMaintainedModel(BaseModel):

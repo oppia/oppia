@@ -964,7 +964,7 @@ def get_model_keys_And_delete_story(
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
-    keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_keys_for_delete())
+    keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_key())
 
     # Delete the opportunities available.
     model_to_put.append(opportunity_services.get_model_for_delete_exp_opportunities_corresponding_to_story(
