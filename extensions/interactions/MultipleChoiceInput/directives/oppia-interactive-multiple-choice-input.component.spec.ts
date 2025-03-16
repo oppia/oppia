@@ -28,12 +28,15 @@ import {AudioTranslationLanguageService} from 'pages/exploration-player-page/ser
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {MultipleChoiceInputSelectionClearService} from 'pages/exploration-player-page/services/multiple-choice-input-interaction-clear.service';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;
   let fixture: ComponentFixture<InteractiveMultipleChoiceInputComponent>;
   let currentInteractionService: CurrentInteractionService;
   let playerTranscriptService: PlayerTranscriptService;
+  let multipleChoiceInputSelectionClearService: MultipleChoiceInputSelectionClearService;
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
@@ -66,6 +69,16 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     }
   }
 
+  class MockMultipleChoiceInputSelectionClearService {
+    private clearSelectionSubject: BehaviorSubject<boolean> =
+      new BehaviorSubject<boolean>(false);
+    clearSelection$: Observable<boolean> =
+      this.clearSelectionSubject.asObservable();
+    triggerClearSelection(): void {
+      this.clearSelectionSubject.next(true);
+    }
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveMultipleChoiceInputComponent],
@@ -86,6 +99,10 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
           provide: CurrentInteractionService,
           useClass: MockCurrentInteractionService,
         },
+        {
+          provide: MultipleChoiceInputSelectionClearService,
+          useClass: MockMultipleChoiceInputSelectionClearService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -95,6 +112,9 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveMultipleChoiceInputComponent);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    multipleChoiceInputSelectionClearService = TestBed.inject(
+      MultipleChoiceInputSelectionClearService
+    );
     component = fixture.componentInstance;
 
     let contentId: string = 'content_id';
@@ -358,5 +378,35 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     expect(
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
+  });
+
+  it('should remove "selected" class from the selected button', function () {
+    const mockButton = document.createElement('button');
+    mockButton.classList.add('multiple-choice-option', 'selected');
+    spyOn(document, 'querySelector')
+      .withArgs('button.multiple-choice-option.selected')
+      .and.returnValue(mockButton);
+    component.answer = 1;
+    component.clearSelection();
+    expect(mockButton.classList.contains('selected')).toBeFalse();
+  });
+
+  it('should subscribe to clearSelection$ and call clearSelection when true is emitted', () => {
+    spyOn(component, 'clearSelection');
+    const serviceSpy = spyOn(
+      multipleChoiceInputSelectionClearService.clearSelection$,
+      'subscribe'
+    ).and.callFake(callback => callback(true));
+    component.ngOnInit();
+    expect(serviceSpy).toHaveBeenCalled();
+    expect(component.clearSelection).toHaveBeenCalled();
+  });
+
+  it('should unsubscribe from clearSelection$ on destroy', () => {
+    component.subscription = jasmine.createSpyObj('Subscription', [
+      'unsubscribe',
+    ]);
+    component.ngOnDestroy();
+    expect(component.subscription.unsubscribe).toHaveBeenCalled();
   });
 });
