@@ -49,6 +49,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/save-draft-publish-and-discard-the-changes.spec.ts"
     },
     {
+      "name": "exploration-editor/verify-statistics-and-previous-explorations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts"
+    },
+    {
       "name": "logged-in-user/create-and-delete-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
     },
