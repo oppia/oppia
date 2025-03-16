@@ -386,7 +386,7 @@ def get_exploration_recommendations(
             recommendations.
 
     Returns:
-        ExplorationRecommendations object containing the recommended
+        ExplorationRecommendations. The object containing the recommended
         explorations IDs for the given exploration.
     """
 
