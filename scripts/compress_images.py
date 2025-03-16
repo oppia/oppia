@@ -23,7 +23,6 @@ import os
 import pathlib
 import shutil
 import subprocess
-import sys
 import tempfile
 
 from PIL import Image
@@ -83,11 +82,57 @@ class ImageCompressor:
             else 'LZW'
         )
 
+    def run_compression_logic(
+            self,
+            file_extension: str,
+            file_path: pathlib.Path,
+            output_file_path: pathlib.Path,
+            actual_compression: bool
+    ) -> List[CompressedImageInfo] | None:
+        """Helper function for running compression logic."""
+        result_image: List[CompressedImageInfo] = []
+        with Image.open(file_path):
+
+            compression_type = self.get_compression_type(file_extension)
+
+            cmd = [
+                'gm', 'convert',
+                str(file_path),
+                '-strip',
+                '-compress', compression_type,
+                str(output_file_path)
+            ]
+
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, check=True
+            )
+            if result.returncode == 0:
+                if not actual_compression:
+                    original_size = file_path.stat().st_size
+                    new_size = output_file_path.stat().st_size
+
+                    if new_size < original_size * self.tolerance:
+                        result_image.append({
+                            'path': file_path,
+                            'original_size': original_size,
+                            'new_size': new_size
+                        })
+            else:
+                logging.info(
+                    '[ERROR]: %s occurred on file %s',
+                        file_path,
+                        subprocess.CalledProcessError
+                )
+        if actual_compression:
+            return None
+        else:
+            return result_image
+
     def find_compressible_images(self) -> List[CompressedImageInfo]:
         """Find images that can be compressed further.
 
         Returns:
-            result_images: List[]. List of compressible images.
+            result_images: List[CompressedImageInfo]. Compressible images list.
         """
         result_images: List[CompressedImageInfo] = []
 
@@ -96,39 +141,18 @@ class ImageCompressor:
             if file_extension not in self.ALL_IMAGES_EXTENSIONS:
                 continue
 
-            with Image.open(file_path):
-                with tempfile.TemporaryDirectory() as tmpdir:
-                    temp_compressed = (
-                        pathlib.Path(tmpdir) / f'compressed_{file_path.name}'
-                    )
-
-                    compression_type = self.get_compression_type(file_extension)
-
-                    cmd = [
-                        'gm', 'convert',
-                        str(file_path),
-                        '-strip',
-                        '-compress', compression_type,
-                        str(temp_compressed)
-                    ]
-
-                    result = subprocess.run(
-                        cmd, capture_output=True, text=True, check=False
-                    )
-                    if result.returncode == 0 and temp_compressed.exists():
-                        original_size = file_path.stat().st_size
-                        new_size = temp_compressed.stat().st_size
-
-                        if new_size < original_size * self.tolerance:
-                            result_images.append({
-                                'path': file_path,
-                                'original_size': original_size,
-                                'new_size': new_size
-                            })
-                    else:
-                        logging.info(
-                            'Could not compress %s', {file_path}
-                        )
+            get_tempdir = tempfile.gettempdir()
+            temp_compressed = (
+                pathlib.Path(get_tempdir) / f'compressed_{file_path.name}'
+            )
+            result = self.run_compression_logic(
+                file_extension,
+                file_path,
+                temp_compressed,
+                False
+            )
+            if result:
+                result_images.extend(result)
 
         return result_images
 
@@ -151,33 +175,16 @@ class ImageCompressor:
 
             # Maintain original directory structure.
             rel_path = os.path.relpath(file_path)
-            output_file_path = os.path.join(self.output_dir, rel_path)
+            output_file_path = pathlib.Path(self.output_dir) / rel_path
 
             # Create necessary directories.
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-
-            if file_extension not in self.ALL_IMAGES_EXTENSIONS:
-                continue
-
-            with Image.open(file_path):
-                compression_type = self.get_compression_type(file_extension)
-
-                cmd = [
-                    'gm', 'convert',
-                    str(file_path),
-                    '-strip',
-                    '-compress', compression_type,
-                    output_file_path
-                ]
-
-                result = subprocess.run(
-                    cmd, capture_output=True, text=True, check=False
-                )
-                if result.returncode != 0:
-                    logging.error(
-                        'Compression failed for %s: %s',
-                        file_path, result.stderr
-                    )
+            self.run_compression_logic(
+                file_extension,
+                file_path,
+                output_file_path,
+                True
+            )
 
     def run(self) -> int:
         """Main method to run the image compression process.
@@ -193,7 +200,7 @@ class ImageCompressor:
             )
 
             print(
-                f'{len(compressed_images)} images'
+                f'{len(compressed_images)} images '
                 'could be compressed further:\n'
             )
             for image in compressed_images:
@@ -223,11 +230,16 @@ class ImageCompressor:
             return 0
 
 
-if __name__ == '__main__':  # pragma: no cover
+def main() -> int:
+    """Main function for compression."""
     images_dir = pathlib.Path('./assets')
     compressor = ImageCompressor(images_dir)
     print(
-        '[IMPORTANT NOTE]: Make sure to delete /compressed folder '
+        '[IMPORTANT NOTE]: Make sure to delete the /compressed folder '
         'after replacing images in the repository. '
     )
-    sys.exit(compressor.run())
+    return compressor.run()
+
+
+if __name__ == '__main__':  # pragma: no cover
+    main()

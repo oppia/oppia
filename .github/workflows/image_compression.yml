@@ -6,8 +6,7 @@ on:
   push:
     branches:
       - develop
-      - release-*
-      - issue#21274
+      - release-* 
   pull_request:
     branches:
       - develop
