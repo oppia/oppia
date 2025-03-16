@@ -16,7 +16,6 @@
  * @fileoverview Service for querying the INTERACTION_SPECS constants.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
@@ -34,10 +33,3 @@ export class InteractionSpecsService {
     return interactionSpecs.is_trainable;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InteractionSpecsService',
-    downgradeInjectable(InteractionSpecsService)
-  );

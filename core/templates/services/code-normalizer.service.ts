@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -117,7 +116,3 @@ export class CodeNormalizerService {
     return normalizedCodeLines.join('\n');
   }
 }
-
-angular
-  .module('oppia')
-  .factory('CodeNormalizerService', downgradeInjectable(CodeNormalizerService));

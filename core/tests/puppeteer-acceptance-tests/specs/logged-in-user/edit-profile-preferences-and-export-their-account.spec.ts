@@ -46,7 +46,14 @@ describe('Logged-in User', function () {
       await loggedInUser1.updateProfilePicture(PROFILE_PICTURE);
       await loggedInUser1.updateBio('This is my new bio.');
       await loggedInUser1.updatePreferredDashboard('Creator Dashboard');
-      await loggedInUser1.updateSubjectInterests(['math', 'science']);
+      await loggedInUser1.updateSubjectInterestsWithEnterKey([
+        'math',
+        'science',
+      ]);
+      await loggedInUser1.updateSubjectInterestsWhenBlurringField([
+        'art',
+        'history',
+      ]);
       await loggedInUser1.updatePreferredExplorationLanguage('Hinglish');
       await loggedInUser1.updatePreferredSiteLanguage('English');
       await loggedInUser1.updatePreferredAudioLanguage('English');
@@ -60,8 +67,12 @@ describe('Logged-in User', function () {
       await loggedInUser1.navigateToProfilePageFromPreferencePage();
       await loggedInUser1.verifyProfilePicUpdate();
       await loggedInUser1.expectBioToBe('This is my new bio.');
-      await loggedInUser1.expectSubjectInterestsToBe(['math', 'science']);
-
+      await loggedInUser1.expectSubjectInterestsToBe([
+        'math',
+        'science',
+        'art',
+        'history',
+      ]);
       // Export account from Preferences page.
       await loggedInUser1.navigateToPreferencesPage();
       await loggedInUser1.exportAccount();

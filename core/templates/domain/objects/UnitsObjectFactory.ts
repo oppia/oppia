@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {createUnit, unit} from 'mathjs';
@@ -264,8 +263,135 @@ export class UnitsObjectFactory {
     }
     return new Units(this.fromStringToList(units));
   }
-}
+  getAllInstancesOfUnits(units: string[]): string[] {
+    let unitInstances: string[] = [];
 
-angular
-  .module('oppia')
-  .factory('UnitsObjectFactory', downgradeInjectable(UnitsObjectFactory));
+    units.forEach(unitString => {
+      if (unitString.includes('^')) {
+        this.getAllInstancesOfUnits(unitString.split('^')).forEach(baseUnit => {
+          if (/^[a-zA-Z]+$/.test(baseUnit)) {
+            unitInstances.push(baseUnit);
+          }
+        });
+      } else if (this.isunit(unitString) && unitString.length > 0) {
+        let sanitizedUnit = unitString.replace(/[0-9]/g, '');
+
+        if (/^[a-zA-Z]+$/.test(sanitizedUnit)) {
+          unitInstances.push(sanitizedUnit);
+        }
+      }
+    });
+
+    return unitInstances;
+  }
+
+  getDuplicatedUnit(units: string): string {
+    let unitList = this.getAllInstancesOfUnits(this.stringToLexical(units));
+
+    let unitNormalizationMap: {[originalUnit: string]: string} = {};
+
+    unitList.forEach(unit => {
+      unitNormalizationMap[unit] =
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit] || unit;
+    });
+
+    let normalizedUnits = unitList.map(unit => unitNormalizationMap[unit]);
+
+    let seenUnits = new Set<string>();
+
+    for (let i = 0; i < normalizedUnits.length; i++) {
+      let normalizedUnit = normalizedUnits[i];
+
+      if (seenUnits.has(normalizedUnit)) {
+        return (
+          unitList.find(
+            (originalUnit, index) =>
+              unitNormalizationMap[originalUnit] === normalizedUnit && index < i
+          ) || ''
+        );
+      }
+
+      seenUnits.add(normalizedUnit);
+    }
+
+    return '';
+  }
+
+  hasMultipleSlashes(units: string): boolean {
+    let slashCount = (units.match(/\//g) || []).length;
+
+    return slashCount > 1;
+  }
+
+  getCorrectedFormat(units: {
+    units: {unit: string; exponent: number}[];
+  }): string {
+    let unitDetails = units.units;
+
+    let unitNormalizationMap: {[unit: string]: string} = {};
+
+    unitDetails.forEach(({unit}) => {
+      unitNormalizationMap[unit] =
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit] || unit;
+    });
+
+    let unitToFirstInstanceMap: {[normalizedUnit: string]: string} = {};
+
+    unitDetails.forEach(({unit}) => {
+      let normalizedUnit = unitNormalizationMap[unit];
+
+      if (!unitToFirstInstanceMap[normalizedUnit]) {
+        unitToFirstInstanceMap[normalizedUnit] = unit;
+      }
+    });
+
+    let aggregatedExponents: {[finalUnit: string]: number} = {};
+
+    unitDetails.forEach(({unit, exponent}) => {
+      let normalizedUnit = unitNormalizationMap[unit];
+
+      let originalUnit = unitToFirstInstanceMap[normalizedUnit];
+
+      if (aggregatedExponents[originalUnit]) {
+        aggregatedExponents[originalUnit] += exponent;
+      } else {
+        aggregatedExponents[originalUnit] = exponent;
+      }
+    });
+
+    let numeratorUnits: string[] = [];
+
+    let denominatorUnits: string[] = [];
+
+    for (let unit in aggregatedExponents) {
+      let exponent = aggregatedExponents[unit];
+
+      if (exponent > 0) {
+        numeratorUnits.push(exponent === 1 ? `${unit}` : `${unit}^${exponent}`);
+      } else if (exponent < 0) {
+        denominatorUnits.push(
+          exponent === -1 ? `${unit}` : `${unit}^${-exponent}`
+        );
+      }
+    }
+
+    let numeratorPart = numeratorUnits.join(' ');
+
+    let denominatorPart = denominatorUnits.join(' ');
+
+    let correctedFormat =
+      numeratorPart.length === 0
+        ? denominatorPart.length === 0
+          ? ''
+          : denominatorUnits.length === 1
+            ? `1/${denominatorPart}`
+            : `1/(${denominatorPart})`
+        : denominatorPart.length === 0
+          ? numeratorPart
+          : denominatorUnits.length === 1
+            ? `${numeratorPart}/${denominatorPart}`
+            : `${numeratorPart}/(${denominatorPart})`;
+
+    return correctedFormat;
+  }
+}

@@ -17,7 +17,6 @@
  * visible.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -38,7 +37,3 @@ export class BackgroundMaskService {
     this.maskIsActive = false;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BackgroundMaskService', downgradeInjectable(BackgroundMaskService));

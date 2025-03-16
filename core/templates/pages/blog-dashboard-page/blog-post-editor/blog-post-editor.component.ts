@@ -29,7 +29,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AlertsService} from 'services/alerts.service';
 import {
   BlogPostEditorData,
@@ -465,10 +464,3 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogPostEditor',
-  downgradeComponent({
-    component: BlogPostEditorComponent,
-  }) as angular.IDirectiveFactory
-);

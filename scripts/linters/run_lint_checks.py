@@ -680,7 +680,7 @@ def main(args: Optional[List[str]] = None) -> None:
         name = _get_space_separated_linter_name(type(_linter).__name__)
         task_custom = concurrent_task_utils.create_task(
             _linter.perform_all_lint_checks, verbose_mode_enabled,
-            custom_semaphore, name=name)
+            custom_semaphore, name=name, errors_to_retry_on=[])
         tasks_custom.append(task_custom)
 
     for _third_party_linter in third_party_linters:
@@ -689,7 +689,7 @@ def main(args: Optional[List[str]] = None) -> None:
         )
         task_third_party = concurrent_task_utils.create_task(
             _third_party_linter.perform_all_lint_checks, verbose_mode_enabled,
-            third_party_semaphore, name=name)
+            third_party_semaphore, name=name, errors_to_retry_on=[])
         tasks_third_party.append(task_third_party)
 
     # Execute tasks.

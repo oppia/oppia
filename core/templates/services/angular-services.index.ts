@@ -140,6 +140,7 @@ import { ExpressionInterpolationService } from 'expressions/expression-interpola
 import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExpressionSyntaxTreeService } from 'expressions/expression-syntax-tree.service';
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { ConvertHtmlToUnicodePipe } from 'filters/convert-html-to-unicode.pipe';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { CamelCaseToHyphensPipe } from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
@@ -193,7 +194,7 @@ import { SetInputRulesService } from 'interactions/SetInput/directives/set-input
 import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
 import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
-import { baseInteractionValidationService } from 'interactions/base-interaction-validation.service';
+import { BaseInteractionValidationService } from 'interactions/base-interaction-validation.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
 import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
@@ -637,6 +638,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
   ['FormatRtePreviewPipe', FormatRtePreviewPipe],
+  ['ConvertHtmlToUnicodePipe', ConvertHtmlToUnicodePipe],
   ['FractionInputRulesService', FractionInputRulesService],
   ['FractionInputValidationService', FractionInputValidationService],
   ['GenerateContentIdService', GenerateContentIdService],
@@ -917,7 +919,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['YamlService', YamlService],
-  ['baseInteractionValidationService', baseInteractionValidationService],
+  ['BaseInteractionValidationService', BaseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],
   ['CollectionEditorStateService', CollectionEditorStateService],

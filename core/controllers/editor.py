@@ -1379,7 +1379,9 @@ class ImageUploadHandler(
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': r'\w+[.]\w+'
+                        'regex_pattern': (
+                            utils.get_image_filename_regex_pattern()
+                        ),
                     }]
                 }
             },

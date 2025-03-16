@@ -225,12 +225,6 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     Raises:
         Exception. Multiple files found with given file name.
     """
-    # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled and
-    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
-    # name here to obtain the correct filepath.
-    if filename.startswith('error-page'):
-        filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
         (os.path.join(subdir, f) for f in filenames if f == filename)
         for subdir, _, filenames in os.walk(rootdir)))
@@ -4193,6 +4187,7 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
+        diagnostic_test_is_enabled: bool = False,
         thumbnail_data: Optional[
             classroom_config_domain.ImageData
         ] = None,
@@ -4214,6 +4209,8 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
+            diagnostic_test_is_enabled: bool. Whether this classroom
+                is published or not.
             thumbnail_data: Optional[ImageData]. Image data object for
                 thumbnail.
             banner_data: Optional[ImageData]. Image data object for banner.
@@ -4240,6 +4237,8 @@ version: 1
                 else {}
             ),
             is_published=is_published,
+            diagnostic_test_is_enabled=(
+                diagnostic_test_is_enabled),
             thumbnail_data=(
                 thumbnail_data
                 if thumbnail_data is not None
