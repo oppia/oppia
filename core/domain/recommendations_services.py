@@ -382,13 +382,14 @@ def get_exploration_recommendations(
     after completing the exploration keyed by exp_id.
 
     Args:
-        exp_id: str. The ID of the exploration for which to get
-            the recommendations.
-
+        exp_id: str. The ID of the exploration for which to get the 
+            recommendations.
+     
     Returns:
-        ExplorationRecommendations. The object containing the
-            recommended explorations IDs for the given exploration.
+        ExplorationRecommendations. The object containing the recommended
+            explorations IDs for the given exploration.
     """
+
     exp_recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(
             exp_id, strict=False))
