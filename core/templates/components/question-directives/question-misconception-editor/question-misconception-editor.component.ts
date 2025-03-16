@@ -65,6 +65,7 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
+  previousFeedbackIsUsed: boolean | null = null;
   directiveSubscriptions = new Subscription();
 
   constructor(
@@ -95,8 +96,12 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
           this.initValues();
         })
       );
+      if (this.previousFeedbackIsUsed !== null) {
+        this.feedbackIsUsed = this.previousFeedbackIsUsed;
+      } else {
+        this.feedbackIsUsed = true;
+      }
     }
-    this.feedbackIsUsed = true;
   }
 
   initValues(): void {
@@ -115,6 +120,11 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
             this.misconceptionName = misconceptions[i].getName();
             this.selectedMisconception = misconceptions[i];
             this.selectedMisconceptionSkillId = skillId;
+            if (this.previousFeedbackIsUsed === null) {
+              this.feedbackIsUsed =
+                this.outcome.feedback.html.trim() ===
+                misconceptions[i].getFeedback().trim();
+            }
           }
         }
       } else {
@@ -149,9 +159,12 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 
   updateValues(newValues: MisconceptionUpdatedValues): void {
+    if (this.feedbackIsUsed !== newValues.feedbackIsUsed) {
+      this.previousFeedbackIsUsed = this.feedbackIsUsed;
+      this.feedbackIsUsed = newValues.feedbackIsUsed;
+    }
     this.selectedMisconception = newValues.misconception;
     this.selectedMisconceptionSkillId = newValues.skillId;
-    this.feedbackIsUsed = newValues.feedbackIsUsed;
   }
 
   tagAnswerGroupWithMisconception(): void {
@@ -190,9 +203,14 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
       outcome.feedback.html = this.selectedMisconception.getFeedback();
-      this.saveAnswerGroupFeedback.emit(outcome);
-      this.externalSaveService.onExternalSave.emit();
+    } else {
+      if (outcome.feedback.html === this.selectedMisconception.getFeedback()) {
+        outcome.feedback.html = '';
+      }
     }
+
+    this.saveAnswerGroupFeedback.emit(outcome);
+    this.externalSaveService.onExternalSave.emit();
     this.misconceptionEditorIsOpen = false;
   }
 
