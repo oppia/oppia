@@ -24,6 +24,7 @@ import os
 
 from core import utils
 from core.tests import test_utils
+from scripts import compress_images
 
 from typing import Final, List, Tuple
 
@@ -322,6 +323,71 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             task_results = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
+
+    def test_check_compressible_images_with_compression_needed(self) -> None:
+        """Test case where images can be compressed."""
+        mock_compressible_images = [
+            {
+                'path': 'assets/images/test1.png',
+                'original_size': 10000,
+                'new_size': 6000
+            },
+            {
+                'path': 'assets/images/test2.jpg',
+                'original_size': 8000,
+                'new_size': 5000
+            }
+        ]
+
+        find_swap = self.swap(
+            compress_images.ImageCompressor,
+            'find_compressible_images',
+            lambda self: mock_compressible_images
+        )
+
+        with find_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_compressible_images()
+
+        self.assertEqual(error_messages.name, 'Compressible images')
+        self.assertTrue(error_messages.failed)
+        self.assertIn(
+            'Found 2 images that could be compressed further:',
+            error_messages.get_report()[0]
+        )
+        self.assertIn(
+            'assets/images/test1.png - Could save 4000 bytes (40.00%)',
+            error_messages.get_report()[1]
+        )
+        self.assertIn(
+            'assets/images/test2.jpg - Could save 3000 bytes (37.50%)',
+            error_messages.get_report()[2]
+        )
+        self.assertIn(
+            'Run python -m scripts.compress_images',
+            error_messages.get_report()[3]
+        )
+        self.assertIn(
+            '[IMPORTANT]: Make sure to remove /compressed directory',
+            error_messages.get_report()[4]
+        )
+
+    def test_check_compressible_images_with_no_compression_needed(self) -> None:
+        """Test case where no images need compression."""
+        find_swap = self.swap(
+            compress_images.ImageCompressor,
+            'find_compressible_images',
+            lambda self: []
+        )
+
+        with find_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_compressible_images()
+
+        self.assertEqual(error_messages.name, 'Compressible images')
+        self.assertFalse(error_messages.failed)
+        expected_error_messages = ['SUCCESS  Compressible images check passed']
+        self.assertEqual(error_messages.get_report(), expected_error_messages)
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(

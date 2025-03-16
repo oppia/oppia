@@ -93,7 +93,7 @@ class TestImageCompressor(unittest.TestCase):
         mock_subprocess_run.assert_called()
 
     @mock.patch('pathlib.Path.stat')
-    def test_file_size_retrieval_without_compression(self, mock_stat):
+    def test_file_size_retrieval_without_compression(self, mock_stat) -> None:
         """Test file sizes are retrieved when actual_compression is False."""
         mock_stat.return_value.st_size = 10000
 
@@ -122,7 +122,7 @@ class TestImageCompressor(unittest.TestCase):
             result = compressor.run()
             self.assertEqual(result, 0)
 
-    def test_return_value_based_on_actual_compression(self):
+    def test_return_value_based_on_actual_compression(self) -> None:
         """Test return value based on actual_compression flag."""
         result_image = [{
             'path': '/fake/path/image.png',
@@ -216,7 +216,7 @@ class TestImageCompressor(unittest.TestCase):
 
     @mock.patch('scripts.compress_images.ImageCompressor.run', return_value=0)
     @mock.patch('builtins.print')
-    def test_main_function(self, mock_print, mock_run):
+    def test_main_function(self, mock_print, mock_run) -> None:
         """Test the main function execution."""
 
         result = compress_images.main()
@@ -227,7 +227,3 @@ class TestImageCompressor(unittest.TestCase):
         )
         mock_run.assert_called_once()
         self.assertEqual(result, 0)
-
-
-if __name__ == '__main__':
-    unittest.main()

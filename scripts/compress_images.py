@@ -23,6 +23,7 @@ import os
 import pathlib
 import shutil
 import subprocess
+import sys
 import tempfile
 
 from PIL import Image
@@ -242,4 +243,4 @@ def main() -> int:
 
 
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    sys.exit(main())
