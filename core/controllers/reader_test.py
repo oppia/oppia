@@ -29,6 +29,7 @@ from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import platform_parameter_list
 from core.domain import question_services
+from core.domain import recommendations_domain
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import skill_services
@@ -692,8 +693,13 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         """Sets the recommendations in the exploration corresponding to the
         given exploration id.
         """
+        exploration_recommendations = (
+            recommendations_domain.ExplorationRecommendations(
+                exp_id,
+                recommended_ids
+        ))
         recommendations_services.set_exploration_recommendations(
-            exp_id, recommended_ids)
+            exploration_recommendations)
 
     def _complete_exploration_in_collection(self, exp_id: str) -> None:
         """Completes the exploration within the collection. Records that the
