@@ -1,0 +1,33 @@
+<div class="modal-header">
+  <h3>{{headerText}}</h3>
+</div>
+<div class="modal-body">
+  <p *ngIf="supportsAutogeneration">
+    This action will cause voiceovers to be regenerated for all existing
+    <strong>{{languageDescription}}</strong>
+    translations in each curated exploration. Do you want to continue?
+  </p>
+  <p *ngIf="!supportsAutogeneration">
+    <mat-icon>warning</mat-icon>
+    If you change your mind and turn on autogeneration again to "Yes" in near
+    future, all voiceovers for this language accent code in all the curated
+    explorations will be regenerated from scratch, as translations may have
+    changed. This will incur additional costs as per the given “Note” below.
+  </p>
+  <p>
+    <i>
+      <strong>Note: </strong>Assuming there are 100 explorations, with each
+      curated exploration having 10,000 characters in its
+      <strong>{{languageDescription}}</strong> translation, the total cost of
+      regenerating voiceovers for all explorations is approximately
+      <strong>$16 USD.</strong>
+    </i>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success" (click)="update()">
+    <span *ngIf="supportsAutogeneration">Turn on autogeneration</span>
+    <span *ngIf="!supportsAutogeneration">Turn off autogeneration</span>
+  </button>
+</div>

@@ -31,6 +31,8 @@ import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-re
 import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
 import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voiceover-regeneration-support-modal.component';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -51,7 +53,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   constructor(
     private ngbModal: NgbModal,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private languageUtilService: LanguageUtilService
   ) {}
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
@@ -235,32 +238,50 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.saveUpdatedLanguageAccentSupport();
   }
 
-  isAutogenerationSupported(languageAccentCode: string): string {
-    if (this.languageAccentCodesToSupportsAutogeneration[languageAccentCode]) {
-      return 'Yes';
-    } else {
-      return 'No';
-    }
-  }
-
   isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
     return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
   }
 
   updateSupportsAutogenerationField(
     languageAccentCode: string,
-    supportsAutogeneration: string
+    supportsAutogeneration: boolean
   ): void {
     const languageCode =
       this.languageAccentCodeToLanguageCode[languageAccentCode];
+    const languageDescription =
+      this.languageUtilService.getAudioLanguageDescription(languageCode);
+    const languageAccentCodeDescription =
+      this.supportedLanguageAccentCodesToDescriptions[languageAccentCode];
 
-    if (supportsAutogeneration === 'Yes') {
-      this.languageCodesMapping[languageCode][languageAccentCode] = true;
-    } else {
-      this.languageCodesMapping[languageCode][languageAccentCode] = false;
-    }
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      EditVoiceoverRegenerationSupportModalComponent,
+      {backdrop: 'static'}
+    );
 
-    this.saveUpdatedLanguageAccentSupport();
+    modalRef.componentInstance.languageDescription = languageDescription;
+    modalRef.componentInstance.languageAccentDescription =
+      languageAccentCodeDescription;
+    modalRef.componentInstance.supportsAutogeneration = supportsAutogeneration;
+
+    modalRef.result.then(
+      () => {
+        if (supportsAutogeneration) {
+          this.languageCodesMapping[languageCode][languageAccentCode] = true;
+        } else {
+          this.languageCodesMapping[languageCode][languageAccentCode] = false;
+        }
+        this.saveUpdatedLanguageAccentSupport();
+      },
+      () => {
+        if (supportsAutogeneration) {
+          this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+            false;
+        } else {
+          this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+            true;
+        }
+      }
+    );
   }
 
   removeLanguageAccentCodeSupport(languageAccentCodeToRemove: string): void {

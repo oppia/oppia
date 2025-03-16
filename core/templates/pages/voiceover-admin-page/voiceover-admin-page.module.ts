@@ -33,6 +33,7 @@ import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {VoiceoverAdminPageRootComponent} from './voiceover-admin-page-root.component';
 import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
+import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voiceover-regeneration-support-modal.component';
 
 @NgModule({
   imports: [
@@ -59,6 +60,7 @@ import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
     AddAccentToVoiceoverLanguageModalComponent,
+    EditVoiceoverRegenerationSupportModalComponent,
   ],
   entryComponents: [
     VoiceoverAdminPageRootComponent,
@@ -66,6 +68,7 @@ import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
     AddAccentToVoiceoverLanguageModalComponent,
+    EditVoiceoverRegenerationSupportModalComponent,
   ],
 })
 export class VoiceoverAdminPageModule {}
