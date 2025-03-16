@@ -350,22 +350,59 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_upload_bad_image(self) -> None:
-        """Test upload of a malformed image."""
+    def test_upload_unsupported_image_format(self) -> None:
+        """Test upload of a valid image with an unsupported format."""
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Upload an invalid image.
+        # Simulate valid image data of a different type (e.g., BMP).
+        bmp_image_data = (
+            b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00'
+            b'\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff'
+            b'\x00\x00\x00'
+        )
+
+        # Upload the BMP image.
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=[('image', 'unused_filename', b'non_image_data')]
+            upload_files=[('image', 'unused_filename', bmp_image_data)]
         )
+
+        # Assert the response.
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'Image not recognized')
+        self.assertEqual(
+            response_dict['error'], 'Image uses unsupported format')
+
+        self.logout()
+
+    def test_upload_corrupted_image(self) -> None:
+        """Test upload of a corrupted image."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Simulate corrupted image data.
+        corrupted_image_data = (
+            b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff')
+
+        # Upload the corrupted image.
+        response_dict = self.post_json(
+            '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[('image', 'unused_filename', corrupted_image_data)]
+        )
+
+        # Assert the response.
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'],
+            'Image not recognized')
 
         self.logout()
 

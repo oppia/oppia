@@ -1024,11 +1024,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
       // Opening modal second time.
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
-      // We need multiple '$rootScope.$apply()' here since, the source code
-      // consists of nested promises.
       flush();
+      tick();
       flush();
-
       expect(modalSpy).toHaveBeenCalledTimes(1);
     })
   );
@@ -1073,12 +1071,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
       } as NgbModalRef);
 
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
-      // We need multiple '$rootScope.$apply()' here since, the source code
-      // consists of nested promises.
       flush();
       tick();
       flush();
-
       expect(modalSpy).toHaveBeenCalled();
     })
   );

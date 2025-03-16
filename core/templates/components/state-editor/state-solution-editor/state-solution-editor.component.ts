@@ -18,7 +18,6 @@
  */
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
@@ -251,10 +250,3 @@ export class StateSolutionEditorComponent implements OnInit {
     this.solutionCardIsShown = !this.solutionCardIsShown;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateSolutionEditor',
-  downgradeComponent({
-    component: StateSolutionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

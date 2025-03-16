@@ -125,7 +125,7 @@ export const AppConstants = {
   // length, in characters, for the name of each node label in the state graph.
   MAX_NODE_LABEL_LENGTH: 15,
 
-  // If an $http request fails with the following error codes, a warning is
+  // If an http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
 
@@ -326,8 +326,10 @@ export const AppConstants = {
   },
   VOLUNTEER_FORM_LINK:
     'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-  IMPACT_REPORT_LINK:
+  IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  IMPACT_REPORT_LINK_2023:
+    'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:

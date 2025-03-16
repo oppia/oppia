@@ -28,7 +28,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {hexbin, HexbinBin} from 'd3-hexbin';
 import {max, sum} from 'd3-array';
 import {RGBColor, rgb} from 'd3-color';
@@ -157,10 +156,3 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     this.hexagonMesh = hexbinGenerator.mesh();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVisualizationClickHexbins',
-  downgradeComponent({
-    component: OppiaVisualizationClickHexbinsComponent,
-  }) as angular.IDirectiveFactory
-);

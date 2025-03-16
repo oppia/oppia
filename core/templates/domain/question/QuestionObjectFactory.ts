@@ -17,7 +17,6 @@
  * question domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {
   State,
@@ -26,6 +25,7 @@ import {
 } from 'domain/state/StateObjectFactory';
 import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
 
 /* Null in ID denotes a new question whose ID is yet
   to be set, this ID is later set in backend API service. */
@@ -80,7 +80,7 @@ export class Question {
   }
 
   setStateData(newStateData: State): void {
-    this._stateData = angular.copy(newStateData);
+    this._stateData = cloneDeep(newStateData);
   }
 
   getLanguageCode(): string {
@@ -228,7 +228,3 @@ export class QuestionObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('QuestionObjectFactory', downgradeInjectable(QuestionObjectFactory));
