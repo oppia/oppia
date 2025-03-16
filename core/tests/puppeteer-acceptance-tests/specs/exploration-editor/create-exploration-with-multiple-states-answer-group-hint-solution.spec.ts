@@ -17,9 +17,9 @@
  * answer groups, hints, and solutions in the exploration editor.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
+import { UserFactory } from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import { ExplorationEditor } from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -48,24 +48,28 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+
+    // Use createMinimalExploration to set up the introduction card.
+    await explorationEditor.createMinimalExploration(
+      INTRODUCTION_CARD_CONTENT,
+      INTERACTION_TYPES.CONTINUE_BUTTON
+    );
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard('Test Question');
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.TEST_QUESTION);
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
+    await explorationEditor.createMinimalExploration(
+      'Enter a negative number greater than -100.',
+      INTERACTION_TYPES.NUMERIC_INPUT
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
-      'Prefect!',
+      'Perfect!',
       CARD_NAME.FINAL_CARD,
       true
     );
@@ -75,17 +79,17 @@ describe('Exploration Editor', function () {
     await explorationEditor.addHintToState('Think of negative numbers.');
     await explorationEditor.addSolutionToState(
       '-40',
-      'Yes,that is correct.',
+      'Yes, that is correct.',
       true
     );
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the final card and update its content.
+    // Navigate to the final card and set up its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent(
-      'We have practiced negative numbers.'
+    await explorationEditor.createMinimalExploration(
+      'We have practiced negative numbers.',
+      INTERACTION_TYPES.END_EXPLORATION
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
