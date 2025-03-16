@@ -17,7 +17,6 @@
  * contributors to contribute.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -76,6 +75,15 @@ interface FeaturedTranslationLanguagesBackendDict {
 
 interface TopicNamesBackendDict {
   topic_names: string[];
+}
+
+interface TopicNamesPerClassroomDict {
+  classroom: string;
+  topics: string[];
+}
+
+interface TopicNamesPerClassroomBackendDict {
+  topic_names_per_classroom: TopicNamesPerClassroomDict[];
 }
 
 interface PreferredTranslationLanguageBackendDict {
@@ -258,6 +266,32 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
+  async fetchTranslatableTopicNamesPerClassroomAsync(): Promise<
+    TopicNamesPerClassroomDict[]
+  > {
+    try {
+      const response = await this.http
+        .get<TopicNamesPerClassroomBackendDict>(
+          '/gettranslatabletopicnamesperclassroom'
+        )
+        .toPromise();
+
+      const topicsPerClassroom = response.topic_names_per_classroom.map(
+        ({classroom, topics}) => ({
+          classroom,
+          topics:
+            classroom === ''
+              ? [AppConstants.TOPIC_SENTINEL_NAME_ALL, ...topics]
+              : topics,
+        })
+      );
+
+      return topicsPerClassroom;
+    } catch {
+      return [];
+    }
+  }
+
   async savePreferredTranslationLanguageAsync(
     languageCode: string
   ): Promise<void> {
@@ -294,10 +328,3 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributionOpportunitiesBackendApiService',
-    downgradeInjectable(ContributionOpportunitiesBackendApiService)
-  );

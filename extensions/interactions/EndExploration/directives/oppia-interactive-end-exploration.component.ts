@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 
 import {ContextService} from 'services/context.service';
@@ -106,10 +105,3 @@ export class InteractiveEndExplorationComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveEndExploration',
-  downgradeComponent({
-    component: InteractiveEndExplorationComponent,
-  }) as angular.IDirectiveFactory
-);

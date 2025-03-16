@@ -25,7 +25,6 @@ import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-red
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {State, StateBackendDict} from 'domain/state/StateObjectFactory';
 import {Question} from './QuestionObjectFactory';
 
@@ -223,7 +222,3 @@ export class QuestionUpdateService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('QuestionUpdateService', downgradeInjectable(QuestionUpdateService));

@@ -217,6 +217,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'exploration-editor/verify-statistics-and-previous-explorations',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/create-and-delete-account',
@@ -226,6 +227,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
     'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/deny-access-to-pages-without-additional-roles',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
     'logged-out-user/check-all-user-flow-of-partner',
@@ -256,6 +258,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'logged-out-user/play-lesson-in-different-languages-and-listen-'
     'to-voiceovers',
+    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',

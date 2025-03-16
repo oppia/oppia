@@ -17,12 +17,11 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
@@ -37,7 +36,7 @@ export class NumericExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -154,10 +153,3 @@ export class NumericExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumericExpressionInputValidationService',
-    downgradeInjectable(NumericExpressionInputValidationService)
-  );

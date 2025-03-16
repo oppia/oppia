@@ -597,10 +597,9 @@ export class ConversationSkinComponent {
   }
 
   private _getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a $scope variable
-    // happens,
-    // AngularJS compares the new value of the variable to its previous
-    // value. If they are the same, then the variable is not updated.
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';

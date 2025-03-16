@@ -23,7 +23,6 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {Subtopic} from 'domain/topic/subtopic.model';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -107,10 +106,3 @@ export class SubtopicSummaryTileComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSubtopicSummaryTile',
-  downgradeComponent({
-    component: SubtopicSummaryTileComponent,
-  }) as angular.IDirectiveFactory
-);

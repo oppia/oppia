@@ -18,7 +18,6 @@
 
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -114,10 +113,3 @@ export class OppiaFooterComponent {
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFooter',
-  downgradeComponent({
-    component: OppiaFooterComponent,
-  }) as angular.IDirectiveFactory
-);

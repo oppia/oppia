@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 
 import './oppia-visualization-enumerated-frequency-table.directive.css';
@@ -53,10 +52,3 @@ export class OppiaVisualizationEnumeratedFrequencyTableComponent
     this.answerVisible = this.data.map((_, i) => i === 0);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVisualizationEnumeratedFrequencyTable',
-  downgradeComponent({
-    component: OppiaVisualizationEnumeratedFrequencyTableComponent,
-  }) as angular.IDirectiveFactory
-);
