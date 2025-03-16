@@ -36,7 +36,7 @@ enum CARD_NAME {
   FINAL_CARD = 'Final Card',
 }
 
-describe('Exploration Editor - Multiple States', function () {
+describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
   beforeAll(async function () {
