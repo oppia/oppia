@@ -93,7 +93,10 @@ class TestImageCompressor(unittest.TestCase):
         mock_subprocess_run.assert_called()
 
     @mock.patch('pathlib.Path.stat')
-    def test_file_size_retrieval_without_compression(self, mock_stat) -> None:
+    def test_file_size_retrieval_without_compression(
+        self,
+        mock_stat: mock.MagicMock
+    ) -> None:
         """Test file sizes are retrieved when actual_compression is False."""
         mock_stat.return_value.st_size = 10000
 
@@ -216,7 +219,11 @@ class TestImageCompressor(unittest.TestCase):
 
     @mock.patch('scripts.compress_images.ImageCompressor.run', return_value=0)
     @mock.patch('builtins.print')
-    def test_main_function(self, mock_print, mock_run) -> None:
+    def test_main_function(
+        self,
+        mock_print: mock.MagicMock,
+        mock_run: mock.MagicMock
+    ) -> None:
         """Test the main function execution."""
 
         result = compress_images.main()
