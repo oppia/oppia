@@ -199,12 +199,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   clearSelection(): void {
     // Radio buttons get unselected when specifying a solution.
-    // Object.keys(this.userSelections).forEach(key => {
-    //   this.userSelections[key] = false;
-    // });
-    // this.selectionCount = 0;
-    // this.preventAdditionalSelections = false;
-    // Deselect for multiple choice answer.
     var selectedElement = document.querySelector(
       'button.multiple-choice-option.selected'
     );
