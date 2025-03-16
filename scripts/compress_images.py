@@ -106,7 +106,7 @@ class ImageCompressor:
             result = subprocess.run(
                 cmd, capture_output=True, text=True, check=True
             )
-            if result.returncode == 0:
+            if result.returncode == 0 and output_file_path.exists():
                 if not actual_compression:
                     original_size = file_path.stat().st_size
                     new_size = output_file_path.stat().st_size
@@ -118,10 +118,10 @@ class ImageCompressor:
                             'new_size': new_size
                         })
             else:
-                logging.info(
+                logging.error(
                     '[ERROR]: %s occurred on file %s',
                         file_path,
-                        subprocess.CalledProcessError
+                        result.stderr
                 )
         if actual_compression:
             return None

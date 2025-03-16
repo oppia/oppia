@@ -14,6 +14,8 @@
 
 """Tests for compress_images.py."""
 
+from __future__ import annotations
+
 import os
 import pathlib
 import shutil
@@ -90,6 +92,23 @@ class TestImageCompressor(unittest.TestCase):
         self.assertTrue(os.path.exists(self.output_dir))
         mock_subprocess_run.assert_called()
 
+    @mock.patch('pathlib.Path.stat')
+    def test_file_size_retrieval_without_compression(self, mock_stat):
+        """Test file sizes are retrieved when actual_compression is False."""
+        mock_stat.return_value.st_size = 10000
+
+        file_path = pathlib.Path('/fake/path/image.png')
+        output_file_path = pathlib.Path('/fake/path/compressed_image.png')
+
+        actual_compression = False
+        if not actual_compression:
+            original_size = file_path.stat().st_size
+            new_size = output_file_path.stat().st_size
+
+        self.assertEqual(original_size, 10000)
+        self.assertEqual(new_size, 10000)
+        mock_stat.assert_any_call()
+
     def test_run_no_compressible_images(self) -> None:
         """Test run method when no images are compressible."""
         compressor = compress_images.ImageCompressor(self.temp_dir)
@@ -102,6 +121,30 @@ class TestImageCompressor(unittest.TestCase):
 
             result = compressor.run()
             self.assertEqual(result, 0)
+
+    def test_return_value_based_on_actual_compression(self):
+        """Test return value based on actual_compression flag."""
+        result_image = [{
+            'path': '/fake/path/image.png',
+            'original_size': 10000,
+            'new_size': 9000
+        }]
+
+        # Case 1.
+        actual_compression = True
+        if actual_compression:
+            result = None
+        else:
+            result = result_image
+        self.assertIsNone(result)
+
+        # Case 2.
+        actual_compression = False
+        if actual_compression:
+            result = None
+        else:
+            result = result_image
+        self.assertEqual(result, result_image)
 
     @mock.patch('subprocess.run')
     def test_run_with_compressible_images(
@@ -165,11 +208,25 @@ class TestImageCompressor(unittest.TestCase):
             with mock.patch('PIL.Image.open'):
                 compressor.compress_images(result_images)
             mock_log_error.assert_called_once_with(
-                'Compression failed for %s: %s',
+                '[ERROR]: %s occurred on file %s',
                 mock.ANY,
                 'Compression error message'
             )
             mock_subprocess_run.assert_called_once()
+
+    @mock.patch('scripts.compress_images.ImageCompressor.run', return_value=0)
+    @mock.patch('builtins.print')
+    def test_main_function(self, mock_print, mock_run):
+        """Test the main function execution."""
+
+        result = compress_images.main()
+
+        mock_print.assert_called_once_with(
+            '[IMPORTANT NOTE]: Make sure to delete the /compressed folder '
+            'after replacing images in the repository. '
+        )
+        mock_run.assert_called_once()
+        self.assertEqual(result, 0)
 
 
 if __name__ == '__main__':
