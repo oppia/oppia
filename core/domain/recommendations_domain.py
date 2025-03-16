@@ -24,8 +24,7 @@ from typing import List
 
 
 class ExplorationRecommendations:
-    """A domain object for exploration recommendations.
-    """
+    """A domain object for exploration recommendations."""
 
     def __init__(
         self,

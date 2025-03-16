@@ -392,7 +392,7 @@ def get_exploration_recommendations(
     exp_recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(
             exp_id, strict=False))
-    
+
     if exp_recommendations_model is None:
         return None
 

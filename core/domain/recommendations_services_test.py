@@ -350,7 +350,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         self.assertEqual(
-            recommended_exp_ids, 
+            recommended_exp_ids,
             saved_recommendation.recommended_exploration_ids)
 
         recommended_exp_ids = ['exp_id_3']
@@ -365,7 +365,8 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         self.assertEqual(
-            recommended_exp_ids, saved_recommendation.recommended_exploration_ids)
+            recommended_exp_ids, 
+            saved_recommendation.recommended_exploration_ids)
 
         recommended_exp_ids = []
         exploration_recommendations = (
@@ -379,7 +380,8 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         self.assertEqual(
-            recommended_exp_ids, saved_recommendation.recommended_exploration_ids)
+            recommended_exp_ids, 
+            saved_recommendation.recommended_exploration_ids)
 
     def test_delete_recommendations_for_exploration(self) -> None:
         recommendations_services.delete_explorations_from_recommendations([
