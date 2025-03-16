@@ -55,6 +55,14 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, description='Description 3')
+        # Skill that has the linked skill as a prerequisite.
+        self.skill_with_prerequisite = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_with_prerequisite,
+            self.admin_id,
+            description='Has linked_skill as prerequisite.',
+            prerequisite_skill_ids=[self.linked_skill_id]
+        )
         self.subtopic_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.subtopic_skill_id, self.admin_id, description='Subtopic Skill')
@@ -1022,16 +1030,20 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         old_skill_id = self.linked_skill_id
         new_skill_id = skill_services.get_new_skill_id()
+        skill_with_old_skill_as_prerequisite = skill_fetchers.get_skill_by_id(
+            self.skill_with_prerequisite)
         self.save_new_skill(
             new_skill_id, self.admin_id, description='Skill Description')
         old_links = question_services.get_question_skill_links_of_skill(
             old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
             new_skill_id, 'Skill Description')
+        old_prerequisites = skill_with_old_skill_as_prerequisite.prerequisite_skill_ids
 
         self.assertEqual(len(old_links), 1)
         self.assertEqual(old_links[0].skill_id, old_skill_id)
         self.assertEqual(len(new_links), 0)
+        self.assertEqual(old_prerequisites, [old_skill_id])
 
         csrf_token = self.get_new_csrf_token()
         payload = {
@@ -1045,11 +1057,15 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
             new_skill_id, 'Skill Description')
+        new_prerequisites = skill_with_old_skill_as_prerequisite.prerequisite_skill_ids
 
         self.assertEqual(json_response['merged_into_skill'], new_skill_id)
         self.assertEqual(len(old_links), 0)
         self.assertEqual(len(new_links), 1)
         self.assertEqual(new_links[0].skill_id, new_skill_id)
+        # The old_skill should be replaced by the new skill in the prerequisite_skills array of
+        # skill_with_old_skill_as_prerequisite as the old_skill is merged to the new skill.
+        self.assertEqual(new_prerequisites, [new_skill_id])
 
         self.logout()
 

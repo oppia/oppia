@@ -81,8 +81,6 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     audit_topic_related_models_relation_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     reject_invalid_suggestion_and_delete_invalid_translation_jobs)
-from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
-
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
     """Returns all jobs that have inherited from the JobBase class.

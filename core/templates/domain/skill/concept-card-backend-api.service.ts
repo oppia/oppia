@@ -28,7 +28,6 @@ import {
 } from 'domain/skill/concept-card.model';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {SkillBackendApiService} from './skill-backend-api.service';
 
 interface ConceptCardBackendDicts {
   concept_card_dicts: ConceptCardBackendDict[];
@@ -40,8 +39,7 @@ interface ConceptCardBackendDicts {
 export class ConceptCardBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService,
-    private skillBackendApiService: SkillBackendApiService
+    private urlInterpolation: UrlInterpolationService
   ) {}
 
   // Maps previously loaded concept cards to their IDs.
@@ -102,6 +100,7 @@ export class ConceptCardBackendApiService {
     return new Promise((resolve, reject) => {
       var uncachedSkillIds = this._getUncachedSkillIds(skillIds);
       const conceptCards: ConceptCard[] = [];
+
       if (uncachedSkillIds.length !== 0) {
         // Case where only part (or none) of the concept cards are cached
         // locally.

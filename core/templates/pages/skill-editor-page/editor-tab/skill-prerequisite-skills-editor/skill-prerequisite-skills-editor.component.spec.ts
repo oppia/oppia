@@ -28,6 +28,7 @@ import {
 import {SkillPrerequisiteSkillsEditorComponent} from './skill-prerequisite-skills-editor.component';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {
   TopicsAndSkillsDashboardBackendApiService,
@@ -45,6 +46,7 @@ describe('Skill editor main tab Component', () => {
   let fixture: ComponentFixture<SkillPrerequisiteSkillsEditorComponent>;
   let skillUpdateService: SkillUpdateService;
   let skillEditorStateService: SkillEditorStateService;
+  let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
   let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
@@ -53,6 +55,7 @@ describe('Skill editor main tab Component', () => {
 
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
+  let skillWithSupersedingSkill: Skill;
   let skillSummaryDict: SkillSummaryBackendDict;
   let resizeEvent = new Event('resize');
   let mockEventEmitter = new EventEmitter();
@@ -137,7 +140,21 @@ describe('Skill editor main tab Component', () => {
       version: 3,
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
-      superseding_skill_id: 'skill0',
+      superseding_skill_id: null,
+      all_questions_merged: true,
+    });
+
+    skillWithSupersedingSkill = skillObjectFactory.createFromBackendDict({
+      id: 'skill2',
+      description: 'test description 2',
+      misconceptions: [misconceptionDict1],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      next_misconception_id: 3,
+      prerequisite_skill_ids: ['skill_1'],
+      superseding_skill_id: 'skill_0',
       all_questions_merged: true,
     });
 
@@ -378,6 +395,67 @@ describe('Skill editor main tab Component', () => {
   }));
 
   describe('while adding a skill', () => {
+    it('should not show skills with non-null superseding skill id', () => {
+      // Arrange
+      // Mock skill backend API service to return skills when fetchSkillAsync is called.
+      const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.callFake(
+        (skillId: string) => {
+          // Return different skill objects based on the skillId.
+          if (skillId === 'skill1') {
+            return Promise.resolve({skill: sampleSkill});
+          } else if (skillId === 'skill2') {
+            return Promise.resolve({skill: skillWithSupersedingSkill});
+          }
+          return Promise.resolve({skill: sampleSkill});
+        }
+      );
+      // Set up required component properties.
+      component.skill = sampleSkill;
+      component.groupedSkillSummaries = {
+        current: [
+          {id: 'skill1', description: 'test description 1'},
+          {id: 'skill2', description: 'test description 2'},
+        ],
+        others: [],
+      };
+      component.categorizedSkills = {
+        'Topic 1': {
+          'Subtopic 1': [
+            {id: 'skill1', description: 'test description 1'},
+            {id: 'skill2', description: 'test description 2'},
+          ],
+        },
+      };
+      component.untriagedSkillSummaries = [];
+      // Mock modal implementation.
+      const modalRef = jasmine.createSpyObj('NgbModalRef', [
+        'componentInstance',
+        'result',
+      ]);
+      modalRef.componentInstance = {};
+      modalRef.result = Promise.resolve();
+      spyOn(ngbModal, 'open').and.returnValue(modalRef);
+      // Act.
+      component.addSkill();
+      // Wait for promises to resolve.
+      return fixture.whenStable().then(() => {
+        // Assert
+        // Check that the modal was opened with filtered skills.
+        expect(ngbModal.open).toHaveBeenCalled();
+        // Verify skill2 was filtered out due to having a superseding skill ID.
+        expect(modalRef.componentInstance.skillSummaries).toEqual([
+          {id: 'skill1', description: 'test description 1'},
+        ]);
+        // Verify categorized skills were also filtered.
+        expect(
+          modalRef.componentInstance.categorizedSkills['Topic 1']['Subtopic 1']
+        ).toEqual([{id: 'skill1', description: 'test description 1'}]);
+        // Verify skillsInSameTopicCount was updated correctly.
+        expect(modalRef.componentInstance.skillsInSameTopicCount).toBe(1);
+      });
+    });
+
     it(
       'should show info message if we try ' +
         'to add a prerequisite skill to itself',
