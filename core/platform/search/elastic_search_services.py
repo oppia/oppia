@@ -296,7 +296,7 @@ def search(
             'multi_match': {
                 'query': query_string,
                 'fields': ['title^3', 'description', 'category^2'],
-                'fuzziness': 'AUTO',
+                'fuzziness': 0,
                 'prefix_length': 1,
                 'max_expansions': 50,
                 'minimum_should_match': '75%'

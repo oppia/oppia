@@ -406,6 +406,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        logging.basicConfig(level=logging.INFO)
 
     def test_library_index_handler_for_user_preferred_language(self) -> None:
         """Test whether the handler returns the correct language preference."""
@@ -450,6 +451,9 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         rating_services.assign_rating_to_exploration('user', '0', 2)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
 
+        # //Debugging test failure 
+        logging.info(f"'response dict :' {response_dict}")
+        print(f"'response dict :' {response_dict}")
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 1)
         self.assertDictContainsSubset({
