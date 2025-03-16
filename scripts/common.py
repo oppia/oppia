@@ -218,6 +218,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
     'exploration-editor/verify-statistics-and-previous-explorations',
+    'exploration-editor/submit-review-and-respond-to-feedback',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/create-and-delete-account',

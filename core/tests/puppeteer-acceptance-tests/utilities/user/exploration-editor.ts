@@ -223,6 +223,10 @@ const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -2268,6 +2272,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Verifies if specific feedback text is present on the page.
+   * @param {string} feedback - The feedback text to check for.
+   */
+  async viewFeedbackIsPresent(feedback: string): Promise<void> {
+    await this.page.waitForSelector(feedbackSelector);
+    const actualFeedback = await this.page.$eval(feedbackSelector, el =>
+      el.textContent?.trim()
+    );
+    if (actualFeedback === feedback) {
+      showMessage('Feedback is present.');
+    } else {
+      throw new Error('Feedback is not present.');
+    }
+  }
+
+  /**
    * Checks if a suggestion is anonymous.
    * @param {string} suggestion - The expected suggestion.
    * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.
@@ -2306,6 +2326,72 @@ export class ExplorationEditor extends BaseUser {
   async replyToSuggestion(reply: string): Promise<void> {
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Navigates back to the feedback tab.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.type(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+    await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Checks if the current feedback status matches the expected value.
+   * @param {string} statusValue - The expected status value of the feedback.
+   */
+  async expectFeedbackStatusToBe(statusValue: string): Promise<void> {
+    const currentStatus = await this.page.$eval(
+      feedbackStatusMenu,
+      el => (el as HTMLSelectElement).value
+    );
+    if (currentStatus !== statusValue) {
+      throw new Error(
+        `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
+      );
+    }
+  }
+
+  /**
+   * Presses the back button in the feedback thread tab.
+   */
+  async pressFeedbackThreadBackButton(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Verifies that a feedback thread at the specified index has the expected status.
+   * @param {number} threadIndex - The 1-indexed position of the feedback thread.
+   * @param {string} expectedStatus - The status text expected for the feedback thread.
+   */
+  async expectFeedbackStatusInList(
+    threadIndex: number,
+    expectedStatus: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackTabRowSelector, {
+      visible: true,
+    });
+    let feedbackStatuses = await this.page.$$(feedbackStatusSelector);
+    const statusText = await this.page.evaluate(
+      el => el.textContent?.trim(),
+      feedbackStatuses[threadIndex - 1]
+    );
+    if (statusText !== expectedStatus) {
+      throw new Error(
+        `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
+      );
+    }
   }
 }
 

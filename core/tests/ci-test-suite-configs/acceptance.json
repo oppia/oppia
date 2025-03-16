@@ -53,6 +53,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts"
     },
     {
+      "name": "exploration-editor/submit-review-and-respond-to-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
       "name": "logged-in-user/create-and-delete-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
     },
