@@ -724,19 +724,29 @@ export class BaseUser {
               path.basename(dirName)
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
+        storeReceivedOnFailure: true,
+        customReceivedPostfix: '',
+        customReceivedDir: __dirname.startsWith('/home/runner')
+          ? path.join(
+              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
+              path.basename(dirName)
+            )
+          : path.join(testPath, dirName, 'diff-snapshots'),
       });
       if (typeof newPage !== 'undefined') {
         await newPage.close();
       }
     } catch (error) {
+      var ErrorMessage = error.message;
       if (__dirname.startsWith('/home/runner')) {
-        throw new Error(
-          error.message +
-            '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
-        );
-      } else {
-        throw new Error(error.message);
+        ErrorMessage +=
+          '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).';
       }
+      ErrorMessage +=
+        '\r\nPlease update the screenshots if the UI changed. If the screenshot(s) is failing constantly with ' +
+        'the same percentage, consider updating the screenshot(s).\r\nTo update the screenshots(s), delete the old screenshot(s)' +
+        ' and replace it with the screenshot(s) from the folder diff-snapshot. The new screenshot(s) should not ends "-diff".';
+      throw new Error(ErrorMessage + '\r\n' + process.env.SPEC_NAME);
     }
   }
   /*
