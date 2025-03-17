@@ -751,7 +751,7 @@
 	"I18N_FOOTER_NEWSLETTER_TEXT": "¡Sé parte de la comunidad de Oppia! Nuestro boletín quincenal te mantiene informado sobre nuevas funciones, lecciones y cómo Oppia está teniendo un impacto mundial.",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Fundación Oppia",
 	"I18N_FOOTER_OPPIA_MISSION": "La misión de Oppia es proporcionar una plataforma de aprendizaje que satisfaga las necesidades únicas de las comunidades con escasos recursos.",
-	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "<a href=\"/donate\">¡Dona</a> o <a href=\"/volunteer\" (click)=\"navigateToVolunteerPage()\">hazte voluntario</a> hoy!",
+	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "<a href=\"/donate\">¡Dona</a> o <a href=\"/volunteer\">hazte voluntario</a> hoy!",
 	"I18N_FOOTER_PRIVACY_POLICY": "Normativa de privacidad",
 	"I18N_FOOTER_TEACH": "Enseña con Oppia",
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "ENSEÑA/APRENDE",
