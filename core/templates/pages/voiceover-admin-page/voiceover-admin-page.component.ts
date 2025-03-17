@@ -231,6 +231,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
       this.languageCodesMapping[languageCode] = {};
     }
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
+    this.languageAccentCodesToSupportsAutogeneration[languageAccentCodeToAdd] =
+      false;
 
     this.languageAccentCodeIsPresent =
       Object.keys(this.supportedLanguageAccentCodesToDescriptions).length !== 0;
