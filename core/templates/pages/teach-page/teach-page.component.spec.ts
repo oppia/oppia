@@ -258,6 +258,12 @@ describe('Teach Page', () => {
     ).toHaveBeenCalled();
   });
 
+  it('should use relative URL for teacher story blog link', () => {
+    expect(component.teacherStoryTaggedBlogsLink).toBe(
+      '/blog/search/find?q=&tags=(%22Teacher%20story%22)'
+    );
+  });
+
   it('should redirect to teach page when Tips For Parents is clicked', () => {
     component.onClickTipforParentsButton();
     expect(windowRef.nativeWindow.location.href).toBe('/teach');

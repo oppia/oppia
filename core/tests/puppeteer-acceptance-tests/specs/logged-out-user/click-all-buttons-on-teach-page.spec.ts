@@ -55,6 +55,19 @@ describe('Logged-out User in Teach page', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should open the blog page with teacher stories when "Check out our blog" button is clicked',
+    async function () {
+      await loggedOutUser.clickBlogButtonInTeachPage();
+      const currentUrl = await loggedOutUser.getCurrentUrl();
+      expect(currentUrl).toContain(
+        '/blog/search/find?q=&tags=(%22Teacher%20story%22)'
+      );
+      expect(currentUrl).not.toContain('oppia.org');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

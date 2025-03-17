@@ -332,8 +332,6 @@ export const AppConstants = {
     'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
-  TEACHER_STORY_TAGGED_BLOGS_LINK:
-    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
   VOLUNTEER_EXPECTATIONS: [
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',

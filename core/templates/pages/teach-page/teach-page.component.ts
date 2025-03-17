@@ -63,7 +63,8 @@ export class TeachPageComponent implements OnInit, OnDestroy, AfterViewInit {
   creatorsCarouselContainer!: ElementRef;
   @ViewChild('testimonialsCarousel') testimonialsCarousel!: NgbCarousel;
   parentsTeachersPdfGuideLink = AppConstants.PARENTS_TEACHERS_PDF_GUIDE_LINK;
-  teacherStoryTaggedBlogsLink = AppConstants.TEACHER_STORY_TAGGED_BLOGS_LINK;
+  teacherStoryTaggedBlogsLink =
+    '/blog/search/find?q=&tags=(%22Teacher%20story%22)';
   androidUrl = `/${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE}`;
   displayedTestimonialId!: number;
   libraryUrl!: string;
