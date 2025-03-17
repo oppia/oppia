@@ -21,7 +21,6 @@ import binascii
 import collections
 import datetime
 import hashlib
-import imghdr
 import io
 import itertools
 import json
@@ -40,6 +39,7 @@ from core.constants import constants
 
 from PIL import Image
 import certifi
+import filetype
 import yaml
 
 from typing import ( # isort:skip
@@ -426,14 +426,16 @@ def convert_image_binary_to_data_url(
         Exception. The given binary string does not represent a PNG image.
         Exception. The given binary string does not represent a WEBP image.
     """
-    if imghdr.what(None, h=content) == file_type:
-        return '%s%s' % (
-            DATA_URL_FORMAT_PREFIX % file_type,
-            urllib.parse.quote(base64.b64encode(content))
-        )
-    else:
+    file_details = filetype.guess(content)
+    if file_details is None or file_details.extension != file_type:
         raise Exception(
-            'The given string does not represent a %s image.' % file_type)
+            'The given binary string does not represent a %s image.' 
+            % file_type)
+
+    return '%s%s' % (
+        DATA_URL_FORMAT_PREFIX % file_type,
+        urllib.parse.quote(base64.b64encode(content))
+    )
 
 
 def is_base64_encoded(content: str) -> bool:
