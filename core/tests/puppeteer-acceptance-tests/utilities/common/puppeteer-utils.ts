@@ -746,7 +746,7 @@ export class BaseUser {
         '\r\nPlease update the screenshots if the UI changed. If the screenshot(s) is failing constantly with ' +
         'the same percentage, consider updating the screenshot(s).\r\nTo update the screenshots(s), delete the old screenshot(s)' +
         ' and replace it with the screenshot(s) from the folder diff-snapshot. The new screenshot(s) should not ends "-diff".';
-      throw new Error(ErrorMessage + '\r\n' + process.env.SPEC_NAME);
+      throw new Error(ErrorMessage);
     }
   }
   /*
