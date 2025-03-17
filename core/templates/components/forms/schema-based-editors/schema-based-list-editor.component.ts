@@ -123,7 +123,7 @@ export class SchemaBasedListEditorComponent
     // Treat the first item in the list as a special case -- if this list
     // is contained in another list, and the outer list is opened with a
     // desire to autofocus on the first input field, we can then focus on
-    // the given $scope.labelForFocusTarget().
+    // the given this.labelForFocusTarget().
     // NOTE: This will cause problems for lists nested within lists, since
     // sub-element 0 > 1 will have the same label as sub-element 1 > 0.
     // But we will assume (for now) that nested lists won't be used -- if

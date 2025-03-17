@@ -45,6 +45,7 @@ import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {SkillEditorAccessGuard} from './skill-editor-access.guard';
 import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
+import {RteHelperService} from 'services/rte-helper.service';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -104,6 +105,6 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
     SkillEditorMainTabComponent,
     SkillEditorPageComponent,
   ],
-  providers: [SkillEditorStalenessDetectionService],
+  providers: [SkillEditorStalenessDetectionService, RteHelperService],
 })
 export class SkillEditorPageModule {}

@@ -253,7 +253,7 @@ export class ClassroomPageComponent implements OnDestroy {
     return this.platformFeatureService.status.DiagnosticTest.isEnabled;
   }
 
-  isDiagnosticTestEnabled(): boolean {
-    return this.classroomData.getIsDiagnosticTestEnabled();
+  diagnosticTestIsEnabled(): boolean {
+    return this.classroomData.getDiagnosticTestIsEnabled();
   }
 }

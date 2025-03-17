@@ -50,6 +50,7 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -109,7 +110,7 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
-
+  let urlService: UrlService;
   let threadSummaryList = [
     {
       status: 'open',
@@ -196,6 +197,7 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
+    urlService = TestBed.inject(UrlService);
     feedbackUpdatesBackendApiService = TestBed.inject(
       FeedbackUpdatesBackendApiService
     );
@@ -851,4 +853,18 @@ describe('TopNavigationBarComponent', () => {
     expect(learnerGroupSpy).not.toHaveBeenCalled();
     expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
   }));
+
+  it('should hide menu icon when page contains a back button', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
+    component.PAGES_WITH_BACK_STATE = ['/blog/'];
+    component.ngOnInit();
+    expect(component.menuIconIsShown).toBeFalse();
+  });
+
+  it('should show menu icon when page does not contain a back button', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
+    component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
+    component.ngOnInit();
+    expect(component.menuIconIsShown).toBeTrue();
+  });
 });
