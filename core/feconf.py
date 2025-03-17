@@ -167,7 +167,7 @@ class ValidModelNames(enum.Enum):
     SUGGESTION = 'suggestion'
     TOPIC = 'topic'
     TRANSLATION = 'translation'
-    TRANSLATION_COUNT_DEBUG_TRACKER = 'translation_count_debug_tracker'
+    OPPORTUNITY_DEBUG = 'opportunity_debug'
     USER = 'user'
     VOICEOVER = 'voiceover'
 

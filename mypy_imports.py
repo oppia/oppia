@@ -62,6 +62,8 @@ from core.storage.improvements import gae_models as improvements_models
 from core.storage.job import gae_models as job_models
 from core.storage.learner_group import gae_models as learner_group_models
 from core.storage.opportunity import gae_models as opportunity_models
+from core.storage.opportunity_debug import (
+    gae_models as opportunity_debug_models)
 from core.storage.question import gae_models as question_models
 from core.storage.recommendations import gae_models as recommendations_models
 from core.storage.skill import gae_models as skill_models
@@ -71,8 +73,6 @@ from core.storage.subtopic import gae_models as subtopic_models
 from core.storage.suggestion import gae_models as suggestion_models
 from core.storage.topic import gae_models as topic_models
 from core.storage.translation import gae_models as translation_models
-from core.storage.translation_count_debug_tracker import (
-    gae_models as translation_count_debug_tracker_models)
 from core.storage.user import gae_models as user_models
 from core.storage.voiceover import gae_models as voiceover_models
 
@@ -115,7 +115,7 @@ __all__ = [
     'suggestion_models',
     'topic_models',
     'translation_models',
-    'translation_count_debug_tracker_models',
+    'opportunity_debug_models',
     'translate_services',
     'transaction_services',
     'user_models',

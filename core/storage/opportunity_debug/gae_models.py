@@ -32,8 +32,8 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class TranslationCountDebugTrackerModel(base_models.BaseModel):
-    """Storage model for recording changes to translation counts.
+class OpportunityDebugModel(base_models.BaseModel):
+    """Storage model for recording changes made to opportunity model.
 
     The ID of each instance is <exploration_id>.<language_code>.
     """
@@ -66,7 +66,7 @@ class TranslationCountDebugTrackerModel(base_models.BaseModel):
     @classmethod
     def get_by_exp_id_and_langauge_code(
         cls, exp_id: str, language_code: str
-    ) -> Optional[TranslationCountDebugTrackerModel]:
+    ) -> Optional[OpportunityDebugModel]:
         """Gets the model instance for the given exploration and language code.
 
         Args:
@@ -74,7 +74,7 @@ class TranslationCountDebugTrackerModel(base_models.BaseModel):
             language_code: str. The language code.
 
         Returns:
-            TranslationCountDebugTrackerModel|None. The model instance, if it
+            OpportunityDebugModel|None. The model instance, if it
             exists, else None.
         """
         return cls.get_by_id(f'{exp_id}.{language_code}')
@@ -82,33 +82,33 @@ class TranslationCountDebugTrackerModel(base_models.BaseModel):
     @classmethod
     def get_multi_by_exp_id(
         cls, exp_id: str
-    ) -> Sequence[TranslationCountDebugTrackerModel]:
+    ) -> Sequence[OpportunityDebugModel]:
         """Gets all the model instances for the given exploration ID.
 
         Args:
             exp_id: str. The exploration ID.
 
         Returns:
-            list(TranslationCountDebugTrackerModel). The model instances.
+            list(OpportunityDebugModel). The model instances.
         """
         debug_models: Sequence[
-            TranslationCountDebugTrackerModel] = cls.get_all().filter(
+            OpportunityDebugModel] = cls.get_all().filter(
                 cls.exp_id == exp_id).fetch()
         return debug_models
 
     @classmethod
     def get_multi_by_language_code(
         cls, language_code: str
-    ) -> Sequence[TranslationCountDebugTrackerModel]:
+    ) -> Sequence[OpportunityDebugModel]:
         """Gets all the model instances for the given language code.
 
         Args:
             language_code: str. The language code.
 
         Returns:
-            list(TranslationCountDebugTrackerModel). The model instances.
+            list(OpportunityDebugModel). The model instances.
         """
         debug_models: Sequence[
-            TranslationCountDebugTrackerModel] = cls.get_all().filter(
+            OpportunityDebugModel] = cls.get_all().filter(
                 cls.language_code == language_code).fetch()
         return debug_models

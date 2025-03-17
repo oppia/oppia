@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for core.storage.translation_count_debug_tracker.gae_models."""
+"""Tests for core.storage.opportunity_debug.gae_models."""
 
 from __future__ import annotations
 import datetime
@@ -25,24 +25,24 @@ from core.tests import test_utils
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
-    from mypy_imports import translation_count_debug_tracker_models
+    from mypy_imports import opportunity_debug_models
 
 (
     base_models,
-    translation_count_debug_tracker_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.TRANSLATION_COUNT_DEBUG_TRACKER
+    opportunity_debug_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.OPPORTUNITY_DEBUG
 ])
 
 
-class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
-    """Test the TranslationCountDebugTrackerModel class."""
+class OpportunityDebugModelUnitTest(test_utils.GenericTestBase):
+    """Test the OpportunityDebugModel class."""
 
     dt = datetime.datetime.utcnow()
 
     def setUp(self) -> None:
         super().setUp()
         # Create first model.
-        translation_count_debug_tracker_models.TranslationCountDebugTrackerModel( # pylint: disable=line-too-long
+        opportunity_debug_models.OpportunityDebugModel( # pylint: disable=line-too-long
             id='exp_id1.hi',
             exp_id='exp_id1',
             language_code='hi',
@@ -66,7 +66,7 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
             ]
         ).put()
         # Create second model.
-        translation_count_debug_tracker_models.TranslationCountDebugTrackerModel( # pylint: disable=line-too-long
+        opportunity_debug_models.OpportunityDebugModel( # pylint: disable=line-too-long
             id='exp_id1.es',
             exp_id='exp_id1',
             language_code='es',
@@ -82,7 +82,7 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
             ]
         ).put()
         # Create third model.
-        translation_count_debug_tracker_models.TranslationCountDebugTrackerModel( # pylint: disable=line-too-long
+        opportunity_debug_models.OpportunityDebugModel( # pylint: disable=line-too-long
             id='exp_id2.hi',
             exp_id='exp_id2',
             language_code='hi',
@@ -100,15 +100,15 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
@@ -123,8 +123,8 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
             'events': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_export_policy(),
             expected_export_policy_dict
         )
@@ -132,8 +132,8 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
     def test_get_by_exploration_id_and_langauge_code(
         self) -> None:
         model1 = (
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_by_exp_id_and_langauge_code(
                     'exp_id1', 'hi'))
 
@@ -165,8 +165,8 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_multi_by_exp_id(self) -> None:
         models_list = (
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_multi_by_exp_id('exp_id1'))
         self.assertEqual(len(models_list), 2)
 
@@ -214,8 +214,8 @@ class TranslationCountDebugTrackerModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_multi_by_language_code(self) -> None:
         models_list = (
-            translation_count_debug_tracker_models
-                .TranslationCountDebugTrackerModel
+            opportunity_debug_models
+                .OpportunityDebugModel
                     .get_multi_by_language_code('hi'))
         self.assertEqual(len(models_list), 2)
 
