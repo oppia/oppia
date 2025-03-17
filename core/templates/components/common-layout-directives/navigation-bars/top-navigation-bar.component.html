@@ -1,5 +1,5 @@
 <div class="navbar-header e2e-test-navbar-header oppia-top-navigation-bar">
-  <a *ngIf="windowIsNarrow && !pageIsIframed"
+  <a *ngIf="windowIsNarrow && !pageIsIframed && menuIconIsShown"
      (click)="toggleSidebar($event)"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ml-0"
      tabindex="0">
@@ -38,7 +38,7 @@
           <img [src]="getStaticImageUrl('/logo/288x128_logo_white.png')"
                class="oppia-logo"
                alt="Oppia Home"
-               [ngStyle]="!windowIsNarrow && {'width': '90px'}">
+               [ngStyle]="{'width': !windowIsNarrow ? '90px' : '','margin-left': !menuIconIsShown ? '25px' : '0px'}">
         </picture>
       </a>
     </ng-template>

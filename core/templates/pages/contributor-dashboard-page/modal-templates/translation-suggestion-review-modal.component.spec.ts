@@ -49,6 +49,7 @@ import {of, Subject} from 'rxjs';
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
@@ -287,7 +288,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     beforeEach(() => {
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
@@ -427,7 +428,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
@@ -481,7 +482,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       flush();
     }));
 
-    it('should initialize $scope properties after controller is initialized', function () {
+    it('should initialize component properties after component is initialized', function () {
       component.ngOnInit();
       expect(component.subheading).toBe(subheading);
       expect(component.reviewable).toBe(reviewable);
@@ -1124,7 +1125,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
@@ -1281,9 +1282,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
+
       component.editedContent = editedContent;
       mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
         false;
@@ -1335,7 +1337,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       flush();
     }));
 
-    it('should initialize $scope properties after controller is initialized', function () {
+    it('should initialize component properties after component is initialized', function () {
       component.ngOnInit();
       expect(component.subheading).toBe(subheading);
       expect(component.reviewable).toBe(reviewable);
@@ -1880,9 +1882,10 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
+
       mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
         false;
       component.ngOnInit();
@@ -2046,12 +2049,12 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
     });
 
-    it('should initialize $scope properties after controller is initialized', fakeAsync(function () {
+    it('should initialize component properties after component is initialized', fakeAsync(function () {
       const messages = [
         {
           author_username: '',
@@ -2256,12 +2259,12 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
     });
 
-    it('should initialize $scope properties after controller is initialized', fakeAsync(function () {
+    it('should initialize component properties after component is initialized', fakeAsync(function () {
       const messages = [
         {
           author_username: '',
@@ -2443,7 +2446,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should correctly set variables if there is only one item', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContributionOne
       );
       component.ngOnInit();
@@ -2455,9 +2458,10 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should correctly set variables if there are multiple items', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
+
       component.ngOnInit();
 
       expect(component.isFirstItem).toBeTrue();
@@ -2467,9 +2471,10 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should successfully navigate between items', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
+
       component.ngOnInit();
       spyOn(component, 'refreshActiveContributionState').and.callThrough();
 
@@ -2518,7 +2523,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       'should close the modal if the opportunity is' +
         ' deleted when navigating forward',
       () => {
-        component.suggestionIdToContribution = angular.copy(
+        component.suggestionIdToContribution = cloneDeep(
           suggestionIdToContribution
         );
         component.ngOnInit();
@@ -2535,7 +2540,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       'should close the modal if the opportunity is' +
         ' deleted when navigating backward',
       () => {
-        component.suggestionIdToContribution = angular.copy(
+        component.suggestionIdToContribution = cloneDeep(
           suggestionIdToContribution
         );
         component.ngOnInit();
@@ -2628,7 +2633,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_2';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;

@@ -62,7 +62,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_3': []
             },
             'is_published': True,
-            'is_diagnostic_test_enabled': False,
+            'diagnostic_test_is_enabled': False,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
             'banner_data': self.dummy_banner_data.to_dict(),
             'index': 0
@@ -78,7 +78,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.math_classroom.topic_list_intro,
             self.math_classroom.topic_id_to_prerequisite_topic_ids,
             self.math_classroom.is_published,
-            self.math_classroom.is_diagnostic_test_enabled,
+            self.math_classroom.diagnostic_test_is_enabled,
             self.math_classroom.thumbnail_data.filename,
             self.math_classroom.thumbnail_data.bg_color,
             self.math_classroom.thumbnail_data.size_in_bytes,
@@ -101,7 +101,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
                 'topic_id_3': []
             },
             'is_published': True,
-            'is_diagnostic_test_enabled': False,
+            'diagnostic_test_is_enabled': False,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
             'banner_data': self.dummy_banner_data.to_dict(),
             'index': 1
@@ -117,7 +117,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             self.physics_classroom.topic_list_intro,
             self.physics_classroom.topic_id_to_prerequisite_topic_ids,
             self.physics_classroom.is_published,
-            self.physics_classroom.is_diagnostic_test_enabled,
+            self.physics_classroom.diagnostic_test_is_enabled,
             self.physics_classroom.thumbnail_data.filename,
             self.physics_classroom.thumbnail_data.bg_color,
             self.physics_classroom.thumbnail_data.size_in_bytes,
@@ -159,7 +159,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             'topic_list_intro': 'Start from the basics with our first topic.',
             'topic_id_to_prerequisite_topic_ids': {'topic_id_chem': []},
             'is_published': True,
-            'is_diagnostic_test_enabled': False,
+            'diagnostic_test_is_enabled': False,
             'thumbnail_data': self.dummy_thumbnail_data.to_dict(),
             'banner_data': self.dummy_banner_data.to_dict(),
             'index': 2
@@ -175,7 +175,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             chemistry_classroom.topic_list_intro,
             chemistry_classroom.topic_id_to_prerequisite_topic_ids,
             chemistry_classroom.is_published,
-            chemistry_classroom.is_diagnostic_test_enabled,
+            chemistry_classroom.diagnostic_test_is_enabled,
             chemistry_classroom.thumbnail_data.filename,
             chemistry_classroom.thumbnail_data.bg_color,
             chemistry_classroom.thumbnail_data.size_in_bytes,

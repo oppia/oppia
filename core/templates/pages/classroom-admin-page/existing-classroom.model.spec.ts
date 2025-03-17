@@ -109,7 +109,7 @@ describe('Classroom admin model', () => {
         topic2: ['topic1'],
       },
       isPublished: true,
-      isDiagnosticTestEnabled: false,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -130,9 +130,9 @@ describe('Classroom admin model', () => {
     expect(classroom.getIsPublished()).toBeTrue();
     classroom.setIsPublished(false);
     expect(classroom.getIsPublished()).toBeFalse();
-    expect(classroom.getIsDiagnosticTestEnabled()).toBeFalse();
-    classroom.setIsDiagnosticTestEnabled(true);
-    expect(classroom.getIsDiagnosticTestEnabled()).toBeTrue();
+    expect(classroom.getDiagnosticTestIsEnabled()).toBeFalse();
+    classroom.setdiagnosticTestIsEnabled(true);
+    expect(classroom.getDiagnosticTestIsEnabled()).toBeTrue();
   });
 
   it('should be able to get classroom dict from object', () => {
@@ -145,7 +145,7 @@ describe('Classroom admin model', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
-      isDiagnosticTestEnabled: false,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };

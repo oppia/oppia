@@ -374,7 +374,7 @@ describe('Classroom Page Component', () => {
       1
     );
     component.classroomData = classroomData;
-    expect(component.isDiagnosticTestEnabled()).toBeFalse();
+    expect(component.diagnosticTestIsEnabled()).toBeFalse();
   });
 
   it('should show private classroom banner to curriculum admins', fakeAsync(() => {

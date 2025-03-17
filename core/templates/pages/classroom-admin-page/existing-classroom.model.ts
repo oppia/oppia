@@ -67,7 +67,7 @@ export class ExistingClassroomData
   _topicsCountInClassroom: number;
   _topicIdToTopicName!: TopicIdToTopicName;
   _isPublished: boolean;
-  _isDiagnosticTestEnabled: boolean;
+  _diagnosticTestIsEnabled: boolean;
   _thumbnail_data: ImageData;
   _banner_data: ImageData;
 
@@ -80,7 +80,7 @@ export class ExistingClassroomData
     topicListIntro: string,
     topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds,
     isPublished: boolean,
-    isDiagnosticTestEnabled: boolean,
+    diagnosticTestIsEnabled: boolean,
     thumbnailData: ImageData,
     bannerData: ImageData
   ) {
@@ -94,7 +94,7 @@ export class ExistingClassroomData
       this._topicIdToPrerequisiteTopicIds
     ).length;
     this._isPublished = isPublished;
-    this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
+    this._diagnosticTestIsEnabled = diagnosticTestIsEnabled;
     this._thumbnail_data = thumbnailData;
     this._banner_data = bannerData;
   }
@@ -119,8 +119,8 @@ export class ExistingClassroomData
     return this._banner_data;
   }
 
-  getIsDiagnosticTestEnabled(): boolean {
-    return this._isDiagnosticTestEnabled;
+  getDiagnosticTestIsEnabled(): boolean {
+    return this._diagnosticTestIsEnabled;
   }
 
   getTopicIdToPrerequisiteTopicId(): TopicIdToPrerequisiteTopicIds {
@@ -139,8 +139,8 @@ export class ExistingClassroomData
     this._isPublished = isPublished;
   }
 
-  setIsDiagnosticTestEnabled(isDiagnosticTestEnabled: boolean): void {
-    this._isDiagnosticTestEnabled = isDiagnosticTestEnabled;
+  setdiagnosticTestIsEnabled(diagnosticTestIsEnabled: boolean): void {
+    this._diagnosticTestIsEnabled = diagnosticTestIsEnabled;
   }
 
   setTeaserText(teaserText: string): void {
@@ -177,7 +177,7 @@ export class ExistingClassroomData
       classroomDict.topicListIntro,
       classroomDict.topicIdToPrerequisiteTopicIds,
       classroomDict.isPublished,
-      classroomDict.isDiagnosticTestEnabled,
+      classroomDict.diagnosticTestIsEnabled,
       classroomDict.thumbnailData,
       classroomDict.bannerData
     );
@@ -193,7 +193,7 @@ export class ExistingClassroomData
       topicListIntro: this._topicListIntro,
       topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds,
       isPublished: this._isPublished,
-      isDiagnosticTestEnabled: this._isDiagnosticTestEnabled,
+      diagnosticTestIsEnabled: this._diagnosticTestIsEnabled,
       thumbnailData: this._thumbnail_data,
       bannerData: this._banner_data,
     };
