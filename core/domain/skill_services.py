@@ -602,12 +602,12 @@ def remove_prerequisite_skill_id_from_all_skills(skill_id: str) -> None:
         skill_id: str. The ID of the prerequisite skill to be removed.
     """
 
-    skills_with_prereq_skill = skill_models.SkillModel.get_by_prerequisite_skill_id(
+    skills_with_prereq = skill_models.SkillModel.get_by_prerequisite_skill_id(
         skill_id)
 
     updated_skills = []
 
-    for skill in skills_with_prereq_skill:
+    for skill in skills_with_prereq:
         skill.prerequisite_skill_ids = [
             prereq_skill_id for prereq_skill_id in skill.prerequisite_skill_ids
             if prereq_skill_id != skill_id
@@ -635,11 +635,11 @@ def replace_prerequisite_skill_id_from_all_skills(
         new_skill_id: str. The ID of the skill that replaces the old skill.
         old_skill_id: str. The ID of the skill to be replaced.
     """
-    skills_with_prereq_skill = skill_models.SkillModel.get_by_prerequisite_skill_id(
+    skills_with_prereq = skill_models.SkillModel.get_by_prerequisite_skill_id(
         old_skill_id)
     updated_skills = []
 
-    for skill in skills_with_prereq_skill:
+    for skill in skills_with_prereq:
         skill.prerequisite_skill_ids = [
             prereq_skill_id for prereq_skill_id in skill.prerequisite_skill_ids
             if prereq_skill_id != old_skill_id

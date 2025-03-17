@@ -1064,7 +1064,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(len(new_links), 1)
         self.assertEqual(new_links[0].skill_id, new_skill_id)
         # The old_skill should be replaced by the new skill in the
-        # prerequisite_skills array of skill_with_prereq as the 
+        # prerequisite_skills array of skill_with_prereq as the
         # old_skill is merged to the new skill.
         self.assertEqual(new_prerequisites, [new_skill_id])
 

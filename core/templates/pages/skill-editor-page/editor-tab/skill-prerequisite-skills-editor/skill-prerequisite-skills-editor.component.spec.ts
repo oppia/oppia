@@ -394,21 +394,43 @@ describe('Skill editor main tab Component', () => {
   }));
 
   describe('while adding a skill', () => {
-    it('should not show skills with non-null superseding skill id', () => {
-      // Arrange
-      // Mock skill backend API service to return skills when fetchSkillAsync is called.
+    it('should filter out skills with non-null superseding skill id', fakeAsync(() => {
+      // Mock the skill backend API service.
       const skillBackendApiService = TestBed.inject(SkillBackendApiService);
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.callFake(
         (skillId: string) => {
-          // Return different skill objects based on the skillId.
           if (skillId === 'skill1') {
             return Promise.resolve({skill: sampleSkill});
           } else if (skillId === 'skill2') {
             return Promise.resolve({skill: skillWithSupersedingSkill});
+          } else if (skillId === 'BBB6dzfb5pPt') {
+            return Promise.resolve({
+              skill: {
+                getId: () => 'BBB6dzfb5pPt',
+                getSupersedingSkillId: () => null,
+              },
+            });
+          } else if (skillId === 'D1FdmljJNXdt') {
+            return Promise.resolve({
+              skill: {
+                getId: () => 'D1FdmljJNXdt',
+                getSupersedingSkillId: () => 'some-id',
+              },
+            });
+          } else if (skillId === '4P77sLaU14DE') {
+            return Promise.resolve({
+              skill: {
+                getId: () => '4P77sLaU14DE',
+                getSupersedingSkillId: () => null,
+              },
+            });
           }
-          return Promise.resolve({skill: sampleSkill});
+          return Promise.resolve({
+            skill: {getId: () => skillId, getSupersedingSkillId: () => null},
+          });
         }
       );
+
       // Set up required component properties.
       component.skill = sampleSkill;
       component.groupedSkillSummaries = {
@@ -426,7 +448,10 @@ describe('Skill editor main tab Component', () => {
           ],
         },
       };
-      component.untriagedSkillSummaries = [];
+      component.untriagedSkillSummaries = [
+        {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
+      ];
+
       // Mock modal implementation.
       const modalRef = jasmine.createSpyObj('NgbModalRef', [
         'componentInstance',
@@ -435,30 +460,39 @@ describe('Skill editor main tab Component', () => {
       modalRef.componentInstance = {};
       modalRef.result = Promise.resolve();
       spyOn(ngbModal, 'open').and.returnValue(modalRef);
-      // Act.
+
       component.addSkill();
-      // Wait for promises to resolve.
-      return fixture.whenStable().then(() => {
-        // Assert
-        // Check that the modal was opened with filtered skills.
-        expect(ngbModal.open).toHaveBeenCalled();
-        // Verify skill2 was filtered out due to having a superseding skill ID.
-        expect(modalRef.componentInstance.skillSummaries).toEqual([
-          {id: 'skill1', description: 'test description 1'},
-        ]);
-        // Verify categorized skills were also filtered.
-        expect(
-          modalRef.componentInstance.categorizedSkills['Topic 1']['Subtopic 1']
-        ).toEqual([{id: 'skill1', description: 'test description 1'}]);
-        // Verify skillsInSameTopicCount was updated correctly.
-        expect(modalRef.componentInstance.skillsInSameTopicCount).toBe(1);
-      });
-    });
+      tick();
+
+      // Assert.
+      expect(ngbModal.open).toHaveBeenCalled();
+      // Verify skill2 was filtered out due to having a superseding skill ID.
+      expect(modalRef.componentInstance.skillSummaries).toEqual([
+        {id: 'skill1', description: 'test description 1'},
+      ]);
+      // Verify categorized skills were also filtered.
+      expect(
+        modalRef.componentInstance.categorizedSkills['Topic 1']['Subtopic 1']
+      ).toEqual([{id: 'skill1', description: 'test description 1'}]);
+      // Verify skillsInSameTopicCount was updated correctly.
+      expect(modalRef.componentInstance.skillsInSameTopicCount).toBe(1);
+      // Verify untriaged skills were filtered correctly.
+      expect(modalRef.componentInstance.untriagedSkillSummaries).toEqual([
+        {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
+      ]);
+    }));
 
     it(
       'should show info message if we try ' +
         'to add a prerequisite skill to itself',
       fakeAsync(() => {
+        // Setup skillBackendApiService mock.
+        const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
+          skill: {getId: () => 'skill1', getSupersedingSkillId: () => null},
+        });
+
+        // Setup modal mock.
         spyOn(ngbModal, 'open').and.callFake(() => {
           return {
             componentInstance: {},
@@ -467,12 +501,20 @@ describe('Skill editor main tab Component', () => {
             }),
           } as NgbModalRef;
         });
+
         let alertsSpy = spyOn(
           alertsService,
           'addInfoMessage'
         ).and.callThrough();
 
         component.skill = sampleSkill;
+        component.groupedSkillSummaries = {
+          current: [{id: 'skill1', description: 'description'}],
+          others: [],
+        };
+        component.categorizedSkills = {};
+        component.untriagedSkillSummaries = [];
+
         component.addSkill();
         tick();
 
@@ -487,6 +529,13 @@ describe('Skill editor main tab Component', () => {
       'should show info message if we try to add a prerequisite ' +
         'skill which has already been added',
       fakeAsync(() => {
+        // Setup skillBackendApiService mock.
+        const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
+          skill: {getId: () => 'skill_1', getSupersedingSkillId: () => null},
+        });
+
+        // Setup modal mock
         spyOn(ngbModal, 'open').and.callFake(() => {
           return {
             componentInstance: {},
@@ -502,6 +551,13 @@ describe('Skill editor main tab Component', () => {
         ).and.callThrough();
 
         component.skill = sampleSkill;
+        component.groupedSkillSummaries = {
+          current: [{id: 'skill_1', description: 'description'}],
+          others: [],
+        };
+        component.categorizedSkills = {};
+        component.untriagedSkillSummaries = [];
+
         component.addSkill();
         tick();
 
@@ -515,6 +571,19 @@ describe('Skill editor main tab Component', () => {
     it(
       'should add skill sucessfully when calling ' + "'addSkill'",
       fakeAsync(() => {
+        // Setup skillBackendApiService mock.
+        const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+        spyOn(skillBackendApiService, 'fetchSkillAsync').and.resolveTo({
+          skill: {getId: () => 'skillId', getSupersedingSkillId: () => null},
+        });
+
+        // Setup update service spy.
+        const updateSpy = spyOn(
+          skillUpdateService,
+          'addPrerequisiteSkill'
+        ).and.callThrough();
+
+        // Setup modal mock.
         let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
           return {
             componentInstance: {},
@@ -525,10 +594,18 @@ describe('Skill editor main tab Component', () => {
         });
 
         component.skill = sampleSkill;
+        component.groupedSkillSummaries = {
+          current: [{id: 'skillId', description: 'New Skill'}],
+          others: [],
+        };
+        component.categorizedSkills = {};
+        component.untriagedSkillSummaries = [];
+
         component.addSkill();
         tick();
 
         expect(modalSpy).toHaveBeenCalled();
+        expect(updateSpy).toHaveBeenCalledWith(sampleSkill, 'skillId');
       })
     );
   });

@@ -159,7 +159,11 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
         model2.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
         self.assertEqual(
-            skill_models.SkillModel.get_by_prerequisite_skill_id('skill_id_a'), [model2])
+            skill_models.SkillModel.get_by_prerequisite_skill_id(
+                'skill_id_a'
+            ),
+            [model2]
+        )
 
     def test_get_export_policy(self) -> None:
         expected_dict = {

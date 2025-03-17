@@ -104,7 +104,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
         this.skillBackendApiService.fetchSkillAsync(skillId)
       )
     ).then(skillObjects => {
-      const skillSupersededMap = {};
+      const skillSupersededMap: {[skillId: string]: boolean} = {};
       skillObjects.forEach(skillObject => {
         skillSupersededMap[skillObject.skill.getId()] =
           skillObject.skill.getSupersedingSkillId() !== null;

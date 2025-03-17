@@ -729,14 +729,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_services.replace_prerequisite_skill_id_from_all_skills(
             'skill_id_1', 'skill_id_3')
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        self.assertEqual(skill.prerequisite_skill_ids,
-                         ['skill_id_3', 'skill_id_2'])
+        self.assertEqual(
+            skill.prerequisite_skill_ids,
+            ['skill_id_3', 'skill_id_2']
+        )
 
         skill_services.replace_prerequisite_skill_id_from_all_skills(
             'skill_id_2', 'skill_id_4')
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        self.assertEqual(skill.prerequisite_skill_ids,
-                         ['skill_id_3', 'skill_id_4'])
+        self.assertEqual(
+            skill.prerequisite_skill_ids,
+            ['skill_id_3', 'skill_id_4']
+        )
 
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
