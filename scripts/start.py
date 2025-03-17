@@ -28,9 +28,6 @@ from typing import Iterator, Optional, Sequence
 # Do not import any Oppia modules here,
 # import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build).
-# install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -170,6 +167,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             stack.enter_context(servers.managed_cloud_datastore_emulator(
                 clear_datastore=not parsed_args.save_datastore))
         if not parsed_args.skip_install:
+            # This installs third party libraries before importing other files or importing
+            # libraries that use the builtins python module (e.g. build).
             install_third_party_libs.main()
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
