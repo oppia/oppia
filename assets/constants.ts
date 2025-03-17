@@ -7757,5 +7757,39 @@ export default {
   "SHORT_COMMIT_HASH": "",
   "LANGUAGE_CODE_TO_PUNCTIONATION_MARKS": {
     "en": ".!?"
+  },
+  "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
+    "en": {
+      "+": "plus",
+      "-": "minus",
+      "*": "times",
+      "×": "times",
+      "÷": "divided by",
+      "=": "equals"
+    },
+    "hi": {
+      "+": "जोड़",
+      "-": "घटा",
+      "*": "गुणा",
+      "×": "गुणा",
+      "÷": "विभाजित",
+      "=": "बराबर"
+    },
+    "pt": {
+      "+": "mais",
+      "-": "menos",
+      "*": "vezes",
+      "×": "vezes",
+      "÷": "dividido por",
+      "=": "igual a"
+    },
+    "ar": {
+      "+": "زائد",
+      "-": "ناقص",
+      "*": "ضرب",
+      "×": "ضرب",
+      "÷": "قسمة على",
+      "=": "يساوي"
+    }
   }
 } as const;

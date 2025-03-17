@@ -50,6 +50,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {AppConstants} from 'app.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -109,7 +110,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private stateEditorService: StateEditorService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
-    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -199,6 +201,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
+  }
+
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
   updateManualVoiceoverWithChangeList(): void {
@@ -471,6 +478,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   isExplorationLinkedToStory() {
     return this.contextService.isExplorationLinkedToStory();
+  }
+
+  shouldShowAutoVoiceoverRegenerationSection(): boolean {
+    return (
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.isExplorationLinkedToStory()
+    );
   }
 
   deleteManualVoiceover(): void {

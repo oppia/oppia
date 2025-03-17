@@ -17,6 +17,8 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
@@ -404,25 +406,41 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
         self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.exploration = self.save_new_valid_exploration(
-            'exp_id', 'user_id', title='Exploration 1')
+            'exp_id', self.owner_id, title='Exploration 1')
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, self.exploration.id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
 
     def test_should_be_able_to_regenerate_voiceovers(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.VOICE_ARTIST_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'exploration_id': self.exploration.id,
             'language_accent_code': 'en-US',
             'state_name': 'Introduction',
             'content_id': 'content_0',
             'exploration_version': 1
         }
 
+        handler_url = '/regenerate_automatic_voiceover/%s' % self.exploration.id
+
         response_dict = self.put_json(
-            feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
-            payload, csrf_token=csrf_token)
+            handler_url, payload, csrf_token=csrf_token)
 
         expected_sentence_tokens_with_durations = [
             {'token': 'This', 'audio_offset_msecs': 0.0},

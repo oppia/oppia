@@ -119,12 +119,20 @@ export class TranslationStatusService implements OnInit {
     if (manualVoiceover) {
       availabilityStatus.available = true;
       availabilityStatus.needsUpdate = manualVoiceover.needsUpdate;
-    } else if (automaticVoiceover) {
+    } else if (
+      automaticVoiceover &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ) {
       availabilityStatus.available = true;
       availabilityStatus.needsUpdate = automaticVoiceover.needsUpdate;
     }
 
     return availabilityStatus;
+  }
+
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
   _getTranslationStatus(contentId: string): AvailabilityStatus {
@@ -280,6 +288,22 @@ export class TranslationStatusService implements OnInit {
           voiceoverContentIds = Object.keys(
             activeEntityVoiceovers.voiceoversMapping
           );
+        }
+
+        // If Automatic voiceover regeneration is not enabled, then we need to
+        // check for only manual voiceovers.
+        if (
+          activeEntityVoiceovers &&
+          !this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+        ) {
+          voiceoverContentIds = [];
+          for (let contentId in activeEntityVoiceovers.voiceoversMapping) {
+            const manualVoiceover =
+              activeEntityVoiceovers.getManualVoiceover(contentId);
+            if (manualVoiceover) {
+              voiceoverContentIds.push(contentId);
+            }
+          }
         }
 
         if (

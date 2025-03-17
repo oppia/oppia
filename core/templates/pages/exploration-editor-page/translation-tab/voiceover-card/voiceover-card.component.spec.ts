@@ -44,6 +44,8 @@ import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -56,6 +58,16 @@ class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
+    };
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -74,6 +86,7 @@ describe('Voiceover card component', () => {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let alertsService: AlertsService;
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
+  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -87,6 +100,10 @@ describe('Voiceover card component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         TranslationLanguageService,
       ],
@@ -112,6 +129,7 @@ describe('Voiceover card component', () => {
     voiceoverLanguageManagementService = TestBed.inject(
       VoiceoverLanguageManagementService
     );
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     spyOn(
       translationLanguageService,
@@ -803,4 +821,28 @@ describe('Voiceover card component', () => {
     component.updateContentAvailabilityStatusForVoiceovers();
     expect(component.contentAvailableForVoiceovers).toBeFalse();
   }));
+
+  it('should disable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeFalse();
+  });
+
+  it('should enable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeTrue();
+  });
 });

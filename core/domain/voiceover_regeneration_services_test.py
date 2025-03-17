@@ -195,6 +195,55 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         self.assertEqual(audio_offset_list, generated_audio_offset_list)
 
+    @mock.patch(
+        'core.domain.fs_services.GcsFileSystem.get',
+        side_effect=Exception('Mocked exception during voiceover retrieval')
+    )
+    def test_regenerate_voiceover_if_there_is_problem_in_cached_voiceover(
+        self,
+        _: mock.Mock,
+    ) -> None:
+        content_html = '<p>This is from cached model</p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        audio_offset_list: List[Dict[str, Union[str, float]]] = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        voiceover_filename_for_binary = 'english.mp3'
+        voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename_for_binary)
+        mimetype = 'audio/mpeg'
+
+        with open(voiceover_path, 'rb') as file:
+            binary_audio_data = file.read()
+
+        fs.commit(
+        '%s/%s' % ('audio', filename),
+        binary_audio_data, mimetype=mimetype)
+
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code, parsed_text, filename, audio_offset_list))
+        cached_model.update_timestamps()
+        cached_model.put()
+
+        generated_audio_offset_list = (
+            voiceover_regeneration_services.
+            synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename))
+
+        self.assertEqual(audio_offset_list, generated_audio_offset_list)
+
     def test_update_cache_model_in_case_of_collision(self) -> None:
         content_html_1 = '<p>This is from cached model</p>'
         content_html_2 = '<p>This is a test text</p>'
@@ -378,6 +427,21 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(retrieved_content_html, content_html)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Translation for content_id content_id_1 not found in language hi'
+        ):
+            (
+                voiceover_regeneration_services.
+                get_content_html_in_requested_language(
+                    entity_id,
+                    entity_version,
+                    'Introduction',
+                    'content_id_1',
+                    'hi-IN'
+                )
+            )
 
     def test_should_regenerate_voiceover_for_exp_content(self) -> None:
         editor_email = 'editor1@example.com'

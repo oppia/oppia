@@ -25,10 +25,6 @@ import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
-import {
-  Voiceover,
-  VoiceoverBackendDict,
-} from 'domain/exploration/voiceover.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -244,9 +240,11 @@ export class VoiceoverBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .put<RegenerateVoiceoverBackendResponse>(
-          VoiceoverDomainConstants.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+          this.urlInterpolationService.interpolateUrl(
+            VoiceoverDomainConstants.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+            {exploration_id: explorationID}
+          ),
           {
-            exploration_id: explorationID,
             exploration_version: explorationVersion,
             state_name: stateName,
             content_id: contentId,
