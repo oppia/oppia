@@ -2192,59 +2192,69 @@ fdescribe('Contributions and review component', () => {
       'should remove resolved suggestions when suggestion ' +
         'modal is opened and remove button is clicked',
       fakeAsync(() => {
-
+        let eventEmitter = new EventEmitter();
         spyOn(ngbModal, 'open').and.returnValue({
           componentInstance: {
             authorName: null,
             contentHtml: null,
             reviewable: null,
-            question: null,
-            questionHeader: null,
-            suggestion: null,
-            skillRubrics: null,
-            suggestionId: null,
-            skillDifficulty: null,
-            misconceptionsBySkill: null,
+            suggestionIdToContribution: {
+              suggestion_1: {
+                suggestion: {
+                  suggestion_id: 'suggestion_1',
+                  target_id: '1',
+                  suggestion_type: 'translate_content',
+                  change_cmd: {
+                    content_html: 'Translation',
+                    translation_html: 'Tradução',
+                  },
+                  status: 'review',
+                },
+                details: {
+                  skill_description: 'skill_description',
+                  skill_rubrics: [],
+                  chapter_title: 'skill_1',
+                  story_title: 'skill_1',
+                  topic_name: 'skill_1',
+                },
+              },
+            },
+            initialSuggestionId: null,
+            subheading: null,
             editSuggestionEmitter: eventEmitter,
+            queuedSuggestionSummaryEmit: eventEmitter,
+            queuedSuggestionEmit: eventEmitter,
           },
-          result: Promise.resolve({
-            action: null,
-            reviewMessage: null,
-            skillDifficulty: null,
-          }),
-        } as NgbModalRef);
-
-
-
-        spyOn(ngbModal, 'open').and.returnValue({
-          componentInstance: MockNgbModalRef,
           result: Promise.resolve(['id1', 'id2']),
         } as NgbModalRef);
+        // spyOn(ngbModal, 'open').and.returnValue({
+        //   componentInstance: MockNgbModalRef,
+        //   result: Promise.resolve(['id1', 'id2']),
+        // } as NgbModalRef);
+
+        component.contributions = {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_html: 'Translation',
+              translation_html: 'Tradução',
+            },
+            status: 'review',
+          },
+          details: {
+            skill_description: 'skill_description',
+            skill_rubrics: [],
+            chapter_title: 'skill_1',
+            story_title: 'skill_1',
+            topic_name: 'skill_1',
+          },
+        },
         const removeSpy = spyOn(
           contributionOpportunitiesService.removeOpportunitiesEventEmitter,
           'emit'
         ).and.returnValue(null);
-        component.contributions = {
-          suggestion_1: {
-            suggestion: {
-              suggestion_id: 'suggestion_1',
-              target_id: '1',
-              suggestion_type: 'translate_content',
-              change_cmd: {
-                content_html: 'Translation',
-                translation_html: 'Tradução',
-              },
-              status: 'review',
-            },
-            details: {
-              skill_description: 'skill_description',
-              skill_rubrics: [],
-              chapter_title: 'skill_1',
-              story_title: 'skill_1',
-              topic_name: 'skill_1',
-            },
-          },
-        };
 
         component.onClickViewSuggestion('suggestion_1');
         tick();
