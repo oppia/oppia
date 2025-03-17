@@ -39,13 +39,9 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-let gifshot = require('gifshot');
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 
-declare global {
-  interface Window {
-    GifFrames: Function;
-  }
-}
+let gifshot = require('gifshot');
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
@@ -57,6 +53,7 @@ describe('ImageEditor', () => {
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
+  let gifFrames: GifFramesService;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -386,6 +383,7 @@ describe('ImageEditor', () => {
           useClass: MockImageUploadHelperService,
         },
         ImageLocalStorageService,
+        GifFramesService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -401,6 +399,7 @@ describe('ImageEditor', () => {
     contextService = TestBed.inject(ContextService);
     fixture = TestBed.createComponent(ImageEditorComponent);
     component = fixture.componentInstance;
+    gifFrames = TestBed.inject(GifFramesService);
     spyOn(contextService, 'getEntityId').and.returnValue('2');
     spyOn(contextService, 'getEntityType').and.returnValue('question');
     // This throws "Argument of type 'mockImageObject' is not assignable to
@@ -1894,7 +1893,9 @@ describe('ImageEditor', () => {
         },
       })
     );
-    spyOn(window, 'GifFrames').and.resolveTo([
+
+    // Replace gifFrames with a spy that returns a resolved promise.
+    spyOn(gifFrames, 'getFrames').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -1910,6 +1911,7 @@ describe('ImageEditor', () => {
         },
       },
     ] as never);
+
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
@@ -2265,7 +2267,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2375,7 +2377,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
