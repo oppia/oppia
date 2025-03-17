@@ -263,6 +263,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'to-voiceovers',
     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+    'logged-out-user/view-and-search-blog-posts',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
