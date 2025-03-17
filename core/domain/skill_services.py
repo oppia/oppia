@@ -594,21 +594,23 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
                 'Removed skill with id %s and name %s from the topic' % (
                     skill_id, skill_name))
 
+
 def remove_prerequisite_skill_id_from_all_skills(skill_id: str) -> None:
     """Removes the given skill ID from all skills' prerequisite lists.
-    
+
     Args:
-        skill_id (str): The ID of the prerequisite skill to be removed.
+        skill_id: str. The ID of the prerequisite skill to be removed.
     """
 
-    skills_with_prerequisite_skill_id = skill_models.SkillModel.get_by_prerequisite_skill_id(skill_id)
+    skills_with_prereq_skill = skill_models.SkillModel.get_by_prerequisite_skill_id(
+        skill_id)
 
     updated_skills = []
 
-    for skill in skills_with_prerequisite_skill_id:
+    for skill in skills_with_prereq_skill:
         skill.prerequisite_skill_ids = [
-            prerequisite_skill_id for prerequisite_skill_id in skill.prerequisite_skill_ids
-            if prerequisite_skill_id != skill_id
+            prereq_skill_id for prereq_skill_id in skill.prerequisite_skill_ids
+            if prereq_skill_id != skill_id
         ]
 
         updated_skills.append(skill)
@@ -622,22 +624,25 @@ def remove_prerequisite_skill_id_from_all_skills(skill_id: str) -> None:
             [skill.id for skill in updated_skills]
         )
 
+
 def replace_prerequisite_skill_id_from_all_skills(
     old_skill_id: str, new_skill_id: str
 ) -> None:
-    """Replaces the old skill ID with the new one in all the associated skills' prerequisites.
-    
+    """Replaces the old skill ID with the new one in all the associated skills'
+        prerequisites.
+
     Args:
-        old_skill_id (str): The ID of the skill to be replaced.
-        new_skill_id (str): The ID of the skill that replaces the old skill.
+        new_skill_id: str. The ID of the skill that replaces the old skill.
+        old_skill_id: str. The ID of the skill to be replaced.
     """
-    skills_with_old_prerequisite_skill_id = skill_models.SkillModel.get_by_prerequisite_skill_id(old_skill_id)
+    skills_with_prereq_skill = skill_models.SkillModel.get_by_prerequisite_skill_id(
+        old_skill_id)
     updated_skills = []
 
-    for skill in skills_with_old_prerequisite_skill_id:
+    for skill in skills_with_prereq_skill:
         skill.prerequisite_skill_ids = [
-            prerequisite_skill_id for prerequisite_skill_id in skill.prerequisite_skill_ids
-            if prerequisite_skill_id != old_skill_id
+            prereq_skill_id for prereq_skill_id in skill.prerequisite_skill_ids
+            if prereq_skill_id != old_skill_id
         ]
         if new_skill_id not in skill.prerequisite_skill_ids:
             skill.prerequisite_skill_ids.append(new_skill_id)
@@ -651,6 +656,7 @@ def replace_prerequisite_skill_id_from_all_skills(
             None,
             [skill.id for skill in updated_skills]
         )
+
 
 @overload
 def get_skill_summary_by_id(

@@ -46,7 +46,6 @@ describe('Skill editor main tab Component', () => {
   let fixture: ComponentFixture<SkillPrerequisiteSkillsEditorComponent>;
   let skillUpdateService: SkillUpdateService;
   let skillEditorStateService: SkillEditorStateService;
-  let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
   let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;

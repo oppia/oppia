@@ -77,10 +77,10 @@ def _create_topic(
     all_skill_ids = topic.get_all_skill_ids()
     for skill_id in all_skill_ids:
         skill = skill_fetchers.get_skill_by_id(skill_id)
-        if(skill.superseding_skill_id != None):
+        if skill.superseding_skill_id is not None:
             raise utils.ValidationError(
             'The skill %s has a superseding skill %s' %
-            skill_id, skill.superseding_skill_id)
+            (skill_id, skill.superseding_skill_id))
     if does_topic_with_name_exist(topic.name):
         raise utils.ValidationError(
             'Topic with name \'%s\' already exists' % topic.name)

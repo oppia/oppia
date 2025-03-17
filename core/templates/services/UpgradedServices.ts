@@ -880,8 +880,7 @@ export class UpgradedServices {
     upgradedServices['ConceptCardBackendApiService'] =
       new ConceptCardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['SkillBackendApiService']
+        upgradedServices['UrlInterpolationService']
       );
     upgradedServices['ClassroomBackendApiService'] =
       new ClassroomBackendApiService(
