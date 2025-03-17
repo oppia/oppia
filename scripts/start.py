@@ -167,7 +167,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             stack.enter_context(servers.managed_cloud_datastore_emulator(
                 clear_datastore=not parsed_args.save_datastore))
         if not parsed_args.skip_install:
-            # This installs third party libraries before importing other files or importing
+            # This installs third party libraries before 
+            # importing other files or importing
             # libraries that use the builtins python module (e.g. build).
             install_third_party_libs.main()
 
