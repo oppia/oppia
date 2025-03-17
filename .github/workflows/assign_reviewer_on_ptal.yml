@@ -56,7 +56,7 @@ jobs:
             }
             const reviewers = match[1]
               .split(/@+/)
-              .map(part => part.trim().replace(/[\s,]+/g, ''))
+              .map(part => part.replace(/[\s,]+/g, ''))
               .filter(part => part)
               .map(sanitizeUsername)
               .filter(u => u);
