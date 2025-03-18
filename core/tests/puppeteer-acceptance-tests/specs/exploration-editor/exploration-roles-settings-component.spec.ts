@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for verifying different user roles and their
+ * @fileoverview Acceptance Test for verifying different users roles and their
  * access permissions in an exploration.
  */
 
