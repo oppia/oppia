@@ -74,8 +74,8 @@ export class TextInputValidationService {
       typeof placeholder.unicode !== 'string'
     ) {
       warningsList.push({
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: 'Placeholder text must be a string.',
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Placeholder text must be a string.',
       });
     }
 

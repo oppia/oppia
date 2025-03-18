@@ -120,7 +120,7 @@ export class PlaythroughIssue {
       default:
         throw new Error(
           'Backend dict does not match any known issue type: ' +
-          JSON.stringify(backendDict)
+            JSON.stringify(backendDict)
         );
     }
   }

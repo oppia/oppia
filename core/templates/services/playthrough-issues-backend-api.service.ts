@@ -107,9 +107,10 @@ export class PlaythroughIssuesBackendApiService {
         .then(
           () => {
             if (this.cachedIssues.length !== 0) {
-                const issueIndex = this.cachedIssues.findIndex(issue =>
-                JSON.stringify(issue) === JSON.stringify(issueToResolve)
-                );
+              const issueIndex = this.cachedIssues.findIndex(
+                issue =>
+                  JSON.stringify(issue) === JSON.stringify(issueToResolve)
+              );
               if (issueIndex !== -1) {
                 this.cachedIssues.splice(issueIndex, 1);
                 resolve();

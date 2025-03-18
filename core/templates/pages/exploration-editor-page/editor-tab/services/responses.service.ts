@@ -259,7 +259,9 @@ export class ResponsesService {
 
   private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
-    if (JSON.stringify(newDefaultOutcome) !== JSON.stringify(oldDefaultOutcome)) {
+    if (
+      JSON.stringify(newDefaultOutcome) !== JSON.stringify(oldDefaultOutcome)
+    ) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
       this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
@@ -278,7 +280,7 @@ export class ResponsesService {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
       this._confirmedUnclassifiedAnswersMemento = cloneDeep(
-      newConfirmedUnclassifiedAnswers
+        newConfirmedUnclassifiedAnswers
       );
     }
   };

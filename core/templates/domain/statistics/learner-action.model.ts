@@ -117,28 +117,28 @@ export class LearnerAction {
   ): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case LearnerActionType.ExplorationStart:
-      return new LearnerAction(
-        learnerActionBackendDict.action_type,
-        learnerActionBackendDict.action_customization_args as ExplorationStartCustomizationArgs,
-        learnerActionBackendDict.schema_version
-      );
+        return new LearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args as ExplorationStartCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       case LearnerActionType.AnswerSubmit:
-      return new LearnerAction(
-        learnerActionBackendDict.action_type,
-        learnerActionBackendDict.action_customization_args as AnswerSubmitCustomizationArgs,
-        learnerActionBackendDict.schema_version
-      );
+        return new LearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args as AnswerSubmitCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       case LearnerActionType.ExplorationQuit:
-      return new LearnerAction(
-        learnerActionBackendDict.action_type,
-        learnerActionBackendDict.action_customization_args as ExplorationQuitCustomizationArgs,
-        learnerActionBackendDict.schema_version
-      );
+        return new LearnerAction(
+          learnerActionBackendDict.action_type,
+          learnerActionBackendDict.action_customization_args as ExplorationQuitCustomizationArgs,
+          learnerActionBackendDict.schema_version
+        );
       default:
-      throw new Error(
-        'Backend dict does not match any known action type: ' +
-        JSON.stringify(learnerActionBackendDict)
-      );
+        throw new Error(
+          'Backend dict does not match any known action type: ' +
+            JSON.stringify(learnerActionBackendDict)
+        );
     }
   }
 }
