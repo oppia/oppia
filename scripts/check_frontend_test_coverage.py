@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILENAMES = [
         'services/voiceover-recording.service.ts',
     'core/templates/pages/exploration-player-page/services/'
         'learner-answer-info.service.ts',
-    'core/templates/services/rte-helper-modal.component.ts',
-    # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
     'core/templates/tests/unit-test-utils.ajs.ts',
     # Please don't try to cover unit-test-utils.ajs.ts file.
     'extensions/interactions/MusicNotesInput/directives/'
