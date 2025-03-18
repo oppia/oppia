@@ -2250,7 +2250,7 @@ fdescribe('Contributions and review component', () => {
             story_title: 'skill_1',
             topic_name: 'skill_1',
           },
-        },
+        }
         const removeSpy = spyOn(
           contributionOpportunitiesService.removeOpportunitiesEventEmitter,
           'emit'
