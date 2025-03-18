@@ -31,6 +31,5 @@ module.exports = {
   transformIgnorePatterns: ['node_modules/(?!expect/)'],
   moduleNameMapper: {
     '/^expect$/': 'expect/build/index.js',
-    '^expect/(.*)$': 'expect/$1',
   },
 };
