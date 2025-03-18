@@ -223,6 +223,9 @@ const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
+const stateContentEditorSelector =
+  '.e2e-test-edit-content.oppia-editable-section';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -2306,6 +2309,16 @@ export class ExplorationEditor extends BaseUser {
   async replyToSuggestion(reply: string): Promise<void> {
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
+  }
+
+  async isEditRolesButtonHidden(): Promise<boolean> {
+    const element = await this.page.$(editRolesButtonSelector);
+    return element === null;
+  }
+
+  async isStateContentEditorVisible(): Promise<boolean> {
+    const element = await this.page.$(stateContentEditorSelector);
+    return element !== null;
   }
 }
 
