@@ -173,7 +173,7 @@ export class ExplorationEngineService {
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
       oldInteractionArgs.catchMisspellings &&
-      angular.equals(outcome, defaultOutcome);
+      outcome === defaultOutcome;
 
     if (shouldCheckForMisspelling) {
       const answerIsOnlyMisspelled =

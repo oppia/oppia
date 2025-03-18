@@ -158,7 +158,7 @@ export class AnswerClassificationService {
           continue;
         }
         for (const trainingDatum of answerGroup.trainingData) {
-          if (angular.equals(answer, trainingDatum)) {
+            if (answer === trainingDatum) {
             return new AnswerClassificationResult(
               answerGroup.outcome,
               i,

@@ -99,7 +99,7 @@ export class ExplorationPropertyService {
 
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
-    return !angular.equals(this.savedMemento, this.displayed);
+    return JSON.stringify(this.savedMemento) !== JSON.stringify(this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE

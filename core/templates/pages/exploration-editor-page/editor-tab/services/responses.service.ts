@@ -178,7 +178,7 @@ export class ResponsesService {
     if (
       newAnswerGroups &&
       oldAnswerGroups &&
-      !angular.equals(newAnswerGroups, oldAnswerGroups)
+      JSON.stringify(newAnswerGroups) !== JSON.stringify(oldAnswerGroups)
     ) {
       this._answerGroups = newAnswerGroups;
       this._answerGroupsChangedEventEmitter.emit();
@@ -259,7 +259,7 @@ export class ResponsesService {
 
   private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
-    if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
+    if (JSON.stringify(newDefaultOutcome) !== JSON.stringify(oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
       this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
@@ -272,15 +272,13 @@ export class ResponsesService {
     const oldConfirmedUnclassifiedAnswers =
       this._confirmedUnclassifiedAnswersMemento;
     if (
-      !angular.equals(
-        newConfirmedUnclassifiedAnswers,
-        oldConfirmedUnclassifiedAnswers
-      )
+      JSON.stringify(newConfirmedUnclassifiedAnswers) !==
+      JSON.stringify(oldConfirmedUnclassifiedAnswers)
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
       this._confirmedUnclassifiedAnswersMemento = cloneDeep(
-        newConfirmedUnclassifiedAnswers
+      newConfirmedUnclassifiedAnswers
       );
     }
   };

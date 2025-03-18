@@ -723,7 +723,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         )
       );
     }
-    if (angular.isString(first) && angular.isString(second)) {
+    if (typeof first === 'string' && typeof second === 'string') {
       return this.stripWhitespace(first) === this.stripWhitespace(second);
     }
     return false;

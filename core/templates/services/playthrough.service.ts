@@ -83,7 +83,8 @@ class CyclicStateTransitionsTracker {
       const cycleOfVisitedStates = this.makeCycle(
         this.pathOfVisitedStates.indexOf(destStateName)
       );
-      if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
+      if (this.cycleOfVisitedStates.length === cycleOfVisitedStates.length &&
+          this.cycleOfVisitedStates.every((value, index) => value === cycleOfVisitedStates[index])) {
         this.numLoops += 1;
       } else {
         this.cycleOfVisitedStates = cycleOfVisitedStates;

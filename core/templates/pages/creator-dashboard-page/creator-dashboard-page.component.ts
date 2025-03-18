@@ -271,7 +271,7 @@ export class CreatorDashboardPageComponent {
       );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
-    angular.element(this.windowRef.nativeWindow).on('resize', () => {
+    this.windowRef.nativeWindow.addEventListener('resize', () => {
       this.updatesGivenScreenWidth();
     });
   }

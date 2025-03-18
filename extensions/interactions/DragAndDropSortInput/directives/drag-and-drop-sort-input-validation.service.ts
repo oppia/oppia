@@ -254,16 +254,14 @@ export class DragAndDropSortInputValidationService {
               .map(contentId => choiceContentIdToHtml[contentId])
               .sort();
             if (
-              !angular.equals(
-                sortedCustomArgsChoices,
-                flattenedAndSortedXInputs
-              )
+              JSON.stringify(sortedCustomArgsChoices) !==
+              JSON.stringify(flattenedAndSortedXInputs)
             ) {
               warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message:
-                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
-                  'options do not match customization argument choices.',
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message:
+                `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                'options do not match customization argument choices.',
               });
             }
             break;
