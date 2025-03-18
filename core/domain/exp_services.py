@@ -1569,6 +1569,12 @@ def delete_explorations(
         taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
+    for exp_id in exploration_ids:
+        opportunity_services.store_opportunity_debug_data(
+            exp_id,
+            None,
+            opportunity_services.EXPLORATION_DELETED)
+
 
 def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
     """Remove explorations from all subscribers' exploration_ids.
@@ -1978,6 +1984,16 @@ def update_exploration(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
         [exploration_id]
     )
+
+    # OPPORTUNITY DEBUG INFO
+    if opportunity_services.is_exploration_available_for_contribution(
+        exploration_id
+    ):
+        opportunity_services.store_opportunity_debug_data(
+            exploration_id,
+            None,
+            opportunity_services.EXPLORATION_UPDATED
+        )
 
 
 def compute_models_to_put_when_saving_new_exp_version(
@@ -2575,6 +2591,16 @@ def revert_exploration(
     )
     datastore_services.put_multi(exp_issues_models_to_put)
     datastore_services.put_multi(translation_and_opportunity_models_to_put)
+
+    # OPPORTUNITY DEBUG INFO
+    if opportunity_services.is_exploration_available_for_contribution(
+        exploration_id
+    ):
+        opportunity_services.store_opportunity_debug_data(
+            exploration_id,
+            None,
+            opportunity_services.EXPLORATION_REVERTED
+        )
 
 
 # Creation and deletion methods.

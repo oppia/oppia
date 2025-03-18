@@ -932,6 +932,11 @@ def unpublish_story(
     opportunity_services.delete_exploration_opportunities(exp_ids)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
+    # OPPORTUNITY DEBUG INFO
+    for exp_id in exp_ids:
+        opportunity_services.store_opportunity_debug_data(
+            exp_id, None, opportunity_services.STORY_DELETED)
+
 
 def delete_canonical_story(
     user_id: str, topic_id: str, story_id: str

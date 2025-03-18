@@ -22,6 +22,7 @@ import collections
 import logging
 
 from core import feconf
+from datetime import datetime
 
 from core.constants import constants
 from core.domain import exp_domain
@@ -41,11 +42,17 @@ from typing import Dict, List, Optional, Sequence, Tuple
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
+    from mypy_imports import opportunity_debug_modelss
     from mypy_imports import user_models
+    from mypy_imports import datastore_services
 
-(opportunity_models, user_models) = models.Registry.import_models([
-    models.Names.OPPORTUNITY, models.Names.USER
+(
+    opportunity_models,
+    opportunity_debug_modelss,
+    user_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY,  models.Names.OPPORTUNITY_DEBUG, models.Names.USER
 ])
+datastore_services = models.Registry.import_datastore_services()
 
 # NOTE TO DEVELOPERS: The functions:
 #   - delete_all_exploration_opportunity_summary_models()
@@ -53,6 +60,125 @@ if MYPY: # pragma: no cover
 # were removed in #13021 as part of the migration to Apache Beam. Please refer
 # to that PR if you need to reinstate them.
 
+STORY_PUBLISED = 'story_published'
+EXPLORATION_UPDATED = 'exploration_updated'
+EXPLORATION_REVERTED = 'exploration_reverted'
+EXPLORATION_DELETED = 'exploration_deleted'
+STORY_DELETED = 'story_deleted'
+STORY_UNPUBLISHED = 'story_unpublished'
+TOPIC_DELETED = 'topic_deleted'
+TRANSLATION_ACCEPTED = 'translation_accepted'
+
+def store_opportunity_debug_data(
+    exp_id: str,
+    language_code: Optional[str],
+    event_type: str
+) -> None:
+    """Saves the debug information for the opportunity model.
+
+    Args:
+        exp_id: str. The exploration id.
+        language_code: str. The language code of the translation.
+        event_type: str. The type of event that occurred.
+    """
+    debug_models = []
+    if language_code:
+        debug_model = opportunity_debug_models.OpportunityDebugModel
+            .get_by_exp_id_and_langauge_code(exp_id, language_code)
+        if not debug_model:
+            debug_model = opportunity_models.OpportunityDebugModel(
+                id=f'{exp_id}.{language_code}',
+                exp_id=exp_id,
+                language_code=language_code,
+                events=[]
+            )
+
+        opp_summary_model = opportunity_models
+            .ExplorationOpportunitySummaryModel.get(
+            exp_id, strict=False)
+        if opp_summary_model is not None:
+            opp_summary = (
+                get_exploration_opportunity_summary_from_model(
+                    opp_summary_model))
+            exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
+            entity_translation = translation_fetchers.get_entity_translation(
+                feconf.TranslatableEntityType.EXPLORATION,
+                exp_id,
+                exp.version,
+                language_code) if exp else None
+
+            actual_content_count = exp.get_content_count() if exp else 0
+            stored_content_count = opp_summary.content_count
+            actual_translation_count = exp.get_translation_count(
+                entity_translation) if exp else 0
+            stored_translation_count = opp_summary.translation_counts.get(
+                language_code, 0)
+
+            debug_model = opportunity_debug_models.OpportunityDebugModel
+                .get_by_exp_id_and_langauge_code(exp_id, language_code)
+            if not debug_model:
+                debug_model = opportunity_models.OpportunityDebugModel(
+                    id=f'{exp_id}.{language_code}',
+                    exp_id=exp_id,
+                    language_code=language_code,
+                    events=[]
+                )
+
+            event = {
+                'event_type': event_type,
+                'timestamp': datetime.utcnow()
+            }
+            event['actual_content_count'] = actual_content_count
+            event['stored_content_count'] = stored_content_count
+            event['actual_translation_count'] = actual_translation_count
+            event['stored_translation_count'] = stored_trans_count
+            debug_model.events.append(event)
+            debug_models.append(debug_model)
+    else:
+        opp_summary_model = opportunity_models
+            .ExplorationOpportunitySummaryModel.get(
+            exp_id, strict=False)
+        if opp_summary_model is not None:
+            opp_summary = (
+                get_exploration_opportunity_summary_from_model(
+                    opp_summary_model))
+            exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
+            actual_transalaion_count_mapping = (
+                translation_services.get_transalation_counts(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exp)) if exp else {}
+
+            actual_content_count = exp.get_content_count() if exp else 0
+            stored_content_count = opp_summary.content_count
+            for lang_code in actual_transalaion_count_mapping.keys():
+                actual_translation_count = actual_translation_count_mapping.get(
+                    lang_code, 0)
+                stored_translation_count = opp_summary.translation_counts.get(
+                    lang_code, 0)
+                
+                debug_model = opportunity_debug_models.OpportunityDebugModel
+                    .get_by_exp_id_and_langauge_code(exp_id, language_code)
+                if not debug_model:
+                    debug_model = opportunity_models.OpportunityDebugModel(
+                        id=f'{exp_id}.{lang_code}',
+                        exp_id=exp_id,
+                        language_code=lang_code,
+                        events=[]
+                    )
+
+                event = {
+                    'event_type': event_type,
+                    'timestamp': datetime.utcnow()
+                }
+                event['actual_content_count'] = actual_content_count
+                event['stored_content_count'] = stored_content_count
+                event['actual_translation_count'] = actual_translation_count
+                event['stored_translation_count'] = stored_trans_count
+                debug_model.events.append(event)
+                debug_models.append(debug_model)
+        
+    datastore_services.update_timestamps_multi(debug_models)
+    datastore_services.put_multi(debug_models)
 
 def is_exploration_available_for_contribution(exp_id: str) -> bool:
     """Checks whether a given exploration id belongs to a curated list of
@@ -471,6 +597,11 @@ def delete_exploration_opportunities_corresponding_to_topic(
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         list(exp_opportunity_models))
 
+    # OPPORTUINTY DEBUG INFO
+    for exp_opportunity_model in exp_opportunity_models:
+        store_opportunity_debug_data(
+            exp_opportunity_model.id, None, TOPIC_DELETED)
+
 
 def update_exploration_opportunities(
     old_story: story_domain.Story,
@@ -523,6 +654,11 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
         exp_opprtunity_model_class.story_id == story_id
     ).fetch()
     exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
+
+    # OPPORTUINTY DEBUG INFO
+    for exp_opportunity_model in exp_opportunity_models:
+        store_opportunity_debug_data(
+            exp_opportunity_model.id, None, STORY_DELETED)
 
 
 def get_translation_opportunities(
