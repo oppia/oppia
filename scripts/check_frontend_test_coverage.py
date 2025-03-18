@@ -69,8 +69,6 @@ NOT_FULLY_COVERED_FILENAMES = [
         'services/voiceover-recording.service.ts',
     'core/templates/pages/exploration-player-page/services/'
         'learner-answer-info.service.ts',
-    'core/templates/services/rte-helper-modal.component.ts',
-    # TODO(#18390): Completely cover "rte-helper-modal.component.ts".
     'extensions/interactions/MusicNotesInput/directives/'
         'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
