@@ -13,15 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for thanks for subscribing modal component.
+ * @fileoverview Unit tests for footer donate volunteer components.
  */
 
-import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import {Renderer2, ElementRef} from '@angular/core';
 
 class MockWindowRef {
   nativeWindow = {
@@ -33,7 +40,11 @@ class MockWindowRef {
   };
 }
 
-describe('Thanks for subscribing modal component', function () {
+class MockSiteAnalyticsService {
+  registerClickFooterButtonEvent(page: string): void {}
+}
+
+describe('FooterDonateVolunteerComponent', () => {
   let component: FooterDonateVolunteerComponent;
   let fixture: ComponentFixture<FooterDonateVolunteerComponent>;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -48,6 +59,18 @@ describe('Thanks for subscribing modal component', function () {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
+        {
+          provide: Renderer2,
+          useValue: {listen: () => () => {}},
+        },
+        {
+          provide: ElementRef,
+          useValue: {nativeElement: document.createElement('div')},
+        },
       ],
     }).compileComponents();
   }));
@@ -56,10 +79,38 @@ describe('Thanks for subscribing modal component', function () {
     fixture = TestBed.createComponent(FooterDonateVolunteerComponent);
     component = fixture.componentInstance;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    fixture.detectChanges();
   });
 
-  it('should register Volunteer footer link click event', () => {
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should call setupClickListeners after view initialization', fakeAsync(() => {
+    spyOn(component, 'setupClickListeners').and.callThrough();
+
+    component.ngAfterViewInit();
+    tick();
+
+    expect(component.setupClickListeners).toHaveBeenCalled();
+  }));
+
+  it('should navigate to donate page and register analytics event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToDonatePage();
+
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.DONATE);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/donate');
+  });
+
+  it('should navigate to volunteer page and register analytics event', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+
     expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
     component.navigateToVolunteerPage();
@@ -70,4 +121,68 @@ describe('Thanks for subscribing modal component', function () {
 
     expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
   });
+
+  it('should prevent default navigation for Donate link', fakeAsync(() => {
+    const donateLink = document.createElement('a');
+    donateLink.setAttribute('href', '/donate');
+    component.el.nativeElement.appendChild(donateLink);
+    component.ngAfterViewInit();
+    tick();
+    const event = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const preventDefaultSpy = spyOn(event, 'preventDefault').and.callThrough();
+
+    donateLink.dispatchEvent(event);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+  }));
+
+  it('should prevent default navigation for Volunteer link', fakeAsync(() => {
+    const volunteerLink = document.createElement('a');
+    volunteerLink.setAttribute('href', '/volunteer');
+    component.el.nativeElement.appendChild(volunteerLink);
+    component.ngAfterViewInit();
+    tick();
+    const event = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const preventDefaultSpy = spyOn(event, 'preventDefault').and.callThrough();
+
+    volunteerLink.dispatchEvent(event);
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+  }));
+
+  it('should set up click listeners for Donate and Volunteer links', fakeAsync(() => {
+    const donateLink = document.createElement('a');
+    donateLink.setAttribute('href', '/donate');
+    const volunteerLink = document.createElement('a');
+    volunteerLink.setAttribute('href', '/volunteer');
+    component.el.nativeElement.appendChild(donateLink);
+    component.el.nativeElement.appendChild(volunteerLink);
+    const rendererListenSpy = spyOn(
+      component.renderer,
+      'listen'
+    ).and.callThrough();
+    component.ngAfterViewInit();
+    tick();
+
+    expect(rendererListenSpy).toHaveBeenCalledWith(
+      donateLink,
+      'click',
+      jasmine.any(Function)
+    );
+    expect(rendererListenSpy).toHaveBeenCalledWith(
+      volunteerLink,
+      'click',
+      jasmine.any(Function)
+    );
+
+    expect(rendererListenSpy).toHaveBeenCalledTimes(2);
+  }));
 });
