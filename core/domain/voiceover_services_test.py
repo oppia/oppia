@@ -489,7 +489,7 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
             retrieved_policy.language_codes_mapping,
             language_codes_mapping)
 
-        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+        language_codes_mapping = {
             'en': {
                 'en-US': False
             }
