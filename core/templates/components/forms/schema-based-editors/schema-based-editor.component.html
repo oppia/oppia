@@ -1,0 +1,83 @@
+<form #hybridForm="ngForm">
+  <schema-based-choices-editor *ngIf="schema['choices']"
+                               [(ngModel)]="localValue"
+                               [schema]="schema"
+                               [choices]="schema.choices"
+                               [disabled]="disabled"
+                               name="choicesEditor">
+  </schema-based-choices-editor>
+
+  <schema-based-bool-editor *ngIf="schema.type === 'bool' && !schema['choices']"
+                            [(ngModel)]="localValue"
+                            [disabled]="disabled"
+                            [labelForFocusTarget]="labelForFocusTarget"
+                            name="boolEditor">
+  </schema-based-bool-editor>
+
+  <schema-based-int-editor *ngIf="schema.type === 'int' && !schema.choices"
+                           [(ngModel)]="localValue"
+                           [disabled]="disabled"
+                           [required]="notRequired"
+                           [validators]="schema.validators"
+                           [labelForFocusTarget]="labelForFocusTarget"
+                           (inputBlur)="inputBlur.emit()"
+                           (inputFocus)="inputFocus.emit()"
+                           name="intEditor">
+  </schema-based-int-editor>
+
+  <schema-based-float-editor *ngIf="schema.type === 'float' && !schema.choices"
+                             [(ngModel)]="localValue"
+                             [disabled]="disabled"
+                             [validators]="schema.validators"
+                             [uiConfig]="schema.ui_config"
+                             [labelForFocusTarget]="labelForFocusTarget"
+                             (inputBlur)="inputBlur.emit()"
+                             (inputFocus)="inputFocus.emit()"
+                             name="floatEditor">
+  </schema-based-float-editor>
+
+  <schema-based-unicode-editor *ngIf="schema.type === 'unicode' && !schema.choices"
+                               [(ngModel)]="localValue"
+                               [disabled]="disabled"
+                               [validators]="schema.validators"
+                               [uiConfig]="schema.ui_config"
+                               [labelForFocusTarget]="labelForFocusTarget"
+                               (inputBlur)="inputBlur.emit()"
+                               (inputFocus)="inputFocus.emit()"
+                               name="unicodeEditor">
+  </schema-based-unicode-editor>
+
+  <schema-based-html-editor *ngIf="schema.type === 'html' && !schema.choices"
+                            [(ngModel)]="localValue"
+                            [disabled]="disabled"
+                            [labelForFocusTarget]="labelForFocusTarget"
+                            [uiConfig]="schema.ui_config"
+                            name="htmlEditor">
+  </schema-based-html-editor>
+
+  <schema-based-list-editor *ngIf="schema.type === 'list' && !schema['choices']"
+                            [(ngModel)]="localValue"
+                            [localValue]="localValue"
+                            [disabled]="disabled"
+                            [itemSchema]="schema.items"
+                            [len]="schema.len"
+                            [uiConfig]="schema.ui_config"
+                            [validators]="schema.validators"
+                            [labelForFocusTarget]="labelForFocusTarget"
+                            name="listEditor">
+  </schema-based-list-editor>
+
+  <schema-based-dict-editor *ngIf="schema.type === 'dict' && !schema['choices']"
+                            [(ngModel)]="localValue"
+                            [disabled]="disabled"
+                            [propertySchemas]="schema.properties"
+                            [labelForFocusTarget]="labelForFocusTarget"
+                            name="dictEditor">
+  </schema-based-dict-editor>
+
+  <schema-based-custom-editor *ngIf="schema.type === 'custom' && !schema['choices']"
+                              [(ngModel)]="localValue"
+                              [schema]="schema"
+                              name="customEditor">
+  </schema-based-custom-editor>
+</form>
