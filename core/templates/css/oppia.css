@@ -1924,12 +1924,6 @@ pre.oppia-pre-wrapped-text {
 .oppia-state-graph-animate-show {
   opacity: 1;
 }
-.oppia-state-graph-animate-show.ng-hide-add, .oppia-state-graph-animate-show.ng-hide-remove {
-  transition: all linear 0.5s;
-}
-.oppia-state-graph-animate-show.ng-hide {
-  opacity: 0;
-}
 
 /* Styles for the loading indicator or try again shown while image is loading or failed to load respectively */
 .oppia-image-container {
