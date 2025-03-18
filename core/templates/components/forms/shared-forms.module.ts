@@ -27,7 +27,6 @@ import {MaterialModule} from 'modules/material.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {TranslateModule} from '@ngx-translate/core';
 import {CustomFormsComponentsModule} from './custom-forms-directives/custom-form-components.module';
-import {SchemaBasedEditorComponent} from './schema-based-editors/schema-based-editor.component';
 import {AudioSliderComponent} from './slider/audio-slider.component';
 import {ObjectEditorComponent} from './custom-forms-directives/object-editor.directive';
 import {DirectivesModule} from 'directives/directives.module';
@@ -71,7 +70,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedChoicesEditorComponent,
     SchemaBasedCustomEditorComponent,
     SchemaBasedDictEditorComponent,
-    SchemaBasedEditorComponent,
     MarkAudioAsNeedingUpdateModalComponent,
     MarkTranslationsAsNeedingUpdateModalComponent,
     SchemaBasedFloatEditorComponent,
@@ -87,7 +85,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedChoicesEditorComponent,
     SchemaBasedCustomEditorComponent,
     SchemaBasedDictEditorComponent,
-    SchemaBasedEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,
@@ -105,7 +102,6 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './forms-templates/m
     SchemaBasedChoicesEditorComponent,
     SchemaBasedCustomEditorComponent,
     SchemaBasedDictEditorComponent,
-    SchemaBasedEditorComponent,
     SchemaBasedFloatEditorComponent,
     SchemaBasedHtmlEditorComponent,
     SchemaBasedIntEditorComponent,
