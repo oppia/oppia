@@ -217,8 +217,8 @@ export class CurrentInteractionService {
   get onAnswerChanged$(): Observable<void> {
     return CurrentInteractionService.answerChangedSubject.asObservable();
   }
-  updateAnswerIsValid(isValid: boolean): void {
-    this.getDisplayedCard()?.updateAnswerIsValid(isValid);
+  updateAnswerIsValid(isAnswerValid: boolean): void {
+    this.getDisplayedCard()?.updateAnswerIsValid(isAnswerValid);
   }
   showInvalidResponseError(): boolean {
     return this.getDisplayedCard().showInvalidResponseError();
