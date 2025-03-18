@@ -106,7 +106,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 'topic_id_to_prerequisite_topic_ids': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'is_diagnostic_test_enabled': (
+                'diagnostic_test_is_enabled': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'thumbnail_filename': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),

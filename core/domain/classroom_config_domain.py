@@ -36,7 +36,7 @@ class ClassroomDict(TypedDict):
     topic_list_intro: str
     topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
     is_published: bool
-    is_diagnostic_test_enabled: bool
+    diagnostic_test_is_enabled: bool
     thumbnail_data: ImageDataDict
     banner_data: ImageDataDict
     index: int
@@ -61,7 +61,7 @@ class Classroom:
         topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
         is_published: bool,
-        is_diagnostic_test_enabled: bool,
+        diagnostic_test_is_enabled: bool,
         thumbnail_data: ImageData,
         banner_data: ImageData,
         index: int
@@ -79,7 +79,7 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            is_diagnostic_test_enabled: bool. Whether this classroom 
+            diagnostic_test_is_enabled: bool. Whether this classroom 
                 is published or not.
             thumbnail_data: ImageData. Image data object for classroom
                 thumbnail.
@@ -95,7 +95,7 @@ class Classroom:
         self.topic_id_to_prerequisite_topic_ids = (
             topic_id_to_prerequisite_topic_ids)
         self.is_published = is_published
-        self.is_diagnostic_test_enabled = is_diagnostic_test_enabled
+        self.diagnostic_test_is_enabled = diagnostic_test_is_enabled
         self.thumbnail_data = thumbnail_data
         self.banner_data = banner_data
         self.index = index
@@ -120,7 +120,7 @@ class Classroom:
             classroom_dict['topic_list_intro'],
             classroom_dict['topic_id_to_prerequisite_topic_ids'],
             classroom_dict['is_published'],
-            classroom_dict['is_diagnostic_test_enabled'],
+            classroom_dict['diagnostic_test_is_enabled'],
             ImageData.from_dict(classroom_dict['thumbnail_data']),
             ImageData.from_dict(classroom_dict['banner_data']),
             classroom_dict['index']
@@ -142,7 +142,7 @@ class Classroom:
             'topic_id_to_prerequisite_topic_ids': (
                 self.topic_id_to_prerequisite_topic_ids),
             'is_published': self.is_published,
-            'is_diagnostic_test_enabled': self.is_diagnostic_test_enabled,
+            'diagnostic_test_is_enabled': self.diagnostic_test_is_enabled,
             'thumbnail_data': self.thumbnail_data.to_dict(),
             'banner_data': self.banner_data.to_dict(),
             'index': self.index
@@ -356,11 +356,11 @@ class Classroom:
                 'Expected is_published of the classroom to be a boolean, '
                 'received: %s.' % self.is_published)
 
-        if not isinstance(self.is_diagnostic_test_enabled, bool):
+        if not isinstance(self.diagnostic_test_is_enabled, bool):
             raise utils.ValidationError(
-                'Expected is_diagnostic_test_enabled of the classroom to '
+                'Expected diagnostic_test_is_enabled of the classroom to '
                 'be a boolean, received: %s.' % (
-                    self.is_diagnostic_test_enabled))
+                    self.diagnostic_test_is_enabled))
 
         if strict:
             if not isinstance(self.index, int):
