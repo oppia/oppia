@@ -138,7 +138,7 @@ describe('InteractiveRatioExpressionInput', () => {
       ).toHaveBeenCalledWith(false);
     });
 
-    it('should raise error if there is more Terms than expected', function () {
+    it('should raise error if there is more terms than expected', function () {
       component.ngOnInit();
       component.answer = '2:3:4:5';
       component.expectedNumberOfTerms = 3;
