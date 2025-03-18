@@ -319,7 +319,8 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             azure_speech_synthesis_services.
             get_azure_voicecode_from_language_accent_code(language_accent_code))
         main_ssml_content = (
-            azure_speech_synthesis_services.SSML_TEMPLATE_BLOCK % main_content)
+            azure_speech_synthesis_services.MAIN_CONTENT_SSML_TEMPLATE_BLOCK %
+            main_content)
         return (
             azure_speech_synthesis_services.SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS
         ) % (language_accent_code, voice_code, main_ssml_content)
@@ -361,6 +362,17 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         plaintext = 'Find the value of 5 - 3.'
         expected_main_content = (
             'Find the value of 5 <say-as interpret-as="math">minus</say-as> 3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 5 + 3.'
+        expected_main_content = (
+            'Find the value of 5 <say-as interpret-as="math">plus</say-as> 3.')
 
         ssml_content = (
             azure_speech_synthesis_services.convert_plaintext_to_ssml_content(

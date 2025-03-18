@@ -507,7 +507,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 
 
 def get_autogeneratable_language_accent_codes() -> List[str]:
-    """The method returns the list of lanaguage accent codes that are supported
+    """The method returns the list of language accent codes that are supported
     by cloud service for autogeneration.
 
     Returns:

@@ -53,8 +53,8 @@ SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS = """
 # A string template block representing the math content within the SSML.
 MATH_TEMPLATE_SSML_BLOCK = """<say-as interpret-as="math">%s</say-as>"""
 
-# A string template block representing the non math content within the SSML.
-SSML_TEMPLATE_BLOCK = """
+# A string template block representing the main content within the SSML.
+MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
     <p>
         %s
     </p>
@@ -175,7 +175,7 @@ def convert_plaintext_to_ssml_content(
                 '-',
                 MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['-'])
 
-        # Update the content to pronounce `+` correctly in the given language.
+        # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
             content = content.replace(
                 '*',
@@ -199,13 +199,19 @@ def convert_plaintext_to_ssml_content(
                 '÷',
                 MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
 
+        # Update the content to pronounce `+` correctly in the given language.
+        if ' + ' in content:
+            content = content.replace(
+                '+',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['+'])
+
         # Update the content to pronounce `=` correctly in the given language.
         if ' = ' in content:
             content = content.replace(
                 ' = ',
                 MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['='])
 
-        main_ssml_content += (SSML_TEMPLATE_BLOCK % content)
+        main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,

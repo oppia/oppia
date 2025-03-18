@@ -346,12 +346,9 @@ export class ChangeListService {
   }
 
   isOnlyVoiceoverChangeListPresent(): boolean {
-    for (let change of this.explorationChangeList) {
-      if (change.cmd !== 'update_voiceovers') {
-        return false;
-      }
-    }
-    return true;
+    return this.explorationChangeList.every(
+      change => change.cmd === 'update_voiceovers'
+    );
   }
 
   getTranslationChangeList(): ExplorationChange[] {
