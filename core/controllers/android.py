@@ -295,16 +295,15 @@ class AndroidActivityHandler(base.BaseHandler[
                 translation_fetchers.get_multiple_entity_translations(
                     translation_references))
 
-            for activity_data, translation in zip(
-                activities_data, translations):
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'language_code': activity_data.get('language_code'),
-                    'payload': (
-                        translation.to_dict()['translations']
-                        if translation is not None else None)
-                })
+            activities.extend([{
+                'id': activity_data['id'],
+                'version': activity_data.get('version'),
+                'language_code': activity_data.get('language_code'),
+                'payload': (
+                    translation.to_dict()['translations']
+                    if translation is not None else None)
+            } for activity_data, translation in zip(
+                activities_data, translations)])
 
         else:
             # All other activities are standard versioned models

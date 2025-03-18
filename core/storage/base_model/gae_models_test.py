@@ -971,11 +971,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 3)
 
         assert results[0] is not None
-        self.assertIsNotNone(results[0])
         assert results[1] is not None
-        self.assertIsNotNone(results[1])
         assert results[2] is not None
-        self.assertIsNotNone(results[2])
 
         self.assertEqual(results[0].version, 1)
         self.assertEqual(results[1].version, 1)
