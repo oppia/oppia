@@ -477,7 +477,7 @@ class VoiceoverAutogenerationPolicyUnitTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             voiceover_auto_policy.language_codes_mapping['en'] = {
-                1:  # type: ignore[index]
+                1:  # type: ignore[dict-item]
                 False
             }
             voiceover_auto_policy.validate()
@@ -532,7 +532,7 @@ class VoiceoverAutogenerationPolicyUnitTests(test_utils.GenericTestBase):
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
             voiceover_auto_policy.language_codes_mapping['en'] = {
-                'en-US': 'False'  # type: ignore[index]
+                'en-US': 'False'  # type: ignore[dict-item]
             }
             voiceover_auto_policy.validate()
 
