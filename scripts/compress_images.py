@@ -218,11 +218,11 @@ class ImageCompressor:
                 '\nCompressed images have been saved '
                 'to the compressed_images directory. '
                 '\nTo use these compressed images in your PR:\n'
-                '1. Go to the GitHub Actions tab in your repository.\n'
-                '2. Find the workflow run for your PR.\n'
-                '3. Download the script-output artifact.\n'
+                '1. Click the summary tab at top left.\n'
+                '2. Scroll down and look for compressed-images artifact.\n'
+                '3. Download the compressed-images file.\n'
                 '4. Extract the downloaded zip file.\n'
-                '5. Copy the compressed images to their '
+                '5. Replace the compressed images in their '
                 'respective locations in your repository.\n'
             )
             return 1
