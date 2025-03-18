@@ -122,9 +122,11 @@ export class SchemaBasedEditorComponent
   }
 
   ngAfterViewInit(): void {
-    this.form.statusChanges.subscribe(validationStatus => {
-      this.onValidatorChange();
-    });
+    if (this.form !== null) {
+      this.form.statusChanges.subscribe(validationStatus => {
+        this.onValidatorChange();
+      });
+    }
   }
 
   @Input() set disabled(val: boolean) {
