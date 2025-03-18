@@ -69,11 +69,9 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
-
 const gifshot = require('gifshot');
-import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
 // default Window interface doesn't contain "GifFrames" property. Hence we want
@@ -82,11 +80,6 @@ import * as gifFrames from 'gif-frames';
 // global scope Window as Window is a global object. Typescript interfaces only
 // union the interfaces with the same name when presented in the same scope.
 // TODO(#16735): Remove the usage of declare globals in "non-global" files.
-declare global {
-  interface Window {
-    GifFrames: gifFrames;
-  }
-}
 
 interface FilepathData {
   mode: number;
@@ -210,7 +203,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private gifFramesService: GifFramesService
   ) {}
 
   ngOnInit(): void {
@@ -1125,8 +1119,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    (this.windowRef.nativeWindow as Window)
-      .GifFrames({
+    this.gifFramesService
+      .getFrames({
         url: imageDataURI,
         frames: 'all',
         outputType: 'canvas',
