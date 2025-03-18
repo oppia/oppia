@@ -53,12 +53,13 @@ import {SchemaBasedIntEditorComponent} from '../schema-based-int-editor.componen
 import {SchemaBasedListEditorComponent} from '../schema-based-list-editor.component';
 import {SchemaBasedUnicodeEditor} from '../schema-based-unicode-editor.component';
 
-const findComponent = <T>(
+// eslint-disable-next-line func-style
+export function findComponent<T>(
   fixture: ComponentFixture<T>,
   selector: string
-): DebugElement => {
+): DebugElement {
   return fixture.debugElement.query(By.css(selector));
-};
+}
 
 export class MockTranslateService {
   instant(val: string): string {
@@ -108,6 +109,7 @@ describe('Schema based editor', () => {
   }));
 
   it('should follow the schema', fakeAsync(() => {
+    // Create the component.
     const schema: DictSchema = {
       type: 'dict',
       properties: [
@@ -156,6 +158,7 @@ describe('Schema based editor', () => {
       tick();
     };
 
+    // eslint-disable-next-line max-len
     const expectTopLevelComponentValueToBe = (
       fieldNameValue: string,
       real: number
@@ -168,6 +171,7 @@ describe('Schema based editor', () => {
       expect(localValue.real).toBe(real);
     };
 
+    // Check that the initial values for the UI fields are populated correctly.
     const schemaBasedUnicodeEditorInput = findComponent(
       schemaBasedEditorFixture,
       'schema-based-unicode-editor'
@@ -185,8 +189,14 @@ describe('Schema based editor', () => {
     expect(schemaBasedUnicodeEditorInput.value).toBe('');
     expect(schemaBasedFloatEditorInput.value).toBe('');
 
+    // Change the values in the UI.
     changeValuesInUI('SomeName', 4);
+
+    // Check that the changes are propagated correctly to the top level
+    // component.
     expectTopLevelComponentValueToBe('SomeName', 4);
+
+    // Check if the form validation becomes false when value is not valid.
     expect(unicodeInputFormController.invalid).toBeFalse();
     changeValuesInUI('SomeVeryLongName');
     expectTopLevelComponentValueToBe('SomeVeryLongName', 4);

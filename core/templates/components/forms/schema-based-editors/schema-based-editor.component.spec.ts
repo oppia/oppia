@@ -28,7 +28,7 @@ import {FormControl, FormsModule} from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {SchemaBasedEditorComponent} from './schema-based-editor.component';
 
-describe('SchemaBasedEditorComponent', () => {
+describe('Schema based editor component', function () {
   let component: SchemaBasedEditorComponent;
   let fixture: ComponentFixture<SchemaBasedEditorComponent>;
 
@@ -47,7 +47,6 @@ describe('SchemaBasedEditorComponent', () => {
     component.schema = {
       type: 'float',
       choices: [12, 23],
-      defaultValue: 12,
     };
 
     fixture.detectChanges();
@@ -58,7 +57,9 @@ describe('SchemaBasedEditorComponent', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    const mockFunction = (value: SchemaDefaultValue) => value;
+    let mockFunction = function (value: SchemaDefaultValue) {
+      return value;
+    };
     component.registerOnChange(mockFunction);
     component.registerOnTouched();
 
@@ -79,10 +80,21 @@ describe('SchemaBasedEditorComponent', () => {
   });
 
   it('should set form validity', fakeAsync(() => {
-    const mockEmitter = new EventEmitter();
-    const form = jasmine.createSpyObj('form', ['setErrors']);
+    let mockEmitter = new EventEmitter();
+    let form = jasmine.createSpyObj('form', ['$setValidity']);
 
     spyOnProperty(component.form, 'statusChanges').and.returnValue(mockEmitter);
+    spyOn(angular, 'element').and.returnValue(
+      // This throws "Type '{ top: number; }' is not assignable to type
+      // 'JQLite | Coordinates'". We need to suppress this error because
+      // angular element have more properties than offset and top.
+      // @ts-expect-error
+      {
+        controller: (formString: string) => {
+          return form;
+        },
+      }
+    );
 
     component.ngAfterViewInit();
     tick();
@@ -92,6 +104,6 @@ describe('SchemaBasedEditorComponent', () => {
 
     component.writeValue(10);
     expect(component.localValue).toEqual(10);
-    expect(form.setErrors).toHaveBeenCalledTimes(2);
+    expect(form.$setValidity).toHaveBeenCalledTimes(2);
   }));
 });
