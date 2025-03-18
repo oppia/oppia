@@ -77,10 +77,9 @@ export class SchemaBasedEditorComponent
   }
 
   @Input() set localValue(val: SchemaDefaultValue) {
-    if (val === undefined) {
+    if (val === null) {
       if (this.schema && 'defaultValue' in this.schema) {
-        // eslint-disable-next-line oppia/disallow-flags
-        this._localValue = (this.schema as any).defaultValue ?? null; // eslint-disable-line @typescript-eslint/no-explicit-any
+        this._localValue = (this.schema.defaultValue as SchemaDefaultValue) ?? null;
       } else {
         this._localValue = null;
       }
@@ -145,10 +144,12 @@ export class SchemaBasedEditorComponent
 
   @Input() set disabled(val: boolean) {
     this._disabled = val;
-    if (val) {
-      this.form.control.disable({emitEvent: false});
-    } else {
-      this.form.control.enable({emitEvent: false});
+    if (this.form) {
+      if (val) {
+        this.form.control.disable({ emitEvent: false });
+      } else {
+        this.form.control.enable({ emitEvent: false });
+      }
     }
   }
 
