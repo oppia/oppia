@@ -186,7 +186,7 @@
                     </div>
                     <div class="small text-muted">
                       {{ getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId()) }}
-                    </div>                    
+                    </div>
                   </div>
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
                     <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
