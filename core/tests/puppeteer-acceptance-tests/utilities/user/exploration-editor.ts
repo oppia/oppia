@@ -843,6 +843,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Assigns a role of manager to any guest user.
+   */
+  async assignUserToManagerRole(username: string): Promise<void> {
+    await this.clickOn(editRoleButton);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
+    const [managerOption] = await this.page.$x(
+      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    );
+    await managerOption.click();
+    await this.page.waitForSelector('.e2e-test-tag-filter-selection-dropdown', {
+      hidden: true,
+    });
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as managerRole.`);
+  }
+
+  /**
    * Assigns a role of collaborator to any guest user.
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
