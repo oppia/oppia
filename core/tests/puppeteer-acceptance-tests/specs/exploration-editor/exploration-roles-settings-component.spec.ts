@@ -30,7 +30,6 @@ enum INTERACTION_TYPES {
 ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 
 describe('Exploration User Roles', function () {
-  let newCollaborator: ExplorationEditor;
   let manager: ExplorationEditor;
   let collaborator: ExplorationEditor;
   let playtester: ExplorationEditor;
@@ -38,10 +37,11 @@ describe('Exploration User Roles', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
-    newCollaborator = await UserFactory.createNewUser(
+    const newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
     );
+    await newCollaborator.closeBrowser();
 
     playtester = await UserFactory.createNewUser(
       'playtester',
@@ -64,7 +64,6 @@ describe('Exploration User Roles', function () {
   it(
     'should verify correct access permissions for different user roles',
     async function () {
-      await UserFactory.closeBrowserForUser(newCollaborator);
       // Create exploration with explorationCreator user.
       await explorationCreator.navigateToCreatorDashboardPage();
       await explorationCreator.navigateToExplorationEditorPage();
@@ -108,24 +107,22 @@ describe('Exploration User Roles', function () {
       // Test collaborator access.
       await collaborator.expectExplorationToBeAccessibleByUrl(explorationId);
       await collaborator.dismissWelcomeModal();
+
+      // Verify collaborator can modify exploration.
+      await collaborator.updateCardContent('Updated content by collaborator');
+      await collaborator.saveExplorationDraft();
+
       await collaborator.navigateToSettingsTab();
 
       // Verify collaborator cannot add users.
       const isHidden = await collaborator.isEditRolesButtonHidden();
       expect(isHidden).toBe(true);
-
-      // Verify collaborator can modify exploration.
-      await collaborator.navigateToEditorTab();
-      await collaborator.updateCardContent('Updated content by collaborator');
-      await collaborator.saveExplorationDraft();
       await UserFactory.closeBrowserForUser(collaborator);
 
       // Test playtester access.
       await playtester.expectExplorationToBeAccessibleByUrl(explorationId);
       await playtester.dismissWelcomeModal();
 
-      // Verify playtester can view editor and translation tabs.
-      await playtester.navigateToEditorTab();
       // Verify playtester cannot modify exploration.
       const isEditable = await playtester.isStateContentEditorVisible();
       expect(isEditable).toBe(false);

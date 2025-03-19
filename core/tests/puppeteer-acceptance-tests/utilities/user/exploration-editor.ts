@@ -284,13 +284,19 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
     showMessage('Settings tab is opened successfully.');
   }
 
+  /**
+   * Function to open control dropdown so that delete exploration button is visible
+   * in mobile view.
+   */
+  async openExplorationControlDropdown(): Promise<void> {
+    await this.clickOn(explorationControlsSettingsDropdown);
+  }
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
