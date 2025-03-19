@@ -121,9 +121,9 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
         skillsInSameTopicCount
       );
 
-      const filteredCategorizedSkills = {};
+      const filteredCategorizedSkills: CategorizedSkills = {};
       for (let topic in this.categorizedSkills) {
-        filteredCategorizedSkills[topic] = {};
+        filteredCategorizedSkills[topic] = {uncategorized: []};
         for (let subtopic in this.categorizedSkills[topic]) {
           filteredCategorizedSkills[topic][subtopic] = this.categorizedSkills[
             topic

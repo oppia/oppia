@@ -535,7 +535,6 @@ describe('Skill editor main tab Component', () => {
           skill: {getId: () => 'skill_1', getSupersedingSkillId: () => null},
         });
 
-        // Setup modal mock
         spyOn(ngbModal, 'open').and.callFake(() => {
           return {
             componentInstance: {},
