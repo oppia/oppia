@@ -771,7 +771,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            exploration_voice_artists_link_model.id, self.exploration_id)
+            exploration_voice_artists_link_model.exp_id, self.exploration_id)
         self.assertDictEqual(
             exploration_voice_artists_link_model.
             content_id_to_voiceovers_mapping,
@@ -802,7 +802,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 }
             )
         )
-        exploration_voice_artists_link_model1.put()
+        exploration_voice_artists_link_model1.validate()
 
         exploration_voice_artists_link_model2 = (
             voiceover_services.
@@ -815,7 +815,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 }
             )
         )
-        exploration_voice_artists_link_model2.put()
+        exploration_voice_artists_link_model2.validate()
 
         expected_voice_artist_to_language_mapping = {
             'voice_artist_1': {
@@ -862,7 +862,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 }
             )
         )
-        exploration_voice_artists_link_model2.put()
+        exploration_voice_artists_link_model2.validate()
 
         self.assertDictEqual(
             voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
@@ -891,7 +891,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 }
             )
         )
-        exploration_voice_artists_link_model1.put()
+        exploration_voice_artists_link_model1.validate()
 
         exploration_voice_artists_link_model2 = (
             voiceover_services.
@@ -908,7 +908,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 }
             )
         )
-        exploration_voice_artists_link_model2.put()
+        exploration_voice_artists_link_model2.validate()
 
         exploration_id_to_filenames = (
             voiceover_services.get_voiceover_filenames(
@@ -951,7 +951,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                     content_id_to_voiceovers_mapping)
             )
         )
-        exploration_voice_artists_link_model.put()
+        exploration_voice_artists_link_model.validate()
 
         exploration = self.save_new_valid_exploration(
             'exploration_id',
@@ -1064,7 +1064,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                     content_id_to_voiceovers_mapping)
             )
         )
-        exploration_voice_artists_link_model.put()
+        exploration_voice_artists_link_model.validate()
 
         exploration = self.save_new_valid_exploration(
             'exploration_id',
