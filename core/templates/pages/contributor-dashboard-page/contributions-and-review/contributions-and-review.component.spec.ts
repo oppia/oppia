@@ -88,7 +88,7 @@ class MockPlatformFeatureService {
   };
 }
 
-fdescribe('Contributions and review component', () => {
+describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
