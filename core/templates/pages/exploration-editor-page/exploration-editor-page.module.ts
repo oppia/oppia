@@ -134,7 +134,6 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {GraphDataService} from './services/graph-data.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {InteractionDetailsCacheService} from './editor-tab/services/interaction-details-cache.service';
@@ -360,7 +359,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     GraphDataService,
     HintAndSolutionModalService,
     ImageLocalStorageService,
-    HintAndSolutionModalService,
     ImageUploadHelperService,
     InteractionAttributesExtractorService,
     InteractionDetailsCacheService,
