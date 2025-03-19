@@ -41,7 +41,6 @@ import {
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {ContextService} from 'services/context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   ImageLocalStorageService,
   ImagesData,
@@ -1079,38 +1078,98 @@ describe('Translation Modal Component', () => {
       }));
     });
 
-    fdescribe('when browser tab/window is closed', () => {
-      let windowRef: WindowRef;
-      let beforeUnloadHandler: Function;
+    describe('when browser tab/window is closed', () => {
+      let beforeUnloadSpy: jasmine.Spy;
+      let mockEvent: BeforeUnloadEvent;
+      let preventDefaultSpy: jasmine.Spy;
 
       beforeEach(() => {
+        // Mock the translateTextService.init to avoid HTTP request
         spyOn(translateTextService, 'init').and.callFake(
           (expId, languageCode, successCallback) => successCallback()
         );
-        windowRef = TestBed.inject(WindowRef);
 
-        // Store the handler function when addEventListener is called
-        spyOn(window, 'addEventListener').and.callFake((event, handler) => {
-          beforeUnloadHandler = handler;
-        });
+        // Create a proper mock BeforeUnloadEvent with a spy
+        preventDefaultSpy = jasmine.createSpy('preventDefault');
+        mockEvent = {
+          preventDefault: preventDefaultSpy,
+          returnValue: '',
+        } as unknown as BeforeUnloadEvent;
+
+        // Set up the event listener spy
+        beforeUnloadSpy = spyOn(window, 'addEventListener').and.callFake(
+          (eventName: string, handler: Function) => {
+            console.log('Event listener added for:', eventName);
+            if (eventName === 'beforeunload') {
+              component['beforeUnloadHandler'] = handler as (
+                e: BeforeUnloadEvent
+              ) => string | undefined;
+              console.log(
+                'Beforeunload handler stored:',
+                component['beforeUnloadHandler']
+              );
+            }
+          }
+        );
       });
 
       it('should add beforeunload event listener on init', () => {
         component.ngOnInit();
-        expect(window.addEventListener).toHaveBeenCalledWith(
+        expect(beforeUnloadSpy).toHaveBeenCalledWith(
           'beforeunload',
           jasmine.any(Function)
         );
       });
 
       it('should remove beforeunload event listener on destroy', () => {
+        const removeEventListenerSpy = spyOn(window, 'removeEventListener');
         component.ngOnInit();
-        spyOn(window, 'removeEventListener');
         component.ngOnDestroy();
-        expect(window.removeEventListener).toHaveBeenCalledWith(
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
           'beforeunload',
-          beforeUnloadHandler
+          jasmine.any(Function)
         );
+      });
+
+      it('should show confirmation dialog when there are unsaved changes', () => {
+        // Set unsaved changes before initializing
+        component.activeWrittenTranslation = 'Some unsaved text';
+        console.log(
+          'Setting unsaved changes:',
+          component.activeWrittenTranslation
+        );
+
+        // Initialize the component
+        component.ngOnInit();
+        console.log('Beforeunload handler:', component['beforeUnloadHandler']);
+
+        // Call the handler directly
+        const handler = component['beforeUnloadHandler'];
+        console.log('Handler type:', typeof handler);
+        handler(mockEvent);
+
+        console.log('preventDefault called:', preventDefaultSpy.calls.count());
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        expect(mockEvent.returnValue).toBe('');
+      });
+
+      it('should not show confirmation dialog when there are no unsaved changes', () => {
+        // Explicitly set no unsaved changes
+        component.activeWrittenTranslation = '';
+        console.log('Setting no unsaved changes');
+
+        // Initialize the component
+        component.ngOnInit();
+        console.log('Beforeunload handler:', component['beforeUnloadHandler']);
+
+        // Call the handler directly
+        const handler = component['beforeUnloadHandler'];
+        console.log('Handler type:', typeof handler);
+        handler(mockEvent);
+
+        console.log('preventDefault called:', preventDefaultSpy.calls.count());
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        expect(mockEvent.returnValue).toBe('');
       });
     });
 

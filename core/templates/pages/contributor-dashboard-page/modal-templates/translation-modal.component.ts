@@ -281,21 +281,15 @@ export class TranslationModalComponent {
 
     // Add beforeunload event handler
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-      const hasUnsavedChanges =
-        typeof this.activeWrittenTranslation === 'string'
-          ? this.activeWrittenTranslation.length > 0
-          : this.activeWrittenTranslation.length > 0;
-
-      if (hasUnsavedChanges) {
+      if (
+        this.activeWrittenTranslation &&
+        this.activeWrittenTranslation.length > 0
+      ) {
         e.preventDefault();
-        const message =
-          'You have unsaved changes. Are you sure you want to leave?';
-        e.returnValue = message;
-        return message;
+        e.returnValue = '';
+        return '';
       }
-      return undefined;
     };
-
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
   }
 
