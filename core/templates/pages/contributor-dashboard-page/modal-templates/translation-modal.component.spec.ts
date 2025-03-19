@@ -41,6 +41,7 @@ import {
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {ContextService} from 'services/context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   ImageLocalStorageService,
   ImagesData,
