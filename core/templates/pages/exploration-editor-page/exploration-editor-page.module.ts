@@ -132,6 +132,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {GraphDataService} from './services/graph-data.service';
+import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -357,6 +358,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     FocusManagerService,
     GenerateContentIdService,
     GraphDataService,
+    HintAndSolutionModalService,
     ImageLocalStorageService,
     HintAndSolutionModalService,
     ImageUploadHelperService,
