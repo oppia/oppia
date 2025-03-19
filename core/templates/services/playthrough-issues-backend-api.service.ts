@@ -29,6 +29,7 @@ import {
 } from 'domain/statistics/playthrough-issue.model';
 import {ServicesConstants} from 'services/services.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import _ from 'lodash';
 
 @Injectable({providedIn: 'root'})
 export class PlaythroughIssuesBackendApiService {
@@ -109,7 +110,10 @@ export class PlaythroughIssuesBackendApiService {
             if (this.cachedIssues.length !== 0) {
               const issueIndex = this.cachedIssues.findIndex(
                 issue =>
-                  JSON.stringify(issue) === JSON.stringify(issueToResolve)
+                  _.isEqual(
+                    issue,
+                    issueToResolve
+                  )
               );
               if (issueIndex !== -1) {
                 this.cachedIssues.splice(issueIndex, 1);

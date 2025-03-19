@@ -49,6 +49,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
+import _ from 'lodash';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -178,7 +179,7 @@ export class ResponsesService {
     if (
       newAnswerGroups &&
       oldAnswerGroups &&
-      JSON.stringify(newAnswerGroups) !== JSON.stringify(oldAnswerGroups)
+      !_.isEqual(newAnswerGroups, oldAnswerGroups)
     ) {
       this._answerGroups = newAnswerGroups;
       this._answerGroupsChangedEventEmitter.emit();
@@ -259,9 +260,7 @@ export class ResponsesService {
 
   private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
-    if (
-      JSON.stringify(newDefaultOutcome) !== JSON.stringify(oldDefaultOutcome)
-    ) {
+    if (!_.isEqual(newDefaultOutcome, oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
       this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
@@ -273,9 +272,7 @@ export class ResponsesService {
   ) => {
     const oldConfirmedUnclassifiedAnswers =
       this._confirmedUnclassifiedAnswersMemento;
-    if (
-      JSON.stringify(newConfirmedUnclassifiedAnswers) !==
-      JSON.stringify(oldConfirmedUnclassifiedAnswers)
+    if (!_.isEqual(newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 

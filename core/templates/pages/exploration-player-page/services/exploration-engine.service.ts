@@ -61,6 +61,7 @@ import {
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -173,7 +174,7 @@ export class ExplorationEngineService {
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
       oldInteractionArgs.catchMisspellings &&
-      outcome === defaultOutcome;
+      _.isEqual(outcome, defaultOutcome);
 
     if (shouldCheckForMisspelling) {
       const answerIsOnlyMisspelled =

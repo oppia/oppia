@@ -30,6 +30,7 @@ import {
   ParamChangeBackendDict,
 } from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import _ from 'lodash';
 
 export type ExplorationPropertyValues =
   | null
@@ -99,7 +100,7 @@ export class ExplorationPropertyService {
 
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
-    return JSON.stringify(this.savedMemento) !== JSON.stringify(this.displayed);
+    return !_.isEqual(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE

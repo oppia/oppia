@@ -27,6 +27,7 @@ import {FractionInputCustomizationArgs} from 'interactions/customization-args-de
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {Rule} from 'domain/exploration/rule.model';
+import _ from 'lodash';
 
 interface FractionWarning {
   type: string;
@@ -168,10 +169,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (
-                JSON.stringify(fractionDict) !==
-                JSON.stringify(fractionInSimplestForm)
-              ) {
+              if (!_.isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -226,10 +224,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (
-                JSON.stringify(fractionDict) !==
-                JSON.stringify(fractionInSimplestForm)
-              ) {
+              if (!_.isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -249,8 +244,7 @@ export class FractionInputValidationService {
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
               if (
-                JSON.stringify(fractionDict) !==
-                JSON.stringify(fractionInSimplestForm)
+                !_.isEqual(fractionDict, fractionInSimplestForm)
               ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -273,8 +267,7 @@ export class FractionInputValidationService {
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
               if (
-                JSON.stringify(fractionDict) !==
-                JSON.stringify(fractionInSimplestForm)
+                !_.isEqual(fractionDict, fractionInSimplestForm)
               ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
@@ -297,8 +290,7 @@ export class FractionInputValidationService {
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
               if (
-                JSON.stringify(fractionDict) !==
-                JSON.stringify(fractionInSimplestForm)
+                !_.isEqual(fractionDict, fractionInSimplestForm)
               ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,

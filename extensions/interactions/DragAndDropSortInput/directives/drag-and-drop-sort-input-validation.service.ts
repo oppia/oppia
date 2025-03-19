@@ -28,6 +28,7 @@ import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
+import _ from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -253,10 +254,7 @@ export class DragAndDropSortInputValidationService {
               .reduce((acc, val) => acc.concat(val), [])
               .map(contentId => choiceContentIdToHtml[contentId])
               .sort();
-            if (
-              JSON.stringify(sortedCustomArgsChoices) !==
-              JSON.stringify(flattenedAndSortedXInputs)
-            ) {
+            if (_.isEqual(sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
