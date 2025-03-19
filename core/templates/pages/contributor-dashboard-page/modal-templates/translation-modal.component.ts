@@ -279,7 +279,6 @@ export class TranslationModalComponent {
       },
     };
 
-    // Add beforeunload event handler
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
       const hasUnsavedChanges =
         typeof this.activeWrittenTranslation === 'string'
@@ -715,7 +714,6 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
-    // Remove beforeunload event handler
     window.removeEventListener('beforeunload', this.beforeUnloadHandler);
   }
 }

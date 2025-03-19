@@ -1079,17 +1079,14 @@ describe('Translation Modal Component', () => {
       }));
     });
 
-    fdescribe('when browser tab/window is closed', () => {
-      let windowRef: WindowRef;
+    describe('when browser tab/window is closed', () => {
       let beforeUnloadHandler: Function;
 
       beforeEach(() => {
         spyOn(translateTextService, 'init').and.callFake(
           (expId, languageCode, successCallback) => successCallback()
         );
-        windowRef = TestBed.inject(WindowRef);
 
-        // Store the handler function when addEventListener is called
         spyOn(window, 'addEventListener').and.callFake((event, handler) => {
           beforeUnloadHandler = handler;
         });
