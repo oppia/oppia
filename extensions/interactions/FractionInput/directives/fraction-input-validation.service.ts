@@ -27,7 +27,7 @@ import {FractionInputCustomizationArgs} from 'interactions/customization-args-de
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {Rule} from 'domain/exploration/rule.model';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 interface FractionWarning {
   type: string;
@@ -169,7 +169,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!_.isEqual(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -224,7 +224,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!_.isEqual(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -243,9 +243,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (
-                !_.isEqual(fractionDict, fractionInSimplestForm)
-              ) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -266,9 +264,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (
-                !_.isEqual(fractionDict, fractionInSimplestForm)
-              ) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -289,9 +285,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (
-                !_.isEqual(fractionDict, fractionInSimplestForm)
-              ) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
