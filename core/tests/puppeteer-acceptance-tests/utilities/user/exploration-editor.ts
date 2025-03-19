@@ -21,6 +21,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
+import path from 'path';
+import fs from 'fs';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -219,7 +221,12 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const historyTabButton = '.e2e-test-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const downloadExplorationButton = '.e2e-test-download-exploration';
 
+const downloadPath = '/home/somnath/Downloads';
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
@@ -1543,6 +1550,83 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
     await this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileHistoryTabButton);
+    } else {
+      await this.clickOn(historyTabButton);
+    }
+  }
+
+  /**
+   * Function to download a specific version of Exploration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   */
+  async downloadExploration(explorationVersion: number): Promise<void> {
+    const historyItems = await this.page.$$(historyListContent);
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await historyItem.$('.history-table-index');
+      const versionText = await this.page.evaluate(
+        element => element.textContent,
+        versionNumberElement
+      );
+
+      if (parseInt(versionText, 10) === explorationVersion) {
+        const dropdownButton = await historyItem.$(
+          '.e2e-test-history-list-options'
+        );
+        await dropdownButton?.click();
+        await this.page.waitForTimeout(1000);
+        const downloadButton = await this.page.$(
+          'a.dropdown-item.e2e-test-download-exploration'
+        );
+        await this.page.evaluate(el => el.click(), downloadButton);
+        await this.page.waitForTimeout(5000);
+        const downloadedFile = await this.waitForDownload(explorationVersion);
+        if (downloadedFile) {
+          showMessage(`${downloadedFile} file is successfully downloaded`);
+          return;
+        } else {
+          throw new Error(
+            `Download failed for Exploration version: ${explorationVersion}`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Waits for a file to be downloaded and verifies its name.
+   * @param {number} expectedVersion - The expected version number in the file name.
+   * @returns {Promise<string | null>} - Returns the file name if correct, otherwise null.
+   */
+  async waitForDownload(expectedVersion: number): Promise<string | null> {
+    let downloadedFile: string | null = null;
+    for (let i = 0; i < 10; i++) {
+      // Retry for 10 seconds.
+      const files = fs.readdirSync(downloadPath);
+      downloadedFile =
+        files.find(file => {
+          return file.match(
+            new RegExp(
+              `^oppia-(downloadhistory|unpublished_exploration)-v${expectedVersion}( \\(\\d+\\))?\\.zip$`
+            )
+          );
+        }) || null;
+
+      if (downloadedFile) {
+        break;
+      }
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    return downloadedFile;
   }
 
   /**

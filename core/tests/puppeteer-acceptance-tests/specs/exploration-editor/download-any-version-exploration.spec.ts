@@ -1,0 +1,88 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for download any version of the exploration from the history tab..
+ */
+
+import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  END_EXPLORATION = 'End Exploration',
+  MULTIPLE_CHOICE = 'Multiple Choice',
+}
+enum CARD_NAME {
+  INTRODUCTION = 'Introduction',
+  MULTIPLE_CHOICE_QUESTION = 'Multiple Choice',
+  FINAL_CARD = 'Final Card',
+}
+
+describe('Exploration Creator', function () {
+  let explorationEditor: ExplorationEditor;
+
+  beforeAll(async function () {
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
+    // Navigate to the creator dashboard and create a new exploration.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+
+    await explorationEditor.createMinimalExploration(
+      'Content',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.updateCardContent('Modified ');
+    await explorationEditor.saveExplorationDraft();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it(
+    'should show the latest saved changes',
+    async function () {
+      // Navigate to the preview tab and check whether the contents of the card are updated.
+      await explorationEditor.navigateToPreviewTab();
+      await explorationEditor.expectPreviewCardContentToBe(
+        CARD_NAME.INTRODUCTION,
+        'Modified Content'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should download any version of Exploration',
+    async function () {
+      // Navigate to the history tab, .
+      await explorationEditor.navigateToHistoryTab();
+      await explorationEditor.downloadExploration(3);
+      await explorationEditor.downloadExploration(2);
+      await explorationEditor.downloadExploration(1);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});
