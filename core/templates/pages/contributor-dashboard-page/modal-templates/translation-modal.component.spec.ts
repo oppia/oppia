@@ -1097,7 +1097,7 @@ describe('Translation Modal Component', () => {
         beforeUnloadSpy = spyOn(window, 'addEventListener').and.callFake(
           (eventName: string, handler: Function) => {
             if (eventName === 'beforeunload') {
-              component['beforeUnloadHandler'] = handler as (
+              component.beforeUnloadHandler = handler as (
                 e: BeforeUnloadEvent
               ) => string | undefined;
             }
@@ -1126,7 +1126,7 @@ describe('Translation Modal Component', () => {
       it('should not show confirmation dialog when there are no unsaved changes', () => {
         component.activeWrittenTranslation = '';
         component.ngOnInit();
-        const handler = component['beforeUnloadHandler'];
+        const handler = component.beforeUnloadHandler;
         handler(mockEvent);
 
         expect(preventDefaultSpy).not.toHaveBeenCalled();
