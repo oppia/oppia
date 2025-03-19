@@ -183,7 +183,8 @@ export class TranslationModalComponent {
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
 
-  private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
+  private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined =
+    () => undefined;
 
   constructor(
     public readonly activeModal: NgbActiveModal,
