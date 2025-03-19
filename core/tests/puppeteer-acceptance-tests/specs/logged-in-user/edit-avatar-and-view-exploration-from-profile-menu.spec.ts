@@ -37,7 +37,7 @@ describe('Logged-in User', function () {
       'logged_in_user@example.com'
     );
 
-    // Create and publish exploration
+    // Create and publish exploration.
     await loggedInUser.createAndPublishAMinimalExplorationWithTitle(
       TEST_EXPLORATION.title,
       TEST_EXPLORATION.category
