@@ -452,13 +452,17 @@ describe('Skill editor main tab Component', () => {
         {id: '4P77sLaU14DE', description: 'Dummy Skill 3'},
       ];
 
+      const validSkillSummary = {
+        id: 'skill1',
+        description: 'test description 1',
+      };
       // Mock modal implementation.
       const modalRef = jasmine.createSpyObj('NgbModalRef', [
         'componentInstance',
         'result',
       ]);
       modalRef.componentInstance = {};
-      modalRef.result = Promise.resolve();
+      modalRef.result = Promise.resolve(validSkillSummary);
       spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
       component.addSkill();
