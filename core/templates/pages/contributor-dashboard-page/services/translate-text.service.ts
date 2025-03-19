@@ -40,14 +40,6 @@ export interface TranslatableItem {
 
 export type Status = 'pending' | 'submitted';
 
-export interface TranslatableContent {
-  content: string | string[];
-  dataFormat: string;
-  contentType: string;
-  interactionId?: string;
-  ruleType?: string;
-}
-
 export class StateAndContent {
   constructor(
     public stateName: string,
@@ -69,7 +61,7 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING: Status = 'pending';
   SUBMITTED: Status = 'submitted';
-  stateWiseContents: Record<string, Record<string, TranslatableContent>> = {};
+  stateWiseContents: Record<string, Record<string, any>> = {};
   stateWiseContentIds: Record<string, string[]> = {};
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];
