@@ -106,7 +106,7 @@ jobs:
           python -m scripts.run_e2e_tests --skip-install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E test logs
-        if: always()
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
@@ -178,7 +178,7 @@ jobs:
           python -m scripts.run_acceptance_tests 
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance test logs
-        if: always()
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
@@ -219,7 +219,7 @@ jobs:
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload mobile acceptance test logs
-        if: always()
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
