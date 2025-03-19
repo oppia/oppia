@@ -183,6 +183,8 @@ export class TranslationModalComponent {
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
 
+  private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
+
   constructor(
     public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
@@ -276,6 +278,19 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection(),
       },
     };
+
+    // Add beforeunload event handler
+    this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      if (
+        this.activeWrittenTranslation &&
+        this.activeWrittenTranslation.length > 0
+      ) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+    window.addEventListener('beforeunload', this.beforeUnloadHandler);
   }
 
   ngAfterViewInit(): void {
@@ -322,7 +337,7 @@ export class TranslationModalComponent {
       const modalRef = this.ngbModal.open(
         ConfirmTranslationExitModalComponent,
         {
-          backdrop: true,
+          backdrop: 'static',
         }
       );
 
@@ -691,5 +706,10 @@ export class TranslationModalComponent {
       return;
     }
     this.activeModal.close(this.activeWrittenTranslation);
+  }
+
+  ngOnDestroy(): void {
+    // Remove beforeunload event handler
+    window.removeEventListener('beforeunload', this.beforeUnloadHandler);
   }
 }
