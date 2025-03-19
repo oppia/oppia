@@ -1497,6 +1497,7 @@ export class LoggedInUser extends BaseUser {
 
     showMessage(`Title has been updated to ${title}`);
   }
+
   /**
    * Open settings tab.(Note->It also opens all the dropdowns present
    * in the setting tab for mobile view port.)
@@ -1527,6 +1528,7 @@ export class LoggedInUser extends BaseUser {
     }
     showMessage('Settings tab is opened successfully.');
   }
+
   /**
    * Function to navigate to exploration editor.
    * @param explorationUrl - url of the exploration.
@@ -1546,6 +1548,7 @@ export class LoggedInUser extends BaseUser {
     await this.goto(CreatorDashboardUrl);
     showMessage('Creator dashboard page is opened successfully.');
   }
+
   /**
    * Function to navigate to exploration editor.
    */
@@ -1571,6 +1574,7 @@ export class LoggedInUser extends BaseUser {
       showMessage(`welcome modal not found: ${error.message}`);
     }
   }
+
   /**
    * Function to add content to a card.
    * @param {string} content - The content to be added to the card.
@@ -1586,6 +1590,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully.');
   }
+
   /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
@@ -1600,6 +1605,7 @@ export class LoggedInUser extends BaseUser {
     });
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
+
   /**
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
@@ -1643,6 +1649,7 @@ export class LoggedInUser extends BaseUser {
     showMessage('Exploration is saved successfully.');
     await this.waitForNetworkIdle();
   }
+
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -1743,6 +1750,7 @@ export class LoggedInUser extends BaseUser {
       category
     );
   }
+
   /**
    * Opens an exploration in the editor.
    * @param {string} explorationName - The name of the exploration.
