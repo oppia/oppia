@@ -279,7 +279,6 @@ export class TranslationModalComponent {
       },
     };
 
-    // Add beforeunload event handler
     this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
       if (
         this.activeWrittenTranslation &&
@@ -709,7 +708,6 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
-    // Remove beforeunload event handler
     window.removeEventListener('beforeunload', this.beforeUnloadHandler);
   }
 }
