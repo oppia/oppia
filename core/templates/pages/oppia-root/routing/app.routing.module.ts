@@ -18,7 +18,7 @@
 
 import {APP_BASE_HREF} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {Route, RouterModule} from '@angular/router';
+import {Route, RouterModule, Router, Event, NavigationStart} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
@@ -587,4 +587,23 @@ routes.push(
     },
   ],
 })
-export class AppRoutingModule {}
+
+export class AppRoutingModule {
+  constructor(private router: Router) {
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationStart) {
+        const currentUrl =
+          window.location.pathname +
+          window.location.search +
+          window.location.hash;
+        const lowercaseUrl = currentUrl.toLowerCase();
+        const loginPath = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE;
+        if (currentUrl !== lowercaseUrl && !currentUrl.startsWith(loginPath)) {
+          setTimeout(() => {
+            this.router.navigateByUrl(lowercaseUrl, { replaceUrl: true });
+          }, 0);
+        }
+      }
+    });
+  }  
+}
