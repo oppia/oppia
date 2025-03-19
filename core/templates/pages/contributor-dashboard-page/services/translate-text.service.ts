@@ -59,25 +59,25 @@ export class StateAndContent {
 })
 export class TranslateTextService {
   STARTING_INDEX = -1;
-  PENDING: Status = 'pending';
-  SUBMITTED: Status = 'submitted';
-  stateWiseContents: Record<string, Record<string, any>> = {};
-  stateWiseContentIds: Record<string, string[]> = {};
-  stateNamesList: string[] = [];
-  stateAndContent: StateAndContent[] = [];
+  PENDING = 'pending';
+  SUBMITTED = 'submitted';
+  stateWiseContents = {};
+  stateWiseContentIds = {};
+  stateNamesList = [];
+  stateAndContent = [];
   activeIndex = this.STARTING_INDEX;
-  activeExpId: string | null = null;
-  activeExpVersion: string | null = null;
-  activeContentId: string | null = null;
-  activeStateName: string | null = null;
-  activeContentText: string | string[] | null = null;
-  activeContentStatus: Status = this.PENDING;
+  activeExpId;
+  activeExpVersion;
+  activeContentId;
+  activeStateName: string;
+  activeContentText: string;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
   ) {}
 
-  private _getNextText(): string | string[] | null {
+  private _getNextText(): string | string[] {
     if (this.stateAndContent.length === 0) {
       return null;
     }
@@ -88,7 +88,7 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] | null {
+  private _getPreviousText(): string | string[] {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
       return null;
     }
@@ -118,29 +118,31 @@ export class TranslateTextService {
   }
 
   private _getUpdatedTextToTranslate(
-    text: string | string[] | null,
+    text: string | string[],
     more: boolean,
     status: Status,
-    translation: string | string[]
+    translation: string
   ): TranslatableItem {
-    if (!text) {
-      throw new Error('Text cannot be null');
-    }
-    const currentStateAndContent = this.stateAndContent[this.activeIndex];
-    if (!currentStateAndContent) {
-      throw new Error('No state and content found for current index');
-    }
-    const {dataFormat, contentType, interactionId, ruleType} =
-      currentStateAndContent;
-    return {
-      text,
-      more,
-      status,
-      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+    const {
       dataFormat,
       contentType,
       interactionId,
       ruleType,
+    }: {
+      dataFormat?: string;
+      contentType?: string;
+      interactionId?: string;
+      ruleType?: string;
+    } = this.stateAndContent[this.activeIndex] || {};
+    return {
+      text: text,
+      more: more,
+      status: status,
+      translation: this._isSetDataFormat(dataFormat) ? [] : translation,
+      dataFormat: dataFormat,
+      contentType: contentType,
+      interactionId: interactionId,
+      ruleType: ruleType,
     };
   }
 
@@ -152,7 +154,7 @@ export class TranslateTextService {
     this.activeContentId = null;
     this.activeStateName = null;
     this.activeContentText = null;
-    this.activeContentStatus = this.PENDING;
+    this.activeContentStatus = this.PENDING as Status;
     this.activeExpId = expId;
     this.translateTextBackendApiService
       .getTranslatableTextsAsync(expId, languageCode)
@@ -161,7 +163,7 @@ export class TranslateTextService {
         this.activeExpVersion = translatableTexts.explorationVersion;
         for (const stateName in this.stateWiseContents) {
           let stateHasText: boolean = false;
-          const contentIds: string[] = [];
+          const contentIds = [];
           const contentIdToContentMapping = this.stateWiseContents[stateName];
           for (const contentId in contentIdToContentMapping) {
             const translatableItem = contentIdToContentMapping[contentId];
@@ -174,7 +176,7 @@ export class TranslateTextService {
                 stateName,
                 contentId,
                 translatableItem.content,
-                this.PENDING,
+                this.PENDING as Status,
                 this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
                 translatableItem.dataFormat,
                 translatableItem.contentType,
@@ -200,14 +202,9 @@ export class TranslateTextService {
 
   getTextToTranslate(): TranslatableItem {
     const text = this._getNextText();
-    if (!text) {
-      throw new Error('No text available to translate');
-    }
-    const currentStateAndContent = this.stateAndContent[this.activeIndex];
-    if (!currentStateAndContent) {
-      throw new Error('No state and content found for current index');
-    }
-    const {status = this.PENDING, translation = ''} = currentStateAndContent;
+    const {status = this.PENDING, translation = ''} = {
+      ...this.stateAndContent[this.activeIndex],
+    };
     return this._getUpdatedTextToTranslate(
       text,
       this._isMoreTextAvailableForTranslation(),
@@ -218,14 +215,9 @@ export class TranslateTextService {
 
   getPreviousTextToTranslate(): TranslatableItem {
     const text = this._getPreviousText();
-    if (!text) {
-      throw new Error('No previous text available to translate');
-    }
-    const currentStateAndContent = this.stateAndContent[this.activeIndex];
-    if (!currentStateAndContent) {
-      throw new Error('No state and content found for current index');
-    }
-    const {status = this.PENDING, translation = ''} = currentStateAndContent;
+    const {status = this.PENDING, translation = ''} = {
+      ...this.stateAndContent[this.activeIndex],
+    };
     return this._getUpdatedTextToTranslate(
       text,
       this._isPreviousTextAvailableForTranslation(),
@@ -242,18 +234,6 @@ export class TranslateTextService {
     successCallback: () => void,
     errorCallback: (reason: string) => void
   ): void {
-    if (
-      !this.activeExpId ||
-      !this.activeExpVersion ||
-      !this.activeContentId ||
-      !this.activeStateName
-    ) {
-      throw new Error('Required properties are not initialized');
-    }
-    const stateContent = this.stateWiseContents[this.activeStateName];
-    if (!stateContent || !stateContent[this.activeContentId]) {
-      throw new Error('State content not found');
-    }
     this.translateTextBackendApiService
       .suggestTranslatedTextAsync(
         this.activeExpId,
@@ -261,7 +241,8 @@ export class TranslateTextService {
         this.activeContentId,
         this.activeStateName,
         languageCode,
-        stateContent[this.activeContentId].content,
+        this.stateWiseContents[this.activeStateName][this.activeContentId]
+          .content,
         translation,
         imagesData,
         dataFormat
