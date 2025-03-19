@@ -251,16 +251,13 @@ describe('InteractiveFractionInputComponent', () => {
     }
   );
 
-  it(
-    'should reset validity status when user modifies answer input',
-    fakeAsync(() => {
-      component.answer = 'invalid';
-      component.answerValueChanged();
-      tick(150);
+  it('should reset validity status when user modifies answer input', fakeAsync(() => {
+    component.answer = 'invalid';
+    component.answerValueChanged();
+    tick(150);
 
-      expect(component.isValid).toBeTrue();
-    })
-  );
+    expect(component.isValid).toBeTrue();
+  }));
 
   it(
     'should display proper fraction error' +
@@ -292,19 +289,16 @@ describe('InteractiveFractionInputComponent', () => {
     }
   );
 
-  it(
-    'should display invalid length error when number exceeds 7 digits',
-    () => {
-      component.answer = '12345678/1';
+  it('should display invalid length error when number exceeds 7 digits', () => {
+    component.answer = '12345678/1';
 
-      component.submitAnswer();
+    component.submitAnswer();
 
-      expect(component.errorMessageI18nKey).toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
-          .INVALID_CHARS_LENGTH
-      );
-    }
-  );
+    expect(component.errorMessageI18nKey).toBe(
+      ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
+        .INVALID_CHARS_LENGTH
+    );
+  });
 
   it(
     'should display simplest form error message when input' +
