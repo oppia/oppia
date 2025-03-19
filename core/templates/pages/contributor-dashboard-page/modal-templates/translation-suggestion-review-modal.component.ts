@@ -463,7 +463,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.allContributions[this.queuedSuggestion?.suggestion_id];
         delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
-        this.queuedSuggestionEmit.emit(this.removedSuggestion)
+        // this.queuedSuggestionEmit.emit(this.removedSuggestion)
+        this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
 
         // If the reviewed item was the last item, close the modal.
         if (this.lastSuggestionToReview || this.isLastItem) {

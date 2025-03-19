@@ -2197,70 +2197,59 @@ fdescribe('Contributions and review component', () => {
           componentInstance: {
             authorName: null,
             contentHtml: null,
-            reviewable: null,
-            suggestionIdToContribution: {
-              suggestion_1: {
-                suggestion: {
-                  suggestion_id: 'suggestion_1',
-                  target_id: '1',
-                  suggestion_type: 'translate_content',
-                  change_cmd: {
-                    content_html: 'Translation',
-                    translation_html: 'Tradução',
-                  },
-                  status: 'review',
-                },
-                details: {
-                  skill_description: 'skill_description',
-                  skill_rubrics: [],
-                  chapter_title: 'skill_1',
-                  story_title: 'skill_1',
-                  topic_name: 'skill_1',
-                },
-              },
-            },
-            initialSuggestionId: null,
-            subheading: null,
+            reviewable: true,
+            suggestionIdToContribution: {},
+            initialSuggestionId: 'suggestion_1',
+            subheading: 'Sub heading',
             editSuggestionEmitter: eventEmitter,
             queuedSuggestionSummaryEmit: eventEmitter,
             queuedSuggestionEmit: eventEmitter,
           },
           result: Promise.resolve(['id1', 'id2']),
         } as NgbModalRef);
-        // spyOn(ngbModal, 'open').and.returnValue({
-        //   componentInstance: MockNgbModalRef,
-        //   result: Promise.resolve(['id1', 'id2']),
-        // } as NgbModalRef);
+    
+        console.log('LINE 2214 TESTING FILE')
 
-        component.contributions = {
-          suggestion: {
-            suggestion_id: 'suggestion_1',
-            target_id: '1',
-            suggestion_type: 'translate_content',
-            change_cmd: {
-              content_html: 'Translation',
-              translation_html: 'Tradução',
-            },
-            status: 'review',
-          },
-          details: {
-            skill_description: 'skill_description',
-            skill_rubrics: [],
-            chapter_title: 'skill_1',
-            story_title: 'skill_1',
-            topic_name: 'skill_1',
-          },
-        }
         const removeSpy = spyOn(
           contributionOpportunitiesService.removeOpportunitiesEventEmitter,
           'emit'
         ).and.returnValue(null);
-
+        component.contributions = {
+          'suggestion_1': {
+            suggestion: {
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change_cmd: {
+                content_html: 'Translation',
+                translation_html: 'Tradução',
+              },
+              status: 'review',
+            },
+            details: {
+              skill_description: 'skill_description',
+              skill_rubrics: [],
+              chapter_title: 'skill_1',
+              story_title: 'skill_1',
+              topic_name: 'skill_1',
+            },
+          },
+        };
+        component.queuedSuggestion = {
+          target_id: 'id_1',
+          suggestion_id: 'suggestion_1',
+          action_status: 'accepted',
+          reviewer_message: 'test'
+        }
+        // tick()
+        console.log('LINE 2238 POST SETUP', component.contributions)
         component.onClickViewSuggestion('suggestion_1');
         tick();
-        tick();
+        tick()
 
+        console.log('TEST FILE - 2243')
         expect(removeSpy).toHaveBeenCalled();
+        console.log('TEST FILE - TEST CASE END')
       })
     );
 

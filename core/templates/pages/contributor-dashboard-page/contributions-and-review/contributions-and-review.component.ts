@@ -383,6 +383,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     initialSuggestionId: string,
     reviewable: boolean
   ): void {
+    console.log('LINE 386, ', suggestionIdToContribution)
+    console.log('LINE 387, ', initialSuggestionId)
     const details = this.contributions[initialSuggestionId]
       .details as ContributionDetails;
     const subheading =
@@ -391,7 +393,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       details.story_title +
       ' / ' +
       details.chapter_title;
-
+      console.log('MAIN CODE LINE 394')
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,
       {
@@ -407,7 +409,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.initialSuggestionId = initialSuggestionId;
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
-
+    console.log('MAIN CODE LINE 410')
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe((queuedSuggestionSummary: string) => {
       if (this.queuedSuggestionSummary){
         // Queue any previously queued suggestion.
@@ -422,20 +424,23 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       console.log('Received suggestion: ', queuedSuggestion);
       this.queuedSuggestion = queuedSuggestion
     });
-
+    console.log('MAIN CODE LINE 425')
     modalRef.result.then(
       resolvedSuggestionIds => {
+        console.log('INSIDE ARROW FN,', this.queuedSuggestion)
         const filteredResolvedSuggestionIds = resolvedSuggestionIds.filter(
-          suggestionId => this.queuedSuggestion?.suggestion.suggestion_id !== suggestionId
+          suggestionId => this.queuedSuggestion?.suggestion_id !== suggestionId
         );
         // Emit only the filtered resolved suggestions
+        console.log('RESOLVED SUGGESTION IDS', resolvedSuggestionIds)
+        console.log('FILTERED_SUGGESTION', filteredResolvedSuggestionIds)
         if (filteredResolvedSuggestionIds.length > 0) {
           this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
             filteredResolvedSuggestionIds
           );
         }
         resolvedSuggestionIds.forEach(suggestionId => {  
-          if (this.queuedSuggestion.suggestion.suggestion_id == suggestionId) {
+          if (this.queuedSuggestion && this.queuedSuggestion.suggestion_id == suggestionId) {
             console.log('Not removing the queued Suggestion yet.')
           } else {
           delete this.contributions[suggestionId];
@@ -578,7 +583,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   onClickViewSuggestion(suggestionId: string): void {
+    console.log('LINE NO 581 ****,', this.contributions )
     const suggestion = this.contributions[suggestionId].suggestion;
+    console.log('LINE 582, ', suggestion)
     const reviewable = this.activeTabType === this.TAB_TYPE_REVIEWS;
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_QUESTION) {
       this.openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
@@ -589,15 +596,18 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] = contribution;
       }
+      console.log('MAIN CODE LINE 584')
       this.contextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
         suggestion.target_id
       );
+      console.log('MAIN CODE LINE 599')
       this._showTranslationSuggestionModal(
         suggestionIdToContribution,
         suggestionId,
         reviewable
       );
+      console.log('MAIN CODE LINE 605')
     }
   }
 
