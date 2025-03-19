@@ -496,7 +496,8 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 def get_exploration_voice_artists_link(
     exploration_id: str
 ) -> Optional[voiceover_domain.ExplorationVoiceArtistsLink]:
-    """Retrieves the ExplorationVoiceArtistsLink domain object for an exploration.
+    """Retrieves the ExplorationVoiceArtistsLink domain
+    object for an exploration.
 
     Args:
         exploration_id: str. The ID of the exploration.
@@ -509,7 +510,7 @@ def get_exploration_voice_artists_link(
         exploration_id, strict=False)
     if model is None:
         return None
-    
+
     return voiceover_domain.ExplorationVoiceArtistsLink(
         exp_id=model.id,
         content_id_to_voiceovers_mapping=model.content_id_to_voiceovers_mapping
@@ -526,10 +527,10 @@ def save_exploration_voice_artists_link(
             object to save.
     """
     exploration_voice_artists_link.validate()
-    
+
     model = voiceover_models.ExplorationVoiceArtistsLinkModel.get(
         exploration_voice_artists_link.exp_id, strict=False)
-    
+
     if model is None:
         model = voiceover_models.ExplorationVoiceArtistsLinkModel(
             id=exploration_voice_artists_link.exp_id,
@@ -539,7 +540,7 @@ def save_exploration_voice_artists_link(
     else:
         model.content_id_to_voiceovers_mapping = (
             exploration_voice_artists_link.content_id_to_voiceovers_mapping)
-    
+
     model.update_timestamps()
     model.put()
 
@@ -560,17 +561,16 @@ def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
         voiceover_models.VoiceArtistMetadataModel] = (
             voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
 
-    # Fetch all link models but convert to domain objects for processing
     exploration_voice_artist_link_models: Sequence[
         voiceover_models.ExplorationVoiceArtistsLinkModel] = (
             voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
         )
-    
-    # Create domain objects from models
+
     exploration_voice_artist_links = [
         voiceover_domain.ExplorationVoiceArtistsLink(
             exp_id=model.id,
-            content_id_to_voiceovers_mapping=model.content_id_to_voiceovers_mapping
+            content_id_to_voiceovers_mapping=(
+                model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
     ]
 
@@ -583,7 +583,6 @@ def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
             language_code_to_accent
         )
 
-    # Process using domain objects instead of models
     for exploration_voice_artist_link in exploration_voice_artist_links:
         content_id_to_voiceovers_mapping = (
             exploration_voice_artist_link.content_id_to_voiceovers_mapping)
@@ -629,12 +628,12 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
         voiceover_models.ExplorationVoiceArtistsLinkModel] = (
             voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
         )
-    
-    # Create domain objects from models
+
     exploration_voice_artist_links = [
         voiceover_domain.ExplorationVoiceArtistsLink(
             exp_id=model.id,
-            content_id_to_voiceovers_mapping=model.content_id_to_voiceovers_mapping
+            content_id_to_voiceovers_mapping=(
+                model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
     ]
 
@@ -690,12 +689,12 @@ def get_voiceover_filenames(
             voiceover_models.ExplorationVoiceArtistsLinkModel.
             get_all().fetch()
         )
-    
-    # Create domain objects from models
+
     exploration_voice_artist_links = [
         voiceover_domain.ExplorationVoiceArtistsLink(
             exp_id=model.id,
-            content_id_to_voiceovers_mapping=model.content_id_to_voiceovers_mapping
+            content_id_to_voiceovers_mapping=(
+                model.content_id_to_voiceovers_mapping)
         ) for model in exp_voice_artist_link_models
     ]
 
@@ -845,7 +844,7 @@ def create_exploration_voice_artists_link_model_instance(
     exploration_id: str,
     content_id_to_voiceovers_mapping: (
         voiceover_domain.ContentIdToVoiceoverMappingType)
-) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
+) -> voiceover_domain.ExplorationVoiceArtistsLink:
     """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
     between the latest content IDs within an exploration and the corresponding
     IDs of voice artists who provided voiceovers in the specified language code.
@@ -927,7 +926,6 @@ def update_exploration_voice_artist_link_model(
             for voiceover_dict in lang_code_to_voiceovers.values():
                 old_filenames.append(voiceover_dict.filename)
 
-    # Use domain object instead of directly using the model
     exploration_voice_artists_link = get_exploration_voice_artists_link(
         updated_exploration.id)
 
@@ -950,15 +948,15 @@ def update_exploration_voice_artist_link_model(
                 content_id_to_voiceovers_mapping[content_id][lang_code] = (
                     user_id, voiceover_dict.to_dict())
 
-    # Creating or updating the domain object
     if exploration_voice_artists_link is None:
-        exploration_voice_artists_link = voiceover_domain.ExplorationVoiceArtistsLink(
-            exp_id=updated_exploration.id,
-            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
+        exploration_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                exp_id=updated_exploration.id,
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
         )
     else:
         exploration_voice_artists_link.content_id_to_voiceovers_mapping = (
             content_id_to_voiceovers_mapping)
 
-    # Save the domain object (which will handle the model update)
     save_exploration_voice_artists_link(exploration_voice_artists_link)

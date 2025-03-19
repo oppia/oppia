@@ -40,7 +40,6 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
-    from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -171,7 +170,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         snapshot_models: List[exp_models.ExplorationSnapshotContentModel],
         metadata_models: List[exp_models.ExplorationSnapshotMetadataModel]
     ) -> Tuple[
-        Optional[voiceover_models.ExplorationVoiceArtistsLinkModel], str]:
+        voiceover_domain.ExplorationVoiceArtistsLink, str]:
         """Creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
 
@@ -187,7 +186,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         Returns:
             A 2-tuple with the following elements:
-            - ExplorationVoiceArtistsLinkModel. An object containing voice
+            - ExplorationVoiceArtistsLink. An object containing voice
             artist IDs and their provided voiceovers for the given exploration.
             - The debug logs.
         """

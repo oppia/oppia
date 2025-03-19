@@ -449,7 +449,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 content_id_to_voiceovers_mapping_1
             )
         )
-        exp_voice_artist_link_model_1.put()
+        exp_voice_artist_link_model_1.validate()
 
         exp_voice_artist_link_model_2 = (
             voiceover_services.
@@ -458,7 +458,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 content_id_to_voiceovers_mapping_2
             )
         )
-        exp_voice_artist_link_model_2.put()
+        exp_voice_artist_link_model_2.validate()
 
     def _create_voice_artist_metadata(self) -> None:
         """The method creates two instances of voice artists metadata model."""
