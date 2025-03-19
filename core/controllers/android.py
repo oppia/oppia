@@ -155,7 +155,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_SUBTOPIC,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM,
-                        'question_skill_link',
+                        'questions',
                         'question'
                     ]
                 },
@@ -230,29 +230,27 @@ class AndroidActivityHandler(base.BaseHandler[
             } for (activity_data, subtopic_page) in zip(
                 activities_data, subtopic_pages)])
 
-        elif activity_type == 'question_skill_link':
-            # Question skill links are unique in that they don't have
-            # versions and represent a many-to-many relationship
-            # between questions and skills.
+        elif activity_type == 'questions':
+            # Questions require special handling as they are fetched in bulk.
+            # With a fixed limit of questions per request,
+            # and an offset to paginate through the entire question set.
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
                         'Version cannot be specified for '
-                        'question_skill_link')
+                        'questions activity')
 
             if offset is None:
                 raise self.InvalidInputException(
-                    'Offset required for question_skill_link')          
+                    'Offset required for questions activity')
 
-            question_ids_by_skill_id = (
-                question_fetchers.get_all_question_skill_links(offset=offset))
-            for skill_id, question_ids in question_ids_by_skill_id.items():
-                activities.append({
-                    'id': skill_id,
-                    'payload': {
-                        'question_ids': question_ids
-                    }
-                })
+            questions = (
+                question_fetchers.get_all_questions(offset=offset))
+
+            activities.extend([{
+                'id': question.id,
+                'payload': question.to_dict()
+            } for question in questions])
 
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:

@@ -120,7 +120,7 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
-  "SKILL_QUESTION_LIMIT": 100,
+  "MAX_QUESTIONS_FETCHABLE": 100,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {

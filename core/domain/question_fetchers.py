@@ -25,7 +25,7 @@ from core.constants import constants
 from core.domain import question_domain
 from core.domain import state_domain
 from core.platform import models
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -224,38 +224,23 @@ def get_multiple_questions_by_ids_and_version(
     ]
 
 
-def get_all_question_skill_links(
+def get_all_questions(
     offset: int = 0,
-    question_count: int = constants.SKILL_QUESTION_LIMIT
-) -> Dict[str, List[str]]:
-    """Returns all question skill links in a dictionary format.
+    question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+) -> List[question_domain.Question]:
+    """Returns all the questions.
 
     Args:
-        question_count: int. Max number of question skill links to fetch.
-            Defaults to constants.SKILL_QUESTION_LIMIT.
-        offset: int. Offset to start fetching question skill links from.
+        offset: int. Number of query results to skip.
+        question_count: int. The number of questions to return.
 
     Returns:
-        dict(str, list(str)). A mapping of skill IDs to lists of question IDs.
-
-    Raises:
-        ValueError. The requested question count exceeds the limit.
+        dict. A dict with two keys:
+            question_ids: list(str). The list of question ids.
+            next_offset: str. The offset to query the next set of questions.
     """
-    if question_count > constants.SKILL_QUESTION_LIMIT:
-        raise ValueError(
-            'Requested question count exceeds the limit of %d.' 
-            % constants.SKILL_QUESTION_LIMIT
-        )
-
-    qsl_models = question_models.QuestionSkillLinkModel.get_all_question_links(
-        question_count=question_count, offset=offset)
-
-    unique_skill_ids = list(dict.fromkeys([
-        model.skill_id for model in qsl_models]))
-
-    return {
-        skill_id: [
-            model.question_id for model in qsl_models
-            if model.skill_id == skill_id]
-        for skill_id in unique_skill_ids
-    }
+    question_models_list = question_models.QuestionModel.get_all_questions(
+        offset, question_count)
+    return [
+        get_question_from_model(model) for model in question_models_list
+    ]

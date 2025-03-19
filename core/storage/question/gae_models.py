@@ -298,6 +298,26 @@ class QuestionModel(base_models.VersionedModel):
         cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
+    @classmethod
+    def get_all_questions(
+        cls,
+        offset: int,
+        question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+    ) -> Sequence[QuestionModel]:
+        """Fetches the list of questions in batches.
+
+        Args:
+            question_count: int. The number of questions to be returned.
+            offset: int. Number of query results to skip.
+
+        Returns:
+            list(QuestionModel). The list of questions.
+        """
+        question_count = min(question_count, constants.MAX_QUESTIONS_FETCHABLE)
+
+        return cls.query().order(-cls.last_updated).fetch(
+            question_count, offset=offset)
+
 
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.
@@ -424,22 +444,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return cls.query(
             cls.skill_id.IN(skill_ids)
         ).order(-cls.last_updated).fetch(question_skill_count, offset=offset)
-
-    @classmethod
-    def get_all_question_links(
-        cls, question_count: int, offset: int
-    ) -> Sequence[QuestionSkillLinkModel]:
-        """Fetches the list of QuestionSkillLinkModels in batches.
-
-        Args:
-            question_count: int. The number of questions to be returned.
-            offset: int. Number of query results to skip.
-
-        Returns:
-            list(QuestionSkillLinkModel). The QuestionSkillLinkModels.
-        """
-        return cls.query().order(-cls.last_updated).fetch(
-            question_count, offset=offset)
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(

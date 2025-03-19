@@ -19,10 +19,10 @@
 from __future__ import annotations
 
 from core import feconf
-from core.constants import constants
 from core.domain import question_domain
 from core.domain import question_fetchers
 from core.domain import question_services
+from core.domain import skill_services
 from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
@@ -221,74 +221,107 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
 
-    def test_get_all_question_skill_links(self) -> None:
-        question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id, 'skill_1', 0.3)
+    def test_get_all_questions_returns_correct_questions(self) -> None:
+        # Create a skill and two questions linked to that skill.
+        skill_id = skill_services.get_new_skill_id()
 
-        question_skill_links = (
-            question_fetchers.get_all_question_skill_links())
+        question_id1 = question_services.get_new_question_id()
+        question_id2 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
 
-        self.assertEqual(len(question_skill_links), 1)
-        self.assertEqual(
-            question_skill_links,
-            {
-                'skill_1': [self.question_id]
-            }
-        )
-
-    def test_get_all_question_skill_links_pagination(self) -> None:
-
-        # Create two questions.
-        question_id_1 = question_services.get_new_question_id()
-        question_id_2 = question_services.get_new_question_id()
-
-        # Create two skills and link them to the questions.
         self.save_new_question(
-            question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC', self.content_id_generator),
-            ['skill_1'],
-            self.content_id_generator.next_content_id_index)
+            question_id1, self.editor_id,
+            self._create_valid_question_data(
+                'Question 1', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index
+        )
         self.save_new_question(
-            question_id_2, self.editor_id,
-            self._create_valid_question_data('DEF', self.content_id_generator),
-            ['skill_2'],
-            self.content_id_generator.next_content_id_index)
-
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id_1, 'skill_1', 0.3)
-        question_services.create_new_question_skill_link(
-            self.editor_id, question_id_2, 'skill_2', 0.5)
-
-        # Fetch the question-skill links with pagination.
-        # Question_skill_links are returned in the last updated order.
-        # question_count = 1, offset = 1.
-        question_skill_links = (
-            question_fetchers.get_all_question_skill_links(1, 1))
-
-        self.assertEqual(
-            question_skill_links,
-            {
-                'skill_1': [question_id_1]
-            }
+            question_id2, self.editor_id,
+            self._create_valid_question_data(
+                'Question 2', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index
         )
+        # Link each question to the skill.
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id1, skill_id, 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id2, skill_id, 0.3)
 
-        question_skill_links_2 = (
-            question_fetchers.get_all_question_skill_links(0, 2))
-        self.assertEqual(len(question_skill_links_2), 2)
-        self.assertEqual(
-            question_skill_links_2,
-            {
-                'skill_2': [question_id_2],
-                'skill_1': [question_id_1]
-            }
+        # Fetch all questions.
+        questions = question_fetchers.get_all_questions(
+            offset=0, question_count=10)
+        returned_question_ids = [q.id for q in questions if q is not None]
+        self.assertIn(question_id1, returned_question_ids)
+        self.assertIn(question_id2, returned_question_ids)
+
+    def test_get_all_questions_pagination(self) -> None:
+        # Create a skill and three questions linked to that skill.
+        skill_id = skill_services.get_new_skill_id()
+        question_ids = []
+        content_id_generator = translation_domain.ContentIdGenerator()
+
+        for i in range(2):
+            qid = question_services.get_new_question_id()
+            question_ids.append(qid)
+            self.save_new_question(
+                qid, self.editor_id,
+                self._create_valid_question_data(
+                    f'Question {i+1}', content_id_generator),
+                [skill_id],
+                content_id_generator.next_content_id_index
+            )
+            question_services.create_new_question_skill_link(
+                self.editor_id, qid, skill_id, 0.3)
+
+        # Use an offset of 1 and fetch only 1 question.
+        questions = question_fetchers.get_all_questions(
+            offset=1, question_count=1)
+        self.assertEqual(len(questions), 1)
+        # The returned question should be the first one created.
+        self.assertEqual(questions[0].id, question_ids[0])
+
+    def test_get_all_questions_empty_when_offset_too_high(self) -> None:
+        # Create a skill and a single question.
+        skill_id = skill_services.get_new_skill_id()
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id, self.editor_id,
+            self._create_valid_question_data(
+                'Single Question', content_id_generator),
+            [skill_id],
+            content_id_generator.next_content_id_index
         )
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id, skill_id, 0.3)
 
-    def test_get_question_ids_by_skill_ids_exceeds_limit(self) -> None:
-        with self.assertRaisesRegex(
-            ValueError,
-            'Requested question count exceeds the limit of %d' %
-            constants.SKILL_QUESTION_LIMIT
-        ):
-            question_fetchers.get_all_question_skill_links(
-                question_count=constants.SKILL_QUESTION_LIMIT + 1,
-                offset=0)
+        # Use an offset greater than the number of questions available.
+        questions = question_fetchers.get_all_questions(
+            offset=100, question_count=10)
+        self.assertEqual(questions, [])
+
+    def test_get_all_questions_respects_question_count_limit(self) -> None:
+        # Create a skill and three questions linked to that skill.
+        skill_id = skill_services.get_new_skill_id()
+        question_ids = []
+        content_id_generator = translation_domain.ContentIdGenerator()
+
+        for i in range(2):
+            qid = question_services.get_new_question_id()
+            question_ids.append(qid)
+            self.save_new_question(
+                qid, self.editor_id,
+                self._create_valid_question_data(
+                    f'Question {i+1}', content_id_generator),
+                [skill_id],
+                content_id_generator.next_content_id_index
+            )
+            question_services.create_new_question_skill_link(
+                self.editor_id, qid, skill_id, 0.3)
+
+        # Fetch only 2 questions even though more exist.
+        questions = question_fetchers.get_all_questions(
+            offset=0, question_count=2)
+        self.assertEqual(len(questions), 2)
