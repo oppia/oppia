@@ -383,6 +383,19 @@ const watchAVideoButtonInThanksForSubscribe =
 const readOurBlogButtonInThanksForSubscribe =
   '.e2e-test-thanks-for-subscribe-read-blog-btn';
 const readBlogUrl = testConstants.URLs.ReadBlogLink;
+const noBlogPostsFoundSelector = '.e2e-no-blog-posts-found';
+const blogTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogPostTagSelector = '.e2e-test-blog-post-tag';
+const blogSearchInputSelector = '.e2e-test-search-input';
+const blogSubmitButtonSelector = '.e2e-test-search-submit-btn';
+const blogTagFilterSelector = '.e2e-test-tag-filter-component';
+const blogTagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const blogPaginationSelector = '.e2e-test-pagination';
+const blogPaginationNextSelector = '.e2e-test-pagination-next-button';
+const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
+const blogPostTitleContainerSelector =
+  '.e2e-test-blog-post-page-title-container';
+const blogPostContentSelector = '.e2e-test-blog-post-content';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -536,6 +549,149 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToSplashPage(): Promise<void> {
     await this.goto(splashPageUrl);
+  }
+
+  /**
+   * Navigates to the blog page
+   */
+  async navigateToBlogPage(): Promise<void> {
+    await this.goto(blogUrl);
+  }
+
+  /**
+   * Function to check whether any blog posts are found.
+   * @returns {Promise<boolean>} A promise that resolves to a boolean
+   * indicating whether any blog posts are found.
+   */
+  async checkIfBlogPostsAreFound(): Promise<boolean> {
+    const noPostsElement = await this.page.$(noBlogPostsFoundSelector);
+    if (noPostsElement) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Function to verify that the each blog post has a tag
+   * associated with it
+   */
+  async expectBlogPostsToHaveAtLeastOneTag(): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    const allPostsHaveTags = await this.page.$$eval(
+      blogTagContainerSelector,
+      (posts, tagSelector) =>
+        posts.every(post => post.querySelector(tagSelector as string) !== null),
+      blogPostTagSelector
+    );
+    if (!allPostsHaveTags) {
+      throw new Error('Not all blog posts have tags');
+    }
+  }
+
+  /**
+   * Function to filter blog posts by a keyword
+   */
+  async filterBlogPostsByKeyword(keyword: string): Promise<void> {
+    await this.type(blogSearchInputSelector, keyword);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the keyword
+   */
+  async expectBlogSearchResultsToContain(text: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    const contentFound = await this.page.$$eval(
+      `${blogPostTitleContainerSelector}, ${blogPostContentSelector}`,
+      (elements, searchText) =>
+        elements.some(el =>
+          el.textContent
+            ?.toLowerCase()
+            .includes((searchText as string).toLowerCase())
+        ),
+      text
+    );
+
+    if (!contentFound) {
+      throw new Error(`No results found containing "${text}"`);
+    }
+  }
+
+  /**
+   * Function to filter blog posts by a tag
+   */
+  async filterBlogPostsByTag(tagName: string): Promise<void> {
+    await this.clickOn(blogTagFilterSelector);
+    await this.clickOn(`.e2e-test-select-${tagName}`);
+    await this.page.waitForSelector(blogTagFilterDropdownSelector, {
+      hidden: true,
+    });
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+  }
+
+  /**
+   * Function to verify that the filtered blog posts contain the tag
+   */
+  async expectBlogSearchResultsToHaveTag(tagName: string): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    const tagFound = await this.page.$$eval(
+      blogPostTagSelector,
+      (elements, expectedTag) =>
+        elements.some(el => el.textContent?.trim() === expectedTag),
+      tagName
+    );
+
+    if (!tagFound) {
+      throw new Error(`No results found with tag "${tagName}"`);
+    }
+  }
+
+  /**
+   * Function to check whether the pagination controls are visible
+   */
+  async expectBlogPaginationControlsVisible(): Promise<void> {
+    let blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      return;
+    }
+    try {
+      await this.page.waitForSelector(blogPaginationSelector, {
+        visible: true,
+      });
+    } catch (error) {
+      throw new Error('Pagination controls not visible');
+    }
+  }
+
+  /**
+   * Function to click the next button in the pagination controls
+   */
+  async clickNextBlogPage(): Promise<void> {
+    const nextButton = await this.page.$(blogPaginationNextSelector);
+    if (!nextButton) {
+      return;
+    }
+    await this.clickOn(blogPaginationNextSelector);
+  }
+
+  /**
+   * Function to click the previous button in the pagination controls
+   */
+  async clickPreviousBlogPage(): Promise<void> {
+    const prevButton = await this.page.$(blogPaginationPrevSelector);
+    if (!prevButton) {
+      return;
+    }
+    await this.clickOn(blogPaginationPrevSelector);
   }
 
   /**
