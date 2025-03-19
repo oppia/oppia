@@ -623,8 +623,6 @@ class DiagnosticTestPlayerPageAccessValidationHandlerTests(
                 ACCESS_VALIDATION_HANDLER_PREFIX),
                 expected_status_int=404)
 
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
     def test_should_access_diagnostic_test_page_when_feature_is_enabled(
         self) -> None:
         self.get_html_response(

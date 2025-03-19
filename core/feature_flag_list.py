@@ -35,7 +35,6 @@ class FeatureNames(enum.Enum):
         'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
-    DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
@@ -112,7 +111,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
-    FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST
@@ -143,12 +141,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.CHECKPOINT_CELEBRATION.value: (
         (
             'This flag is for the checkpoint celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.DIAGNOSTIC_TEST.value: (
-        (
-            'This flag is for the diagnostic test functionality.',
             feature_flag_domain.ServerMode.PROD
         )
     ),
