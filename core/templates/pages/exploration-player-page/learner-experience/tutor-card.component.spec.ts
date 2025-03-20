@@ -209,7 +209,6 @@ describe('Tutor card component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowRef = TestBed.inject(WindowRef);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     translateService = TestBed.inject(TranslateService);
 
