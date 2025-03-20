@@ -779,21 +779,6 @@ describe('Checkpoint celebration modal component', function () {
     ).toHaveBeenCalled();
   });
 
-  it('should not open lesson info modal if feature is disabled', () => {
-    spyOn(checkpointCelebrationUtilityService, 'openLessonInformationModal');
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      CheckpointCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-
-    component.openLessonInfoModal();
-
-    expect(
-      checkpointCelebrationUtilityService.openLessonInformationModal
-    ).not.toHaveBeenCalled();
-  });
-
   it('should determine if current language is RTL', () => {
     const isLanguageRTLSpy = spyOn(
       i18nLanguageCodeService,

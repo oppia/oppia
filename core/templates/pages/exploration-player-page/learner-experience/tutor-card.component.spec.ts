@@ -364,34 +364,6 @@ describe('Tutor card component', () => {
     expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
   }));
 
-  it('should not trigger celebratory animation if the feature is not enabled', () => {
-    spyOn(componentInstance, 'updateDisplayedCard');
-    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      EndChapterCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-    spyOn(componentInstance, 'triggerCelebratoryAnimation');
-    componentInstance.animationHasPlayedOnce = false;
-    componentInstance.inStoryMode = true;
-    const changes: SimpleChanges = {
-      displayedCard: {
-        previousValue: false,
-        currentValue: true,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    };
-
-    componentInstance.ngOnChanges(changes);
-
-    expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
-    expect(
-      componentInstance.triggerCelebratoryAnimation
-    ).not.toHaveBeenCalled();
-  });
-
   it('should not trigger celebratory animation if not in story mode', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);

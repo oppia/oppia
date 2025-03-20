@@ -29,8 +29,6 @@ class FeatureNames(enum.Enum):
     """Enum for Feature names."""
 
     DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
-    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
-    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
         'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
@@ -105,8 +103,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
 # be in prod stage otherwise it will cause a test error in the backend test.
 PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-    FeatureNames.END_CHAPTER_CELEBRATION,
-    FeatureNames.CHECKPOINT_CELEBRATION,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
@@ -131,18 +127,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
         (
             'This is a dummy feature flag for the e2e tests.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.END_CHAPTER_CELEBRATION.value: (
-        (
-            'This flag is for the end chapter celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.CHECKPOINT_CELEBRATION.value: (
-        (
-            'This flag is for the checkpoint celebration feature.',
             feature_flag_domain.ServerMode.PROD
         )
     ),

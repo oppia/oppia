@@ -424,14 +424,10 @@ describe('Ratings and recommendations component', () => {
       'get'
     ).and.callThrough();
 
-    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
-
     featureSpy.and.returnValue({
       EndChapterCelebration: {
         isEnabled: false,
       },
     } as FeatureStatusChecker);
-
-    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);
   });
 });

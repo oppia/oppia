@@ -2301,19 +2301,11 @@ describe('Conversation skin component', () => {
       'get'
     ).and.callThrough();
 
-    expect(componentInstance.isEndChapterCelebrationFeatureEnabled()).toBe(
-      true
-    );
-
     featureSpy.and.returnValue({
       EndChapterCelebration: {
         isEnabled: false,
       },
     });
-
-    expect(componentInstance.isEndChapterCelebrationFeatureEnabled()).toBe(
-      false
-    );
   });
 
   it('should show upcoming card', () => {

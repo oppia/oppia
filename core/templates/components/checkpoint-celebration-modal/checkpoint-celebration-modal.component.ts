@@ -185,7 +185,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (
       newStateName === this.currentStateName ||
       newStateName === this.mostRecentlyReachedCheckpointStateName ||
-      !this.platformFeatureService.status.CheckpointCelebration.isEnabled ||
       !this.explorationPlayerStateService.isInStoryChapterMode()
     ) {
       return;
@@ -328,9 +327,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   openLessonInfoModal(): void {
-    if (!this.platformFeatureService.status.CheckpointCelebration.isEnabled) {
-      return;
-    }
     this.checkpointCelebrationUtilityService.openLessonInformationModal();
   }
 
