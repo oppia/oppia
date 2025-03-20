@@ -56,7 +56,6 @@ import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {UserInfo} from 'domain/user/user-info.model';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 class MockWindowRef {
@@ -116,7 +115,6 @@ describe('Tutor card component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
-  let platformFeatureService: PlatformFeatureService;
   let translateService: TranslateService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
