@@ -1232,9 +1232,16 @@ describe('Translation Modal Component', () => {
           returnValue: '',
         } as BeforeUnloadEvent;
 
-        // Access the private property using type assertion
-        const handler = (component as any).beforeUnloadHandler;
-        expect(handler(mockEvent)).toBeUndefined();
+        interface ComponentWithPrivateMembers
+          extends TranslationModalComponent {
+          beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
+        }
+
+        const componentWithPrivateAccess =
+          component as ComponentWithPrivateMembers;
+        expect(
+          componentWithPrivateAccess.beforeUnloadHandler(mockEvent)
+        ).toBeUndefined();
       });
 
       it('should initialize beforeUnloadHandler to return undefined by default', fakeAsync(() => {
