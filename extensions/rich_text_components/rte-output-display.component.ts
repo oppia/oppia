@@ -31,18 +31,20 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {ConstantNodeDependencies} from 'mathjs';
 import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ContextService} from 'services/context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 import {
   OppiaRteParserService,
   OppiaRteNode,
   TextNode,
 } from 'services/oppia-rte-parser.service';
 import {ServicesConstants} from 'services/services.constants';
+import {LocalStorageService} from 'services/local-storage.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 
@@ -73,6 +75,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  // Remove this
   @ViewChild('treeContainer', {static: false}) treeContainer: ElementRef;
   @ViewChild('highlight') highlightTagPortal: ElementRef;
   @Input() rteString: string;
@@ -80,12 +83,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
-  audioPlaybackHighlightIntervals = [];
+
   highlighIdToSentenceText = {};
   wrapped = false;
   previousHighlightedElementId!: string;
-  punctuationsForCurrentLanguage =
-    AppConstants.LANGUAGE_CODE_TO_PUNCTIONATION_MARKS['en'];
+  // The background color of the sentence being played in the audio player.
+  backgroundColorOfHighlightedSentence = '#f3d140';
 
   constructor(
     private _viewContainerRef: ViewContainerRef,
@@ -96,7 +99,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private audioPlayerService: AudioPlayerService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private contextService: ContextService
+    private contextService: ContextService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private localStorageService: LocalStorageService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   wrapSentencesInSpansForHighlighting(htmlString: string): string {
@@ -105,26 +111,50 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return htmlString;
     }
     this.wrapped = true;
+
+    let languageCode =
+      this.localStorageService.getLastSelectedTranslationLanguageCode();
+
+    // To split sentences from the lesson content, we need to use
+    // language-specific punctuation marks.
+    const punctuationsForCurrentLanguage =
+      AppConstants.LANGUAGE_CODE_TO_PUNCTIONATION_MARKS[languageCode];
+
+    // The regex below is used to split sentences from the lesson content.
+    const sentenceRegex = new RegExp(
+      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Z”])`,
+      'g'
+    );
+
     // Create a temporary DOM element.
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
+
+    // The index is used to assign a unique id to each sentence of the
+    // lesson content.
     let index = 1;
+
     let highlighIdToSentenceText = {};
 
     function traverse(node: Node) {
       if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
-        const sentences = textContent.split(/(?<=[.!?])\s+/);
+        const sentences = textContent.split(sentenceRegex);
         const fragment = document.createDocumentFragment();
 
         sentences.forEach(sentence => {
           if (sentence.trim()) {
+            // Create a span element for each sentence to be highlighted during
+            // voiceover playback.
             const wordsToHighlight = document.createElement('span');
-            let id = `highlightBlock${index}`;
-            wordsToHighlight.id = id;
+
+            let elementId = `highlightBlock${index}`;
+            wordsToHighlight.id = elementId;
             wordsToHighlight.textContent = sentence;
-            highlighIdToSentenceText[id] = sentence;
+
             fragment.appendChild(wordsToHighlight);
+
+            highlighIdToSentenceText[elementId] = sentence;
             index++;
           }
         });
@@ -159,6 +189,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
     this.rteString = this.rteString.replace(/\n/g, '');
+
+    // The following line wraps each sentence in a span tag to highlight
+    // the sentence during voiceover playback.
     this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
 
     let domparser = new DOMParser();
@@ -210,35 +243,67 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     });
   }
 
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
+  }
+
   ngOnInit(): void {
+    // If the below feature flag is not enabld then the sentence highlighting
+    // feature will not work.
+    if (!this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+      return;
+    }
+
+    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      this.entityVoiceoversService.getActiveEntityVoiceovers()
+        ?.automatedVoiceoversAudioOffsetsMsecs || {}
+    );
+    this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+
+    // The below lines runs on every 200ms to highlight the sentence being
+    // played in the audio player.
     setInterval(() => {
+      // Highlight only when the audio is playing.
       if (this.audioPlayerService.isPlaying()) {
         let previousHighlightedElement = document.getElementById(
           this.previousHighlightedElementId
         );
-        let currentElementIdToHighlight =
-          this.getCurrentSentenceIdToHighlight();
 
+        let currentElementIdToHighlight =
+          this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
+            this.audioPlayerService.getCurrentTimeInSecs()
+          );
+
+        // If previous highlighted sentence and current sentence are same, then
+        // do not highlight the sentence again.
         if (
-          previousHighlightedElement &&
-          previousHighlightedElement.textContent ===
-            this.highlighIdToSentenceText[currentElementIdToHighlight]
+          previousHighlightedElement?.textContent ===
+          this.highlighIdToSentenceText[currentElementIdToHighlight]
         ) {
           return;
         }
 
+        // Removes the highlight background from the previous sentence.
         if (previousHighlightedElement) {
           previousHighlightedElement.style.backgroundColor = '';
         }
 
-        let elementToHighlight = document.getElementById(
+        let currentElementToHighlight = document.getElementById(
           currentElementIdToHighlight
         );
-        if (elementToHighlight) {
-          elementToHighlight.style.backgroundColor = 'yellow';
+
+        // Highlights the current sentence being played in the audio player.
+        if (currentElementToHighlight) {
+          // Apply CSS for smooth transition
+          currentElementToHighlight.style.backgroundColor =
+            this.backgroundColorOfHighlightedSentence;
+
           this.previousHighlightedElementId = currentElementIdToHighlight;
         }
       } else {
+        // Removes the highlight from the previous sentence when the audio is
+        // paused.
         let previousHighlightedElement = document.getElementById(
           this.previousHighlightedElementId
         );
@@ -249,81 +314,19 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }, 200);
   }
 
-  getElementIdForGivenAttribute(attribute): string {
-    if (Object.keys(attribute).includes('id')) {
-      return attribute.id;
-    }
-    return '';
-  }
-
-  getCurrentSentenceIdToHighlight(): string | undefined {
-    let currentTimeInSecs = this.audioPlayerService.getCurrentTimeInSecs();
-    let currentsentenceIdAndInterval =
-      this.audioPlaybackHighlightIntervals.find(sentenceIdAndInterval => {
-        return (
-          currentTimeInSecs >= sentenceIdAndInterval.startTimeInSecs &&
-          currentTimeInSecs <= sentenceIdAndInterval.endTimeInSecs
-        );
-      });
-    return currentsentenceIdAndInterval?.sentenceId;
-  }
-
-  getSentenceAudioOffset() {
-    let automatedVoiceoversAudioOffsetsMsecs =
-      this.entityVoiceoversService.getActiveEntityVoiceovers()
-        ?.automatedVoiceoversAudioOffsetsMsecs || [];
-
-    if (Object.values(automatedVoiceoversAudioOffsetsMsecs).length === 0) {
-      return;
-    }
-
-    let contentId!: string;
+  getActiveContentId(): string {
+    // The below if-else block is used to get the active content ID based on the
+    // current page.
     if (
       this.contextService.isInExplorationPlayerPage() ||
       (this.contextService.isInExplorationEditorPage() &&
         this.contextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      contentId = this.voiceoverPlayerService.getActiveContentId();
+      return this.voiceoverPlayerService.getActiveContentId();
     } else {
-      contentId =
-        this.translationTabActiveContentIdService.getActiveContentId();
+      return this.translationTabActiveContentIdService.getActiveContentId();
     }
-
-    let audioOffsets = automatedVoiceoversAudioOffsetsMsecs[contentId];
-
-    if (audioOffsets === undefined) {
-      return;
-    }
-
-    let lastIndex = 0;
-    Object.entries(this.highlighIdToSentenceText).map(([key, text]) => {
-      const words =
-        (typeof text === 'string' ? text.match(/\w+|[^\s\w]+/g) : []) ?? [];
-
-      let minOffset = Number.MAX_VALUE;
-      let maxOffset = 0;
-
-      words.forEach(word => {
-        for (let i = lastIndex; i < audioOffsets.length; i++) {
-          const {token, audioOffsetMsecs} = audioOffsets[i];
-
-          if (token.toLowerCase() === word.toLowerCase()) {
-            if (audioOffsetMsecs < minOffset) minOffset = audioOffsetMsecs;
-            if (audioOffsetMsecs > maxOffset) maxOffset = audioOffsetMsecs;
-            lastIndex = i;
-            break;
-          }
-        }
-      });
-
-      this.audioPlaybackHighlightIntervals.push({
-        sentenceId: key,
-        startTimeInSecs:
-          minOffset === Number.MAX_VALUE ? 0 : Math.round(minOffset / 1000),
-        endTimeInSecs: Math.round(maxOffset / 1000),
-      });
-    });
   }
 
   ngAfterViewInit(): void {
@@ -393,7 +396,19 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       textNodes.forEach(node => node.parentElement.removeChild(node));
 
       this._updateNode();
-      this.getSentenceAudioOffset();
+
+      // If the below feature flag is not enabld then the sentence highlighting
+      // feature will not work.
+      if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+        const activeContentId = this.getActiveContentId();
+        this.automaticVoiceoverHighlightService.setActiveContentId(
+          activeContentId
+        );
+        this.automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap(
+          this.highlighIdToSentenceText
+        );
+        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+      }
       setTimeout(() => (this.show = true), 0);
     }
   }

@@ -7756,7 +7756,10 @@ export default {
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
   "LANGUAGE_CODE_TO_PUNCTIONATION_MARKS": {
-    "en": ".!?"
+    "ar": "؟!",
+    "en": ".!?",
+    "pt": ".!?",
+    "hi": "।!?"
   },
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
     "en": {
