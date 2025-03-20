@@ -1226,6 +1226,31 @@ describe('Translation Modal Component', () => {
         translationLanguageService.setActiveLanguageCode('es');
       });
 
+      it('should have beforeUnloadHandler initialized as a function returning undefined', () => {
+        const mockEvent = {
+          preventDefault: () => {},
+          returnValue: '',
+        } as BeforeUnloadEvent;
+
+        // Access the private property using type assertion
+        const handler = (component as any).beforeUnloadHandler;
+        expect(handler(mockEvent)).toBeUndefined();
+      });
+
+      it('should initialize beforeUnloadHandler to return undefined by default', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
+        const mockEvent = {
+          preventDefault: () => {},
+          returnValue: '',
+        } as BeforeUnloadEvent;
+
+        component.activeWrittenTranslation = '';
+        expect(handler(mockEvent)).toBeUndefined();
+      }));
+
       it('should add beforeunload event listener on init', fakeAsync(() => {
         component.ngOnInit();
         tick();
@@ -1265,14 +1290,6 @@ describe('Translation Modal Component', () => {
         expect(preventDefaultSpy).toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
-
-      it('should have a default beforeUnloadHandler that returns undefined', () => {
-        const mockEvent = {
-          preventDefault: () => {},
-          returnValue: '',
-        } as BeforeUnloadEvent;
-        expect(component['beforeUnloadHandler'](mockEvent)).toBeUndefined();
-      });
     });
 
     describe('when no unsaved changes', () => {
