@@ -3277,6 +3277,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'new_value': self.EXP_ID
             })], 'Changes.')
 
+        self.save_new_skill(
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
+
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_id, 'hi')

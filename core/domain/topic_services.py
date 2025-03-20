@@ -82,7 +82,7 @@ def _create_topic(
                 raise utils.ValidationError(
                 'The skill %s has a superseding skill %s' %
                 (skill_id, skill.superseding_skill_id))
-        except Exception as e:
+        except Exception:
             continue
 
     if does_topic_with_name_exist(topic.name):
