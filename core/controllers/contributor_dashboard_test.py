@@ -1162,7 +1162,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
-
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'

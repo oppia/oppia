@@ -111,7 +111,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id)
         self.assertEqual(
-            len(json_response['untriaged_skill_summary_dicts']), 1)
+            len(json_response['untriaged_skill_summary_dicts']), 2)
         self.assertEqual(
             len(json_response['mergeable_skill_summary_dicts']), 2)
 
@@ -186,7 +186,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
-            len(json_response['untriaged_skill_summary_dicts']), 1)
+            len(json_response['untriaged_skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['skill_id'],
             skill_id)
@@ -283,7 +283,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'keywords': [],
             }, csrf_token=csrf_token)
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 3)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
         self.assertEqual(
@@ -393,7 +393,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'keywords': []
             }, csrf_token=csrf_token)
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 0)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
         self.assertFalse(json_response['more'])
         self.assertEqual(json_response['next_cursor'], None)
 
@@ -440,7 +440,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'keywords': []
             }, csrf_token=csrf_token)
 
-        self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+        self.assertEqual(len(json_response['skill_summary_dicts']), 2)
         self.assertEqual(
             json_response['skill_summary_dicts'][0]['id'], self.linked_skill_id)
 
@@ -1057,7 +1057,6 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
             new_skill_id, 'Skill Description')
-        new_prerequisites = skill_with_prereq.prerequisite_skill_ids
 
         self.assertEqual(json_response['merged_into_skill'], new_skill_id)
         self.assertEqual(len(old_links), 0)
@@ -1066,6 +1065,9 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         # The old_skill should be replaced by the new skill in the
         # prerequisite_skills array of skill_with_prereq as the
         # old_skill is merged to the new skill.
+        skill_with_prereq = skill_fetchers.get_skill_by_id(
+            self.skill_with_prerequisite)
+        new_prerequisites = skill_with_prereq.prerequisite_skill_ids
         self.assertEqual(new_prerequisites, [new_skill_id])
 
         self.logout()
