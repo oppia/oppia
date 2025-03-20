@@ -437,6 +437,70 @@ class VoiceoverAutogenerationPolicyUnitTests(test_utils.GenericTestBase):
                 'True')  # type: ignore[assignment]
             voiceover_auto_pol.validate()
 
+    def test_validate_language_codes_mapping_type(self) -> None:
+        language_codes_mapping = {
+            'en': {
+                'en-US': False
+            }
+        }
+        voiceover_auto_policy = (
+            voiceover_domain.VoiceoverAutogenerationPolicy(
+                language_codes_mapping, True))
+
+        expected_error_msg = 'language_codes_mapping must be a dict'
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping = 3  # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping = True # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping = ['1']  # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
+    def test_validate_language_code_mapping_type(self) -> None:
+        language_codes_mapping = {
+            'en': {
+                'en-US': False
+            }
+        }
+        voiceover_auto_policy = (
+            voiceover_domain.VoiceoverAutogenerationPolicy(
+                language_codes_mapping, True))
+
+        expected_error_msg = 'language_code_mapping must be a dict'
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping['en'] = 4  # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping['en'] = False  # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            # TODO(#13059): Here we use MyPy ignore because after we fully type
+            # the codebase we plan to get rid of the tests that intentionally
+            # test wrong inputs that we can normally catch by typing.
+            voiceover_auto_policy.language_codes_mapping['en'] = ['1']  # type: ignore[assignment]
+            voiceover_auto_policy.validate()
+
     def test_validate_language_code_type(self) -> None:
         language_codes_mapping = {
             'en': {
