@@ -56,7 +56,6 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {AlertsService} from 'services/alerts.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -72,6 +71,22 @@ class MockConfirmTranslationExitModal {
   result = Promise.resolve();
   close(): void {}
   dismiss(): void {}
+}
+
+class MockImageLocalStorageService {
+  private storedImages: Map<string, ImagesData> = new Map();
+
+  getStoredImagesData(): ImagesData[] {
+    return Array.from(this.storedImages.values());
+  }
+
+  flushStoredImagesData(): void {
+    this.storedImages.clear();
+  }
+
+  getFilenameToBase64MappingAsync(): Promise<Record<string, string>> {
+    return Promise.resolve({});
+  }
 }
 
 describe('Translation Modal Component', () => {
@@ -91,9 +106,12 @@ describe('Translation Modal Component', () => {
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let mockModalRef: MockConfirmTranslationExitModal;
-  let alertsService: AlertsService;
   let windowRef: WindowRef;
-  let mockWindow: Window;
+  let mockWindow: {
+    addEventListener: jasmine.Spy;
+    removeEventListener: jasmine.Spy;
+    gtag: jasmine.Spy;
+  };
 
   const opportunity: TranslationOpportunity = {
     id: '1',
@@ -117,6 +135,11 @@ describe('Translation Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     mockModalRef = new MockConfirmTranslationExitModal();
+    mockWindow = {
+      addEventListener: jasmine.createSpy('addEventListener'),
+      removeEventListener: jasmine.createSpy('removeEventListener'),
+      gtag: jasmine.createSpy('gtag'),
+    };
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -143,12 +166,11 @@ describe('Translation Modal Component', () => {
         },
         {
           provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              addEventListener: jasmine.createSpy('addEventListener'),
-              removeEventListener: jasmine.createSpy('removeEventListener'),
-            },
-          },
+          useValue: {nativeWindow: mockWindow},
+        },
+        {
+          provide: ImageLocalStorageService,
+          useClass: MockImageLocalStorageService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -1094,8 +1116,13 @@ describe('Translation Modal Component', () => {
       }));
     });
 
-    fdescribe('when handling unsaved changes when browser tab/window is closed', () => {
-      let mockWindow: any;
+    describe('when handling unsaved changes when browser tab/window is closed', () => {
+      interface MockWindow {
+        addEventListener: jasmine.Spy;
+        removeEventListener: jasmine.Spy;
+      }
+
+      let mockWindow: MockWindow;
       let mockEvent: BeforeUnloadEvent;
       let preventDefaultSpy: jasmine.Spy;
       let translationLanguageService: TranslationLanguageService;
