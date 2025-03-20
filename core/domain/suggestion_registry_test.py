@@ -4104,7 +4104,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
+            uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
             subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
