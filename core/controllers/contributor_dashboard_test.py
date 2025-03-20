@@ -25,7 +25,6 @@ from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import skill_services
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import state_domain
@@ -85,8 +84,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic', 'abbrev', 'description', 'fragm')
-        self.skill_id_0 = skill_services.get_new_skill_id()
-        self.skill_id_1 = skill_services.get_new_skill_id()
+        self.skill_id_0 = 'skill_id_0'
+        self.skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
 
         self.create_story_for_translation_opportunity(
@@ -98,9 +97,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.topic_id_1 = '1'
         topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'topic1', 'url-fragment', 'description', 'fragm')
-        self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_2, self.admin_id, description='Skill Description 2')
+        self.skill_id_2 = 'skill_id_2'
         self._publish_valid_topic(topic, [self.skill_id_2])
 
         self.create_story_for_translation_opportunity(
@@ -267,14 +264,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_name = 'topic9'
         topic = topic_domain.Topic.create_default_topic(
             topic_id, topic_name, 'url-fragment-nine', 'description', 'fragm')
-        skill_id_3 = skill_services.get_new_skill_id()
-        skill_id_4 = skill_services.get_new_skill_id()
-        skill_id_5 = skill_services.get_new_skill_id()
-        
-        self.save_new_skill(
-            skill_id_4, self.admin_id, description='Skill Description 4')
-        self.save_new_skill(
-            skill_id_5, self.admin_id, description='Skill Description 5')
+        skill_id_3 = 'skill_id_3'
+        skill_id_4 = 'skill_id_4'
+        skill_id_5 = 'skill_id_5'
         self._publish_valid_topic(
             topic, [skill_id_3, skill_id_4, skill_id_5])
 
@@ -330,15 +322,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_name = 'topic10'
         topic = topic_domain.Topic.create_default_topic(
             topic_id, topic_name, 'url-fragment-ten', 'description', 'fragm-t')
-        skill_id_6 = skill_services.get_new_skill_id()
-        skill_id_7 = skill_services.get_new_skill_id()
-        skill_id_8 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_6, self.admin_id, description='Skill Description 6')
-        self.save_new_skill(
-            skill_id_7, self.admin_id, description='Skill Description 7')
-        self.save_new_skill(
-            skill_id_8, self.admin_id, description='Skill Description 8')
+        skill_id_6 = 'skill_id_6'
+        skill_id_7 = 'skill_id_7'
+        skill_id_8 = 'skill_id_8'
         self._publish_valid_topic(
             topic, [skill_id_6, skill_id_7, skill_id_8])
 
@@ -1121,9 +1107,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         subtopic_id = 1
-        subtopic_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            subtopic_skill_id, self.admin_id, description='Subtopic Skill Description')
+        subtopic_skill_id = 'subtopic_skill_id' + topic.id
         topic.subtopics = [
             topic_domain.Subtopic(
                 subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
@@ -1178,9 +1162,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
-        skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.admin_id, description='Skill Description 1')
 
         topic = topic_domain.Topic.create_default_topic(
             '0', 'topic', 'abbrev', 'description', 'fragm')
@@ -1188,11 +1169,11 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', [skill_id_1], 'image.svg',
+                1, 'Title', ['skill_id_1'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = [skill_id_1]
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(topic.id, self.admin_id)
 
@@ -1777,11 +1758,6 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
             response,
             {'topic_names': []}
         )
-
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
-
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
             topic_id, 'topic', 'abbrev', 'description', 'fragm')
@@ -1789,11 +1765,11 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', [skill_id_3], 'image.svg',
+                1, 'Title', ['skill_id_3'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = [skill_id_3]
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.owner_id, topic)
 
         # Unpublished topics should not be returned.
@@ -1836,12 +1812,8 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
     def test_no_topic_name_should_be_returned_when_topic_is_not_published(
         self) -> None:
         # Create a topic.
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
-        
         subtopic = topic_domain.Subtopic(
-            1, 'Title', [skill_id_3], 'image.svg',
+            1, 'Title', ['skill_id_3'], 'image.svg',
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'dummy-subtopic-three')
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -1878,11 +1850,8 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
     def test_topic_name_should_be_returned_when_topic_is_published(
         self) -> None:
         # Create a topic.
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
         subtopic = topic_domain.Subtopic(
-            1, 'Title', [skill_id_3], 'image.svg',
+            1, 'Title', ['skill_id_3'], 'image.svg',
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'dummy-subtopic-three')
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -1927,11 +1896,8 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
     def test_topic_without_classroom_should_also_be_returned(
         self) -> None:
         # Create topics.
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
         subtopic = topic_domain.Subtopic(
-            1, 'Title', [skill_id_3], 'image.svg',
+            1, 'Title', ['skill_id_3'], 'image.svg',
             constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
             'dummy-subtopic-three')
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -2071,20 +2037,17 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
             topic_id: str. Topic ID.
             topic_name: str. Topic name.
         """
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
         topic = topic_domain.Topic.create_default_topic(
             topic_id, topic_name, 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', [skill_id_3], 'image.svg',
+                1, 'Title', ['skill_id_3'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = [skill_id_3]
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 
@@ -2369,20 +2332,17 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             topic_id: str. Topic ID.
             topic_name: str. Topic name.
         """
-        skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_3, self.admin_id, description='Skill Description 3')
         topic = topic_domain.Topic.create_default_topic(
             topic_id, topic_name, 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', [skill_id_3], 'image.svg',
+                1, 'Title', ['skill_id_3'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = [skill_id_3]
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 

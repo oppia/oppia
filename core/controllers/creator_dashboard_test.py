@@ -25,7 +25,6 @@ from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import collection_services
 from core.domain import exp_services
-from core.domain import skill_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_domain
@@ -304,18 +303,12 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['topic_summary_dicts']), 0)
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id_1, self.owner_id, description='Skill Description 1')
-        self.save_new_skill(
-            skill_id_2, self.owner_id, description='Skill Description 2')
         self.save_new_topic(
             'topic_id', self.owner_id, name='Name',
             description='Description',
             canonical_story_ids=['story_id_1', 'story_id_2'],
             additional_story_ids=['story_id_3'],
-            uncategorized_skill_ids=[skill_id_1, skill_id_2],
+            uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
             subtopics=[], next_subtopic_id=1)
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['topic_summary_dicts']), 1)

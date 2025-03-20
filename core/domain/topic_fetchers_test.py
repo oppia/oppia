@@ -59,6 +59,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.save_new_skill(
+            self.skill_id_1, self.user_id, description='Skill Description 1')
+        self.save_new_skill(
+            self.skill_id_2, self.user_id, description='Skill Description 2')
+        self.save_new_skill(
+            'skill_3', self.user_id, description='Skill Description 3')
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,

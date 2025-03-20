@@ -5153,10 +5153,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
             url_fragment=self.story_url_fragment)
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one')
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description')
-        subtopic_1.skill_ids = [self.skill_id]
+        subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -5351,12 +5348,9 @@ class StoryViewerTests(test_utils.GenericTestBase):
         self.save_new_story(
             self.story_id, self.admin_id, self.topic_id,
             url_fragment=self.story_url_fragment)
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description')
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one')
-        subtopic_1.skill_ids = [self.skill_id]
+        subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -5551,17 +5545,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one')
-        self.skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_1, self.admin_id, description='Skill Description 1')
-        subtopic_1.skill_ids = [self.skill_id_1]
+        subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
             2, 'Subtopic Title 2', 'url-frag-two')
-        self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_2, self.admin_id, description='Skill Description 1')
-        subtopic_2.skill_ids = [self.skill_id_2]
+        subtopic_2.skill_ids = ['skill_id_2']
         subtopic_2.url_fragment = 'sub-two-frag'
         self.subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -5750,10 +5738,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one')
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, description='Skill Description 1')
-        subtopic_1.skill_ids = [self.skill_id]
+        subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',

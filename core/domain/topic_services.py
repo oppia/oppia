@@ -83,11 +83,8 @@ def _create_topic(
                 'The skill %s has a superseding skill %s' %
                 (skill_id, skill.superseding_skill_id))
         except Exception as e:
-            logging.error(
-                f'The skill with id: {skill_id} does not' +
-                ' have a skill model associated with it.'
-            )
-            raise e
+            continue
+
     if does_topic_with_name_exist(topic.name):
         raise utils.ValidationError(
             'Topic with name \'%s\' already exists' % topic.name)
