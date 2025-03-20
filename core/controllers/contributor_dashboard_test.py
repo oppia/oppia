@@ -87,10 +87,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.topic_id, 'topic', 'abbrev', 'description', 'fragm')
         self.skill_id_0 = skill_services.get_new_skill_id()
         self.skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id_0, self.admin_id, description='Skill Description 0')
-        self.save_new_skill(
-            self.skill_id_1, self.admin_id, description='Skill Description 1')
         self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
 
         self.create_story_for_translation_opportunity(

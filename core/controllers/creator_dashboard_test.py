@@ -307,9 +307,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            skill_id_1, self.user_id, description='Skill Description 1')
+            skill_id_1, self.owner_id, description='Skill Description 1')
         self.save_new_skill(
-            skill_id_2, self.user_id, description='Skill Description 2')
+            skill_id_2, self.owner_id, description='Skill Description 2')
         self.save_new_topic(
             'topic_id', self.owner_id, name='Name',
             description='Description',
