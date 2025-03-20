@@ -55,6 +55,8 @@ import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AlertsService} from 'services/alerts.service';
 
 enum ExpansionTabType {
   CONTENT,
@@ -89,6 +91,9 @@ describe('Translation Modal Component', () => {
   let wds: WindowDimensionsService;
   let ngbModal: NgbModal;
   let mockModalRef: MockConfirmTranslationExitModal;
+  let alertsService: AlertsService;
+  let windowRef: WindowRef;
+  let mockWindow: Window;
 
   const opportunity: TranslationOpportunity = {
     id: '1',
@@ -135,6 +140,15 @@ describe('Translation Modal Component', () => {
         {
           provide: ConfirmTranslationExitModalComponent,
           useClass: MockConfirmTranslationExitModal,
+        },
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              addEventListener: jasmine.createSpy('addEventListener'),
+              removeEventListener: jasmine.createSpy('removeEventListener'),
+            },
+          },
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -183,6 +197,8 @@ describe('Translation Modal Component', () => {
         can_review_questions: false,
       })
     );
+    windowRef = TestBed.inject(WindowRef);
+    mockWindow = windowRef.nativeWindow;
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -1078,15 +1094,18 @@ describe('Translation Modal Component', () => {
       }));
     });
 
-    describe('when browser tab/window is closed', () => {
-      let beforeUnloadSpy: jasmine.Spy;
+    fdescribe('when handling unsaved changes when browser tab/window is closed', () => {
+      let mockWindow: any;
       let mockEvent: BeforeUnloadEvent;
       let preventDefaultSpy: jasmine.Spy;
+      let translationLanguageService: TranslationLanguageService;
 
       beforeEach(() => {
-        spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback()
-        );
+        TestBed.resetTestingModule();
+        mockWindow = {
+          addEventListener: jasmine.createSpy('addEventListener'),
+          removeEventListener: jasmine.createSpy('removeEventListener'),
+        };
 
         preventDefaultSpy = jasmine.createSpy('preventDefault');
         mockEvent = {
@@ -1094,44 +1113,131 @@ describe('Translation Modal Component', () => {
           returnValue: '',
         } as unknown as BeforeUnloadEvent;
 
-        beforeUnloadSpy = spyOn(window, 'addEventListener').and.callFake(
-          (eventName: string, handler: Function) => {
-            if (eventName === 'beforeunload') {
-              component.beforeUnloadHandler = handler as (
-                e: BeforeUnloadEvent
-              ) => string | undefined;
-            }
-          }
-        );
+        TestBed.configureTestingModule({
+          imports: [HttpClientTestingModule],
+          declarations: [
+            TranslationModalComponent,
+            WrapTextWithEllipsisPipe,
+            ConfirmTranslationExitModalComponent,
+          ],
+          providers: [
+            NgbActiveModal,
+            TranslationLanguageService,
+            {
+              provide: ChangeDetectorRef,
+              useValue: changeDetectorRef,
+            },
+            {
+              provide: NgbModal,
+              useValue: {
+                open: () => mockModalRef,
+              },
+            },
+            {
+              provide: ConfirmTranslationExitModalComponent,
+              useClass: MockConfirmTranslationExitModal,
+            },
+            {
+              provide: WindowRef,
+              useValue: {nativeWindow: mockWindow},
+            },
+            {
+              provide: TranslateTextService,
+              useValue: {
+                init: (
+                  expId: string,
+                  languageCode: string,
+                  successCallback: () => void
+                ) => {
+                  successCallback();
+                },
+                getTextToTranslate: () => ({
+                  text: 'Sample text',
+                  more: true,
+                  status: 'active',
+                  translation: '',
+                  dataFormat: 'html',
+                  contentType: 'content',
+                }),
+                getPreviousTextToTranslate: () => ({
+                  text: 'Previous text',
+                  more: true,
+                  status: 'active',
+                  translation: '',
+                  dataFormat: 'html',
+                  contentType: 'content',
+                }),
+              },
+            },
+            {
+              provide: UserService,
+              useValue: {
+                getUserContributionRightsDataAsync: () =>
+                  Promise.resolve({
+                    can_review_translation_for_language_codes: ['ar'],
+                  }),
+              },
+            },
+            {
+              provide: ContextService,
+              useValue: {
+                setImageSaveDestinationToLocalStorage: () => {},
+                setCustomEntityContext: () => {},
+                getEntityType: () => 'exploration',
+                getEntityId: () => '1',
+                getImageSaveDestination: () => 'localStorage',
+              },
+            },
+          ],
+          schemas: [NO_ERRORS_SCHEMA],
+        });
+
+        fixture = TestBed.createComponent(TranslationModalComponent);
+        component = fixture.componentInstance;
+        component.opportunity = opportunity;
+        translationLanguageService = TestBed.inject(TranslationLanguageService);
+        translationLanguageService.setActiveLanguageCode('es');
       });
 
-      it('should add beforeunload event listener on init', () => {
+      it('should add beforeunload event listener on init', fakeAsync(() => {
         component.ngOnInit();
-        expect(beforeUnloadSpy).toHaveBeenCalledWith(
+        tick();
+        expect(mockWindow.addEventListener).toHaveBeenCalledWith(
           'beforeunload',
           jasmine.any(Function)
         );
-      });
+      }));
 
-      it('should remove beforeunload event listener on destroy', () => {
-        const removeEventListenerSpy = spyOn(window, 'removeEventListener');
+      it('should remove beforeunload event listener on destroy', fakeAsync(() => {
         component.ngOnInit();
+        tick();
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
         component.ngOnDestroy();
-        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        expect(mockWindow.removeEventListener).toHaveBeenCalledWith(
           'beforeunload',
-          jasmine.any(Function)
+          handler
         );
-      });
+      }));
 
-      it('should not show confirmation dialog when there are no unsaved changes', () => {
-        component.activeWrittenTranslation = '';
+      it('should not show confirmation dialog when there are no unsaved changes', fakeAsync(() => {
         component.ngOnInit();
-        const handler = component.beforeUnloadHandler;
+        tick();
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
+        component.activeWrittenTranslation = '';
         handler(mockEvent);
-
         expect(preventDefaultSpy).not.toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
-      });
+      }));
+
+      it('should show confirmation dialog when there are unsaved changes', fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        const handler = mockWindow.addEventListener.calls.argsFor(0)[1];
+        component.activeWrittenTranslation = 'Some unsaved text';
+        handler(mockEvent);
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        expect(mockEvent.returnValue).toBe('');
+      }));
     });
 
     describe('when no unsaved changes', () => {

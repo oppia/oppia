@@ -52,6 +52,7 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -198,7 +199,8 @@ export class TranslationModalComponent {
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly wds: WindowDimensionsService
+    private readonly wds: WindowDimensionsService,
+    private readonly windowRef: WindowRef
   ) {}
 
   public get expansionTabType(): typeof ExpansionTabType {
@@ -290,7 +292,10 @@ export class TranslationModalComponent {
         return '';
       }
     };
-    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+    this.windowRef.nativeWindow.addEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
   }
 
   ngAfterViewInit(): void {
@@ -709,6 +714,9 @@ export class TranslationModalComponent {
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+    this.windowRef.nativeWindow.removeEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
   }
 }
