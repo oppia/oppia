@@ -56,13 +56,13 @@ class ExplorationRecommendations:
             raise utils.ValidationError(
                 'Expected recommended_exploration_ids to be a list, '
                 'received %s' % self.recommended_exploration_ids)   
-        without_duplicate = set()
+        unique_exp_ids = set()
         for recommended_exploration_id in self.recommended_exploration_ids:
-            if recommended_exploration_id in without_duplicate:
+            if recommended_exploration_id in unique_exp_ids:
                 raise utils.ValidationError(
                     'recommended_exploration_ids contains duplicate values: %s'
                     % recommended_exploration_id)
-            without_duplicate.add(recommended_exploration_id)
+            unique_exp_ids.add(recommended_exploration_id)
             if not isinstance(recommended_exploration_id, str):
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be a string, '
