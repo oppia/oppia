@@ -228,7 +228,6 @@ const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
-
 const downloadPath = '/home/somnath/Downloads';
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
