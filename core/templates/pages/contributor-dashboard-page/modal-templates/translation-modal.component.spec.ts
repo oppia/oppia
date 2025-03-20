@@ -1265,6 +1265,14 @@ describe('Translation Modal Component', () => {
         expect(preventDefaultSpy).toHaveBeenCalled();
         expect(mockEvent.returnValue).toBe('');
       }));
+
+      it('should have a default beforeUnloadHandler that returns undefined', () => {
+        const mockEvent = {
+          preventDefault: () => {},
+          returnValue: '',
+        } as BeforeUnloadEvent;
+        expect(component['beforeUnloadHandler'](mockEvent)).toBeUndefined();
+      });
     });
 
     describe('when no unsaved changes', () => {
