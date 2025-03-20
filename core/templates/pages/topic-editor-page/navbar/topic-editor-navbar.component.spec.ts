@@ -33,6 +33,7 @@ import {
   TopicRightsBackendApiService,
   TopicRightsBackendResponse,
 } from 'domain/topic/topic-rights-backend-api.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {AlertsService} from 'services/alerts.service';
@@ -90,6 +91,7 @@ describe('Topic Editor Navbar', () => {
         UrlService,
         UndoRedoService,
         TopicRightsBackendApiService,
+        SkillBackendApiService,
         {
           provide: WindowRef,
           useValue: windowRef,
@@ -838,4 +840,63 @@ describe('Topic Editor Navbar', () => {
     componentInstance._validateTopic();
     expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
   });
+
+  it('should validate topic and check superseding skills', fakeAsync(() => {
+    componentInstance.topic = topic;
+    const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1', 'skill_2']);
+
+    const mockSkill1 = {
+      skill: {
+        getSupersedingSkillId: () => 'superseding_skill_1',
+      },
+    };
+    const mockSkill2 = {
+      skill: {
+        getSupersedingSkillId: () => null,
+      },
+    };
+
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.callFake(skillId => {
+      if (skillId === 'skill_1') {
+        return Promise.resolve(mockSkill1);
+      } else {
+        return Promise.resolve(mockSkill2);
+      }
+    });
+
+    componentInstance._validateTopic();
+    tick();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues).toContain(
+      'The skill with id skill_1 has superseding skill superseding_skill_1'
+    );
+    expect(componentInstance.validationIssues.length).toBe(2);
+  }));
+
+  it('should handle errors when fetching skills during validation', fakeAsync(() => {
+    componentInstance.topic = topic;
+    const skillBackendApiService = TestBed.inject(SkillBackendApiService);
+
+    spyOn(topic, 'getSkillIds').and.returnValue(['skill_1']);
+
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.reject(new Error('Network error'))
+    );
+
+    componentInstance._validateTopic();
+    tick();
+
+    expect(componentInstance.validationIssues).toContain(
+      'Topic url fragment is not valid.'
+    );
+    expect(componentInstance.validationIssues).toContain(
+      'Error fetching skill with id skill_1: Network error'
+    );
+    expect(componentInstance.validationIssues.length).toBe(2);
+  }));
 });
