@@ -350,7 +350,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(saved_recommendation)
+        assert saved_recommendation is not None
         self.assertEqual(
             recommended_exp_ids,
             saved_recommendation.recommended_exploration_ids)
@@ -367,7 +367,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(saved_recommendation)
+        assert saved_recommendation is not None
         self.assertEqual(
             recommended_exp_ids,
             saved_recommendation.recommended_exploration_ids)
@@ -384,7 +384,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_exploration_recommendations(
                 exp_id))
         # Ruling out the possibility of None for mypy type checking.
-        self.assertIsNotNone(saved_recommendation)
+        assert saved_recommendation is not None
         self.assertEqual(
             recommended_exp_ids,
             saved_recommendation.recommended_exploration_ids)
