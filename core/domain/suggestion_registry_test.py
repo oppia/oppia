@@ -3984,8 +3984,6 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
     story_id_2: str = 'story_2'
     story_id_3: str = 'story_3'
     subtopic_id: int = 1
-    skill_id_1: str = 'skill_1'
-    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
         auth_id = 'someUser'
@@ -3993,6 +3991,12 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
         user_settings = user_services.create_new_user(
             auth_id, 'user@example.com')
         user_services.set_username(user_settings.user_id, username)
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_1, self.user_id, description='Skill Description 1')
+        self.save_new_skill(
+            skill_id_2, self.user_id, description='Skill Description 2')
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -4001,7 +4005,7 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             topic_id_2, self.user_id, name='topic2',
@@ -4009,7 +4013,7 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         expected_frontend_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -4079,8 +4083,6 @@ class TranslationReviewerTotalContributionStatsUnitTests(
     story_id_2: str = 'story_2'
     story_id_3: str = 'story_3'
     subtopic_id: int = 1
-    skill_id_1: str = 'skill_1'
-    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
         auth_id = 'someUser'
@@ -4088,6 +4090,12 @@ class TranslationReviewerTotalContributionStatsUnitTests(
         user_settings = user_services.create_new_user(
             auth_id, 'user@example.com')
         user_services.set_username(user_settings.user_id, username)
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_1, self.user_id, description='Skill Description 1')
+        self.save_new_skill(
+            skill_id_2, self.user_id, description='Skill Description 2')
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -4096,7 +4104,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             topic_id_2, self.user_id, name='topic2',
@@ -4104,7 +4112,7 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
             'language_code': self.SUGGESTION_LANGUAGE_CODE,
@@ -4168,8 +4176,6 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
     story_id_2: str = 'story_2'
     story_id_3: str = 'story_3'
     subtopic_id: int = 1
-    skill_id_1: str = 'skill_1'
-    skill_id_2: str = 'skill_2'
 
     def test_to_frontend_dict(self) -> None:
         auth_id = 'someUser'
@@ -4177,6 +4183,12 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
         user_settings = user_services.create_new_user(
             auth_id, 'user@example.com')
         user_services.set_username(user_settings.user_id, username)
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_1, self.user_id, description='Skill Description 1')
+        self.save_new_skill(
+            skill_id_2, self.user_id, description='Skill Description 2')
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -4185,7 +4197,7 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
             topic_id_2, self.user_id, name='topic2',
@@ -4193,7 +4205,7 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             description='Description',
             canonical_story_ids=[self.story_id_1, self.story_id_2],
             additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            uncategorized_skill_ids=[skill_id_1, skill_id_2],
             subtopics=[], next_subtopic_id=1)
         expected_stats_dict = {
             'contributor_name': username,

@@ -134,17 +134,21 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.new_content_html = '<p>new content html</p>'
 
+        skill_id_333 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_333, self.admin_id, description='Skill Description 333')
+
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_333'], 'image.svg',
+                1, 'Title', [skill_id_333], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
+        topic.skill_ids_for_diagnostic_test = [skill_id_333]
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
@@ -2816,17 +2820,21 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
+        skill_id_333 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_333, self.admin_id, description='Skill Description 333')
+
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_333'], 'image.svg',
+                1, 'Title', [skill_id_333], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
-        topic.skill_ids_for_diagnostic_test = ['skill_id_333']
+        topic.skill_ids_for_diagnostic_test = [skill_id_333]
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 
@@ -3241,6 +3249,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, title='Exploration title',
             category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
+        self.save_new_skill(
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
@@ -3277,8 +3287,6 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'new_value': self.EXP_ID
             })], 'Changes.')
 
-        self.save_new_skill(
-            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         user_services.allow_user_to_review_question(self.reviewer_id)
         user_services.allow_user_to_review_translation_in_language(

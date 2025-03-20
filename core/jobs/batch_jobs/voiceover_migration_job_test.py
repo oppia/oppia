@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -237,6 +238,10 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         exp_services.update_exploration(
             self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
             change_list, 'Translation commits3')
+        
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_1, self.admin_id, description='Skill Description 1')
 
         topic_1 = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm')
@@ -244,11 +249,11 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         topic_1.thumbnail_bg_color = '#C6DCDA'
         topic_1.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_1'], 'image.svg',
+                1, 'Title', [skill_id_1], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic_1.next_subtopic_id = 2
-        topic_1.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
 
         topic_services.save_new_topic(self.owner_id, topic_1)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
@@ -381,17 +386,21 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             self.editor_id_2, self.CURATED_EXPLORATION_ID_2,
             change_list, 'Translation commits2')
 
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id_1, self.admin_id, description='Skill Description 1')
+
         topic_2 = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID_2, 'topic2', 'abbrev-top', 'description', 'fragmem')
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_2.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title subtopic', ['skill_id_1'], 'image.svg',
+                1, 'Title subtopic', [skill_id_1], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-sub')]
         topic_2.next_subtopic_id = 2
-        topic_2.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_2.skill_ids_for_diagnostic_test = [skill_id_1]
 
         topic_services.save_new_topic(self.owner_id, topic_2)
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
