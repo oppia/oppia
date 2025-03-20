@@ -21,7 +21,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
-import path from 'path';
 import fs from 'fs';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
@@ -224,7 +223,6 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
-const downloadExplorationButton = '.e2e-test-download-exploration';
 
 const downloadPath = '/home/somnath/Downloads';
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
@@ -1584,12 +1582,13 @@ export class ExplorationEditor extends BaseUser {
         );
         await dropdownButton?.click();
         await this.page.waitForTimeout(1000);
-        const downloadButton = await this.page.$(
+        const downloadButton = await historyItem.$(
           'a.dropdown-item.e2e-test-download-exploration'
         );
         await this.page.evaluate(el => el.click(), downloadButton);
         await this.page.waitForTimeout(5000);
-        const downloadedFile = await this.waitForDownload(explorationVersion);
+        const downloadedFile =
+          await this.waitForExplorationDownload(explorationVersion);
         if (downloadedFile) {
           showMessage(`${downloadedFile} file is successfully downloaded`);
           return;
@@ -1603,29 +1602,27 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Waits for a file to be downloaded and verifies its name.
+   * Waits for a Exploration zip file to be downloaded and verifies its name.
    * @param {number} expectedVersion - The expected version number in the file name.
    * @returns {Promise<string | null>} - Returns the file name if correct, otherwise null.
    */
-  async waitForDownload(expectedVersion: number): Promise<string | null> {
-    let downloadedFile: string | null = null;
-    for (let i = 0; i < 10; i++) {
-      // Retry for 10 seconds.
-      const files = fs.readdirSync(downloadPath);
-      downloadedFile =
-        files.find(file => {
-          return file.match(
-            new RegExp(
-              `^oppia-(downloadhistory|unpublished_exploration)-v${expectedVersion}( \\(\\d+\\))?\\.zip$`
-            )
-          );
-        }) || null;
-
-      if (downloadedFile) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  async waitForExplorationDownload(
+    expectedVersion: number
+  ): Promise<string | null> {
+    if (!fs.existsSync(downloadPath)) {
+      fs.mkdirSync(downloadPath);
     }
+    // Wait for network to be idle after triggering the download.
+    await this.page.waitForNetworkIdle();
+    const files = fs.readdirSync(downloadPath);
+    const downloadedFile =
+      files.find(file =>
+        file.match(
+          new RegExp(
+            `^oppia-(downloadhistory|unpublished_exploration)-v${expectedVersion}( \\(\\d+\\))?\\.zip$`
+          )
+        )
+      ) || null;
     return downloadedFile;
   }
 

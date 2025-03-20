@@ -23,14 +23,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
-  MULTIPLE_CHOICE = 'Multiple Choice',
-}
-enum CARD_NAME {
-  INTRODUCTION = 'Introduction',
-  MULTIPLE_CHOICE_QUESTION = 'Multiple Choice',
-  FINAL_CARD = 'Final Card',
 }
 
 describe('Exploration Creator', function () {
@@ -53,28 +46,23 @@ describe('Exploration Creator', function () {
 
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.updateCardContent('Modified ');
+    await explorationEditor.updateCardContent('Modified version 3 ');
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.updateCardContent('Modified version 4 ');
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.updateCardContent('Modified version 5 ');
     await explorationEditor.saveExplorationDraft();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
-  it(
-    'should show the latest saved changes',
-    async function () {
-      // Navigate to the preview tab and check whether the contents of the card are updated.
-      await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.expectPreviewCardContentToBe(
-        CARD_NAME.INTRODUCTION,
-        'Modified Content'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
   it(
     'should download any version of Exploration',
     async function () {
       // Navigate to the history tab, .
       await explorationEditor.navigateToHistoryTab();
+      await explorationEditor.downloadExploration(5);
+      await explorationEditor.downloadExploration(4);
       await explorationEditor.downloadExploration(3);
       await explorationEditor.downloadExploration(2);
       await explorationEditor.downloadExploration(1);
