@@ -59,8 +59,7 @@
     "core/tests",
     "**/*.spec.ts",
     "**/*Spec.ts",
-    "**/*.ajs.ts",
-    "core/templates/tests/unit-test-utils.ajs.ts"
+    "**/*.ajs.ts"
   ],
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": false,

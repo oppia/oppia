@@ -1,0 +1,37 @@
+name: Check Inactive Issues
+on:
+  schedule:
+    # Each midnight.
+    - cron: '0 0 * * *'
+  # GitHub doesn't provide assurance that the scheduled jobs will run on time
+  # (see https://github.community/t/no-assurance-on-scheduled-jobs/133753).
+  # So, we add the workflow_dispatch event here to allow triggering this
+  # workflow manually if needed.
+  workflow_dispatch:
+permissions: read-all
+
+jobs:
+  check-inactive-issues:
+    name: Check Inactive Issues
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+        
+    - name: Merge develop branch into the current branch
+      uses: ./.github/actions/merge-develop-and-set-up-dependencies
+
+    - name: Check inactive issues
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEASSIGN_INACTIVE_CONTRIBUTORS: ${{ secrets.DEASSIGN_INACTIVE_CONTRIBUTORS }}
+      run: |
+        python -m scripts.inactive_issue_checker
+      
+    - name: Report failure if failed on oppia/oppia develop branch
+      if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+      uses: ./.github/actions/send-webhook-notification
+      with:
+        message: "Inactive issue check failed on the upstream develop branch."
+        webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
