@@ -40,6 +40,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
+    from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -170,7 +171,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         snapshot_models: List[exp_models.ExplorationSnapshotContentModel],
         metadata_models: List[exp_models.ExplorationSnapshotMetadataModel]
     ) -> Tuple[
-        voiceover_domain.ExplorationVoiceArtistsLink, str]:
+        Optional[voiceover_models.ExplorationVoiceArtistsLinkModel], str]:
         """Creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
 
@@ -186,7 +187,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         Returns:
             A 2-tuple with the following elements:
-            - ExplorationVoiceArtistsLink. An object containing voice
+            - ExplorationVoiceArtistsLinkModel. An object containing voice
             artist IDs and their provided voiceovers for the given exploration.
             - The debug logs.
         """
@@ -360,7 +361,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         debug_logs += ('\n')
 
         with datastore_services.get_ndb_context():
-            exploration_voice_artists_link_model = (
+            exploration_voice_artists_link = (
                 voiceover_services.
                 create_exploration_voice_artists_link_model_instance(
                     exploration_model.id,
@@ -368,7 +369,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 )
             )
 
-        return exploration_voice_artists_link_model, debug_logs
+        return exploration_voice_artists_link, debug_logs
 
     def extract_exploration_id_from_snapshot_id(
         self,

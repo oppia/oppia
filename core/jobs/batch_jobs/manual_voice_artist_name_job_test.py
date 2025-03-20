@@ -924,7 +924,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
                 exploration_models[0], snapshot_models, metadata_models))
         assert exp_link_model is not None
 
-        self.assertEqual(exp_link_model.exp_id, self.CURATED_EXPLORATION_ID_1)
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
             exp_link_model.content_id_to_voiceovers_mapping,
             expected_content_id_to_voiceovers_mapping
@@ -1046,7 +1046,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
                 exploration_models[0], snapshot_models, metadata_models
             ))
         assert exp_link_model is not None
-        self.assertEqual(exp_link_model.exp_id, self.CURATED_EXPLORATION_ID_1)
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
 
     def test_should_create_empty_exploration_voice_artist_link_model(
@@ -1100,6 +1100,6 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             ))
         assert exp_link_model is not None
 
-        self.assertEqual(exp_link_model.exp_id, self.CURATED_EXPLORATION_ID_1)
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
             exp_link_model.content_id_to_voiceovers_mapping, {})

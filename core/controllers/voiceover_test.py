@@ -177,7 +177,7 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
                     self.content_id_to_voiceovers_mapping)
             )
         )
-        exploration_voice_artist_link_model.validate()
+        exploration_voice_artist_link_model.put()
 
         voiceover_services.update_voice_artist_metadata(
             voice_artist_id=self.voice_artist_id,

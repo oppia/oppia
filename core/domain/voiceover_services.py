@@ -844,7 +844,7 @@ def create_exploration_voice_artists_link_model_instance(
     exploration_id: str,
     content_id_to_voiceovers_mapping: (
         voiceover_domain.ContentIdToVoiceoverMappingType)
-) -> voiceover_domain.ExplorationVoiceArtistsLink:
+) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
     """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
     between the latest content IDs within an exploration and the corresponding
     IDs of voice artists who provided voiceovers in the specified language code.
@@ -872,13 +872,14 @@ def create_exploration_voice_artists_link_model_instance(
         )
     )
     exploration_voice_artists_link.validate()
-    model = voiceover_models.ExplorationVoiceArtistsLinkModel(
+    exploration_voice_artists_link_model = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel(
         id=exploration_id,
         content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
-    )
-    model.update_timestamps()
-    model.put()
-    return exploration_voice_artists_link
+    ))
+    exploration_voice_artists_link_model.update_timestamps()
+
+    return exploration_voice_artists_link_model
 
 
 def update_exploration_voice_artist_link_model(
