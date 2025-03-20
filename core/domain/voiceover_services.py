@@ -517,7 +517,7 @@ def get_exploration_voice_artists_link(
     )
 
 
-def save_exploration_voice_artists_link(
+def set_exploration_voice_artists_link(
     exploration_voice_artists_link: voiceover_domain.ExplorationVoiceArtistsLink
 ) -> None:
     """Saves the ExplorationVoiceArtistsLink domain object to storage.
@@ -959,4 +959,4 @@ def update_exploration_voice_artist_link_model(
         exploration_voice_artists_link.content_id_to_voiceovers_mapping = (
             content_id_to_voiceovers_mapping)
 
-    save_exploration_voice_artists_link(exploration_voice_artists_link)
+    set_exploration_voice_artists_link(exploration_voice_artists_link)

@@ -346,9 +346,7 @@ class ExplorationVoiceArtistsLink:
                 (in which voiceovers of content is made) as keys
                 and a two-tuple as values. First value of tuple
                 is voice artist ID and second value is VoiceOverDict.
-
         """
-
         self.exp_id = exp_id
         self.content_id_to_voiceovers_mapping = content_id_to_voiceovers_mapping
 
@@ -461,7 +459,7 @@ class ExplorationVoiceArtistsLink:
                 if not isinstance(voiceover_dict['file_size_bytes'], int):
                     raise utils.ValidationError(
                         'Expected file size to be int, received: %s'
-                        % voiceover_dict['file_size']
+                        % voiceover_dict['file_size_bytes']
                     )
 
                 if not isinstance(voiceover_dict['needs_update'], bool):
