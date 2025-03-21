@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import List
+from typing import Dict, List
 
 
 class ExplorationRecommendations:
@@ -56,13 +56,12 @@ class ExplorationRecommendations:
             raise utils.ValidationError(
                 'Expected recommended_exploration_ids to be a list, '
                 'received %s' % self.recommended_exploration_ids)   
-        unique_exp_ids = set()
+
+        counts = {}
         for recommended_exploration_id in self.recommended_exploration_ids:
-            if recommended_exploration_id in unique_exp_ids:
-                raise utils.ValidationError(
-                    'recommended_exploration_ids contains duplicate values: %s'
-                    % recommended_exploration_id)
-            unique_exp_ids.add(recommended_exploration_id)
+            counts[recommended_exploration_id] = (
+                counts.get(recommended_exploration_id, 0) + 1)
+
             if not isinstance(recommended_exploration_id, str):
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be a string, '
@@ -71,3 +70,25 @@ class ExplorationRecommendations:
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be non-empty, '
                     'received %s' % recommended_exploration_id)
+
+        self.validate_no_exploration_id_duplicate(counts)
+
+    def validate_no_exploration_id_duplicate(
+        self,
+        counts: Dict[str, int]
+    ) -> None:
+        """Validates the counts for recommended_exploration_ids (there
+        should be no duplicate).
+
+        Args:
+            counts: dict. The dictionary storing the number of times
+                an exploration id appears in recommended_exploration_ids.
+        """
+        non_unique_counts = (
+            {exp_id: count for exp_id, count in counts.items if count > 1})
+        if non_unique_counts:
+            duplicates = (', '.join('({}, {})'.format(exp_id, count) for (
+                exp_id, count) in non_unique_counts.items))
+            raise utils.ValidationError(
+                'recommended_exploration_ids contains duplicate values,'
+                'received (exp_id, count): %s' % duplicates)
