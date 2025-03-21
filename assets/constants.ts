@@ -7754,5 +7754,40 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "SHORT_COMMIT_HASH": "",
+
+  "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
+    "en": {
+      "+": "plus",
+      "-": "minus",
+      "*": "times",
+      "×": "times",
+      "÷": "divided by",
+      "=": "equals"
+    },
+    "hi": {
+      "+": "जोड़",
+      "-": "घटा",
+      "*": "गुणा",
+      "×": "गुणा",
+      "÷": "विभाजित",
+      "=": "बराबर"
+    },
+    "pt": {
+      "+": "mais",
+      "-": "menos",
+      "*": "vezes",
+      "×": "vezes",
+      "÷": "dividido por",
+      "=": "igual a"
+    },
+    "ar": {
+      "+": "زائد",
+      "-": "ناقص",
+      "*": "ضرب",
+      "×": "ضرب",
+      "÷": "قسمة على",
+      "=": "يساوي"
+    }
+  }
 } as const;
