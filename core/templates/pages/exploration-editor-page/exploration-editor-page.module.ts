@@ -74,6 +74,7 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
+import {AutomaticVoiceoverRegenerationConfirmModalComponent} from './translation-tab/voiceover-card/modals/automatic-voiceover-regeneration-confirm-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -210,6 +211,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -265,6 +267,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
