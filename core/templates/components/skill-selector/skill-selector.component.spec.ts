@@ -410,9 +410,7 @@ describe('SkillSelectorComponent', () => {
           skill_model_last_updated: 124444,
         }),
       ];
-      component.skillIdsToExclude = {
-        1: true,
-      };
+      component.skillIdsToExclude = new Set(['1']);
 
       expect(
         component.searchInUntriagedSkillSummaries('skill summary 2')
@@ -467,10 +465,7 @@ describe('SkillSelectorComponent', () => {
           skill_model_last_updated: 124444,
         }),
       ];
-      component.skillIdsToExclude = {
-        1: true,
-        2: true,
-      };
+      component.skillIdsToExclude = new Set(['1', '2']);
 
       expect(component.searchInUntriagedSkillSummaries('')).toEqual([
         SkillSummary.createFromBackendDict({

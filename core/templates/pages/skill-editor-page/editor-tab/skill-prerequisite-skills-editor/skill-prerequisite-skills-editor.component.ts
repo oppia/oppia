@@ -78,12 +78,10 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       this.groupedSkillSummaries.others
     );
     const allowSkillsFromOtherTopics = true;
-    const skillIdsToExclude = {
-      [this.skill.getId()]: true,
-    };
-    this.skill.getPrerequisiteSkillIds().forEach(prerequisiteSkillId => {
-      skillIdsToExclude[prerequisiteSkillId] = true;
-    });
+    const skillIdsToExclude = new Set([
+      ...this.skill.getPrerequisiteSkillIds(),
+      this.skill.getId(),
+    ]);
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent,
