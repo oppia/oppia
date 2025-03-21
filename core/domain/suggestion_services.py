@@ -2291,7 +2291,8 @@ def update_translation_suggestion(
         )
 
     if len(translation_html) > MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION:
-        # Get a truncated version of the translation HTML if it exceeds the maximum length.
+        # Get a truncated version of the translation HTML if it
+        # exceeds the maximum length.
         _, truncated_translation_html = _highlight_differences(
             original_text_html, translation_html
         )
