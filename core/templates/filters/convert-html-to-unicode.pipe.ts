@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Converts HTML to unicode.
+ * @fileoverview Converts HTML to Unicode Pipe.
  */
 
-export const convertHtmlToUnicode = (html: string): string => {
-  const domparser = new DOMParser();
-  const dom = domparser.parseFromString(html, 'text/html');
+import {Pipe, PipeTransform} from '@angular/core';
 
-  return dom.querySelector('body')?.innerText as string;
-};
-
-angular.module('oppia').filter('convertHtmlToUnicode', [
-  function () {
-    return function (html: string) {
-      return convertHtmlToUnicode(html);
-    };
-  },
-]);
+@Pipe({name: 'convertHtmlToUnicode'})
+export class ConvertHtmlToUnicodePipe implements PipeTransform {
+  transform(html: string): string {
+    const domparser = new DOMParser();
+    const dom = domparser.parseFromString(html, 'text/html');
+    return dom.querySelector('body')?.innerText || '';
+  }
+}

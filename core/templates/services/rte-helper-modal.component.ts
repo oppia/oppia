@@ -179,7 +179,7 @@ export class RteHelperModalComponent {
         const tmpCustomizationArg = {
           name: caName,
           value: this.attrsCustomizationArgsDict.hasOwnProperty(caName)
-            ? angular.copy(this.attrsCustomizationArgsDict[caName])
+            ? typedCloneDeep(this.attrsCustomizationArgsDict[caName])
             : this.customizationArgSpecs[i].default_value,
         } as Extract<
           CustomizationArgsNameAndValueArray[number],

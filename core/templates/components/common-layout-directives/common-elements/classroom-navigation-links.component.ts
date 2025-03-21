@@ -25,6 +25,7 @@ import {
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-classroom-navigation-links',
@@ -33,12 +34,14 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 export class ClassroomNavigationLinksComponent implements OnInit {
   classroomSummaries: ClassroomSummaryDict[] = [];
   isLoading: boolean = true;
+  currentUrl!: string;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private windowRef: WindowRef
   ) {}
 
   getClassroomThumbnail(
@@ -72,19 +75,23 @@ export class ClassroomNavigationLinksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.classroomBackendApiService
-      .getAllClassroomsSummaryAsync()
-      .then((data: ClassroomSummaryDict[]) => {
-        for (
-          let i = 0;
-          i < data.length && this.classroomSummaries.length < 2;
-          i++
-        ) {
-          if (data[i].is_published) {
-            this.classroomSummaries.push(data[i]);
+    this.currentUrl =
+      this.windowRef.nativeWindow.location.pathname.split('/')[1];
+    if (this.currentUrl !== 'signup') {
+      this.classroomBackendApiService
+        .getAllClassroomsSummaryAsync()
+        .then((data: ClassroomSummaryDict[]) => {
+          for (
+            let i = 0;
+            i < data.length && this.classroomSummaries.length < 2;
+            i++
+          ) {
+            if (data[i].is_published) {
+              this.classroomSummaries.push(data[i]);
+            }
           }
-        }
-        this.isLoading = false;
-      });
+          this.isLoading = false;
+        });
+    }
   }
 }

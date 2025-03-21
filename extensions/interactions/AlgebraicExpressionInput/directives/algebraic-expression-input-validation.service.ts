@@ -23,7 +23,7 @@ import nerdamer from 'nerdamer';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {AlgebraicExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
@@ -39,7 +39,7 @@ export class AlgebraicExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(

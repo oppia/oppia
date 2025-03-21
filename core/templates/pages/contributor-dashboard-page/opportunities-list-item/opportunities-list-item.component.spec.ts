@@ -90,7 +90,7 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized', () => {
+    it('should initialize component properties after component is initialized', () => {
       const windowResizeSpy = spyOn(
         windowDimensionsService,
         'getResizeEvent'
@@ -155,7 +155,7 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized', () => {
+    it('should initialize component properties after component is initialized', () => {
       expect(component.opportunityDataIsLoading).toBe(false);
       expect(component.labelText).toBe('Label text');
       expect(component.labelStyle).toEqual({
@@ -199,7 +199,7 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized', () => {
+    it('should initialize component properties after component is initialized', () => {
       expect(component.opportunityDataIsLoading).toBeTrue();
       expect(component.labelText).toBeUndefined();
       expect(component.labelStyle).toBeUndefined();
