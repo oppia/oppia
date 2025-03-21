@@ -861,7 +861,7 @@ export class ExplorationEditor extends BaseUser {
       "//mat-option[contains(., 'Manager (can edit permissions)')]"
     );
     await managerOption.click();
-    await this.page.waitForSelector('.e2e-test-tag-filter-selection-dropdown', {
+    await this.page.waitForSelector(tagFilterDropdownSelector, {
       hidden: true,
     });
     await this.clickOn(saveRoleButton);
