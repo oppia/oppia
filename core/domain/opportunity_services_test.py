@@ -49,20 +49,26 @@ from typing import Dict, List, Union
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
+    from mypy_imports import opportunity_debug_models
     from mypy_imports import opportunity_models
     from mypy_imports import story_models
     from mypy_imports import suggestion_models
+    from mypy_imports import translation_models
 
 (
     feedback_models,
+    opportunity_debug_models,
     opportunity_models,
     story_models,
-    suggestion_models
+    suggestion_models,
+    translation_models
 ) = models.Registry.import_models([
     models.Names.FEEDBACK,
+    models.Names.OPPORTUNITY_DEBUG,
     models.Names.OPPORTUNITY,
     models.Names.STORY,
-    models.Names.SUGGESTION
+    models.Names.SUGGESTION,
+    models.Names.TRANSLATION
 ])
 
 
@@ -1209,3 +1215,163 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
 
         self.assertFalse(
             'hi' in opportunity.incomplete_translation_language_codes)
+
+
+class OpportunityServicesDebugDataTest(test_utils.GenericTestBase):
+    """Tests for the store_opportunity_debug_data method."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.exploration_id = 'exp1'
+        self.subtopic_id = 'subtopic1'
+        self.topic_id = 'topic1'
+        self.story_id = 'story1'
+
+        exp1 = self.save_new_valid_exploration(
+            self.exploration_id, self.owner_id)
+        self.publish_exploration(self.owner_id, exp1.id)
+
+        self.save_new_topic(
+            self.topic_id, self.owner_id)
+
+        self.create_story_for_translation_opportunity(
+            self.owner_id,
+            self.admin_id,
+            self.story_id,
+            self.topic_id,
+            self.exploration_id)
+
+        opportunity_services.add_new_exploration_opportunities(
+            self.story_id, [self.exploration_id])
+
+        self.language_code = 'hi'
+
+        model = translation_models.EntityTranslationsModel.create_new(
+            'exploration',
+            exp1.id,
+            exp1.version,
+            self.language_code,
+            {
+                'content_0': {
+                    'content_value': '<p>hi</p>',
+                    'content_format': 'html',
+                    'needs_update': False
+                }
+            }
+        )
+        model.update_timestamps()
+        model.put()
+
+    def test_store_opportunity_debug_data_for_nonexistent_exploration(
+        self) -> None:
+        nonexistent_exp_id = 'nonexistent_exp'
+        opportunity_services.store_opportunity_debug_data(
+            nonexistent_exp_id, self.language_code,
+            opportunity_services.EXPLORATION_DELETED)
+
+        debug_model = (
+            opportunity_debug_models.OpportunityDebugModel
+            .get_by_exp_id_and_langauge_code(
+                self.exploration_id, self.language_code))
+        self.assertIsNone(debug_model)
+
+    def test_store_opportunity_debug_data_for_nonexistent_exploration_and_none_language(self) -> None: # pylint: disable=line-too-long
+        nonexistent_exp_id = 'nonexistent_exp'
+        opportunity_services.store_opportunity_debug_data(
+            nonexistent_exp_id, None,
+            opportunity_services.EXPLORATION_DELETED)
+
+        debug_models = (
+            opportunity_debug_models.OpportunityDebugModel
+            .get_multi_by_exp_id(self.exploration_id))
+        self.assertEqual(len(debug_models), 0)
+
+    def test_store_opportunity_debug_data_with_none_language(self) -> None:
+        opportunity_services.store_opportunity_debug_data(
+            self.exploration_id, None, opportunity_services.STORY_DELETED)
+
+        debug_models = (
+            opportunity_debug_models.OpportunityDebugModel
+            .get_multi_by_exp_id(self.exploration_id))
+        self.assertIsNotNone(debug_models)
+        self.assertEqual(len(debug_models), 1)
+        self.assertEqual(debug_models[0].exp_id, self.exploration_id)
+        self.assertEqual(debug_models[0].language_code, self.language_code)
+        self.assertEqual(len(debug_models[0].events), 1)
+        self.assertEqual(
+            debug_models[0].events[0]['event_type'],
+            opportunity_services.STORY_DELETED)
+
+    def test_store_opportunity_debug_data_with_language_code(self) -> None:
+        opportunity_services.store_opportunity_debug_data(
+            self.exploration_id, self.language_code,
+            opportunity_services.TRANSLATION_ACCEPTED)
+
+        debug_model = (
+            opportunity_debug_models.OpportunityDebugModel
+            .get_by_exp_id_and_langauge_code(
+                self.exploration_id, self.language_code))
+        self.assertIsNotNone(debug_model)
+
+        assert debug_model is not None
+        self.assertEqual(debug_model.exp_id, self.exploration_id)
+        self.assertEqual(debug_model.language_code, self.language_code)
+        self.assertEqual(len(debug_model.events), 1)
+        self.assertEqual(
+            debug_model.events[0]['event_type'],
+            opportunity_services.TRANSLATION_ACCEPTED)
+
+    def test_store_opportunity_debug_data_multiple_events(self) -> None:
+        opportunity_services.store_opportunity_debug_data(
+            self.exploration_id, self.language_code,
+            opportunity_services.EXPLORATION_UPDATED)
+
+        opportunity_services.store_opportunity_debug_data(
+            self.exploration_id, self.language_code,
+            opportunity_services.TRANSLATION_ACCEPTED)
+
+        debug_model = (
+            opportunity_debug_models.OpportunityDebugModel
+            .get_by_exp_id_and_langauge_code(
+                self.exploration_id, self.language_code))
+        assert debug_model is not None
+        self.assertEqual(len(debug_model.events), 2)
+        self.assertEqual(
+            debug_model.events[0]['event_type'],
+            opportunity_services.EXPLORATION_UPDATED)
+        self.assertEqual(
+            debug_model.events[1]['event_type'],
+            opportunity_services.TRANSLATION_ACCEPTED)
+
+    def test_store_opportunity_debug_data_with_different_event_types(
+        self) -> None:
+        event_types = [
+            opportunity_services.STORY_PUBLISHED,
+            opportunity_services.EXPLORATION_UPDATED,
+            opportunity_services.EXPLORATION_REVERTED,
+            opportunity_services.EXPLORATION_DELETED,
+            opportunity_services.STORY_DELETED,
+            opportunity_services.STORY_UNPUBLISHED,
+            opportunity_services.TOPIC_DELETED,
+            opportunity_services.TRANSLATION_ACCEPTED
+        ]
+
+        event_index = 0
+        for event_type in event_types:
+            opportunity_services.store_opportunity_debug_data(
+                self.exploration_id, self.language_code, event_type)
+
+            debug_model = (
+                opportunity_debug_models.OpportunityDebugModel
+                .get_by_exp_id_and_langauge_code(
+                    self.exploration_id, self.language_code))
+            assert debug_model is not None
+            self.assertEqual(
+                debug_model.events[event_index]['event_type'],
+                event_type)
+            event_index += 1

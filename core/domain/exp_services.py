@@ -1985,7 +1985,7 @@ def update_exploration(
         [exploration_id]
     )
 
-    # OPPORTUNITY DEBUG INFO
+    # OPPORTUNITY DEBUG INFO.
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id
     ):
@@ -2592,7 +2592,7 @@ def revert_exploration(
     datastore_services.put_multi(exp_issues_models_to_put)
     datastore_services.put_multi(translation_and_opportunity_models_to_put)
 
-    # OPPORTUNITY DEBUG INFO
+    # OPPORTUNITY DEBUG INFO.
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id
     ):
