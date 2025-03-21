@@ -61,11 +61,29 @@ describe('Exploration Creator', function () {
     async function () {
       // Navigate to the history tab, .
       await explorationEditor.navigateToHistoryTab();
-      await explorationEditor.downloadExploration(5);
-      await explorationEditor.downloadExploration(4);
-      await explorationEditor.downloadExploration(3);
-      await explorationEditor.downloadExploration(2);
-      await explorationEditor.downloadExploration(1);
+      // Before publishing, the Exploration zip file name would be
+      // oppia-unpublished_exploration-v{versionNumber}.zip or
+      // oppia-unpublished_exploration-v{versionNumber} (numberOfDownloadsSameFile).zip.
+      await explorationEditor.downloadExploration(5, false);
+      await explorationEditor.downloadExploration(4, false);
+      await explorationEditor.downloadExploration(3, false);
+      await explorationEditor.downloadExploration(2, false);
+      await explorationEditor.downloadExploration(1, false);
+      // Publish Exploration.
+      await explorationEditor.publishExplorationWithMetadata(
+        'Publish with an interaction',
+        'This is the goal of exploration.',
+        'Algebra'
+      );
+      // After publishing, the Exploration zip file name would be
+      // oppia-{explorationTitle}-v{versionNumber}.zip or
+      // oppia-{explorationTitle}-v{versionNumber} (numberOfDownloadSameFile).zip .
+      await explorationEditor.downloadExploration(6, true);
+      await explorationEditor.downloadExploration(5, true);
+      await explorationEditor.downloadExploration(4, true);
+      await explorationEditor.downloadExploration(3, true);
+      await explorationEditor.downloadExploration(2, true);
+      await explorationEditor.downloadExploration(1, true);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

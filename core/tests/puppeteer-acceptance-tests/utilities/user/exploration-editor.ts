@@ -22,6 +22,8 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -228,7 +230,7 @@ const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
-const downloadPath = '/home/somnath/Downloads';
+const downloadPath = path.join(os.homedir(), 'Downloads');
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
@@ -1570,8 +1572,12 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to download a specific version of Exploration.
    * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
    */
-  async downloadExploration(explorationVersion: number): Promise<void> {
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
     const historyItems = await this.page.$$(historyListContent);
     for (const historyItem of historyItems) {
       const versionNumberElement = await historyItem.$('.history-table-index');
@@ -1591,8 +1597,10 @@ export class ExplorationEditor extends BaseUser {
         );
         await this.page.evaluate(el => el.click(), downloadButton);
         await this.page.waitForTimeout(5000);
-        const downloadedFile =
-          await this.waitForExplorationDownload(explorationVersion);
+        const downloadedFile = await this.waitForExplorationDownload(
+          explorationVersion,
+          isExplorationPublished
+        );
         if (downloadedFile) {
           showMessage(`${downloadedFile} file is successfully downloaded`);
           return;
@@ -1608,25 +1616,28 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Waits for a Exploration zip file to be downloaded and verifies its name.
    * @param {number} expectedVersion - The expected version number in the file name.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
    * @returns {Promise<string | null>} - Returns the file name if correct, otherwise null.
    */
   async waitForExplorationDownload(
-    expectedVersion: number
+    expectedVersion: number,
+    isExplorationPublished: boolean
   ): Promise<string | null> {
-    if (!fs.existsSync(downloadPath)) {
-      fs.mkdirSync(downloadPath);
-    }
     // Wait for network to be idle after triggering the download.
     await this.page.waitForNetworkIdle();
     const files = fs.readdirSync(downloadPath);
+    const filePrefix = isExplorationPublished
+      ? 'oppia-Publishwithaninteraction-v'
+      : 'oppia-unpublished_exploration-v';
     const downloadedFile =
       files.find(file =>
         file.match(
-          new RegExp(
-            `^oppia-(downloadhistory|unpublished_exploration)-v${expectedVersion}( \\(\\d+\\))?\\.zip$`
-          )
+          new RegExp(`^${filePrefix}${expectedVersion}( \\(\\d+\\))?\\.zip$`)
         )
       ) || null;
+    if (downloadedFile) {
+      fs.unlinkSync(path.join(downloadPath, downloadedFile));
+    }
     return downloadedFile;
   }
 
