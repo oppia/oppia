@@ -2181,7 +2181,7 @@ def _highlight_differences(
     )
     start_index = max(0, diff_index - 10)
 
-    prefix = '...' if start_index > 0 or min_length > max_length else ''
+    prefix = '...' if start_index > 0 else ''
 
     truncated_original = prefix + (
         original[start_index: start_index + max_length]
@@ -2291,15 +2291,18 @@ def update_translation_suggestion(
         )
 
     if len(translation_html) > MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION:
-        _, truncated_translation = _highlight_differences(
+        # Get a truncated version of the translation HTML if it exceeds the maximum length.
+        _, truncated_translation_html = _highlight_differences(
             original_text_html, translation_html
         )
-        translation_html = truncated_translation
+        final_translation_html = truncated_translation_html
+    else:
+        final_translation_html = translation_html
 
     suggestion.change_cmd.translation_html = (
-        html_cleaner.clean(translation_html)
-        if isinstance(translation_html, str)
-        else translation_html
+        html_cleaner.clean(final_translation_html)
+        if isinstance(final_translation_html, str)
+        else final_translation_html
     )
     suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change_cmd)

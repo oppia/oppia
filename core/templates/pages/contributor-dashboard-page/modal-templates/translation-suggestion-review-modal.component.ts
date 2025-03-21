@@ -393,9 +393,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.editedContent && this.editedContent) {
-      const componentMismatch = this.areComponentsMismatched();
+      const componentsAreMismatched = this.areComponentsMismatched();
 
-      if (!componentMismatch) {
+      if (!componentsAreMismatched) {
         this.errorMessage = '';
         this.errorFound = false;
       }
