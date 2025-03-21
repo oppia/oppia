@@ -226,6 +226,7 @@ const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
+const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -864,7 +865,7 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     await this.clickOn(saveRoleButton);
-    showMessage(`${username} has been added as managerRole.`);
+    showMessage(`${username} has been added as manager role.`);
   }
 
   /**
@@ -2336,14 +2337,24 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(sendButtonSelector);
   }
 
-  async isEditRolesButtonHidden(): Promise<boolean> {
+  /**
+   * Verifies that the Edit Roles button is hidden, indicating the user
+   * doesn't have permission to modify user roles.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectEditRolesButtonToBeHidden(): Promise<void> {
     const element = await this.page.$(editRolesButtonSelector);
-    return element === null;
+    expect(element).toBe(null);
   }
 
-  async isStateContentEditorVisible(): Promise<boolean> {
+  /**
+   * Verifies that the state content editor is hidden, indicating the user
+   * doesn't have permission to edit exploration content.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectStateContentEditorToBeHidden(): Promise<void> {
     const element = await this.page.$(stateContentEditorSelector);
-    return element !== null;
+    expect(element).toBe(null);
   }
 }
 

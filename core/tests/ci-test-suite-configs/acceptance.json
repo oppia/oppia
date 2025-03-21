@@ -57,8 +57,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-roles-settings-component",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-roles-settings-component.spec.ts"
+      "name": "exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
     },
     {
       "name": "logged-in-user/access-dashboards-from-profile-menu",

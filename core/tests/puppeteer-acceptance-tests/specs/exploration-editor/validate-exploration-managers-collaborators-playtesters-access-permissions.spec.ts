@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for verifying different users roles and their
- * access permissions in an exploration.
+ * @fileoverview Acceptance Test for validating the roles of managers, collaborators, and playtesters,
+ * along with their respective access permissions within an exploration.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -32,16 +32,17 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 describe('Exploration User Roles', function () {
   let manager: ExplorationEditor;
   let collaborator: ExplorationEditor;
+  let newCollaborator: ExplorationEditor;
   let playtester: ExplorationEditor;
   let explorationCreator: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
-    const newCollaborator = await UserFactory.createNewUser(
+    // Create all users
+    newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
     );
-    await newCollaborator.closeBrowser();
 
     playtester = await UserFactory.createNewUser(
       'playtester',
@@ -59,76 +60,84 @@ describe('Exploration User Roles', function () {
       'explorationCreator',
       'explorationCreator@example.com'
     );
+
+    // Create exploration with explorationCreator user
+    await explorationCreator.navigateToCreatorDashboardPage();
+    await explorationCreator.navigateToExplorationEditorPage();
+    await explorationCreator.dismissWelcomeModal();
+
+    await explorationCreator.createMinimalExploration(
+      'Test Exploration',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+
+    await explorationCreator.navigateToSettingsTab();
+
+    // Assign roles to users
+    await explorationCreator.assignUserToManagerRole('manager');
+    await explorationCreator.assignUserToCollaboratorRole('collaborator');
+    await explorationCreator.assignUserToPlaytesterRole('playtester');
+
+    await explorationCreator.saveExplorationDraft();
+    explorationId = await explorationCreator.publishExplorationWithMetadata(
+      'Publish with an interaction',
+      'This is the goal of exploration.',
+      'Algebra'
+    );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should verify correct access permissions for different user roles',
+    'should verify manager has correct access permissions',
     async function () {
-      // Create exploration with explorationCreator user.
-      await explorationCreator.navigateToCreatorDashboardPage();
-      await explorationCreator.navigateToExplorationEditorPage();
-      await explorationCreator.dismissWelcomeModal();
-
-      await explorationCreator.createMinimalExploration(
-        'Test Exploration',
-        INTERACTION_TYPES.END_EXPLORATION
-      );
-
-      await explorationCreator.navigateToSettingsTab();
-
-      // Assign roles to users including manager role to manager user.
-      await explorationCreator.assignUserToManagerRole('manager');
-      await explorationCreator.assignUserToCollaboratorRole('collaborator');
-      await explorationCreator.assignUserToPlaytesterRole('playtester');
-
-      await explorationCreator.saveExplorationDraft();
-      explorationId = await explorationCreator.publishExplorationWithMetadata(
-        'Publish with an interaction',
-        'This is the goal of exploration.',
-        'Algebra'
-      );
-
-      await UserFactory.closeBrowserForUser(explorationCreator);
-
-      // Test manager access.
+      // Test manager access
       await manager.expectExplorationToBeAccessibleByUrl(explorationId);
       await manager.dismissWelcomeModal();
-      await manager.navigateToSettingsTab();
 
-      // Verify manager can add users.
-      await manager.assignUserToCollaboratorRole('newCollaborator');
-
-      // Verify manager can modify exploration.
+      // Verify manager can modify exploration
       await manager.navigateToEditorTab();
       await manager.updateCardContent('Updated content by manager');
       await manager.saveExplorationDraft();
-      await UserFactory.closeBrowserForUser(manager);
 
-      // Test collaborator access.
+      // Verify manager can add users
+      await manager.navigateToSettingsTab();
+      await manager.assignUserToCollaboratorRole('newCollaborator');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should verify collaborator has correct access permissions',
+    async function () {
+      // Test collaborator access
       await collaborator.expectExplorationToBeAccessibleByUrl(explorationId);
       await collaborator.dismissWelcomeModal();
 
-      // Verify collaborator can modify exploration.
+      // Verify collaborator can modify exploration
       await collaborator.updateCardContent('Updated content by collaborator');
       await collaborator.saveExplorationDraft();
 
+      // Verify collaborator cannot add users
       await collaborator.navigateToSettingsTab();
+      await collaborator.expectEditRolesButtonToBeHidden();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-      // Verify collaborator cannot add users.
-      const isHidden = await collaborator.isEditRolesButtonHidden();
-      expect(isHidden).toBe(true);
-      await UserFactory.closeBrowserForUser(collaborator);
-
-      // Test playtester access.
+  it(
+    'should verify playtester has correct access permissions',
+    async function () {
+      // Test playtester access
       await playtester.expectExplorationToBeAccessibleByUrl(explorationId);
       await playtester.dismissWelcomeModal();
 
-      // Verify playtester cannot modify exploration.
-      const isEditable = await playtester.isStateContentEditorVisible();
-      expect(isEditable).toBe(false);
+      // Verify playtester cannot modify exploration
+      await playtester.expectStateContentEditorToBeHidden();
+
+      // Verify playtester can access translations tab
       await playtester.navigateToTranslationsTab();
       await playtester.dismissTranslationTabWelcomeModal();
-      // Verify playtester can preview exploration.
+
+      // Verify playtester can preview exploration
       await playtester.navigateToPreviewTab();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
