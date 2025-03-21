@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import Dict, Iterable, List, cast
+from typing import Dict, List
 
 
 class ExplorationRecommendations:
