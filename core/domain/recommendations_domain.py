@@ -84,12 +84,12 @@ class ExplorationRecommendations:
             counts: dict. The dictionary storing the number of times
                 an exploration id appears in recommended_exploration_ids.
         """
-        non_unique_counts: Dict[str, int] = (
-            {exp_id: count for exp_id, count in cast(
-                Iterable, counts.items) if count > 1})
-        if non_unique_counts:
-            duplicates = (', '.join('({}, {})'.format(exp_id, count) for (
-                exp_id, count) in cast(Iterable, non_unique_counts.items)))
+        duplicates = ''
+        for exp_id, count in counts.items:
+            if count > 1:
+                duplicates = duplicates.join('({}, {}), ').format(exp_id, count)
+
+        if duplicates:
             raise utils.ValidationError(
                 'recommended_exploration_ids contains duplicate values,'
                 'received (exp_id, count): %s' % duplicates)
