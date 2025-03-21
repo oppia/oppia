@@ -120,16 +120,17 @@ def get_skill_by_id(
     if cached_skill is not None:
         return cached_skill
     else:
-        skill_model = skill_models.SkillModel.get(
-            skill_id, strict=strict, version=version)
-        if skill_model:
-            skill = get_skill_from_model(skill_model)
-            caching_services.set_multi(
-                caching_services.CACHE_NAMESPACE_SKILL,
-                sub_namespace,
-                {skill_id: skill})
-            return skill
-        else:
+        try:
+            skill_model = skill_models.SkillModel.get(
+                skill_id, strict=strict, version=version)
+            if skill_model:
+                skill = get_skill_from_model(skill_model)
+                caching_services.set_multi(
+                    caching_services.CACHE_NAMESPACE_SKILL,
+                    sub_namespace,
+                    {skill_id: skill})
+                return skill
+        except:
             return None
 
 
