@@ -85,7 +85,7 @@ class ExplorationRecommendations:
                 an exploration id appears in recommended_exploration_ids.
         """
         duplicates = ''
-        for exp_id, count in counts.items:
+        for exp_id, count in counts.items():
             if count > 1:
                 duplicates = duplicates.join('({}, {}), ').format(exp_id, count)
 
