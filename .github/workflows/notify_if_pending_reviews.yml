@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Notify reviewers
         # SHA1 hash of the develop commit.
-        uses: oppia/stale-review-request-notifier@602eaaf66b38deb72ab1fffb2eef06666c6926ec
+        uses: oppia/stale-review-request-notifier@4f7d29fced7ff84194cc7c8e5949ea09c4be5905
         with:
           category-name: Notify\ Reviewers
           repo-token: ${{ secrets.DISCUSSION_NOTIFICATION_TOKEN }}
