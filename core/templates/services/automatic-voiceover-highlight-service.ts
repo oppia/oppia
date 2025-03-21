@@ -49,7 +49,9 @@ export class AutomaticVoiceoverHighlightService {
       this.localStorageService.getLastSelectedTranslationLanguageCode();
 
     this.punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_PUNCTIONATION_MARKS[this.languageCode];
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        this.languageCode
+      ];
   }
 
   setActiveContentId(contentId: string): void {

@@ -27,8 +27,11 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 export class EditVoiceoverRegenerationSupportModalComponent extends ConfirmOrCancelModal {
   languageAccentDescription: string = '';
   languageDescription: string = '';
+  languageCode: string = '';
   supportsAutogeneration!: boolean;
   headerText: string = '';
+  constantsFileLocation: string =
+    'https://github.com/oppia/oppia/blob/develop/assets/constants.ts';
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

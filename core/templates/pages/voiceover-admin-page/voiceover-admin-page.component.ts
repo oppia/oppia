@@ -261,6 +261,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     );
 
     modalRef.componentInstance.languageDescription = languageDescription;
+    modalRef.componentInstance.languageCode = languageCode;
     modalRef.componentInstance.languageAccentDescription =
       languageAccentCodeDescription;
     modalRef.componentInstance.supportsAutogeneration = supportsAutogeneration;

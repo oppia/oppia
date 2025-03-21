@@ -7755,7 +7755,7 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
-  "LANGUAGE_CODE_TO_PUNCTIONATION_MARKS": {
+  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
     "pt": ".!?",

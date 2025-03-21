@@ -118,7 +118,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // To split sentences from the lesson content, we need to use
     // language-specific punctuation marks.
     const punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_PUNCTIONATION_MARKS[languageCode];
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        languageCode
+      ];
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
