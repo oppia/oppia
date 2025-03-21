@@ -32,17 +32,17 @@ interface SentenceHighlightInterval {
   providedIn: 'root',
 })
 export class AutomaticVoiceoverHighlightService {
-  private languageCode!: string;
-  private punctuationsForCurrentLanguage!: string;
-  private activeContentId!: string;
+  public languageCode!: string;
+  public punctuationsForCurrentLanguage!: string;
+  public activeContentId!: string;
 
-  private highlightIdToSentenceMap: {[highlightId: string]: string} = {};
-  private automatedVoiceoversAudioOffsetsMsecs: ContentIdToVoiceoversAudioOffsetsMsecs =
+  public highlightIdToSentenceMap: {[highlightId: string]: string} = {};
+  public automatedVoiceoversAudioOffsetsMsecs: ContentIdToVoiceoversAudioOffsetsMsecs =
     {};
-  private highlightIdToSentenceWithoutSpacesMap: {
+  public highlightIdToSentenceWithoutSpacesMap: {
     [highlightId: string]: string;
   } = {};
-  private sentenceHighlightIntervalList: SentenceHighlightInterval[] = [];
+  public sentenceHighlightIntervalList: SentenceHighlightInterval[] = [];
 
   constructor(private localStorageService: LocalStorageService) {
     this.languageCode =
@@ -70,7 +70,7 @@ export class AutomaticVoiceoverHighlightService {
     this.removeSpacesAndTransformMathSymbols();
   }
 
-  private removeSpacesAndTransformMathSymbols(): void {
+  removeSpacesAndTransformMathSymbols(): void {
     for (let highlightSentenceId in this.highlightIdToSentenceMap) {
       let sentence = this.highlightIdToSentenceMap[highlightSentenceId];
       // this.transformMathSentenceContainingAudioSpecficWords(highlightSentenceId, sentence);
@@ -123,7 +123,7 @@ export class AutomaticVoiceoverHighlightService {
     this.highlightIdToSentenceMap[highlightSentenceId] = sentence;
   }
 
-  getSentencesToHighlightForTimeRanges() {
+  getSentencesToHighlightForTimeRanges(): void {
     const audioOffsets =
       this.automatedVoiceoversAudioOffsetsMsecs[this.activeContentId];
 

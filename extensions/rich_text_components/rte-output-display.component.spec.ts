@@ -19,7 +19,9 @@
 import {DebugElement, SimpleChanges} from '@angular/core';
 import {
   ComponentFixture,
+  discardPeriodicTasks,
   fakeAsync,
+  flush,
   TestBed,
   tick,
   waitForAsync,
@@ -28,17 +30,57 @@ import {By} from '@angular/platform-browser';
 import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {AutomaticVoiceoverHighlightService} from '../../core/templates/services/automatic-voiceover-highlight-service';
+import {EntityVoiceoversService} from '../../core/templates/services/entity-voiceovers.services';
+import {ContextService} from '../../core/templates/services/context.service';
+import {TranslationTabActiveContentIdService} from '../../core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
+import {VoiceoverPlayerService} from '../../core/templates/pages/exploration-player-page/services/voiceover-player.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    };
+  }
+}
 
 describe('RTE display component', () => {
   let fixture: ComponentFixture<RteOutputDisplayComponent>;
   let component: RteOutputDisplayComponent;
   let rteParserService: OppiaRteParserService;
+  let platformFeatureService: PlatformFeatureService;
+  let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
+  let entityVoiceoversService: EntityVoiceoversService;
+  let contextService: ContextService;
+  let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
+  let voiceoverPlayerService: VoiceoverPlayerService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RichTextComponentsModule],
+      imports: [RichTextComponentsModule, HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
     }).compileComponents();
     rteParserService = TestBed.inject(OppiaRteParserService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    automaticVoiceoverHighlightService = TestBed.inject(
+      AutomaticVoiceoverHighlightService
+    );
+    translationTabActiveContentIdService = TestBed.inject(
+      TranslationTabActiveContentIdService
+    );
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    contextService = TestBed.inject(ContextService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     fixture = TestBed.createComponent(RteOutputDisplayComponent);
     component = fixture.componentInstance;
   }));
@@ -179,5 +221,172 @@ describe('RTE display component', () => {
     expect(component.elementRef.nativeElement.innerText).toEqual(
       'HiHelloHello'
     );
+  }));
+
+  it('should disable voiceover regeneration feature flag', fakeAsync(() => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeFalse();
+  }));
+
+  it('should enable voiceover regeneration feature flag', fakeAsync(() => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeTrue();
+  }));
+
+  it('should correctly wrap html content inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<p>Hi<em>Hello</em>Hello</p>';
+    let expectedOutputWrappedString =
+      '<p><span id="highlightBlock1">Hi</span><em><span ' +
+      'id="highlightBlock2">Hello</span></em><span id="highlightBlock3">' +
+      'Hello</span></p>';
+
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {
+    let rteString = '<p>Hi<em>Hello</em>Hello</p>';
+    let regenerateVoiceoverFeatureSpy = spyOn(
+      component,
+      'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+    );
+    spyOn(
+      automaticVoiceoverHighlightService,
+      'setAutomatedVoiceoversAudioOffsets'
+    );
+    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers');
+
+    regenerateVoiceoverFeatureSpy.and.returnValue(false);
+    component.ngOnInit();
+    tick();
+    flush();
+    discardPeriodicTasks();
+
+    expect(
+      automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets
+    ).not.toHaveBeenCalled();
+    expect(
+      entityVoiceoversService.getActiveEntityVoiceovers
+    ).not.toHaveBeenCalled();
+
+    regenerateVoiceoverFeatureSpy.and.returnValue(true);
+    component.ngOnInit();
+    tick(1000);
+    flush();
+    discardPeriodicTasks();
+
+    expect(
+      automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets
+    ).toHaveBeenCalled();
+    expect(
+      entityVoiceoversService.getActiveEntityVoiceovers
+    ).toHaveBeenCalled();
+  }));
+
+  it('should correctly set data for sentence highlighting during voiceover playback in ngOnChanges', fakeAsync(() => {
+    let rteString = '<p>Hi<em>Hello</em>Hello</p>';
+    let regenerateVoiceoverFeatureSpy = spyOn(
+      component,
+      'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+    );
+    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSenetnceMap');
+    spyOn(automaticVoiceoverHighlightService, 'setActiveContentId');
+
+    let changes: SimpleChanges = {
+      rteString: {
+        previousValue: '',
+        currentValue: rteString,
+        firstChange: true,
+        isFirstChange: () => true,
+      },
+    };
+
+    const node = document.createTextNode('Congratulations! You have finished');
+    component.elementRef.nativeElement.parentNode.insertBefore(
+      node,
+      component.elementRef.nativeElement
+    );
+    component.rteString = rteString;
+
+    regenerateVoiceoverFeatureSpy.and.returnValue(false);
+    component.ngOnChanges(changes);
+    tick(1000);
+
+    expect(
+      automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap
+    ).not.toHaveBeenCalled();
+    expect(
+      automaticVoiceoverHighlightService.setActiveContentId
+    ).not.toHaveBeenCalled();
+
+    fixture.detectChanges();
+
+    regenerateVoiceoverFeatureSpy.and.returnValue(true);
+    component.ngOnChanges(changes);
+    tick(1000);
+
+    expect(
+      automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap
+    ).toHaveBeenCalled();
+    expect(
+      automaticVoiceoverHighlightService.setActiveContentId
+    ).toHaveBeenCalled();
+  }));
+
+  it('should be able to get contentId for specific pages', fakeAsync(() => {
+    let ttacSpy = spyOn(
+      translationTabActiveContentIdService,
+      'getActiveContentId'
+    );
+    let vpsSpy = spyOn(voiceoverPlayerService, 'getActiveContentId');
+    let explorationPlayerPageSpy = spyOn(
+      contextService,
+      'isInExplorationPlayerPage'
+    );
+    let explorationEditorPageSpy = spyOn(
+      contextService,
+      'isInExplorationEditorPage'
+    );
+    let editorTabContextSpy = spyOn(contextService, 'getEditorTabContext');
+
+    // Exploration editor page (translation tab).
+    explorationPlayerPageSpy.and.returnValue(false);
+    explorationEditorPageSpy.and.returnValue(true);
+    editorTabContextSpy.and.returnValue('editor');
+    vpsSpy.and.returnValue('undefined');
+    ttacSpy.and.returnValue('contentId');
+
+    expect(component.getActiveContentId()).toBe('contentId');
+
+    // Exploration editor page (preview tab).
+    explorationPlayerPageSpy.and.returnValue(false);
+    explorationEditorPageSpy.and.returnValue(true);
+    editorTabContextSpy.and.returnValue('preview');
+    vpsSpy.and.returnValue('contentId');
+    ttacSpy.and.returnValue('undefined');
+
+    expect(component.getActiveContentId()).toBe('contentId');
+
+    // Exploration player page.
+    explorationPlayerPageSpy.and.returnValue(true);
+    vpsSpy.and.returnValue('contentId');
+    ttacSpy.and.returnValue('undefined');
+
+    expect(component.getActiveContentId()).toBe('contentId');
   }));
 });
