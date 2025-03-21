@@ -21,6 +21,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -31,14 +32,20 @@ describe('Exploration Editor', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // see: https://github.com/oppia/oppia/issues/19443
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      return;
+    }
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
     );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
     explorationId =
       await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
         'Feedback Test'
@@ -48,6 +55,15 @@ describe('Exploration Editor', function () {
   it(
     'should log in as a different user and give feedback to an exploration, both anonymously and non-anonymously. Then log out and give anonymous feedback.',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       loggedInVisitor = await UserFactory.createNewUser(
         'loggedInVisitor',
         'loggedInVisitor@example.com'
@@ -82,6 +98,15 @@ describe('Exploration Editor', function () {
   it(
     'should log in as the original creator and go to the feedback tab and verify that all the feedback is shown in the list of feedback',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       await explorationEditor.page.bringToFront();
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
@@ -98,6 +123,15 @@ describe('Exploration Editor', function () {
   it(
     'should verify that each feedback report has the correct details',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       // Verify first feedback thread (non-anonymous).
       await explorationEditor.viewFeedbackThread(1);
       await explorationEditor.expectSuggestionToBeAnonymous(
@@ -136,6 +170,15 @@ describe('Exploration Editor', function () {
   it(
     'should verify that feedback recipients can see the responses to their feedback',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       await loggedInVisitor.page.bringToFront();
       await loggedInVisitor.navigateToFeedbackUpdatesPage();
       await loggedInVisitor.viewFeedbackUpdateThread(1);
@@ -152,6 +195,15 @@ describe('Exploration Editor', function () {
   it(
     'should change the feedback status and verify that the changes are saved correctly in both the feedback thread and the list-of-all-feedback menu',
     async function () {
+      // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+      // in mobile viewport which is required for testing the feedback messages tab),
+      // remove this part of skipping the test and make the test to run in mobile viewport as well.
+      // see: https://github.com/oppia/oppia/issues/19443
+      if (process.env.MOBILE === 'true') {
+        showMessage('Test skipped in mobile viewport');
+        return;
+      }
+
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
         'Feedback Test'
