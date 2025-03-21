@@ -708,6 +708,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
         skill_services.delete_skill(self.USER_ID, 'skill_id_2')
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_1'])
 
     def test_remove_prerequisite_skill_id_from_all_skills(self) -> None:
@@ -731,7 +732,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(
             skill.prerequisite_skill_ids,
-            ['skill_id_3', 'skill_id_2']
+            ['skill_id_2', 'skill_id_3']
         )
 
         skill_services.replace_prerequisite_skill_id_from_all_skills(
