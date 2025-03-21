@@ -264,9 +264,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
 
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
           this.voiceoversAreLoaded = true;
-          console.log(
-            this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
-          );
         });
       });
   }

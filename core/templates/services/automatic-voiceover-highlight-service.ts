@@ -134,8 +134,8 @@ export class AutomaticVoiceoverHighlightService {
     let maxOffsetMsecs = 0;
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
-      const token = tokenToAudioOffsetMsecs['token'];
-      const audioOffsetMsecs = tokenToAudioOffsetMsecs['audioOffsetMsecs'];
+      const token = tokenToAudioOffsetMsecs.token;
+      const audioOffsetMsecs = tokenToAudioOffsetMsecs.audioOffsetMsecs;
 
       sentence += token;
       minOffsetMsecs = Math.min(minOffsetMsecs, audioOffsetMsecs);

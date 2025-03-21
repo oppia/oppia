@@ -476,7 +476,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  isExplorationLinkedToStory() {
+  isExplorationLinkedToStory(): boolean {
     return this.contextService.isExplorationLinkedToStory();
   }
 

@@ -56,14 +56,10 @@ export class VoiceoverPlayerService {
       let manualVoiceover = voiceoverTypeToVoiceovers.manual;
       let automaticVoiceover = voiceoverTypeToVoiceovers.auto;
 
-      if (manualVoiceover && manualVoiceover.needsUpdate === false) {
+      if (manualVoiceover?.needsUpdate === false) {
         this.activeVoiceover = manualVoiceover;
-      } else if (
-        automaticVoiceover &&
-        automaticVoiceover.needsUpdate === false
-      ) {
+      } else if (automaticVoiceover?.needsUpdate === false) {
         this.activeVoiceover = automaticVoiceover;
-      } else {
       }
     } catch (e: unknown) {
       this.activeVoiceover = undefined;

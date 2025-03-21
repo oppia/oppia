@@ -1367,7 +1367,6 @@ export class ConversationSkinComponent {
 
         setTimeout(() => {
           this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
-          console.log('Conversation skin submit answer');
           this.setActiveVoiceover(feedbackHtml);
           this.voiceoverPlayerService.setActiveComponentName(
             AppConstants.COMPONENT_NAME_FEEDBACK
@@ -1400,8 +1399,6 @@ export class ConversationSkinComponent {
 
     let feedbackContentId =
       interaction.getContentIdForMatchingHtml(feedbackHtml);
-
-    console.log(feedbackContentId);
 
     if (feedbackContentId) {
       this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);

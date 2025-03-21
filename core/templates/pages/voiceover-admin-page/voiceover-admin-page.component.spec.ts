@@ -422,7 +422,7 @@ describe('Voiceover Admin Page component ', () => {
     });
   }));
 
-  it('should not update cloud supported language accent codes when modal is cancelled ', () => {
+  it('should not update cloud supported language accent codes when modal is cancelled', () => {
     component.languageCodesMapping = {
       en: {
         'en-US': true,
