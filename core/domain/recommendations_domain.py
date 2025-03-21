@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core import utils
 
-from typing import Dict, List
+from typing import cast, Dict, List, Iterable
 
 
 class ExplorationRecommendations:
@@ -85,10 +85,11 @@ class ExplorationRecommendations:
                 an exploration id appears in recommended_exploration_ids.
         """
         non_unique_counts: Dict[str, int] = (
-            {exp_id: count for exp_id, count in counts.items if count > 1})
+            {exp_id: count for exp_id, count in cast(
+                Iterable, counts.items) if count > 1})
         if non_unique_counts:
             duplicates = (', '.join('({}, {})'.format(exp_id, count) for (
-                exp_id, count) in non_unique_counts.items))
+                exp_id, count) in cast(Iterable, non_unique_counts.items)))
             raise utils.ValidationError(
                 'recommended_exploration_ids contains duplicate values,'
                 'received (exp_id, count): %s' % duplicates)
