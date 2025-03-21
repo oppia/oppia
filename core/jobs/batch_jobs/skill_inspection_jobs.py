@@ -22,9 +22,8 @@ from __future__ import annotations
 
 from core.jobs import base_jobs
 from core.jobs import job_utils
+from core.jobs.types import job_run_result
 from core.jobs.io import ndb_io
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
 from core.platform import models
 
 import apache_beam as beam
@@ -42,7 +41,7 @@ if MYPY: # pragma: no cover
 class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
     """Job that counts skills having hanging prerequisites."""
 
-    def run(self) -> beam.PCollection[base_validation_errors.BaseAuditError]:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of skills having hanging prerequisites aggregated from all
         Skill models.
 
@@ -82,11 +81,9 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             | 'Filter hanging prerequisites' >> beam.Filter(
                 lambda result: not result[1]  # Keep only skills that don't exist (False)
             )
-            | 'Create audit errors' >> beam.Map(
-                lambda result: base_validation_errors.BaseAuditError(
-                    'hanging_prerequisite_skill',
-                    'Skill with ID %s is referenced as a prerequisite but does not exist' % result[0],
-                    {'skill_id': result[0]}
+            | 'Create collection of hanging prerequisites' >> beam.Map(
+                lambda result: job_run_result.JobRunResult.as_stdout(
+                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but does not exist""",
                 )
             )
         )
