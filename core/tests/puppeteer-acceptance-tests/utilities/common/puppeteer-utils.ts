@@ -778,15 +778,23 @@ export class BaseUser {
     anchorInnerText: string,
     expectedDestinationPageUrl: string
   ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const escapedText = anchorInnerText.replace(/"/g, '\\"');
+    const xpath = `//a[contains(normalize-space(text()), "${escapedText}")]`;
+    await this.page.waitForXPath(xpath, {visible: true});
+    const [anchorHandle] = await this.page.$x(xpath);
+    if (!anchorHandle) {
+      throw new Error(
+        `Anchor with text "${anchorInnerText}" not found after wait.`
+      );
+    }
     const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
+    await anchorHandle.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    expect(await newTabPage?.url()).toBe(expectedDestinationPageUrl);
     await newTabPage?.close();
   }
 
