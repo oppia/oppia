@@ -95,7 +95,6 @@ describe('Exploration User Roles', function () {
       await manager.dismissWelcomeModal();
 
       // Verify manager can modify exploration.
-      await manager.navigateToEditorTab();
       await manager.updateCardContent('Updated content by manager');
       await manager.saveExplorationDraft();
 
