@@ -22,6 +22,7 @@ import re
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import state_domain
 
 from typing import Dict, List, Optional, Tuple, TypedDict, Union
@@ -318,14 +319,6 @@ class EntityVoiceovers:
             automated_voiceovers_audio_offsets_msecs={})
 
 
-class ExplorationVoiceArtistsLinkDict(TypedDict):
-    """Dict type for Exploration Voice Artists object."""
-
-    exp_id: str
-    content_id_to_voiceovers_mapping: Dict[
-        str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]]
-
-
 class ExplorationVoiceArtistsLink:
     """Domain object for linking Exploration with voice artists."""
 
@@ -340,49 +333,14 @@ class ExplorationVoiceArtistsLink:
 
         Args: 
             exp_id: str. ID of exploration.
-            content_id_to_voiceovers_mapping: Dict. A dict consisting 
-                of content IDs as key and other dicts as value.
-                This other dict consists of a bunch of languages
-                (in which voiceovers of content is made) as keys
-                and a two-tuple as values. First value of tuple
-                is voice artist ID and second value is VoiceOverDict.
+            content_id_to_voiceovers_mapping: Dict. A dictionary with content
+                IDs as keys and nested dicts as values. Each nested dict
+                contains language codes as keys and a 2-tuple as values.
+                The 2-tuple contains voice artist ID as the first element 
+                and VoiceoverDict as the second element.
         """
         self.exp_id = exp_id
         self.content_id_to_voiceovers_mapping = content_id_to_voiceovers_mapping
-
-    @classmethod
-    def from_dict(
-        cls, exploration_voiceArtists: ExplorationVoiceArtistsLinkDict
-    ) -> ExplorationVoiceArtistsLink:
-        """Returns a explorationVoiceArtistsLink domain object from a dict.
-
-        Args:
-            exploration_voiceArtists: Dict. Dict represents object
-                of Exploration voice artists link object.
-
-        Returns:
-            ExplorationVoiceArtistsLink: Object.
-            Exploration voice artists link object instance.
-        """
-        return cls(
-            exploration_voiceArtists['exp_id'],
-            exploration_voiceArtists['content_id_to_voiceovers_mapping']
-        )
-
-    def to_dict(self) -> ExplorationVoiceArtistsLinkDict:
-        """Returns a dict representing a exploration voice artist link
-        data domain object.
-
-        Returns:
-            ExplorationVoiceArtistsLinkDict. Dict. A dict, 
-            mapping content ID to respective voice over artist.
-        """
-
-        return {
-            'exp_id': self.exp_id,
-            'content_id_to_voiceovers_mapping': (
-                self.content_id_to_voiceovers_mapping)
-        }
 
     def validate(self) -> None:
         """Validates attributes of ExplorationVoiceArtistsLink."""
@@ -403,7 +361,7 @@ class ExplorationVoiceArtistsLink:
             )
         # Validating content within content_id_to_voiceovers_mapping dict.
         for content_id, nested_dict in (
-            self.content_id_to_voiceovers_mapping.items()):
+        self.content_id_to_voiceovers_mapping.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'Expected content id to be string, recieved: %s.'
@@ -415,25 +373,30 @@ class ExplorationVoiceArtistsLink:
                     % nested_dict
                 )
             # Validating dicts inside each content.
-            for lang, (artist_id, voiceover_dict) in nested_dict.items():
-                # Validating langauge.
-                if not isinstance(lang, str):
+            for language_code, (artist_id, voiceover_dict) in (
+                nested_dict.items()):
+                if not isinstance(language_code, str):
                     raise utils.ValidationError(
-                    'Expected language to be string'
-                    'But recieved: %s' % lang
+                    'Expected language to be string recieved: %s'
+                    % language_code
                 )
+                allowed_language_codes = [language['id'] for language in (
+                constants.SUPPORTED_AUDIO_LANGUAGES)]
+                if language_code not in allowed_language_codes:
+                    raise utils.ValidationError(
+                        'Expected language code to be one from supported '
+                        'audio languages recieved: %s' % language_code
+                    )
                 if not isinstance(artist_id, str):
                     raise utils.ValidationError(
-                    'Expected artist id to be string'
-                    'But recieved: %s' % artist_id
+                    'Expected artist id to be string recieved: %s'
+                    % artist_id
                 )
-                # Validating voiceOverDict.
                 if not isinstance(voiceover_dict, dict):
                     raise utils.ValidationError(
-                        'Expected voiceoverDict to be dictionary, received: %s'
-                        % voiceover_dict
-                    )
-
+                    'Expected voiceover_dict to be dict recieved: %s'
+                    % voiceover_dict
+                )
                 expected_keys = {
                     'filename',
                     'file_size_bytes',
@@ -450,26 +413,4 @@ class ExplorationVoiceArtistsLink:
                     raise utils.ValidationError(
                         'Unexpected keys in voiceoverDict: %s' % unexpected_keys
                     )
-                if not isinstance(voiceover_dict['filename'], str):
-                    raise utils.ValidationError(
-                        'Expected filename to be string, received: %s'
-                        % voiceover_dict['filename']
-                    )
-
-                if not isinstance(voiceover_dict['file_size_bytes'], int):
-                    raise utils.ValidationError(
-                        'Expected file size to be int, received: %s'
-                        % voiceover_dict['file_size_bytes']
-                    )
-
-                if not isinstance(voiceover_dict['needs_update'], bool):
-                    raise utils.ValidationError(
-                        'Expected needs_update to be bool, received: %s'
-                        % voiceover_dict['needs_update']
-                    )
-
-                if not isinstance(voiceover_dict['duration_secs'], float):
-                    raise utils.ValidationError(
-                        'Expected duration_secs to be float, received: %s'
-                        % voiceover_dict['duration_secs']
-                    )
+                state_domain.Voiceover.from_dict(voiceover_dict).validate()

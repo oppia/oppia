@@ -361,7 +361,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         debug_logs += ('\n')
 
         with datastore_services.get_ndb_context():
-            exploration_voice_artists_link = (
+            exploration_voice_artists_link_model = (
                 voiceover_services.
                 create_exploration_voice_artists_link_model_instance(
                     exploration_model.id,
@@ -369,7 +369,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 )
             )
 
-        return exploration_voice_artists_link, debug_logs
+        return exploration_voice_artists_link_model, debug_logs
 
     def extract_exploration_id_from_snapshot_id(
         self,

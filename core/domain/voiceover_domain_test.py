@@ -411,46 +411,21 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
 
         self.content_id_to_voiceovers_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', self.dummy_voiceover_dict)
+                'en': ('voice_artist_1', self.dummy_voiceover_dict)
             },
             'content_id_1': {
-                'en-US': ('voice_artist_1', self.dummy_voiceover_dict),
-                'es-ES': ('voice_artist_2', self.dummy_voiceover_dict)
+                'en': ('voice_artist_1', self.dummy_voiceover_dict),
+                'es': ('voice_artist_2', self.dummy_voiceover_dict)
             }
         }
 
-        self.exp_voice_artists_link_instance = (
+        self.exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
                 exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     self.content_id_to_voiceovers_mapping))
             )
-        self.exp_voice_artists_link_instance.validate()
-
-    def test_to_dict_method(self) -> None:
-        expected_exp_voice_artists_link_dict = {
-            'exp_id': 'exp_id_1',
-            'content_id_to_voiceovers_mapping':
-            self.content_id_to_voiceovers_mapping
-        }
-        self.assertDictEqual(
-            self.exp_voice_artists_link_instance.to_dict(),
-            expected_exp_voice_artists_link_dict)
-
-    def test_from_dict_method(self) -> None:
-        exp_voice_artists_link_dict: (
-            voiceover_domain.ExplorationVoiceArtistsLinkDict) = {
-            'exp_id': 'exp_id_1',
-            'content_id_to_voiceovers_mapping':
-            self.content_id_to_voiceovers_mapping
-        }
-        expected_exp_voice_artists_link_instance = (
-            voiceover_domain.ExplorationVoiceArtistsLink.from_dict(
-                exp_voice_artists_link_dict))
-
-        self.assertDictEqual(
-            exp_voice_artists_link_dict,
-            expected_exp_voice_artists_link_instance.to_dict())
+        self.exp_voice_artists_link.validate()
 
     def test_validate_exp_id(self) -> None:
         # Test exp_id must be a string.
@@ -461,19 +436,19 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected exploration id to be string'
         ):
-            self.exp_voice_artists_link_instance.exp_id = 123  # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.exp_id = 123  # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
         # Reset for next test.
-        self.exp_voice_artists_link_instance.exp_id = 'exp_id_1'
+        self.exp_voice_artists_link.exp_id = 'exp_id_1'
 
         # Test exp_id should not be empty.
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Exploration ID should not be empty'
         ):
-            self.exp_voice_artists_link_instance.exp_id = ''
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.exp_id = ''
+            self.exp_voice_artists_link.validate()
 
     def test_validate_content_id_to_voiceovers_mapping(self) -> None:
         # Test content_id_to_voiceovers_mapping must be a dict.
@@ -484,14 +459,14 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected content_id_to_voiceovers_mapping to be Dict'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = 'not_a_dict'  # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = 'not_a_dict'  # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_content_id(self) -> None:
         # Test content_id must be a string.
         invalid_mapping = {
             123: {
-                'en-US': ('voice_artist_1', self.dummy_voiceover_dict)
+                'en': ('voice_artist_1', self.dummy_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -501,8 +476,8 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected content id to be string'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_nested_dict(self) -> None:
         # Test nested dict must be a dictionary.
@@ -516,10 +491,10 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected nested dict to be Dictionary'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
-    def test_validate_language(self) -> None:
+    def test_validate_language_code(self) -> None:
         # Test language must be a string.
         invalid_mapping = {
             'content_id_0': {
@@ -531,16 +506,33 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected language to be string'
+            'Expected language to be string recieved: %s' % 123
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
+
+    def test_validate_language_code_present_in_supported_lang(self) -> None:
+        # Test language code must be from one of predefined supported audio
+        # languages.
+        invalid_mapping = {
+            'content_id_0': {
+                'en-US': ('voice_artist_1', self.dummy_voiceover_dict)
+            }
+        }
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected language code to be one from supported audio languages'
+            ' recieved: %s' % 'en-US'
+        ):
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = (
+                invalid_mapping)
+            self.exp_voice_artists_link.validate()
 
     def test_validate_artist_id(self) -> None:
         # Test artist_id must be a string.
         invalid_mapping = {
             'content_id_0': {
-                'en-US': (123, self.dummy_voiceover_dict)
+                'en': (123, self.dummy_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -550,14 +542,14 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected artist id to be string'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_voiceover_dict_type(self) -> None:
         # Test voiceover_dict must be a dictionary.
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', 'not_a_dict')
+                'en': ('voice_artist_1', 'not_a_dict')
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -565,10 +557,11 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected voiceoverDict to be dictionary'
+            'Expected voiceover_dict to be dict recieved: %s'
+            % 'not_a_dict'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_voiceover_dict_missing_keys(self) -> None:
         # Test for missing keys in voiceover_dict.
@@ -579,7 +572,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', incomplete_voiceover_dict)
+                'en': ('voice_artist_1', incomplete_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -589,8 +582,8 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Missing keys in voiceoverDict'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_voiceover_dict_unexpected_keys(self) -> None:
         # Test for unexpected keys in voiceover_dict.
@@ -603,7 +596,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', extra_keys_voiceover_dict)
+                'en': ('voice_artist_1', extra_keys_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -613,8 +606,8 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Unexpected keys in voiceoverDict'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_filename_type(self) -> None:
         # Test filename must be a string.
@@ -626,7 +619,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', invalid_voiceover_dict)
+                'en': ('voice_artist_1', invalid_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -634,10 +627,34 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected filename to be string'
+            'Expected audio filename to be a string, received %s'
+            % 123
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
+
+    def test_validate_filename_fomat(self) -> None:
+        # Test filename must of valid format.
+        invalid_voiceover_dict = {
+            'filename': '.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        invalid_mapping = {
+            'content_id_0': {
+                'en': ('voice_artist_1', invalid_voiceover_dict)
+            }
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid audio filename: %s' % '.mp3'
+        ):
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_file_size_bytes_type(self) -> None:
         # Test file_size_bytes must be an int.
@@ -649,7 +666,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', invalid_voiceover_dict)
+                'en': ('voice_artist_1', invalid_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -657,10 +674,33 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected file size to be int'
+            'Expected file size to be an int, received %s' % '3000'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
+
+    def test_validate_file_size_bytes(self) -> None:
+        # Test file_size_bytes must be greater than zero.
+        invalid_voiceover_dict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 0,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        invalid_mapping = {
+            'content_id_0': {
+                'en': ('voice_artist_1', invalid_voiceover_dict)
+            }
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Invalid file size: %s' % 0
+        ):
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_needs_update_type(self) -> None:
         # Test needs_update must be a bool.
@@ -672,7 +712,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', invalid_voiceover_dict)
+                'en': ('voice_artist_1', invalid_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -680,13 +720,14 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected needs_update to be bool'
+            'Expected needs_update to be a bool, received %s'
+            % 'not_a_bool'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
 
     def test_validate_duration_secs_type(self) -> None:
-        # Test duration_secs must be a float.
+        # Test duration_secs must be a float or int.
         invalid_voiceover_dict = {
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
@@ -695,7 +736,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         invalid_mapping = {
             'content_id_0': {
-                'en-US': ('voice_artist_1', invalid_voiceover_dict)
+                'en': ('voice_artist_1', invalid_voiceover_dict)
             }
         }
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -703,7 +744,31 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected duration_secs to be float'
+            'Expected duration_secs to be a float, received %s' % '6.1'
         ):
-            self.exp_voice_artists_link_instance.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
-            self.exp_voice_artists_link_instance.validate()
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()
+
+    def test_validate_duration_secs(self) -> None:
+        # Test duration_secs must be greater than  or equal to zero.
+        invalid_voiceover_dict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': -1
+        }
+        invalid_mapping = {
+            'content_id_0': {
+                'en': ('voice_artist_1', invalid_voiceover_dict)
+            }
+        }
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Expected duration_secs to be positive number, '
+                'or zero if not yet specified %s' % -1
+        ):
+            self.exp_voice_artists_link.content_id_to_voiceovers_mapping = invalid_mapping # type: ignore[assignment]
+            self.exp_voice_artists_link.validate()

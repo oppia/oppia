@@ -77,7 +77,7 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
         cls,
         exploration_model: exp_models.ExplorationModel,
         exploration_voice_artists_link_model: (
-            voiceover_domain.ExplorationVoiceArtistsLink),
+            voiceover_models.ExplorationVoiceArtistsLinkModel),
         voice_artist_id_to_language_code_mapping: Dict[str, Dict[str, str]]
     ) -> List[voiceover_domain.EntityVoiceovers]:
         """Creates a list of EntityVoiceovers instances containing voiceovers
@@ -87,8 +87,8 @@ class PopulateManualVoiceoversToEntityVoiceoversModelJob(base_jobs.JobBase):
             exploration_model: ExplorationModel. An instance of an
                 exploration model.
             exploration_voice_artists_link_model:
-                ExplorationVoiceArtistsLink. An instance of an
-                ExplorationVoiceArtistsLink model.
+                ExplorationVoiceArtistsLinkModel. An instance of an
+                ExplorationVoiceArtistsLinkModel model.
             voice_artist_id_to_language_code_mapping: dict(str, dict(str, str)).
                 A dictionary maps voice artist IDs to nested dicts. Each nested
                 dict maps language code to language accent code.
