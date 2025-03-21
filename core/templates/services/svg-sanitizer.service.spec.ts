@@ -587,7 +587,7 @@ describe('SvgSanitizerService', () => {
   // This is an expected behavior and does not affect the validity of the SVG.
   it('should remove unwanted/unnecessary attributes and return a safe SVG', () => {
     const testCases = [
-      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed
+      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed.
       {
         svgString:
           '<svg width="100" height="100"' +
