@@ -1,7 +1,6 @@
 title: "{{Issue Description}} | {{your GitHub username}}"
 body:
 - type: input
-  id: debugging_doc_link
   attributes:
     label: Link to debugging doc
     description: "Please paste the Google Doc link to the debugging doc here."
