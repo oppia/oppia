@@ -1544,6 +1544,10 @@ export class LoggedInUser extends BaseUser {
 
     showMessage('Navigation to exploration editor is successful.');
   }
+
+  /**
+   * Function to navigate to Creator Dashboard Page
+   */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(CreatorDashboardUrl);
     showMessage('Creator dashboard page is opened successfully.');
@@ -1621,6 +1625,10 @@ export class LoggedInUser extends BaseUser {
     await this.addInteraction(interaction);
     showMessage('A simple exploration is created.');
   }
+
+  /**
+   * Function to save an exploration draft.
+   */
   async saveExplorationDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);

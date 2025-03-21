@@ -22,6 +22,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const PROFILE_PICTURE = testConstants.data.profilePicture;
 
 describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser;
@@ -49,9 +50,7 @@ describe('Logged-in User', function () {
     'should edit profile avatar via preferences',
     async function () {
       await loggedInUser.navigateToPreferencesPageUsingProfileDropdown();
-      await loggedInUser.updateProfilePicture(
-        'core/tests/puppeteer-acceptance-tests/data/profile-picture.svg'
-      );
+      await loggedInUser.updateProfilePicture(PROFILE_PICTURE);
       await loggedInUser.saveChanges();
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
       await loggedInUser.verifyProfilePicUpdate();
@@ -81,7 +80,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.dismissWelcomeModal();
       await loggedInUser.navigateToSettingsTab();
-      await loggedInUser.updateTitleTo('Edited Exploration');
+      await loggedInUser.updateTitleTo(TEST_EXPLORATION.editedTitle);
 
       await loggedInUser.saveExplorationDraft();
 
