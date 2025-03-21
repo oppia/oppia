@@ -580,13 +580,14 @@ describe('SvgSanitizerService', () => {
     }
   );
 
-  // This test checks if unwanted attributes like xmlns:rdf, xmlns:sodipodi, and xmlns:dc
-  // are removed from the SVG while keeping the valid attributes unchanged.
+  // This test checks that unwanted attributes like xmlns:rdf, xmlns:sodipodi, and xmlns:dc
+  // are removed from the SVG while keeping valid attributes unchanged.
+  // Note: The order of attributes may change because when the SVG is parsed into a DOM document
+  // and then serialized back to a string, browsers standardize the attribute order.
+  // This is an expected behavior and does not affect the validity of the SVG.
   it('should remove unwanted/unnecessary attributes and return a safe SVG', () => {
     const testCases = [
-      // The cases have different orders of attributes because the order affects how invalid attributes are detected and removed.
-      // In some cases, invalid attributes were correctly deleted, but in others, they were skipped due to the order.
-      // Testing with different attribute orders ensures that all invalid attributes are removed properly, regardless of their position.
+      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed
       {
         svgString:
           '<svg width="100" height="100"' +
@@ -605,6 +606,7 @@ describe('SvgSanitizerService', () => {
           ' stroke-width="3" fill="red"/>' +
           ' </svg>',
       },
+      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed.
       {
         svgString:
           '<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"' +
@@ -623,6 +625,7 @@ describe('SvgSanitizerService', () => {
           ' stroke="black" stroke-width="3" fill="red"/>' +
           ' </svg>',
       },
+      // In this image, xmlns:sodipodi is removed.
       {
         svgString:
           '<svg' +
