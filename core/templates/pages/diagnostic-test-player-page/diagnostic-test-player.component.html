@@ -69,7 +69,7 @@
                                       [isPublished]="topicSummary.isTopicPublished()">
             </oppia-topic-summary-tile>
             <div class="oppia-start-button">
-              <button class="btn oppia-start-topic-button">
+              <button class="btn oppia-start-topic-button" (click)="getRecommendationAcceptanceEvent(topicSummary.getName())">
                 <a class="oppia-anchor-tag-under-button"
                    [href]="getTopicUrlFromUrlFragment(topicSummary.getUrlFragment())">
                   {{getTopicButtonText(topicSummary.getName())}}

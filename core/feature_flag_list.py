@@ -84,7 +84,6 @@ class FeatureNames(enum.Enum):
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
@@ -99,6 +98,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -169,7 +169,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
         (
             'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
