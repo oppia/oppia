@@ -57,7 +57,7 @@ class ExplorationRecommendations:
                 'Expected recommended_exploration_ids to be a list, '
                 'received %s' % self.recommended_exploration_ids)   
 
-        counts = {}
+        counts: Dict[str, int] = {}
         for recommended_exploration_id in self.recommended_exploration_ids:
             counts[recommended_exploration_id] = (
                 counts.get(recommended_exploration_id, 0) + 1)
@@ -84,7 +84,7 @@ class ExplorationRecommendations:
             counts: dict. The dictionary storing the number of times
                 an exploration id appears in recommended_exploration_ids.
         """
-        non_unique_counts = (
+        non_unique_counts: Dict[str, int] = (
             {exp_id: count for exp_id, count in counts.items if count > 1})
         if non_unique_counts:
             duplicates = (', '.join('({}, {})'.format(exp_id, count) for (
