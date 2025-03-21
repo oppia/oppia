@@ -28,7 +28,7 @@ from core.platform import models
 
 import apache_beam as beam
 
-from typing import List
+from typing import Iterable, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -91,10 +91,14 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
         return hanging_prerequisites
 
 
-class CheckPrerequisiteExists(beam.DoFn):
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
+class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
     """DoFn to check if a prerequisite skill exists in the list of all skills."""
     
-    def process(self, prerequisite_id, all_skill_ids):
+    def process(self, prerequisite_id, all_skill_ids) -> Iterable[Tuple[str, bool]]:
         """Check if the prerequisite exists in all skill IDs.
         
         Args:

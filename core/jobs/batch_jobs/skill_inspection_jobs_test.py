@@ -29,33 +29,33 @@ from core.domain import skill_domain
 import datetime
 from typing import Final, Type
 
-MYPY = False
+MYPY=False
 if MYPY:
-   from mypy_imports import skill_models
+    from mypy_imports import skill_models
 
-(skill_models,) = models.Registry.import_models([models.Names.SKILL])
+(skill_models,)=models.Registry.import_models([models.Names.SKILL])
 
 
 class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
     JOB_CLASS: Type[
         skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
-    ] = skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
+    ]=skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
 
-    skill_1_id: Final = 'skill_id_1'
-    skill_1_desc: Final = 'skill_description_1'
-    skill_2_id: Final = 'skill_id_2'
-    skill_2_desc: Final = 'skill_description_2'
-    skill_3_id: Final = 'skill_id_3'
-    skill_3_desc: Final = 'skill_description_3'
+    SKILL_1_ID: Final='skill_id_1'
+    SKILL_1_DESC: Final='skill_description_1'
+    SKILL_2_ID: Final='skill_id_2'
+    SKILL_1_DESC: Final='skill_description_2'
+    SKILL_3_ID: Final='skill_id_3'
+    SKILL_3_DESC: Final='skill_description_3'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
     def test_skill_with_no_prerequisites(self) -> None:
-        skill = self.create_model(
+        skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_1_id,
-            description = self.skill_1_desc,
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -91,10 +91,10 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_skill_with_no_hanging_prerequisites(self) -> None:
-        prerequisite_skill = self.create_model(
+        prerequisite_skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_1_id,
-            description = self.skill_1_desc,
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -124,10 +124,10 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False,
             prerequisite_skill_ids=[]
         )
-        skill = self.create_model(
+        skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_2_id,
-            description = self.skill_2_desc,
+            id=self.SKILL_2_ID,
+            description=self.SKILL_1_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -155,7 +155,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=[self.skill_1_id]
+            prerequisite_skill_ids=[self.SKILL_1_ID]
         )
         prerequisite_skill.update_timestamps()
         skill.update_timestamps()
@@ -164,10 +164,10 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_skill_with_hanging_prerequisite(self) -> None:
-        superseding_skill = self.create_model(
+        superseding_skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_1_id,
-            description = self.skill_1_desc,
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -197,10 +197,10 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             all_questions_merged=False,
             prerequisite_skill_ids=[]
         )
-        prerequisite_skill = self.create_model(
+        prerequisite_skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_2_id,
-            description = self.skill_2_desc,
+            id=self.SKILL_2_ID,
+            description=self.SKILL_1_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -228,13 +228,13 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            superseding_skill=self.skill_1_id,
+            superseding_skill_id=self.SKILL_1_ID,
             prerequisite_skill_ids=[]
         )
-        skill = self.create_model(
+        skill=self.create_model(
             skill_models.SkillModel,
-            id = self.skill_3_id,
-            description = self.skill_3_desc,
+            id=self.SKILL_3_ID,
+            description=self.SKILL_3_DESC,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
@@ -262,7 +262,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=[self.skill_2_id]
+            prerequisite_skill_ids=[self.SKILL_2_ID]
         )
         superseding_skill.update_timestamps()
         prerequisite_skill.update_timestamps()
@@ -271,6 +271,6 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout=f"""Skill with ID: {self.skill_2_id} is referenced as a prerequisite but does not exist"""
+                stdout=f"""Skill with ID: {self.SKILL_2_ID} is referenced as a prerequisite but does not exist""" # pylint: disable=line-too-long
             )
         ])

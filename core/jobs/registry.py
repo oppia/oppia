@@ -84,6 +84,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
 
+
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
     """Returns all jobs that have inherited from the JobBase class.
 
