@@ -22,7 +22,6 @@ import re
 
 from core import feconf
 from core import utils
-from core.constants import constants
 from core.domain import state_domain
 
 from typing import Dict, List, Optional, Tuple, TypedDict, Union
@@ -386,16 +385,13 @@ class ExplorationVoiceArtistsLink:
                 'Expected exploration id to be string, recieved: %s.'
                 % self.exp_id
             )
-        if self.exp_id == '':
-            raise utils.ValidationError(
-                'Exploration ID should not be empty.'
-            )
+        if not self.exp_id:
+            raise utils.ValidationError('Exploration ID should not be empty.')
         if not isinstance(self.content_id_to_voiceovers_mapping, dict):
             raise utils.ValidationError(
                 'Expected content_id_to_voiceovers_mapping to be Dict'
                 'But recieved: %s' % self.content_id_to_voiceovers_mapping
             )
-        # Validating content within content_id_to_voiceovers_mapping dict.
         for content_id, nested_dict in (
         self.content_id_to_voiceovers_mapping.items()):
             if not isinstance(content_id, str):
@@ -403,50 +399,95 @@ class ExplorationVoiceArtistsLink:
                     'Expected content id to be string, recieved: %s.'
                     % content_id
                 )
+            if not content_id:
+                raise utils.ValidationError('Content ID should not be empty.')
             if not isinstance(nested_dict, dict):
                 raise utils.ValidationError(
                     'Expected nested dict to be Dictionary, recieved: %s.'
                     % nested_dict
                 )
-            # Validating dicts inside each content.
             for language_code, (artist_id, voiceover_dict) in (
-                nested_dict.items()):
+            nested_dict.items()):
                 if not isinstance(language_code, str):
                     raise utils.ValidationError(
-                    'Expected language to be string recieved: %s'
-                    % language_code
-                )
-                allowed_language_codes = [language['id'] for language in (
-                constants.SUPPORTED_AUDIO_LANGUAGES)]
-                if language_code not in allowed_language_codes:
+                        'Expected language to be string recieved: %s'
+                        % language_code
+                    )
+                if not (
+                    utils.is_supported_audio_language_code(language_code)):
                     raise utils.ValidationError(
-                        'Expected language code to be one from supported '
-                        'audio languages recieved: %s' % language_code
+                        'Expected language code to be one from '
+                        'supported audio languages recieved: %s'
+                        % language_code
                     )
                 if not isinstance(artist_id, str):
                     raise utils.ValidationError(
-                    'Expected artist id to be string recieved: %s'
-                    % artist_id
-                )
+                        'Expected artist id to be string recieved: %s'
+                        % artist_id
+                    )
+                if not artist_id:
+                    raise utils.ValidationError(
+                        'Artist ID should not be empty.')
                 if not isinstance(voiceover_dict, dict):
                     raise utils.ValidationError(
-                    'Expected voiceover_dict to be dict recieved: %s'
-                    % voiceover_dict
-                )
+                        'Expected voiceover_dict to be dict '
+                        'recieved: %s' % voiceover_dict
+                    )
                 expected_keys = {
                     'filename',
                     'file_size_bytes',
                     'needs_update',
                     'duration_secs'
                 }
-                missing_keys = expected_keys - set(voiceover_dict.keys())
-                unexpected_keys = set(voiceover_dict.keys()) - expected_keys
+                missing_keys = (
+                    expected_keys - set(voiceover_dict.keys()))
+                unexpected_keys = (
+                    set(voiceover_dict.keys()) - expected_keys)
                 if missing_keys:
                     raise utils.ValidationError(
-                        'Missing keys in voiceoverDict: %s' % missing_keys
+                        'Missing keys in voiceoverDict: %s'
+                        % missing_keys
                     )
                 if unexpected_keys:
                     raise utils.ValidationError(
-                        'Unexpected keys in voiceoverDict: %s' % unexpected_keys
+                        'Unexpected keys in voiceoverDict: %s'
+                        % unexpected_keys
                     )
-                state_domain.Voiceover.from_dict(voiceover_dict).validate()
+                state_domain.Voiceover.from_dict(
+                    voiceover_dict).validate()
+
+    def get_voice_artist_language_mappings(
+        self,
+        mapping: Dict[str, Dict[str, str]]
+    ) -> Dict[str, Dict[str, str]]:
+        """Gets voice artist language accent mappings from this link.
+
+        Args:
+                mapping : Dict[str, Dict[str, str]]. A mapping dict.
+
+        Returns:
+            Dict[str, Dict[str, str]]. A mapped dict.
+        """
+        result: Dict[str, Dict[str, str]] = {}
+        for lang_voiceover_mapping_tuple in (
+        self.content_id_to_voiceovers_mapping.values()):
+
+            for lang_code, voiceover_tuple in (
+            lang_voiceover_mapping_tuple.items()):
+
+                voice_artist_id = voiceover_tuple[0]
+                accent_type = ''
+                if (voice_artist_id in mapping and
+                lang_code in mapping[
+                voice_artist_id]
+                ):
+                    accent_type = (
+                        mapping[
+                            voice_artist_id][lang_code])
+
+                if voice_artist_id not in result:
+                    result[voice_artist_id] = {}
+
+                result[voice_artist_id][lang_code] = accent_type
+
+        return result

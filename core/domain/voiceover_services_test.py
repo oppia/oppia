@@ -827,9 +827,22 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             }
         }
 
-        retrieved_voice_artist_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
+        retrieved_voice_artist_to_language_mapping: Dict[
+            str, Dict[str, str]] = {}
+        voice_artist_mapping = (
+            voiceover_services.get_voice_artist_metadata_mapping())
+        exploration_links = (
+            voiceover_services.get_exploration_voice_artist_links())
+        for link in exploration_links:
+            link_mappings = link.get_voice_artist_language_mappings(
+                voice_artist_mapping)
+            for voice_artist_id, language_mapping in link_mappings.items():
+                if voice_artist_id not in (
+                    retrieved_voice_artist_to_language_mapping):
+                    retrieved_voice_artist_to_language_mapping[
+                        voice_artist_id] = {}
+                retrieved_voice_artist_to_language_mapping[
+                    voice_artist_id].update(language_mapping)
 
         self.assertDictEqual(
             expected_voice_artist_to_language_mapping,

@@ -164,10 +164,22 @@ class VoiceArtistMetadataHandler(
     @acl_decorators.can_access_voiceover_admin_page
     def get(self) -> None:
         """Retrieves voice artist data for the voiceover admin page."""
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping())
-        voice_artist_id_to_voice_artist_name = (
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names())
+        voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = {}
+        voice_artist_mapping = (
+            voiceover_services.get_voice_artist_metadata_mapping())
+        exploration_links = (
+            voiceover_services.get_exploration_voice_artist_links())
+
+        for link in exploration_links:
+            link_mappings = link.get_voice_artist_language_mappings(
+                voice_artist_mapping)
+            for voice_artist_id, language_mapping in link_mappings.items():
+                if voice_artist_id not in voice_artist_id_to_language_mapping:
+                    voice_artist_id_to_language_mapping[voice_artist_id] = {}
+                voice_artist_id_to_language_mapping[
+                    voice_artist_id].update(language_mapping)
+            voice_artist_id_to_voice_artist_name = (
+                voiceover_services.get_voice_artist_ids_to_voice_artist_names())
 
         self.values.update({
             'voice_artist_id_to_language_mapping':

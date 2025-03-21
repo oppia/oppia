@@ -506,7 +506,6 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         return autogeneratable_language_accent_list
 
 
-
 def get_exploration_voice_artists_link(
     exploration_id: str
 ) -> Optional[voiceover_domain.ExplorationVoiceArtistsLink]:
@@ -558,6 +557,7 @@ def set_exploration_voice_artists_link(
     model.update_timestamps()
     model.put()
 
+
 def get_autogeneratable_language_accent_codes() -> List[str]:
     """The method returns the list of language accent codes that are supported
     by cloud service for autogeneration.
@@ -571,74 +571,40 @@ def get_autogeneratable_language_accent_codes() -> List[str]:
     return language_accent_codes
 
 
+def get_voice_artist_metadata_mapping() -> Dict[str, Dict[str, str]]:
+    """Gets a mapping of voice artist IDs to language-accent mappings.
 
-def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
-    """The method returns a dict with all voice artist IDs as keys and nested
-    dicts as values. Each nested dict contains language codes as keys and
-    language accent codes as values.
-
-    Returns:
-        dict(str, dict(str, str)). A dict representing voice artist IDs to
-        language mappings.
+    Returns: Dict[str, Dict[str, str]]
+        A dict mapping voice artist IDs to language-accent mappings.
     """
-    voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = {}
-    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
-
     voice_artist_metadata_models: Sequence[
         voiceover_models.VoiceArtistMetadataModel] = (
-            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+        voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
 
+    return {
+        model.id: model.language_code_to_accent
+        for model in voice_artist_metadata_models
+    }
+
+
+def get_exploration_voice_artist_links() -> (
+        List[voiceover_domain.ExplorationVoiceArtistsLink]):
+    """Gets all exploration voice artist links as domain objects.
+
+    Returns: List[voiceover_domain.ExplorationVoiceArtistsLink]
+        A list of ExplorationVoiceArtistsLink domain objects.
+    """
     exploration_voice_artist_link_models: Sequence[
         voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-        )
+        voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
 
-    exploration_voice_artist_links = [
+    return [
         voiceover_domain.ExplorationVoiceArtistsLink(
             exp_id=model.id,
             content_id_to_voiceovers_mapping=(
                 model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
     ]
-
-    for voice_artist_metadata_model in voice_artist_metadata_models:
-        voice_artist_id = voice_artist_metadata_model.id
-        language_code_to_accent = (
-            voice_artist_metadata_model.language_code_to_accent)
-
-        voice_artist_id_to_language_mapping[voice_artist_id] = (
-            language_code_to_accent
-        )
-
-    for exploration_voice_artist_link in exploration_voice_artist_links:
-        content_id_to_voiceovers_mapping = (
-            exploration_voice_artist_link.content_id_to_voiceovers_mapping)
-
-        for lang_voiceover_mapping_tuple in (
-                content_id_to_voiceovers_mapping.values()):
-
-            for lang_code, voiceover_tuple in (
-                    lang_voiceover_mapping_tuple.items()):
-
-                voice_artist_id = voiceover_tuple[0]
-
-                accent_type = ''
-                if (
-                    voice_artist_id in voice_artist_id_to_language_mapping and
-                    lang_code in voice_artist_id_to_language_mapping[
-                        voice_artist_id]
-                ):
-                    accent_type = (
-                        voice_artist_id_to_language_mapping[
-                            voice_artist_id][lang_code])
-
-                if voice_artist_id not in all_voice_artist_to_language_mapping:
-                    all_voice_artist_to_language_mapping[voice_artist_id] = {}
-
-                all_voice_artist_to_language_mapping[
-                    voice_artist_id][lang_code] = accent_type
-
-    return all_voice_artist_to_language_mapping
 
 
 def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
