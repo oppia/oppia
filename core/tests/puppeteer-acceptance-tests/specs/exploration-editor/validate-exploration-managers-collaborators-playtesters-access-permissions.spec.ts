@@ -38,7 +38,7 @@ describe('Exploration User Roles', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
-    // Create all users
+    // Create all users.
     newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
@@ -61,7 +61,7 @@ describe('Exploration User Roles', function () {
       'explorationCreator@example.com'
     );
 
-    // Create exploration with explorationCreator user
+    // Create exploration with explorationCreator user.
     await explorationCreator.navigateToCreatorDashboardPage();
     await explorationCreator.navigateToExplorationEditorPage();
     await explorationCreator.dismissWelcomeModal();
@@ -73,7 +73,7 @@ describe('Exploration User Roles', function () {
 
     await explorationCreator.navigateToSettingsTab();
 
-    // Assign roles to users
+    // Assign roles to users.
     await explorationCreator.assignUserToManagerRole('manager');
     await explorationCreator.assignUserToCollaboratorRole('collaborator');
     await explorationCreator.assignUserToPlaytesterRole('playtester');
@@ -89,16 +89,16 @@ describe('Exploration User Roles', function () {
   it(
     'should verify manager has correct access permissions',
     async function () {
-      // Test manager access
+      // Test manager access.
       await manager.expectExplorationToBeAccessibleByUrl(explorationId);
       await manager.dismissWelcomeModal();
 
-      // Verify manager can modify exploration
+      // Verify manager can modify exploration.
       await manager.navigateToEditorTab();
       await manager.updateCardContent('Updated content by manager');
       await manager.saveExplorationDraft();
 
-      // Verify manager can add users
+      // Verify manager can add users.
       await manager.navigateToSettingsTab();
       await manager.assignUserToCollaboratorRole('newCollaborator');
     },
@@ -108,15 +108,15 @@ describe('Exploration User Roles', function () {
   it(
     'should verify collaborator has correct access permissions',
     async function () {
-      // Test collaborator access
+      // Test collaborator access.
       await collaborator.expectExplorationToBeAccessibleByUrl(explorationId);
       await collaborator.dismissWelcomeModal();
 
-      // Verify collaborator can modify exploration
+      // Verify collaborator can modify exploration.
       await collaborator.updateCardContent('Updated content by collaborator');
       await collaborator.saveExplorationDraft();
 
-      // Verify collaborator cannot add users
+      // Verify collaborator cannot add users.
       await collaborator.navigateToSettingsTab();
       await collaborator.expectEditRolesButtonToBeHidden();
     },
@@ -126,18 +126,18 @@ describe('Exploration User Roles', function () {
   it(
     'should verify playtester has correct access permissions',
     async function () {
-      // Test playtester access
+      // Test playtester access.
       await playtester.expectExplorationToBeAccessibleByUrl(explorationId);
       await playtester.dismissWelcomeModal();
 
-      // Verify playtester cannot modify exploration
+      // Verify playtester cannot modify exploration.
       await playtester.expectStateContentEditorToBeHidden();
 
-      // Verify playtester can access translations tab
+      // Verify playtester can access translations tab.
       await playtester.navigateToTranslationsTab();
       await playtester.dismissTranslationTabWelcomeModal();
 
-      // Verify playtester can preview exploration
+      // Verify playtester can preview exploration.
       await playtester.navigateToPreviewTab();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
