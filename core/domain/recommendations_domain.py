@@ -39,8 +39,8 @@ class ExplorationRecommendations:
             recommended_exploration_ids: list(str). Ids of recommended 
                 explorations.
         """
-        self.recommended_exploration_ids = recommended_exploration_ids
         self.exp_id = exp_id
+        self.recommended_exploration_ids = recommended_exploration_ids
 
     def validate(self) -> None:
         """Validates the ExplorationRecommendations object."""
@@ -71,25 +71,10 @@ class ExplorationRecommendations:
                     'Expected recommended_exploration_id to be non-empty, '
                     'received %s' % recommended_exploration_id)
 
-        self.validate_no_exploration_id_duplicate(counts)
-
-    def validate_no_exploration_id_duplicate(
-        self,
-        counts: Dict[str, int]
-    ) -> None:
-        """Validates the counts for recommended_exploration_ids (there
-        should be no duplicate).
-
-        Args:
-            counts: dict. The dictionary storing the number of times
-                an exploration id appears in recommended_exploration_ids.
-        """
-        duplicates = ''
-        for exp_id, count in counts.items():
-            if count > 1:
-                duplicates = duplicates.join('({}, {}), ').format(exp_id, count)
-
-        if duplicates:
+        if any(count > 1 for count in counts.values()):
             raise utils.ValidationError(
-                'recommended_exploration_ids contains duplicate values,'
-                'received (exp_id, count): %s' % duplicates)
+                'recommended_exploration_ids contains duplicate values, '
+                'received (exp_id, count): %s' % ', '.join(
+                    f'({exp_id}, {count})' for exp_id, count in counts.items() 
+                    if count > 1)
+            )

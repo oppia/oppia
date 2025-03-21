@@ -31,8 +31,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = ['1']
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids))
+                exp_id, recommended_exploration_ids))
         self.assertEqual(
             exploration_recommendations.recommended_exploration_ids[0], '1')
 
@@ -71,8 +70,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = ['1']
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids))
+                exp_id, recommended_exploration_ids))
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected exp_id to be non-empty'
@@ -89,8 +87,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = 123
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids  # type: ignore[arg-type]
+                exp_id, recommended_exploration_ids  # type: ignore[arg-type]
         ))
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -103,8 +100,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = True
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids  # type: ignore[arg-type]
+                exp_id, recommended_exploration_ids  # type: ignore[arg-type]
         ))
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -119,8 +115,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = [0]
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids  # type: ignore[arg-type]
+                exp_id, recommended_exploration_ids  # type: ignore[arg-type]
         ))
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -133,8 +128,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = ['']
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids))
+                exp_id, recommended_exploration_ids))
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected recommended_exploration_id to be non-empty'
@@ -148,8 +142,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = ['1', '2', '1']
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids))
+                exp_id, recommended_exploration_ids))
 
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -161,7 +154,6 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
         recommended_exploration_ids = ['1', '2']
         exploration_recommendations = (
             recommendations_domain.ExplorationRecommendations(
-                exp_id,
-                recommended_exploration_ids))
+                exp_id, recommended_exploration_ids))
 
         exploration_recommendations.validate()
