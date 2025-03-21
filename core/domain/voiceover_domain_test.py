@@ -501,6 +501,28 @@ class VoiceoverAutogenerationPolicyUnitTests(test_utils.GenericTestBase):
             voiceover_auto_policy.language_codes_mapping['en'] = ['1']  # type: ignore[assignment]
             voiceover_auto_policy.validate()
 
+    def test_validate_language_code_equals_extracted_language_code(
+        self
+    ) -> None:
+        language_codes_mapping = {
+            'en': {
+                'en-US': False
+            }
+        }
+        voiceover_auto_policy = (
+            voiceover_domain.VoiceoverAutogenerationPolicy(
+                language_codes_mapping, True))
+
+        expected_error_msg = (
+            'language_accent_code must be formatted as {{language}}-{{accent}}'
+            ' where language must correspond to language_code')
+
+        with self.assertRaisesRegex(utils.ValidationError, expected_error_msg):
+            voiceover_auto_policy.language_codes_mapping['en'] = {
+                'fr-US': False
+            }
+            voiceover_auto_policy.validate()
+
     def test_validate_language_code_type(self) -> None:
         language_codes_mapping = {
             'en': {
