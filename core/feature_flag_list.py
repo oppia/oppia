@@ -29,6 +29,8 @@ class FeatureNames(enum.Enum):
     """Enum for Feature names."""
 
     DUMMY_FEATURE_FLAG_FOR_E2E_TESTS = 'dummy_feature_flag_for_e2e_tests'
+    END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
+    CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
         'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
@@ -121,6 +123,8 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    FeatureNames.END_CHAPTER_CELEBRATION,
+    FeatureNames.CHECKPOINT_CELEBRATION,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {

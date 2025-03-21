@@ -75,9 +75,6 @@ class MockWindowRef {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EndChapterCelebration: {
-        isEnabled: true,
-      },
       EnableVoiceoverContribution: {
         isEnabled: false,
       },
