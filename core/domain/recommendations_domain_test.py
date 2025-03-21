@@ -153,7 +153,7 @@ class ExplorationRecommendationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'recommended_exploration_ids contains duplicate values:'):
+            'recommended_exploration_ids contains duplicate values'):
             exploration_recommendations.validate()
 
     def test_validation_passes(self) -> None:
