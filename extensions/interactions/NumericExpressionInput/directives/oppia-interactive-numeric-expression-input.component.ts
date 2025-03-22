@@ -88,6 +88,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
         );
       }
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
