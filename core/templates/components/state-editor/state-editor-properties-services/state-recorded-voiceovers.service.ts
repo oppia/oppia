@@ -16,7 +16,6 @@
  * @fileoverview A data service that stores the content ids
  * to audio translations.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -36,10 +35,3 @@ export class StateRecordedVoiceoversService extends StatePropertyService<Recorde
     this.setterMethodKey = 'saveRecordedVoiceovers';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateRecordedVoiceoversService',
-    downgradeInjectable(StateRecordedVoiceoversService)
-  );

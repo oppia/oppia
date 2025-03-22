@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {CollectionSummaryTileConstants} from 'components/summary-tile/collection-summary-tile.constants';
@@ -140,10 +139,3 @@ export class CollectionSummaryTileComponent implements OnInit, OnDestroy {
     this.collectionIsCurrentlyHoveredOver = hoverState;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaCollectionSummaryTile',
-    downgradeComponent({component: CollectionSummaryTileComponent})
-  );

@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -74,10 +73,3 @@ export class ThreadStatusDisplayService {
     return '';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ThreadStatusDisplayService',
-    downgradeInjectable(ThreadStatusDisplayService)
-  );

@@ -24,7 +24,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'filepath-editor',
@@ -91,10 +90,3 @@ export class FilepathEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'filepathEditor',
-  downgradeComponent({
-    component: FilepathEditorComponent,
-  }) as angular.IDirectiveFactory
-);

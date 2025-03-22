@@ -16,7 +16,6 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -420,10 +419,3 @@ export class ExplorationDiffService {
     return this._getDiffGraphData(oldStates, newStates, changeListData);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationDiffService',
-    downgradeInjectable(ExplorationDiffService)
-  );

@@ -19,7 +19,6 @@
  * answer submission process.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ContextService} from 'services/context.service';
@@ -218,10 +217,10 @@ export class CurrentInteractionService {
   get onAnswerChanged$(): Observable<void> {
     return CurrentInteractionService.answerChangedSubject.asObservable();
   }
+  updateAnswerIsValid(isAnswerValid: boolean): void {
+    this.getDisplayedCard()?.updateAnswerIsValid(isAnswerValid);
+  }
+  showInvalidResponseError(): boolean {
+    return this.getDisplayedCard().showInvalidResponseError();
+  }
 }
-angular
-  .module('oppia')
-  .factory(
-    'CurrentInteractionService',
-    downgradeInjectable(CurrentInteractionService)
-  );

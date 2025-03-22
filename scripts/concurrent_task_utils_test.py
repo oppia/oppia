@@ -82,7 +82,7 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
 
     def test_create_task_with_success(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function, True, self.semaphore)
+            test_function, True, self.semaphore, errors_to_retry_on=[])
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -92,7 +92,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_success(self) -> None:
         task = concurrent_task_utils.TaskThread(
             test_function('unused_arg'), False, self.semaphore, name='test',
-            report_enabled=True)
+            report_enabled=True, errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -104,7 +104,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
     def test_task_thread_with_exception(self) -> None:
         task = concurrent_task_utils.TaskThread(
             test_function, True, self.semaphore, name='test',
-            report_enabled=True)
+            report_enabled=True, errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -130,7 +130,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=True)
+            self.semaphore, name='test', report_enabled=True,
+            errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -156,7 +157,8 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
         task = concurrent_task_utils.TaskThread(
             test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=False)
+            self.semaphore, name='test', report_enabled=False,
+            errors_to_retry_on=[])
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -171,7 +173,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_single_task(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test',
+            errors_to_retry_on=[])
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -181,7 +184,8 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), False, self.semaphore)
+                test_function('unused_arg'), False, self.semaphore,
+                errors_to_retry_on=[])
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -192,7 +196,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function, True, self.semaphore)
+                test_function, True, self.semaphore, errors_to_retry_on=[])
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -201,3 +205,163 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             'positional argument: \'unused_arg\'',
             self.task_stdout
         )
+
+
+class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
+    """Tests for retry behaviors in create_task method."""
+
+    def test_create_task_with_retryable_errors(self) -> None:
+        call_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise Exception('Error -11')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task',
+                    failed=False,
+                    trimmed_messages=[],
+                    messages=['Success']
+                )
+            ]
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='retryable_task',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 2)
+        self.assertTrue(task.finished)
+        self.assertIsNone(task.exception)
+        self.assertEqual(call_count, 2)
+        self.assertEqual(task.task_results[0].messages[0], 'Success')
+
+    def test_create_task_with_non_retryable_errors(self) -> None:
+        """Tests that retries only occur for specific errors ('Error -11')."""
+        def mock_func() -> None:
+            raise Exception('Non-retryable error')
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='non_retryable_task',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 1)
+        self.assertTrue(task.finished)
+        self.assertIsNotNone(task.exception)
+        self.assertEqual(str(task.exception), 'Non-retryable error')
+
+    def test_create_task_exceeds_max_retries(self) -> None:
+        """Tests that tasks fail after exceeding maximum number of retries."""
+        call_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal call_count
+            call_count += 1
+            raise Exception('Error -11')
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='retryable_task_exceeds_max',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 3)
+        self.assertTrue(task.finished)
+        self.assertIsNotNone(task.exception)
+        self.assertEqual(str(task.exception), 'Error -11')
+        self.assertEqual(call_count, 3)
+
+    def test_retry_on_partial_error_substring_match(self) -> None:
+        """Tests that retrying occurs when only a subset of the error messages
+        match.
+        """
+        attempt_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal attempt_count
+            attempt_count += 1
+            if attempt_count == 1:
+                # Partial match: only 'Error -11' is present.
+                raise Exception('Error -11 occurred (partial match)')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task',
+                    failed=False,
+                    trimmed_messages=[],
+                    messages=['Success']
+                )
+            ]
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='partial_error_retry_task',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11', 'Connection timeout']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(attempt_count, 2)
+
+    def test_retry_on_all_error_substring_matches(self) -> None:
+        """Tests that retrying occurs when the error message contains all of the
+        retryable error substrings.
+        """
+        attempt_count = 0
+
+        def mock_func() -> List[concurrent_task_utils.TaskResult]:
+            nonlocal attempt_count
+            attempt_count += 1
+            if attempt_count == 1:
+                # Full match: both substrings are present.
+                raise Exception('Error -11 and Connection timeout (full match)')
+            return [
+                concurrent_task_utils.TaskResult(
+                    name='mock_task',
+                    failed=False,
+                    trimmed_messages=[],
+                    messages=['Success']
+                )
+            ]
+
+        task = concurrent_task_utils.create_task(
+            func=mock_func,
+            verbose=True,
+            semaphore=self.semaphore,
+            name='all_errors_retry_task',
+            report_enabled=False,
+            errors_to_retry_on=['Error -11', 'Connection timeout']
+        )
+        task.start_time = time.time()
+        task.start()
+        task.join()
+
+        self.assertEqual(task.num_attempts, 2)
+        self.assertEqual(attempt_count, 2)

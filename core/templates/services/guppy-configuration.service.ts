@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 const SYMBOLS_TO_REMOVE = [
   'norm',
@@ -140,10 +139,3 @@ export class GuppyConfigurationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GuppyConfigurationService',
-    downgradeInjectable(GuppyConfigurationService)
-  );

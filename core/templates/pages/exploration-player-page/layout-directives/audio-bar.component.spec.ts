@@ -188,14 +188,15 @@ describe('Audio Bar Component', () => {
   });
 
   it('should set current voiceover time after the view has changed', () => {
-    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(5);
+    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
+    spyOn(audioPlayerService, 'getCurrentTimeInSecs').and.returnValue(5);
 
     component.currentVoiceoverTime = 0;
     component.ngAfterContentChecked();
 
     expect(component.currentVoiceoverTime).toEqual(5);
   });
-
   it(
     'should check whether the auto generated language ' + 'code is selected',
     () => {

@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {BaseUndoRedo} from 'domain/editor/undo_redo/base-undo-redo.service';
 
 @Injectable({
@@ -29,10 +28,3 @@ export class QuestionUndoRedoService extends BaseUndoRedo {
     super();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionUndoRedoService',
-    downgradeInjectable(QuestionUndoRedoService)
-  );

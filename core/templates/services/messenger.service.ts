@@ -19,7 +19,6 @@
  * be attempted due to cross-domain security issues.)
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {LoggerService} from 'services/contextual/logger.service';
@@ -281,6 +280,3 @@ export class MessengerService {
     }
   }
 }
-angular
-  .module('oppia')
-  .factory('MessengerService', downgradeInjectable(MessengerService));

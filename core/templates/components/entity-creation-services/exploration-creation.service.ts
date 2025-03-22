@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -108,9 +107,3 @@ export class ExplorationCreationService {
       });
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationCreationService',
-    downgradeInjectable(ExplorationCreationService)
-  );

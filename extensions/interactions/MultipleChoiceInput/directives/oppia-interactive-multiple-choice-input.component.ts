@@ -21,7 +21,6 @@
  */
 
 import {Component, HostListener, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -187,10 +186,3 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveMultipleChoiceInput',
-  downgradeComponent({
-    component: InteractiveMultipleChoiceInputComponent,
-  })
-);

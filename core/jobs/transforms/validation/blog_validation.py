@@ -131,23 +131,24 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
             timestamps.
         """
         model = job_utils.clone_model(input_model)
+        max_clock_skew_duration = base_validation.MAX_CLOCK_SKEW_DURATION
 
         if model.created_on > (
-                model.last_updated + base_validation.MAX_CLOCK_SKEW_SECS):
+                model.last_updated + max_clock_skew_duration):
             yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                 model)
 
         current_datetime = datetime.datetime.utcnow()
         if model.published_on:
-            if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+            if (model.published_on - max_clock_skew_duration) > (
                     current_datetime):
                 yield blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(model) # pylint: disable=line-too-long
 
-            if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+            if (model.published_on - max_clock_skew_duration) > (
                     model.last_updated):
                 yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
 
-        if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
+        if (model.last_updated - max_clock_skew_duration) > (
                 current_datetime):
             yield blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(model) # pylint: disable=line-too-long
 

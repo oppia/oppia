@@ -18,7 +18,7 @@
  */
 
 import {Injectable, Injector} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
@@ -170,10 +170,3 @@ export class QuestionValidationService {
     return null;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionValidationService',
-    downgradeInjectable(QuestionValidationService)
-  );

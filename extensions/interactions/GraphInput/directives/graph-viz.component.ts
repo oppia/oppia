@@ -30,6 +30,7 @@ import {
   Input,
   OnInit,
   Output,
+  ViewChild,
 } from '@angular/core';
 import {isNumber} from 'angular';
 import {GraphAnswer} from 'interactions/answer-defs';
@@ -40,7 +41,6 @@ import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UtilsService} from 'services/utils.service';
 import {EdgeCentre, GraphDetailService} from './graph-detail.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 const debounce = (delay: number = 5): MethodDecorator => {
@@ -87,9 +87,13 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @Input() canEditEdgeWeight: boolean;
   @Input() interactionIsActive: boolean;
   @Input() canEditOptions: boolean;
+  @ViewChild('dotCursor') dotCursor!: ElementRef<HTMLDivElement>;
+  @ViewChild('graphArea') graphArea!: ElementRef<HTMLElement>;
+  dotCursorCoordinateX: number = 0;
+  dotCursorCoordinateY: number = 0;
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
-  isMobile: boolean = false;
+  usingMobileDevice: boolean = false;
   helpText: string = '';
   _MODES = {
     MOVE: 0,
@@ -160,10 +164,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.selectedEdgeWeightValue = 0;
     this.shouldShowWrongWeightWarning = false;
 
-    this.isMobile = false;
-    if (this.deviceInfoService.isMobileDevice()) {
-      this.isMobile = true;
-    }
+    this.usingMobileDevice = !!this.deviceInfoService.isMobileDevice();
   }
 
   ngAfterViewInit(): void {
@@ -201,6 +202,36 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.init();
     }
     this.changeDetectorRef.detectChanges();
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    if (this.state.currentMode === 2 && !this.isButtonOnTopOfDot()) {
+      const stepSizeInPx = 10;
+
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.dotCursorCoordinateX -= stepSizeInPx;
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          this.dotCursorCoordinateY -= stepSizeInPx;
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          this.dotCursorCoordinateX += stepSizeInPx;
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          this.dotCursorCoordinateY += stepSizeInPx;
+          break;
+        case 'Enter':
+          this.onClickGraphSVG();
+      }
+      const dot = this.dotCursor.nativeElement;
+      dot.style.top = this.dotCursorCoordinateY + 'px';
+      dot.style.left = this.dotCursorCoordinateX + 'px';
+    }
   }
 
   getEdgeColor(index: number): string {
@@ -273,6 +304,19 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     );
     this.state.mouseX = svgp.x;
     this.state.mouseY = svgp.y;
+    // The condition `currentMode === 2` signifies that
+    // the "add node" option in the graph is active.
+    if (this.state.currentMode === 2) {
+      const dot = document.querySelector(
+        '.oppia-cursor-for-add-node'
+      ) as HTMLDivElement;
+      const graphAreaRect =
+        this.graphArea.nativeElement.getBoundingClientRect();
+      this.dotCursorCoordinateX = event.clientX - graphAreaRect.left;
+      this.dotCursorCoordinateY = event.clientY - graphAreaRect.top;
+      dot.style.top = this.dotCursorCoordinateY + 'px';
+      dot.style.left = this.dotCursorCoordinateX + 'px';
+    }
     // We use vertexDragStartX/Y and mouseDragStartX/Y to make
     // mouse-dragging by label more natural, by moving the vertex
     // according to the difference from the original position.
@@ -292,17 +336,54 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     }
   }
 
+  isButtonOnTopOfDot(): boolean {
+    const dotElement = document.querySelector(
+      '.oppia-cursor-for-add-node'
+    ) as HTMLDivElement;
+    const buttonElements = document.querySelectorAll('.graph-button');
+
+    if (!dotElement || !buttonElements || buttonElements.length === 0) {
+      return false;
+    }
+
+    const dotRect = dotElement.getBoundingClientRect();
+    const dotTop = dotRect.top;
+    const dotBottom = dotRect.bottom;
+    const dotLeft = dotRect.left;
+    const dotRight = dotRect.right;
+
+    for (let i = 0; i < buttonElements.length; i++) {
+      const buttonRect = buttonElements[i].getBoundingClientRect();
+      const buttonTop = buttonRect.top;
+      const buttonBottom = buttonRect.bottom;
+      const buttonLeft = buttonRect.left;
+      const buttonRight = buttonRect.right;
+
+      if (
+        buttonTop <= dotTop &&
+        buttonBottom >= dotBottom &&
+        buttonLeft <= dotLeft &&
+        buttonRight >= dotRight
+      ) {
+        buttonElements[i].dispatchEvent(new MouseEvent('click'));
+        return true;
+      }
+    }
+    return false;
+  }
+
   onClickGraphSVG(): void {
     if (!this.interactionIsActive) {
       return;
     }
     if (
       this.state.currentMode === this._MODES.ADD_VERTEX &&
-      this.canAddVertex
+      this.canAddVertex &&
+      !this.isButtonOnTopOfDot()
     ) {
       this.graph.vertices.push({
-        x: this.state.mouseX,
-        y: this.state.mouseY,
+        x: this.dotCursorCoordinateX,
+        y: this.dotCursorCoordinateY,
         label: '',
       });
       this.graphChange.emit(this.graph);
@@ -350,7 +431,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   init(): void {
     this.initButtons();
     this.state.currentMode = this.buttons[0].mode;
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       if (this.state.currentMode === this._MODES.ADD_EDGE) {
         this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
       } else if (this.state.currentMode === this._MODES.MOVE) {
@@ -374,7 +455,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   setMode(mode: number): void {
     this.state.currentMode = mode;
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       if (this.state.currentMode === this._MODES.ADD_EDGE) {
         this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
       } else if (this.state.currentMode === this._MODES.MOVE) {
@@ -418,35 +499,47 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     ) {
       this.beginEditVertexLabel(index);
     }
-    if (this.isMobile) {
-      this.state.hoveredVertex = index;
-      if (
-        this.state.addEdgeVertex === null &&
-        this.state.currentlyDraggedVertex === null
-      ) {
-        this.onTouchInitialVertex(index);
-      } else {
-        if (this.state.addEdgeVertex === index) {
-          this.state.hoveredVertex = null;
+    this.state.hoveredVertex = index;
+    if (
+      this.state.addEdgeVertex === null &&
+      this.state.currentlyDraggedVertex === null
+    ) {
+      this.onTouchInitialVertex(index);
+    } else {
+      if (this.state.addEdgeVertex === index) {
+        this.state.hoveredVertex = null;
+        if (this.usingMobileDevice) {
           this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
           this.state.addEdgeVertex = null;
-          return;
         }
-        this.onTouchFinalVertex(index);
+        return;
       }
+      this.onTouchFinalVertex(index);
     }
+  }
+
+  onFocusVertex(index: number): void {
+    this.state.hoveredVertex = index;
+  }
+
+  onBlurVertex(index: number): void {
+    this.onMouseleaveVertex(index);
   }
 
   onTouchInitialVertex(index: number): void {
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
       if (this.canAddEdge) {
         this.beginAddEdge(index);
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+        if (this.usingMobileDevice) {
+          this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+        }
       }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.canMoveVertex) {
         this.beginDragVertex(index);
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+        if (this.usingMobileDevice) {
+          this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+        }
       }
     }
   }
@@ -456,18 +549,22 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       this.tryAddEdge(this.state.addEdgeVertex, index);
       this.endAddEdge();
       this.state.hoveredVertex = null;
-      this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+      if (this.usingMobileDevice) {
+        this.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+      }
     } else if (this.state.currentMode === this._MODES.MOVE) {
       if (this.state.currentlyDraggedVertex !== null) {
         this.endDragVertex();
         this.state.hoveredVertex = null;
-        this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        if (this.usingMobileDevice) {
+          this.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+        }
       }
     }
   }
 
   onMousedownVertex(index: number): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
@@ -482,7 +579,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   }
 
   onMouseleaveVertex(index: number): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     this.state.hoveredVertex =
@@ -521,7 +618,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   @HostListener('document:mouseup', ['$event'])
   @debounce()
   onMouseupDocument(): void {
-    if (this.isMobile) {
+    if (this.usingMobileDevice) {
       return;
     }
     if (this.state.currentMode === this._MODES.ADD_EDGE) {
@@ -694,9 +791,3 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.state.selectedEdge = null;
   }
 }
-angular.module('oppia').directive(
-  'graphViz',
-  downgradeComponent({
-    component: GraphVizComponent,
-  })
-);

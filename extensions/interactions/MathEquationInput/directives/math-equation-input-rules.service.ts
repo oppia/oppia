@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
@@ -229,10 +228,3 @@ export class MathEquationInputRulesService {
     return false;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MathEquationInputRulesService',
-    downgradeInjectable(MathEquationInputRulesService)
-  );

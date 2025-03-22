@@ -18,7 +18,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {State} from 'domain/state/StateObjectFactory';
@@ -368,9 +367,3 @@ export class VersionDiffVisualizationComponent implements OnInit {
     }
   }
 }
-angular.module('oppia').directive(
-  'oppiaVersionDiffVisualization',
-  downgradeComponent({
-    component: VersionDiffVisualizationComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -17,7 +17,6 @@
  * used for content translations.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
@@ -139,10 +138,3 @@ export class ContentTranslationLanguageService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContentTranslationLanguageService',
-    downgradeInjectable(ContentTranslationLanguageService)
-  );

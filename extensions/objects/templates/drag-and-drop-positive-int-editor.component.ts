@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'drag-and-drop-positive-int-editor',
@@ -54,9 +53,3 @@ export class DragAndDropPositiveIntEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
-angular.module('oppia').directive(
-  'dragAndDropPositiveIntEditor',
-  downgradeComponent({
-    component: DragAndDropPositiveIntEditorComponent,
-  }) as angular.IDirectiveFactory
-);

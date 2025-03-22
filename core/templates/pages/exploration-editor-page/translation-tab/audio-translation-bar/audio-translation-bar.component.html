@@ -156,7 +156,7 @@
     </div>
     <div *ngIf="!audioLoadingIndicatorIsShown" class="fx-row fx-main-center fx-cross-center">
       <oppia-audio-slider class="full-width"
-                          [value]="audioPlayerService.getCurrentTime()"
+                          [value]="audioPlayerService.getCurrentTimeInSecs()"
                           [max]="durationSecs"
                           (valueChange)="setProgress($event)"
                           [thumbLabel]="true"
@@ -169,7 +169,7 @@
       {{ startingDuration | formatTime }} / {{ durationSecs | formatTime }}
     </div>
     <div *ngIf="audioTimerIsShown && !audioIsLoading">
-      {{ audioPlayerService.getCurrentTime() | formatTime }} / {{ durationSecs | formatTime }}
+      {{ audioPlayerService.getCurrentTimeInSecs() | formatTime }} / {{ durationSecs | formatTime }}
     </div>
     <div *ngIf="!audioTimerIsShown && !audioIsLoading">
        -- / --

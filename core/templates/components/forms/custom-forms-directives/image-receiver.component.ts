@@ -24,7 +24,6 @@ import {
   EventEmitter,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -212,10 +211,3 @@ export class ImageReceiverComponent {
     return null;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaImageReceiver',
-    downgradeComponent({component: ImageReceiverComponent})
-  );

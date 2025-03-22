@@ -40,12 +40,14 @@
       </div>
     </div>
     <div *ngIf="activeTab === 'story'">
-      <stories-list [topicName]="topic.getName()"
+      <stories-list
+                    [topicName]="topic.getName()"
+                    [topicId]="topic.getId()"
                     [topicDescription]="topic.getDescription()"
                     [canonicalStorySummaries]="canonicalStorySummaries"
-                    [classroomUrlFragment]="''"
-                    [classroomName]="''"
-                    [topicUrlFragment]="''">
+                    [classroomUrlFragment]="classroomUrlFragment"
+                    [classroomName]="classroomName"
+                    [topicUrlFragment]="topicUrlFragment">
       </stories-list>
     </div>
     <div *ngIf="activeTab === 'subtopic'">
@@ -126,7 +128,7 @@
       top: 30px;
     }
   }
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 500px) {
     .topic-preview-container {
       margin-top: 80px;
       width: 100%;
