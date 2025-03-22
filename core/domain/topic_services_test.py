@@ -2057,7 +2057,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Name should be a string.'):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name')
-            
+    
     def test_does_not_add_skill_with_superseding_skill_to_topic(
             self) -> None:
         self.save_new_skill(
@@ -2084,9 +2084,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             Exception,
-            'The skill \'has_superseding\' has a superseding skill \'supersede\''):
-                topic_services.add_uncategorized_skill(
-                    self.user_id, topic_id, 'has_superseding')
+            'The skill \'has_superseding\' has a superseding skill \'supersede\''): # pylint:disable=line-too-long
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic_id, 'has_superseding')
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong

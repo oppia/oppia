@@ -662,7 +662,7 @@ def _save_topic(
     topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
     topic.validate(strict=topic_rights.topic_is_published)
     skill = does_topic_have_skill_with_superseding_skill(topic)
-    if skill != None:
+    if skill is not None:
         raise utils.ValidationError(
             'The skill \'%s\' has a superseding skill \'%s\'' %
             (skill.id, skill.superseding_skill_id))

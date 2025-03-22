@@ -750,8 +750,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             ['skill_id_4']
         )
 
-    def test_replace_prerequisite_skill_id_from_all_skills_with_nonexistent_id(self) -> None:
-        # This should execute without errors even though no skills have this prerequisite
+    def test_replace_prereq_skill_id_from_all_skills_with_nonexistent_id(
+        self) -> None:
+        # This should execute without errors even though no
+        # skills have this prerequisite.
         skill_services.replace_prerequisite_skill_id_from_all_skills(
             'non_existent_skill_id', 'some_new_skill_id')
 
