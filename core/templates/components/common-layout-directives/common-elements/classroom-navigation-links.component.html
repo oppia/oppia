@@ -10,6 +10,7 @@
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
+      <div class="classroom-grid " [attr.data-classroom-count]="classroomSummaries.length">
         <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
           <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
             <div class="classroom-text-container">
@@ -33,13 +34,6 @@
             </div>
           </div>
         </div>
-        <div class="nav-item-bottom-link classrooms-page-link" *ngIf="classroomSummaries.length > 1">
-          <a class="underline nav-item-bottom-link" tabindex="0" href="/learn">
-            <span class="link">
-              {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
-            </span>
-            <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-          </a>
         </div>
       </div>
     </div>
@@ -47,13 +41,21 @@
 </div>
 
 <style>
+
+  .classroom-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-auto-flow: row;
+    gap: 15px;
+  }
+
   .classroom-item {
     align-items: start;
     display: flex;
     flex-direction: row;
     height: 70px;
     justify-content: space-between;
-    width: 332px;
+    width: 245px;
   }
 
   .classroom-item .classroom-text-container {
@@ -61,7 +63,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-width: 236px;
+    max-width: 400px;
   }
 
   .classroom-item .classroom-text-container .classroom-name {
@@ -161,6 +163,18 @@
     }
     100% {
       background-position: -200% 0;
+    }
+  }
+
+  @media screen and (max-width : 1212px){
+    .classroom-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  }
+
+  @media screen and (max-width : 925px) {
+    .classroom-grid {
+    grid-template-columns: repeat(1, 1fr);
     }
   }
 

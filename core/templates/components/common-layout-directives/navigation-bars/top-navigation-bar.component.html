@@ -101,13 +101,23 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
+              [ngClass]="{
+                'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
+                'one-classrooms': classroomSummariesLength==1,
+                'two-classrooms': classroomSummariesLength==2
+              }"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu">
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <div class="nav-item-left d-flex flex-column justify-content-between">
+                <div
+                [ngClass]="{
+                  'nav-item-left d-flex flex-column justify-content-between' : true,
+                  'nav-item-left-one-classrooms': classroomSummariesLength==1,
+                  'nav-item-left-two-classrooms': classroomSummariesLength==2
+                }"
+                >
                   <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
                 </div>
                 <span class="nav-item-right d-flex flex-column">

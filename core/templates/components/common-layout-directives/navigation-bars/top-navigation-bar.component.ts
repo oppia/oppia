@@ -89,6 +89,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
+  classroomSummariesLength: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -376,11 +377,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
-    this.getInvolvedMenuOffset = this.getDropdownOffset('.get-involved', 574);
-    this.donateMenuOffset = this.getDropdownOffset('.donate-tab', 286);
-    this.learnDropdownOffset = this.getDropdownOffset('.learn-tab', 688);
+    this.getInvolvedMenuOffset = this.getDropdownOffset(
+      '.get-involved',
+      '.get-involved-dropdown'
+    );
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab',
+      '.classroom-enabled'
+    );
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
+    this.getClassroomSummariesLength();
   }
 
   // This function is required to shift the dropdown towards left if
@@ -388,8 +395,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // This function compares the width of the dropdown with the space
   // available on the right to calculate the offset. It returns zero if
   // there is enough space to fit the content.
-  getDropdownOffset(cssClass: string, width: number): number {
+  getDropdownOffset(cssClass: string, dropdownClass: string): number {
     let learnTab: HTMLElement | null = document.querySelector(cssClass);
+    let dropdown: HTMLElement | null = document.querySelector(dropdownClass);
+    if (!learnTab || !dropdown) {
+      return 0;
+    }
+    let computedStyle = window.getComputedStyle(dropdown);
+    let width: number = parseFloat(computedStyle.minWidth);
     if (learnTab) {
       let leftOffset = learnTab.getBoundingClientRect().left;
       let space = window.innerWidth - leftOffset;
@@ -400,6 +413,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getClassroomSummariesLength() {
+    const classrooomGrid = document.querySelector('.classroom-grid');
+    if (classrooomGrid) {
+      this.classroomSummariesLength = parseInt(
+        classrooomGrid.getAttribute('data-classroom-count')
+      );
+    }
+    console.log(this.classroomSummariesLength);
   }
 
   changeLanguage(languageCode: string): void {
