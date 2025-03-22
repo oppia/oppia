@@ -905,3 +905,67 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
                 'or zero if not yet specified %s' % -1
         ):
             exp_voice_artists_link.validate()
+
+    def test_get_voice_artist_language_mappings_empty_input(self) -> None:
+        """Tests get_voice_artist_language_mappings with empty input mapping."""
+        voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        content_id_to_voiceovers_mapping = {
+            'content_id_0': {
+                'en': ('voice_artist_1', voiceover_dict)
+            }
+        }
+        exp_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                exp_id='exp123',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
+            )
+
+        result = exp_voice_artists_link.get_voice_artist_language_mappings({})
+
+        expected_result = {'voice_artist_1': {'en': ''}}
+        self.assertEqual(result, expected_result)
+
+    def test_get_voice_artist_language_mappings_multiple_langs(self) -> None:
+        """Tests get_voice_artist_language_mappings with multiple languages."""
+        voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        content_id_to_voiceovers_mapping = {
+            'content_id_0': {
+                'en': ('voice_artist_1', voiceover_dict),
+                'es': ('voice_artist_1', voiceover_dict)
+            }
+        }
+        exp_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                exp_id='exp123',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
+            )
+
+        voice_artist_id_to_language_mapping = {
+            'voice_artist_1': {
+                'en': 'British',
+                'es': 'Castilian'
+            }
+        }
+
+        result = exp_voice_artists_link.get_voice_artist_language_mappings(
+            voice_artist_id_to_language_mapping)
+
+        expected_result = {
+            'voice_artist_1': {
+                'en': 'British',
+                'es': 'Castilian'
+            }
+        }
+        self.assertEqual(result, expected_result)

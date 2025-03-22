@@ -458,15 +458,17 @@ class ExplorationVoiceArtistsLink:
 
     def get_voice_artist_language_mappings(
         self,
-        mapping: Dict[str, Dict[str, str]]
+        voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]]
     ) -> Dict[str, Dict[str, str]]:
         """Gets voice artist language accent mappings from this link.
 
         Args:
-                mapping : Dict[str, Dict[str, str]]. A mapping dict.
+            voice_artist_id_to_language_mapping: dict. A dict mapping voice
+                artist IDs to language-accent mappings.
 
-        Returns:
-            Dict[str, Dict[str, str]]. A mapped dict.
+        Returns: 
+            VoiceArtistMetadataModel. Dictionary of the data 
+            from VoiceArtistMetadataModel.
         """
         result: Dict[str, Dict[str, str]] = {}
         for lang_voiceover_mapping_tuple in (
@@ -477,12 +479,12 @@ class ExplorationVoiceArtistsLink:
 
                 voice_artist_id = voiceover_tuple[0]
                 accent_type = ''
-                if (voice_artist_id in mapping and
-                lang_code in mapping[
+                if (voice_artist_id in voice_artist_id_to_language_mapping and
+                lang_code in voice_artist_id_to_language_mapping[
                 voice_artist_id]
                 ):
                     accent_type = (
-                        mapping[
+                        voice_artist_id_to_language_mapping[
                             voice_artist_id][lang_code])
 
                 if voice_artist_id not in result:

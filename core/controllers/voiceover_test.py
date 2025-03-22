@@ -232,9 +232,11 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         for link in exploration_links:
             link_mappings = (
                 link.get_voice_artist_language_mappings(voice_artist_mapping))
+
             for voice_artist_id, language_mapping in link_mappings.items():
                 if voice_artist_id not in voice_artist_id_to_language_mapping:
                     voice_artist_id_to_language_mapping[voice_artist_id] = {}
+
                 voice_artist_id_to_language_mapping[
                     voice_artist_id].update(language_mapping)
 
@@ -268,9 +270,11 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         for link in exploration_links:
             link_mappings = (
                 link.get_voice_artist_language_mappings(voice_artist_mapping))
+
             for voice_artist_id, language_mapping in link_mappings.items():
                 if voice_artist_id not in voice_artist_id_to_language_mapping:
                     voice_artist_id_to_language_mapping[voice_artist_id] = {}
+
                 voice_artist_id_to_language_mapping[
                     voice_artist_id].update(language_mapping)
 
