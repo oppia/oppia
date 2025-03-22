@@ -17,7 +17,6 @@
  * the learner and editor views.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
@@ -96,10 +95,3 @@ export class ExtensionTagAssemblerService {
     return element;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExtensionTagAssemblerService',
-    downgradeInjectable(ExtensionTagAssemblerService)
-  );

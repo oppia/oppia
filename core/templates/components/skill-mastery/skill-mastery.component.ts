@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SkillMasteryListConstants} from 'components/skills-mastery-list/skills-mastery-list.constants';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
@@ -88,10 +87,3 @@ export class SkillMasteryViewerComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'skillMasteryViewer',
-    downgradeComponent({component: SkillMasteryViewerComponent})
-  );

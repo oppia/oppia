@@ -25,7 +25,6 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Schema} from 'services/schema-default-value.service';
 
 @Component({
@@ -87,10 +86,3 @@ export class SchemaBasedChoicesEditorComponent
 
   ngOnInit(): void {}
 }
-
-angular.module('oppia').directive(
-  'schemaBasedChoicesEditor',
-  downgradeComponent({
-    component: SchemaBasedChoicesEditorComponent,
-  })
-);

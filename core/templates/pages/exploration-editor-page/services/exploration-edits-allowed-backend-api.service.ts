@@ -19,7 +19,6 @@
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -40,10 +39,3 @@ export class ExplorationEditsAllowedBackendApiService {
       .then(callback, () => {});
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationEditsAllowedBackendApiService',
-    downgradeInjectable(ExplorationEditsAllowedBackendApiService)
-  );

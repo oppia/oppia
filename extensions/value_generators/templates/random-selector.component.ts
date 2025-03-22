@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'random-selector',
@@ -55,10 +54,3 @@ export class RandomSelectorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'randomSelector',
-  downgradeComponent({
-    component: RandomSelectorComponent,
-  })
-);

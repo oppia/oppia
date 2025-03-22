@@ -19,7 +19,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface ConnectionCheckResponse {
   isInternetConnected: boolean;
@@ -38,10 +37,3 @@ export class ServerConnectionBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ServerConnectionBackendApiService',
-    downgradeInjectable(ServerConnectionBackendApiService)
-  );

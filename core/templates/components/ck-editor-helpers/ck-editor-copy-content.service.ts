@@ -17,7 +17,6 @@
  *               ck editor
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -209,10 +208,3 @@ export class CkEditorCopyContentService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CkEditorCopyContentService',
-    downgradeInjectable(CkEditorCopyContentService)
-  );

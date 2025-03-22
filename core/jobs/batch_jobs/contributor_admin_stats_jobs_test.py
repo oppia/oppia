@@ -104,6 +104,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_1 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=1,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic2',
@@ -122,6 +123,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_2 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=2,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic1',
@@ -140,6 +142,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_3 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=3,
             language_code=self.LANGUAGE_CODE,
             contributor_user_id='user2',
             topic_id='topic1',
@@ -159,6 +162,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_4 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=4,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic3',
@@ -177,6 +181,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_with_no_topic = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=5,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='',
@@ -196,6 +201,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         self.translation_contribution_model_with_invalid_topic = (
             self.create_model(
                 suggestion_models.TranslationContributionStatsModel,
+                id=6,
                 language_code='hi',
                 contributor_user_id='user1',
                 topic_id='invalid_topic',
@@ -214,6 +220,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_5 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=7,
             language_code='hi',
             contributor_user_id='user3',
             topic_id='topic3',
@@ -233,6 +240,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_6 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=8,
             language_code='hi',
             contributor_user_id='user4',
             topic_id='topic2',
@@ -252,6 +260,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_1 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=9,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user1',
             topic_id='topic1',
@@ -269,6 +278,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_2 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=10,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user1',
             topic_id='topic2',
@@ -286,6 +296,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_3 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=11,
             language_code='hi',
             reviewer_user_id='user2',
             topic_id='topic1',
@@ -303,6 +314,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_4 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=12,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user3',
             topic_id='topic4',
@@ -320,6 +332,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_with_invalid_topic = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=13,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user3',
             topic_id='invalid_topic',
@@ -337,6 +350,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_1 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=14,
             contributor_user_id='user1',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -349,6 +363,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_2 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=15,
             contributor_user_id='user1',
             topic_id='topic2',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -361,6 +376,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_3 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=16,
             contributor_user_id='user2',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -373,6 +389,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_4 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=17,
             contributor_user_id='user3',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -385,6 +402,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_5 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=18,
             contributor_user_id='user4',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -398,6 +416,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         self.question_contribution_model_with_invalid_topic = (
             self.create_model(
                 suggestion_models.QuestionContributionStatsModel,
+                id=19,
                 contributor_user_id='user3',
                 topic_id='invalid_topic',
                 submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -410,6 +429,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_1 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=20,
             reviewer_user_id='user1',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -422,6 +442,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_2 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=21,
             reviewer_user_id='user1',
             topic_id='topic2',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -434,6 +455,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_3 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=22,
             reviewer_user_id='user2',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -446,6 +468,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_4 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=23,
             reviewer_user_id='user3',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -458,6 +481,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_with_invalid_topic = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=24,
             reviewer_user_id='user3',
             topic_id='invalid_topic',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -470,6 +494,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_rejected_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=25,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -484,6 +509,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_with_edits_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=26,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -499,6 +525,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=27,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -514,6 +541,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_model_user2 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=28,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_2,
@@ -529,6 +557,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_model_user3 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=29,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_2,
@@ -545,6 +574,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         self.question_suggestion_accepted_model_with_incomplete_contribution_stats = ( # pylint: disable=line-too-long
             self.create_model(
                 suggestion_models.GeneralSuggestionModel,
+                id=30,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
                 target_id=self.target_id,
@@ -560,6 +590,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_rejected_model_user1 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=31,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -575,6 +606,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_rejected_model_user2 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=32,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -590,6 +622,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_accepted_with_edits_model = self.create_model( # pylint: disable=line-too-long
             suggestion_models.GeneralSuggestionModel,
+            id=33,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_2,
@@ -605,6 +638,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_accepted_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=34,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_3,
@@ -620,6 +654,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_in_review_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=35,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -635,6 +670,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_in_review_model_user3 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=36,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_3,
@@ -650,6 +686,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_in_review_model_user4 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=37,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id_2,
@@ -665,12 +702,29 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats = self.create_model( # pylint: disable=line-too-long
             suggestion_models.GeneralSuggestionModel,
+            id=38,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_IN_REVIEW,
             author_id='user4',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.transaltion_suggestion_model_with_none_story_id = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            id=39,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp5',
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user5',
             final_reviewer_id='reviewer_2',
             change_cmd=self.change_cmd,
             score_category=self.score_category,
@@ -1625,6 +1679,33 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             translation_submitter_total_stats.recent_review_outcomes
         )
 
+    def test_job_does_not_creates_stats_if_no_contribution_stats_model_exist(self) -> None: # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_2.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_2.update_timestamps()
+
+        self.put_multi([
+            self.translation_suggestion_accepted_with_edits_model,
+            self.topic_model_2,
+            self.exp_2,
+            self.story_2,
+            self.exp_context_2,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user1, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \nUnique valid topic IDs '
+                    'with contribution stats: \n'))
+        ])
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -1888,4 +1969,106 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                     'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
                     'IDs with contribution stats: \n- topic2\nUnique valid '
                     'topic IDs with contribution stats: \n- topic2\n'))
+        ])
+
+
+class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
+    ContributorDashboardTest):
+
+    JOB_CLASS: Type[
+        contributor_admin_stats_jobs
+            .AuditAndLogIncorretDataInContributorAdminStatsJob
+    ] = (
+        contributor_admin_stats_jobs
+            .AuditAndLogIncorretDataInContributorAdminStatsJob)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 0'),
+            job_run_result.JobRunResult(
+                stdout='LOGGED QUESTION SUGGESTION COUNT SUCCESS: 0')
+        ])
+
+    def test_job_audits_admin_stats(self) -> None:
+
+        self.translation_contribution_model_3.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps() # pylint: disable=line-too-long
+        self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_2.update_timestamps()
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
+        self.question_review_model_1.update_timestamps()
+        self.question_review_model_2.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_user2.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.transaltion_suggestion_model_with_none_story_id.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_3,
+            self.translation_contribution_model_with_invalid_topic,
+            self.translation_review_model_1,
+            self.translation_review_model_2,
+            self.question_contribution_model_1,
+            self.question_contribution_model_with_invalid_topic,
+            self.question_review_model_1,
+            self.question_review_model_2,
+            self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_user2,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_rejected_model_user2,
+            self.transaltion_suggestion_model_with_none_story_id,
+            self.topic_model_1,
+            self.topic_model_2,
+            self.exp_1,
+            self.exp_2,
+            self.story_1,
+            self.story_2,
+            self.exp_context_1,
+            self.exp_context_2,
+        ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 31,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp1,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' rejected,\nlanguage_code: hi,\ncorresponding_topic_id: [\n{'
+                'topic_id: topic1, problem: no_stats_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 39,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp5,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' review,\nlanguage_code: hi,\ncorresponding_topic_id: [\n{'
+                'topic_id: None, problem: no_exp_context_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====QUESTION_CONTRIBUTION====>\n{\nsuggestion_id: 27,\n'
+                'suggestion_type: add_question,\ntarget_type: exploration,'
+                '\ntraget_id: exp1,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' accepted,\ncorresponding_topic_id: [\n{topic_id: topic2, '
+                'problem: no_stats_model},\n],\nskill_opportunity_model_exists'
+                ': False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====QUESTION_CONTRIBUTION====>\n{\nsuggestion_id: 28,\n'
+                'suggestion_type: add_question,\ntarget_type: exploration,\n'
+                'traget_id: exp2,\ntarget_verion_at_submission: 1,\nstatus: '
+                'accepted,\ncorresponding_topic_id: [\n{topic_id: topic1, '
+                'problem: no_stats_model},\n],\nskill_opportunity_model_exists'
+                ': False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                'LOGGED QUESTION SUGGESTION COUNT SUCCESS: 2')),
+            job_run_result.JobRunResult(stdout=(
+                'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 2'))
         ])

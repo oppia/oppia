@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -140,10 +139,3 @@ export class TrainingPanelComponent implements OnInit {
     this.selectedAnswerGroupIndex = this.classification.answerGroupIndex;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTrainingPanel',
-  downgradeComponent({
-    component: TrainingPanelComponent,
-  }) as angular.IDirectiveFactory
-);

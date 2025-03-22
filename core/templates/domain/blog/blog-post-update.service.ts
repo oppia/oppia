@@ -17,7 +17,6 @@
  */
 import {Injectable} from '@angular/core';
 import {BlogPostData} from 'domain/blog/blog-post.model';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ImagesData} from 'services/image-local-storage.service';
 
 export interface BlogPostChangeDict {
@@ -62,7 +61,3 @@ export class BlogPostUpdateService {
     this.changeDict = {};
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BlogPostUpdateService', downgradeInjectable(BlogPostUpdateService));

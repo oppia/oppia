@@ -17,12 +17,11 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Ratio} from 'domain/objects/ratio.model';
@@ -36,7 +35,7 @@ import {RatioInputAnswer} from 'interactions/answer-defs';
 })
 export class RatioExpressionInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -285,10 +284,3 @@ export class RatioExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'RatioExpressionInputValidationService',
-    downgradeInjectable(RatioExpressionInputValidationService)
-  );

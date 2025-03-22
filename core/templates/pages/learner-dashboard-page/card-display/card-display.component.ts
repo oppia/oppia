@@ -24,7 +24,6 @@ import {
   AfterContentInit,
   NgZone,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 @Component({
   selector: 'oppia-card-display',
@@ -149,10 +148,3 @@ export class CardDisplayComponent implements AfterContentInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'cardDisplayComponent',
-    downgradeComponent({component: CardDisplayComponent})
-  );

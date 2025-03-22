@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -251,20 +250,10 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 
   isDiagnosticTestFeatureFlagEnabled(): boolean {
-    // Currently, diagnostic test functionality is only supported for the math
-    // classroom. This issue (#21091) will ensure this functionality can be
-    // enabled/disabled for any classroom from the classroom admin page.
-    // Remove the second clause here, once the issue is resolved.
-    return (
-      this.platformFeatureService.status.DiagnosticTest.isEnabled &&
-      this.classroomUrlFragment === 'math'
-    );
+    return this.platformFeatureService.status.DiagnosticTest.isEnabled;
+  }
+
+  diagnosticTestIsEnabled(): boolean {
+    return this.classroomData.getDiagnosticTestIsEnabled();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaClassroomPage',
-  downgradeComponent({
-    component: ClassroomPageComponent,
-  }) as angular.IDirectiveFactory
-);

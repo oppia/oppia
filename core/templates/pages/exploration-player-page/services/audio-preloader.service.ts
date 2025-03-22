@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
@@ -196,7 +195,3 @@ export class AudioPreloaderService {
     this.filenamesOfAudioCurrentlyDownloading.length = 0;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AudioPreloaderService', downgradeInjectable(AudioPreloaderService));

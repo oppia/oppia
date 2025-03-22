@@ -17,7 +17,6 @@
  * about explorations from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
@@ -273,10 +272,3 @@ export class ReadOnlyExplorationBackendApiService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReadOnlyExplorationBackendApiService',
-    downgradeInjectable(ReadOnlyExplorationBackendApiService)
-  );

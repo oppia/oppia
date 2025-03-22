@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import './primary-button.component.css';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -111,10 +110,3 @@ export class PrimaryButtonComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPrimaryButton',
-  downgradeComponent({
-    component: PrimaryButtonComponent,
-  }) as angular.IDirectiveFactory
-);

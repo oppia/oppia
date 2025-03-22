@@ -23,7 +23,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {ContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
@@ -133,10 +132,3 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
     };
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSolutionExplanationEditor',
-  downgradeComponent({
-    component: SolutionExplanationEditor,
-  }) as angular.IDirectiveFactory
-);

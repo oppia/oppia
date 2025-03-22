@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {AttributionService} from 'services/attribution.service';
@@ -114,10 +113,3 @@ export class AttributionGuideComponent implements OnInit {
     setTimeout(() => $(codeDiv).tooltip('hide'), 1000);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'attributionGuide',
-    downgradeComponent({component: AttributionGuideComponent})
-  );
