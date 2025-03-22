@@ -213,8 +213,4 @@ export class RatingsAndRecommendationsComponent {
       'true'
     );
   }
-
-  isEndChapterFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
-  }
 }

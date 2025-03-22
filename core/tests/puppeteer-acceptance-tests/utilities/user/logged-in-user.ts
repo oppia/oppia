@@ -126,6 +126,11 @@ const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
+const profileMenuLink = '.e2e-test-profile-link';
+const preferencesMenuLink = '.e2e-test-preferences-link';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -192,7 +197,14 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the learner dashboard using profile dropdown in the navbar.
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
     await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      visible: true,
+    });
     await this.clickOn(learnerDashboardMenuLink);
   }
 
@@ -1369,6 +1381,66 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToSiteAdminPage(): Promise<void> {
     await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(creatorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(creatorDashboardMenuLink);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(contributorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(contributorDashboardMenuLink);
+  }
+
+  /**
+   * Navigates to the Preferences Page Using Profile Dropdown Menu.
+   */
+  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(preferencesMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(preferencesMenuLink);
+  }
+
+  /**
+   * Navigates to the Profile Page Using Profile Dropdown Menu.
+   */
+  async navigateToProfilePageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(profileMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(profileMenuLink);
   }
 }
 
