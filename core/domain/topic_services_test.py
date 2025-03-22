@@ -60,6 +60,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic services."""
 
     user_id: str = 'user_id'
+    exp_id_1: str = 'exp_id_1'
     story_id_1: str = 'story_1'
     story_id_2: str = 'story_2'
     story_id_3: str = 'story_3'
@@ -1606,6 +1607,29 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             },
             'change'
         )
+        self.save_new_valid_exploration(
+            self.exp_id_1, self.owner_id)
+        self.publish_exploration(self.owner_id, self.exp_id_1)
+        story_services.update_story(
+            self.user_id, self.story_id_1, [story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.exp_id_1
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'node_id': 'node_1',
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
+            })], 'Changes.')
 
         self.assertIsNotNone(
             suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
