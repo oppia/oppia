@@ -407,12 +407,12 @@ DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
-IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_JPEG = 'jpg'
 IMAGE_FORMAT_PNG = 'png'
 IMAGE_FORMAT_GIF = 'gif'
 IMAGE_FORMAT_SVG = 'svg'
 
-# An array containing the accepted image formats (as determined by the imghdr
+# An array containing the accepted image formats (as determined by the filetype
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
@@ -1042,6 +1042,8 @@ VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
 VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover/<exploration_id>')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
