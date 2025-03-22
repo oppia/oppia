@@ -2057,7 +2057,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Name should be a string.'):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, changelist, 'Update topic name')
-    
+
     def test_does_not_add_skill_with_superseding_skill_to_topic(
             self) -> None:
         self.save_new_skill(
