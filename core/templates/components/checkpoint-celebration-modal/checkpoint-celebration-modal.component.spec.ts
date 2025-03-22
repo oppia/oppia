@@ -40,9 +40,7 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -76,16 +74,6 @@ class MockCheckpointCelebrationUtilityService {
 
   openLessonInformationModal() {
     this.openLessonInformationModalEmitter.emit();
-  }
-}
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      CheckpointCelebration: {
-        isEnabled: true,
-      },
-    };
   }
 }
 
@@ -221,7 +209,6 @@ describe('Checkpoint celebration modal component', function () {
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
-  let platformFeatureService: PlatformFeatureService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
@@ -240,10 +227,6 @@ describe('Checkpoint celebration modal component', function () {
         InteractionObjectFactory,
         AudioTranslationLanguageService,
         ExplorationPlayerStateService,
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -279,7 +262,6 @@ describe('Checkpoint celebration modal component', function () {
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService
     );
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
@@ -554,34 +536,6 @@ describe('Checkpoint celebration modal component', function () {
     expect(component.triggerMiniMessage).toHaveBeenCalled();
   });
 
-  it('should not trigger checkpoint message if feature is disabled', () => {
-    component.orderedCheckpointList = [
-      'Introduction',
-      'MostRecentlyReachedCheckpointStateName',
-      'NewStateName',
-      'EndState',
-    ];
-    component.currentStateName = 'Introduction';
-    component.mostRecentlyReachedCheckpointStateName =
-      'MostRecentlyReachedCheckpointStateName';
-    spyOn(
-      explorationPlayerStateService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
-    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      CheckpointCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-
-    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
-
-    expect(
-      checkpointCelebrationUtilityService.getCheckpointMessage
-    ).not.toHaveBeenCalled();
-  });
-
   it('should not trigger checkpoint message if not in story mode', () => {
     component.orderedCheckpointList = [
       'Introduction',
@@ -777,21 +731,6 @@ describe('Checkpoint celebration modal component', function () {
     expect(
       checkpointCelebrationUtilityService.openLessonInformationModal
     ).toHaveBeenCalled();
-  });
-
-  it('should not open lesson info modal if feature is disabled', () => {
-    spyOn(checkpointCelebrationUtilityService, 'openLessonInformationModal');
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      CheckpointCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-
-    component.openLessonInfoModal();
-
-    expect(
-      checkpointCelebrationUtilityService.openLessonInformationModal
-    ).not.toHaveBeenCalled();
   });
 
   it('should determine if current language is RTL', () => {
