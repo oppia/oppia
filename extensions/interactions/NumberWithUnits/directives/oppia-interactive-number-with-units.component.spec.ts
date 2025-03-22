@@ -50,6 +50,7 @@ describe('Number with units interaction component', () => {
     ) => {},
     showNoResponseError: (): boolean => false,
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    updateAnswerIsValid: (answer: boolean) => {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -127,27 +128,6 @@ describe('Number with units interaction component', () => {
     ).toHaveBeenCalledOnceWith('24 km');
   }));
 
-  it('should display warning when the answer format is incorrect', fakeAsync(() => {
-    spyOn(currentInteractionService, 'updateCurrentAnswer');
-
-    // PreChecks.
-    expect(component.errorMessageI18nKey).toBe('');
-    expect(component.isValid).toBeTrue();
-
-    // Test: Incorrect answer.
-    component.answer = '24 k';
-
-    component.answerValueChanged();
-    tick(150);
-
-    // PostChecks: Error message as the Unit is incorrect.
-    expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
-    expect(component.isValid).toBeFalse();
-    expect(
-      currentInteractionService.updateCurrentAnswer
-    ).toHaveBeenCalledOnceWith('24 k');
-  }));
-
   it("should close help modal when user clicks the 'close' button", () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject('close'),
@@ -202,12 +182,16 @@ describe('Number with units interaction component', () => {
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
     spyOn(currentInteractionService, 'showNoResponseError');
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
 
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
+    );
     expect(
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
@@ -218,12 +202,16 @@ describe('Number with units interaction component', () => {
     spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
       true
     );
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe(
       'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+    );
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
     );
     expect(currentInteractionService.showNoResponseError).toHaveBeenCalledTimes(
       1
