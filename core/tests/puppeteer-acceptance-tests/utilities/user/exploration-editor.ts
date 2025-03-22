@@ -453,7 +453,8 @@ export class ExplorationEditor extends BaseUser {
   async updateCardContent(content: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(stateEditSelector, {
-      visible: true, timeout: 10000,
+      visible: true,
+      timeout: 10000,
     });
     await this.clickOn(stateEditSelector);
     await this.page.waitForTimeout(500);
