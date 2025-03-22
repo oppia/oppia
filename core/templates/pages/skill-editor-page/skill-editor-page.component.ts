@@ -136,20 +136,18 @@ export class SkillEditorPageComponent implements OnInit {
         skill.getId()
       );
 
-    if (skillEditorBrowserTabsInfo) {
-      if (
-        skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
-        this.undoRedoService.getChangeCount() > 0
-      ) {
-        skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
-      }
-      skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
-
-      this.localStorageService.updateEntityEditorBrowserTabsInfo(
-        skillEditorBrowserTabsInfo,
-        EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
-      );
+    if (
+      skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges() &&
+      this.undoRedoService.getChangeCount() > 0
+    ) {
+      skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
     }
+    skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
+    this.localStorageService.updateEntityEditorBrowserTabsInfo(
+      skillEditorBrowserTabsInfo,
+      EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
+    );
   }
 
   createOrUpdateSkillEditorBrowserTabsInfo(): void {
@@ -213,7 +211,7 @@ export class SkillEditorPageComponent implements OnInit {
     );
     this.skillIsInitialized = false;
     this.skillEditorStalenessDetectionService.init();
-    this.windowRef.nativeWindow.addEventListener('beforeunload', event => {
+    this.windowRef.nativeWindow.addEventListener('unload', event => {
       this.onClosingSkillEditorBrowserTab();
     });
     this.windowRef.nativeWindow.addEventListener('storage', event => {
