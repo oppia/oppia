@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import inspect
 from core.jobs import base_jobs
-from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors
@@ -30,6 +29,12 @@ from core.platform import models
 import apache_beam as beam
 
 from typing import Callable, Dict, Iterator, List
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+
+(base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -79,7 +84,10 @@ class BaseValidationJob(base_jobs.JobBase):
         )
     
     def get_validation_fns(self) -> List[
-        Callable[[models.BaseModel], Iterator[job_run_result.JobRunResult]]]:
+        Callable[
+            [base_models.BaseModel],
+            Iterator[job_run_result.JobRunResult]
+        ]]:
         """Dynamically discovers and returns a list of all validation functions
         within the class.
 
@@ -97,7 +105,8 @@ class BaseValidationJob(base_jobs.JobBase):
         return validation_fns
     
     def validate_created_on_less_than_last_updated(
-        self, model: models.BaseModel) -> Iterator[job_run_result.JobRunResult]:
+        self, model: base_models.BaseModel) -> Iterator[
+            job_run_result.JobRunResult]:
         """Validates that the model's created_on time is less than or equal to
         its last_updated time.
 
@@ -118,7 +127,7 @@ class ApplyAllValidations(beam.DoFn):
         super().__init__()
         self._validation_functions = validation_functions
 
-    def process(self, model: models.BaseModel) -> Iterator[
+    def process(self, model: base_models.BaseModel) -> Iterator[
         job_run_result.JobRunResult]:
         for validation_fn in self._validation_functions:
             for error in validation_fn(model):

@@ -37,7 +37,7 @@ if MYPY:  # pragma: no cover
 class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with a mock validation function."""
 
-    def validate_mock_error(self, model: models.BaseModel) -> Iterator[
+    def validate_mock_error(self, model: base_models.BaseModel) -> Iterator[
         base_validation_errors.BaseValidationError]:
         """Mock validation function to generate a BaseValidationError."""
         if 'mock_error' in model.id:
