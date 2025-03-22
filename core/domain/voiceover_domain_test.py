@@ -529,6 +529,31 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         ):
             exp_voice_artists_link.validate()
 
+    def test_validate_content_id(self) -> None:
+        voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        content_id_to_voiceovers_mapping = {
+            '': {
+                'en': ('voice_artist_1', voiceover_dict)
+            }
+        }
+        exp_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                exp_id='exp_id_1',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
+            )
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Content ID should not be empty.'
+        ):
+            exp_voice_artists_link.validate()
+
     def test_validate_nested_dict_type(self) -> None:
         content_id_to_voiceovers_mapping = {
             'content_id_0': 'not_a_dict'
@@ -627,6 +652,30 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected artist id to be string'
+        ):
+            exp_voice_artists_link.validate()
+
+    def test_validate_artist_id(self) -> None:
+        voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        content_id_to_voiceovers_mapping = {
+            'content_id_1': {
+                'en': ('', voiceover_dict)
+            }
+        }
+        exp_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                exp_id='exp_id_1',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
+            )
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            'Artist ID should not be empty.'
         ):
             exp_voice_artists_link.validate()
 
