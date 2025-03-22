@@ -160,6 +160,7 @@
         "scripts.clean_test",
         "core.storage.collection.gae_models_test",
         "scripts.linters.codeowner_linter_test",
+        "scripts.inactive_issue_checker_test",
         "core.storage.email.gae_models_test",
         "core.storage.user.gae_models_test",
         "core.storage.job.gae_models_test",
