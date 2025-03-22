@@ -369,6 +369,37 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             manual_voiceover.to_dict(),
             self.dummy_manual_voiceover_dict)
 
+    def test_should_be_able_to_add_automated_voiceover_audio_offset(
+        self
+    ) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_1')
+        entity_voiceovers_object.add_automated_voiceovers_audio_offsets(
+            'content_1',
+            [
+                {'token': 'This', 'audio_offset_msecs': 0.0},
+                {'token': 'is', 'audio_offset_msecs': 100.0},
+                {'token': 'a', 'audio_offset_msecs': 200.0},
+                {'token': 'test', 'audio_offset_msecs': 300.0},
+                {'token': 'text', 'audio_offset_msecs': 400.0},
+            ]
+        )
+
+        self.assertEqual(
+            entity_voiceovers_object.automated_voiceovers_audio_offsets_msecs[
+                'content_1'], [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ]
+        )
+
     def test_is_both_voiceovers_empty_should_return_successfully(self) -> None:
         entity_voiceovers_object = (
             voiceover_domain.EntityVoiceovers.create_empty(
