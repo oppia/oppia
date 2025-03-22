@@ -28,8 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
-from typing import Iterable, Tuple, List
+from typing import Iterable, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover

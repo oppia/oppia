@@ -33,7 +33,8 @@ if MYPY:
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
 
-datastore_services  =  models.Registry.import_datastore_services()
+datastore_services = models.Registry.import_datastore_services()
+
 
 class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
     JOB_CLASS: Type[
@@ -51,12 +52,12 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
     def test_skill_with_no_prerequisites(self) -> None:
         skill = self.create_model(
             skill_models.SkillModel,
-            id = self.SKILL_1_ID,
-            description = self.SKILL_1_DESC,
-            language_code = constants.DEFAULT_LANGUAGE_CODE,
-            misconceptions = [],
-            rubrics = [],
-            skill_contents = {
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            misconceptions=[],
+            rubrics=[],
+            skill_contents={
                 'explanation': {
                     'html': 'test explanation',
                     'content_id': 'explanation',
@@ -72,15 +73,15 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     }
                 }
             },
-            next_misconception_id = 0,
-            misconceptions_schema_version = feconf
+            next_misconception_id=0,
+            misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version = feconf
+            rubric_schema_version=feconf
                 .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version = feconf
+            skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            all_questions_merged = False,
-            prerequisite_skill_ids = []
+            all_questions_merged=False,
+            prerequisite_skill_ids=[]
         )
         skill.update_timestamps()
         self.put_multi([skill])
@@ -90,12 +91,12 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
     def test_skill_with_no_hanging_prerequisites(self) -> None:
         prerequisite_skill = self.create_model(
             skill_models.SkillModel,
-            id = self.SKILL_1_ID,
-            description = self.SKILL_1_DESC,
-            language_code = constants.DEFAULT_LANGUAGE_CODE,
-            misconceptions = [],
-            rubrics = [],
-            skill_contents = {
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            misconceptions=[],
+            rubrics=[],
+            skill_contents={
                 'explanation': {
                     'html': 'test explanation',
                     'content_id': 'explanation',
@@ -111,24 +112,24 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     }
                 }
             },
-            next_misconception_id = 0,
-            misconceptions_schema_version = feconf
+            next_misconception_id=0,
+            misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version = feconf
+            rubric_schema_version=feconf
                 .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version = feconf
+            skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            all_questions_merged = False,
-            prerequisite_skill_ids = []
+            all_questions_merged=False,
+            prerequisite_skill_ids=[]
         )
         skill = self.create_model(
             skill_models.SkillModel,
-            id = self.SKILL_2_ID,
-            description = self.SKILL_2_DESC,
-            language_code = constants.DEFAULT_LANGUAGE_CODE,
-            misconceptions = [],
-            rubrics = [],
-            skill_contents = {
+            id=self.SKILL_2_ID,
+            description=self.SKILL_2_DESC,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            misconceptions=[],
+            rubrics=[],
+            skill_contents={
                 'explanation': {
                     'html': 'test explanation',
                     'content_id': 'explanation',
@@ -144,15 +145,15 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     }
                 }
             },
-            next_misconception_id = 0,
-            misconceptions_schema_version = feconf
+            next_misconception_id=0,
+            misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version = feconf
+            rubric_schema_version=feconf
                 .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version = feconf
+            skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            all_questions_merged = False,
-            prerequisite_skill_ids = [self.SKILL_1_ID]
+            all_questions_merged=False,
+            prerequisite_skill_ids=[self.SKILL_1_ID]
         )
         prerequisite_skill.update_timestamps()
         skill.update_timestamps()
@@ -163,12 +164,12 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
     def test_skill_with_hanging_prerequisite(self) -> None:
         skill = self.create_model(
             skill_models.SkillModel,
-            id = self.SKILL_1_ID,
-            description = self.SKILL_1_DESC,
-            language_code = constants.DEFAULT_LANGUAGE_CODE,
-            misconceptions = [],
-            rubrics = [],
-            skill_contents = {
+            id=self.SKILL_1_ID,
+            description=self.SKILL_1_DESC,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            misconceptions=[],
+            rubrics=[],
+            skill_contents={
                 'explanation': {
                     'html': 'test explanation',
                     'content_id': 'explanation',
@@ -184,21 +185,21 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     }
                 }
             },
-            next_misconception_id = 0,
-            misconceptions_schema_version = feconf
+            next_misconception_id=0,
+            misconceptions_schema_version=feconf
                 .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version = feconf
+            rubric_schema_version=feconf
                 .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version = feconf
+            skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            all_questions_merged = False,
-            prerequisite_skill_ids = ['nonexistent_skill']
+            all_questions_merged=False,
+            prerequisite_skill_ids=['nonexistent_skill']
         )
         skill.update_timestamps()
         self.put_multi([skill])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout = 'Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist' # pylint: disable = line-too-long
+                stdout='Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist' # pylint: disable = line-too-long
             )
         ])
