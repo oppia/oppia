@@ -14,21 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Audit jobs that check if any skills in the datastore have hanging prerequisites. This happens when a skill A is merged to another skill B and not deleted.
-    If A was added as a prerequisite skill to some topic/skill, A is called a hanging prerequisite.
+"""Audit jobs that check if any skills in the datastore have hanging
+    prerequisites. If a skill A is added as a prerequisite skill to
+    some topic/skill and deleted or merged to another skill B, A is
+    called a hanging prerequisite.
 """
 
 from __future__ import annotations
 
 from core.jobs import base_jobs
-from core.jobs import job_utils
-from core.jobs.types import job_run_result
 from core.jobs.io import ndb_io
+from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -42,12 +43,12 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
     """Job that counts skills having hanging prerequisites."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of skills having hanging prerequisites aggregated from all
-        Skill models.
+        """Returns a PCollection of skills having hanging
+        prerequisites aggregated from all Skill models.
 
         Returns:
-            PCollection. A PCollection of hanging prerequisite skills discovered during the
-            validation.
+            PCollection. A PCollection of hanging prerequisite
+            skills discovered during the validation.
         """
         skill_models_pcoll = (
             self.pipeline
@@ -69,21 +70,24 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
                 lambda skill_model: skill_model.prerequisite_skill_ids
                 if skill_model.prerequisite_skill_ids else []
             )
-            | 'Remove duplicate prerequisites' >> beam.Distinct()
+            | 'Remove duplicate prerequisites' >> beam.Filter(
+                lambda x, seen=set(): not (x in seen or seen.add(x))
+            )
         )
 
         hanging_prerequisites = (
             prerequisite_skill_ids
             | 'Check if prerequisite exists' >> beam.ParDo(
-                CheckPrerequisiteExists(), 
+                CheckPrerequisiteExists(),
                 beam.pvalue.AsIter(all_skill_ids)
             )
             | 'Filter hanging prerequisites' >> beam.Filter(
-                lambda result: not result[1]  # Keep only skills that don't exist (False)
+                # Keep only skills that don't exist (False)
+                lambda result: not result[1]
             )
             | 'Create collection of hanging prerequisites' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but does not exist""",
+                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but does not exist""" # pylint: disable=line-too-long
                 )
             )
         )
@@ -96,18 +100,25 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
-    """DoFn to check if a prerequisite skill exists in the list of all skills."""
-    
-    def process(self, prerequisite_id, all_skill_ids) -> Iterable[Tuple[str, bool]]:
+    """DoFn to check if a prerequisite skill exists in the list of all
+    skills.
+    """
+
+    def process(
+        self,
+        prerequisite_id: str,
+        all_skill_ids: List[str]
+    ) -> Iterable[Tuple[str, bool]]:
         """Check if the prerequisite exists in all skill IDs.
-        
+
         Args:
-            prerequisite_id: The ID of the prerequisite skill to check.
-            all_skill_ids: List of all valid skill IDs.
-            
+            prerequisite_id: string. The ID of the prerequisite skill to check.
+            all_skill_ids: list(string). List of all valid skill IDs.
+
         Yields:
-            A tuple (prerequisite_id, exists) where exists is True if the prerequisite
-            exists in all_skill_ids, False otherwise.
+            Tuple(string, boolean). A tuple (prerequisite_id, exists) where
+            exists is True if the prerequisite exists in all_skill_ids, False
+            otherwise.
         """
         exists = prerequisite_id in all_skill_ids
         yield (prerequisite_id, exists)
