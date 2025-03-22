@@ -730,10 +730,6 @@ export class ConversationSkinComponent {
     }
   }
 
-  isEndChapterCelebrationFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
-  }
-
   reloadExploration(): void {
     this.windowRef.nativeWindow.location.reload();
   }
