@@ -1383,20 +1383,6 @@ export class LoggedInUser extends BaseUser {
     await this.goto(siteAdminPageUrl);
   }
 
-  /**
-   * Gives feedback on the current page.
-   * @param {string} feedback - The feedback text to submit.
-   * @param {boolean} stayAnonymous - Whether to submit the feedback anonymously.
-   */
-  async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
-    await this.page.waitForSelector(feedbackTextareaSelector);
-    await this.type(feedbackTextareaSelector, feedback);
-    if (stayAnonymous) {
-      await this.clickOn(anonymousCheckboxSelector);
-    }
-    await this.clickOn(submitButtonSelector);
-  }
-
   /* Navigates to the Creator Dashboard Using Profile Dropdown Menu.
    */
   async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
@@ -1454,6 +1440,20 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(profileMenuLink);
+  }
+
+  /**
+   * Gives feedback on the current page.
+   * @param {string} feedback - The feedback text to submit.
+   * @param {boolean} stayAnonymous - Whether to submit the feedback anonymously.
+   */
+  async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
+    await this.page.waitForSelector(feedbackTextareaSelector);
+    await this.type(feedbackTextareaSelector, feedback);
+    if (stayAnonymous) {
+      await this.clickOn(anonymousCheckboxSelector);
+    }
+    await this.clickOn(submitButtonSelector);
   }
 }
 
