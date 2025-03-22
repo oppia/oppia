@@ -81,42 +81,6 @@ var ReleaseCoordinatorPage = function () {
     return null;
   };
 
-  // Remove this method after the end_chapter_celebration feature flag
-  // is deprecated.
-  this.getEndChapterCelebrationFeatureElement = async function () {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
-    for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if (
-        (await elem.$(featureNameLocator).getText()) ===
-        'end_chapter_celebration'
-      ) {
-        return elem;
-      }
-    }
-
-    return null;
-  };
-
-  // Remove this method after the checkpoint_celebration feature flag
-  // is deprecated.
-  this.getCheckpointCelebrationFeatureElement = async function () {
-    var featureFlagElements = await featureFlagElementsSelector();
-    var count = featureFlagElements.length;
-    for (let i = 0; i < count; i++) {
-      var elem = featureFlagElements[i];
-      if (
-        (await elem.$(featureNameLocator).getText()) ===
-        'checkpoint_celebration'
-      ) {
-        return elem;
-      }
-    }
-
-    return null;
-  };
-
   // Remove this method after the enable_voiceover_contribution feature flag
   // is deprecated.
   this.getVoiceoverContributionFeatureElement = async function () {
