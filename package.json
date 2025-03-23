@@ -139,6 +139,15 @@
     "yargs": "^17.0.0",
     "zone.js": "^0.10.3"
   },
+  "browser": {
+    "crypto": false,
+    "fs": false,
+    "path": false,
+    "os": false,
+    "net": false,
+    "stream": false,
+    "tls": false
+  },
   "keywords": [],
   "dependencies": {
     "@angular/animations": "^11.2.10",
