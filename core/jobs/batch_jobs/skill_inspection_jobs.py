@@ -28,7 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, List, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -63,6 +63,17 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             )
         )
 
+        skills_with_superseding_skills = (
+            skill_models_pcoll
+            | 'Extract skill models with superseding IDs' >> beam.Map(
+                lambda skill_model: (skill_model.id, 
+                                    skill_model.superseding_skill_id if hasattr(
+                                        skill_model,
+                                        'superseding_skill_id'
+                                    ) else None)
+            )
+        )
+
         prerequisite_skill_ids = (
             skill_models_pcoll
             | 'Extract prerequisite skill ids' >> beam.FlatMap(
@@ -78,15 +89,17 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             prerequisite_skill_ids
             | 'Check if prerequisite exists' >> beam.ParDo(
                 CheckPrerequisiteExists(),
-                beam.pvalue.AsIter(all_skill_ids)
+                beam.pvalue.AsIter(all_skill_ids),
+                beam.pvalue.AsDict(skills_with_superseding_skills)
             )
             | 'Filter hanging prerequisites' >> beam.Filter(
-                # Keep only skills that don't exist (False)
-                lambda result: not result[1]
+                # Keep only skills that don't exist (False) or have a
+                # superseding skill.
+                lambda result: not result[1] or result[2] is not None
             )
             | 'Create collection of hanging prerequisites' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but does not exist""" # pylint: disable=line-too-long
+                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but {'does not exist' if not result[1] else f'is superseded by skill with ID: {result[2]}'}""" # pylint: disable=line-too-long
                 )
             )
         )
@@ -100,24 +113,29 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
     """DoFn to check if a prerequisite skill exists in the list of all
-    skills.
+    skills and if it has a superseding skill.
     """
 
     def process(
         self,
         prerequisite_id: str,
-        all_skill_ids: List[str]
+        all_skill_ids: List[str],
+        skill_superseding_map: Dict[str, Optional[str]],
     ) -> Iterable[Tuple[str, bool]]:
         """Check if the prerequisite exists in all skill IDs.
 
         Args:
             prerequisite_id: string. The ID of the prerequisite skill to check.
             all_skill_ids: list(string). List of all valid skill IDs.
+            skill_superseding_map: dict(string, string). Map of skill IDs to their
+            superseding skill IDs.
 
         Yields:
-            Tuple(string, boolean). A tuple (prerequisite_id, exists) where
-            exists is True if the prerequisite exists in all_skill_ids, False
-            otherwise.
+            Tuple(string, boolean, string). A tuple
+            (prerequisite_id, exists, superseding_id) where exists is True if the
+            prerequisite exists in all_skill_ids, False otherwise and superseding_id
+            is the ID of the superseding skill if one exists, None otherwise.
         """
         exists = prerequisite_id in all_skill_ids
-        yield (prerequisite_id, exists)
+        superseding_id = skill_superseding_map.get(prerequisite_id, None)
+        yield (prerequisite_id, exists, superseding_id)

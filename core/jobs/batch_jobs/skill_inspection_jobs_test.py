@@ -162,6 +162,39 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_skill_with_hanging_prerequisite(self) -> None:
+        superseded_skill = self.create_model(
+            skill_models.SkillModel,
+            id=self.SKILL_2_ID,
+            description=self.SKILL_2_DESC,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            misconceptions=[],
+            rubrics=[],
+            skill_contents={
+                'explanation': {
+                    'html': 'test explanation',
+                    'content_id': 'explanation',
+                },
+                'worked_examples': [],
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {}
+                },
+                'written_translations': {
+                    'translations_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
+                }
+            },
+            next_misconception_id=0,
+            misconceptions_schema_version=feconf
+                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf
+                .CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf
+                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            all_questions_merged=False,
+            superseding_skill_id='superseding-skill'
+        )
         skill = self.create_model(
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
@@ -193,13 +226,17 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_contents_schema_version=feconf
                 .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=['nonexistent_skill']
+            prerequisite_skill_ids=['nonexistent_skill', self.SKILL_2_ID]
         )
+        superseded_skill.update_timestamps()
         skill.update_timestamps()
-        self.put_multi([skill])
+        self.put_multi([superseded_skill, skill])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist' # pylint: disable = line-too-long
+            ),
+            job_run_result.JobRunResult(
+                stdout='Skill with ID: skill_id_2 is referenced as a prerequisite but is superseded by skill with ID: superseding-skill' # pylint: disable = line-too-long
             )
         ])
