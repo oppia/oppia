@@ -18,7 +18,6 @@
 
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -157,10 +156,3 @@ export class TopicEditorStoriesListComponent implements OnInit {
     this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicEditorStoriesList',
-  downgradeComponent({
-    component: TopicEditorStoriesListComponent,
-  }) as angular.IDirectiveFactory
-);

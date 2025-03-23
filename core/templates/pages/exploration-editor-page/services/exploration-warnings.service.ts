@@ -17,7 +17,6 @@
  */
 
 import {Injectable, Injector} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -655,10 +654,3 @@ export class ExplorationWarningsService {
     return distanceToDestState;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationWarningsService',
-    downgradeInjectable(ExplorationWarningsService)
-  );

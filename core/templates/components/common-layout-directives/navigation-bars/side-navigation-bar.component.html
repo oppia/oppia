@@ -311,10 +311,25 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" target="_blank" rel="noopener" [href]="IMPACT_REPORT_LINK" class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-button">
-            <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_IMPACT_REPORT' | translate }}</span>
-            <i class="fas fa-external-link-alt launch-icon"></i>
-          </a>
+          <div (click)="toggleImpactReportSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-sidebar-expand-impactreport-submenu">
+            <span [ngClass]="{'oppia-sidebar-submenu-toggle': impactReportSubmenuIsShown}" class="text-uppercase">{{ 'I18N_SIDEBAR_IMPACT_REPORT' | translate }}</span>
+            <i [ngClass]="{'oppia-sidebar-menu-icon-transition': impactReportSubmenuIsShown}" class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon">
+            </i>
+          </div>
+          <div [hidden]="!impactReportSubmenuIsShown">
+            <div *ngFor="let report of impactReports">
+              <a tabindex="-1"
+                 target="_blank"
+                 rel="noopener"
+                 [href]="report.link"
+                 class="oppia-impact-report-button oppia-sidebar-menu-link e2e-mobile-test-sidebar-impact-report-button">
+                <span class="oppia-sidebar-submenu-title">
+                  {{ report.year }}
+                </span>
+                <i class="fas fa-external-link-alt launch-icon"></i>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </li>

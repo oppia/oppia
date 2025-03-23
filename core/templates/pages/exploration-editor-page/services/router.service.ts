@@ -18,7 +18,6 @@
 
 import {PlatformLocation} from '@angular/common';
 import {Injectable, EventEmitter, NgZone} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
@@ -71,7 +70,12 @@ export class RouterService {
 
     this.location.onPopState(() => {
       if (window.location.hash === '') {
-        window.history.go(-1);
+        // We use setTimeout() here so that window.history.go(-1)
+        // can go back one page and set the hash before being
+        // interrupted by the next call in the stack.
+        setTimeout(() => {
+          window.history.go(-1);
+        });
       }
     });
   }
@@ -345,7 +349,3 @@ export class RouterService {
     return this.refreshVersionHistoryEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('RouterService', downgradeInjectable(RouterService));

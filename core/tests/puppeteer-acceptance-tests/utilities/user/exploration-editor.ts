@@ -28,6 +28,7 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -218,6 +219,10 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const totalPlaysSelector = '.e2e-test-oppia-total-plays';
+const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
+const avarageRatingSelector = '.e2e-test-oppia-average-rating';
+const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
@@ -407,6 +412,23 @@ export class ExplorationEditor extends BaseUser {
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
       showMessage(`welcome modal not found: ${error.message}`);
+    }
+  }
+
+  /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dropdownToggleIcon, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
+    } catch (error) {
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -997,6 +1019,13 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveOutcomeDestButton);
   }
 
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    await this.clickOn(openOutcomeDestButton);
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
+    await this.clickOn(saveOutcomeDestButton);
+  }
+
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
@@ -1101,7 +1130,6 @@ export class ExplorationEditor extends BaseUser {
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
-
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
@@ -1126,6 +1154,12 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.waitForNetworkIdle();
     }
   }
 
@@ -1136,7 +1170,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
   async editDefaultResponseFeedback(
-    defaultResponseFeedback?: string,
+    defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
@@ -1676,14 +1710,18 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
+   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    flag: boolean = true
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    await this.dismissWelcomeModal();
+    if (flag) {
+      await this.dismissWelcomeModal();
+    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2013,6 +2051,7 @@ export class ExplorationEditor extends BaseUser {
     voiceoverFilePath: string
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
+    await this.page.waitForSelector(activeTranslationTab);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -2026,6 +2065,145 @@ export class ExplorationEditor extends BaseUser {
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to create and save a new untitled exploration containing only the EndExploration interaction.
+   */
+  async createAndSaveAMinimalExploration(): Promise<void> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
+   * Function to verify the average rating and the number of users who submitted ratings.
+   * @param {number} expectedRating - The expected average rating.
+   * @param {number} expectedUsers - The expected count of users who submitted ratings.
+   */
+  async expectAverageRatingAndUsersToBe(
+    expectedRating: number,
+    expectedUsers: number
+  ): Promise<void> {
+    await this.page.waitForSelector(avarageRatingSelector, {
+      visible: true,
+    });
+    const avarageRating = await this.page.$eval(
+      avarageRatingSelector,
+      element => parseFloat((element as HTMLElement).innerText.trim())
+    );
+    if (avarageRating !== expectedRating) {
+      throw new Error(
+        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+      );
+    }
+    const totalUsersText = await this.page.$eval(
+      usersCountInRatingSelector,
+      el => (el as HTMLElement).innerText.trim() || ''
+    );
+    // Extract number from text (e.g., "by 3 users" → 3).
+    const totalUsersMatch = totalUsersText.match(/\d+/);
+    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
+    if (totalUsers !== expectedUsers) {
+      throw new Error(
+        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected number of open feedback entries.
+   * @param {number} number - The expected count of open feedback entries.
+   */
+  async expectOpenFeedbacksToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
+      visible: true,
+    });
+    const numberOfOpenFeedbacks = await this.page.$eval(
+      numberOfOpenFeedbacksSelector,
+      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfOpenFeedbacks !== number) {
+      throw new Error(
+        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of plays."
+   * @param {number} number - The expected total play count.
+   */
+  async expectTotalPlaysToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(totalPlaysSelector, {
+      visible: true,
+    });
+    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
+      parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfTotalPlays !== number) {
+      throw new Error(
+        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of explorations.
+   * @param {number} number - The expected count of total explorations.
+   */
+  async expectNumberOfExplorationsToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const count = titlesOnPage.length;
+
+    if (count !== number) {
+      throw new Error(
+        `Expected ${number} explorations, but found ${count} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the presence and expected number of occurrences of an exploration.
+   * @param {string} explorationName - The name of the exploration.
+   * @param {number} numberOfOccurrence - The expected occurrence count of the exploration.
+   */
+  async expectExplorationNameToAppearNTimes(
+    explorationName: string,
+    numberOfOccurrence: number = 1
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+
+    // Extract all exploration titles.
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+
+    // Count occurrences of the target exploration.
+    const count = titlesOnPage.filter(
+      title => title === explorationName
+    ).length;
+
+    if (numberOfOccurrence === 1 && count !== numberOfOccurrence) {
+      throw new Error(`Exploration "${explorationName}" not found.`);
+    } else if (count !== numberOfOccurrence) {
+      throw new Error(
+        `Exploration "${explorationName}" found ${count} times, but expected ${numberOfOccurrence} times.`
+      );
+    }
   }
 
   /**

@@ -334,6 +334,143 @@ describe('NumberWithUnitsObjectFactory', () => {
       );
     });
 
+    it('should throw errors for duplicated units', () => {
+      // Simple duplicate units like "m m".
+
+      expect(() => {
+        nwuof.fromRawInputString('2 m m');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
+      );
+
+      // Check complex expressions like "((m)/(s^2))(m/kg)".
+
+      expect(() => {
+        nwuof.fromRawInputString('2 ((m)/(s^2))(m/kg)');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^2/(s^2 kg)".'
+      );
+
+      // Mixed normalized and unnormalized units like "m/meter".
+
+      expect(() => {
+        nwuof.fromRawInputString('2 ((m/meter)/s meter)/kg');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m/(s kg)".'
+      );
+
+      // Both are normalized as "yard".
+
+      expect(() => {
+        nwuof.fromRawInputString('2 yard yards');
+      }).toThrowError(
+        'Your answer has a repeated unit: "yard". Try rewriting it as "yard^2".'
+      );
+
+      // Units mapped to the same normalized value, such as "meter" and "m".
+
+      expect(() => {
+        nwuof.fromRawInputString('3 m meter');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
+      );
+
+      expect(() => {
+        nwuof.fromRawInputString('3 m^2 sec^-3 m');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^3/sec^3".'
+      );
+
+      // Multiple duplicates within a single expression.
+
+      expect(() => {
+        nwuof.fromRawInputString('6 ((m m)/(kg kg))');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^2/kg^2".'
+      );
+
+      // Units with mismatched exponents in division.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 s^4/s^3');
+      }).toThrowError(
+        'Your answer has a repeated unit: "s". Try rewriting it as "s".'
+      );
+
+      // Units with mismatched exponents in multiplication.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 s^4 s^3');
+      }).toThrowError(
+        'Your answer has a repeated unit: "s". Try rewriting it as "s^7".'
+      );
+
+      // Mismatched exponents in multiplication and division.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 m^3/m m^2');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^4".'
+      );
+
+      // Repetition in ratios like "(m/m) m".
+
+      expect(() => {
+        nwuof.fromRawInputString('1 (m/m) m');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m".'
+      );
+
+      // Invalid nested parentheses with duplicated units and space variation.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 ((m)/(s^2))/(m  kg)');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "1/(s^2 kg)".'
+      );
+
+      // Excessive duplicate units in the denominator.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 km / (s s s sec)');
+      }).toThrowError(
+        'Your answer has a repeated unit: "s". Try rewriting it as "km/s^4".'
+      );
+
+      // Mixed normalized and unnormalized units.
+
+      expect(() => {
+        nwuof.fromRawInputString('4 (meter^3)/(m^3 kg)');
+      }).toThrowError(
+        'Your answer has a repeated unit: "meter". Try rewriting it as "1/kg".'
+      );
+
+      // Negative exponent usage.
+
+      expect(() => {
+        nwuof.fromRawInputString('4 m/(m^-2 m)');
+      }).toThrowError(
+        'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
+      );
+    });
+
+    it('should throw errors for duplicated slashes', () => {
+      // Multiple slashes in an expression.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 km/s/m/kg');
+      }).toThrowError(
+        'Your answer contains more than one slash ("/"). Try rewriting it as "km/(s m kg)".'
+      );
+
+      // Excessive slashes in a complex expression.
+
+      expect(() => {
+        nwuof.fromRawInputString('2 km/s^2/m/kg/in/mol');
+      }).toThrowError(
+        'Your answer contains more than one slash ("/"). Try rewriting it as "km/(s^2 m kg in mol)".'
+      );
+    });
     it('should create currency units', () => {
       const createCurrencyUnitsSpy = spyOn(nwuof, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();

@@ -188,14 +188,15 @@ describe('Audio Bar Component', () => {
   });
 
   it('should set current voiceover time after the view has changed', () => {
-    spyOn(audioPlayerService, 'getCurrentTime').and.returnValue(5);
+    spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
+    spyOn(audioPlayerService, 'getCurrentTimeInSecs').and.returnValue(5);
 
     component.currentVoiceoverTime = 0;
     component.ngAfterContentChecked();
 
     expect(component.currentVoiceoverTime).toEqual(5);
   });
-
   it(
     'should check whether the auto generated language ' + 'code is selected',
     () => {
@@ -230,6 +231,25 @@ describe('Audio Bar Component', () => {
     component.languagesInExploration = [];
     result = component.isAudioBarAvailable();
     expect(result).toBe(false);
+  });
+
+  it('should call focusOnAudioControls when expanding the audio bar', () => {
+    spyOn(component, 'focusOnAudioControls');
+    component.expandAudioBar();
+    expect(component.focusOnAudioControls).toHaveBeenCalled();
+  });
+
+  it('should focus on audio controls element when focusOnAudioControls is called', () => {
+    const mockElementRef = {
+      nativeElement: {
+        focus: jasmine.createSpy('focus'),
+      },
+    };
+    component.audioControlsRef = mockElementRef as ElementRef;
+
+    component.focusOnAudioControls();
+
+    expect(mockElementRef.nativeElement.focus).toHaveBeenCalled();
   });
 
   it('should check if the audio bar is available with enabled accent', () => {

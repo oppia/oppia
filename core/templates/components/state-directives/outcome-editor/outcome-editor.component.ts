@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -315,10 +314,3 @@ export class OutcomeEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaOutcomeEditor',
-  downgradeComponent({
-    component: OutcomeEditorComponent,
-  }) as angular.IDirectiveFactory
-);

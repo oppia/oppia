@@ -25,7 +25,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
@@ -124,10 +123,3 @@ export class PieChartComponent implements OnInit, OnDestroy, AfterViewInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPieChart',
-  downgradeComponent({
-    component: PieChartComponent,
-  }) as angular.IDirectiveFactory
-);

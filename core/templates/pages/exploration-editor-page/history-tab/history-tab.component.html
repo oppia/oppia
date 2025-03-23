@@ -48,18 +48,18 @@
           <em class="e2e-test-history-tab-commit-date">{{ metadata.createdOnMsecsStr }}</em>
         </div>
         <div class="history-table-options e2e-test-history-list-options">
-          <div class="dropdown">
-            <button class="history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
+          <div ngbDropdown class="dropdown">
+            <button ngbDropdownToggle class="history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
               <i class="fa fa-ellipsis-v"></i>
             </button>
-            <div class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
-              <a class="dropdown-item e2e-test-revert-version"
+            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
+              <a ngbDropdownItem class="dropdown-item e2e-test-revert-version"
                  href="#"
                  *ngIf="metadata.versionNumber !== currentVersion && isEditable()"
                  (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
-              <a class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
+              <a ngbDropdownItem class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
                  title="Download exploration as a zip file.">
                 Download
               </a>

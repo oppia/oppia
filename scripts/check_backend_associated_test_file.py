@@ -50,7 +50,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/data/failing_tests.py',
     'core/tests/data/image_constants.py',
     'core/tests/data/unicode_and_str_handler.py',
-    'docker/patched_wsgi_server.py',
     'docker/fix_google_module.py',
 ]
 

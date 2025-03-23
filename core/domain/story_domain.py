@@ -1630,7 +1630,10 @@ class Story:
         title: str,
         description: str,
         corresponding_topic_id: str,
-        url_fragment: str
+        url_fragment: str,
+        meta_tag_content: Optional[str] = '',
+        thumbnail_filename: Optional[str] = None,
+        thumbnail_bg_color: Optional[str] = None
     ) -> Story:
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
@@ -1643,6 +1646,11 @@ class Story:
             corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
             url_fragment: str. The url fragment of the story.
+            meta_tag_content: Optional[str]. The meta tag content of the story.
+            thumbnail_filename: Optional[str]. The filename for the thumbnail 
+                of the story.
+            thumbnail_bg_color: Optional[str]. The background color for the 
+                thumbnail of the story.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -1650,12 +1658,23 @@ class Story:
         # Initial node id for a new story.
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
+        if thumbnail_filename is not None:
+            raw_image = b''
+            with open(
+                f'core/tests/data/{thumbnail_filename}', 'rt',
+                encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                raw_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                thumbnail_filename, feconf.ENTITY_TYPE_STORY, story_id,
+                raw_image, 'thumbnail', False)
         return cls(
-            story_id, title, None, None, None, description,
+            story_id, title, thumbnail_filename,
+            thumbnail_bg_color, None, description,
             feconf.DEFAULT_STORY_NOTES, story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0,
-            url_fragment, '')
+            url_fragment, str(meta_tag_content))
 
     @classmethod
     def _convert_story_contents_v1_dict_to_v2_dict(

@@ -16,7 +16,6 @@
  * @fileoverview Service for getting the rules services of interactions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -139,10 +138,3 @@ export class InteractionRulesRegistryService {
     ) as InteractionRulesService;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InteractionRulesRegistryService',
-    downgradeInjectable(InteractionRulesRegistryService)
-  );

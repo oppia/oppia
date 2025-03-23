@@ -23,6 +23,7 @@ import {showMessage} from '../common/show-message';
 const baseURL = testConstants.URLs.BaseURL;
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
@@ -97,6 +98,22 @@ export class VoiceoverAdmin extends BaseUser {
     await this.goto(editorUrl);
 
     showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dropdownToggleIcon, {
+        visible: true,
+      });
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
+    } catch (error) {
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+    }
   }
 
   /**

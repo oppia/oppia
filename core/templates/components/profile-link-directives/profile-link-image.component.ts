@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {UserService} from 'services/user.service';
 
@@ -57,10 +56,3 @@ export class ProfileLinkImageComponent implements OnInit {
       this.userService.getProfileImageDataUrl(this.username);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'profileLinkImage',
-    downgradeComponent({component: ProfileLinkImageComponent})
-  );

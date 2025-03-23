@@ -42,7 +42,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
 import {ContextService} from 'services/context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -176,10 +175,3 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveVideo',
-  downgradeComponent({
-    component: NoninteractiveVideo,
-  }) as angular.IDirectiveFactory
-);

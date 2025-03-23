@@ -27,6 +27,13 @@ import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-p
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE,
+    loadChildren: () =>
+      import('pages/maintenance-page/maintenance-page.module').then(
+        m => m.MaintenancePageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE,
     loadChildren: () =>
       import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
@@ -45,6 +52,14 @@ const routes: Route[] = [
       import('pages/collection-editor-page/collection-editor-page.module').then(
         m => m.CollectionEditorPageModule
       ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-editor-page/exploration-editor-page.module'
+      ).then(m => m.ExplorationEditorPageModule),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -103,6 +118,13 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRACTICE_SESSION.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
     loadChildren: () =>
       import('pages/email-dashboard-pages/email-dashboard-page.module').then(
@@ -125,6 +147,14 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-editor-page/topic-editor-page.module').then(
+        m => m.TopicEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,

@@ -24,7 +24,6 @@ import {
   SecurityContext,
 } from '@angular/core';
 import {Location} from '@angular/common';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
@@ -612,7 +611,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
       // The initResults function is written separately since it is also
-      // called in this.$on when some external events are triggered.
+      // called in ngOnInit when some external events are triggered.
       this.initResults();
       this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
         this.resultsLoaded
@@ -627,10 +626,3 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.componentSubscription.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionPlayer',
-  downgradeComponent({
-    component: QuestionPlayerComponent,
-  }) as angular.IDirectiveFactory
-);

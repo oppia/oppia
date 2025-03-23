@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {UrlService} from 'services/contextual/url.service';
 import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-subtopic-summary.model';
@@ -251,10 +250,3 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
     return masteryLevel;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerViewAssignedGroupSyllabus',
-    downgradeComponent({component: LearnerGroupViewAssignedSyllabusComponent})
-  );

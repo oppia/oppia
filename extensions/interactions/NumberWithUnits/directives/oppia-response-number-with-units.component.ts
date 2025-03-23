@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
@@ -49,10 +48,3 @@ export class ResponseNumberWithUnitsComponent implements OnInit {
       .toString();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseNumberWithUnits',
-  downgradeComponent({
-    component: ResponseNumberWithUnitsComponent,
-  }) as angular.IDirectiveFactory
-);

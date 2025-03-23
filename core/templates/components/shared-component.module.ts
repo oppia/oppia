@@ -171,6 +171,14 @@ import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
 import {FullExpandAccordionComponent} from 'pages/about-page/accordion/full-expand-accordion.component';
+import {ExplorationSaveModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-save-modal.component';
+import {ConfirmDiscardChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
+import {EditorReloadingModalComponent} from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
+import {ExplorationMetadataModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
+import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
+import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
+import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
+import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -192,9 +200,16 @@ import {DynamicComponentModule} from 'value_generators/templates/dynamic-compone
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.component';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
-import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
+import {RteHelperModalComponent} from 'services/rte-helper-modal.component';
 import {DirectivesModule} from 'directives/directives.module';
-
+import {UrlFragmentEditorComponent} from './url-fragment-editor/url-fragment-editor.component';
+import {PreviewSummaryTileModalComponent} from 'pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component';
+import {LostChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component';
+import {ChangesInHumanReadableFormComponent} from 'pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component';
+import {SaveVersionMismatchModalComponent} from 'pages/exploration-editor-page/modal-templates/save-version-mismatch-modal.component';
+import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import {SaveValidationFailModalComponent} from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component';
+import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -374,6 +389,22 @@ import {DirectivesModule} from 'directives/directives.module';
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
+    ExplorationSaveModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    EditorReloadingModalComponent,
+    ExplorationMetadataModalComponent,
+    ExplorationPublishModalComponent,
+    PostPublishModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
+    PreviewSummaryTileModalComponent,
+    LostChangesModalComponent,
+    ChangesInHumanReadableFormComponent,
+    SaveVersionMismatchModalComponent,
+    ConfirmDeleteStateModalComponent,
+    SaveValidationFailModalComponent,
+    ModifyTranslationsModalComponent,
   ],
 
   entryComponents: [
@@ -512,6 +543,22 @@ import {DirectivesModule} from 'directives/directives.module';
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
+    ExplorationSaveModalComponent,
+    ConfirmDiscardChangesModalComponent,
+    EditorReloadingModalComponent,
+    ExplorationMetadataModalComponent,
+    ExplorationPublishModalComponent,
+    PostPublishModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
+    PreviewSummaryTileModalComponent,
+    LostChangesModalComponent,
+    ChangesInHumanReadableFormComponent,
+    SaveVersionMismatchModalComponent,
+    ConfirmDeleteStateModalComponent,
+    SaveValidationFailModalComponent,
+    ModifyTranslationsModalComponent,
   ],
 
   exports: [
@@ -660,6 +707,9 @@ import {DirectivesModule} from 'directives/directives.module';
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent,
   ],
 })
 export class SharedComponentsModule {}

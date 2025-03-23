@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {JoyrideService} from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
@@ -533,10 +532,3 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationEditorTab',
-  downgradeComponent({
-    component: ExplorationEditorTabComponent,
-  }) as angular.IDirectiveFactory
-);

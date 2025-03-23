@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -38,13 +37,23 @@ export class SideNavigationBarComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() display!: boolean;
 
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      year: '2023',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      year: '2022',
+    },
+  ];
   currentUrl!: string;
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   getinvolvedSubmenuIsShown: boolean = false;
   learnSubmenuIsShown: boolean = true;
   aboutSubmenuIsShown: boolean = false;
+  impactReportSubmenuIsShown: boolean = false;
   userIsLoggedIn!: boolean;
 
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -102,6 +111,10 @@ export class SideNavigationBarComponent {
     this.aboutSubmenuIsShown = !this.aboutSubmenuIsShown;
   }
 
+  toggleImpactReportSubmenu(): void {
+    this.impactReportSubmenuIsShown = !this.impactReportSubmenuIsShown;
+  }
+
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
@@ -131,10 +144,3 @@ export class SideNavigationBarComponent {
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSideNavigationBar',
-  downgradeComponent({
-    component: SideNavigationBarComponent,
-  }) as angular.IDirectiveFactory
-);

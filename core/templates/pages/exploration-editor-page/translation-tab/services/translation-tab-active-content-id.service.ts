@@ -16,7 +16,6 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
@@ -60,10 +59,3 @@ export class TranslationTabActiveContentIdService {
     return this._activeContentIdChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslationTabActiveContentIdService',
-    downgradeInjectable(TranslationTabActiveContentIdService)
-  );

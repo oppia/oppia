@@ -16,7 +16,6 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -352,7 +351,3 @@ export class PlaythroughService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('PlaythroughService', downgradeInjectable(PlaythroughService));

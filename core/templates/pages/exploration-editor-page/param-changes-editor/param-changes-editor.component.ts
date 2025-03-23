@@ -18,7 +18,6 @@
  */
 
 import {Component, Injector, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
@@ -295,10 +294,3 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'paramChangesEditor',
-  downgradeComponent({
-    component: ParamChangesEditorComponent,
-  }) as angular.IDirectiveFactory
-);

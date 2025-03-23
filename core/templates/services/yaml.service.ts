@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import yaml from 'js-yaml';
 
 @Injectable({
@@ -37,7 +37,3 @@ export class YamlService {
     return yaml.load(yamlStringToBeParsed);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('YamlService', downgradeInjectable(YamlService));

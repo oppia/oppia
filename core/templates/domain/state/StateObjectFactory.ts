@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -204,7 +203,3 @@ export class StateObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateObjectFactory', downgradeInjectable(StateObjectFactory));

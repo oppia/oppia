@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
@@ -126,10 +125,3 @@ export class UnresolvedAnswersOverviewComponent implements OnInit {
       AppConstants.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaUnresolvedAnswersOverview',
-  downgradeComponent({
-    component: UnresolvedAnswersOverviewComponent,
-  }) as angular.IDirectiveFactory
-);

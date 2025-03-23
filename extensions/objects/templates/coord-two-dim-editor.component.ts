@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {
   icon,
@@ -117,10 +116,3 @@ export class CoordTwoDimEditorComponent implements OnInit {
     this.updateMarker(this.value[0], this.value[1]);
   }
 }
-
-angular.module('oppia').directive(
-  'coordTwoDimEditor',
-  downgradeComponent({
-    component: CoordTwoDimEditorComponent,
-  })
-);

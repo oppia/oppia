@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 
@@ -310,7 +309,3 @@ export class SvgSanitizerService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SvgSanitizerService', downgradeInjectable(SvgSanitizerService));

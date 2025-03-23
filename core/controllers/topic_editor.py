@@ -201,7 +201,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': [],
+                'all_node_dicts': [node.to_dict() for node in nodes],
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
                 'upcoming_chapters_count': upcoming_chapters_count,
@@ -312,41 +312,6 @@ class TopicEditorStoryHandler(
         self.render_json({
             'storyId': new_story_id
         })
-
-
-class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single topic."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'topic_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
-        """Displays the topic editor page.
-
-        Args:
-            topic_id: str. The ID of the topic.
-
-        Raises:
-            Exception. The topic with the given id doesn't exist.
-        """
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-
-        if topic is None:
-            raise self.NotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
-        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(

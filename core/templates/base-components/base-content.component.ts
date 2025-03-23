@@ -17,7 +17,6 @@
  */
 
 import {ChangeDetectorRef, Component, Directive} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {CookieService} from 'ngx-cookie';
 import {Subscription} from 'rxjs';
@@ -219,10 +218,3 @@ export class BaseContentNavBarPreLogoActionDirective {}
   selector: 'page-footer',
 })
 export class BaseContentPageFooterDirective {}
-
-angular.module('oppia').directive(
-  'oppiaBaseContent',
-  downgradeComponent({
-    component: BaseContentComponent,
-  }) as angular.IDirectiveFactory
-);

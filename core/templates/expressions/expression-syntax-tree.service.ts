@@ -16,7 +16,6 @@
  * @fileoverview Expression syntax tree service.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ExpressionParserService} from 'expressions/expression-parser.service';
@@ -332,10 +331,3 @@ export class ExpressionSyntaxTreeService {
     },
   };
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionSyntaxTreeService',
-    downgradeInjectable(ExpressionSyntaxTreeService)
-  );

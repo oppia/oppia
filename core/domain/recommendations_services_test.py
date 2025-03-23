@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.domain import exp_services
 from core.domain import recommendations_services
@@ -296,6 +298,41 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             recommendations_services.get_item_similarity(
                 exp_summaries['exp_id_1'], exp_summaries['exp_id_2']),
             0.0
+        )
+
+    def test_get_item_similarity_when_language_code_differs(self) -> None:
+        exp_summaries = exp_services.get_all_exploration_summaries()
+        exp_summaries['exp_id_1'].language_code = 'en'
+        exp_summaries['exp_id_2'].language_code = 'es'
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'],
+                exp_summaries['exp_id_2']),
+                2.5
+        )
+
+    def test_get_item_similarity_when_owner_ids_differs(self) -> None:
+        exp_summaries = exp_services.get_all_exploration_summaries()
+        exp_summaries['exp_id_1'].owner_ids = ['owner_id_1']
+        exp_summaries['exp_id_2'].owner_ids = ['owner_id_2']
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'],
+                exp_summaries['exp_id_2']),
+                3.5
+        )
+
+    def test_get_item_similarity_when_time_delta_is_greater_than_7_days(
+        self) -> None:
+        exp_summaries = exp_services.get_all_exploration_summaries()
+        # Test case where time_delta_days > 7.
+        time_in_past = datetime.datetime.utcnow() - datetime.timedelta(days=10)
+        exp_summaries['exp_id_2'].exploration_model_last_updated = time_in_past
+        self.assertEqual(
+            recommendations_services.get_item_similarity(
+                exp_summaries['exp_id_1'],
+                exp_summaries['exp_id_2']),
+                3.5
         )
 
     def test_get_and_set_exploration_recommendations(self) -> None:

@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -307,10 +306,3 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateTranslationEditor',
-  downgradeComponent({
-    component: StateTranslationEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
@@ -315,6 +314,23 @@ export class NumberWithUnitsObjectFactory {
     }
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
+    var duplicatedUnit = this.unitsFactory.getDuplicatedUnit(units);
+
+    var correctedFormats = this.unitsFactory.getCorrectedFormat(unitsObj);
+
+    var containMultipleSlashes = this.unitsFactory.hasMultipleSlashes(units);
+
+    if (duplicatedUnit) {
+      throw new Error(
+        `Your answer has a repeated unit: "${duplicatedUnit}". Try rewriting it as "${correctedFormats}".`
+      );
+    }
+
+    if (containMultipleSlashes) {
+      throw new Error(
+        `Your answer contains more than one slash ("/"). Try rewriting it as "${correctedFormats}".`
+      );
+    }
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
@@ -327,10 +343,3 @@ export class NumberWithUnitsObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsObjectFactory',
-    downgradeInjectable(NumberWithUnitsObjectFactory)
-  );

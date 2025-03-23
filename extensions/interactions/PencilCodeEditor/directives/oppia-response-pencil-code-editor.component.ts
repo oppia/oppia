@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -47,10 +46,3 @@ export class ResponePencilCodeEditor implements OnInit {
     ).code;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponsePencilCodeEditor',
-  downgradeComponent({
-    component: ResponePencilCodeEditor,
-  }) as angular.IDirectiveFactory
-);

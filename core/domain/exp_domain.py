@@ -42,8 +42,8 @@ from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence, Set,
-    Tuple, TypedDict, Union, cast, overload)
+    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence,
+    Set, Tuple, TypedDict, Union, cast, overload)
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -5760,6 +5760,43 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return json.dumps(exploration_dict)
 
     @classmethod
+    # Here we use type Any because data retrieve from cache may be older version
+    # of state dict so field can be anything.
+    def migrate_state_schema(
+        cls,
+        exploration_dict: Dict[str, Any]
+    ) -> ExplorationDict:
+        """Migrates the state schema of the exploration to the latest version.
+
+        Args:
+            exploration_dict: dict. The exploration data as a dictionary.
+
+        Returns:
+            ExplorationDict. The migrated exploration dictionary.
+        """
+        current_dict_states_schema_version = (
+            exploration_dict['states_schema_version'])
+        target_schema_version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        while current_dict_states_schema_version < target_schema_version:
+            versioned_states = VersionedExplorationStatesDict(
+                states_schema_version=current_dict_states_schema_version,
+                states=exploration_dict['states']
+            )
+            cls.update_states_from_model(
+                versioned_states,
+                current_dict_states_schema_version,
+                exploration_dict['init_state_name'],
+                exploration_dict['language_code']
+            )
+            current_dict_states_schema_version += 1
+            exploration_dict['states_schema_version'] = (
+                current_dict_states_schema_version)
+        # Here we use MyPy ignore because exploration_dict have to be
+        # ExplorationDict type.
+        exp_dict: ExplorationDict = exploration_dict # type: ignore[assignment]
+        return exp_dict
+
+    @classmethod
     def deserialize(cls, json_string: str) -> Exploration:
         """Returns an Exploration domain object decoded from a JSON string.
 
@@ -5772,6 +5809,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             Exploration. The corresponding Exploration domain object.
         """
         exploration_dict = json.loads(json_string)
+        exploration_dict = cls.migrate_state_schema(exploration_dict)
         created_on = (
             utils.convert_string_to_naive_datetime_object(
                 exploration_dict['created_on'])

@@ -16,7 +16,6 @@
  * @fileoverview Search service for Blog Posts.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {
@@ -239,7 +238,3 @@ export class BlogPostSearchService {
     return this._lastSelectedTags;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BlogPostSearchService', downgradeInjectable(BlogPostSearchService));

@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface StarDict {
   cssClass: string;
@@ -105,10 +104,3 @@ export class RatingDisplayComponent {
     this.displayValue(this.ratingValue);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRatingDisplay',
-  downgradeComponent({
-    component: RatingDisplayComponent,
-  }) as angular.IDirectiveFactory
-);

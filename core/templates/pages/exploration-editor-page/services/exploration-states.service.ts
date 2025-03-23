@@ -18,7 +18,6 @@
  * keeps no mementos.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -623,6 +622,10 @@ export class ExplorationStatesService {
     return count;
   }
 
+  isNewStateNameDuplicate(newStateName: string): boolean {
+    return this._states.hasState(newStateName);
+  }
+
   isNewStateNameValid(newStateName: string, showWarnings: boolean): boolean {
     if (this._states.hasState(newStateName)) {
       if (showWarnings) {
@@ -959,10 +962,3 @@ export class ExplorationStatesService {
     return this._refreshGraphEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationStatesService',
-    downgradeInjectable(ExplorationStatesService)
-  );
