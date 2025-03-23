@@ -570,7 +570,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected nested dict to be Dictionary'
+            'Expected nested dict to be dict'
         ):
             exp_voice_artists_link.validate()
 
@@ -598,7 +598,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected language to be string recieved: %s' % 123
+            'Expected language to be string, recieved: %s' % 123
         ):
             exp_voice_artists_link.validate()
 
@@ -623,8 +623,9 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected language code to be one from supported audio languages'
-            ' recieved: %s' % 'en-US'
+            'Expected language code to be in '
+            'supported audio languages, recieved: %s'
+            % 'en-US'
         ):
             exp_voice_artists_link.validate()
 
@@ -651,7 +652,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             )
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected artist id to be string'
+            'Expected artist id to be string, recieved: %s' % 123
         ):
             exp_voice_artists_link.validate()
 
@@ -696,7 +697,7 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
             )
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected voiceover_dict to be dict recieved: %s'
+            'Expected voiceover_dict to be a dict, recieved: %s'
             % 'not_a_dict'
         ):
             exp_voice_artists_link.validate()

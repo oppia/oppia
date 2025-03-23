@@ -587,7 +587,7 @@ def get_voice_artist_metadata_mapping() -> Dict[str, Dict[str, str]]:
     }
 
 
-def get_exploration_voice_artist_links() -> (
+def get_exploration_voice_artists_links() -> (
         List[voiceover_domain.ExplorationVoiceArtistsLink]):
     """Gets all exploration voice artist links as domain objects.
 
@@ -605,6 +605,36 @@ def get_exploration_voice_artist_links() -> (
                 model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
     ]
+
+
+def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
+    """The method returns a dict with all voice artist IDs as keys and nested
+    dicts as values. Each nested dict contains language codes as keys and
+    language accent codes as values.
+
+    Returns:
+        dict(str, dict(str, str)). A dict representing voice artist IDs to
+        language mappings.
+    """
+    voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = (
+        get_voice_artist_metadata_mapping())
+    exp_voice_artist_link: (
+        List[voiceover_domain.ExplorationVoiceArtistsLink]) = (
+        get_exploration_voice_artists_links()
+    )
+
+    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
+    for link in exp_voice_artist_link:
+        link_mappings = link.get_voice_artist_language_mappings(
+            voice_artist_id_to_language_mapping)
+
+        for voice_artist_id, language_mapping in link_mappings.items():
+            if voice_artist_id not in all_voice_artist_to_language_mapping:
+                all_voice_artist_to_language_mapping[voice_artist_id] = {}
+            all_voice_artist_to_language_mapping[voice_artist_id].update(
+                language_mapping)
+
+    return all_voice_artist_to_language_mapping
 
 
 def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:

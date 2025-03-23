@@ -393,7 +393,7 @@ class ExplorationVoiceArtistsLink:
                 'But recieved: %s' % self.content_id_to_voiceovers_mapping
             )
         for content_id, nested_dict in (
-        self.content_id_to_voiceovers_mapping.items()):
+            self.content_id_to_voiceovers_mapping.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
                     'Expected content id to be string, recieved: %s.'
@@ -403,26 +403,26 @@ class ExplorationVoiceArtistsLink:
                 raise utils.ValidationError('Content ID should not be empty.')
             if not isinstance(nested_dict, dict):
                 raise utils.ValidationError(
-                    'Expected nested dict to be Dictionary, recieved: %s.'
+                    'Expected nested dict to be dict, recieved: %s.'
                     % nested_dict
                 )
             for language_code, (artist_id, voiceover_dict) in (
-            nested_dict.items()):
+                nested_dict.items()):
                 if not isinstance(language_code, str):
                     raise utils.ValidationError(
-                        'Expected language to be string recieved: %s'
+                        'Expected language to be string, recieved: %s'
                         % language_code
                     )
                 if not (
                     utils.is_supported_audio_language_code(language_code)):
                     raise utils.ValidationError(
-                        'Expected language code to be one from '
-                        'supported audio languages recieved: %s'
+                        'Expected language code to be in '
+                        'supported audio languages, recieved: %s'
                         % language_code
                     )
                 if not isinstance(artist_id, str):
                     raise utils.ValidationError(
-                        'Expected artist id to be string recieved: %s'
+                        'Expected artist id to be string, recieved: %s'
                         % artist_id
                     )
                 if not artist_id:
@@ -430,7 +430,7 @@ class ExplorationVoiceArtistsLink:
                         'Artist ID should not be empty.')
                 if not isinstance(voiceover_dict, dict):
                     raise utils.ValidationError(
-                        'Expected voiceover_dict to be dict '
+                        'Expected voiceover_dict to be a dict, '
                         'recieved: %s' % voiceover_dict
                     )
                 expected_keys = {
@@ -472,10 +472,10 @@ class ExplorationVoiceArtistsLink:
         """
         result: Dict[str, Dict[str, str]] = {}
         for lang_voiceover_mapping_tuple in (
-        self.content_id_to_voiceovers_mapping.values()):
+            self.content_id_to_voiceovers_mapping.values()):
 
             for lang_code, voiceover_tuple in (
-            lang_voiceover_mapping_tuple.items()):
+                lang_voiceover_mapping_tuple.items()):
 
                 voice_artist_id = voiceover_tuple[0]
                 accent_type = ''
