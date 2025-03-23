@@ -20,7 +20,6 @@ Topic Summary models in the datastore."""
 from __future__ import annotations
 
 from core.jobs import base_jobs
-from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property

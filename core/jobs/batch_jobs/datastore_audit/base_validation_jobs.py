@@ -33,6 +33,7 @@ from typing import Callable, Dict, Iterator, List
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models
+    from mypy_imports import datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -48,8 +49,8 @@ class BaseValidationJob(base_jobs.JobBase):
         """Runs the validation job.
 
         Returns:
-            PCollection. A PCollection of dictionaries, where keys are error types
-            and values are lists of truncated model IDs.
+            PCollection. A PCollection of dictionaries, where keys are error
+            types and values are lists of truncated model IDs.
         """
         all_models = (
             self.pipeline
@@ -65,15 +66,15 @@ class BaseValidationJob(base_jobs.JobBase):
         # This is important for the following reasons:
         # 1) To improve readability: it makes the error reports more organized
         # and easier to understand by grouping similar errors together.
-        # 2) For efficient analysis: Grouping allows for easier analysis and 
-        # troubleshooting. You can quickly identify the different groups of errors
-        # and focus on addressing each group. 
-        # 3) To prevent truncation issues: Grouping errors by type helps prevent 
-        # situations where certain error types are hidden due to truncation 
-        # limits in logging systems. By grouping, we can ensure that a 
+        # 2) For efficient analysis: Grouping allows for easier analysis and
+        # troubleshooting. You can quickly identify the different groups of
+        # errors and focus on addressing each group. 
+        # 3) To prevent truncation issues: Grouping errors by type helps prevent
+        # situations where certain error types are hidden due to truncation
+        # limits in logging systems. By grouping, we can ensure that a
         # representative sample of each error type is visible in the initial
         # set of logs, even if the total number of errors for a particular
-        # type exceeds the truncation limit. 
+        # type exceeds the truncation limit.
         return results | 'Group Errors by Type' >> beam.GroupBy(
             lambda error: type(error).__name__
         ) | 'Extract Error Messages' >> beam.Map(
@@ -82,7 +83,7 @@ class BaseValidationJob(base_jobs.JobBase):
                     :ERROR_TRUNCATION_LIMIT]
             }
         )
-    
+
     def get_validation_fns(self) -> List[
         Callable[
             [base_models.BaseModel],
@@ -91,9 +92,9 @@ class BaseValidationJob(base_jobs.JobBase):
         """Dynamically discovers and returns a list of all validation functions
         within the class.
 
-        This method inspects the class's methods and identifies those whose names
-        begin with 'validate_'. These methods are assumed to be validation functions
-        that take a BaseModel and yield JobRunResult objects.
+        This method inspects the class's methods and identifies those whose
+        names begin with 'validate_'. These methods are assumed to be validation
+        functions that take a BaseModel and yield JobRunResult objects.
 
         Returns:
             List. A list of callable validation functions.
@@ -103,7 +104,7 @@ class BaseValidationJob(base_jobs.JobBase):
             if name.startswith('validate_'):
                 validation_fns.append(method)
         return validation_fns
-    
+
     def validate_created_on_less_than_last_updated(
         self, model: base_models.BaseModel) -> Iterator[
             job_run_result.JobRunResult]:
@@ -111,7 +112,7 @@ class BaseValidationJob(base_jobs.JobBase):
         its last_updated time.
 
         Args:
-            model: The model to validate.
+            model: datastore_services.Model. The model to validate.
 
         Yields:
             JobRunResult. The result of the validation (if any error is found).
@@ -121,9 +122,20 @@ class BaseValidationJob(base_jobs.JobBase):
             yield base_validation_errors.InconsistentTimestampsError(model)
 
 
-class ApplyAllValidations(beam.DoFn):
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
+class ApplyAllValidations(beam.DoFn):  # type: ignore[misc]
     """A PTransform to apply all validation functions to a single model."""
-    def __init__(self, validation_functions):
+
+    def __init__(
+        self, validation_functions: List[
+            Callable[
+                [base_models.BaseModel],
+                Iterator[job_run_result.JobRunResult]
+            ]]
+        ):
         super().__init__()
         self._validation_functions = validation_functions
 

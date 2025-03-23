@@ -117,7 +117,7 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
         class ErrorWithEmptyMessage(base_validation_errors.BaseValidationError):
             """Subclass that tries to assign an empty value to self.stderr."""
 
-            def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
+            def __init__(self, model: base_models.BaseModel) -> None:
                 super().__init__('', model)
 
         with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):

@@ -25,7 +25,7 @@ from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
-from typing import Type, Iterator
+from typing import Iterator, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -51,7 +51,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
     JOB_CLASS: Type[MockChildValidationJob] = MockChildValidationJob
 
     def test_run_with_datetime_error(self) -> None:
-        now = datetime.datetime.now()    
+        now = datetime.datetime.now()
 
         model = self.create_model(
             base_models.BaseModel,
