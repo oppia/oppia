@@ -26,7 +26,7 @@ from core.jobs.types import job_run_result
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Mapping, Optional, Union
+from typing import Mapping, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -54,10 +54,10 @@ class BaseValidationError(job_run_result.JobRunResult):
 
         if not message:
             raise ValueError('message must be a non-empty string')
-        
+
         model_id = job_utils.get_model_id(model)
         if not model_id:
-            model_id = "missing model Id"
+            model_id = 'missing model Id'
 
         error_message = '%s in %s(id=%s): %s' % (
             self.__class__.__name__,
@@ -175,7 +175,7 @@ class ModelRelationshipError(BaseValidationError):
         Args:
             id_property: ModelProperty. The property referring to the ID of the
                 target model.
-            model. The the model with problematic ID property.
+            model: base_model.BaseModel. The the model with problematic ID property.
             target_kind: str. The kind of model the property refers to.
             target_id: str. The ID of the specific model that the property
                 refers to. NOTE: This is the value of the ID property.
