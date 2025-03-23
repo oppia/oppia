@@ -1757,6 +1757,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
             response,
             {'topic_names': []}
         )
+
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
             topic_id, 'topic', 'abbrev', 'description', 'fragm')
