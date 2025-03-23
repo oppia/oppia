@@ -77,6 +77,7 @@ export class InteractiveMathEquationInput implements OnInit {
         this.guppyInitializationService.getAllowedVariables()
       );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
@@ -101,6 +102,11 @@ export class InteractiveMathEquationInput implements OnInit {
       this.hasBeenTouched = true;
       this.value = activeGuppyObject.guppyInstance.asciimath();
       this.currentInteractionService.updateCurrentAnswer(this.value);
+      let answerIsValid = this.mathInteractionsService.validateEquation(
+        this.value,
+        this.guppyInitializationService.getAllowedVariables()
+      );
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
     }
 
     if (!focusObj.focused) {
