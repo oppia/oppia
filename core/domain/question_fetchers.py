@@ -203,27 +203,6 @@ def migrate_state_schema(
     return next_content_id_index
 
 
-def get_multiple_questions_by_ids_and_version(
-    question_ids_and_versions: List[Tuple[str, Optional[int]]]
-) -> List[Optional[question_domain.Question]]:
-    """Returns a list of domain objects representing questions.
-
-    Args:
-        question_ids_and_versions: list(tuple(str, int|None)). List of
-            question ids and versions.
-
-    Returns:
-        list(Question|None). A list of domain objects representing questions
-        with the given ids or None when the id is not valid.
-    """
-    question_model_list = question_models.QuestionModel.get_version_multi(
-        question_ids_and_versions)
-    return [
-        get_question_from_model(model) if model is not None else None
-        for model in question_model_list
-    ]
-
-
 def get_all_questions(
     offset: int = 0,
     question_count: int = constants.MAX_QUESTIONS_FETCHABLE
