@@ -368,7 +368,7 @@ def set_exploration_recommendations(
             containing the ID of the exploration for which to set the 
             recommendations and the new recommended exploration IDs to set.
     """
-
+    exploration_recommendations.validate()
     recommendations_models.ExplorationRecommendationsModel(
         id=exploration_recommendations.exp_id,
         recommended_exploration_ids=(

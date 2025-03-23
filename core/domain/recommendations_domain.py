@@ -44,13 +44,13 @@ class ExplorationRecommendations:
 
     def validate(self) -> None:
         """Validates the ExplorationRecommendations object."""
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s'
-                % self.exp_id)
         if not self.exp_id:
             raise utils.ValidationError(
                 'Expected exp_id to be non-empty, received %s'
+                % self.exp_id)
+        if not isinstance(self.exp_id, str):
+            raise utils.ValidationError(
+                'Expected exp_id to be a string, received %s'
                 % self.exp_id)
         if not isinstance(self.recommended_exploration_ids, list):
             raise utils.ValidationError(
@@ -62,13 +62,13 @@ class ExplorationRecommendations:
             counts[recommended_exploration_id] = (
                 counts.get(recommended_exploration_id, 0) + 1)
 
-            if not isinstance(recommended_exploration_id, str):
-                raise utils.ValidationError(
-                    'Expected recommended_exploration_id to be a string, '
-                    'received %s' % recommended_exploration_id)
             if not recommended_exploration_id:
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be non-empty, '
+                    'received %s' % recommended_exploration_id)
+            if not isinstance(recommended_exploration_id, str):
+                raise utils.ValidationError(
+                    'Expected recommended_exploration_id to be a string, '
                     'received %s' % recommended_exploration_id)
 
         if any(count > 1 for count in counts.values()):
