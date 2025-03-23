@@ -9,14 +9,8 @@ body:
 - type: checkboxes
   id: sharing
   attributes:
-    label: I confirm that I've given edit access to the doc to the dev mailing lists, as described in the instructions at the top of the doc.
     options:
-        - label: "Yes"
-          required: true
-- type: checkboxes
-  id: sharing
-  attributes:
-    label: I confirm that I set the sharing options of the doc to "anyone with the link can comment".
-    options:
-        - label: "Yes"
-          required: true
+    - label: "I confirm that I've given edit access to the doc to the dev mailing lists, as described in the instructions at the top of the doc."
+      required: true
+    - label: "I confirm that I set the sharing options of the doc to 'anyone with the link can comment'."
+      required: true
