@@ -28,8 +28,6 @@ from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils as core_test_utils
 
-from typing import Union
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
