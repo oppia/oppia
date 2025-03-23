@@ -39,8 +39,12 @@ class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
         language_accent_master_list: Dict[str, Dict[str, str]] = (
             voiceover_services.get_language_accent_master_list())
 
+        voiceover_autogeneration_policy = (
+            voiceover_services.get_voiceover_autogeneration_policy()
+        )
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_autogeneration_policy.language_codes_mapping
+            if voiceover_autogeneration_policy else {})
 
         json_response = self.get_json(feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL)
 
@@ -65,8 +69,12 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
         self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        voiceover_autogeneration_policy = (
+            voiceover_services.get_voiceover_autogeneration_policy()
+        )
         initial_language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_autogeneration_policy.language_codes_mapping
+            if voiceover_autogeneration_policy else {})
         self.assertDictEqual(
             initial_language_codes_mapping, {})
         expected_language_codes_mapping = {
@@ -85,8 +93,12 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
             feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
             payload, csrf_token=csrf_token)
 
+        voiceover_autogeneration_policy = (
+            voiceover_services.get_voiceover_autogeneration_policy()
+        )
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_autogeneration_policy.language_codes_mapping
+            if voiceover_autogeneration_policy else {})
         self.assertDictEqual(
             language_codes_mapping, expected_language_codes_mapping)
 

@@ -41,8 +41,12 @@ class VoiceoverAdminDataHandler(
         language_accent_master_list: Dict[str, Dict[str, str]] = (
             voiceover_services.get_language_accent_master_list())
 
+        voiceover_autogeneration_policy = (
+            voiceover_services.get_voiceover_autogeneration_policy()
+        )
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_autogeneration_policy.language_codes_mapping
+            if voiceover_autogeneration_policy else {})
 
         autogeneratable_language_accent_codes = (
             voiceover_services.get_autogeneratable_language_accent_codes())
