@@ -229,4 +229,30 @@ describe('Current Interaction Service', () => {
 
     expect(currentInteractionService.showNoResponseError()).toBeTrue();
   });
+  it('should update answer validity using updateAnswerIsValid', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'updateAnswerIsValid');
+
+    currentInteractionService.updateAnswerIsValid(true);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(true);
+
+    currentInteractionService.updateAnswerIsValid(false);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(false);
+  });
+
+  it('should check invalid response error visibility', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'showInvalidResponseError').and.returnValues(
+      true,
+      false
+    );
+
+    expect(currentInteractionService.showInvalidResponseError()).toBeTrue();
+    expect(currentInteractionService.showInvalidResponseError()).toBeFalse();
+    expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
+  });
 });
