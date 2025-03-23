@@ -40,6 +40,7 @@ import {TopicsAndSkillsDashboardPageRootComponent} from './topics-and-skills-das
 import {TopicsAndSkillsDashboardAuthGuard} from './topics-and-skills-dashboard-auth.guard';
 import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
 import {CreateNewSkillModalService} from 'pages/topic-editor-page/services/create-new-skill-modal.service';
+import {RteHelperService} from 'services/rte-helper.service';
 
 @NgModule({
   imports: [
@@ -84,6 +85,10 @@ import {CreateNewSkillModalService} from 'pages/topic-editor-page/services/creat
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent,
   ],
-  providers: [TopicCreationService, CreateNewSkillModalService],
+  providers: [
+    TopicCreationService,
+    CreateNewSkillModalService,
+    RteHelperService,
+  ],
 })
 export class TopicsAndSkillsDashboardPageModule {}
