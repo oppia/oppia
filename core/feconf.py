@@ -526,7 +526,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.4.4'
+OPPIA_VERSION = '3.4.5'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1046,6 +1046,8 @@ VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
 VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover/<exploration_id>')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
