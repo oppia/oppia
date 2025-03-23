@@ -24,7 +24,7 @@ import {
   ElementRef,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
@@ -166,7 +166,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   isUndoFeatureEnabled: boolean = false;
   @Input() altTextIsDisplayed: boolean = false;
-  @Output() queuedSuggestionSummaryEmit = new EventEmitter<PendingSuggestionDict>();
+  @Output() queuedSuggestionSummaryEmit =
+    new EventEmitter<PendingSuggestionDict>();
   @Output() queuedSuggestionEmit = new EventEmitter<PendingSuggestionDict>();
 
   @ViewChild('contentPanel')
@@ -463,7 +464,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.allContributions[this.queuedSuggestion?.suggestion_id];
         delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
-        this.queuedSuggestionEmit.emit(this.queuedSuggestion)
+        this.queuedSuggestionEmit.emit(this.queuedSuggestion);
         // this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
 
         // If the reviewed item was the last item, close the modal.
@@ -509,12 +510,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
       };
-      console.log('Emitting QueuedSuggestionSummary ID - ', this.queuedSuggestion.suggestion_id)
-      this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
+      console.log(
+        'Emitting QueuedSuggestionSummary ID - ',
+        this.queuedSuggestion.suggestion_id
+      );
+      this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
 
       this.resolveSuggestionAndUpdateModal();
-    }
-    else {
+    } else {
       this.finalCommitMessage = this.generateCommitMessage();
       const reviewMessageForSubmitter =
         this.reviewMessage +
@@ -564,7 +567,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           action_status: AppConstants.ACTION_REJECT_SUGGESTION,
           reviewer_message: reviewMessage || this.reviewMessage,
         };
-        this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
+        this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
         this.resolveSuggestionAndUpdateModal();
       }
     } else {

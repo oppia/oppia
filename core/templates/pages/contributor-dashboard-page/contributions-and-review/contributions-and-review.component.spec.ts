@@ -2577,13 +2577,16 @@ describe('Contributions and review component', () => {
         },
         result: Promise.resolve(['id1', 'id2']),
       } as NgbModalRef);
-    
-      const removeSpy = spyOn(contributionOpportunitiesService.removeOpportunitiesEventEmitter, 'emit').and.returnValue(null);
-      const commitTimeoutSpy = spyOn(component, 'startCommitTimeout')
-      const undoSnackbarSpy = spyOn(component, 'showUndoSnackbar')
+
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
+      const commitTimeoutSpy = spyOn(component, 'startCommitTimeout');
+      const undoSnackbarSpy = spyOn(component, 'showUndoSnackbar');
       // Set initial state
       component.contributions = {
-        'suggestion_1': {
+        suggestion_1: {
           suggestion: {
             suggestion_id: 'suggestion_1',
             target_id: '1',
@@ -2603,27 +2606,27 @@ describe('Contributions and review component', () => {
           },
         },
       };
-    
+
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
-        reviewer_message: 'test'
+        reviewer_message: 'test',
       };
-    
+
       // Simulate opening the modal and the user actions
       component.onClickViewSuggestion('suggestion_1');
       tick(); // simulate any asynchronous effects of opening the view
-    
+
       // Now emit a new queued suggestion which should trigger the subscription logic
       eventEmitter.emit({
         target_id: 'id_1',
         suggestion_id: 'suggestion_2',
         action_status: 'accepted',
-        reviewer_message: 'test'
+        reviewer_message: 'test',
       });
       tick(); // Process the emitted event and any side effects
-      
+
       expect(commitTimeoutSpy).toHaveBeenCalled();
       expect(undoSnackbarSpy).toHaveBeenCalled();
       expect(removeSpy).toHaveBeenCalled();
@@ -2636,132 +2639,131 @@ describe('Contributions and review component', () => {
         target_id: 'id_1',
         suggestion_id: 'suggestion_1',
         action_status: 'accepted',
-        reviewer_message: 'test'
+        reviewer_message: 'test',
       };
 
-      component.startCommitTimeout()
+      component.startCommitTimeout();
       expect(component.commitQueuedSuggestion).not.toHaveBeenCalled();
 
-      tick(COMMIT_TIMEOUT_DURATION)
+      tick(COMMIT_TIMEOUT_DURATION);
       expect(component.commitQueuedSuggestion).toHaveBeenCalled();
     }));
 
-    it(
-      'should commit the queued Suggestion when commit function is called',
-      function () {
-        component.queuedSuggestionSummary = {
-          target_id: 'id_1',
-          suggestion_id: 'suggestion_1',
-          action_status: 'accepted',
-          reviewer_message: 'test'
-        };
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        component.contributions = {}
-        spyOn(alertsService, 'addSuccessMessage');
-        spyOn(alertsService, 'clearMessages');
-        const removeSpy = spyOn(contributionOpportunitiesService.removeOpportunitiesEventEmitter, 'emit').and.returnValue(null);
+    it('should commit the queued Suggestion when commit function is called', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'id_1',
+        suggestion_id: 'suggestion_1',
+        action_status: 'accepted',
+        reviewer_message: 'test',
+      };
+      spyOn(
+        contributionAndReviewService,
+        'reviewExplorationSuggestion'
+      ).and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          reviewMessage,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          return Promise.resolve(successCallback(suggestionId));
+        }
+      );
+      component.contributions = {};
+      spyOn(alertsService, 'addSuccessMessage');
+      spyOn(alertsService, 'clearMessages');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
 
-        component.commitQueuedSuggestion();
-        expect(component.queuedSuggestionSummary).toBeNull()
-        expect(removeSpy).toHaveBeenCalled()
-      }
-    );
+      component.commitQueuedSuggestion();
+      expect(component.queuedSuggestionSummary).toBeNull();
+      expect(removeSpy).toHaveBeenCalled();
+    });
 
-    it(
-      'should not commit the queued Suggestion when there is no queued Suggestion',
-      function () {
-        component.queuedSuggestionSummary = null
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        component.contributions = {}
-        spyOn(alertsService, 'addSuccessMessage');
-        spyOn(alertsService, 'clearMessages');
-        const removeSpy = spyOn(contributionOpportunitiesService.removeOpportunitiesEventEmitter, 'emit').and.returnValue(null);
+    it('should not commit the queued Suggestion when there is no queued Suggestion', function () {
+      component.queuedSuggestionSummary = null;
+      spyOn(
+        contributionAndReviewService,
+        'reviewExplorationSuggestion'
+      ).and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          reviewMessage,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          return Promise.resolve(successCallback(suggestionId));
+        }
+      );
+      component.contributions = {};
+      spyOn(alertsService, 'addSuccessMessage');
+      spyOn(alertsService, 'clearMessages');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
 
-        component.commitQueuedSuggestion();
-        expect(contributionAndReviewService.reviewExplorationSuggestion).not.toHaveBeenCalled();
-      }
-    );
+      component.commitQueuedSuggestion();
+      expect(
+        contributionAndReviewService.reviewExplorationSuggestion
+      ).not.toHaveBeenCalled();
+    });
 
-    it(
-      'should not call remove suggestion emitter if network call fails',
-      function () {
-        component.queuedSuggestionSummary = {
-          target_id: 'id_1',
-          suggestion_id: 'suggestion_1',
-          action_status: 'accepted',
-          reviewer_message: 'test'
-        };
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.reject(errorCallback(suggestionId));
-          }
-        );
-        component.contributions = {}
-        spyOn(alertsService, 'addWarning');
-        spyOn(alertsService, 'clearWarnings');
-        const removeSpy = spyOn(contributionOpportunitiesService.removeOpportunitiesEventEmitter, 'emit').and.returnValue(null);
+    it('should not call remove suggestion emitter if network call fails', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'id_1',
+        suggestion_id: 'suggestion_1',
+        action_status: 'accepted',
+        reviewer_message: 'test',
+      };
+      spyOn(
+        contributionAndReviewService,
+        'reviewExplorationSuggestion'
+      ).and.callFake(
+        (
+          targetId,
+          suggestionId,
+          action,
+          reviewMessage,
+          commitMessage,
+          successCallback,
+          errorCallback
+        ) => {
+          return Promise.reject(errorCallback(suggestionId));
+        }
+      );
+      component.contributions = {};
+      spyOn(alertsService, 'addWarning');
+      spyOn(alertsService, 'clearWarnings');
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit'
+      ).and.returnValue(null);
 
-        component.commitQueuedSuggestion();
-        expect(component.queuedSuggestionSummary).toBeNull()
-        expect(removeSpy).not.toHaveBeenCalled()
-      }
-    );
+      component.commitQueuedSuggestion();
+      expect(component.queuedSuggestionSummary).toBeNull();
+      expect(removeSpy).not.toHaveBeenCalled();
+    });
 
-    it(
-      'should not call remove suggestion emitter if network call fails',
-      function () {
-        component.queuedSuggestionSummary = {
-          target_id: 'id_1',
-          suggestion_id: 'suggestion_1',
-          action_status: 'accepted',
-          reviewer_message: 'test'
-        };
+    it('should not call remove suggestion emitter if network call fails', function () {
+      component.queuedSuggestionSummary = {
+        target_id: 'id_1',
+        suggestion_id: 'suggestion_1',
+        action_status: 'accepted',
+        reviewer_message: 'test',
+      };
 
-        component.undoReviewAction();
-        expect(component.queuedSuggestionSummary).toBeNull()
-      }
-    );
+      component.undoReviewAction();
+      expect(component.queuedSuggestionSummary).toBeNull();
+    });
 
     it('should show the pop up bar when suggestion is queued', () => {
       spyOn(component, 'commitQueuedSuggestion').and.callThrough();

@@ -584,41 +584,49 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
-      component.ngOnInit()
-      spyOn(component, 'generateCommitMessage').and.returnValue('Generated Commit Message');
+      component.ngOnInit();
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
       // spyOn(component, 'resolveSuggestionAndUpdateModal');
-      const queuedSuggestionSpy = spyOn(component.queuedSuggestionSummaryEmit, 'emit');
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
 
       component.queuedSuggestion = {
         suggestion_id: 'suggestion_2',
         target_id: '2',
         action_status: 'ACCEPTED',
-        reviewer_message: ''
-      }
+        reviewer_message: '',
+      };
 
       component.acceptAndReviewNext();
       expect(queuedSuggestionSpy).toHaveBeenCalled();
-    })
+    });
 
     it('should emit queuedSuggestion Emit when suggestions are rejected', () => {
-      component.ngOnInit()
-      spyOn(component, 'generateCommitMessage').and.returnValue('Generated Commit Message');
+      component.ngOnInit();
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
       // spyOn(component, 'resolveSuggestionAndUpdateModal');
-      const queuedSuggestionSpy = spyOn(component.queuedSuggestionSummaryEmit, 'emit');
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
 
       component.queuedSuggestion = {
         suggestion_id: 'suggestion_2',
         target_id: '2',
         action_status: 'REJECTED',
-        reviewer_message: ''
-      }
+        reviewer_message: '',
+      };
       component.lastSuggestionToReview = true;
 
-      component.rejectAndReviewNext('')
-      expect(queuedSuggestionSpy).toHaveBeenCalled()
-    })
-
-
+      component.rejectAndReviewNext('');
+      expect(queuedSuggestionSpy).toHaveBeenCalled();
+    });
 
     describe('isHtmlContentEqual', function () {
       it('should return true regardless of &nbsp; differences', function () {

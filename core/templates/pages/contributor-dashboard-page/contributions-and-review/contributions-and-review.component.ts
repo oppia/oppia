@@ -406,20 +406,27 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.initialSuggestionId = initialSuggestionId;
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
-    modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe((queuedSuggestionSummary: string) => {
-      if (this.queuedSuggestionSummary){
-        // Commit any previously queued suggestion.
-        console.log('IN CARS, there is already a queued suggestion summary object', this.queuedSuggestionSummary.suggestion_id)
-        this.commitQueuedSuggestion();
+    modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe(
+      (queuedSuggestionSummary: string) => {
+        if (this.queuedSuggestionSummary) {
+          // Commit any previously queued suggestion.
+          console.log(
+            'IN CARS, there is already a queued suggestion summary object',
+            this.queuedSuggestionSummary.suggestion_id
+          );
+          this.commitQueuedSuggestion();
+        }
+        this.queuedSuggestionSummary = queuedSuggestionSummary;
+        this.startCommitTimeout();
+        this.showUndoSnackbar();
       }
-      this.queuedSuggestionSummary = queuedSuggestionSummary
-      this.startCommitTimeout()
-      this.showUndoSnackbar()
-    });
+    );
 
-    modalRef.componentInstance.queuedSuggestionEmit.subscribe((queuedSuggestion: string) => {
-      this.queuedSuggestion = queuedSuggestion
-    });
+    modalRef.componentInstance.queuedSuggestionEmit.subscribe(
+      (queuedSuggestion: string) => {
+        this.queuedSuggestion = queuedSuggestion;
+      }
+    );
     modalRef.result.then(
       resolvedSuggestionIds => {
         const filteredResolvedSuggestionIds = resolvedSuggestionIds.filter(
@@ -432,9 +439,12 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           );
         }
         resolvedSuggestionIds.forEach(suggestionId => {
-          if (this.queuedSuggestion && this.queuedSuggestion.suggestion_id == suggestionId) {
+          if (
+            this.queuedSuggestion &&
+            this.queuedSuggestion.suggestion_id == suggestionId
+          ) {
           } else {
-          delete this.contributions[suggestionId];
+            delete this.contributions[suggestionId];
           }
         });
       },
@@ -450,7 +460,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     clearTimeout(this.commitTimeout); // Clear existing timeout.
     // Start a new timeout for commit after timeframe.
     this.commitTimeout = setTimeout(() => {
-      this.commitQueuedSuggestion()
+      this.commitQueuedSuggestion();
     }, COMMIT_TIMEOUT_DURATION);
   }
 
@@ -458,11 +468,14 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     if (!this.queuedSuggestionSummary || this.isCommitting) {
       return;
     }
-    console.log('RECIEVEC A COMMIT REQUEST FOR ID - ', this.queuedSuggestionSummary.suggestion_id)
+    console.log(
+      'RECIEVEC A COMMIT REQUEST FOR ID - ',
+      this.queuedSuggestionSummary.suggestion_id
+    );
     this.isCommitting = true;
-    const currentSuggestionSummary = this.queuedSuggestionSummary
-    this.queuedSuggestionSummary = null
-  
+    const currentSuggestionSummary = this.queuedSuggestionSummary;
+    this.queuedSuggestionSummary = null;
+
     this.contributionAndReviewService.reviewExplorationSuggestion(
       currentSuggestionSummary.target_id,
       currentSuggestionSummary.suggestion_id,
@@ -483,7 +496,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
           }.`
         );
         clearTimeout(this.commitTimeout);
-        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([currentSuggestionSummary.suggestion_id])
+        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+          [currentSuggestionSummary.suggestion_id]
+        );
         delete this.contributions[currentSuggestionSummary.suggestion_id];
         this.isCommitting = false;
       },
@@ -517,7 +532,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   undoReviewAction(): void {
-    this.queuedSuggestionSummary = null
+    this.queuedSuggestionSummary = null;
     clearTimeout(this.commitTimeout); // Clear the commit timeout.
   }
 
