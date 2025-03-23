@@ -121,7 +121,7 @@ class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
         prerequisite_id: str,
         all_skill_ids: List[str],
         skill_superseding_map: Dict[str, Optional[str]],
-    ) -> Iterable[Tuple[str, bool]]:
+    ) -> Iterable[Tuple[str, bool, Optional[str]]]:
         """Check if the prerequisite exists in all skill IDs.
 
         Args:
