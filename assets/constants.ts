@@ -86,6 +86,7 @@ export default {
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
+  "ACTIVITY_TYPE_QUESTIONS": "questions",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -120,7 +121,7 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
-  "MAX_QUESTIONS_FETCHABLE": 100,
+  "MAX_QUESTIONS_FETCHABLE": 1000,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {

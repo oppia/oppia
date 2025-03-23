@@ -155,8 +155,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_SUBTOPIC,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM,
-                        'questions',
-                        'question'
+                        constants.ACTIVITY_TYPE_QUESTIONS,
                     ]
                 },
             },
@@ -230,19 +229,18 @@ class AndroidActivityHandler(base.BaseHandler[
             } for (activity_data, subtopic_page) in zip(
                 activities_data, subtopic_pages)])
 
-        elif activity_type == 'questions':
+        elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
             # With a fixed limit of questions per request,
             # and an offset to paginate through the entire question set.
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified for '
-                        'questions activity')
+                        'Version cannot be specified when fetching questions')
 
             if offset is None:
                 raise self.InvalidInputException(
-                    'Offset required for questions activity')
+                    'Offset required when fetching questions')
 
             questions = (
                 question_fetchers.get_all_questions(offset=offset))
@@ -330,10 +328,6 @@ class AndroidActivityHandler(base.BaseHandler[
             elif activity_type == constants.ACTIVITY_TYPE_SKILL:
                 fetched_entities = (
                     skill_fetchers.get_multiple_skills_by_ids_and_version(
-                        ids_and_versions))
-            elif activity_type == 'question':
-                fetched_entities = (
-                    question_fetchers.get_multiple_questions_by_ids_and_version(
                         ids_and_versions))
             else:
                 fetched_entities = (

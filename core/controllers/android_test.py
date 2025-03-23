@@ -492,11 +492,16 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
             # Response should be a list of question dictionaries.
             returned_question_ids = [entry['id'] for entry in response]
-            self.assertIn(question_id1, returned_question_ids)
-            self.assertIn(question_id2, returned_question_ids)
-            # Check that each entry has a payload that is a dict.
+            # Sort the lists to compare them.
+            self.assertEqual(
+                sorted(returned_question_ids),
+                sorted([question_id1, question_id2])
+            )
             for entry in response:
-                self.assertIsInstance(entry.get('payload'), dict)
+                self.assertEqual(
+                    entry['payload'],
+                    question_services.get_question_by_id(entry['id']).to_dict()
+                )
 
     def test_get_questions_with_version_fails(self) -> None:
         """Test that supplying a version in activities_data raises an error."""
@@ -510,7 +515,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'Version cannot be specified for questions activity'
+                'Version cannot be specified when fetching questions'
             )
 
     def test_get_questions_without_offset_fails(self) -> None:
@@ -524,7 +529,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
             self.assertEqual(
                 response['error'],
-                'Offset required for questions activity'
+                'Offset required when fetching questions'
             )
 
     def test_get_questions_pagination(self) -> None:
@@ -593,24 +598,6 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 [{
                     'id': 'nonexistent_classroom',
-                    'payload': None
-                }]
-            )
-
-    def test_get_nonexistent_question_returns_null_payload(self) -> None:
-        """Test requesting nonexistent question returns null payload."""
-        with self.secrets_swap:
-            self.assertEqual(
-                self.get_json(
-                    '/android_data?activity_type=question&'
-                    'activities_data='
-                    '[{"id": "nonexistent_question_id", "version": 1}]',
-                    headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
-                ),
-                [{
-                    'id': 'nonexistent_question_id',
-                    'version': 1,
                     'payload': None
                 }]
             )
