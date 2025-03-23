@@ -383,8 +383,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     initialSuggestionId: string,
     reviewable: boolean
   ): void {
-    console.log('LINE 386, ', suggestionIdToContribution)
-    console.log('LINE 387, ', initialSuggestionId)
     const details = this.contributions[initialSuggestionId]
       .details as ContributionDetails;
     const subheading =
@@ -393,7 +391,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       details.story_title +
       ' / ' +
       details.chapter_title;
-      console.log('MAIN CODE LINE 394')
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent,
       {
@@ -409,10 +406,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     modalRef.componentInstance.initialSuggestionId = initialSuggestionId;
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.subheading = subheading;
-    console.log('MAIN CODE LINE 410')
     modalRef.componentInstance.queuedSuggestionSummaryEmit.subscribe((queuedSuggestionSummary: string) => {
       if (this.queuedSuggestionSummary){
-        // Queue any previously queued suggestion.
+        // Commit any previously queued suggestion.
+        console.log('IN CARS, there is already a queued suggestion summary object', this.queuedSuggestionSummary.suggestion_id)
         this.commitQueuedSuggestion();
       }
       this.queuedSuggestionSummary = queuedSuggestionSummary
@@ -421,27 +418,21 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     });
 
     modalRef.componentInstance.queuedSuggestionEmit.subscribe((queuedSuggestion: string) => {
-      console.log('Received suggestion: ', queuedSuggestion);
       this.queuedSuggestion = queuedSuggestion
     });
-    console.log('MAIN CODE LINE 425')
     modalRef.result.then(
       resolvedSuggestionIds => {
-        console.log('INSIDE ARROW FN,', this.queuedSuggestion)
         const filteredResolvedSuggestionIds = resolvedSuggestionIds.filter(
           suggestionId => this.queuedSuggestion?.suggestion_id !== suggestionId
         );
         // Emit only the filtered resolved suggestions
-        console.log('RESOLVED SUGGESTION IDS', resolvedSuggestionIds)
-        console.log('FILTERED_SUGGESTION', filteredResolvedSuggestionIds)
         if (filteredResolvedSuggestionIds.length > 0) {
           this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
             filteredResolvedSuggestionIds
           );
         }
-        resolvedSuggestionIds.forEach(suggestionId => {  
+        resolvedSuggestionIds.forEach(suggestionId => {
           if (this.queuedSuggestion && this.queuedSuggestion.suggestion_id == suggestionId) {
-            console.log('Not removing the queued Suggestion yet.')
           } else {
           delete this.contributions[suggestionId];
           }
@@ -457,43 +448,43 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   startCommitTimeout(): void {
     clearTimeout(this.commitTimeout); // Clear existing timeout.
-
     // Start a new timeout for commit after timeframe.
     this.commitTimeout = setTimeout(() => {
-      console.log('Timeout expired hence committing the suggestion')
       this.commitQueuedSuggestion()
     }, COMMIT_TIMEOUT_DURATION);
   }
 
   commitQueuedSuggestion(): void {
-    console.log('Queued Suggestion Summary Line 463 -- ', this.queuedSuggestionSummary)
     if (!this.queuedSuggestionSummary || this.isCommitting) {
       return;
     }
+    console.log('RECIEVEC A COMMIT REQUEST FOR ID - ', this.queuedSuggestionSummary.suggestion_id)
     this.isCommitting = true;
+    const currentSuggestionSummary = this.queuedSuggestionSummary
+    this.queuedSuggestionSummary = null
+  
     this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.queuedSuggestionSummary.target_id,
-      this.queuedSuggestionSummary.suggestion_id,
-      this.queuedSuggestionSummary.action_status,
-      this.queuedSuggestionSummary.reviewer_message,
-      this.queuedSuggestionSummary.action_status === 'accept' &&
-        this.queuedSuggestionSummary.commit_message
-        ? this.queuedSuggestionSummary.commit_message
+      currentSuggestionSummary.target_id,
+      currentSuggestionSummary.suggestion_id,
+      currentSuggestionSummary.action_status,
+      currentSuggestionSummary.reviewer_message,
+      currentSuggestionSummary.action_status === 'accept' &&
+        currentSuggestionSummary.commit_message
+        ? currentSuggestionSummary.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage(
           `Suggestion ${
-            this.queuedSuggestionSummary?.action_status === 'accept'
+            currentSuggestionSummary?.action_status === 'accept'
               ? 'accepted'
               : 'rejected'
           }.`
         );
         clearTimeout(this.commitTimeout);
-        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([this.queuedSuggestionSummary.suggestion_id])
-        delete this.contributions[this.queuedSuggestionSummary.suggestion_id];
-        this.queuedSuggestionSummary = null
+        this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([currentSuggestionSummary.suggestion_id])
+        delete this.contributions[currentSuggestionSummary.suggestion_id];
         this.isCommitting = false;
       },
       errorMessage => {
@@ -517,12 +508,10 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.currentSnackbarRef.instance.message = 'Suggestion queued';
 
     this.currentSnackbarRef.onAction().subscribe(() => {
-      console.log('UNDOING, SETTING STUFF TO NULL')
       this.undoReviewAction();
     });
 
     this.currentSnackbarRef.afterDismissed().subscribe(() => {
-      console.log('Committing while closing the snackbar')
       this.commitQueuedSuggestion();
     });
   }
@@ -583,9 +572,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   onClickViewSuggestion(suggestionId: string): void {
-    console.log('LINE NO 581 ****,', this.contributions )
     const suggestion = this.contributions[suggestionId].suggestion;
-    console.log('LINE 582, ', suggestion)
     const reviewable = this.activeTabType === this.TAB_TYPE_REVIEWS;
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_QUESTION) {
       this.openQuestionSuggestionModal(suggestionId, suggestion, reviewable);
@@ -596,18 +583,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] = contribution;
       }
-      console.log('MAIN CODE LINE 584')
       this.contextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
         suggestion.target_id
       );
-      console.log('MAIN CODE LINE 599')
       this._showTranslationSuggestionModal(
         suggestionIdToContribution,
         suggestionId,
         reviewable
       );
-      console.log('MAIN CODE LINE 605')
     }
   }
 

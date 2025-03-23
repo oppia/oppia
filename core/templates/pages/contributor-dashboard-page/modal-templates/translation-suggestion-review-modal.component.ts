@@ -167,7 +167,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isUndoFeatureEnabled: boolean = false;
   @Input() altTextIsDisplayed: boolean = false;
   @Output() queuedSuggestionSummaryEmit = new EventEmitter<PendingSuggestionDict>();
-  @Output() queuedSuggestionEmit = new EventEmitter<ActiveContributionDict>();
+  @Output() queuedSuggestionEmit = new EventEmitter<PendingSuggestionDict>();
 
   @ViewChild('contentPanel')
   contentPanel!: RteOutputDisplayComponent;
@@ -463,8 +463,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.allContributions[this.queuedSuggestion?.suggestion_id];
         delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
-        // this.queuedSuggestionEmit.emit(this.removedSuggestion)
-        this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
+        this.queuedSuggestionEmit.emit(this.queuedSuggestion)
+        // this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
 
         // If the reviewed item was the last item, close the modal.
         if (this.lastSuggestionToReview || this.isLastItem) {
@@ -509,7 +509,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
       };
-
+      console.log('Emitting QueuedSuggestionSummary ID - ', this.queuedSuggestion.suggestion_id)
       this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
 
       this.resolveSuggestionAndUpdateModal();

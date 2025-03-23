@@ -69,7 +69,7 @@ class MockPlatformFeatureService {
   };
 }
 
-describe('Translation Suggestion Review Modal Component', function () {
+fdescribe('Translation Suggestion Review Modal Component', function () {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
