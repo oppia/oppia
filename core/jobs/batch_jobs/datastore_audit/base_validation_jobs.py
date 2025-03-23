@@ -68,7 +68,7 @@ class BaseValidationJob(base_jobs.JobBase):
         # and easier to understand by grouping similar errors together.
         # 2) For efficient analysis: Grouping allows for easier analysis and
         # troubleshooting. You can quickly identify the different groups of
-        # errors and focus on addressing each group. 
+        # errors and focus on addressing each group.
         # 3) To prevent truncation issues: Grouping errors by type helps prevent
         # situations where certain error types are hidden due to truncation
         # limits in logging systems. By grouping, we can ensure that a
