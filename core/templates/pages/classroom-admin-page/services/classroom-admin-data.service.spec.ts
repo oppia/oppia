@@ -43,6 +43,7 @@ let existingClassroom = new ExistingClassroomData(
   'Start from the basics with our first topic.',
   {},
   true,
+  false,
   dummyThumbnailData,
   dummyBannerData
 );
@@ -71,6 +72,7 @@ describe('Classroom Admin Data Service', () => {
       'Start from the basics with our first topic.',
       {},
       true,
+      false,
       dummyThumbnailData,
       dummyBannerData
     );
@@ -152,6 +154,7 @@ describe('Classroom Admin Data Service', () => {
       '',
       {},
       true,
+      false,
       {...dummyThumbnailData, filename: ''},
       {...dummyBannerData, filename: ''}
     );

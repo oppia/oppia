@@ -24,8 +24,6 @@
  */
 export enum FeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
-  EndChapterCelebration = 'end_chapter_celebration',
-  CheckpointCelebration = 'checkpoint_celebration',
   DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',

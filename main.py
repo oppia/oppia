@@ -576,6 +576,10 @@ URLS = [
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler
     ),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+        voiceover.RegenerateAutomaticVoiceoverHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
@@ -1229,6 +1233,8 @@ for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
     get_redirect_route(r'/profile/<username>', oppia_root.OppiaRootPage),
+    get_redirect_route(
+        r'/collection/<collection_id>', oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),

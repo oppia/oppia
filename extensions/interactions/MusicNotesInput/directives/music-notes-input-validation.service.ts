@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -32,7 +32,7 @@ import {AppConstants} from 'app.constants';
 })
 export class MusicNotesInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
