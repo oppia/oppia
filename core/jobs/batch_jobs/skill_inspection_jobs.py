@@ -66,11 +66,13 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
         skills_with_superseding_skills = (
             skill_models_pcoll
             | 'Extract skill models with superseding IDs' >> beam.Map(
-                lambda skill_model: (skill_model.id, 
-                                    skill_model.superseding_skill_id if hasattr(
-                                        skill_model,
-                                        'superseding_skill_id'
-                                    ) else None)
+                lambda skill_model: (
+                    skill_model.id,
+                    skill_model.superseding_skill_id if hasattr(
+                        skill_model,
+                        'superseding_skill_id'
+                    ) else None
+                )
             )
         )
 
@@ -127,14 +129,15 @@ class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
         Args:
             prerequisite_id: string. The ID of the prerequisite skill to check.
             all_skill_ids: list(string). List of all valid skill IDs.
-            skill_superseding_map: dict(string, string). Map of skill IDs to their
-            superseding skill IDs.
+            skill_superseding_map: dict(string, string). Map of skill IDs to
+                their superseding skill IDs.
 
         Yields:
             Tuple(string, boolean, string). A tuple
-            (prerequisite_id, exists, superseding_id) where exists is True if the
-            prerequisite exists in all_skill_ids, False otherwise and superseding_id
-            is the ID of the superseding skill if one exists, None otherwise.
+            (prerequisite_id, exists, superseding_id) where exists is True if
+            the prerequisite exists in all_skill_ids, False otherwise and
+            superseding_id is the ID of the superseding skill if one exists,
+            None otherwise.
         """
         exists = prerequisite_id in all_skill_ids
         superseding_id = skill_superseding_map.get(prerequisite_id, None)
