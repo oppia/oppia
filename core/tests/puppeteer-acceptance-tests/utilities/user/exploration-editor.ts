@@ -22,7 +22,6 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
