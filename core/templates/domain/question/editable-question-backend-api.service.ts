@@ -29,6 +29,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
+import cloneDeep from 'lodash/cloneDeep';
 
 export interface CreateQuestionResponse {
   questionId: string;
@@ -135,7 +136,7 @@ export class EditableQuestionBackendApiService {
               this.questionObjectFactory.createFromBackendDict(
                 response.question_dict
               );
-            let skillDicts = angular.copy(response.associated_skill_dicts);
+            let skillDicts = cloneDeep(response.associated_skill_dicts);
             successCallback({
               questionObject: questionObject,
               associated_skill_dicts: skillDicts,
@@ -177,7 +178,7 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionDict = angular.copy(response.questionDict);
+            let questionDict = cloneDeep(response.questionDict);
             successCallback(
               // The returned data is an updated question dict.
               questionDict
