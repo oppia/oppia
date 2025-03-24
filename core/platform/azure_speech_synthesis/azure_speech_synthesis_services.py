@@ -26,8 +26,9 @@ import os
 
 from core import feconf
 from core import utils
+from core.constants import constants
+from core.domain import voiceover_services
 from core.platform import models
-
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -50,14 +51,10 @@ SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS = """
 """
 
 # A string template block representing the math content within the SSML.
-MATH_TEMPLATE_SSML_BLOCK = """
-    <say-as interpret-as="math">
-        %s
-    </say-as>
-"""
+MATH_TEMPLATE_SSML_BLOCK = """<say-as interpret-as="math">%s</say-as>"""
 
-# A string template block representing the non math content within the SSML.
-NON_MATH_TEMPLATE_SSML_BLOCK = """
+# A string template block representing the main content within the SSML.
+MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
     <p>
         %s
     </p>
@@ -66,7 +63,7 @@ NON_MATH_TEMPLATE_SSML_BLOCK = """
 # Standard arithmetic operators used to separate text with math expressions in
 # an SSML string.
 COMMONLY_USED_ARITHMETIC_EXPRESSIONS = [
-    '+', ' - ', '*', ' / ', '×', '÷']
+    '+', ' - ', '*', ' / ', '×', '÷', '=']
 
 
 class WordBoundaryCollection:
@@ -142,7 +139,7 @@ def get_azure_voicecode_from_language_accent_code(
 
 
 def convert_plaintext_to_ssml_content(
-        plaintext: str, language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
@@ -162,13 +159,59 @@ def convert_plaintext_to_ssml_content(
     """
     content_list = plaintext.split(feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
-    main_ssml_content = ''
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code))
 
+    math_symbol_pronounciations = (
+        constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            language_code, {}))
+
+    main_ssml_content = ''
     for content in content_list:
-        if is_mathematical_text(content):
-            main_ssml_content += (MATH_TEMPLATE_SSML_BLOCK % content)
-        else:
-            main_ssml_content += (NON_MATH_TEMPLATE_SSML_BLOCK % content)
+        # Updates the content to pronounce `-` correctly in the given language.
+        if ' - ' in content:
+            content = content.replace(
+                '-',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['-'])
+
+        # Update the content to pronounce `*` correctly in the given language.
+        if ' * ' in content:
+            content = content.replace(
+                '*',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['*'])
+
+        # Update the content to pronounce `×` correctly in the given language.
+        if '×' in content:
+            content = content.replace(
+                '×',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['×'])
+
+        # Update the content to pronounce `/` correctly in the given language.
+        if ' / ' in content:
+            content = content.replace(
+                '/',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `÷` correctly in the given language.
+        if '÷' in content:
+            content = content.replace(
+                '÷',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `+` correctly in the given language.
+        if ' + ' in content:
+            content = content.replace(
+                '+',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['+'])
+
+        # Update the content to pronounce `=` correctly in the given language.
+        if ' = ' in content:
+            content = content.replace(
+                ' = ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['='])
+
+        main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,

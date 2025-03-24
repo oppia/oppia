@@ -29,6 +29,12 @@ const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
+const moderatorPageUrl = testConstants.URLs.ModeratorPage;
+const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
+const contributorDashboardAdminUrl =
+  testConstants.URLs.ContributorDashboardAdmin;
+const siteAdminPageUrl = testConstants.URLs.AdminPage;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -120,6 +126,11 @@ const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
+const creatorDashboardMenuLink = '.e2e-test-creator-dashboard-link';
+const contributorDashboardMenuLink =
+  '.e2e-test-contributor-dashboard-menu-link';
+const profileMenuLink = '.e2e-test-profile-link';
+const preferencesMenuLink = '.e2e-test-preferences-link';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -186,7 +197,14 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the learner dashboard using profile dropdown in the navbar.
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
     await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(learnerDashboardMenuLink, {
+      visible: true,
+    });
     await this.clickOn(learnerDashboardMenuLink);
   }
 
@@ -1310,6 +1328,119 @@ export class LoggedInUser extends BaseUser {
       }
     }
     throw new Error(`Lesson not found: ${lessonName}`);
+  }
+
+  /**
+   * Checks if the error page with the given status code is displayed.
+   * @param {number} statusCode - The expected error status code.
+   */
+  async expectErrorPage(statusCode: number): Promise<void> {
+    const isErrorPresent = await this.isTextPresentOnPage(
+      `Error ${statusCode}`
+    );
+
+    if (!isErrorPresent) {
+      throw new Error(
+        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+      );
+    }
+
+    showMessage(`User is on error page with status code ${statusCode}.`);
+  }
+
+  /**
+   * Navigates to the Topics and Skills Dashboard page.
+   */
+  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl);
+  }
+
+  /**
+   * Navigates to the Moderator page.
+   */
+  async navigateToModeratorPage(): Promise<void> {
+    await this.goto(moderatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Release Coordinator page.
+   */
+  async navigateToReleaseCoordinatorPage(): Promise<void> {
+    await this.goto(releaseCoordinatorPageUrl);
+  }
+
+  /**
+   * Navigates to the Contributor Admin Dashboard page.
+   */
+  async navigateToContributorAdminDashboardPage(): Promise<void> {
+    await this.goto(contributorDashboardAdminUrl);
+  }
+
+  /**
+   * Navigates to the Admin page.
+   */
+  async navigateToSiteAdminPage(): Promise<void> {
+    await this.goto(siteAdminPageUrl);
+  }
+
+  /**
+   * Navigates to the Creator Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToCreatorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(creatorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(creatorDashboardMenuLink);
+  }
+
+  /**
+   * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
+   */
+  async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(contributorDashboardMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(contributorDashboardMenuLink);
+  }
+
+  /**
+   * Navigates to the Preferences Page Using Profile Dropdown Menu.
+   */
+  async navigateToPreferencesPageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(preferencesMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(preferencesMenuLink);
+  }
+
+  /**
+   * Navigates to the Profile Page Using Profile Dropdown Menu.
+   */
+  async navigateToProfilePageUsingProfileDropdown(): Promise<void> {
+    await this.page.waitForSelector(profileDropdown, {
+      visible: true,
+    });
+    await this.clickOn(profileDropdown);
+
+    await this.page.waitForSelector(profileMenuLink, {
+      visible: true,
+    });
+    await this.clickOn(profileMenuLink);
   }
 }
 

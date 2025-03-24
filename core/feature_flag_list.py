@@ -84,7 +84,6 @@ class FeatureNames(enum.Enum):
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
@@ -99,14 +98,13 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
 PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-    FeatureNames.END_CHAPTER_CELEBRATION,
-    FeatureNames.CHECKPOINT_CELEBRATION,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
@@ -125,24 +123,14 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    FeatureNames.END_CHAPTER_CELEBRATION,
+    FeatureNames.CHECKPOINT_CELEBRATION,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
         (
             'This is a dummy feature flag for the e2e tests.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.END_CHAPTER_CELEBRATION.value: (
-        (
-            'This flag is for the end chapter celebration feature.',
-            feature_flag_domain.ServerMode.PROD
-        )
-    ),
-    FeatureNames.CHECKPOINT_CELEBRATION.value: (
-        (
-            'This flag is for the checkpoint celebration feature.',
             feature_flag_domain.ServerMode.PROD
         )
     ),
@@ -169,7 +157,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
         (
             'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (

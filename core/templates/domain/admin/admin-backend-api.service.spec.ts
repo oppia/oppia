@@ -31,6 +31,7 @@ import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-pa
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {Story} from 'domain/story/story.model';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 describe('Admin backend api service', () => {
@@ -57,8 +58,8 @@ describe('Admin backend api service', () => {
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
         language_code: 'en',
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#C6DCDA',
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
         total_published_node_count: 0,
         can_edit_topic: true,
         is_published: false,
@@ -119,6 +120,26 @@ describe('Admin backend api service', () => {
         skill_model_last_updated: 1711790151229.944,
       },
     ],
+    story_list: [
+      {
+        id: 'bpqKYtmRl7xE',
+        title: 'dummy_title0',
+        description: 'description',
+        notes: '',
+        story_contents: {
+          initial_node_id: null,
+          nodes: [],
+          next_node_id: 'node_1',
+        },
+        language_code: 'en',
+        version: 1,
+        corresponding_topic_id: 'SZOdEWYZ7QE5',
+        thumbnail_bg_color: '#B3D8F1',
+        thumbnail_filename: 'thumbnail.svg',
+        url_fragment: 'tjbtqqfejb',
+        meta_tag_content: 'dummy_meta',
+      },
+    ],
   };
   let adminDataObject: AdminPageData;
 
@@ -148,6 +169,9 @@ describe('Admin backend api service', () => {
       ),
       skillList: adminBackendResponse.skill_list.map(dict =>
         SkillSummary.createFromBackendDict(dict)
+      ),
+      storyList: adminBackendResponse.story_list.map(dict =>
+        Story.createFromBackendDict(dict)
       ),
     };
 
@@ -1545,6 +1569,62 @@ describe('Admin backend api service', () => {
 
     abas
       .generateDummyStoriesAsync(topicId, numDummyStoriesToGenerate)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(
+      {
+        error: 'Failed to get data.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
+
+  it('should generate dummy chapters', fakeAsync(() => {
+    let action = 'generate_dummy_chapters';
+    let storyId = 'story_id';
+    let numberOfChapters = 5;
+    let payload = {
+      action: action,
+      story_id: storyId,
+      num_dummy_chapters_to_generate: numberOfChapters,
+    };
+
+    abas
+      .generateDummyChaptersAsync(storyId, numberOfChapters)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle generate dummy chapters request failure', fakeAsync(() => {
+    let action = 'generate_dummy_chapters';
+    let storyId = 'story_id';
+    let numberOfChapters = 5;
+    let payload = {
+      action: action,
+      story_id: storyId,
+      num_dummy_chapters_to_generate: numberOfChapters,
+    };
+
+    abas
+      .generateDummyChaptersAsync(storyId, numberOfChapters)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
