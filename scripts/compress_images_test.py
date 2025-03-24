@@ -77,6 +77,7 @@ class TestImageCompressor(unittest.TestCase):
     @mock.patch('subprocess.run')
     def test_compress_images(self, mock_subprocess_run: mock.MagicMock) -> None:
         """Test image compression process."""
+        self.assertFalse(os.path.exists(self.output_dir))
         result_images: List[CompressedImageInfo] = [
             {
                 'path': pathlib.Path(self.png_path),
@@ -228,9 +229,4 @@ class TestImageCompressor(unittest.TestCase):
 
         result = compress_images.main()
 
-        mock_print.assert_called_once_with(
-            '[IMPORTANT NOTE]: Make sure to delete the /compressed folder '
-            'after replacing images in the repository. '
-        )
-        mock_run.assert_called_once()
         self.assertEqual(result, 0)

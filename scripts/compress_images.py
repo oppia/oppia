@@ -85,12 +85,22 @@ class ImageCompressor:
 
     def run_compression_logic(
             self,
-            file_extension: str,
             file_path: pathlib.Path,
             output_file_path: pathlib.Path,
-            actual_compression: bool
     ) -> List[CompressedImageInfo] | None:
-        """Helper function for running compression logic."""
+        """Helper function for running compression logic.
+
+        Args:
+            file_path: pathlib.Path. The path to the image file.
+            output_file_path: pathlib.Path. The path to the output file.
+        
+        Returns:
+            result_image: List[CompressedImageInfo]. List of all compressible
+            images over repository with attributes as path, original_size
+            and new_size.
+        """
+
+        file_extension = file_path.suffix.lower()
         result_image: List[CompressedImageInfo] = []
         with Image.open(file_path):
 
@@ -108,32 +118,31 @@ class ImageCompressor:
                 cmd, capture_output=True, text=True, check=True
             )
             if result.returncode == 0 and output_file_path.exists():
-                if not actual_compression:
-                    original_size = file_path.stat().st_size
-                    new_size = output_file_path.stat().st_size
+                original_size = file_path.stat().st_size
+                new_size = output_file_path.stat().st_size
 
-                    if new_size < original_size * self.tolerance:
-                        result_image.append({
-                            'path': file_path,
-                            'original_size': original_size,
-                            'new_size': new_size
-                        })
+                if new_size < original_size * self.tolerance:
+                    result_image.append({
+                        'path': file_path,
+                        'original_size': original_size,
+                        'new_size': new_size
+                    })
             else:
                 logging.error(
                     '[ERROR]: %s occurred on file %s',
                         file_path,
                         result.stderr
                 )
-        if actual_compression:
-            return None
-        else:
-            return result_image
+
+        return result_image
 
     def find_compressible_images(self) -> List[CompressedImageInfo]:
         """Find images that can be compressed further.
 
         Returns:
-            result_images: List[CompressedImageInfo]. Compressible images list.
+            result_images: List[CompressedImageInfo]. List of all compressible
+            images over repository with attributes as path, original_size
+            and new_size.
         """
         result_images: List[CompressedImageInfo] = []
 
@@ -147,10 +156,8 @@ class ImageCompressor:
                 pathlib.Path(get_tempdir) / f'compressed_{file_path.name}'
             )
             result = self.run_compression_logic(
-                file_extension,
                 file_path,
                 temp_compressed,
-                False
             )
             if result:
                 result_images.extend(result)
@@ -163,16 +170,23 @@ class ImageCompressor:
         """Compress the identified images.
 
         Args:
-            result_images: List. List of images to compress.
+            result_images: List[CompressedImageInfo]. List of images
+                to be compressed.
         """
         # Remove existing output directory and create a new one.
         if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir)
+            try:
+                shutil.rmtree(self.output_dir, ignore_errors=True)
+            except OSError as e:
+                logging.error(
+                    '[ERROR]: %s occurred while removing %s',
+                    e, self.output_dir
+                )
+
         os.makedirs(self.output_dir, exist_ok=True)
 
         for image in result_images:
             file_path = image['path']
-            file_extension = file_path.suffix.lower()
 
             # Maintain original directory structure.
             rel_path = os.path.relpath(file_path)
@@ -180,11 +194,9 @@ class ImageCompressor:
 
             # Create necessary directories.
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-            self.run_compression_logic(
-                file_extension,
+            compress_result = self.run_compression_logic( # pylint: disable=unused-variable
                 file_path,
                 output_file_path,
-                True
             )
 
     def run(self) -> int:
@@ -235,10 +247,7 @@ def main() -> int:
     """Main function for compression."""
     images_dir = pathlib.Path('./assets')
     compressor = ImageCompressor(images_dir)
-    print(
-        '[IMPORTANT NOTE]: Make sure to delete the /compressed folder '
-        'after replacing images in the repository. '
-    )
+    
     return compressor.run()
 
 
