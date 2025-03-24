@@ -175,7 +175,8 @@ class ModelRelationshipError(BaseValidationError):
         Args:
             id_property: ModelProperty. The property referring to the ID of the
                 target model.
-            model: base_model.BaseModel. The the model with problematic ID property.
+            model: base_model.BaseModel. The the model with problematic ID
+                property.
             target_kind: str. The kind of model the property refers to.
             target_id: str. The ID of the specific model that the property
                 refers to. NOTE: This is the value of the ID property.
