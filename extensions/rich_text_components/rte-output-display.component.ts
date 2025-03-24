@@ -137,7 +137,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     const acceptedTagsForVoiceoverHighlighting = ['P', 'LI'];
 
-    function traverse(node: Node) {
+    const traverse = function (node: Node) {
       let currentNodeName = node.nodeName;
 
       if (node.nodeType === Node.TEXT_NODE) {
@@ -226,7 +226,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return node;
         }
       }
-    }
+    };
 
     let x = traverse(tempDiv);
     this.highlighIdToSentenceText = highlighIdToSentenceText;
@@ -359,7 +359,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
         // Highlights the current sentence being played in the audio player.
         if (currentElementToHighlight) {
-          // Apply CSS for smooth transition
           currentElementToHighlight.style.backgroundColor =
             this.backgroundColorOfHighlightedSentence;
 
