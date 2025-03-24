@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -25,7 +24,6 @@ from core.controllers import editor
 from core.controllers import reader
 from core.domain import blog_services
 from core.domain import classroom_config_services
-from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
