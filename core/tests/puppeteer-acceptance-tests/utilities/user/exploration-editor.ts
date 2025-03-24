@@ -230,7 +230,7 @@ const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
-const downloadPath = path.join(os.homedir(), 'Downloads');
+const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 export class ExplorationEditor extends BaseUser {
   /**
@@ -1570,6 +1570,46 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Gets the list of existing files for the given version.
+   * @param {number} version - The expected version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @returns {string[]} - List of matching file names.
+   */
+  async getExistingVersionFiles(
+    version: number,
+    isPublished: boolean
+  ): Promise<string[]> {
+    const filePrefix = isPublished
+      ? 'oppia-Publishwithaninteraction-v'
+      : 'oppia-unpublished_exploration-v';
+
+    const files = fs.readdirSync(downloadPath);
+    return files.filter(file =>
+      file.match(new RegExp(`^${filePrefix}${version}( \\(\\d+\\))?\\.zip$`))
+    );
+  }
+
+  /**
+   * Generates the expected filename based on the existing count.
+   * @param {number} version - The version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @param {number} fileCount - The number of existing files.
+   * @returns {string} - The expected filename.
+   */
+  getExpectedFileName(
+    version: number,
+    isPublished: boolean,
+    fileCount: number
+  ): string {
+    const filePrefix = isPublished
+      ? 'oppia-Publishwithaninteraction-v'
+      : 'oppia-unpublished_exploration-v';
+    return fileCount === 0
+      ? `${filePrefix}${version}.zip`
+      : `${filePrefix}${version} (${fileCount}).zip`;
+  }
+
+  /**
    * Function to download a specific version of Exploration.
    * @param {number} explorationVersion - The version of the exploration to download.
    * @param {boolean} isExplorationPublished - Whether the Exploration is published.
@@ -1587,20 +1627,30 @@ export class ExplorationEditor extends BaseUser {
       );
 
       if (parseInt(versionText, 10) === explorationVersion) {
+        // Count existing files before downloading.
+        const existingFiles = await this.getExistingVersionFiles(
+          explorationVersion,
+          isExplorationPublished
+        );
+        const nextNumber = existingFiles.length;
+        const expectedFileName = this.getExpectedFileName(
+          explorationVersion,
+          isExplorationPublished,
+          nextNumber
+        );
+
         const dropdownButton = await historyItem.$(
           '.e2e-test-history-list-options'
         );
-        await dropdownButton?.click();
+        await this.page.evaluate(el => el.click(), dropdownButton);
         await this.page.waitForTimeout(1000);
         const downloadButton = await historyItem.$(
           'a.dropdown-item.e2e-test-download-exploration'
         );
         await this.page.evaluate(el => el.click(), downloadButton);
         await this.page.waitForTimeout(5000);
-        const downloadedFile = await this.waitForExplorationDownload(
-          explorationVersion,
-          isExplorationPublished
-        );
+        const downloadedFile =
+          await this.waitForExplorationDownload(expectedFileName);
         if (downloadedFile) {
           showMessage(`${downloadedFile} file is successfully downloaded`);
           return;
@@ -1614,28 +1664,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Waits for a Exploration zip file to be downloaded and verifies its name.
-   * @param {number} expectedVersion - The expected version number in the file name.
-   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
-   * @returns {Promise<string | null>} - Returns the file name if correct, otherwise null.
+   * Waits for a downloaded file to appear and cleans up only the new one.
+   * @param {string} expectedFileName - The expected file name.
+   * @returns {Promise<string | null>} - The verified file name or null if not found.
    */
   async waitForExplorationDownload(
-    expectedVersion: number,
-    isExplorationPublished: boolean
+    expectedFileName: string
   ): Promise<string | null> {
     // Wait for network to be idle after triggering the download.
     await this.page.waitForNetworkIdle();
     const files = fs.readdirSync(downloadPath);
-    const filePrefix = isExplorationPublished
-      ? 'oppia-Publishwithaninteraction-v'
-      : 'oppia-unpublished_exploration-v';
     const downloadedFile =
-      files.find(file =>
-        file.match(
-          new RegExp(`^${filePrefix}${expectedVersion}( \\(\\d+\\))?\\.zip$`)
-        )
-      ) || null;
-    if (downloadedFile) {
+      files.find(file => file === expectedFileName) || null;
+    if (
+      downloadedFile &&
+      fs.existsSync(path.join(downloadPath, downloadedFile))
+    ) {
       fs.unlinkSync(path.join(downloadPath, downloadedFile));
     }
     return downloadedFile;
