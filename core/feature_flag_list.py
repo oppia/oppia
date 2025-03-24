@@ -35,6 +35,7 @@ class FeatureNames(enum.Enum):
         'contributor_dashboard_accomplishments')
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
+    DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
         'serial_chapter_launch_curriculum_admin_view')
     SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
@@ -123,6 +124,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ANDROID_BETA_LANDING_PAGE,
     FeatureNames.BLOG_PAGES,
     FeatureNames.CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS,
+    FeatureNames.DIAGNOSTIC_TEST,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
