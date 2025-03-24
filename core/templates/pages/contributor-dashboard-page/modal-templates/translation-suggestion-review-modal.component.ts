@@ -105,8 +105,6 @@ enum ExpansionTabType {
   TRANSLATION,
 }
 
-const COMMIT_TIMEOUT_DURATION = 30000; // 30 seconds in milliseconds.
-
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
@@ -465,11 +463,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
         this.queuedSuggestionEmit.emit(this.queuedSuggestion);
-        // this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion)
 
         // If the reviewed item was the last item, close the modal.
         if (this.lastSuggestionToReview || this.isLastItem) {
-          // this.commitQueuedSuggestion();
           this.activeModal.close(this.resolvedSuggestionIds);
           return;
         }
@@ -510,10 +506,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
       };
-      console.log(
-        'Emitting QueuedSuggestionSummary ID - ',
-        this.queuedSuggestion.suggestion_id
-      );
       this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
 
       this.resolveSuggestionAndUpdateModal();

@@ -410,10 +410,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       (queuedSuggestionSummary: string) => {
         if (this.queuedSuggestionSummary) {
           // Commit any previously queued suggestion.
-          console.log(
-            'IN CARS, there is already a queued suggestion summary object',
-            this.queuedSuggestionSummary.suggestion_id
-          );
           this.commitQueuedSuggestion();
         }
         this.queuedSuggestionSummary = queuedSuggestionSummary;
@@ -432,7 +428,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         const filteredResolvedSuggestionIds = resolvedSuggestionIds.filter(
           suggestionId => this.queuedSuggestion?.suggestion_id !== suggestionId
         );
-        // Emit only the filtered resolved suggestions
+        // Emit only the filtered resolved suggestions.
         if (filteredResolvedSuggestionIds.length > 0) {
           this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
             filteredResolvedSuggestionIds
@@ -441,7 +437,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         resolvedSuggestionIds.forEach(suggestionId => {
           if (
             this.queuedSuggestion &&
-            this.queuedSuggestion.suggestion_id == suggestionId
+            this.queuedSuggestion.suggestion_id === suggestionId
           ) {
           } else {
             delete this.contributions[suggestionId];
@@ -468,10 +464,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     if (!this.queuedSuggestionSummary || this.isCommitting) {
       return;
     }
-    console.log(
-      'RECIEVEC A COMMIT REQUEST FOR ID - ',
-      this.queuedSuggestionSummary.suggestion_id
-    );
+    console.log(this.queuedSuggestionSummary.suggestion_id);
     this.isCommitting = true;
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;

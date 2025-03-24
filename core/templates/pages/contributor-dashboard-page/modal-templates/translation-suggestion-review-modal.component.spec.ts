@@ -42,7 +42,7 @@ import {
   MatSnackBarModule,
   MatSnackBarRef,
 } from '@angular/material/snack-bar';
-import {of, Subject} from 'rxjs';
+import {of} from 'rxjs';
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
@@ -80,7 +80,6 @@ describe('Translation Suggestion Review Modal Component', function () {
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
-  let snackBarSpy: jasmine.Spy;
   let snackBar: MatSnackBar;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
@@ -588,7 +587,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       spyOn(component, 'generateCommitMessage').and.returnValue(
         'Generated Commit Message'
       );
-      // spyOn(component, 'resolveSuggestionAndUpdateModal');
       const queuedSuggestionSpy = spyOn(
         component.queuedSuggestionSummaryEmit,
         'emit'
@@ -610,7 +608,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       spyOn(component, 'generateCommitMessage').and.returnValue(
         'Generated Commit Message'
       );
-      // spyOn(component, 'resolveSuggestionAndUpdateModal');
       const queuedSuggestionSpy = spyOn(
         component.queuedSuggestionSummaryEmit,
         'emit'

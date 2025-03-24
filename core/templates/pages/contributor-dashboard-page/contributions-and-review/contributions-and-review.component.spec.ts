@@ -63,15 +63,6 @@ import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {delay} from 'rxjs/operators';
 
-class MockNgbModalRef {
-  componentInstance: {
-    suggestionIdToContribution: null;
-    initialSuggestionId: null;
-    reviewable: null;
-    subheading: null;
-  };
-}
-
 class MockNgbModal {
   open() {
     return {
@@ -86,13 +77,6 @@ class MockPlatformFeatureService {
       isEnabled: false,
     },
   };
-}
-
-class MockMatSnackBarRef {
-  instance = {message: ''};
-  afterDismissed = () => of({action: '', dismissedByAction: false});
-  onAction = () => of(undefined);
-  dismiss = () => of(undefined);
 }
 
 describe('Contributions and review component', () => {
@@ -2584,7 +2568,7 @@ describe('Contributions and review component', () => {
       ).and.returnValue(null);
       const commitTimeoutSpy = spyOn(component, 'startCommitTimeout');
       const undoSnackbarSpy = spyOn(component, 'showUndoSnackbar');
-      // Set initial state
+
       component.contributions = {
         suggestion_1: {
           suggestion: {
@@ -2614,18 +2598,18 @@ describe('Contributions and review component', () => {
         reviewer_message: 'test',
       };
 
-      // Simulate opening the modal and the user actions
+      // Simulate opening the modal and the user actions.
       component.onClickViewSuggestion('suggestion_1');
-      tick(); // simulate any asynchronous effects of opening the view
+      tick(); // Simulate any asynchronous effects of opening the view.
 
-      // Now emit a new queued suggestion which should trigger the subscription logic
+      // Now emit a new queued suggestion which should trigger the subscription logic.
       eventEmitter.emit({
         target_id: 'id_1',
         suggestion_id: 'suggestion_2',
         action_status: 'accepted',
         reviewer_message: 'test',
       });
-      tick(); // Process the emitted event and any side effects
+      tick();
 
       expect(commitTimeoutSpy).toHaveBeenCalled();
       expect(undoSnackbarSpy).toHaveBeenCalled();
@@ -2706,7 +2690,7 @@ describe('Contributions and review component', () => {
       component.contributions = {};
       spyOn(alertsService, 'addSuccessMessage');
       spyOn(alertsService, 'clearMessages');
-      const removeSpy = spyOn(
+      spyOn(
         contributionOpportunitiesService.removeOpportunitiesEventEmitter,
         'emit'
       ).and.returnValue(null);
@@ -2767,7 +2751,6 @@ describe('Contributions and review component', () => {
 
     it('should show the pop up bar when suggestion is queued', () => {
       spyOn(component, 'commitQueuedSuggestion').and.callThrough();
-      // component.hasQueuedSuggestion = true;
       component.showUndoSnackbar();
 
       expect(snackBarSpy.calls.mostRecent().returnValue.instance.message).toBe(
@@ -2793,7 +2776,6 @@ describe('Contributions and review component', () => {
         snackBarSpy.and.returnValue(snackBarRefMock);
 
         component.showUndoSnackbar();
-        // component.hasQueuedSuggestion = true;
 
         afterDismissedObservable.next();
         afterDismissedObservable.complete();
