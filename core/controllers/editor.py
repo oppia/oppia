@@ -239,12 +239,15 @@ class ExplorationHandler(
         commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload['change_list']
 
-        # Validate commit message for public explorations
-        exploration_rights = rights_manager.get_exploration_rights(exploration_id)
+        # Validate commit message for public explorations.
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id
+        )
         if exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC:
             if not commit_message:
                 raise self.InvalidInputException(
-                    'Exploration is public so expected a commit message but received none.'
+                    'Exploration is public so expected a commit '
+                    'message but received none.'
                 )
 
         changes_are_mergeable = exp_services.are_changes_mergeable(
