@@ -93,7 +93,7 @@ class ImageCompressor:
         Args:
             file_path: pathlib.Path. The path to the image file.
             output_file_path: pathlib.Path. The path to the output file.
-        
+
         Returns:
             result_image: List[CompressedImageInfo]. List of all compressible
             images over repository with attributes as path, original_size
@@ -247,7 +247,7 @@ def main() -> int:
     """Main function for compression."""
     images_dir = pathlib.Path('./assets')
     compressor = ImageCompressor(images_dir)
-    
+
     return compressor.run()
 
 

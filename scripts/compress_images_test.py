@@ -219,14 +219,12 @@ class TestImageCompressor(unittest.TestCase):
             mock_subprocess_run.assert_called_once()
 
     @mock.patch('scripts.compress_images.ImageCompressor.run', return_value=0)
-    @mock.patch('builtins.print')
     def test_main_function(
         self,
-        mock_print: mock.MagicMock,
         mock_run: mock.MagicMock
     ) -> None:
         """Test the main function execution."""
 
         result = compress_images.main()
-
         self.assertEqual(result, 0)
+        mock_run.assert_called_once()
