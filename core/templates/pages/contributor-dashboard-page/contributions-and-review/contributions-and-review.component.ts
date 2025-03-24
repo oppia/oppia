@@ -439,6 +439,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
             this.queuedSuggestion &&
             this.queuedSuggestion.suggestion_id === suggestionId
           ) {
+
           } else {
             delete this.contributions[suggestionId];
           }
@@ -464,7 +465,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     if (!this.queuedSuggestionSummary || this.isCommitting) {
       return;
     }
-    console.log(this.queuedSuggestionSummary.suggestion_id);
     this.isCommitting = true;
     const currentSuggestionSummary = this.queuedSuggestionSummary;
     this.queuedSuggestionSummary = null;
