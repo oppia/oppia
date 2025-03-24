@@ -75,9 +75,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
-  // Remove this
-  @ViewChild('treeContainer', {static: false}) treeContainer: ElementRef;
-  @ViewChild('highlight') highlightTagPortal: ElementRef;
   @Input() rteString: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
@@ -124,12 +121,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
-      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Z”])`,
+      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Za-z”])`,
       'g'
     );
 
     // Create a temporary DOM element.
-    const tempDiv = document.createElement('div');
+    let tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
 
     // The index is used to assign a unique id to each sentence of the
@@ -138,38 +135,103 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     let highlighIdToSentenceText = {};
 
+    const acceptedTagsForVoiceoverHighlighting = ['P', 'LI'];
+
     function traverse(node: Node) {
+      let currentNodeName = node.nodeName;
+
       if (node.nodeType === Node.TEXT_NODE) {
         const textContent = node.textContent || '';
         const sentences = textContent.split(sentenceRegex);
-        const fragment = document.createDocumentFragment();
+        let textNodesForSentences = [];
 
-        sentences.forEach(sentence => {
-          if (sentence.trim()) {
-            // Create a span element for each sentence to be highlighted during
-            // voiceover playback.
-            const wordsToHighlight = document.createElement('span');
-
-            let elementId = `highlightBlock${index}`;
-            wordsToHighlight.id = elementId;
-            wordsToHighlight.textContent = sentence;
-
-            fragment.appendChild(wordsToHighlight);
-
-            highlighIdToSentenceText[elementId] = sentence;
-            index++;
-          }
-        });
-        node.parentNode?.replaceChild(fragment, node);
+        for (let sentence of sentences) {
+          let tempTextNode = document.createTextNode(sentence);
+          textNodesForSentences.push(tempTextNode);
+        }
+        return textNodesForSentences;
       } else {
-        node.childNodes.forEach(traverse);
+        let updatedChildNodes = [];
+
+        node.childNodes.forEach(childNode => {
+          updatedChildNodes = updatedChildNodes.concat(traverse(childNode));
+        });
+
+        if (node.nodeName === 'DIV') {
+          let temp = document.createElement('div');
+          updatedChildNodes?.forEach(child => {
+            temp.appendChild(child);
+          });
+          return temp;
+        }
+
+        if (!acceptedTagsForVoiceoverHighlighting.includes(currentNodeName)) {
+          let currentElementReplicaNodes = [];
+          updatedChildNodes?.forEach(child => {
+            let tempElementNode = document.createElement(currentNodeName);
+            tempElementNode.appendChild(child);
+            currentElementReplicaNodes.push(tempElementNode);
+          });
+          return currentElementReplicaNodes;
+        } else {
+          // Earliest parent tag.
+          const textContent = node.textContent || '';
+          const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
+
+          let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
+          // Removing spaces to avoid ambiguity during string matching.
+          currentSentenceToMatch = currentSentenceToMatch
+            ?.split(' ')
+            ?.join('')
+            ?.trim();
+
+          let spanNodeList = [];
+          let nextSentenceOffset = '';
+          let tempSpanNode = document.createElement('span');
+
+          for (let tempChildNode of updatedChildNodes) {
+            let sentence = tempChildNode.textContent;
+            let temp = nextSentenceOffset + sentence;
+            temp = temp.split(' ').join('').trim();
+
+            tempSpanNode.appendChild(tempChildNode);
+
+            if (temp === currentSentenceToMatch) {
+              spanNodeList.push(tempSpanNode);
+
+              nextSentenceOffset = '';
+              currentSentenceToMatch = sentencesInEarliestParentTag.shift();
+              currentSentenceToMatch = currentSentenceToMatch
+                ?.split(' ')
+                ?.join('')
+                ?.trim();
+
+              tempSpanNode = document.createElement('span');
+            } else {
+              nextSentenceOffset += sentence;
+            }
+          }
+
+          let x = node.cloneNode();
+
+          spanNodeList.forEach(spanNode => {
+            let elementId = `highlightBlock${index}`;
+            spanNode.id = elementId;
+            index++;
+            highlighIdToSentenceText[elementId] = spanNode.textContent;
+            x.appendChild(spanNode);
+          });
+
+          node = x.cloneNode(true);
+          return node;
+        }
       }
     }
 
-    traverse(tempDiv);
+    let x = traverse(tempDiv);
     this.highlighIdToSentenceText = highlighIdToSentenceText;
 
-    return tempDiv.innerHTML;
+    return x?.innerHTML;
   }
 
   private _updateNode(): void {

@@ -75,17 +75,16 @@ export class AutomaticVoiceoverHighlightService {
   removeSpacesAndTransformMathSymbols(): void {
     for (let highlightSentenceId in this.highlightIdToSentenceMap) {
       let sentence = this.highlightIdToSentenceMap[highlightSentenceId];
-      // this.transformMathSentenceContainingAudioSpecficWords(highlightSentenceId, sentence);
+      sentence =
+        this.transformMathSentenceContainingAudioSpecficWords(sentence);
       this.highlightIdToSentenceWithoutSpacesMap[highlightSentenceId] = sentence
         .split(' ')
-        .join('');
+        .join('')
+        .trim();
     }
   }
 
-  transformMathSentenceContainingAudioSpecficWords(
-    highlightSentenceId,
-    sentence: string
-  ): void {
+  transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
     let mathSymbolPronounciations =
       AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS[
         this.languageCode
@@ -122,7 +121,7 @@ export class AutomaticVoiceoverHighlightService {
       sentence = sentence.replace(/ = /g, mathSymbolPronounciations['=']);
     }
 
-    this.highlightIdToSentenceMap[highlightSentenceId] = sentence;
+    return sentence;
   }
 
   getSentencesToHighlightForTimeRanges(): void {
@@ -132,6 +131,7 @@ export class AutomaticVoiceoverHighlightService {
     let sentence = '';
     let minOffsetMsecs = Number.MAX_VALUE;
     let maxOffsetMsecs = 0;
+    this.sentenceHighlightIntervalList = [];
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       const token = tokenToAudioOffsetMsecs.token;

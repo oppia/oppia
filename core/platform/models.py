@@ -281,10 +281,10 @@ class _Gae(Platform):
         Returns:
             module. The azure_speech_synthesis_services module.
         """
-        # if constants.DEV_MODE:
-        #     from core.platform.azure_speech_synthesis import (
-        #         dev_mode_azure_speech_synthesis_services)
-        #     return dev_mode_azure_speech_synthesis_services
+        if constants.DEV_MODE:
+            from core.platform.azure_speech_synthesis import (
+                dev_mode_azure_speech_synthesis_services)
+            return dev_mode_azure_speech_synthesis_services
         from core.platform.azure_speech_synthesis import (
             azure_speech_synthesis_services)
         return azure_speech_synthesis_services
