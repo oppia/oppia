@@ -43,6 +43,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Install GraphicsMagick
+        run: sudo apt-get update && sudo apt-get install graphicsmagick
       - name: Run backend test shard
         id: run_backend_test_shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
