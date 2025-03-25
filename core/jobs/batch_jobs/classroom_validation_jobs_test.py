@@ -24,7 +24,7 @@ from core.jobs.batch_jobs import classroom_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Type, Dict, List
+from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:
@@ -35,7 +35,7 @@ if MYPY:
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
-class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
+class GetClassroomsWithInvalidTopicIdJobTests(job_test_utils.JobTestBase):
     JOB_CLASS: Type[
         classroom_validation_jobs.GetClassroomsWithInvalidTopicIdJob
     ] = classroom_validation_jobs.GetClassroomsWithInvalidTopicIdJob
@@ -50,7 +50,6 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
 
     def test_classroom_with_valid_topic_ids(self) -> None:
         """Test classroom with all valid topic IDs."""
-        # Create valid topics
         topic_model = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID_1,
@@ -67,7 +66,7 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
             deleted=False)
-        
+
         topic_model2 = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID_2,
@@ -84,8 +83,7 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
             deleted=False)
-        
-        # Create a classroom with valid topic IDs
+
         classroom_topic_ids: Dict[str, List[str]] = {
             self.TOPIC_ID_1: [
                 self.TOPIC_ID_2
@@ -100,14 +98,13 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             topic_list_intro='topic list intro',
             topic_id_to_prerequisite_topic_ids=classroom_topic_ids
         )
-        
+
         self.put_multi([topic_model, topic_model2, classroom])
 
         self.assert_job_output_is_empty()
 
     def test_classroom_with_invalid_topic_ids(self) -> None:
         """Test classroom with some invalid topic IDs."""
-        # Create only one valid topic
         topic = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID_1,
@@ -124,8 +121,7 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
             deleted=False)
-        
-        # Create a classroom with invalid topic IDs
+
         classroom_topic_ids: Dict[str, List[str]] = {
             self.TOPIC_ID_3: [
                 self.TOPIC_ID_1,
@@ -141,19 +137,18 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             topic_list_intro='topic list intro',
             topic_id_to_prerequisite_topic_ids=classroom_topic_ids
         )
-        
+
         self.put_multi([topic, classroom])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr="Classroom has invalid topic ids: \"{'topic_3': ['topic_1', 'topic_2']}\""),
+                stderr='Classroom has invalid topic ids: \"{\'topic_3\': [\'topic_1\', \'topic_2\']}\"'), # pylint: disable=line-too-long
             job_run_result.JobRunResult(
                 stdout='CountClassroomsWithInvalidTopicIds SUCCESS: 1'),
         ])
 
     def test_classroom_with_all_invalid_topic_ids(self) -> None:
         """Test classroom with all invalid topic IDs."""
-        # Create a classroom with no valid topics
         classroom_topic_ids: Dict[str, str] = {
             'math': self.TOPIC_ID_1,
             'science': self.TOPIC_ID_2,
@@ -168,19 +163,18 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             topic_list_intro='topic list intro',
             topic_id_to_prerequisite_topic_ids=classroom_topic_ids
         )
-        
+
         self.put_multi([classroom])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr="Classroom has invalid topic ids: \"{'math': 'topic_1', 'science': 'topic_2', 'history': 'topic_3'}\""),
+                stderr='Classroom has invalid topic ids: \"{\'math\': \'topic_1\', \'science\': \'topic_2\', \'history\': \'topic_3\'}\"'), # pylint: disable=line-too-long
             job_run_result.JobRunResult(
                 stdout='CountClassroomsWithInvalidTopicIds SUCCESS: 1'),
         ])
 
     def test_multiple_classrooms_with_mixed_validity(self) -> None:
         """Test multiple classrooms with mixed topic ID validity."""
-        # Create some valid topics
         topic1 = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID_1,
@@ -197,8 +191,7 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
             deleted=False)
-        
-        # Create classrooms with different topic ID validities
+
         classroom1_topic_ids: Dict[str, List[str]] = {
             self.TOPIC_ID_3: [
                 self.TOPIC_ID_1,
@@ -214,7 +207,7 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             topic_list_intro='topic list intro',
             topic_id_to_prerequisite_topic_ids=classroom1_topic_ids
         )
-        
+
         classroom2_topic_ids: Dict[str, List[str]] = {
             self.TOPIC_ID_3: [
                 self.TOPIC_ID_1,
@@ -230,14 +223,14 @@ class GetClassroomsWithInvalidTopicIdTests(job_test_utils.JobTestBase):
             topic_list_intro='topic list intro 2',
             topic_id_to_prerequisite_topic_ids=classroom2_topic_ids
         )
-        
+
         self.put_multi([topic1, classroom1, classroom2])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr="Classroom has invalid topic ids: \"{'topic_3': ['topic_1', 'topic_2']}\""),
+                stderr='Classroom has invalid topic ids: \"{\'topic_3\': [\'topic_1\', \'topic_2\']}\"'), # pylint: disable=line-too-long
             job_run_result.JobRunResult(
-                stderr="Classroom has invalid topic ids: \"{'topic_3': ['topic_1', 'topic_2']}\""),
+                stderr='Classroom has invalid topic ids: \"{\'topic_3\': [\'topic_1\', \'topic_2\']}\"'), # pylint: disable=line-too-long
             job_run_result.JobRunResult(
                 stdout='CountClassroomsWithInvalidTopicIds SUCCESS: 2'),
         ])
