@@ -358,7 +358,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_index_should_raise_exception(self) -> None:
         self.classroom.index = 'index' # type: ignore[assignment]
         error_msg = (
-            'Expected index of the classroom to be a boolean, '
+            'Expected index of the classroom to be a intger, '
             'received: index.'
         )
         with self.assertRaisesRegex(
@@ -443,8 +443,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_thumbnail_data_should_raise_exception(self) -> None:
         self.classroom.thumbnail_data = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected thumbnail_data of the classroom to be a string, '
-            'received: 1.'
+            'Expected thumbnail_data of the classroom to be a '
+            'ImageData dict, received: 1'
         )
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
@@ -456,8 +456,8 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_invalid_banner_data_should_raise_exception(self) -> None:
         self.classroom.banner_data = 1 # type: ignore[assignment]
         error_msg = (
-            'Expected banner_data of the classroom to be a string, '
-            'received: 1.')
+            'Expected banner_data of the classroom to be a '
+            'ImageData dict, received: 1.')
         with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate(strict=True)

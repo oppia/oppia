@@ -365,18 +365,18 @@ class Classroom:
         if strict:
             if not isinstance(self.index, int):
                 raise utils.ValidationError(
-                    'Expected index of the classroom to be a boolean, '
+                    'Expected index of the classroom to be a intger, '
                     'received: %s.' % self.index)
 
             if not isinstance(self.thumbnail_data, ImageData):
                 raise utils.ValidationError(
-                    'Expected thumbnail_data of the classroom to be a string, '
-                    'received: %s.' % self.thumbnail_data
+                    'Expected thumbnail_data of the classroom to be a '
+                    'ImageData dict, received: %s.' % self.thumbnail_data
                 )
             if not isinstance(self.banner_data, ImageData):
                 raise utils.ValidationError(
-                    'Expected banner_data of the classroom to be a string, '
-                    'received: %s.' % self.banner_data
+                    'Expected banner_data of the classroom to be a '
+                    'ImageData dict, received: %s.' % self.banner_data
                 )
             if self.thumbnail_data.filename == '':
                 raise utils.ValidationError(
