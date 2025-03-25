@@ -102,7 +102,7 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
-MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION = 200
+MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION: Final = 200
 
 
 @overload
@@ -2160,7 +2160,7 @@ def _strip_prefix(component_name: str) -> str:
 
 
 def _highlight_differences(
-    original: str, updated: str, max_length: int = 200
+    original: str, updated: str, max_length: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
 ) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
 
@@ -2279,6 +2279,7 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
+        # Get truncated versions only for error message display
         original_text_preview, translation_text_preview = (
             _highlight_differences(
             original_text_html, translation_html)
@@ -2290,20 +2291,11 @@ def update_translation_suggestion(
             f'Translated text preview: {translation_text_preview}'
         )
 
-    if len(translation_html) > MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION:
-        # Get a truncated version of the translation HTML if it
-        # exceeds the maximum length.
-        _, truncated_translation_html = _highlight_differences(
-            original_text_html, translation_html
-        )
-        final_translation_html = truncated_translation_html
-    else:
-        final_translation_html = translation_html
-
+    # Store the full translation HTML without truncation
     suggestion.change_cmd.translation_html = (
-        html_cleaner.clean(final_translation_html)
-        if isinstance(final_translation_html, str)
-        else final_translation_html
+        html_cleaner.clean(translation_html)
+        if isinstance(translation_html, str)
+        else translation_html
     )
     suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change_cmd)

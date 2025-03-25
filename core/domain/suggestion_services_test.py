@@ -1340,52 +1340,84 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertIn('Alpha', original)
         self.assertIn('Beta', updated_suggestion.change_cmd.translation_html)
+        
+    def test_update_translation_suggestion_error_with_multiple_component_discrepancies(self) -> None:
+        content_html_with_image = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        translation_html_without_math = (
+            '<p>Translation without math.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        suggestion = self.create_translation_suggestion(content_html_with_image, content_html_with_image)
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 1 image, 1 math. '
+            'Components in translated text: 2 image, 0 math.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, translation_html_without_math
+            )
 
-    def test_update_translation_suggestion_with_truncation(self) -> None:
-        original = f'{"A" * 300}XYZ'
-        updated = f'{"A" * 300}ABC'
+    def test_update_translation_suggestion_no_rte_components(self) -> None:
+        original = 'This is a test string.'
+        updated = 'This is a best string.'
 
         suggestion = self.create_translation_suggestion(original, original)
 
         suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, updated
+            suggestion.suggestion_id, updated)
+
+    def test_update_translation_suggestion_error_with_truncated_text(self) -> None:
+        max_length = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+        long_original_html = (
+            '<p>' + 'a' * 250 + '</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Original Alt" '
+            'caption-with-value="Original Caption" '
+            'filepath-with-value="original.svg">'
+            '</oppia-noninteractive-image>'
         )
+        long_updated_html = '<p>' + 'b' * 250 + '</p>'
+        suggestion = self.create_translation_suggestion(long_original_html, long_original_html)
 
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id
-        )
+        original_preview_start = long_original_html.find('<p>')
+        original_preview_end = original_preview_start + max_length
+        truncated_original_expected = long_original_html[original_preview_start:original_preview_end]
 
-        self.assertTrue(
-            updated_suggestion.change_cmd.translation_html.startswith('...')
-        )
-        self.assertIn('XYZ', original)
-        self.assertIn('ABC', updated_suggestion.change_cmd.translation_html)
+        updated_preview_start = long_updated_html.find('<p>')
+        updated_preview_end = updated_preview_start + max_length
+        truncated_updated_expected = long_updated_html[updated_preview_start:updated_preview_end]
 
-    def test_update_translation_suggestion_identical_long_strings(self) -> None:
-        """Test updating a translation suggestion with identical long strings
-        that need truncation.
-        """
-        long_text = f'{"A" * 250}'
-        original = long_text
-        updated = long_text
-
-        suggestion = self.create_translation_suggestion(original, updated)
-
-        suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, updated
-        )
-
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id
-        )
-
-        self.assertEqual(
-            len(updated_suggestion.change_cmd.translation_html), 200
-        )
-        self.assertEqual(
-            updated_suggestion.change_cmd.translation_html, original[:200]
-        )
-
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            f'Components in original text: 1 image. Components in translated text: 0 image.\\n'
+            f'Original text preview: {truncated_original_expected}\\n'
+            f'Translated text preview: {truncated_updated_expected}'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, long_updated_html
+            )
+        
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
     ) -> None:
