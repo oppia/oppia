@@ -30,7 +30,7 @@ export class NormalizeWhitespacePunctuationAndCasePipe
   implements PipeTransform
 {
   transform(input: string): string {
-    let isAlphanumeric = function (character: string) {
+    let isAlphanumeric = function (character: string): boolean {
       return (
         'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
           character.toLowerCase()
@@ -40,32 +40,39 @@ export class NormalizeWhitespacePunctuationAndCasePipe
 
     input = input.trim();
     let inputLines = input.split('\n');
-    let resultLines = [];
-    for (let i: number = 0; i < inputLines.length; i++) {
+    let resultLines: string[] = [];
+    for (let line of inputLines) {
+      let processedLine = line.trim().replace(/\s{2,}/g, ' ');
       let result = '';
-
-      let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
-      for (let j: number = 0; j < inputLine.length; j++) {
-        let currentChar: string = inputLine.charAt(j).toLowerCase();
+      for (let j = 0; j < processedLine.length; j++) {
+        let currentChar = processedLine.charAt(j).toLowerCase();
         if (currentChar === ' ') {
+          // Keep the space if the next character is alphanumeric.
           if (
-            j > 0 &&
-            j < inputLine.length - 1 &&
-            isAlphanumeric(inputLine.charAt(j - 1)) &&
-            isAlphanumeric(inputLine.charAt(j + 1))
+            j < processedLine.length - 1 &&
+            isAlphanumeric(processedLine.charAt(j + 1))
           ) {
             result += currentChar;
           }
         } else {
           result += currentChar;
+          // If current character is punctuation (i.e. not alphanumeric) and the next character exists,
+          // and if the next character is alphanumeric and not a space,
+          // then insert a space after the punctuation.
+          if (!isAlphanumeric(currentChar) && j < processedLine.length - 1) {
+            if (
+              processedLine.charAt(j + 1) !== ' ' &&
+              isAlphanumeric(processedLine.charAt(j + 1))
+            ) {
+              result += ' ';
+            }
+          }
         }
       }
-
       if (result) {
         resultLines.push(result);
       }
     }
-
     return resultLines.join('\n');
   }
 }
