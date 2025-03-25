@@ -1422,7 +1422,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            f'Components in original text: 1 image. Components in translated text: 0 image.\\n'
+            f'Components in original text: 1 image. Components in translated text: 0 image.\\n' # pylint: disable=line-too-long
             f'Original text preview: {truncated_original_expected}\\n'
             f'Translated text preview: {truncated_updated_expected}'
         ):
