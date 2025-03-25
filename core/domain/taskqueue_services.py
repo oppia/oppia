@@ -32,8 +32,8 @@ if MYPY: # pragma: no cover
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
-
-# NOTE: The following constants should match the queue names in queue.yaml.
+# NOTE: The following constants should match the queue names on the
+# Cloud Tasks UI.
 # Taskqueue for backing up state.
 QUEUE_NAME_BACKUPS: Final = 'backups'
 # Default queue for processing tasks (including MapReduce ones).
