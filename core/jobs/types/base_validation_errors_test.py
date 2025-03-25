@@ -94,7 +94,7 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
         self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
     def test_missing_model_id(self) -> None:
-        def mock_get_model_id(unused_model) -> None:
+        def mock_get_model_id(unused_model: base_models.BaseModel) -> None:
             return None
 
         with self.swap(job_utils, 'get_model_id', mock_get_model_id):
