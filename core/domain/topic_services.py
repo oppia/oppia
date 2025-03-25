@@ -1090,11 +1090,12 @@ def delete_topic(
         model_to_put: List[base_models.BaseModel] = []
         keys_to_delete: List[datastore_services.Key] = []
         topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
-        model_to_put.append(topic_rights_model.get_models_for_deletion(
+        model_to_put.extend(topic_rights_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
 
         # delete_topic_summary(topic_id)
-        model_to_put.append(topic_models.TopicSummaryModel.get(topic_id).get_instance())
+        keys_to_delete.append(topic_models.TopicSummaryModel.get(topic_id).get_datastore_key())
+        # model_to_put.append(topic_models.TopicSummaryModel.get(topic_id).get_instance())
         topic_model = topic_models.TopicModel.get(topic_id)
         for subtopic in topic_model.subtopics:
             subtopic_page_instances = (
@@ -1109,10 +1110,13 @@ def delete_topic(
         for story_reference in all_story_references:
             story_dict = story_services.get_model_keys_And_delete_story(
                 committer_id, story_reference['story_id'])
-            model_to_put.append(story_dict['model_to_put'])
-            keys_to_delete.append(story_dict['keys_to_delete'])
-        model_to_put.append(topic_model.get_models_for_deletion(
+            model_to_put.extend(story_dict['model_to_put'])
+            keys_to_delete.extend(story_dict['keys_to_delete'])
+        model_to_put.extend(topic_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
+
+        print(keys_to_delete)
+        
 
         # datastore_services.update_timestamps_and_put_multi_transactional(model_to_put)
         datastore_services.update_timestamps_multi(model_to_put)

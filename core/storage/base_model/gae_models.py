@@ -583,12 +583,12 @@ class BaseModel(datastore_services.Model):
         Returns:
             datastore_services.Key. The model associated datastore key.
         """
-        return self.key;
+        return self.key
 
     def get_instance(self) -> SELF_BASE_MODEL:
         """
         """
-        return self;
+        return self
 
 
 class BaseHumanMaintainedModel(BaseModel):
@@ -1183,8 +1183,10 @@ class VersionedModel(BaseModel):
                 datastore_services.Key(
                     self.COMMIT_LOG_ENTRY_CLASS, commit_log_id)
                 for commit_log_id in commit_log_ids]
+        keys_to_delete = content_keys + metadata_keys + commit_log_keys
+        keys_to_delete.append(self.get_datastore_key());
 
-        return content_keys + metadata_keys + commit_log_keys
+        return  keys_to_delete
 
     # Here force deletion is false
     def get_models_for_deletion(
@@ -1222,7 +1224,7 @@ class VersionedModel(BaseModel):
                 # Here, we are narrowing down the type from object to BaseModel.
                 assert isinstance(model_to_put, BaseModel)
                 models_to_put_values.append(model_to_put)
-            return model_to_put
+            return models_to_put_values
 
 
     # Here we use MyPy ignore because the signature of this method

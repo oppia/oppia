@@ -1585,7 +1585,48 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Added story_id_4 to additional story ids')
 
-    def test_delete_topic(self) -> None:
+    def test_delete_topic_force_deletion_true(self) -> None:
+        # Add suggestion for the topic to test if it is deleted too.
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question = self.save_new_question(
+            'question_id',
+            self.user_id_admin,
+            self._create_valid_question_data('dest', content_id_generator),
+            [self.skill_id_1],
+            content_id_generator.next_content_id_index)
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_TOPIC,
+            self.TOPIC_ID,
+            1,
+            self.user_id_admin,
+            {
+                'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+                'skill_difficulty': 0.3,
+                'skill_id': self.skill_id_1,
+                'question_dict': question.to_dict()
+            },
+            'change'
+        )
+
+        self.assertIsNotNone(
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
+
+        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID, True)
+        self.assertIsNone(
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
+        self.assertIsNone(
+            topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID, strict=False))
+        self.assertIsNone(
+            subtopic_page_services.get_subtopic_page_by_id(
+                self.TOPIC_ID, 1, strict=False))
+        self.assertIsNone(
+            suggestion_services.get_suggestion_by_id(
+                suggestion.suggestion_id, strict=False
+            )
+        )
+
+    def test_delete_topic_force_deletion_false(self) -> None:
         # Add suggestion for the topic to test if it is deleted too.
         content_id_generator = translation_domain.ContentIdGenerator()
         question = self.save_new_question(

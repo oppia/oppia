@@ -940,7 +940,7 @@ def get_model_keys_And_delete_story(
     if story_model is not None:
         story = story_fetchers.get_story_from_model(story_model)
         exp_ids = story.story_contents.get_all_linked_exp_ids()
-        model_to_put.append(story_model.get_models_for_deletion(
+        model_to_put.extend(story_model.get_models_for_deletion(
             committer_id,
             feconf.COMMIT_MESSAGE_STORY_DELETED))
         # Reject the suggestions related to the exploration used in
@@ -955,7 +955,7 @@ def get_model_keys_And_delete_story(
             exp_models.ExplorationContextModel.story_id == story_id
         ).fetch()
     )
-    model_to_put.append(list(exploration_context_models))
+    model_to_put.extend(list(exploration_context_models))
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -967,11 +967,11 @@ def get_model_keys_And_delete_story(
     keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_key())
 
     # Delete the opportunities available.
-    model_to_put.append(opportunity_services.get_model_for_delete_exp_opportunities_corresponding_to_story(
+    model_to_put.extend(opportunity_services.get_model_for_delete_exp_opportunities_corresponding_to_story(
         story_id))
 
     # Delete references of the story from all related learner groups.
-    model_to_put.append(learner_group_services.get_model_remove_story_reference_from_learner_groups(story_id))
+    model_to_put.extend(learner_group_services.get_model_remove_story_reference_from_learner_groups(story_id))
 
     return {"model_to_put": model_to_put, "keys_to_delete": keys_to_delete}
 
