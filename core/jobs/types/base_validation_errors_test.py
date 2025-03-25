@@ -93,6 +93,18 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
+    def test_missing_model_id(self) -> None:
+        error = FooError(self.model)
+
+        def mock_get_model_id(unused_model) -> None:
+            retun None
+
+        with self.swap(job_utils, 'get_model_id', mock_get_model_id)
+            self.assertEqual(
+                error.stderr,
+                'FooError in BaseModel(id="missing model Id"): foo'
+        )
+
     def test_message_raises_type_error_if_assigned_a_non_string_value(
         self
     ) -> None:
