@@ -996,7 +996,7 @@ export class ConversationSkinComponent {
             this.recommendedExplorationSummaries = nextStoryNode;
           });
         if (this.isLoggedIn) {
-          this.storyViewerBackendApiService
+          let chapterCompletionRecord = this.storyViewerBackendApiService
             .recordChapterCompletionAsync(
               topicUrlFragment,
               classroomUrlFragment,
@@ -1029,6 +1029,27 @@ export class ConversationSkinComponent {
                   }
                 });
             });
+          Promise.all([chapterCompletionRecord]).then(() => {
+            setTimeout(() => {
+              if (!this.showProgressClearanceMessage) {
+                this.showProgressClearanceMessage = true;
+                console.log(
+                  `[${new Date().toISOString()}] Progress Clearance shown.`
+                );
+                setTimeout(() => {
+                  let alertInfoElement = document.querySelector(
+                    '.oppia-exploration-checkpoints-message'
+                  );
+
+                  // Remove the alert message after 6 sec.
+                  if (alertInfoElement) {
+                    alertInfoElement.remove();
+                  }
+                }, this.alertMessageTimeout);
+              }
+            }, 0);
+          });
+          return;
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
             StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE,
