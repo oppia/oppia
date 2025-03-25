@@ -32,14 +32,15 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 describe('Exploration User Roles', function () {
   let manager: ExplorationEditor;
   let collaborator: ExplorationEditor;
-  let _newCollaborator: ExplorationEditor;
+  let newCollaborator: ExplorationEditor;
   let playtester: ExplorationEditor;
   let explorationCreator: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
     // Create all users.
-    _newCollaborator = await UserFactory.createNewUser(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
     );
