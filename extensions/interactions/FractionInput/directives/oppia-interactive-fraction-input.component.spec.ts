@@ -70,6 +70,7 @@ describe('InteractiveFractionInputComponent', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer | null): void => {},
+    updateAnswerIsValid(isValid: boolean) {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -152,91 +153,8 @@ describe('InteractiveFractionInputComponent', () => {
   );
 
   it(
-    'should display INVALID_CHARS_LENGTH error message when input' +
-      ' fraction has more than 7 charaters in a number while user is typing',
-    fakeAsync(() => {
-      const updateCurrentAnswerSpy = spyOn(
-        currentInteractionService,
-        'updateCurrentAnswer'
-      );
-      component.answer = '123';
-      component.answerValueChanged();
-      component.answer = '12345678';
-
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      component.answerValueChanged();
-      tick(150);
-
-      expect(component.errorMessageI18nKey).toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
-          .INVALID_CHARS_LENGTH
-      );
-      expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
-        ['123'],
-        ['12345678'],
-      ]);
-    })
-  );
-
-  it(
-    'should display INVALID_CHARS error message when input' +
-      ' fraction has invalid characters while user is typing',
-    fakeAsync(() => {
-      const updateCurrentAnswerSpy = spyOn(
-        currentInteractionService,
-        'updateCurrentAnswer'
-      );
-      component.answer = '?2';
-      component.answerValueChanged();
-      component.answer = '??2';
-
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      component.answerValueChanged();
-      tick(150);
-
-      expect(component.errorMessageI18nKey).toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
-      );
-      expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['?2'], ['??2']]);
-    })
-  );
-
-  it(
-    'should display INVALID_FORMAT error message when input' +
-      ' fraction is in a incorrect format while user is typing',
-    fakeAsync(() => {
-      const updateCurrentAnswerSpy = spyOn(
-        currentInteractionService,
-        'updateCurrentAnswer'
-      );
-      component.answer = '2';
-
-      component.answerValueChanged();
-
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-
-      component.answer = '2 / 4 / 5';
-      component.answerValueChanged();
-      tick(150);
-      expect(component.errorMessageI18nKey).toBe(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
-      );
-      expect(component.isValid).toBe(false);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([
-        ['2'],
-        ['2 / 4 / 5'],
-      ]);
-    })
-  );
-
-  it(
-    'should not display error message when input' +
-      ' fraction is correct while user is typing',
+    'should update the current answer with debounce' +
+      'when user types valid input',
     fakeAsync(() => {
       const updateCurrentAnswerSpy = spyOn(
         currentInteractionService,
@@ -245,17 +163,142 @@ describe('InteractiveFractionInputComponent', () => {
       component.answer = '2';
       component.answerValueChanged();
       component.answer = '2/3';
-      component.isValid = false;
-      component.errorMessageI18nKey = 'error';
-
       component.answerValueChanged();
       tick(150);
 
-      expect(component.errorMessageI18nKey).toBe('');
-      expect(component.isValid).toBe(true);
-      expect(updateCurrentAnswerSpy.calls.allArgs()).toEqual([['2'], ['2/3']]);
+      expect(updateCurrentAnswerSpy).toHaveBeenCalledWith('2/3');
     })
   );
+
+  it(
+    'should display invalid format error when' +
+      'empty answer after user submits.',
+    () => {
+      component.answer = '';
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_FRACTIONS_INVALID_FORMAT'
+      );
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+    }
+  );
+
+  it(
+    'should display invalid characters error when' +
+      ' invalid character are submitted and not allowed',
+    () => {
+      component.answer = '3a/4';
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe(
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
+      );
+      expect(component.isValid).toBeFalse();
+    }
+  );
+
+  it(
+    'should display invalid format error when' +
+      'double slashes are submitted and not allowed',
+    () => {
+      component.answer = '2//3';
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe(
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
+      );
+      expect(component.isValid).toBeFalse();
+    }
+  );
+
+  it(
+    'should not display error message when negative' +
+      ' input fraction is valid after user submits',
+    () => {
+      component.answer = '-1 2/3';
+      spyOn(currentInteractionService, 'onSubmit');
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe('');
+      expect(currentInteractionService.onSubmit).toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should correctly initialize answer' +
+      'when saved solution contains negative mixed number',
+    () => {
+      component.savedSolution = {
+        isNegative: true,
+        wholeNumber: 1,
+        numerator: 2,
+        denominator: 3,
+      };
+
+      component.ngOnInit();
+
+      expect(component.answer).toBe('-1 2/3');
+    }
+  );
+
+  it('should reset validity status when user modifies answer input', fakeAsync(() => {
+    component.answer = 'invalid';
+    component.answerValueChanged();
+    tick(150);
+
+    expect(component.isValid).toBeTrue();
+  }));
+
+  it(
+    'should display proper fraction error' +
+      'when improper fraction is submitted and not allowed',
+    () => {
+      component.allowImproperFraction = false;
+      component.answer = '4/3';
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION'
+      );
+    }
+  );
+
+  it(
+    'should display non-mixed error' +
+      'when mixed number is submitted and integer parts are disallowed',
+    () => {
+      component.allowNonzeroIntegerPart = false;
+      component.answer = '1 1/2';
+
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toBe(
+        'I18N_INTERACTIONS_FRACTIONS_NON_MIXED'
+      );
+    }
+  );
+
+  it('should display invalid length error when number exceeds 7 digits', () => {
+    component.answer = '12345678/1';
+
+    component.submitAnswer();
+
+    expect(component.errorMessageI18nKey).toBe(
+      ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS
+        .INVALID_CHARS_LENGTH
+    );
+  });
 
   it(
     'should display simplest form error message when input' +
@@ -264,12 +307,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.requireSimplestForm = true;
       component.answer = '2/6';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
@@ -280,12 +328,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.allowImproperFraction = false;
       component.answer = '5/3';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
@@ -296,12 +349,17 @@ describe('InteractiveFractionInputComponent', () => {
       component.allowNonzeroIntegerPart = false;
       component.answer = '1 1/3';
 
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+
       component.submitAnswer();
 
       expect(component.errorMessageI18nKey).toBe(
         'I18N_INTERACTIONS_FRACTIONS_NON_MIXED'
       );
       expect(component.isValid).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     }
   );
 
