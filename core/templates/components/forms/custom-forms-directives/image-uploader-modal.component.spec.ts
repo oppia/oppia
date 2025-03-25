@@ -26,6 +26,7 @@ import {ImageUploaderModalComponent} from './image-uploader-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {of} from 'rxjs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {fakeAsync, tick} from '@angular/core/testing';
 
 describe('Image Uploader Modal', () => {
   let fixture: ComponentFixture<ImageUploaderModalComponent>;
@@ -102,6 +103,10 @@ describe('Image Uploader Modal', () => {
       document.createElement('img')
     );
 
+    // Trigger change detection to propagate the updated input property to the component.
+    // Without this, Angular's change detection might not run before ngOnInit(), leading to
+    // stale property values if the component relies on the updated input during initialization.
+    fixture.detectChanges();
     componentInstance.initializeCropper();
 
     expect(componentInstance.cropper).toBeDefined();
@@ -114,6 +119,7 @@ describe('Image Uploader Modal', () => {
       document.createElement('img')
     );
 
+    fixture.detectChanges();
     componentInstance.initializeCropper();
 
     expect(componentInstance.cropper).toBeDefined();
@@ -129,82 +135,96 @@ describe('Image Uploader Modal', () => {
   });
 
   it('should handle image upload and confirm image', () => {
-    const dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
-    const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
-      c.charCodeAt(0)
-    );
-    const file = new File([arrayBuffer], 'filename.png');
+    fakeAsync(() => {
+      const dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
+      const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
+        c.charCodeAt(0)
+      );
+      const file = new File([arrayBuffer], 'filename.png');
 
-    const fileReaderMock = {
-      readAsDataURL: jasmine
-        .createSpy('readAsDataURL')
-        .and.callFake(function () {
-          const event = {
-            target: {result: 'base64ImageData'},
-          } as ProgressEvent<FileReader>;
-          if (this.onload) {
-            this.onload(event);
-          }
-        }),
-      addEventListener: jasmine.createSpy('addEventListener'),
-      removeEventListener: jasmine.createSpy('removeEventListener'),
-      onload: null as
-        | ((this: FileReader, ev: ProgressEvent<FileReader>) => void)
-        | null,
-    };
+      const fileReaderMock = {
+        readAsDataURL: jasmine
+          .createSpy('readAsDataURL')
+          .and.callFake(function () {
+            const event = {
+              target: {result: 'base64ImageData'},
+            } as ProgressEvent<FileReader>;
+            if (this.onload) {
+              this.onload(event);
+            }
+          }),
+        addEventListener: jasmine.createSpy('addEventListener'),
+        removeEventListener: jasmine.createSpy('removeEventListener'),
+        onload: null as
+          | ((this: FileReader, ev: ProgressEvent<FileReader>) => void)
+          | null,
+      };
 
-    spyOn(window, 'FileReader').and.returnValue(
-      fileReaderMock as unknown as FileReader
-    );
+      spyOn(window, 'FileReader').and.returnValue(
+        fileReaderMock as unknown as FileReader
+      );
 
-    componentInstance.onFileChanged(file);
-    expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+      componentInstance.onFileChanged(file);
+      // Advance the virtual clock to process pending asynchronous operations like file reading.
+      // This ensures any Promise resolutions or setTimeout calls in onFileChanged complete before
+      // proceeding. Without this, image loading might not finish before we check upload status.
+      tick();
 
-    const imageDataUrl = 'base64ImageData';
-    componentInstance.cropper = {
-      getCroppedCanvas: () => {
-        return {
-          toDataURL: () => imageDataUrl,
-        };
-      },
-    } as Cropper;
+      expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
 
-    componentInstance.confirm();
-    expect(componentInstance.croppedImageDataUrl).toEqual(imageDataUrl);
+      const imageDataUrl = 'base64ImageData';
+      componentInstance.cropper = {
+        getCroppedCanvas: () => {
+          return {
+            toDataURL: () => imageDataUrl,
+          };
+        },
+      } as Cropper;
+
+      componentInstance.confirm();
+      expect(componentInstance.croppedImageDataUrl).toEqual(imageDataUrl);
+    });
   });
 
   it(
     'should confirm and set croppedImageDataUrl same as uploadedImage ' +
       'in case of Thumbnail',
-    () => {
+    fakeAsync(() => {
       componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
+      fixture.detectChanges();
+
       componentInstance.ngOnInit();
       let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
       componentInstance.invalidImageWarningIsShown = false;
 
       componentInstance.onFileChanged(file);
+      tick();
 
       expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
 
       const confirmSpy = spyOn(componentInstance, 'confirm').and.callThrough();
-
       componentInstance.confirm();
 
       expect(confirmSpy).toHaveBeenCalled();
       expect(componentInstance.croppedImageDataUrl).toEqual(
         componentInstance.uploadedImage as string
       );
-    }
+    })
   );
 
   it('should remove invalid tags and attributes', () => {
-    componentInstance.ngOnInit();
-    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
-    componentInstance.invalidImageWarningIsShown = false;
+    fakeAsync(() => {
+      componentInstance.ngOnInit();
+      let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+      componentInstance.invalidImageWarningIsShown = false;
+      fixture.detectChanges();
 
-    componentInstance.onFileChanged(file);
-    expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeFalse();
-    expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+      componentInstance.onFileChanged(file);
+      tick();
+
+      expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeFalse();
+      expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
+    });
   });
 
   it(
@@ -213,6 +233,8 @@ describe('Image Uploader Modal', () => {
     () => {
       componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('blue');
+      fixture.detectChanges();
+
       expect(componentInstance.imageUploaderParameters.bgColor).toBe('blue');
     }
   );
@@ -223,6 +245,8 @@ describe('Image Uploader Modal', () => {
     () => {
       componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('red');
+      fixture.detectChanges();
+
       expect(componentInstance.imageUploaderParameters.bgColor).toBe('red');
     }
   );
@@ -243,17 +267,21 @@ describe('Image Uploader Modal', () => {
   });
 
   it('should not initialize cropper if croppableImageRef is null', () => {
-    spyOn(componentInstance, 'initializeCropper');
-    const mockCroppableImageRef = {nativeElement: {}} as ElementRef;
-    componentInstance.croppableImageRef = mockCroppableImageRef;
-    componentInstance.imageUploaderParameters.imageName = 'Image';
-    componentInstance.ngOnInit();
-    let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
-    componentInstance.invalidImageWarningIsShown = false;
+    fakeAsync(() => {
+      spyOn(componentInstance, 'initializeCropper');
+      const mockCroppableImageRef = {nativeElement: {}} as ElementRef;
+      componentInstance.croppableImageRef = mockCroppableImageRef;
+      componentInstance.imageUploaderParameters.imageName = 'Image';
+      componentInstance.ngOnInit();
+      let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
+      componentInstance.invalidImageWarningIsShown = false;
+      fixture.detectChanges();
 
-    componentInstance.onFileChanged(file);
+      componentInstance.onFileChanged(file);
+      tick();
 
-    expect(componentInstance.initializeCropper).not.toHaveBeenCalled();
+      expect(componentInstance.initializeCropper).not.toHaveBeenCalled();
+    });
   });
 
   it('should throw error if cropper is not initialized', () => {
@@ -263,18 +291,22 @@ describe('Image Uploader Modal', () => {
   });
 
   it('should handle file read errors', () => {
-    spyOn(componentInstance, 'onInvalidImageLoaded');
-    const file = new File([], 'invalid.png');
-    const reader = new FileReader();
+    fakeAsync(() => {
+      spyOn(componentInstance, 'onInvalidImageLoaded');
+      const file = new File([], 'invalid.png');
+      const reader = new FileReader();
 
-    spyOn(reader, 'readAsDataURL').and.callFake(function () {
-      const errorEvent = new ProgressEvent('error');
-      this.onerror(errorEvent);
+      spyOn(reader, 'readAsDataURL').and.callFake(function () {
+        const errorEvent = new ProgressEvent('error');
+        this.onerror(errorEvent);
+      });
+
+      spyOn(window, 'FileReader').and.returnValue(reader);
+
+      componentInstance.onFileChanged(file);
+      tick();
+
+      expect(componentInstance.onInvalidImageLoaded).toHaveBeenCalled();
     });
-
-    spyOn(window, 'FileReader').and.returnValue(reader);
-
-    componentInstance.onFileChanged(file);
-    expect(componentInstance.onInvalidImageLoaded).toHaveBeenCalled();
   });
 });
