@@ -237,6 +237,6 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                 stdout='Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist' # pylint: disable = line-too-long
             ),
             job_run_result.JobRunResult(
-                stdout='Skill with ID: skill_id_2 is referenced as a prerequisite but is superseded by skill with ID: superseding-skill' # pylint: disable = line-too-long
+                stdout='Skill with ID: skill_id_2 (Description: skill_description_2) is referenced as a prerequisite but is superseded by skill with ID: superseding-skill' # pylint: disable = line-too-long
             )
         ])

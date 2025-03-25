@@ -63,6 +63,16 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             )
         )
 
+        skills_description_map = (
+            skill_models_pcoll
+            | 'Create skill ID to description mapping' >> beam.Map(
+                lambda skill_model: (
+                    skill_model.id, 
+                    skill_model.description
+                )
+            )
+        )
+
         skills_with_superseding_skills = (
             skill_models_pcoll
             | 'Extract skill models with superseding IDs' >> beam.Map(
@@ -92,7 +102,8 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             | 'Check if prerequisite exists' >> beam.ParDo(
                 CheckPrerequisiteExists(),
                 beam.pvalue.AsIter(all_skill_ids),
-                beam.pvalue.AsDict(skills_with_superseding_skills)
+                beam.pvalue.AsDict(skills_with_superseding_skills),
+                beam.pvalue.AsDict(skills_description_map)
             )
             | 'Filter hanging prerequisites' >> beam.Filter(
                 # Keep only skills that don't exist (False) or have a
@@ -101,7 +112,7 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             )
             | 'Create collection of hanging prerequisites' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f"""Skill with ID: {result[0]} is referenced as a prerequisite but {'does not exist' if not result[1] else f'is superseded by skill with ID: {result[2]}'}""" # pylint: disable=line-too-long
+                    f"""Skill with ID: {result[0]} (Description: {result[3]}) is referenced as a prerequisite but {'does not exist' if not result[1] else f'is superseded by skill with ID: {result[2]}'}""" # pylint: disable=line-too-long
                 )
             )
         )
@@ -123,6 +134,7 @@ class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
         prerequisite_id: str,
         all_skill_ids: List[str],
         skill_superseding_map: Dict[str, Optional[str]],
+        skills_description_map: Dict[str, str],
     ) -> Iterable[Tuple[str, bool, Optional[str]]]:
         """Check if the prerequisite exists in all skill IDs.
 
@@ -131,14 +143,17 @@ class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
             all_skill_ids: list(string). List of all valid skill IDs.
             skill_superseding_map: dict(string, string). Map of skill IDs to
                 their superseding skill IDs.
+            skills_description_map: dict(string, string). Map of skill IDs to
+                their descriptions.
 
         Yields:
-            Tuple(string, boolean, string). A tuple
+            Tuple(string, boolean, string, string). A tuple
             (prerequisite_id, exists, superseding_id) where exists is True if
-            the prerequisite exists in all_skill_ids, False otherwise and
+            the prerequisite exists in all_skill_ids, False otherwise,
             superseding_id is the ID of the superseding skill if one exists,
-            None otherwise.
+            None otherwise and the description of the skill.
         """
         exists = prerequisite_id in all_skill_ids
         superseding_id = skill_superseding_map.get(prerequisite_id, None)
-        yield (prerequisite_id, exists, superseding_id)
+        description = skills_description_map.get(prerequisite_id, '')
+        yield (prerequisite_id, exists, superseding_id, description)
