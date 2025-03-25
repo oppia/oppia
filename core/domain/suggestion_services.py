@@ -2160,7 +2160,9 @@ def _strip_prefix(component_name: str) -> str:
 
 
 def _highlight_differences(
-    original: str, updated: str, max_length: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+    original: str,
+    updated: str,
+    max_length: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
 ) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
 
@@ -2279,7 +2281,7 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
-        # Get truncated versions only for error message display
+        # Get truncated versions only for error message display.
         original_text_preview, translation_text_preview = (
             _highlight_differences(
             original_text_html, translation_html)
@@ -2291,7 +2293,7 @@ def update_translation_suggestion(
             f'Translated text preview: {translation_text_preview}'
         )
 
-    # Store the full translation HTML without truncation
+    # Store the full translation HTML without truncation.
     suggestion.change_cmd.translation_html = (
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)
