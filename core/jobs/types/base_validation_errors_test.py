@@ -95,7 +95,7 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
 
     def test_missing_model_id(self) -> None:
         def mock_get_model_id(unused_model) -> None:
-            retun None
+            return None
 
         with self.swap(job_utils, 'get_model_id', mock_get_model_id):
             error = FooError(self.model)
