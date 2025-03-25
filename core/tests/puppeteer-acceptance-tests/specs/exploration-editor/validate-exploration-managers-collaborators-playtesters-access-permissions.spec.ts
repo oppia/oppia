@@ -43,7 +43,6 @@ describe('Exploration User Roles', function () {
       'newCollaborator',
       'newCollaborator@example.com'
     );
-    await newCollaborator.closeBrowser();
 
     playtester = await UserFactory.createNewUser(
       'playtester',
