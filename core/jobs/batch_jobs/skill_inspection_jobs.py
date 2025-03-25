@@ -67,7 +67,7 @@ class CountHangingPrerequisiteSkillsJob(base_jobs.JobBase):
             skill_models_pcoll
             | 'Create skill ID to description mapping' >> beam.Map(
                 lambda skill_model: (
-                    skill_model.id, 
+                    skill_model.id,
                     skill_model.description
                 )
             )
@@ -135,7 +135,7 @@ class CheckPrerequisiteExists(beam.DoFn): # type: ignore[misc]
         all_skill_ids: List[str],
         skill_superseding_map: Dict[str, Optional[str]],
         skills_description_map: Dict[str, str],
-    ) -> Iterable[Tuple[str, bool, Optional[str]]]:
+    ) -> Iterable[Tuple[str, bool, Optional[str], str]]:
         """Check if the prerequisite exists in all skill IDs.
 
         Args:
