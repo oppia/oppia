@@ -32,19 +32,16 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 describe('Exploration User Roles', function () {
   let manager: ExplorationEditor;
   let collaborator: ExplorationEditor;
-  // ESLint is disabled for the following line because the variable is used solely to create a user,
-  // which is later utilized to verify the correct role (Viva Manager).
-  // Although the variable itself is not directly referenced elsewhere,
-  // disabling ESLint prevents an unused variable error.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars.
-  let newCollaborator: ExplorationEditor;
+  // This variable is required for user creation, which is later used to verify the correct role (Viva Manager).
+  // Although it is not directly referenced elsewhere, using `_` as the variable name prevents ESLint warnings for unused variables.
+  let _: ExplorationEditor;
   let playtester: ExplorationEditor;
   let explorationCreator: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
     // Create all users.
-    newCollaborator = await UserFactory.createNewUser(
+    _ = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
     );
