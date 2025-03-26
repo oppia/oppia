@@ -1445,7 +1445,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_update_translation_suggestion_error_with_truncated_text(
         self
     ) -> None:
-        truncate_threshold = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+        truncate_threshold = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION # pylint: disable=line-too-long
         long_original_html = (
             f'<p>{"a" * 250}</p>'
             '<oppia-noninteractive-image '
