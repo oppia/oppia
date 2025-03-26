@@ -18,15 +18,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests
+    # Optional: If you need to merge develop branch or set up dependencies
+    - name: Merge develop branch and set up dependencies
+      uses: ./.github/actions/merge-develop-and-set-up-dependencies
     
     - name: Check PR Merge Conflicts
       env:
