@@ -8,6 +8,7 @@ on:
       - develop
       - release-*
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - develop
       - release-*
@@ -46,9 +47,6 @@ jobs:
     name: Build the app, and store build files as an artifact
     needs: [check_test_suites_to_run]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
