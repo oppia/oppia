@@ -469,6 +469,7 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         retrieved_policy = (
             voiceover_services.get_voiceover_autogeneration_policy()
         )
+        assert retrieved_policy is not None
         self.assertDictEqual(
             retrieved_policy.language_codes_mapping,
             language_codes_mapping)
@@ -494,6 +495,7 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
         retrieved_policy = (
             voiceover_services.get_voiceover_autogeneration_policy()
         )
+        assert retrieved_policy is not None
         self.assertDictEqual(
             retrieved_policy.language_codes_mapping,
             language_codes_mapping)
