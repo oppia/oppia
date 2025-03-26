@@ -436,10 +436,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         }
         resolvedSuggestionIds.forEach(suggestionId => {
           if (
-            this.queuedSuggestion &&
-            this.queuedSuggestion.suggestion_id === suggestionId
+            !this.queuedSuggestion ||
+            this.queuedSuggestion.suggestion_id !== suggestionId
           ) {
-          } else {
             delete this.contributions[suggestionId];
           }
         });
