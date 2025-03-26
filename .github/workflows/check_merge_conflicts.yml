@@ -1,0 +1,44 @@
+name: Check PR Merge Conflicts
+on:
+  push:
+    branches:
+      - 'develop'
+
+permissions: read-all
+
+jobs:
+  check-pr-merge-conflicts:
+    name: Check PR Merge Conflicts
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      issues: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Check PR Merge Conflicts
+      env:
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python -m scripts.pr_merge_conflict_check
+      
+    # Optional: Failure notification for specific branch
+    - name: Report failure if failed on oppia/oppia develop branch
+      if: ${{ failure() && github.event_name == 'schedule' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+      uses: ./.github/actions/send-webhook-notification
+      with:
+        message: "PR merge conflict check failed on the upstream develop branch."
+        webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
