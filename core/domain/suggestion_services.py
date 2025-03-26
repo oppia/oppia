@@ -2299,7 +2299,7 @@ def update_translation_suggestion(
 
         # Get truncated versions of both original and translated
         # text for the error message.
-        original_text_preview, translation_text_preview = highlight_differences( #pylint: disable=line-too-long
+        original_text_preview, translation_text_preview = highlight_differences( # pylint: disable=line-too-long
             original_text_html,
             translation_html,
             max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
