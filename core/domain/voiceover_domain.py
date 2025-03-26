@@ -390,7 +390,8 @@ class VoiceoverAutogenerationPolicy:
                     % language_code)
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError(
-                    'Invalid language_code: %s' % language_code)
+                    'Expected language code to be in supported audio '
+                    'language codes, received: %s' % language_code)
             language_code_mapping = self.language_codes_mapping[language_code]
             if not isinstance(language_code_mapping, dict):
                 raise utils.ValidationError(
