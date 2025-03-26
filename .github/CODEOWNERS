@@ -97,6 +97,7 @@
 /core/templates/services/assets-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
+/core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
 
 
 # Audio Voiceover project
@@ -264,7 +265,6 @@
 /app_dev.yaml @oppia/release-workflow-reviewers
 /cron.yaml @oppia/release-workflow-reviewers
 /index.yaml @oppia/release-workflow-reviewers
-/queue.yaml @oppia/release-workflow-reviewers
 
 
 # Global components and filters.
