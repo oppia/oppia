@@ -594,7 +594,7 @@ class VoiceoverAutogenerationPolicyUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Invalid language_code'
+            'Expected language code to be in supported audio language codes'
         ):
             voiceover_autogeneration_policy.language_codes_mapping['n'] = {
                 'en-US': False
