@@ -1138,13 +1138,12 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                         '},\n'
                     )
                 else:
-                    story = story_fetchers.get_story_by_id(story_id)
-                    topic_id = story.corresponding_topic_id
-                    if topic_id not in (
-                        valid_topic_ids_with_contribution_stats):
-                        # Valid stats model does not exists.
+                    story = story_fetchers.get_story_by_id(
+                        story_id, strict=False)
+                    if story is None:
                         logged_suggestions_count += 1
                         debug_logs += (
+                            # No story context model exists.
                             '{\n'
                             f'suggestion_id: {s.id},\n'
                             f'suggestion_type: {s.suggestion_type},\n'
@@ -1155,8 +1154,8 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             f'status: {s.status},\n'
                             f'language_code: {s.language_code},\n'
                             'corresponding_topic_id: [\n{'
-                            f'topic_id: {topic_id}, '
-                            'problem: no_stats_model},\n],\n')
+                            f'topic_id: None, '
+                            'problem: no_story_model},\n],\n')
 
                         # Check if xploration opportunity model exists.
                         opportunity_model_exists = (
@@ -1171,6 +1170,39 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
                             f'{opportunity_model_exists},\n'
                             '},\n'
                         )
+                    else:
+                        topic_id = story.corresponding_topic_id
+                        if topic_id not in (
+                            valid_topic_ids_with_contribution_stats):
+                            # Valid stats model does not exists.
+                            logged_suggestions_count += 1
+                            debug_logs += (
+                                '{\n'
+                                f'suggestion_id: {s.id},\n'
+                                f'suggestion_type: {s.suggestion_type},\n'
+                                f'target_type: {s.target_type},\n'
+                                f'traget_id: {s.target_id},\n'
+                                'target_verion_at_submission: '
+                                f'{s.target_version_at_submission},\n'
+                                f'status: {s.status},\n'
+                                f'language_code: {s.language_code},\n'
+                                'corresponding_topic_id: [\n{'
+                                f'topic_id: {topic_id}, '
+                                'problem: no_stats_model},\n],\n')
+
+                            # Check if xploration opportunity model exists.
+                            opportunity_model_exists = (
+                                opportunity_models
+                                    .ExplorationOpportunitySummaryModel
+                                        .get_by_id(
+                                            s.target_id) is not (
+                                                None)
+                            )
+                            debug_logs += (
+                                'exp_opportunity_model_exists: '
+                                f'{opportunity_model_exists},\n'
+                                '},\n'
+                            )
 
         if logged_suggestions_count == 0:
             return None
