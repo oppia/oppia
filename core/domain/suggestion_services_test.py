@@ -1289,27 +1289,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             translation_html_with_image
         )
 
-    def test_update_translation_suggestion_identical_strings(self) -> None:
-        original = 'This is a test string.'
-        updated = 'This is a test string.'
-
-        suggestion = self.create_translation_suggestion(original, updated)
-
-        suggestion_services.update_translation_suggestion(
-            suggestion.suggestion_id, updated
-        )
-
-        updated_suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion.suggestion_id
-        )
-
-        self.assertEqual(
-            updated_suggestion.change_cmd.translation_html, updated
-        )
-
     def test_update_translation_suggestion_with_extra_characters(self) -> None:
-        original = 'This is a test string.'
-        updated = 'This is a test string. Extra text.'
+        original = "This is a test string."
+        updated = "This is a test string. Extra text."
 
         suggestion = self.create_translation_suggestion(original, original)
 
@@ -1321,12 +1303,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        truncated_original, truncated_updated = suggestion_services._highlight_differences( #pylint: disable=line-too-long
+        truncated_original, truncated_updated = suggestion_services.highlight_differences(
             original, updated
         )
 
-        # self.assertTrue(truncated_original.endswith('Extra text.'))
-        self.assertTrue(truncated_updated.endswith('Extra text.'))
+        self.assertTrue(truncated_original.startswith("..."))
+        self.assertTrue(truncated_updated.startswith("..."))
+        self.assertTrue(truncated_updated.endswith("Extra text."))
 
     def test_update_translation_suggestion_with_long_text(self) -> None:
         original = f'{"A" * 50}DIFFERENT{"B" * 50}'
@@ -1342,24 +1325,36 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id
         )
 
-        truncated_original, truncated_updated = suggestion_services._highlight_differences( #pylint: disable=line-too-long
+        truncated_original, truncated_updated = suggestion_services.highlight_differences( # pylint: disable=line-too-long
             original, updated
         )
 
+        self.assertTrue(truncated_original.startswith('...'))
         self.assertTrue(truncated_updated.startswith('...'))
+
+        self.assertIn('DIFFERENT', truncated_original)
         self.assertIn('CHANGED', truncated_updated)
 
     def test_highlight_differences_identical_strings(self) -> None:
         original_string = 'This is the same string.'
         updated_string = 'This is the same string.'
-        max_length = 50
 
-        truncated_original, truncated_updated = suggestion_services._highlight_differences( #pylint: disable=line-too-long
-            original_string, updated_string, max_length
+        suggestion = self.create_translation_suggestion(original_string, original_string)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated_string
         )
 
-        self.assertEqual(truncated_original, original_string[:max_length])
-        self.assertEqual(truncated_updated, updated_string[:max_length])
+        suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = suggestion_services.highlight_differences( # pylint: disable=line-too-long
+            original_string, updated_string
+        )
+
+        self.assertEqual(truncated_original, original_string)
+        self.assertEqual(truncated_updated, updated_string)
 
     def test_update_translation_suggestion_with_change_in_middle(self) -> None:
         original = 'This is a test string.'

@@ -2159,7 +2159,7 @@ def _strip_prefix(component_name: str) -> str:
     return component_name.removeprefix('oppia-noninteractive-')
 
 
-def _highlight_differences(
+def highlight_differences(
     original: str,
     updated: str,
     max_length: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
@@ -2299,7 +2299,7 @@ def update_translation_suggestion(
 
         # Get truncated versions of both original and translated
         # text for the error message.
-        original_text_preview, translation_text_preview = _highlight_differences(
+        original_text_preview, translation_text_preview = highlight_differences( #pylint: disable=line-too-long
             original_text_html,
             translation_html,
             max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
