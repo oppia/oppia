@@ -1442,7 +1442,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_translation_suggestion(
             suggestion.suggestion_id, updated)
 
-    def test_update_translation_suggestion_error_with_truncated_text(self) -> None:
+    def test_update_translation_suggestion_error_with_truncated_text(
+        self
+    ) -> None:
         max_length = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         long_original_html = (
             f'<p>{"a" * 250}</p>'
