@@ -303,7 +303,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 self.user_id, story_id, topic.id)
         else:
             learner_progress_services.record_both_story_and_topic_started(
-                self.user_id, story.id)
+                self.user_id, story.id, topic.id)
 
         # completed_story_ids = (
         #     learner_progress_services.get_all_completed_story_ids(
