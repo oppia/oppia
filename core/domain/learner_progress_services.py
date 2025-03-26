@@ -258,14 +258,15 @@ def _save_last_playthrough_information(
 
 
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
-    """Adds the exploration id to the completed list of the user unless the
-    exploration has already been completed or has been created/edited by the
-    user. It is also removed from the incomplete list and the learner playlist
-    (if present).
+    """
+    Adds the story id to the incomplete list of the user unless the
+    story has been already completed by the user. It is also removed from
+    the incomplete list(if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
-        exp_id: str. The id of the completed exploration.
+        story_id: str. The id of the completed story.
+        topic_id: str. The id of the completed topic.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -299,6 +300,11 @@ def record_both_story_and_topic_started(user_id: str, story_id: str, topic_id: s
     Adds the story id to the incomplete list of the user unless the
     story has been already completed by the user. It is also removed from
     the incomplete list(if present).
+
+    Args:
+        user_id: str. The id of the user who has completed the exploration.
+        story_id: str. The id of the completed story.
+        topic_id: str. The id of the completed topic.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(

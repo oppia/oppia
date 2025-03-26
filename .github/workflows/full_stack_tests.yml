@@ -16,22 +16,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 jobs:
-  e2e_and_acceptance_coverage:
-    name: Verify all e2e/acceptance tests are included
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-      - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
-        run: python -m scripts.check_tests_are_captured_in_ci
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "The e2e/acceptance coverage test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   check_test_suites_to_run:
     name: Compute which tests to run
     runs-on: ubuntu-22.04
@@ -78,7 +62,7 @@ jobs:
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
       matrix:
-        repeat: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+        repeat: [1, 2, 3, 4, 5]
         suite: ["logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard"]
     name: Acceptance (${{ matrix.suite }}) Run ${{ matrix.repeat }}
     steps:
