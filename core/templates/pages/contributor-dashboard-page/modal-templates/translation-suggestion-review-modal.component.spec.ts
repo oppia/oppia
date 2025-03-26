@@ -583,15 +583,20 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
-      component.ngOnInit()
-      spyOn(component, 'generateCommitMessage').and.returnValue('Generated Commit Message');
-      const queuedSuggestionSpy = spyOn(component.queuedSuggestionSummaryEmit, 'emit');
+      component.ngOnInit();
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
 
       component.queuedSuggestion = {
         suggestion_id: 'suggestion_2',
         target_id: '2',
         action_status: 'ACCEPTED',
-        reviewer_message: ''
+        reviewer_message: '',
       };
 
       component.acceptAndReviewNext();
@@ -600,14 +605,19 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     it('should emit queuedSuggestion Emit when suggestions are rejected', () => {
       component.ngOnInit();
-      spyOn(component, 'generateCommitMessage').and.returnValue('Generated Commit Message');
-      const queuedSuggestionSpy = spyOn(component.queuedSuggestionSummaryEmit, 'emit');
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
 
       component.queuedSuggestion = {
         suggestion_id: 'suggestion_2',
         target_id: '2',
         action_status: 'REJECTED',
-        reviewer_message: ''
+        reviewer_message: '',
       };
       component.lastSuggestionToReview = true;
 
