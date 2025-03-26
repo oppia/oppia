@@ -1307,6 +1307,59 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.change_cmd.translation_html, updated
         )
 
+    def test_update_translation_suggestion_with_extra_characters(self) -> None:
+        original = "This is a test string."
+        updated = "This is a test string. Extra text."
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = suggestion_services._highlight_differences(
+            original, updated
+        )
+
+        self.assertTrue(truncated_updated.endswith("Extra text."))
+
+    def test_update_translation_suggestion_with_long_text(self) -> None:
+        original = 'A' * 50 + 'DIFFERENT' + 'B' * 50
+        updated = 'A' * 50 + 'CHANGED' + 'B' * 50
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = suggestion_services._highlight_differences(
+            original, updated
+        )
+
+        self.assertTrue(truncated_updated.startswith('...'))
+        self.assertIn('CHANGED', truncated_updated)
+
+    def test_highlight_differences_identical_strings(self) -> None:
+        original_string = "This is the same string."
+        updated_string = "This is the same string."
+        max_length = 50
+
+        truncated_original, truncated_updated = suggestion_services._highlight_differences(
+            original_string, updated_string, max_length
+        )
+
+        self.assertEqual(truncated_original, original_string[:max_length])
+        self.assertEqual(truncated_updated, updated_string[:max_length])
+
     def test_update_translation_suggestion_with_change_in_middle(self) -> None:
         original = 'This is a test string.'
         updated = 'This is a best string.'
@@ -1391,9 +1444,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion_services.update_translation_suggestion(
             suggestion.suggestion_id, updated)
 
-    def test_update_translation_suggestion_error_with_truncated_text(
-        self
-    ) -> None:
+    def test_update_translation_suggestion_error_with_truncated_text(self):
         max_length = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         long_original_html = (
             f'<p>{"a" * 250}</p>'

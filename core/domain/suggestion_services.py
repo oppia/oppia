@@ -102,7 +102,7 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
-MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION: Final = 200
+MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION: Final = 100
 
 
 @overload
@@ -2174,21 +2174,37 @@ def _highlight_differences(
     Returns:
         tuple. A pair of truncated strings highlighting where they differ.
     """
+    # If the strings are identical, simply return truncated versions.
     if original == updated:
         return original[:max_length], updated[:max_length]
 
     min_length = min(len(original), len(updated))
-    diff_index = next(
-        (i for i in range(min_length) if original[i] != updated[i]), min_length
-    )
-    start_index = max(0, diff_index - 10)
 
+    # Find the first index where the strings differ.
+    diff_index = min_length
+    for i in range(min_length):
+        if original[i] != updated[i]:
+            diff_index = i
+            break
+    # Calculate start_index with 10 characters before the first difference.
+    start_index = max(0, diff_index - 10)
+    # Add the '...' prefix if truncation happens and it's not already at the start.
     prefix = '...' if start_index > 0 else ''
 
-    truncated_original = prefix + (
-        original[start_index: start_index + max_length]
-    )
-    truncated_updated = prefix + updated[start_index: start_index + max_length]
+    # Truncate both original and updated strings.
+    truncated_original = original[start_index:start_index + max_length]
+    truncated_updated = updated[start_index:start_index + max_length]
+
+
+    # Apply '...' at the start if truncation happens and it's not already at the start of the string.
+    if len(truncated_original) < max_length and start_index > 0:
+        truncated_original = '...' + truncated_original
+    if len(truncated_updated) < max_length and start_index > 0:
+        truncated_updated = '...' + truncated_updated
+
+    truncated_original = truncated_original[:max_length]
+    truncated_updated = truncated_updated[:max_length]
+
 
     return truncated_original, truncated_updated
 
@@ -2235,9 +2251,7 @@ def update_translation_suggestion(
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    if not isinstance(
-        suggestion, suggestion_registry.SuggestionTranslateContent
-    ):
+    if not isinstance(suggestion, suggestion_registry.SuggestionTranslateContent):
         raise Exception(
             'Expected SuggestionTranslateContent suggestion but found: %s.'
             % type(suggestion).__name__
@@ -2267,6 +2281,7 @@ def update_translation_suggestion(
             ))
 
     if discrepancy_components:
+        # Create the component differences summary.
         original_summary = [
             f'{count} {name}' for name, count, _ in discrepancy_components
         ]
@@ -2281,12 +2296,12 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
-        # Get truncated versions only for error message display.
-        original_text_preview, translation_text_preview = (
-            _highlight_differences(
-            original_text_html, translation_html)
+        # Get truncated versions of both original and translated text for the error message.
+        original_text_preview, translation_text_preview = _highlight_differences(
+            original_text_html, translation_html, max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         )
 
+        # Raise the error with detailed information.
         raise utils.InvalidInputException(
             f'{original_summary_text} {updated_summary_text}\n'
             f'Original text preview: {original_text_preview}\n'
