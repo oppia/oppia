@@ -2593,14 +2593,14 @@ describe('Contributions and review component', () => {
 
       component.queuedSuggestionSummary = {
         target_id: 'id_1',
-        suggestion_id: 'suggestion_1',
+        suggestion_id: 'suggestion_2',
         action_status: 'accepted',
         reviewer_message: 'test',
       };
 
       component.queuedSuggestion = {
         target_id: 'id_1',
-        suggestion_id: 'suggestion_1',
+        suggestion_id: 'suggestion_2',
         action_status: 'accepted',
         reviewer_message: 'test',
       };
