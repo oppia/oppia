@@ -2188,15 +2188,15 @@ def _highlight_differences(
             break
     # Calculate start_index with 10 characters before the first difference.
     start_index = max(0, diff_index - 10)
-    # Add the '...' prefix if truncation happens and it's not already at the start.
-    prefix = '...' if start_index > 0 else ''
+    # Add the '...' prefix if truncation happens and it's not
+    # already at the start.
 
     # Truncate both original and updated strings.
     truncated_original = original[start_index:start_index + max_length]
     truncated_updated = updated[start_index:start_index + max_length]
 
-
-    # Apply '...' at the start if truncation happens and it's not already at the start of the string.
+    # Apply '...' at the start if truncation happens and it's not
+    # already at the start of the string.
     if len(truncated_original) < max_length and start_index > 0:
         truncated_original = '...' + truncated_original
     if len(truncated_updated) < max_length and start_index > 0:
@@ -2204,7 +2204,6 @@ def _highlight_differences(
 
     truncated_original = truncated_original[:max_length]
     truncated_updated = truncated_updated[:max_length]
-
 
     return truncated_original, truncated_updated
 
@@ -2251,7 +2250,9 @@ def update_translation_suggestion(
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    if not isinstance(suggestion, suggestion_registry.SuggestionTranslateContent):
+    if not isinstance(
+        suggestion, suggestion_registry.SuggestionTranslateContent
+    ):
         raise Exception(
             'Expected SuggestionTranslateContent suggestion but found: %s.'
             % type(suggestion).__name__
@@ -2296,9 +2297,12 @@ def update_translation_suggestion(
             f'Components in translated text: {", ".join(updated_summary)}.'
         )
 
-        # Get truncated versions of both original and translated text for the error message.
+        # Get truncated versions of both original and translated
+        # text for the error message.
         original_text_preview, translation_text_preview = _highlight_differences(
-            original_text_html, translation_html, max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+            original_text_html,
+            translation_html,
+            max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         )
 
         # Raise the error with detailed information.
