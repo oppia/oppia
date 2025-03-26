@@ -48,7 +48,7 @@ class ExplorationRecommendations:
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s'
                 % self.exp_id)
-        if not self.exp_id:
+        if self.exp_id == '':
             raise utils.ValidationError(
                 'Expected exp_id to be non-empty, received %s'
                 % self.exp_id)
@@ -66,7 +66,7 @@ class ExplorationRecommendations:
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be a string, '
                     'received %s' % recommended_exploration_id)
-            if not recommended_exploration_id:
+            if recommended_exploration_id == '':
                 raise utils.ValidationError(
                     'Expected recommended_exploration_id to be non-empty, '
                     'received %s' % recommended_exploration_id)
