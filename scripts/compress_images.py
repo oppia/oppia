@@ -179,7 +179,7 @@ class ImageCompressor:
                 shutil.rmtree(self.output_dir, ignore_errors=True)
             except OSError as e:
                 logging.error(
-                    '[ERROR]: %s occurred while removing %s',
+                    '[ERROR]: %s occurred on file %s',
                     e, self.output_dir
                 )
 

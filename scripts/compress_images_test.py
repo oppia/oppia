@@ -93,6 +93,37 @@ class TestImageCompressor(unittest.TestCase):
         self.assertTrue(os.path.exists(self.output_dir))
         mock_subprocess_run.assert_called()
 
+    def test_compress_images_directory_removal_error(self) -> None:
+        """Test error handling when removing output directory fails."""
+        compressor = compress_images.ImageCompressor(
+            self.temp_dir,
+            output_dir=self.output_dir
+        )
+
+        os.makedirs(self.output_dir, exist_ok=True)
+
+        with (
+            mock.patch(
+                'shutil.rmtree',
+                ignore_errors=OSError('Permission denied')),
+            mock.patch('logging.error') as mock_log_error,
+            mock.patch('subprocess.run')
+        ):
+            result_images: List[CompressedImageInfo] = [
+                {
+                    'path': pathlib.Path(self.png_path),
+                    'original_size': 1000,
+                    'new_size': 500
+                }
+            ]
+
+            compressor.compress_images(result_images)
+            mock_log_error.assert_called_once_with(
+                '[ERROR]: %s occurred on file %s',
+                pathlib.Path(self.png_path),
+                mock.ANY
+            )
+
     @mock.patch('pathlib.Path.stat')
     def test_file_size_retrieval_without_compression(
         self,
