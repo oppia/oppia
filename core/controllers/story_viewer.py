@@ -299,30 +299,30 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
         if next_node_id is None:
-            learner_progress_services.mark_story_as_completed(
-                self.user_id, story_id)
+            learner_progress_services.mark_both_story_and_topic_as_completed(
+                self.user_id, story_id, topic.id)
         else:
-            learner_progress_services.record_story_started(
+            learner_progress_services.record_both_story_and_topic_started(
                 self.user_id, story.id)
 
-        completed_story_ids = (
-            learner_progress_services.get_all_completed_story_ids(
-                self.user_id))
-        story_ids_in_topic = []
-        for story_reference in topic.canonical_story_references:
-            story_ids_in_topic.append(story_reference.story_id)
+        # completed_story_ids = (
+        #     learner_progress_services.get_all_completed_story_ids(
+        #         self.user_id))
+        # story_ids_in_topic = []
+        # for story_reference in topic.canonical_story_references:
+        #     story_ids_in_topic.append(story_reference.story_id)
 
-        is_topic_completed = set(story_ids_in_topic).intersection(
-            set(completed_story_ids))
+        # is_topic_completed = set(story_ids_in_topic).intersection(
+        #     set(completed_story_ids))
 
         # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
-        if not is_topic_completed:
-            learner_progress_services.record_topic_started(
-                self.user_id, topic.id)
-        else:
-            learner_progress_services.mark_topic_as_learnt(
-                self.user_id, topic.id)
+        # if not is_topic_completed:
+        #     learner_progress_services.record_topic_started(
+        #         self.user_id, topic.id)
+        # else:
+        #     learner_progress_services.mark_topic_as_learnt(
+        #         self.user_id, topic.id)
 
         self.render_json({
             'summaries': exp_summaries,
