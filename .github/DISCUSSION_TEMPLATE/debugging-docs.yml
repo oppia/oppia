@@ -8,6 +8,7 @@ body:
     required: true
 - type: checkboxes
   id: sharing
+  label: "Please confirm the following:"
   attributes:
     options:
     - label: "I confirm that I've given edit access to the doc to the dev mailing lists, as described in the instructions at the top of the doc."
