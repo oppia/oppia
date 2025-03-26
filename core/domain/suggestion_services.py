@@ -2162,21 +2162,21 @@ def _strip_prefix(component_name: str) -> str:
 def highlight_differences(
     original: str,
     updated: str,
-    max_length: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+    truncate_threshold : int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
 ) -> Tuple[str, str]:
     """Finds the first difference between two strings and truncates accordingly.
 
     Args:
         original: str. The original string.
         updated: str. The updated string.
-        max_length: int. Maximum length of the returned snippets.
+        truncate_threshold : int. Maximum length of the returned snippets.
 
     Returns:
         tuple. A pair of truncated strings highlighting where they differ.
     """
     # If the strings are identical, simply return truncated versions.
     if original == updated:
-        return original[:max_length], updated[:max_length]
+        return original[:truncate_threshold], updated[:truncate_threshold]
 
     min_length = min(len(original), len(updated))
 
@@ -2188,22 +2188,20 @@ def highlight_differences(
             break
     # Calculate start_index with 10 characters before the first difference.
     start_index = max(0, diff_index - 10)
-    # Add the '...' prefix if truncation happens and it's not
-    # already at the start.
 
     # Truncate both original and updated strings.
-    truncated_original = original[start_index:start_index + max_length]
-    truncated_updated = updated[start_index:start_index + max_length]
+    truncated_original = original[start_index:start_index + truncate_threshold]
+    truncated_updated = updated[start_index:start_index + truncate_threshold]
 
     # Apply '...' at the start if truncation happens and it's not
     # already at the start of the string.
-    if len(truncated_original) < max_length and start_index > 0:
+    if len(truncated_original) < truncate_threshold and start_index > 0:
         truncated_original = '...' + truncated_original
-    if len(truncated_updated) < max_length and start_index > 0:
+    if len(truncated_updated) < truncate_threshold and start_index > 0:
         truncated_updated = '...' + truncated_updated
 
-    truncated_original = truncated_original[:max_length]
-    truncated_updated = truncated_updated[:max_length]
+    truncated_original = truncated_original[:truncate_threshold]
+    truncated_updated = truncated_updated[:truncate_threshold]
 
     return truncated_original, truncated_updated
 
@@ -2302,7 +2300,7 @@ def update_translation_suggestion(
         original_text_preview, translation_text_preview = highlight_differences( # pylint: disable=line-too-long
             original_text_html,
             translation_html,
-            max_length=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+            truncate_threshold=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         )
 
         # Raise the error with detailed information.

@@ -1445,7 +1445,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     def test_update_translation_suggestion_error_with_truncated_text(
         self
     ) -> None:
-        max_length = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+        truncate_threshold = suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
         long_original_html = (
             f'<p>{"a" * 250}</p>'
             '<oppia-noninteractive-image '
@@ -1460,13 +1460,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         )
 
         original_preview_start = long_original_html.find('<p>')
-        original_preview_end = original_preview_start + max_length
+        original_preview_end = original_preview_start + truncate_threshold
         truncated_original_expected = long_original_html[
             original_preview_start:original_preview_end
         ]
 
         updated_preview_start = long_updated_html.find('<p>')
-        updated_preview_end = updated_preview_start + max_length
+        updated_preview_end = updated_preview_start + truncate_threshold
         truncated_updated_expected = long_updated_html[
             updated_preview_start:updated_preview_end
         ]
