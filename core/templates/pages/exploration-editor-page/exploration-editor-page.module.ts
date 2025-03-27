@@ -74,6 +74,7 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
+import {AutomaticVoiceoverRegenerationConfirmModalComponent} from './translation-tab/voiceover-card/modals/automatic-voiceover-regeneration-confirm-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -132,6 +133,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {GraphDataService} from './services/graph-data.service';
+import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -209,6 +211,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -264,6 +267,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -356,6 +360,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     FocusManagerService,
     GenerateContentIdService,
     GraphDataService,
+    HintAndSolutionModalService,
     ImageLocalStorageService,
     ImageUploadHelperService,
     InteractionAttributesExtractorService,
