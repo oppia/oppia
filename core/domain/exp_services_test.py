@@ -1666,7 +1666,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_id, self.owner_id,
             title='Test Title', category='Test Category'
         )
-        self.process_and_flush_pending_tasks()  # Ensure background tasks complete
+        self.process_and_flush_pending_tasks()
+        # Ensure background tasks complete  
         summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertEqual(summary.title, 'Test Title')
         self.assertEqual(summary.category, 'Test Category')
@@ -1721,8 +1722,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # Revert to version 1, creating version 3.
         exp_services.revert_exploration(self.owner_id, exp_id, 2, 1)
         self.process_and_flush_pending_tasks()
+        # Reverted to initial title.
         summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
-        self.assertEqual(summary.title, 'Initial Title')  # Reverted to initial title
+        self.assertEqual(summary.title, 'Initial Title')
         self.assertEqual(summary.version, 3)
 
     def test_exp_summary_model_after_publishing(self) -> None:
@@ -1751,12 +1753,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertNotIn(self.editor_id, summary_before.editor_ids)
         rights_manager.assign_role_for_exploration(
-            self.owner, exp_id, self.editor_id, 
-            rights_domain.ROLE_EDITOR
+            self.owner, exp_id, self.editor_id, rights_domain.ROLE_EDITOR
         )
         self.process_and_flush_pending_tasks()
         summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
-        self.assertIn(self.editor_id, summary_after.editor_ids)       
+        self.assertIn(self.editor_id, summary_after.editor_ids)
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
@@ -4762,12 +4763,16 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_get_last_updated_by_human_ms(self) -> None:
         self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
+            self.EXP_0_ID, self.owner_id, end_state_name='End'
+        )
         self.process_and_flush_pending_tasks()
 
-        creation_human_update_ms = exp_services.get_last_updated_by_human_ms(self.EXP_0_ID)
+        creation_human_update_ms = exp_services.get_last_updated_by_human_ms(
+            self.EXP_0_ID
+        )
 
-        # Update the exploration this should NOT change the human update timestamp.
+        # Update the exploration; this should NOT change the human update
+        # timestamp.
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
@@ -4780,10 +4785,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
-            creation_human_update_ms
+        new_human_update_ms = exp_services.get_last_updated_by_human_ms(
+            self.EXP_0_ID
         )
+        self.assertEqual(new_human_update_ms, creation_human_update_ms)
 
     def test_get_exploration_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
