@@ -42,7 +42,7 @@ describe('Exploration User Roles', function () {
     // Create a new user and immediately close its browser
     // This prevents unused variable lint errors and ensures
     // any browser resources are properly released, even if
-    // the user object is not used further in this test suite
+    // the user object is not used further in this test suite.
     newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
