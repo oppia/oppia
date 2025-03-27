@@ -258,15 +258,14 @@ def _save_last_playthrough_information(
 
 
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
-    """
-    Adds the story id to the incomplete list of the user unless the
-    story has been already completed by the user. It is also removed from
-    the incomplete list(if present).
+    """Adds the exploration id to the completed list of the user unless the
+    exploration has already been completed or has been created/edited by the
+    user. It is also removed from the incomplete list and the learner playlist
+    (if present).
 
     Args:
         user_id: str. The id of the user who has completed the exploration.
-        story_id: str. The id of the completed story.
-        topic_id: str. The id of the completed topic.
+        exp_id: str. The id of the completed exploration.
     """
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
@@ -293,73 +292,9 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         learner_playlist_services.remove_exploration_from_learner_playlist(
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
-        _save_completed_activities(activities_completed)
-
-def record_both_story_and_topic_started(user_id: str, story_id: str, topic_id: str) -> None:
-    """
-    Adds the story id to the incomplete list of the user unless the
-    story has been already completed by the user. It is also removed from
-    the incomplete list(if present).
-
-    Args:
-        user_id: str. The id of the user who has completed the exploration.
-        story_id: str. The id of the completed story.
-        topic_id: str. The id of the completed topic.
-    """
-    incomplete_activities_model = (
-        user_models.IncompleteActivitiesModel.get(
-            user_id, strict=False))
-    if not incomplete_activities_model:
-        incomplete_activities_model = (
-            user_models.IncompleteActivitiesModel(id=user_id))
-
-    completed_story_ids = get_all_completed_story_ids(user_id)
-
-    incomplete_activities = _get_incomplete_activities_from_model(
-        incomplete_activities_model)
-    
-    learnt_topic_ids = get_all_learnt_topic_ids(user_id)
-
-    if (story_id not in completed_story_ids and
-            story_id not in incomplete_activities.story_ids):
-        incomplete_activities.add_story_id(story_id)
-        if (topic_id not in learnt_topic_ids and
-                topic_id not in incomplete_activities.partially_learnt_topic_ids):
-            incomplete_activities.add_partially_learnt_topic_id(topic_id)
-        _save_incomplete_activities(incomplete_activities)
-
-def mark_both_story_and_topic_as_completed(user_id: str, story_id: str, topic_id: str) -> None:
-    """Adds the story id to the completed list of the user unless the
-    story has already been completed by the user. It is also removed from
-    the incomplete list(if present).
-
-    Args:
-        user_id: str. The id of the user who has completed the story.
-        story_id: str. The id of the completed story.
-    """
-
-    completed_activities_model = (
-        user_models.CompletedActivitiesModel.get(user_id, strict=False))
-    if not completed_activities_model:
-        completed_activities_model = (
-            user_models.CompletedActivitiesModel(id=user_id))
-
-    topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
-        user_id)
-    activities_completed = _get_completed_activities_from_model(
-        completed_activities_model)
-
-    if story_id not in activities_completed.story_ids:
-        remove_story_from_incomplete_list(user_id, story_id)
-        activities_completed.add_story_id(story_id)
-        if topic_id not in activities_completed.learnt_topic_ids:
-            remove_topic_from_partially_learnt_list(user_id, topic_id)
-            if topic_id in topic_ids_to_learn:
-                learner_goals_services.remove_topics_from_learn_goal(
-                    user_id, [topic_id])
-        activities_completed.add_learnt_topic_id(topic_id)
-        _save_completed_activities(activities_completed)
-
+        import time
+        time.sleep(1)
+        _save_completed_activities(activities_completed, marker=f"Exploration: {exp_id}")
 
 
 def mark_story_as_completed(user_id: str, story_id: str) -> None:
