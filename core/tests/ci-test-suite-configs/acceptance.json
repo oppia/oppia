@@ -65,6 +65,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
     },
     {
+      "name": "logged-in-user/edit-avatar-and-view-exploration-from-profile-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-avatar-and-view-exploration-from-profile-page.spec.ts"
+    },
+    {
       "name": "logged-in-user/restart-or-continue-exploration-on-revisit",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
     },
