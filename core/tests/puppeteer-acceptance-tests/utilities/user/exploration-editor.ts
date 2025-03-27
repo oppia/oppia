@@ -228,9 +228,17 @@ const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const historyTableIndex = '.history-table-index';
+const historyListOptions = '.e2e-test-history-list-options';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-unpublished_exploration-v';
+const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -1579,8 +1587,8 @@ export class ExplorationEditor extends BaseUser {
     isPublished: boolean
   ): Promise<string[]> {
     const filePrefix = isPublished
-      ? 'oppia-Publishwithaninteraction-v'
-      : 'oppia-unpublished_exploration-v';
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
 
     const files = fs.readdirSync(downloadPath);
     return files.filter(file =>
@@ -1601,8 +1609,8 @@ export class ExplorationEditor extends BaseUser {
     fileCount: number
   ): string {
     const filePrefix = isPublished
-      ? 'oppia-Publishwithaninteraction-v'
-      : 'oppia-unpublished_exploration-v';
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
     return fileCount === 0
       ? `${filePrefix}${version}.zip`
       : `${filePrefix}${version} (${fileCount}).zip`;
@@ -1619,14 +1627,15 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     const historyItems = await this.page.$$(historyListContent);
     for (const historyItem of historyItems) {
-      const versionNumberElement = await historyItem.$('.history-table-index');
+      const versionNumberElement = await historyItem.$(historyTableIndex);
       const versionText = await this.page.evaluate(
         element => element.textContent,
         versionNumberElement
       );
 
+      // Check whether the current exploration version matches the given explorationVersion.
       if (parseInt(versionText, 10) === explorationVersion) {
-        // Count existing files before downloading.
+        // Count existing files with same name before downloading.
         const existingFiles = await this.getExistingVersionFiles(
           explorationVersion,
           isExplorationPublished
@@ -1638,14 +1647,10 @@ export class ExplorationEditor extends BaseUser {
           nextNumber
         );
 
-        const dropdownButton = await historyItem.$(
-          '.e2e-test-history-list-options'
-        );
+        const dropdownButton = await historyItem.$(historyListOptions);
         await this.page.evaluate(el => el.click(), dropdownButton);
         await this.page.waitForTimeout(1000);
-        const downloadButton = await historyItem.$(
-          'a.dropdown-item.e2e-test-download-exploration'
-        );
+        const downloadButton = await historyItem.$(downloadExplorationButton);
         await this.page.evaluate(el => el.click(), downloadButton);
         await this.page.waitForTimeout(5000);
         const downloadedFile =

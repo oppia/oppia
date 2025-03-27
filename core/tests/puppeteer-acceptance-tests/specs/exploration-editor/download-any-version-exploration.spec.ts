@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for download any version of the exploration from the history tab..
+ * @fileoverview Acceptance Test for download any version of the exploration from the history tab.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
