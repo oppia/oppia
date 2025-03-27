@@ -1667,7 +1667,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             title='Test Title', category='Test Category'
         )
         self.process_and_flush_pending_tasks()
-        # Ensure background tasks complete  
+        # Ensure background tasks complete.
         summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertEqual(summary.title, 'Test Title')
         self.assertEqual(summary.category, 'Test Category')
