@@ -1739,12 +1739,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.owner, exp_id)
         self.process_and_flush_pending_tasks()
         summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
-        self.assertFalse(summary_after.is_private())  # Now public.
+        self.assertFalse(summary_after.is_private())
+        # Now public.
         self.assertIsNotNone(summary_after.first_published_msec)
 
     def test_exp_summary_model_after_assigning_editor(self) -> None:
-        """Test that ExpSummaryModel updates after assigning an editor role.
-        """
+        """Test that ExpSummaryModel updates after assigning an editor role."""
         exp_id = self.EXP_0_ID
         self.save_new_valid_exploration(exp_id, self.owner_id)
         self.process_and_flush_pending_tasks()
