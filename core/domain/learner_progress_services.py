@@ -294,7 +294,7 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         activities_completed.add_exploration_id(exp_id)
         import time
         time.sleep(1)
-        _save_completed_activities(activities_completed, marker=f"Exploration: {exp_id}")
+        _save_completed_activities(activities_completed)
 
 
 def mark_story_as_completed(user_id: str, story_id: str) -> None:
