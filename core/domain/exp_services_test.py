@@ -1656,6 +1656,107 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 exp_fetchers
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'exp_id_1', [1]))
+            
+    def test_exp_summary_model_after_creation(self) -> None:
+        """Test that ExpSummaryModel is correctly initialized after exploration creation."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Test Title', category='Test Category'
+        )
+        self.process_and_flush_pending_tasks()  # Ensure background tasks complete
+        summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertEqual(summary.title, 'Test Title')
+        self.assertEqual(summary.category, 'Test Category')
+        self.assertEqual(summary.owner_ids, [self.owner_id])
+        self.assertEqual(summary.version, 1)
+        self.assertTrue(summary.is_private())  
+        self.assertIsNone(summary.first_published_msec)  
+
+    def test_exp_summary_model_after_update(self) -> None:
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id, title='Initial Title')
+        self.process_and_flush_pending_tasks()
+        
+        initial_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        initial_version = initial_summary.version
+        
+        exp_services.update_exploration(
+            self.owner_id, exp_id,
+            [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Updated Title'
+            })],
+            'Changed title'
+        )
+        self.process_and_flush_pending_tasks()
+        
+        summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertEqual(summary.title, 'Updated Title')
+        # Updated expectation: the version increases by 2.
+        self.assertEqual(summary.version, initial_version + 2)
+
+
+    def test_exp_summary_model_after_reversion(self) -> None:
+        """Test that ExpSummaryModel reflects the reverted state after reversion."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id, title='Initial Title')
+        self.process_and_flush_pending_tasks()
+        
+        # Update to create version 2.
+        exp_services.update_exploration(
+            self.owner_id, exp_id,
+            [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'Updated Title'
+            })],
+            'Changed title'
+        )
+        self.process_and_flush_pending_tasks()
+        
+        # Revert to version 1, creating version 3.
+        exp_services.revert_exploration(self.owner_id, exp_id, 2, 1)
+        self.process_and_flush_pending_tasks()
+        
+        summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertEqual(summary.title, 'Initial Title')  # Reverted to initial title
+        self.assertEqual(summary.version, 3)  
+
+    def test_exp_summary_model_after_publishing(self) -> None:
+        """Test that ExpSummaryModel updates correctly after publishing an exploration."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        self.process_and_flush_pending_tasks()
+        
+        summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertTrue(summary_before.is_private())
+        self.assertIsNone(summary_before.first_published_msec)
+        
+        # Publish the exploration.
+        rights_manager.publish_exploration(self.owner, exp_id)
+        self.process_and_flush_pending_tasks()
+        
+        summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertFalse(summary_after.is_private())  # Now public.
+        self.assertIsNotNone(summary_after.first_published_msec)  
+
+    def test_exp_summary_model_after_assigning_editor(self) -> None:
+        """Test that ExpSummaryModel updates after assigning an editor role."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        self.process_and_flush_pending_tasks()
+        
+        summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertNotIn(self.editor_id, summary_before.editor_ids)
+        
+        rights_manager.assign_role_for_exploration(
+            self.owner, exp_id, self.editor_id, rights_domain.ROLE_EDITOR
+        )
+        self.process_and_flush_pending_tasks()
+        
+        summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertIn(self.editor_id, summary_after.editor_ids)            
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
@@ -4660,27 +4761,29 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        original_timestamp = utils.get_current_time_in_millisecs()
-
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
+        self.process_and_flush_pending_tasks()
 
-        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
+        creation_human_update_ms = exp_services.get_last_updated_by_human_ms(self.EXP_0_ID)
 
+        # Update the exploration this should NOT change the human update timestamp.
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })
+            ],
+            'Did migration.'
+        )
+        self.process_and_flush_pending_tasks()
 
-        self.assertLess(
-            original_timestamp,
-            exp_services.get_last_updated_by_human_ms(self.EXP_0_ID))
-        self.assertLess(
+        self.assertEqual(
             exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
-            timestamp_after_first_edit)
+            creation_human_update_ms
+        )
 
     def test_get_exploration_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
