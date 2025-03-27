@@ -1656,7 +1656,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 exp_fetchers
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'exp_id_1', [1]))
-            
+
     def test_exp_summary_model_after_creation(self) -> None:
         """Test that ExpSummaryModel is correctly initialized after 
         exploration creation.
