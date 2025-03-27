@@ -36,7 +36,6 @@ import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 import './checkpoint-celebration-modal.component.css';
@@ -94,7 +93,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService,
     private explorationPlayerStateService: ExplorationPlayerStateService
   ) {}
 
@@ -185,7 +183,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (
       newStateName === this.currentStateName ||
       newStateName === this.mostRecentlyReachedCheckpointStateName ||
-      !this.platformFeatureService.status.CheckpointCelebration.isEnabled ||
       !this.explorationPlayerStateService.isInStoryChapterMode()
     ) {
       return;
@@ -328,9 +325,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   openLessonInfoModal(): void {
-    if (!this.platformFeatureService.status.CheckpointCelebration.isEnabled) {
-      return;
-    }
     this.checkpointCelebrationUtilityService.openLessonInformationModal();
   }
 

@@ -50,7 +50,9 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   constructor(private stateEditorService: StateEditorService) {}
 
   ngOnInit(): void {
-    this.misconceptionFeedbackIsUsed = true;
+    if (this.misconceptionFeedbackIsUsed !== false) {
+      this.misconceptionFeedbackIsUsed = true;
+    }
     this.misconceptionsBySkill =
       this.stateEditorService.getMisconceptionsBySkill();
   }
