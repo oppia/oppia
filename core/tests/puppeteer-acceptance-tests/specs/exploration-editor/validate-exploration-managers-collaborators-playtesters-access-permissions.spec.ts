@@ -32,19 +32,22 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 describe('Exploration User Roles', function () {
   let manager: ExplorationEditor;
   let collaborator: ExplorationEditor;
-  // This variable is required for user creation, which is later used to verify the correct role (Viva Manager).
-  // Although it is not directly referenced elsewhere, using `_` as the variable name prevents ESLint warnings for unused variables.
-  let _: ExplorationEditor;
+  let newCollaborator: ExplorationEditor;
   let playtester: ExplorationEditor;
   let explorationCreator: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
     // Create all users.
-    _ = await UserFactory.createNewUser(
+    // Create a new user and immediately close its browser
+    // This prevents unused variable lint errors and ensures
+    // any browser resources are properly released, even if
+    // the user object is not used further in this test suite
+    newCollaborator = await UserFactory.createNewUser(
       'newCollaborator',
       'newCollaborator@example.com'
     );
+    await newCollaborator.closeBrowser();
 
     playtester = await UserFactory.createNewUser(
       'playtester',
