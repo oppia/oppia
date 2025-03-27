@@ -111,7 +111,6 @@ jobs:
         with:
           name: e2e-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-          retention-days: 7
       - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         run: >
@@ -125,7 +124,6 @@ jobs:
         with:
           name: e2e-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-          retention-days: 7
       - name: Uploading webdriverio-video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
