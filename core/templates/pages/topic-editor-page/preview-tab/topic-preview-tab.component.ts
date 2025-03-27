@@ -36,11 +36,8 @@ export class TopicPreviewTabComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topic!: Topic;
   topicName!: string;
-  classroomUrlFragment: string = '';
-  classroomName: string = '';
-  topicUrlFragment!: string;
   subtopics!: Subtopic[];
-  canonicalStorySummaries!: StorySummary[];
+  cannonicalStorySummaries!: StorySummary[];
   activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
 
@@ -51,19 +48,13 @@ export class TopicPreviewTabComponent {
 
   ngOnInit(): void {
     this.topic = this.topicEditorStateService.getTopic();
-    this.topicUrlFragment = this.topicEditorStateService
-      .getTopic()
-      .getUrlFragment();
-    this.classroomName = this.topicEditorStateService.getClassroomName() ?? '';
-    this.classroomUrlFragment =
-      this.topicEditorStateService.getClassroomUrlFragment() ?? '';
     this.topicName = this.topic.getName();
     this.subtopics = this.topic.getSubtopics();
-    this.canonicalStorySummaries =
+    this.cannonicalStorySummaries =
       this.topicEditorStateService.getCanonicalStorySummaries();
-    for (let idx in this.canonicalStorySummaries) {
+    for (let idx in this.cannonicalStorySummaries) {
       this.chapterCount +=
-        this.canonicalStorySummaries[idx].getNodeTitles().length;
+        this.cannonicalStorySummaries[idx].getNodeTitles().length;
     }
   }
 
