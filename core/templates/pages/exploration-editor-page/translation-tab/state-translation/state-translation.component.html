@@ -83,7 +83,7 @@
   <div class="translation-nav" joyrideStep="translationTabCardOptions" [stepContent]="TranslationTabCardOptions">
     <ul id="tutorialTranslationState" class="oppia-translation-tabs">
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="e2e-test-accessibility-translation-content" aria-label="Content of the card" role="button">
-        <div (click)="onTabClick(TAB_ID_CONTENT)" tabindex="0" (keydown.enter)="onTabClick(TAB_ID_CONTENT)" [ngStyle]="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
+        <div (click)="onTabClick(TAB_ID_CONTENT)" tabindex="0" (keydown.enter)="onTabClick(TAB_ID_CONTENT)" [ngStyle]="tabStatusColorStyleContent(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
                 tabindex="0"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
@@ -107,7 +107,7 @@
         </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_FEEDBACK), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_FEEDBACK)}" class="e2e-test-accessibility-translation-feedback" aria-label="Feedback responses for answer groups" role="button">
-        <div (click)="onTabClick(TAB_ID_FEEDBACK)" [attr.tabindex]="!isDisabled(TAB_ID_FEEDBACK) ? '0' : '-1'" (keydown.enter)="onTabClick(TAB_ID_FEEDBACK)" [ngStyle]="tabStatusColorStyle(TAB_ID_FEEDBACK)" class="oppia-translation-tabs-text e2e-test-translation-feedback-tab">
+        <div (click)="onTabClick(TAB_ID_FEEDBACK)" [attr.tabindex]="!isDisabled(TAB_ID_FEEDBACK) ? '0' : '-1'" (keydown.enter)="onTabClick(TAB_ID_FEEDBACK)" [ngStyle]="tabStatusColorStyleFeedback(TAB_ID_FEEDBACK)" class="oppia-translation-tabs-text e2e-test-translation-feedback-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_FEEDBACK)" class="oppia-tab-needs-update"
                 tabindex="0"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
@@ -115,7 +115,7 @@
         </div>
       </li>
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_HINTS), 'oppia-disabled-translation-tab': isDisabled(TAB_ID_HINTS)}" class="e2e-test-accessibility-translation-hint" aria-label="Hints for the state" role="button">
-        <div (click)="onTabClick(TAB_ID_HINTS)" [attr.tabindex]="!isDisabled(TAB_ID_HINTS) ? '0' : '-1'" (keydown.enter)="onTabClick(TAB_ID_HINTS)" [ngStyle]="tabStatusColorStyle(TAB_ID_HINTS)" class="oppia-translation-tabs-text e2e-test-translation-hints-tab">
+        <div (click)="onTabClick(TAB_ID_HINTS)" [attr.tabindex]="!isDisabled(TAB_ID_HINTS) ? '0' : '-1'" (keydown.enter)="onTabClick(TAB_ID_HINTS)" [ngStyle]="tabStatusColorStyleContent(TAB_ID_HINTS)" class="oppia-translation-tabs-text e2e-test-translation-hints-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_HINTS)" class="oppia-tab-needs-update"
                 tabindex="0"
                 [ngbTooltip]="needsUpdateTooltipMessage" placement="top">⚠
@@ -163,7 +163,7 @@
              tabindex="0"
              class="oppia-rule-tab oppia-translation-preview-list"
              [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
-             [ngStyle]="contentIdStatusColorStyle(caContent.content.contentId)">
+             [ngStyle]="contentIdStatusColorStyle(caContent.content)">
             <oppia-response-header [index]="index"
                                    [defaultOutcome]="true"
                                    [summary]="caContent.name + ': ' + getSubtitledContentSummary(caContent.content)"
@@ -210,7 +210,7 @@
                (keydown.enter)="changeActiveRuleContentIndex(index)"
                (click)="changeActiveRuleContentIndex(index)"
                [ngClass]="{'oppia-rule-tab-active': activeRuleContentIndex === index}"
-               [ngStyle]="contentIdStatusColorStyle(ruleContent.contentId)">
+               [ngStyle]="contentIdStatusColorStyle(ruleContent)">
                {{ ruleContent.rule | parameterizeRuleDescriptionPipe: stateInteractionId: answerChoices }}
             </a>
             <div *ngIf="activeRuleContentIndex === index">
@@ -237,7 +237,7 @@
                (keydown.enter)="changeActiveAnswerGroupIndex(index)"
                (click)="changeActiveAnswerGroupIndex(index)"
                [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}"
-               [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback.contentId)">
+               [ngStyle]="contentIdStatusColorStyle(answerGroup.outcome.feedback)">
               <oppia-response-header [index]="index"
                                      [summary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, false)"
                                      [shortSummary]="summarizeAnswerGroup(answerGroup, stateInteractionId, answerChoices, true)"
@@ -254,7 +254,7 @@
               <div class="oppia-editor-card-section e2e-test-feedback-{{ index }}-text">
                 <div class="oppia-rule-body-container" tabindex="0">
                   <span *ngIf="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
-                    {{ getEmptyContentMessage() }}
+                    {{ getEmptyContentMessage(answerGroup.outcome.feedback) }}
                   </span>
                   <span>
                     <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
@@ -280,7 +280,7 @@
                tabindex="0"
                (keydown.enter)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
                [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == stateAnswerGroups.length}"
-               [ngStyle]="contentIdStatusColorStyle(stateDefaultOutcome.feedback.contentId)">
+               [ngStyle]="contentIdStatusColorStyle(stateDefaultOutcome.feedback)">
               <oppia-response-header [index]="index"
                                      [isActive]="index === activeAnswerGroupIndex"
                                      [summary]="summarizeDefaultOutcome(stateDefaultOutcome, stateInteractionId, stateDefaultOutcome.length, false)"
@@ -295,11 +295,16 @@
             <div *ngIf="activeAnswerGroupIndex === stateAnswerGroups.length">
               <div class="oppia-editor-card-section e2e-test-feedback-{{ stateAnswerGroups.length }}-text">
                 <div class="oppia-rule-body-container" tabindex="0">
-                  <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
-                                            (click)="onContentClick($event)"
-                                            [rteString]="getRequiredHtml(stateDefaultOutcome.feedback)"
-                                            class="oppia-rte-editor">
-                  </oppia-rte-output-display>
+                  <span *ngIf="!getRequiredHtml(stateDefaultOutcome.feedback)" class="oppia-placeholder">
+                    {{ getEmptyContentMessage(stateDefaultOutcome.feedback) }}
+                  </span>
+                  <span>
+                    <oppia-rte-output-display [ngClass]="{'oppia-rte-editor-focused': isCopyModeActive()}"
+                                              (click)="onContentClick($event)"
+                                              [rteString]="getRequiredHtml(stateDefaultOutcome.feedback)"
+                                              class="oppia-rte-editor">
+                    </oppia-rte-output-display>
+                  </span>
                 </div>
               </div>
             </div>
@@ -317,7 +322,7 @@
              tabindex="0"
              class="oppia-rule-tab e2e-test-hint-{{ index }} oppia-translation-preview-list"
              [ngClass]="{'oppia-rule-tab-active': activeHintIndex === index}"
-             [ngStyle]="contentIdStatusColorStyle(hint.hintContent.contentId)">
+             [ngStyle]="contentIdStatusColorStyle(hint.hintContent)">
             <oppia-response-header [index]="index"
                                    [defaultOutcome]="true"
                                    [summary]="getSubtitledContentSummary(hint.hintContent)"

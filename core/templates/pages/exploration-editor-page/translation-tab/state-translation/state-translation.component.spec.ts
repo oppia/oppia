@@ -512,7 +512,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('content_1', 'html');
-        expect(component.tabStatusColorStyle('content')).toEqual({
+        expect(component.tabStatusColorStyleContent('content')).toEqual({
           'border-top-color': '#D14836',
         });
         expect(component.tabNeedUpdatesStatus('content')).toBe(false);
@@ -556,13 +556,13 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('feedback_1', 'html');
-        expect(component.tabStatusColorStyle('feedback')).toEqual({
-          'border-top-color': '#D14836',
+        expect(component.tabStatusColorStyleFeedback('feedback')).toEqual({
+          'border-top-color': '#6E6E6E',
         });
         expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
         expect(component.contentIdNeedUpdates('feedback_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('feedback_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #6E6E6E',
         });
       });
 
@@ -575,7 +575,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('hint_1', 'html');
-        expect(component.tabStatusColorStyle('hint')).toEqual({
+        expect(component.tabStatusColorStyleContent('hint')).toEqual({
           'border-top-color': '#D14836',
         });
         expect(component.tabNeedUpdatesStatus('hint')).toBe(false);

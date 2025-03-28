@@ -55,6 +55,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationLanguageCodeService} from '../../services/exploration-language-code.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -105,6 +106,8 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }[];
   voiceoverContributionIsEnabled: boolean = true;
 
+  explorationLanguageCode: string;
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -121,7 +124,8 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService
   ) {}
 
   isVoiceoverModeActive(): boolean {
@@ -137,18 +141,30 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
+  needsTranslation(): boolean {
+    return (
+      this.translationLanguageService.getActiveLanguageCode() !==
+      this.explorationLanguageCodeService.displayed
+    );
+  }
+
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
+
+    if (langCode == this.explorationLanguageCodeService.displayed) {
+      return subtitledHtml.html;
+    }
+
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return subtitledHtml.html;
+      return null;
     }
 
     let translationContent =
@@ -156,7 +172,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
-      return subtitledHtml.html;
+      return null;
     }
 
     return translationContent.translation as string;
@@ -187,8 +203,11 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return translationContent.translation as string;
   }
 
-  getEmptyContentMessage(): string {
+  getEmptyContentMessage(subtitledHtml?: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+      if (subtitledHtml && subtitledHtml.isEmpty()) {
+        return 'There is no text available to voiceover.';
+      }
       return (
         'The translation for this section has not been created yet. ' +
         'Switch to translation mode to add a text translation.'
@@ -523,6 +542,53 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
   }
 
+  tabStatusColorStyleFeedback(tabId: string): object {
+    if (this.isDisabled(tabId)) {
+      return {};
+    }
+
+    const hasFeedbackContent =
+      this.stateAnswerGroups.some(ag => !ag.outcome.feedback.isEmpty()) ||
+      (this.stateDefaultOutcome &&
+        !this.stateDefaultOutcome.feedback.isEmpty());
+
+    if (
+      (!hasFeedbackContent || this.needsTranslation()) &&
+      this.translationTabActiveModeService.isVoiceoverModeActive()
+    ) {
+      return {
+        'border-top-color':
+          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+      };
+    }
+
+    return {
+      'border-top-color':
+        this.translationStatusService.getActiveStateComponentStatusColor(tabId),
+    };
+  }
+
+  tabStatusColorStyleContent(tabId: string): object {
+    if (this.isDisabled(tabId)) {
+      return {};
+    }
+
+    if (
+      this.needsTranslation() &&
+      this.translationTabActiveModeService.isVoiceoverModeActive()
+    ) {
+      return {
+        'border-top-color':
+          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+      };
+    }
+
+    return {
+      'border-top-color':
+        this.translationStatusService.getActiveStateComponentStatusColor(tabId),
+    };
+  }
+
   tabNeedUpdatesStatus(tabId: string): boolean {
     if (!this.isDisabled(tabId)) {
       return this.translationStatusService.getActiveStateComponentNeedsUpdateStatus(
@@ -537,10 +603,18 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     );
   }
 
-  contentIdStatusColorStyle(contentId: string): object {
+  contentIdStatusColorStyle(content: SubtitledHtml | SubtitledUnicode): object {
+    if (content.isEmpty() || this.needsTranslation()) {
+      return {
+        'border-left':
+          '3px solid ' +
+          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+      };
+    }
+
     let color =
       this.translationStatusService.getActiveStateContentIdStatusColor(
-        contentId
+        content.contentId
       );
 
     return {'border-left': '3px solid ' + color};

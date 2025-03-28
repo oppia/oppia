@@ -32,6 +32,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -46,6 +47,7 @@ export class TranslationStatusService implements OnInit {
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
+  NULL_ASSETS_AVAILABLE_COLOR: string = '#6E6E6E';
   // These properties are initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -66,7 +68,8 @@ export class TranslationStatusService implements OnInit {
     private entityTranslationsService: EntityTranslationsService,
     private stateEditorService: StateEditorService,
     private platformFeatureService: PlatformFeatureService,
-    private entityVoiceoversService: EntityVoiceoversService
+    private entityVoiceoversService: EntityVoiceoversService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService
   ) {}
 
   ngOnInit(): void {
@@ -187,10 +190,34 @@ export class TranslationStatusService implements OnInit {
         let stateNeedsUpdate = false;
         let noTranslationCount = 0;
         let noVoiceoverCount = 0;
-        let recordedVoiceovers =
-          this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
+        let nonEmptyContent =
+          this.explorationStatesService.getNonEmptyRecordedVoiceoversMemento(
+            stateName
+          );
 
-        let allContentIds = recordedVoiceovers.getAllContentIds();
+        if (
+          this.translationTabActiveModeService.isVoiceoverModeActive() &&
+          this.langCode !== this.explorationLanguageCodeService.displayed
+        ) {
+          let entityTranslations =
+            this.entityTranslationsService
+              .languageCodeToLatestEntityTranslations[this.langCode];
+
+          let filteredVoiceoversMapping = {};
+
+          for (let contentId in nonEmptyContent.voiceoversMapping) {
+            if (entityTranslations) {
+              if (entityTranslations.hasWrittenTranslation(contentId)) {
+                filteredVoiceoversMapping[contentId] =
+                  nonEmptyContent.voiceoversMapping[contentId];
+              }
+            }
+          }
+
+          nonEmptyContent.voiceoversMapping = filteredVoiceoversMapping;
+        }
+        let allContentIds = nonEmptyContent.getAllContentIds();
+
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as

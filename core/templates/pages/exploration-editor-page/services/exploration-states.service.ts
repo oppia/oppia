@@ -767,6 +767,28 @@ export class ExplorationStatesService {
     return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
   }
 
+  getNonEmptyRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
+    const recordedVoiceovers = this.getStatePropertyMemento(
+      stateName,
+      'recorded_voiceovers'
+    );
+
+    let filteredVoiceoversMapping = {};
+
+    for (let contentId in recordedVoiceovers.voiceoversMapping) {
+      let content = this.initalContentsMapping[contentId];
+      if (content && content instanceof SubtitledHtml) {
+        if (!content.isEmpty()) {
+          filteredVoiceoversMapping[contentId] =
+            recordedVoiceovers.voiceoversMapping[contentId];
+        }
+      }
+    }
+
+    recordedVoiceovers.voiceoversMapping = filteredVoiceoversMapping;
+    return recordedVoiceovers;
+  }
+
   saveRecordedVoiceovers(
     stateName: string,
     newRecordedVoiceovers: RecordedVoiceovers
