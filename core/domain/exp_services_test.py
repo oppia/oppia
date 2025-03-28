@@ -1657,6 +1657,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'exp_id_1', [1]))
 
+
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_loading_and_validation_and_deletion_of_demo_explorations(
