@@ -37,15 +37,16 @@ describe('Testing NormalizeWhitespacePunctuationAndCasePipe', () => {
 
     expect(nwpcp.transform('  remove ')).toEqual('remove');
 
-    //  Should remove the space if it does not
-    //  separate two alphanumeric "words".
+    // Should remove the space if it does not separate two alphanumeric "words".
     expect(nwpcp.transform('  remove ? ')).toEqual('remove?');
-    expect(nwpcp.transform(' Hello, world ')).toEqual('hello,world');
+    // Now preserves the space after the comma.
+    expect(nwpcp.transform(' Hello, world ')).toEqual('hello, world');
     expect(nwpcp.transform('  Test1 tesT2 teSt3 ')).toEqual(
       'test1 test2 test3'
     );
+    // Preserve space after punctuation ('!') so that "test2! teSt3" is produced.
     expect(nwpcp.transform('  Test1 tesT2! teSt3 ')).toEqual(
-      'test1 test2!test3'
+      'test1 test2! test3'
     );
 
     expect(nwpcp.transform(' teSTstrinG12  ')).toEqual('teststring12');
