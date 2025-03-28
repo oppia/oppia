@@ -23,7 +23,6 @@ import {
   LanguageAccentToDescription,
   LanguageCodesMapping,
   LanguageAccentMasterList,
-  LanguageAccentCodesToSupportsAutogeneration,
   VoiceArtistIdToLanguageMapping,
   VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
@@ -56,7 +55,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
-  languageAccentCodesToSupportsAutogeneration!: LanguageAccentCodesToSupportsAutogeneration;
   availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
@@ -67,7 +65,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
   languageAccentMasterList!: LanguageAccentMasterList;
-  cloudSupportedLanguageAccentCodes: string[] = [];
   columnsToDisplay: string[] = [
     'voiceArtist',
     'languageCode',
@@ -86,13 +83,10 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.supportedLanguageAccentCodesToDescriptions = {};
         this.languageAccentCodesToDescriptionsMasterList = {};
         this.availableLanguageAccentDescriptionsToCodes = {};
-        this.languageAccentCodesToSupportsAutogeneration = {};
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList
         );
         this.languageAccentMasterList = response.languageAccentMasterList;
-        this.cloudSupportedLanguageAccentCodes =
-          response.autoGeneratableLanguageAccentCodes;
         this.pageIsInitialized = true;
       });
     this.voiceoverBackendApiService
@@ -188,9 +182,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
         this.supportedLanguageAccentCodesToDescriptions[languageAccentCode] =
           languageAccentDescription;
-
-        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
-          languageAccentToSupportsAutogeneration[languageAccentCode];
       }
     }
 
@@ -232,34 +223,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageAccentCodeIsPresent =
       Object.keys(this.supportedLanguageAccentCodesToDescriptions).length !== 0;
     this.removeLanguageAccentDropdown();
-    this.saveUpdatedLanguageAccentSupport();
-  }
-
-  isAutogenerationSupported(languageAccentCode: string): string {
-    if (this.languageAccentCodesToSupportsAutogeneration[languageAccentCode]) {
-      return 'Yes';
-    } else {
-      return 'No';
-    }
-  }
-
-  isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
-    return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
-  }
-
-  updateSupportsAutogenerationField(
-    languageAccentCode: string,
-    supportsAutogeneration: string
-  ): void {
-    const languageCode =
-      this.languageAccentCodeToLanguageCode[languageAccentCode];
-
-    if (supportsAutogeneration === 'Yes') {
-      this.languageCodesMapping[languageCode][languageAccentCode] = true;
-    } else {
-      this.languageCodesMapping[languageCode][languageAccentCode] = false;
-    }
-
     this.saveUpdatedLanguageAccentSupport();
   }
 
