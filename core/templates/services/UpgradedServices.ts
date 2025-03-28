@@ -361,7 +361,6 @@ import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/service
 import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -425,8 +424,6 @@ export class UpgradedServices {
     upgradedServices['EntityVoiceoversService'] = new EntityVoiceoversService(
       upgradedServices['VoiceoverBackendApiService']
     );
-    upgradedServices['VoiceoverLanguageManagementService'] =
-      new VoiceoverLanguageManagementService();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
