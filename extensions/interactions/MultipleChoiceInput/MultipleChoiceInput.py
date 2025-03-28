@@ -39,8 +39,6 @@ class MultipleChoiceInput(base.BaseInteraction):
     instructions: Optional[str] = None
     narrow_instructions: Optional[str] = None
     needs_summary: bool = False
-    # Radio buttons get unselected when specifying a solution. This needs to be
-    # fixed before solution feature can support this interaction.
     can_have_solution: bool = True
     # MultipleChoiceInput interaction must contain a generic submit button.
     show_generic_submit_button: bool = True

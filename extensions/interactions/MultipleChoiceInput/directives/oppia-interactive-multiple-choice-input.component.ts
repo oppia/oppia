@@ -198,7 +198,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   }
 
   clearSelection(): void {
-    // Radio buttons get unselected when specifying a solution.
+    // The radio buttons become unselected when the solution modal is open.
     var selectedElement = document.querySelector(
       'button.multiple-choice-option.selected'
     );
