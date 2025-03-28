@@ -2059,7 +2059,6 @@ export class ExplorationEditor extends BaseUser {
     voiceoverFilePath: string
   ): Promise<void> {
     await this.select(translationLanguageSelector, languageCode);
-    await this.page.waitForSelector(activeTranslationTab);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
