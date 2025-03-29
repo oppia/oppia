@@ -35,6 +35,7 @@ const releaseCoordinatorPageUrl = testConstants.URLs.ReleaseCoordinator;
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
+const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -131,6 +132,49 @@ const contributorDashboardMenuLink =
   '.e2e-test-contributor-dashboard-menu-link';
 const profileMenuLink = '.e2e-test-profile-link';
 const preferencesMenuLink = '.e2e-test-preferences-link';
+const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const saveChangesButton = 'button.e2e-test-save-changes';
+const settingsTab = 'a.e2e-test-exploration-settings-tab';
+const addTitleBar = 'input#explorationTitle';
+const addInteractionModalSelector = 'customize-interaction-body-container';
+const saveDraftButton = 'button.e2e-test-save-draft-button';
+const commitMessage = 'textarea.e2e-test-commit-message-input';
+const publishExplorationButton = 'button.e2e-test-publish-exploration';
+const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
+const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
+const explorationCategoryDropdown =
+  'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
+const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
+const explorationIdElement = 'span.oppia-unique-progress-id';
+const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
+const stateEditSelector = '.e2e-test-state-edit-content';
+const stateContentInputField = 'div.e2e-test-rte';
+const toastMessage = '.e2e-test-toast-message';
+const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
+const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
+const mobileSaveChangesButton =
+  'button.e2e-test-save-changes-for-small-screens';
+const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
+const mobileNavbarOptions = '.navbar-mobile-options';
+const mobileOptionsButton = 'i.e2e-test-mobile-options';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
+const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropdown =
+  'h3.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const explorationControlsSettingsDropdown =
+  'h3.e2e-test-controls-bar-settings-container';
+const tagsField = '.e2e-test-chip-list-tags';
+const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
+const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1441,6 +1485,306 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(profileMenuLink);
+  }
+
+  /**
+   * Deletes the previous written title and updates the new title.
+   */
+  async updateTitleTo(title: string): Promise<void> {
+    await this.clearAllTextFrom(addTitleBar);
+    await this.type(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+
+    showMessage(`Title has been updated to ${title}`);
+  }
+
+  /**
+   * Open settings tab.(Note->It also opens all the dropdowns present
+   * in the setting tab for mobile view port.)
+   */
+  async navigateToSettingsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButton, {visible: true});
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(mobileSettingsBar);
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      await this.clickOn(basicSettingsDropdown);
+      await this.clickOn(advanceSettingsDropdown);
+      await this.clickOn(rolesSettingsDropdown);
+      await this.clickOn(voiceArtistSettingsDropdown);
+      await this.clickOn(permissionSettingsDropdown);
+      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOn(explorationControlsSettingsDropdown);
+    } else {
+      await this.clickOn(settingsTab);
+    }
+    showMessage('Settings tab is opened successfully.');
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   * @param explorationUrl - url of the exploration.
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseUrl}/create/${explorationId}`;
+    await this.goto(editorUrl);
+
+    showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Function to navigate to Creator Dashboard Page
+   */
+  async navigateToCreatorDashboardPage(): Promise<void> {
+    await this.goto(CreatorDashboardUrl);
+    showMessage('Creator dashboard page is opened successfully.');
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickAndWaitForNavigation(createExplorationButton);
+  }
+
+  /**
+   * Function to dismiss exploration editor welcome modal.
+   */
+  async dismissWelcomeModal(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up closed successfully.');
+    } catch (error) {
+      showMessage(`welcome modal not found: ${error.message}`);
+    }
+  }
+
+  /**
+   * Function to add content to a card.
+   * @param {string} content - The content to be added to the card.
+   */
+  async updateCardContent(content: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+    await this.clickOn(stateEditSelector);
+    await this.type(stateContentInputField, `${content}`);
+    await this.clickOn(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Function to add an interaction to the exploration.
+   * @param {string} interactionToAdd - The interaction type to add to the Exploration.
+   * Note: A space is added before and after the interaction name to match the format in the UI.
+   */
+  async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.clickOn(addInteractionButton);
+    await this.clickOn(` ${interactionToAdd} `);
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Function to create an exploration with a content and interaction.
+   * This is a composite function that can be used when a straightforward, simple exploration setup is required.
+   *
+   * @param content - content of the exploration
+   * @param interaction - the interaction to be added to the exploration
+   */
+  async createMinimalExploration(
+    content: string,
+    interaction: string
+  ): Promise<void> {
+    await this.updateCardContent(content);
+    await this.addInteraction(interaction);
+    showMessage('A simple exploration is created.');
+  }
+
+  /**
+   * Function to save an exploration draft.
+   */
+  async saveExplorationDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(mobileSaveChangesButton);
+    } else {
+      await this.clickOn(saveChangesButton);
+    }
+    await this.clickOn(commitMessage);
+    await this.type(commitMessage, 'Testing Testing');
+    await this.clickOn(saveDraftButton);
+    await this.page.waitForSelector(saveDraftButton, {hidden: true});
+
+    // Toast message confirms that the draft has been saved.
+    await this.page.waitForSelector(toastMessage, {
+      visible: true,
+    });
+    await this.page.waitForSelector(toastMessage, {
+      hidden: true,
+    });
+    showMessage('Exploration is saved successfully.');
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to publish exploration.
+   * This is a composite function that can be used when a straightforward, simple exploration published is required.
+   * @param {string} title - The title of the exploration.
+   * @param {string} goal - The goal of the exploration.
+   * @param {string} category - The category of the exploration.,
+   * @param {string} tags - The tags of the exploration.
+   */
+  async publishExplorationWithMetadata(
+    title: string,
+    goal: string,
+    category: string,
+    tags?: string
+  ): Promise<string | null> {
+    const fillExplorationMetadataDetails = async () => {
+      await this.clickOn(explorationTitleInput);
+      await this.type(explorationTitleInput, `${title}`);
+      await this.clickOn(explorationGoalInput);
+      await this.type(explorationGoalInput, `${goal}`);
+      await this.clickOn(explorationCategoryDropdown);
+      await this.clickOn(`${category}`);
+      if (tags) {
+        await this.type(tagsField, tags);
+      }
+    };
+    const publishExploration = async () => {
+      if (this.isViewportAtMobileWidth()) {
+        await this.waitForPageToFullyLoad();
+        const element = await this.page.$(mobileNavbarOptions);
+        // If the element is not present, it means the mobile navigation bar is not expanded.
+        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+        // which expands the mobile navigation bar.
+        if (!element) {
+          await this.clickOn(mobileOptionsButton);
+        }
+        await this.clickOn(mobileChangesDropdown);
+        await this.clickOn(mobilePublishButton);
+      } else {
+        await this.clickOn(publishExplorationButton);
+      }
+    };
+    const confirmPublish = async () => {
+      await this.clickOn(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
+        visible: true,
+      });
+      await this.clickOn(explorationConfirmPublishButton);
+      await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.clickOn(closePublishedPopUpButton);
+      return explorationId;
+    };
+
+    try {
+      await publishExploration();
+      await fillExplorationMetadataDetails();
+      return await confirmPublish();
+    } catch (error) {
+      await this.waitForPageToFullyLoad();
+
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOn(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
+      }
+      await publishExploration();
+      return await confirmPublish();
+    }
+  }
+
+  /**
+   * Function for creating an exploration with only EndExploration interaction with given title.
+   */
+  async createAndPublishAMinimalExplorationWithTitle(
+    title: string,
+    category: string = 'Algebra'
+  ): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+    return await this.publishExplorationWithMetadata(
+      title,
+      'This is Goal here.',
+      category
+    );
+  }
+
+  /**
+   * Opens an exploration in the editor.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async openExplorationInExplorationEditor(
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const title = await this.page.$eval(
+      explorationSummaryTileTitleSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (title === explorationName) {
+      const explorationTileElement = await this.page.$(
+        explorationSummaryTileTitleSelector
+      );
+      await explorationTileElement?.click();
+    } else {
+      throw new Error(`Exploration not found: ${explorationName}`);
+    }
+
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 }
 
