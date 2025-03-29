@@ -62,7 +62,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   chapterPreviewCardIsShown = false;
   mainChapterCardIsShown = true;
   explorationInputButtonsAreShown = false;
-  chapterOutlineButtonsAreShown = false;
+  outlineEditViewIsShown: boolean = false;
   acquiredSkillIdToSummaryMap = {};
   prerequisiteSkillIdToSummaryMap = {};
   chapterOutlineIsShown: boolean = false;
@@ -535,9 +535,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   toggleChapterOutline(): void {
-    if (this.windowDimensionsService.isWindowNarrow()) {
-      this.chapterOutlineIsShown = !this.chapterOutlineButtonsAreShown;
-    }
+    this.chapterOutlineIsShown = !this.chapterOutlineIsShown;
   }
 
   toggleAcquiredSkillsList(): void {
@@ -566,17 +564,24 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateLocalEditableOutline($event: string): void {
     if (this.editableOutline !== $event) {
       this.editableOutline = $event;
-      if (!this.chapterOutlineButtonsAreShown && $event) {
-        this.toggleChapterOutlineButtons();
-      }
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  toggleChapterOutlineButtons(): void {
-    this.chapterOutlineButtonsAreShown = !this.chapterOutlineButtonsAreShown;
+  onSaveButtonClicked(): void {
+    this.updateOutline(this.editableOutline);
+    this.outlineEditViewIsShown = false;
+    this.chapterOutlineIsShown = false;
+    this.oldOutline = this.editableOutline;
+  }
+  onCancelButtonClicked(): void {
+    this.editableOutline = this.oldOutline;
+    this.chapterOutlineIsShown = false;
   }
 
+  makeChapterOutlineEditable(): void {
+    this.chapterOutlineIsShown = true;
+  }
   _recalculateAvailableNodes(): void {
     this.newNodeId = null;
     this.availableNodes = [];

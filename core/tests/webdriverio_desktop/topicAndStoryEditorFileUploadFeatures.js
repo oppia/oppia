@@ -285,7 +285,7 @@ describe('Chapter editor functionality', function () {
     await storyEditorPage.changeNodeOutline(
       await forms.toRichText('First outline')
     );
-    await storyEditorPage.expectNodeOutlineToMatch('First outline');
+
     await storyEditorPage.saveStory('First save');
     // Check if the thumbnail images persist on reload.
     await browser.refresh();

@@ -618,7 +618,7 @@ var StoryEditorPage = function () {
     await action.click('Chapter Title Button', chapterTitleButton);
   };
 
-  this.expectNodeOutlineToMatch = async function (nodeOutline) {
+  this.expectNodeOutlineTextToMatch = async function (nodeOutline) {
     var nodeOutlineEditorRteContent =
       await nodeOutlineEditorRteContentSelector();
     var outlineEditorRteContentText =
