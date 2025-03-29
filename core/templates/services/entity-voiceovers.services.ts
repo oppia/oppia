@@ -37,7 +37,6 @@ export class EntityVoiceoversService {
   public activeLanguageAccentCode!: string;
   public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
     {};
-  public entityVoiceoversLoaded: boolean = false;
   private _voiceoversLoadedEventEmitter = new EventEmitter<void>();
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
@@ -82,7 +81,6 @@ export class EntityVoiceoversService {
 
   async fetchEntityVoiceovers(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.entityVoiceoversLoaded = false;
       this.voiceoverBackendApiService
         .fetchEntityVoiceoversByLanguageCodeAsync(
           this.entityType,
@@ -92,15 +90,10 @@ export class EntityVoiceoversService {
         )
         .then(entityVoiceoversList => {
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
-          this.entityVoiceoversLoaded = true;
           this._voiceoversLoadedEventEmitter.emit();
           resolve();
         });
     });
-  }
-
-  isEntityVoiceoversLoaded(): boolean {
-    return this.entityVoiceoversLoaded;
   }
 
   getEntityVoiceoversByLanguageAccentCode(
@@ -147,27 +140,14 @@ export class EntityVoiceoversService {
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
       for (let contentId in entityVoiceovers.voiceoversMapping) {
-        let voiceovers = [];
-        let manualVoiceover = entityVoiceovers.getManualVoiceover(
-          contentId
-        ) as Voiceover;
-        let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(
-          contentId
-        ) as Voiceover;
-
-        if (manualVoiceover) {
-          voiceovers.push(manualVoiceover);
-        }
-
-        if (automaticVoiceover) {
-          voiceovers.push(automaticVoiceover);
-        }
-
         if (Object.keys(contentIdToVoiceovers).indexOf(contentId) !== -1) {
-          contentIdToVoiceovers[contentId] =
-            contentIdToVoiceovers[contentId].concat(voiceovers);
+          contentIdToVoiceovers[contentId].push(
+            entityVoiceovers.getManualVoiceover(contentId) as Voiceover
+          );
         } else {
-          contentIdToVoiceovers[contentId] = voiceovers;
+          contentIdToVoiceovers[contentId] = [
+            entityVoiceovers.getManualVoiceover(contentId) as Voiceover,
+          ];
         }
       }
     }
