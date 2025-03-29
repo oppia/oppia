@@ -634,34 +634,34 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft(topicName);
   }
 
-    /**
+  /**
    * Updates a rubric.
    * @param {string} difficulty - The difficulty level to update.
    * @param {string} explanation - The explanation to update.
    */
-    async updateRubric(difficulty: string, explanation: string): Promise<void> {
-      await this.waitForStaticAssetsToLoad();
-      let difficultyValue: string;
-      switch (difficulty) {
-        case 'Easy':
-          difficultyValue = '0';
-          break;
-        case 'Medium':
-          difficultyValue = '1';
-          break;
-        case 'Hard':
-          difficultyValue = '2';
-          break;
-        default:
-          throw new Error(`Unknown difficulty: ${difficulty}`);
-      }
-      await this.waitForElementToBeClickable(selectRubricDifficultySelector);
-      await this.select(selectRubricDifficultySelector, difficultyValue);
-      await this.waitForStaticAssetsToLoad();
-      await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-      await this.type(rteSelector, explanation);
-      await this.clickOn(saveRubricExplanationButton);
+  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    let difficultyValue: string;
+    switch (difficulty) {
+      case 'Easy':
+        difficultyValue = '0';
+        break;
+      case 'Medium':
+        difficultyValue = '1';
+        break;
+      case 'Hard':
+        difficultyValue = '2';
+        break;
+      default:
+        throw new Error(`Unknown difficulty: ${difficulty}`);
     }
+    await this.waitForElementToBeClickable(selectRubricDifficultySelector);
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.type(rteSelector, explanation);
+    await this.clickOn(saveRubricExplanationButton);
+  }
 
   /**
    * Publishes an updated skill.

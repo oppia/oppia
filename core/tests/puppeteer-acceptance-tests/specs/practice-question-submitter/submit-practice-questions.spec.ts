@@ -78,7 +78,7 @@ describe('Question Submitter', function () {
     await questionAdmin.navigateToContributorDashboardAdminPage();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
 
-    // Close unnecessary brower windows.
+    // Close unnecessary browser windows.
     UserFactory.closeBrowserForUser(questionAdmin);
     UserFactory.closeBrowserForUser(curriculumAdmin);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);

@@ -93,7 +93,6 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} skillName - The name of the skill to suggest questions for.
    * @param {string} topicName - The name of the topic to suggest questions for.
    */
-
   async suggestQuestionsForSkillandTopic(
     skillName: string,
     topicName: string
