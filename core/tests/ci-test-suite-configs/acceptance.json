@@ -237,6 +237,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-admin/add-and-remove-contribution-rights.spec.ts"
     },
     {
+      "name": "practice-question-submitter/submit-practice-questions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions.spec.ts"
+    },
+    {
       "name": "release-coordinator/edit-feature-rollout-configuration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/edit-feature-rollout-configuration.spec.ts"
     },
