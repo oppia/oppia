@@ -345,12 +345,6 @@ export class ChangeListService {
     return cloneDeep(this.explorationChangeList);
   }
 
-  isOnlyVoiceoverChangeListPresent(): boolean {
-    return this.explorationChangeList.every(
-      change => change.cmd === 'update_voiceovers'
-    );
-  }
-
   getTranslationChangeList(): ExplorationChange[] {
     return cloneDeep(
       this.explorationChangeList.filter(change => {
