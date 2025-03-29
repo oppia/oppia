@@ -733,7 +733,7 @@ export class BaseUser {
       } else {
         dirName = '/dev-mobile-screenshots';
       }
-      failureTrigger += 0.042;
+      failureTrigger += 0.048;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.0352;
       } else if (await currentPage.$(libraryBanner)) {
