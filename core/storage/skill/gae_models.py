@@ -270,7 +270,7 @@ class SkillModel(base_models.VersionedModel):
             the given skill ID as a prerequisite.
         """
         return cls.get_all().filter(
-        cls.prerequisite_skill_ids == skill_id).fetch()
+            cls.prerequisite_skill_ids == skill_id).fetch()
 
 
 class SkillSummaryModel(base_models.BaseModel):
