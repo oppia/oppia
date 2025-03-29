@@ -266,6 +266,14 @@ describe('Image Uploader Modal', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
 
+  it('should check if image is uploaded', () => {
+    componentInstance.uploadedImage = null;
+    expect(componentInstance.isImageUploaded()).toBeFalse();
+
+    componentInstance.uploadedImage = 'some-image-url';
+    expect(componentInstance.isImageUploaded()).toBeTrue();
+  });
+
   it('should not initialize cropper if croppableImageRef is null', () => {
     fakeAsync(() => {
       spyOn(componentInstance, 'initializeCropper');
