@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 interface ClickRegion {
   clickPosition: number[];
@@ -53,10 +52,3 @@ export class ResponseImageClickInput implements OnInit {
       ')';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseImageClickInput',
-  downgradeComponent({
-    component: ResponseImageClickInput,
-  }) as angular.IDirectiveFactory
-);

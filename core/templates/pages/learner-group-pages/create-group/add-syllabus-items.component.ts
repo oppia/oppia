@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subject, Subscription} from 'rxjs';
 
@@ -394,10 +393,3 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerGroupDetails',
-    downgradeComponent({component: AddSyllabusItemsComponent})
-  );

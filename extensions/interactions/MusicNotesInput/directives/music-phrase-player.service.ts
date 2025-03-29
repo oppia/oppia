@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface Note {
   midiValue: number;
@@ -65,10 +64,3 @@ export class MusicPhrasePlayerService {
     this._playMusicPhrase(notes);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MusicPhrasePlayerService',
-    downgradeInjectable(MusicPhrasePlayerService)
-  );

@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {PlaythroughIssuesBackendApiService} from 'services/playthrough-issues-backend-api.service';
 import {PlaythroughIssue} from 'domain/statistics/playthrough-issue.model';
 
@@ -55,10 +55,3 @@ export class PlaythroughIssuesService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PlaythroughIssuesService',
-    downgradeInjectable(PlaythroughIssuesService)
-  );

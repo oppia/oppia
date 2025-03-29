@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {unit} from 'mathjs';
 
@@ -25,7 +24,7 @@ import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -39,7 +38,7 @@ import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 export class NumberWithUnitsValidationService {
   constructor(
     private unitObjectFactory: NumberWithUnitsObjectFactory,
-    private baseInteraction: baseInteractionValidationService
+    private baseInteraction: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -187,10 +186,3 @@ export class NumberWithUnitsValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsValidationService',
-    downgradeInjectable(NumberWithUnitsValidationService)
-  );

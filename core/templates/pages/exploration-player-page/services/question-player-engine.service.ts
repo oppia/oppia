@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
@@ -39,6 +38,7 @@ import {ContextService} from 'services/context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root',
@@ -80,10 +80,9 @@ export class QuestionPlayerEngineService {
   }
 
   private getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a $scope variable
-    // happens,
-    // AngularJS compares the new value of the variable to its previous
-    // value. If they are the same, then the variable is not updated.
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
@@ -286,10 +285,10 @@ export class QuestionPlayerEngineService {
           .taggedSkillMisconceptionId;
     }
 
-    // Use angular.copy() to clone the object
+    // Use cloneDeep() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    const outcome = angular.copy(classificationResult.outcome);
+    const outcome = cloneDeep(classificationResult.outcome);
     // Compute the data for the next state.
     const oldParams = {
       answer: answerString,
@@ -371,10 +370,3 @@ export class QuestionPlayerEngineService {
     return answerIsCorrect;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionPlayerEngineService',
-    downgradeInjectable(QuestionPlayerEngineService)
-  );

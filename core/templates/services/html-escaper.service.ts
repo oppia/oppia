@@ -16,7 +16,6 @@
  * @fileoverview Service for HTML serialization and escaping.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {LoggerService} from 'services/contextual/logger.service';
@@ -81,7 +80,3 @@ export class HtmlEscaperService {
       .replace(/&amp;/g, '&');
   }
 }
-
-angular
-  .module('oppia')
-  .factory('HtmlEscaperService', downgradeInjectable(HtmlEscaperService));

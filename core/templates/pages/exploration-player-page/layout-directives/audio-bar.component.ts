@@ -69,6 +69,7 @@ export class AudioBarComponent {
   selectedLanguageAccentDescription!: string;
   voiceoverToBePlayed!: Voiceover | undefined;
   currentVoiceoverTime: number = 0;
+  totalVoiceoverDurationSecs: number = 0;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -157,7 +158,19 @@ export class AudioBarComponent {
   }
 
   ngAfterContentChecked(): void {
-    this.currentVoiceoverTime = this.audioPlayerService.getCurrentTime();
+    if (
+      this.audioPlayerService.isTrackLoaded() &&
+      this.audioPlayerService.isPlaying()
+    ) {
+      this.currentVoiceoverTime =
+        this.audioPlayerService.getCurrentTimeInSecs();
+      this.totalVoiceoverDurationSecs = Math.floor(
+        this.audioPlayerService.getAudioDuration()
+      );
+    }
+    if (!this.audioPlayerService.isTrackLoaded()) {
+      this.currentVoiceoverTime = 0;
+    }
   }
 
   setProgress(val: {value: number}): void {

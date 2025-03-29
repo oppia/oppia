@@ -18,7 +18,6 @@
  * keeps no mementos.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -963,10 +962,3 @@ export class ExplorationStatesService {
     return this._refreshGraphEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationStatesService',
-    downgradeInjectable(ExplorationStatesService)
-  );

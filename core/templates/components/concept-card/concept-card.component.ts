@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 
@@ -76,10 +75,3 @@ export class ConceptCardComponent implements OnInit {
     this.numberOfWorkedExamplesShown++;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaConceptCard',
-  downgradeComponent({
-    component: ConceptCardComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
 import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -95,10 +94,3 @@ export class ActivityTilesInfinityGridComponent {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaActivityTilesInfinityGrid',
-  downgradeComponent({
-    component: ActivityTilesInfinityGridComponent,
-  }) as angular.IDirectiveFactory
-);

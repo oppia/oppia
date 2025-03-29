@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -97,10 +96,3 @@ export class ReviewMaterialEditorComponent implements OnInit {
     this.onSaveExplanation.emit(explanationObject);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaReviewMaterialEditor',
-    downgradeComponent({component: ReviewMaterialEditorComponent})
-  );

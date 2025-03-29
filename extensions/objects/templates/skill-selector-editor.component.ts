@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
@@ -131,10 +130,3 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'skillSelectorEditor',
-  downgradeComponent({
-    component: SkillSelectorEditorComponent,
-  })
-);

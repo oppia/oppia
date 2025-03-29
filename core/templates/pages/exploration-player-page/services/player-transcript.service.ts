@@ -21,7 +21,6 @@
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -133,22 +132,6 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getLastAnswerOnDisplayedCard(
-    displayedCardIndex: number
-  ): {answerDetails: string} | string | null {
-    if (
-      this.isLastCard(displayedCardIndex) ||
-      this.transcript[displayedCardIndex].getStateName() === null ||
-      this.transcript[displayedCardIndex].getInputResponsePairs().length === 0
-    ) {
-      return null;
-    } else {
-      return this.transcript[displayedCardIndex]
-        .getInputResponsePairs()
-        .slice(-1)[0].learnerInput;
-    }
-  }
-
   isLastCard(index: number): boolean {
     return index === this.transcript.length - 1;
   }
@@ -178,10 +161,3 @@ export class PlayerTranscriptService {
     return null;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PlayerTranscriptService',
-    downgradeInjectable(PlayerTranscriptService)
-  );

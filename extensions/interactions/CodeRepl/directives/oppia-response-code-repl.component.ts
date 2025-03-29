@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
@@ -58,10 +57,3 @@ export class ResponseCodeReplComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseCodeRepl',
-  downgradeComponent({
-    component: ResponseCodeReplComponent,
-  }) as angular.IDirectiveFactory
-);

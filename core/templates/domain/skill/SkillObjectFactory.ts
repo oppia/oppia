@@ -30,7 +30,6 @@ export interface SkillBackendDict {
   version: number;
 }
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -312,6 +311,3 @@ export class SkillObjectFactory {
     });
   }
 }
-angular
-  .module('oppia')
-  .factory('SkillObjectFactory', downgradeInjectable(SkillObjectFactory));

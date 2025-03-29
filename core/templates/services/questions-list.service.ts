@@ -17,7 +17,6 @@
  * questions list in editors.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -156,7 +155,3 @@ export class QuestionsListService {
     return this._questionSummartiesInitializedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('QuestionsListService', downgradeInjectable(QuestionsListService));

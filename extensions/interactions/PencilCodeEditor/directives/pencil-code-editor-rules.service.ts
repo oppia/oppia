@@ -15,7 +15,7 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Injectable} from '@angular/core';
 
 import {CodeNormalizerService} from 'services/code-normalizer.service';
@@ -92,10 +92,3 @@ export class PencilCodeEditorRulesService {
     return normalizedError.indexOf(normalizedSnippet) !== -1;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PencilCodeEditorRulesService',
-    downgradeInjectable(PencilCodeEditorRulesService)
-  );

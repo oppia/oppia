@@ -17,9 +17,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
-import {convertHtmlToUnicode} from 'filters/convert-html-to-unicode.filter';
+import {ConvertHtmlToUnicodePipe} from 'filters/convert-html-to-unicode.pipe';
 import {ExpressionEvaluatorService} from 'expressions/expression-evaluator.service';
 import {ExpressionParserService} from 'expressions/expression-parser.service';
 import {ExpressionSyntaxTreeService} from 'expressions/expression-syntax-tree.service';
@@ -29,6 +28,8 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   providedIn: 'root',
 })
 export class ExpressionInterpolationService {
+  private convertHtmlToUnicodePipe = new ConvertHtmlToUnicodePipe();
+
   constructor(
     private expressionEvaluatorService: ExpressionEvaluatorService,
     private expressionParserService: ExpressionParserService,
@@ -44,7 +45,7 @@ export class ExpressionInterpolationService {
         // expressions are currently input inline via the RTE.
         return this.htmlEscaperService.unescapedStrToEscapedStr(
           this.expressionEvaluatorService.evaluateExpression(
-            convertHtmlToUnicode(p1),
+            this.convertHtmlToUnicodePipe.transform(p1),
             envs
           ) as string
         );
@@ -73,7 +74,7 @@ export class ExpressionInterpolationService {
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.
         return this.expressionEvaluatorService.evaluateExpression(
-          convertHtmlToUnicode(p1),
+          this.convertHtmlToUnicodePipe.transform(p1),
           envs
         ) as string;
       });
@@ -97,7 +98,7 @@ export class ExpressionInterpolationService {
       matches[i] = matches[i].substring(2, matches[i].length - 2);
 
       let params = this.expressionSyntaxTreeService.getParamsUsedInExpression(
-        convertHtmlToUnicode(matches[i])
+        this.convertHtmlToUnicodePipe.transform(matches[i])
       );
 
       for (let j = 0; j < params.length; j++) {
@@ -110,10 +111,3 @@ export class ExpressionInterpolationService {
     return allParams.sort();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionInterpolationService',
-    downgradeInjectable(ExpressionInterpolationService)
-  );

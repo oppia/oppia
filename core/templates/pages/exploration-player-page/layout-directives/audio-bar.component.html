@@ -32,7 +32,7 @@
           <div *ngIf="!audioLoadingIndicatorIsShown">
             <oppia-audio-slider [value]="this.currentVoiceoverTime"
                                 [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
-                                [max]="audioPlayerService.getAudioDuration()"
+                                [max]="this.totalVoiceoverDurationSecs"
                                 (valueChange)="setProgress($event)"
                                 aria-label="audio-slider">
             </oppia-audio-slider>

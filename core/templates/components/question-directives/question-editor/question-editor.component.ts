@@ -25,7 +25,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {Subscription} from 'rxjs';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -248,10 +247,3 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionEditor',
-  downgradeComponent({
-    component: QuestionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 import hashlib
-import imghdr
 import itertools
 import logging
 import urllib
@@ -39,6 +38,7 @@ from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
+import filetype
 import requests
 
 from typing import (
@@ -391,7 +391,10 @@ def fetch_gravatar(user_email: str) -> str:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
-            if imghdr.what(None, h=response.content) == 'png':
+            # File_details might be None if the file does not
+            # match any of the types that filetype supports.
+            file_details = filetype.guess(response.content)
+            if file_details is not None and file_details.extension == 'png':
                 return utils.convert_image_binary_to_data_url(
                     response.content, 'png')
         else:

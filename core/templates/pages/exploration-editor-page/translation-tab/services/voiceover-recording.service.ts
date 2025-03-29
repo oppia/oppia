@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {LoggerService} from 'services/contextual/logger.service';
 
 declare global {
@@ -207,10 +206,3 @@ export class VoiceoverRecordingService {
     this.processor.connect(this.definedAudioContext.destination);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverRecordingService',
-    downgradeInjectable(VoiceoverRecordingService)
-  );

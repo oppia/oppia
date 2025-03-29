@@ -55,7 +55,7 @@ describe('Skill Mastery Modal Controller', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize $scope properties after controller is initialized', () => {
+  it('should initialize component properties after component is initialized', () => {
     spyOn(component.openConceptCardModal, 'emit').and.stub();
 
     expect(component.userIsLoggedIn).toEqual(false);

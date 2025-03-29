@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -113,7 +112,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
-  IMPACT_REPORT_LINK = AppConstants.IMPACT_REPORT_LINK;
+  IMPACT_REPORT_LINK_2023 = AppConstants.IMPACT_REPORT_LINK_2023;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [
@@ -354,6 +353,3 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-angular
-  .module('oppia')
-  .directive('aboutPage', downgradeComponent({component: AboutPageComponent}));

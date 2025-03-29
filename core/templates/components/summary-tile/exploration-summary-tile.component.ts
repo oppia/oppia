@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
@@ -283,10 +282,3 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaExplorationSummaryTile',
-    downgradeComponent({component: ExplorationSummaryTileComponent})
-  );

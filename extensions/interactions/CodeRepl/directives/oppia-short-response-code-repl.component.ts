@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {Answer} from './oppia-response-code-repl.component';
 
@@ -44,9 +43,3 @@ export class ShortResponseCodeRepl implements OnInit {
     ) as Answer;
   }
 }
-angular.module('oppia').directive(
-  'oppiaShortResponseCodeRepl',
-  downgradeComponent({
-    component: ShortResponseCodeRepl,
-  }) as angular.IDirectiveFactory
-);

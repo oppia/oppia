@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TakeBreakModalComponent} from 'pages/exploration-player-page/templates/take-break-modal.component';
 
@@ -74,10 +73,3 @@ export class FatigueDetectionService {
     this.submissionTimesMsec = [];
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FatigueDetectionService',
-    downgradeInjectable(FatigueDetectionService)
-  );

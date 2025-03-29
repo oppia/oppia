@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -57,10 +56,3 @@ export class PlaybookPageComponent implements OnInit {
     return false;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'participationPlaybook',
-    downgradeComponent({component: PlaybookPageComponent})
-  );
