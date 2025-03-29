@@ -325,7 +325,8 @@ export class QuestionSubmitter extends BaseUser {
    */
   async expectQuestionSuggestionModalToAppear(): Promise<void> {
     await this.page.waitForSelector(viewQuestionSudggestionModalHeader, {
-      visible: true,  timeout: 3000
+      visible: true,
+      timeout: 3000,
     });
   }
 
