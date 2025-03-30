@@ -325,37 +325,36 @@ export class ItemSelectionInputValidationService {
         }
       });
     });
-    const ruleTypes = new Set([
+    const allRuleTypes = new Set([
       'IsProperSubsetOf',
       'Equals',
       'ContainsAtLeastOneOf',
     ]);
-    const typeToInputMap = new Map<string, Set<string>>();
-    const ruleToAnswerGroup = new Map<string, number>();
-    ruleTypes.forEach(type => {
-      typeToInputMap.set(type, new Set());
+    const ruleInputPerRuleTypeMap = {};
+    const rulesPreAnswerGroup = {};
+    allRuleTypes.forEach(type => {
+      ruleInputPerRuleTypeMap[type] = new Set();
     });
+
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
           rule.inputs as unknown as ItemSelectionRuleInputs;
         const input = JSON.stringify([...itemSelectionInputs.x].sort());
-        const inputsSet = typeToInputMap.get(rule.type) || new Set();
+        const ruleKey = `${rule.type}:${input}`;
+        const inputsSet = ruleInputPerRuleTypeMap[rule.type];
+        if (!inputsSet) continue;
         if (inputsSet.has(input)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
-            message:
-              `The rule ${ruleIndex + 1} of answer group ` +
-              `${answerGroupIndex + 1} is already present in answer group ${(ruleToAnswerGroup.get(input) ?? 0) + 1} -- ` +
-              'please remove or edit the rule in the answer group to avoid duplicate rules',
+            message: `The rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${(rulesPreAnswerGroup[ruleKey] ?? 0) + 1} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
           });
+        } else {
+          inputsSet.add(input);
+          rulesPreAnswerGroup[ruleKey] = answerGroupIndex;
         }
-
-        (typeToInputMap.get(rule.type) || new Set()).add(input);
-        ruleToAnswerGroup.set(input, answerGroupIndex);
       }
     }
-
     return warningsList;
   }
 }
