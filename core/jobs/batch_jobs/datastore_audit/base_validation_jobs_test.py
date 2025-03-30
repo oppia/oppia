@@ -23,9 +23,10 @@ import datetime
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
 from core.jobs.types import base_validation_errors
+from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Iterator, Type
+from typing import Callable, Iterator, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -34,21 +35,63 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
-class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
-    """Child validation job with a mock validation function."""
+class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with missing get validation implementation."""
+
+    def validate_domain_object(self, model: base_models.BaseModel) -> Iterator[
+        job_run_result.JobRunResult]:
+        yield
+
+
+class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with missing domain object validation."""
 
     def validate_mock_error(self, model: base_models.BaseModel) -> Iterator[
         base_validation_errors.BaseValidationError]:
-        """Mock validation function to generate a BaseValidationError."""
+        yield
+
+    def get_validation_fns(self) -> List[
+        Callable[
+            [base_models.BaseModel],
+            Iterator[job_run_result.JobRunResult]
+        ]]:
+        return [self.validate_mock_error]
+
+
+class MockDomainObjectValidationError(
+    base_validation_errors.BaseValidationError):
+    """Error class for models with inconsistent timestamps."""
+
+
+class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with a mock validation function."""
+
+    def get_validation_fns(self) -> List[
+        Callable[
+            [base_models.BaseModel],
+            Iterator[job_run_result.JobRunResult]
+        ]]:
+        return [self.validate_mock_error]
+
+    def validate_mock_error(self, model: base_models.BaseModel) -> Iterator[
+        base_validation_errors.BaseValidationError]:
         if 'mock_error' in model.id:
             yield base_validation_errors.BaseValidationError(
                 message='Mock validation error message', model=model
             )
 
+    def validate_domain_object(self, model: base_models.BaseModel) -> Iterator[
+        job_run_result.JobRunResult]:
+        if 'domain_error' in model.id:
+            yield base_validation_errors.MockDomainObjectValidationError(
+                message='Domain object validation error message', model=model
+            )  
+
 
 class BaseValidationJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[MockChildValidationJob] = MockChildValidationJob
+    JOB_CLASS: Type[base_validation_jobs.BaseValidationJob] = (
+        MockChildValidationJob)
 
     def test_run_with_datetime_error(self) -> None:
         now = datetime.datetime.now()
@@ -133,3 +176,20 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
                     }
                 ]
             )
+
+    def test_get_validation_fns_not_implemented(self) -> None:
+        self.job = MissingGetValidationJob(self.pipeline)
+
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            "Missing implementation for get_validation_fns in derived class."):
+            self.run_job()
+
+    def test_validate_domain_object_not_implemented(self) -> None:
+        self.job = MissingDomainValidationJob(self.pipeline)
+
+        with self.assertRaisesRegex(
+            NotImplementedError,
+            "Missing implementation for validate_domain_object "
+            "in derived class."):
+            self.run_job()

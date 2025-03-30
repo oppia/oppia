@@ -58,8 +58,13 @@ class BaseValidationJob(base_jobs.JobBase):
                 ndb_io.GetModels(datastore_services.query_everything()))
         )
 
+        default_validation_fns = [
+            self.validate_created_on_less_than_last_updated,
+            self.validate_domain_object,
+        ]
+        all_validation_fns = default_validation_fns + self.get_validation_fns()
         results = all_models | 'Apply Validations' >> beam.ParDo(
-            ApplyAllValidations(self.get_validation_fns())
+            ApplyAllValidations(all_validation_fns)
         )
 
         # Group errors by type and truncate number of messages.
@@ -89,21 +94,20 @@ class BaseValidationJob(base_jobs.JobBase):
             [base_models.BaseModel],
             Iterator[job_run_result.JobRunResult]
         ]]:
-        """Dynamically discovers and returns a list of all validation functions
-        within the class.
-
-        This method inspects the class's methods and identifies those whose
-        names begin with 'validate_'. These methods are assumed to be validation
-        functions that take a BaseModel and yield JobRunResult objects.
+        """Provides a list of validation functions to be applied on a model.
+        Should be implemented in the inherited classes.
 
         Returns:
             List. A list of callable validation functions.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in derived
+                classes.
         """
-        validation_fns = []
-        for name, method in inspect.getmembers(self, inspect.ismethod):
-            if name.startswith('validate_'):
-                validation_fns.append(method)
-        return validation_fns
+        raise NotImplementedError(
+            "Missing implementation for get_validation_fns "
+            "in derived class."
+        )
 
     def validate_created_on_less_than_last_updated(
         self, model: base_models.BaseModel) -> Iterator[
@@ -120,6 +124,27 @@ class BaseValidationJob(base_jobs.JobBase):
         if model.created_on > (
             model.last_updated + base_validation.MAX_CLOCK_SKEW_DURATION):
             yield base_validation_errors.InconsistentTimestampsError(model)
+
+    def validate_domain_object(
+        self, model: base_models.BaseModel) -> Iterator[
+            job_run_result.JobRunResult]:
+        """Validates domain object for the corresponding model.
+        Should be implemented in the inherited classes.
+
+        Args:
+            model: datastore_services.Model. The model to validate.
+
+        Yields:
+            JobRunResult. The result of the validation (if any error is found).
+
+        Raises:
+            NotImplementedError. The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError(
+            "Missing implementation for validate_domain_object "
+            "in derived class."
+        )
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
