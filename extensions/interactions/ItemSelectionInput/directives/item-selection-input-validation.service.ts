@@ -330,12 +330,11 @@ export class ItemSelectionInputValidationService {
       'Equals',
       'ContainsAtLeastOneOf',
     ]);
-    const typeToInputMap: {[key: string]: Set<string>} = {};
-    const ruleToAnswerGroup: {[key: string]: number} = {};
+    const ruleInputPerRuleTypeMap: {[key: string]: Set<string>} = {};
+    const rulesPreAnswerGroup: {[key: string]: number} = {};
     allRuleTypes.forEach((type: string) => {
       ruleInputPerRuleTypeMap[type] = new Set();
     });
-
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
