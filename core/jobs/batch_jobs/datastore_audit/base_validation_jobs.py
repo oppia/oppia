@@ -60,7 +60,7 @@ class BaseValidationJob(base_jobs.JobBase):
 
         default_validation_fns = [
             self.validate_created_on_less_than_last_updated,
-            self.validate_domain_object,
+            self.get_validate_domain_object_fn(),
         ]
         all_validation_fns = default_validation_fns + self.get_validation_fns()
         results = all_models | 'Apply Validations' >> beam.ParDo(
@@ -125,24 +125,22 @@ class BaseValidationJob(base_jobs.JobBase):
             model.last_updated + base_validation.MAX_CLOCK_SKEW_DURATION):
             yield base_validation_errors.InconsistentTimestampsError(model)
 
-    def validate_domain_object(
-        self, model: base_models.BaseModel) -> Iterator[
-            job_run_result.JobRunResult]:
-        """Validates domain object for the corresponding model.
-        Should be implemented in the inherited classes.
+    def get_validate_domain_object_fn(self) -> Callable[
+            [base_models.BaseModel],
+            Iterator[job_run_result.JobRunResult]
+        ]:
+        """Provides a function to validate domain object for the
+        corresponding model. Should be implemented in the inherited classes.
 
-        Args:
-            model: datastore_services.Model. The model to validate.
-
-        Yields:
-            JobRunResult. The result of the validation (if any error is found).
+         Returns:
+            Callable. A callable validation function.
 
         Raises:
             NotImplementedError. The method is not overwritten in derived
                 classes.
         """
         raise NotImplementedError(
-            "Missing implementation for validate_domain_object "
+            "Missing implementation for get_validate_domain_object_fn "
             "in derived class."
         )
 
