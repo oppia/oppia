@@ -70,7 +70,7 @@ describe('Pencil Code Editor Validation Service', () => {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please add feedback for the user in the [All other answers] ' +
-          'rule',
+          'rule.',
       });
 
       // It returns the error when feedback is not provided.

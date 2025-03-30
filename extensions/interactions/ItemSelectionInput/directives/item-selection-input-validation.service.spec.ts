@@ -607,7 +607,7 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in Oppia response 1',
+          message: 'Please specify what Oppia should do in Oppia response 1.',
         },
         {
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -694,7 +694,7 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in Oppia response 1',
+          message: 'Please specify what Oppia should do in Oppia response 1.',
         },
         {
           type: AppConstants.WARNING_TYPES.ERROR,
@@ -790,7 +790,7 @@ describe('ItemSelectionInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in Oppia response 1',
+          message: 'Please specify what Oppia should do in Oppia response 1.',
         },
         {
           type: AppConstants.WARNING_TYPES.ERROR,
