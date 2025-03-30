@@ -28,9 +28,6 @@ from typing import Iterator, Optional, Sequence
 # Do not import any Oppia modules here,
 # import them below the "install_third_party_libs.main()" line.
 from . import install_third_party_libs
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build).
-install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -77,6 +74,11 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
+    action='store_true')
+_PARSER.add_argument(
+    '--skip-install',
+    help='optional; if specified, skips the installation of '
+        'third party libraries',
     action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
@@ -164,6 +166,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 recover_users=parsed_args.save_datastore))
             stack.enter_context(servers.managed_cloud_datastore_emulator(
                 clear_datastore=not parsed_args.save_datastore))
+        if not parsed_args.skip_install:
+            # This installs third party libraries before
+            # importing other files or importing
+            # libraries that use the builtins python module (e.g. build).
+            install_third_party_libs.main()
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:

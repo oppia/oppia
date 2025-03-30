@@ -76,13 +76,13 @@ export class Voiceover {
   }
 
   static createFromBackendDict(
-    voiceoverBackendDict: VoiceoverBackendDict
+    translationBackendDict: VoiceoverBackendDict
   ): Voiceover {
     return new Voiceover(
-      voiceoverBackendDict.filename,
-      voiceoverBackendDict.file_size_bytes,
-      voiceoverBackendDict.needs_update,
-      voiceoverBackendDict.duration_secs
+      translationBackendDict.filename,
+      translationBackendDict.file_size_bytes,
+      translationBackendDict.needs_update,
+      translationBackendDict.duration_secs
     );
   }
 }
