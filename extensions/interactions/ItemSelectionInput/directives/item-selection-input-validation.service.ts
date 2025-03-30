@@ -343,7 +343,9 @@ export class ItemSelectionInputValidationService {
         const input = JSON.stringify([...itemSelectionInputs.x].sort());
         const ruleKey = `${rule.type}:${input}`;
         const inputsSet = ruleInputPerRuleTypeMap[rule.type];
-        if (!inputsSet) continue;
+        if (!inputsSet) {
+          continue;
+        }
         if (inputsSet.has(input)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
