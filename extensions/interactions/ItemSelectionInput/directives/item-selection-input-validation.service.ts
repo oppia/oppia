@@ -332,7 +332,7 @@ export class ItemSelectionInputValidationService {
     ]);
     const ruleInputPerRuleTypeMap = {};
     const rulesPreAnswerGroup = {};
-    allRuleTypes.forEach(type => {
+    allRuleTypes.forEach((type: string) => {
       ruleInputPerRuleTypeMap[type] = new Set();
     });
 
