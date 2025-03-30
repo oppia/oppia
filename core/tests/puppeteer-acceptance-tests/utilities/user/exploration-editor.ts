@@ -2276,22 +2276,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Verifies if specific feedback text is present on the page.
-   * @param {string} feedback - The feedback text to check for.
-   */
-  async viewFeedbackIsPresent(feedback: string): Promise<void> {
-    await this.page.waitForSelector(feedbackSelector);
-    const actualFeedback = await this.page.$eval(feedbackSelector, el =>
-      el.textContent?.trim()
-    );
-    if (actualFeedback === feedback) {
-      showMessage('Feedback is present.');
-    } else {
-      throw new Error('Feedback is not present.');
-    }
-  }
-
-  /**
    * Checks if a suggestion is anonymous.
    * @param {string} suggestion - The expected suggestion.
    * @param {boolean} anonymouslySubmitted - Indicates whether the suggestion is expected to be anonymous.

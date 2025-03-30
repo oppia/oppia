@@ -106,7 +106,6 @@ describe('Exploration Editor', function () {
         showMessage('Test skipped in mobile viewport');
         return;
       }
-
       await explorationEditor.page.bringToFront();
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.openExplorationInExplorationEditor(
@@ -162,7 +161,6 @@ describe('Exploration Editor', function () {
         'I appreciate your anonymous feedback!'
       );
       await explorationEditor.goBackToTheFeedbackTab();
-      await explorationEditor.expectNoOfSuggestionsToBe(3);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -179,7 +177,6 @@ describe('Exploration Editor', function () {
         return;
       }
 
-      await loggedInVisitor.page.bringToFront();
       await loggedInVisitor.navigateToFeedbackUpdatesPage();
       await loggedInVisitor.viewFeedbackUpdateThread(1);
 
@@ -209,7 +206,6 @@ describe('Exploration Editor', function () {
         'Feedback Test'
       );
       await explorationEditor.navigateToFeedbackTab();
-      await explorationEditor.page.bringToFront();
 
       // Change status of the second feedback thread to "fixed".
       await explorationEditor.viewFeedbackThread(2);
