@@ -31,8 +31,8 @@ export interface Warning {
 @Injectable({
   providedIn: 'root',
 })
-export class baseInteractionValidationService {
-  // 'argNames' is an arrays of top-level customization argument names (such
+export class BaseInteractionValidationService {
+  // 'argNames' is an array of top-level customization argument names (such
   // as 'chocies') used to verify the basic structure of the input
   // customization arguments object.
   requireCustomizationArguments(

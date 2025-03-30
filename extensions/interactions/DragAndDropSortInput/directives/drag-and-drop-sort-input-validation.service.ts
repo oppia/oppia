@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {DragAndDropSortInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -34,7 +34,7 @@ import {Rule} from 'domain/exploration/rule.model';
 })
 export class DragAndDropSortInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(

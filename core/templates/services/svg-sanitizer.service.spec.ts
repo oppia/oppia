@@ -579,4 +579,81 @@ describe('SvgSanitizerService', () => {
       });
     }
   );
+
+  // This test checks that unwanted attributes like xmlns:rdf, xmlns:sodipodi, and xmlns:dc
+  // are removed from the SVG while keeping valid attributes unchanged.
+  // Note: The order of attributes may change because when the SVG is parsed into a DOM document
+  // and then serialized back to a string, browsers standardize the attribute order.
+  // This is an expected behavior and does not affect the validity of the SVG.
+  it('should remove unwanted/unnecessary attributes and return a safe SVG', () => {
+    const testCases = [
+      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed.
+      {
+        svgString:
+          '<svg width="100" height="100"' +
+          ' xmlns="http://www.w3.org/2000/svg"' +
+          ' xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"' +
+          ' xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"' +
+          ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' xmlns:dc="http://purl.org/dc/elements/1.1/">' +
+          ' <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />' +
+          ' </svg>',
+        expectedSvgString:
+          '<svg xmlns="http://www.w3.org/2000/svg"' +
+          ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' width="100" height="100">' +
+          ' <circle cx="50" cy="50" r="40" stroke="black"' +
+          ' stroke-width="3" fill="red"/>' +
+          ' </svg>',
+      },
+      // In this image, xmlns:rdf, xmlns:sodipodi, and xmlns:dc are removed.
+      {
+        svgString:
+          '<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"' +
+          ' xmlns:dc="http://purl.org/dc/elements/1.1/"' +
+          ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' xmlns="http://www.w3.org/2000/svg"' +
+          ' xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"' +
+          ' width="100" height="100">' +
+          ' <circle cx="50" cy="50" r="40" stroke="black"' +
+          ' stroke-width="3" fill="red" />' +
+          ' </svg>',
+        expectedSvgString:
+          '<svg xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+          ' <circle cx="50" cy="50" r="40"' +
+          ' stroke="black" stroke-width="3" fill="red"/>' +
+          ' </svg>',
+      },
+      // In this image, xmlns:sodipodi is removed.
+      {
+        svgString:
+          '<svg' +
+          ' xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"' +
+          ' xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' width="100" height="100"' +
+          ' xmlns="http://www.w3.org/2000/svg" >' +
+          ' <circle cx="50" cy="50" r="40"' +
+          ' stroke="black" stroke-width="3" fill="red" />' +
+          ' </svg>',
+        expectedSvgString:
+          '<svg xmlns:xlink="http://www.w3.org/1999/xlink"' +
+          ' xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+          ' <circle cx="50" cy="50" r="40"' +
+          ' stroke="black" stroke-width="3" fill="red"/>' +
+          ' </svg>',
+      },
+    ];
+    testCases.forEach(testCase => {
+      let svgDataURI =
+        'data:image/svg+xml;base64,' +
+        btoa(unescape(encodeURIComponent(testCase.svgString)));
+      let safeSvgData =
+        svgSanitizerService.removeAllInvalidTagsAndAttributes(svgDataURI);
+      expect(safeSvgData).toEqual(
+        'data:image/svg+xml;base64,' +
+          btoa(unescape(encodeURIComponent(testCase.expectedSvgString)))
+      );
+    });
+  });
 });

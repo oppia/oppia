@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {FractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {AppConstants} from 'app.constants';
 import {Warning} from 'services/alerts.service';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -46,7 +46,7 @@ interface Range {
   providedIn: 'root',
 })
 export class FractionInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
