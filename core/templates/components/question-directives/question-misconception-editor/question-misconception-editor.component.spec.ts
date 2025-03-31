@@ -120,6 +120,31 @@ describe('Question Misconception Editor Component', () => {
     );
   });
 
+  it('should remove the tagged misconception', () => {
+    component.outcome.feedback.html = 'feedback';
+    component.misconceptionEditorIsOpen = true;
+
+    component.removeMisconception();
+
+    expect(component.taggedSkillMisconceptionId).toBeNull();
+    expect(component.selectedMisconception).toBeNull();
+    expect(component.selectedMisconceptionSkillId).toBeNull();
+    expect(component.misconceptionEditorIsOpen).toBeFalse();
+    expect(component.outcome.feedback.html).toBe('');
+  });
+
+  it('should cancel edit of misconception', () => {
+    component.misconceptionEditorIsOpen = true;
+
+    component.cancelEdit();
+
+    expect(component.misconceptionEditorIsOpen).toBeFalse();
+    expect(component.selectedMisconception).toEqual(
+      mockMisconceptionObject.abc[0]
+    );
+    expect(component.selectedMisconceptionSkillId).toEqual('abc');
+  });
+
   it('should initialize feedbackIsUsed to true if no previous state exists', () => {
     component.previousFeedbackIsUsed = null;
     component.ngOnInit();
@@ -326,5 +351,23 @@ describe('Question Misconception Editor Component', () => {
     );
     expect(component.selectedMisconceptionSkillId).toEqual('id');
     expect(component.feedbackIsUsed).toBeFalse();
+  });
+
+  it('should return early from updateMisconception if misconception or skillId is null', () => {
+    const saveTaggedMisconceptionSpy = spyOn(
+      component.saveTaggedMisconception,
+      'emit'
+    );
+    component.selectedMisconception = null;
+    component.selectedMisconceptionSkillId = 'abc';
+    component.updateMisconception();
+
+    expect(saveTaggedMisconceptionSpy).not.toHaveBeenCalled();
+
+    component.selectedMisconception = mockMisconceptionObject.abc[0];
+    component.selectedMisconceptionSkillId = null;
+    component.updateMisconception();
+
+    expect(saveTaggedMisconceptionSpy).not.toHaveBeenCalled();
   });
 });

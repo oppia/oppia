@@ -15,8 +15,13 @@
         {{ misconceptionName }}
       </div>
     </div>
-    <div class="oppia-rule-preview-section-mask"></div>
+
   </div>
+  <span *ngIf="isEditable && !misconceptionEditorIsOpen"
+        class="oppia-delete-misconception-button oppia-transition-200 e2e-test-delete-misconception"
+        (click)="removeMisconception()">
+    <i class="material-icons md-18">&#xE5CD;</i>
+  </span>
 </div>
 <div class="clearfix oppia-misconception-selector-container" *ngIf="misconceptionEditorIsOpen">
   <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
@@ -25,7 +30,17 @@
                                          [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
                                          [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-selector>
-  <button class="btn btn-success float-right" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
+  <div class="misconception-save-button">
+    <button class="btn btn-secondary e2e-test-cancel-misconception-button"
+            (click)="cancelEdit()">
+      Cancel
+    </button>
+    <button class="btn btn-success e2e-test-save-misconception-button"
+            [disabled]="selectedMisconception === null"
+            (click)="updateMisconception()">
+      Save Misconception
+    </button>
+  </div>
 </div>
 <button type="button"
         *ngIf="!misconceptionName && isEditable && rules && !outcome.labelledAsCorrect && containsMisconceptions()"
@@ -34,6 +49,20 @@
   Tag with misconception
 </button>
 <style>
+  .oppia-delete-misconception-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+    z-index: 60;
+  }
+
+  .oppia-delete-misconception-button:hover {
+    opacity: 1;
+  }
+
   .oppia-add-rule-button {
     background-color: #058ca6;
     border: 0;
@@ -42,23 +71,45 @@
     padding-top: 5px;
     width: 100%;
   }
+
   .oppia-add-rule-button:active,
   .oppia-add-rule-button:focus,
   .oppia-add-rule-button:hover {
-    background-color: rgba(5,140,166,1);
+    background-color: rgba(5, 140, 166, 1);
   }
+
   .oppia-tagged-misconception-title {
     margin-top: 10px;
   }
 
   .oppia-misconception-editor-container {
+    border: 1px solid #ccc;
     height: 100%;
-    max-width: 95%;
+    position: relative;
+    width: 100%;
+  }
+
+  .oppia-misconception-editor-container:hover {
+    background-color: #eee;
   }
 
   .oppia-misconception-selector-container {
     border-bottom: 1px solid #ccc;
-    display: inline-block;
-    padding-bottom: 12px;
+    box-sizing: border-box;
+    padding: 12px;
+    width: 100%;
+  }
+
+  .misconception-selector-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .misconception-save-button {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
   }
 </style>

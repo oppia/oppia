@@ -16,7 +16,14 @@
  * @fileoverview Component for the question misconception editor.
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -40,6 +47,7 @@ export interface MisconceptionUpdatedValues {
 export interface Outcome {
   feedback: SubtitledHtmlBackendDict;
   labelledAsCorrect: boolean;
+  taggedSkillMisconceptionId: string | null;
 }
 
 @Component({
@@ -61,8 +69,8 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
-  selectedMisconception!: Misconception;
-  selectedMisconceptionSkillId!: string;
+  selectedMisconception!: Misconception | null;
+  selectedMisconceptionSkillId!: string | null;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
   previousFeedbackIsUsed: boolean | null = null;
@@ -71,7 +79,8 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   constructor(
     private externalSaveService: ExternalSaveService,
     private ngbModal: NgbModal,
-    private stateEditorService: StateEditorService
+    private stateEditorService: StateEditorService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -181,7 +190,8 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     modalRef.result.then(
       returnObject => {
         this.selectedMisconception = returnObject.misconception;
-        this.selectedMisconceptionSkillId = returnObject.misconceptionSkillId;
+        this.selectedMisconceptionSkillId =
+          returnObject.misconceptionSkillId ?? '';
         this.feedbackIsUsed = returnObject.feedbackIsUsed;
         this.updateMisconception();
       },
@@ -194,6 +204,10 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   }
 
   updateMisconception(): void {
+    if (!this.selectedMisconception || !this.selectedMisconceptionSkillId) {
+      return;
+    }
+
     let taggedMisconception = {
       skillId: this.selectedMisconceptionSkillId,
       misconceptionId: this.selectedMisconception.getId(),
@@ -216,6 +230,35 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
 
   editMisconception(): void {
     this.misconceptionEditorIsOpen = true;
+  }
+
+  removeMisconception(): void {
+    this.selectedMisconception = null;
+    this.selectedMisconceptionSkillId = null;
+    this.feedbackIsUsed = false;
+    this.misconceptionName = '';
+    this.taggedSkillMisconceptionId = null;
+    const emptyTaggedMisconception = {
+      skillId: '',
+      misconceptionId: 0,
+    };
+    this.saveTaggedMisconception.emit(emptyTaggedMisconception);
+    if (this.outcome) {
+      let outcome = cloneDeep(this.outcome);
+      outcome.taggedSkillMisconceptionId = null;
+      outcome.feedback.html = '';
+      this.outcome.feedback.html = '';
+      this.saveAnswerGroupFeedback.emit(outcome);
+    }
+    this.externalSaveService.onExternalSave.emit();
+    if (this.misconceptionEditorIsOpen) {
+      this.misconceptionEditorIsOpen = false;
+    }
+    this.changeDetectorRef.detectChanges();
+  }
+
+  cancelEdit(): void {
+    this.misconceptionEditorIsOpen = false;
   }
 
   ngOnDestroy(): void {
