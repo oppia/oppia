@@ -62,6 +62,8 @@ class FeatureNames(enum.Enum):
     AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
         'automatic_voiceover_regeneration_from_exp')
     LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
+    SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATION = (
+        'show_voiceover_tab_for_non_curated_exploration')
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -87,7 +89,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATION
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -270,6 +273,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the voice artist accent labeling feature '
             'on the voiceover admin page.',
             feature_flag_domain.ServerMode.PROD
+        )
+    ),
+    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATION.value: (
+        (
+            'The flag enables the voiceover tab for non-curated explorations.',
+            feature_flag_domain.ServerMode.DEV
         )
     )
 }

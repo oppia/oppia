@@ -44,6 +44,7 @@ export enum FeatureNames {
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   LabelAccentToVoiceArtist = 'label_accent_to_voice_artist',
+  ShowVoiceoverTabForNonCuratedExploration = 'show_voiceover_tab_for_non_curated_exploration',
 }
 
 export interface FeatureStatusSummaryBackendDict {
