@@ -191,6 +191,21 @@ export class BaseUser {
           });
         }
 
+        // Set up Download Folder.
+        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+        // Ensure the folder exists.
+        if (!fs.existsSync(downloadDir)) {
+          fs.mkdirSync(downloadDir, {recursive: true});
+        }
+
+        // Enable download behavior using Chrome DevTools Protocol (CDP).
+        const client = await this.page.target().createCDPSession();
+        await client.send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: downloadDir,
+        });
+
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
