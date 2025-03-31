@@ -9,8 +9,7 @@
         <strong>{{ customizationArgSpec.description }}</strong>
         <div class="oppia-customization-arg-editor-inner">
           <schema-based-editor [formControlName]="ind"
-                               [schema]="customizationArgSpec.schema"
-                               [attr.autofocus]="ind === 0 ? '' : null">
+                               [schema]="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
       </div>
