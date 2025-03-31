@@ -43,7 +43,7 @@ class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
             Iterator[job_run_result.JobRunResult]
         ]:
         def validate_domain_object(
-            self, model: base_models.BaseModel) -> Iterator[
+            unused_self, unused_model: base_models.BaseModel) -> Iterator[
                 job_run_result.JobRunResult]:
             yield
         return validate_domain_object
@@ -52,8 +52,9 @@ class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
 class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing domain object validation."""
 
-    def validate_mock_error(self, model: base_models.BaseModel) -> Iterator[
-        base_validation_errors.BaseValidationError]:
+    def validate_mock_error(self, unused_model: base_models.BaseModel
+        ) -> Iterator[base_validation_errors.BaseValidationError]:
+        """Mock validation function."""
         yield
 
     def get_validation_fns(self) -> List[
@@ -68,6 +69,8 @@ class MockDomainObjectValidationError(
     base_validation_errors.BaseValidationError):
     """Error class for models with inconsistent timestamps."""
 
+    pass
+
 
 class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with a mock validation function."""
@@ -81,6 +84,7 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
 
     def validate_mock_error(self, model: base_models.BaseModel) -> Iterator[
         base_validation_errors.BaseValidationError]:
+        """Mock validation function."""
         if 'mock_error' in model.id:
             yield base_validation_errors.BaseValidationError(
                 message='Mock validation error message', model=model
@@ -91,7 +95,7 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
             Iterator[job_run_result.JobRunResult]
         ]:
         def validate_domain_object(
-            self, model: base_models.BaseModel) -> Iterator[
+            unused_self, unused_model: base_models.BaseModel) -> Iterator[
                 job_run_result.JobRunResult]:
             yield
         return validate_domain_object
@@ -191,7 +195,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         with self.assertRaisesRegex(
             NotImplementedError,
-            "Missing implementation for get_validation_fns in derived class."):
+            'Missing implementation for get_validation_fns in derived class.'):
             self.run_job()
 
     def test_validate_domain_object_not_implemented(self) -> None:
@@ -199,6 +203,6 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         with self.assertRaisesRegex(
             NotImplementedError,
-            "Missing implementation for get_validate_domain_object_fn "
-            "in derived class."):
+            'Missing implementation for get_validate_domain_object_fn '
+            'in derived class.'):
             self.run_job()

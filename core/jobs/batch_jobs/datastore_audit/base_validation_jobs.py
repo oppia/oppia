@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import inspect
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms.validation import base_validation
@@ -97,16 +96,13 @@ class BaseValidationJob(base_jobs.JobBase):
         """Provides a list of validation functions to be applied on a model.
         Should be implemented in the inherited classes.
 
-        Returns:
-            List. A list of callable validation functions.
-
         Raises:
             NotImplementedError. The method is not overwritten in derived
                 classes.
         """
         raise NotImplementedError(
-            "Missing implementation for get_validation_fns "
-            "in derived class."
+            'Missing implementation for get_validation_fns '
+            'in derived class.'
         )
 
     def validate_created_on_less_than_last_updated(
@@ -132,16 +128,13 @@ class BaseValidationJob(base_jobs.JobBase):
         """Provides a function to validate domain object for the
         corresponding model. Should be implemented in the inherited classes.
 
-         Returns:
-            Callable. A callable validation function.
-
         Raises:
             NotImplementedError. The method is not overwritten in derived
                 classes.
         """
         raise NotImplementedError(
-            "Missing implementation for get_validate_domain_object_fn "
-            "in derived class."
+            'Missing implementation for get_validate_domain_object_fn '
+            'in derived class.'
         )
 
 
