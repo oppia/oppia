@@ -56,6 +56,8 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
+const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
+
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
@@ -225,6 +227,16 @@ const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+
+export const INTERACTION_TYPES = {
+  CODE_EDITOR: 'Code Editor',
+  END_EXPLORATION: 'End Explorarion',
+};
+
+export const INTERACTION_TABS_OF_INTERACTION_TYPE = {
+  [INTERACTION_TYPES.CODE_EDITOR]: 'PROGRAMMING',
+};
+
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -469,6 +481,14 @@ export class ExplorationEditor extends BaseUser {
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
     await this.clickOn(addInteractionButton);
+
+    // Change tab based on interaction.
+    // Add more conditional tab changes here.
+    if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
+    ) {
+      await this.clickOn(programmingInteractionsButton);
+    }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -1731,6 +1751,33 @@ export class ExplorationEditor extends BaseUser {
       title,
       'This is Goal here.',
       category
+    );
+  }
+
+  /**
+   * This function creates simple Programming Exploration
+   */
+  async createSimpleProgrammingExploration(): Promise<string | null> {
+    await this.createMinimalExploration(
+      'This is a test Programming Exploration',
+      INTERACTION_TYPES.CODE_EDITOR
+    );
+
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, INTERACTION_TYPES.END_EXPLORATION);
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    await this.editDefaultResponseFeedback('Wrong Answer. Please try again');
+    await this.navigateToCard(INTERACTION_TYPES.END_EXPLORATION);
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    await this.saveExplorationDraft();
+    return await this.publishExplorationWithMetadata(
+      'Simple Code Editor',
+      'This is goal here',
+      'Algebra'
     );
   }
 
