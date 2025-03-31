@@ -41,6 +41,7 @@ class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
     def validate_domain_object(
         self, unused_model: base_models.BaseModel) -> Iterator[
             job_run_result.JobRunResult]:
+        """Mock domain validate function."""
         yield from ()
 
     def get_validate_domain_object_fn(self) -> Callable[
@@ -48,13 +49,13 @@ class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
             Iterator[job_run_result.JobRunResult]
         ]:
         return self.validate_domain_object
-        
 
 
 class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing domain object validation."""
 
-    def validate_mock_error(self, unused_model: base_models.BaseModel
+    def validate_mock_error(
+            self, unused_model: base_models.BaseModel
         ) -> Iterator[base_validation_errors.BaseValidationError]:
         """Mock validation function."""
         yield from ()
@@ -95,6 +96,7 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
     def validate_domain_object(
         self, unused_model: base_models.BaseModel) -> Iterator[
             job_run_result.JobRunResult]:
+        """Mock domain validate function."""
         yield from ()
 
     def get_validate_domain_object_fn(self) -> Callable[
