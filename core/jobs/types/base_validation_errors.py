@@ -38,6 +38,7 @@ if MYPY: # pragma: no cover
 class BaseValidationError(job_run_result.JobRunResult):
     """Base class for model validation errors."""
 
+    # TODO(#22338): Re-structure to remove passing model as a param.
     def __init__(self, message: str, model: base_models.BaseModel) -> None:
         """Initializes a new audit error.
 
