@@ -139,9 +139,6 @@
     "yargs": "^17.0.0",
     "zone.js": "^0.10.3"
   },
-  "resolutions": {
-    "@types/babel__traverse": "7.20.6"
-  },
   "keywords": [],
   "dependencies": {
     "@angular/animations": "^11.2.10",
@@ -228,5 +225,8 @@
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
     "wdio-intercept-service": "^4.2.2"
+  },
+  "resolutions": {
+    "@types/babel__traverse": "7.20.6"
   }
 }
