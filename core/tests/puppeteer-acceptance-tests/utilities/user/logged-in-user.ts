@@ -1167,7 +1167,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(feedbackThreadSelector);
     const feedbackThreads = await this.page.$$(feedbackThreadSelector);
 
-    if (threadNumber >= 0 && threadNumber < feedbackThreads.length) {
+    if (threadNumber >= 0 && threadNumber <= feedbackThreads.length) {
       await feedbackThreads[threadNumber - 1].click();
     } else {
       throw new Error(`Thread not found: ${threadNumber}`);
@@ -1785,6 +1785,20 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Gives feedback on the current page.
+   * @param {string} feedback - The feedback text to submit.
+   * @param {boolean} stayAnonymous - Whether to submit the feedback anonymously.
+   */
+  async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
+    await this.page.waitForSelector(feedbackTextareaSelector);
+    await this.type(feedbackTextareaSelector, feedback);
+    if (stayAnonymous) {
+      await this.clickOn(anonymousCheckboxSelector);
+    }
+    await this.clickOn(submitButtonSelector);
   }
 }
 
