@@ -21,6 +21,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
+import fs from 'fs';
+import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -219,12 +221,24 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const historyTabButton = '.e2e-test-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
 const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const historyTableIndex = '.history-table-index';
+const historyListOptions = '.e2e-test-history-list-options';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
 
+const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-unpublished_exploration-v';
+const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -1547,6 +1561,132 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
     await this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileHistoryTabButton);
+    } else {
+      await this.clickOn(historyTabButton);
+    }
+  }
+
+  /**
+   * Gets the list of existing files for the given version.
+   * @param {number} version - The expected version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @returns {string[]} - List of matching file names.
+   */
+  async getExistingVersionFiles(
+    version: number,
+    isPublished: boolean
+  ): Promise<string[]> {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+
+    const files = fs.readdirSync(downloadPath);
+    return files.filter(file =>
+      file.match(new RegExp(`^${filePrefix}${version}( \\(\\d+\\))?\\.zip$`))
+    );
+  }
+
+  /**
+   * Generates the expected filename based on the existing count.
+   * @param {number} version - The version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @param {number} fileCount - The number of existing files.
+   * @returns {string} - The expected filename.
+   */
+  getExpectedFileName(
+    version: number,
+    isPublished: boolean,
+    fileCount: number
+  ): string {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+    return fileCount === 0
+      ? `${filePrefix}${version}.zip`
+      : `${filePrefix}${version} (${fileCount}).zip`;
+  }
+
+  /**
+   * Function to download a specific version of Exploration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
+    const historyItems = await this.page.$$(historyListContent);
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await historyItem.$(historyTableIndex);
+      const versionText = await this.page.evaluate(
+        element => element.textContent,
+        versionNumberElement
+      );
+
+      // Check whether the current exploration version matches the given explorationVersion.
+      if (parseInt(versionText, 10) === explorationVersion) {
+        // Count existing files with same name before downloading.
+        const existingFiles = await this.getExistingVersionFiles(
+          explorationVersion,
+          isExplorationPublished
+        );
+        const nextNumber = existingFiles.length;
+        const expectedFileName = this.getExpectedFileName(
+          explorationVersion,
+          isExplorationPublished,
+          nextNumber
+        );
+
+        const dropdownButton = await historyItem.$(historyListOptions);
+        await this.page.evaluate(el => el.click(), dropdownButton);
+        await this.page.waitForTimeout(1000);
+        const downloadButton = await historyItem.$(downloadExplorationButton);
+        await this.page.evaluate(el => el.click(), downloadButton);
+        await this.page.waitForTimeout(5000);
+        const downloadedFile =
+          await this.waitForExplorationDownload(expectedFileName);
+        if (downloadedFile) {
+          showMessage(`${downloadedFile} file is successfully downloaded`);
+          return;
+        } else {
+          throw new Error(
+            `Download failed for Exploration version: ${explorationVersion}`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Waits for a downloaded file to appear and cleans up only the new one.
+   * @param {string} expectedFileName - The expected file name.
+   * @returns {Promise<string | null>} - The verified file name or null if not found.
+   */
+  async waitForExplorationDownload(
+    expectedFileName: string
+  ): Promise<string | null> {
+    // Wait for network to be idle after triggering the download.
+    await this.page.waitForNetworkIdle();
+    const files = fs.readdirSync(downloadPath);
+    const downloadedFile =
+      files.find(file => file === expectedFileName) || null;
+    if (
+      downloadedFile &&
+      fs.existsSync(path.join(downloadPath, downloadedFile))
+    ) {
+      fs.unlinkSync(path.join(downloadPath, downloadedFile));
+    }
+    return downloadedFile;
   }
 
   /**
