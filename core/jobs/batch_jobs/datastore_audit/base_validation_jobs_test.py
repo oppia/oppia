@@ -38,15 +38,17 @@ if MYPY:  # pragma: no cover
 class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
     """Child validation job with missing get validation implementation."""
 
+    def validate_domain_object(
+        self, unused_model: base_models.BaseModel) -> Iterator[
+            job_run_result.JobRunResult]:
+        yield from ()
+
     def get_validate_domain_object_fn(self) -> Callable[
             [base_models.BaseModel],
             Iterator[job_run_result.JobRunResult]
         ]:
-        def validate_domain_object(
-            unused_self, unused_model: base_models.BaseModel) -> Iterator[
-                job_run_result.JobRunResult]:
-            yield
-        return validate_domain_object
+        return self.validate_domain_object
+        
 
 
 class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
@@ -55,7 +57,7 @@ class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
     def validate_mock_error(self, unused_model: base_models.BaseModel
         ) -> Iterator[base_validation_errors.BaseValidationError]:
         """Mock validation function."""
-        yield
+        yield from ()
 
     def get_validation_fns(self) -> List[
         Callable[
@@ -90,15 +92,16 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
                 message='Mock validation error message', model=model
             )
 
+    def validate_domain_object(
+        self, unused_model: base_models.BaseModel) -> Iterator[
+            job_run_result.JobRunResult]:
+        yield from ()
+
     def get_validate_domain_object_fn(self) -> Callable[
             [base_models.BaseModel],
             Iterator[job_run_result.JobRunResult]
         ]:
-        def validate_domain_object(
-            unused_self, unused_model: base_models.BaseModel) -> Iterator[
-                job_run_result.JobRunResult]:
-            yield
-        return validate_domain_object
+        return self.validate_domain_object
 
 
 class BaseValidationJobTests(job_test_utils.JobTestBase):
