@@ -305,7 +305,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # mark the story as incomplete.
         if next_node_id is not None:
             learner_progress_services.record_story_started(
-                self.user_id, story.id, topic.id)
+                self.user_id, story.id)
         
         completed_story_ids = (
             learner_progress_services.get_all_completed_story_ids(
