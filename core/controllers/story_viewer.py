@@ -264,10 +264,15 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids = [
             completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
-
-        (next_exp_ids, next_node_id, completed_node_ids) = (
-            self._record_node_completion(
-                story_id, node_id, completed_node_ids, ordered_nodes))
+        is_terminal = is_terminal = (len(ordered_nodes) - len(completed_nodes)) == 1
+        if is_terminal:
+            next_exp_ids = []
+            next_node_id = None
+            completed_node_ids.append(node_id)
+        else:
+            (next_exp_ids, next_node_id, completed_node_ids) = (
+                self._record_node_completion(
+                    story_id, node_id, completed_node_ids, ordered_nodes))
 
         ready_for_review_test = False
         exp_summaries = (
@@ -298,13 +303,10 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
-        if next_node_id is None:
-            learner_progress_services.mark_story_as_completed(
-                self.user_id, story_id)
-        else:
-            learner_progress_services.record_story_started(
-                self.user_id, story.id)
-
+        if next_node_id is not None:
+            learner_progress_services.record_both_story_and_topic_started(
+                self.user_id, story.id, topic.id)
+        
         completed_story_ids = (
             learner_progress_services.get_all_completed_story_ids(
                 self.user_id))
@@ -319,9 +321,6 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
             learner_progress_services.record_topic_started(
-                self.user_id, topic.id)
-        else:
-            learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
 
         self.render_json({
