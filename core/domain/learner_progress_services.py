@@ -267,6 +267,8 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         user_id: str. The id of the user who has completed the exploration.
         exp_id: str. The id of the completed exploration.
     """
+    import time
+    time.sleep(1)
     completed_activities_model = (
         user_models.CompletedActivitiesModel.get(
             user_id, strict=False))
@@ -292,7 +294,6 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         learner_playlist_services.remove_exploration_from_learner_playlist(
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
-        import time
         time.sleep(1)
         _save_completed_activities(activities_completed)
 
