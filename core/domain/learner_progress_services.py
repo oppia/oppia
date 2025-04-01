@@ -34,6 +34,7 @@ from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import exp_services
 from core.domain import subscription_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -257,6 +258,31 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
+def check_if_story_is_learnt(user_id: str, story_id: str) -> bool:
+    """Checks if the story is learnt by the user.
+
+    Args:
+        user_id: str. The id of the user.
+        story_id: str. The id of the story.
+
+    Returns:
+        bool. Whether the story is learnt by the user.
+    """
+    story = story_fetchers.get_story_by_id(story_id)
+    completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            user_id, story_id)
+    completed_node_ids = [
+        completed_node.id for completed_node in completed_nodes]
+    ordered_nodes = story.story_contents.get_ordered_nodes()
+    next_exp_id = None
+    for node in ordered_nodes:
+        if node.id not in completed_node_ids:
+            next_exp_id = node.exploration_id
+            break
+    if next_exp_id is None:
+        return True
+    return False
+
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
@@ -283,6 +309,10 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
 
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
+    story_id = exp_services.get_story_id_linked_to_exploration(
+            exp_id)
+
+    is_terminal = check_if_story_is_learnt(user_id, story_id)
 
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
@@ -293,6 +323,12 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
         _save_completed_activities(activities_completed)
+    if is_terminal:
+        # If the story is learnt, we mark the story as completed.
+        story = story_fetchers.get_story_by_id(story_id)
+        topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
+        mark_story_as_completed(user_id, story_id)
+        mark_topic_as_learnt(user_id, topic.id)
 
 
 def mark_story_as_completed(user_id: str, story_id: str) -> None:
