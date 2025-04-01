@@ -454,10 +454,8 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
-      timeout: 10000,
     });
     await this.clickOn(stateEditSelector);
-    await this.page.waitForTimeout(500);
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
