@@ -222,6 +222,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/create-exploration-with-multiple-states'
     '-answer-group-hint-solution',
     'exploration-editor/submit-review-and-respond-to-feedback',
+    'exploration-editor/validate-exploration-managers-collaborators'
+    '-playtesters-access-permissions',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/access-dashboards-from-profile-menu',
