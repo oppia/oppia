@@ -1776,9 +1776,9 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        previous_node_id = -1
+        previous_node_id = None
         for node in story_contents_dict['nodes']:
-            if(previous_node_id != -1 ):
+            if previous_node_id:
                 node.dest = [previous_node_id]
             previous_node_id = node.id
 
@@ -2212,8 +2212,29 @@ class Story:
             raise Exception('Expected to_index value to be with-in bounds.')
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
-        del story_content_nodes[from_index]
+
+        rearranged_node_id = story_content_nodes[from_index].id
+        
+        if from_index == 0:
+            right_neighbour = story_content_nodes[1]
+            self.update_initial_node(right_neighbour.id)
+
+        self.delete_node(rearranged_node_id)
+        
         story_content_nodes.insert(to_index, story_node_to_move)
+        
+        if to_index != 0 :
+            left_neighbour = story_content_nodes[to_index-1]
+            self.update_node_destination_node_ids(left_neighbour.id, [rearranged_node_id])
+        else:
+            self.update_initial_node(rearranged_node_id)
+        
+        if( to_index != len(story_content_nodes) - 1 ):
+            right_neighbour = story_content_nodes[to_index+1]
+            self.update_node_destination_node_ids(rearranged_node_id, [right_neighbour.id])
+       
+        else:
+            self.update_node_destination_node_ids(rearranged_node_id, [])
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str
