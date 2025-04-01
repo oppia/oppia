@@ -56,7 +56,6 @@ import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {UserInfo} from 'domain/user/user-info.model';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 class MockWindowRef {
@@ -76,9 +75,6 @@ class MockWindowRef {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EndChapterCelebration: {
-        isEnabled: true,
-      },
       EnableVoiceoverContribution: {
         isEnabled: false,
       },
@@ -116,7 +112,6 @@ describe('Tutor card component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
-  let platformFeatureService: PlatformFeatureService;
   let translateService: TranslateService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
@@ -211,7 +206,6 @@ describe('Tutor card component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowRef = TestBed.inject(WindowRef);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     translateService = TestBed.inject(TranslateService);
 
@@ -363,34 +357,6 @@ describe('Tutor card component', () => {
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
     expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
   }));
-
-  it('should not trigger celebratory animation if the feature is not enabled', () => {
-    spyOn(componentInstance, 'updateDisplayedCard');
-    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      EndChapterCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-    spyOn(componentInstance, 'triggerCelebratoryAnimation');
-    componentInstance.animationHasPlayedOnce = false;
-    componentInstance.inStoryMode = true;
-    const changes: SimpleChanges = {
-      displayedCard: {
-        previousValue: false,
-        currentValue: true,
-        firstChange: false,
-        isFirstChange: () => false,
-      },
-    };
-
-    componentInstance.ngOnChanges(changes);
-
-    expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
-    expect(
-      componentInstance.triggerCelebratoryAnimation
-    ).not.toHaveBeenCalled();
-  });
 
   it('should not trigger celebratory animation if not in story mode', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
