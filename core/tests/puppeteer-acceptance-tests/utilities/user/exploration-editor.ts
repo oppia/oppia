@@ -238,8 +238,6 @@ const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
-
-
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
