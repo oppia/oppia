@@ -228,11 +228,16 @@ const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+
+const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
+const stateContentEditorSelector =
+  '.e2e-test-edit-content.oppia-editable-section';
+const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+
 const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
-
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -295,13 +300,19 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
     showMessage('Settings tab is opened successfully.');
   }
 
+  /**
+   * Function to open control dropdown so that delete exploration button is visible
+   * in mobile view.
+   */
+  async openExplorationControlDropdown(): Promise<void> {
+    await this.clickOn(explorationControlsSettingsDropdown);
+  }
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -851,6 +862,25 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw error('Automatic Text-to-Speech is disabled.');
     }
+  }
+
+  /**
+   * Assigns a role of manager to any guest user.
+   */
+  async assignUserToManagerRole(username: string): Promise<void> {
+    await this.clickOn(editRoleButton);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
+    const [managerOption] = await this.page.$x(
+      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    );
+    await managerOption.click();
+    await this.page.waitForSelector(tagFilterDropdownSelector, {
+      hidden: true,
+    });
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as manager role.`);
   }
 
   /**
@@ -2446,6 +2476,26 @@ export class ExplorationEditor extends BaseUser {
   async replyToSuggestion(reply: string): Promise<void> {
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Verifies that the Edit Roles button is hidden, indicating the user
+   * doesn't have permission to modify user roles.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectEditRolesButtonToBeHidden(): Promise<void> {
+    const element = await this.page.$(editRolesButtonSelector);
+    expect(element).toBe(null);
+  }
+
+  /**
+   * Verifies that the state content editor is hidden, indicating the user
+   * doesn't have permission to edit exploration content.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectStateContentEditorToBeHidden(): Promise<void> {
+    const element = await this.page.$(stateContentEditorSelector);
+    expect(element).toBe(null);
   }
 }
 
