@@ -974,6 +974,10 @@ export class ExplorationEditor extends BaseUser {
       if (!element) {
         await this.clickOn(mobileOptionsButton);
       }
+      await this.page.waitForSelector(
+        `${mobileSaveChangesButton}:not([disabled])`,
+        {visible: true}
+      );
       await this.clickOn(mobileSaveChangesButton);
     } else {
       await this.clickOn(saveChangesButton);
