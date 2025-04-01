@@ -258,7 +258,7 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
-def check_if_story_is_learnt(user_id: str, story_id: str) -> bool:
+def record_node_completion(user_id: str, story_id: str, exp_id: str) -> bool:
     """Checks if the story is learnt by the user.
 
     Args:
@@ -271,15 +271,20 @@ def check_if_story_is_learnt(user_id: str, story_id: str) -> bool:
     story = story_fetchers.get_story_by_id(story_id)
     completed_nodes = story_fetchers.get_completed_nodes_in_story(
             user_id, story_id)
-    completed_node_ids = [
-        completed_node.id for completed_node in completed_nodes]
+    completed_exp_ids = [
+        completed_node.exploration_id for completed_node in completed_nodes]
     ordered_nodes = story.story_contents.get_ordered_nodes()
     next_exp_id = None
+    node_id = None
     for node in ordered_nodes:
-        if node.id not in completed_node_ids:
+        if node.exploration_id == exp_id:
+            node_id = node.id
+        if node.exploration_id not in completed_exp_ids and node.exploration_id != exp_id:
             next_exp_id = node.exploration_id
             break
     if next_exp_id is None:
+        story_services.record_completed_node_in_story_context(
+                user_id, story_id, node_id)
         return True
     return False
 
@@ -312,7 +317,7 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     story_id = exp_services.get_story_id_linked_to_exploration(
             exp_id)
 
-    is_terminal = check_if_story_is_learnt(user_id, story_id)
+    is_terminal = record_node_completion(user_id, story_id, exp_id)
 
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
