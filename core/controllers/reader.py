@@ -45,7 +45,6 @@ from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
-from core.domain import topic_fetchers
 from core.domain import summary_services
 from core.domain import translation_fetchers
 from core.domain import translation_services
@@ -1419,10 +1418,14 @@ class ExplorationCompleteEventHandler(
             self.normalized_payload['client_time_spent_in_secs'],
             self.normalized_payload['params'],
             feconf.PLAY_TYPE_NORMAL)
+<<<<<<< Updated upstream
         
         story_id = exp_services.get_story_id_linked_to_exploration(
             exploration_id)
         
+=======
+
+>>>>>>> Stashed changes
         if user_id:
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
@@ -1440,20 +1443,8 @@ class ExplorationCompleteEventHandler(
             else:
                 learner_progress_services.mark_collection_as_incomplete(
                     user_id, collection_id)
-            
-            if user_id and story_id:
-                story = story_fetchers.get_story_by_id(story_id)
-                topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-                completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                    self.user_id, story_id)
-                ordered_nodes = story.story_contents.get_ordered_nodes()
-                is_terminal = (len(ordered_nodes) - len(completed_nodes)) == 1
-                if(is_terminal):
-                    learner_progress_services.mark_story_as_completed(
-                        user_id, story.id)
-                    learner_progress_services.mark_topic_as_learnt(
-                        user_id, topic.id)
-                
+
+        self.render_json(self.values)
 
 
 class ExplorationMaybeLeaveHandlerNormalizedPayloadDict(TypedDict):
