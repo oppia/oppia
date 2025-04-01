@@ -17,12 +17,17 @@
  */
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 =======
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 >>>>>>> 273fbc4319 (add acceptance test for exploration feedback management)
+=======
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+>>>>>>> aabe4ffc98 (add acceptance test for exploration feedback management)
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
