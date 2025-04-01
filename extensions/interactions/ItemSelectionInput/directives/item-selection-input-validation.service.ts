@@ -325,26 +325,22 @@ export class ItemSelectionInputValidationService {
         }
       });
     });
-    const allRuleTypes = new Set([
-      'IsProperSubsetOf',
-      'Equals',
-      'ContainsAtLeastOneOf',
-    ]);
-    const ruleInputPerRuleTypeMap: {[key: string]: Set<string>} = {};
+    const ruleInputPerRuleTypeMap: {[key: string]: Set<string>} = {
+      IsProperSubsetOf: new Set<string>(),
+      Equals: new Set<string>(),
+      ContainsAtLeastOneOf: new Set<string>(),
+    };
     const rulesPreAnswerGroup: {[key: string]: number} = {};
-    allRuleTypes.forEach((type: string) => {
-      ruleInputPerRuleTypeMap[type] = new Set();
-    });
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
           rule.inputs as unknown as ItemSelectionRuleInputs;
         const input = JSON.stringify([...itemSelectionInputs.x].sort());
         const ruleKey = `${rule.type}:${input}`;
-        const inputsSet = ruleInputPerRuleTypeMap[rule.type];
-        if (!inputsSet) {
+        if (!ruleInputPerRuleTypeMap.hasOwnProperty(rule.type)) {
           continue;
         }
+        const inputsSet = ruleInputPerRuleTypeMap[rule.type];
         if (inputsSet.has(input)) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
