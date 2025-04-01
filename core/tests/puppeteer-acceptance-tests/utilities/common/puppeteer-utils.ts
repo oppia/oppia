@@ -403,11 +403,13 @@ export class BaseUser {
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */
-  async waitForElementToBeClickable(selector: string | ElementHandle<Element>): Promise<void> {
+  async waitForElementToBeClickable(
+    selector: string | ElementHandle<Element>
+  ): Promise<void> {
     try {
       const element =
         typeof selector === 'string'
-          ? await this.page.waitForSelector(selector, { visible: true })
+          ? await this.page.waitForSelector(selector, {visible: true})
           : selector;
 
       if (!element) {
@@ -415,13 +417,17 @@ export class BaseUser {
       }
 
       // Ensure the element is in the viewport.
-      await this.page.evaluate((el) => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      await this.page.evaluate(el => {
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
       }, element);
 
       // Ensure no overlay is blocking it.
-      const isBlocked = await this.page.evaluate((el) => {
-        const { left, top, width, height } = el.getBoundingClientRect();
+      const isBlocked = await this.page.evaluate(el => {
+        const {left, top, width, height} = el.getBoundingClientRect();
         const centerX = left + width / 2;
         const centerY = top + height / 2;
         const topElement = document.elementFromPoint(centerX, centerY);
@@ -438,8 +444,6 @@ export class BaseUser {
       throw new Error(`Element ${selector} is not clickable: ${error.message}`);
     }
   }
-
-
 
   /**
    * The function clicks the element using the text on the button.
@@ -458,7 +462,10 @@ export class BaseUser {
         await this.page.click(selector);
       }
     } catch (error) {
-      console.error(`Error clicking on the element with selector: ${selector}`, error);
+      console.error(
+        `Error clicking on the element with selector: ${selector}`,
+        error
+      );
       throw error;
     }
   }
