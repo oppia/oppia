@@ -1761,13 +1761,14 @@ class Story:
             story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
                 len(fs.get(filepath)) if fs.isfile(filepath) else None)
         return story_contents_dict
-    
+
     @classmethod
     def _convert_story_contents_v5_dict_to_v6_dict(
         cls, story_contents_dict: StoryContentsDict
     ) -> StoryContentsDict:
         """Converts v5 Story Contents schema to the v6 schema.
-        v6 schema fixes story node's destination_node and relinks disconnected nodes.
+        v6 schema fixes story node's destination_node and relinks 
+        disconnected nodes.
 
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
@@ -1960,7 +1961,8 @@ class Story:
                 raise ValueError(
                     'The node with id %s is the starting node for the story, '
                     'change the starting node before deleting it.' % node_id)
-        delete_node_destination_ids = self.story_contents.nodes[node_index].destination_node_ids
+        node_to_delete = self.story_contents.nodes[node_index]
+        delete_node_destination_ids = node_to_delete.destination_node_ids
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
                 for dest_id in delete_node_destination_ids:
@@ -2214,25 +2216,26 @@ class Story:
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
 
         rearranged_node_id = story_content_nodes[from_index].id
-        
+
         if from_index == 0:
             right_neighbour = story_content_nodes[1]
             self.update_initial_node(right_neighbour.id)
 
         self.delete_node(rearranged_node_id)
-        
         story_content_nodes.insert(to_index, story_node_to_move)
-        
-        if to_index != 0 :
-            left_neighbour = story_content_nodes[to_index-1]
-            self.update_node_destination_node_ids(left_neighbour.id, [rearranged_node_id])
+
+        if to_index != 0:
+            left_neighbour = story_content_nodes[to_index - 1]
+            self.update_node_destination_node_ids(
+                left_neighbour.id, [rearranged_node_id] )
         else:
             self.update_initial_node(rearranged_node_id)
-        
-        if( to_index != len(story_content_nodes) - 1 ):
+
+        if to_index != len(story_content_nodes) - 1:
             right_neighbour = story_content_nodes[to_index+1]
-            self.update_node_destination_node_ids(rearranged_node_id, [right_neighbour.id])
-       
+            self.update_node_destination_node_ids(
+                rearranged_node_id, [right_neighbour.id])
+
         else:
             self.update_node_destination_node_ids(rearranged_node_id, [])
 
