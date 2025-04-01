@@ -470,6 +470,13 @@ export class BaseUser {
   }
 
   /**
+   * This function returns the current URL.
+   */
+  async getCurrentUrl(): Promise<string> {
+    return await this.page.url();
+  }
+
+  /**
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {

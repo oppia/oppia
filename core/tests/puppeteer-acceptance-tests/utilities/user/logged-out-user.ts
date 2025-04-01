@@ -183,6 +183,7 @@ const lessonCreationAccordionCloseButtonInTeachPage =
   '.e2e-test-teach-page-lesson-panel button';
 const lessonCreationAccordionPanelContentInTeachPage =
   '.e2e-test-teach-page-lesson-panel .panel-content';
+const blogButtonInTeachPage = '.e2e-test-teach-page-blog-button';
 const guideButtonInTeachPage = '.e2e-test-teach-page-guide-button';
 const lessonCreatorLinkedinButtonInTeachPage =
   '.e2e-test-teach-page-linkedin-button';
@@ -1492,7 +1493,7 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Teacher Story tagged blogs link
    */
   async clickBlogButtonInTeachPage(): Promise<void> {
-    await this.clickOn('.e2e-test-teach-page-blog-button');
+    await this.clickOn(blogButtonInTeachPage);
   }
 
   async getCurrentUrl(): Promise<string> {

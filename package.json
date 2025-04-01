@@ -225,5 +225,8 @@
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
     "wdio-intercept-service": "^4.2.2"
+  },
+  "resolutions": {
+    "@types/babel__traverse": "7.20.6"
   }
 }
