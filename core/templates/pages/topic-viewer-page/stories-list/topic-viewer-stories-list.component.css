@@ -30,7 +30,7 @@ stories-list .topic-description {
 stories-list .oppia-stories-list-container .oppia-page-card {
   border-radius: 0.25em;
   padding-bottom: 7.5vh;
-  width: 100%;
+  width: 704px;
 }
 
 stories-list .mat-card-margin-desktop {
@@ -72,7 +72,7 @@ stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs i {
 
 @media(max-width: 1024px) {
   stories-list .oppia-stories-list-container .oppia-page-card {
-    width: 100%;
+    width: 80vw;
   }
 }
 
@@ -98,7 +98,7 @@ stories-list .oppia-topic-viewer-breadcrumbs .desktop-breadcrumbs i {
 
 @media(max-width: 500px) {
   stories-list .oppia-stories-list-container .oppia-page-card {
-    padding: 70px 24px 64px 24px;
+    padding: 12em 24px 64px 24px;
     width: 100%;
   }
 
