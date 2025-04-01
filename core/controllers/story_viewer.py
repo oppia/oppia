@@ -265,6 +265,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
         is_terminal = False
+        next_exp_id = None
         for node in ordered_nodes:
             if node.id not in completed_node_ids:
                 next_exp_id = node.exploration_id
