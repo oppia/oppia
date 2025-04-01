@@ -790,7 +790,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.areExplorationWarningsVisible = false;
 
     // The initExplorationPage function is written separately since it
-    // is also called in $scope.$on when some external events are
+    // is also called in directiveSubscriptions when some external events are
     // triggered.
     this.initExplorationPage();
     this.improvementsTabIsEnabled = false;

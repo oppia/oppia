@@ -21,6 +21,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
+import fs from 'fs';
+import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -219,8 +221,24 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const historyTabButton = '.e2e-test-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const totalPlaysSelector = '.e2e-test-oppia-total-plays';
+const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
+const avarageRatingSelector = '.e2e-test-oppia-average-rating';
+const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const historyTableIndex = '.history-table-index';
+const historyListOptions = '.e2e-test-history-list-options';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
 
+const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-unpublished_exploration-v';
+const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -1546,6 +1564,132 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileHistoryTabButton);
+    } else {
+      await this.clickOn(historyTabButton);
+    }
+  }
+
+  /**
+   * Gets the list of existing files for the given version.
+   * @param {number} version - The expected version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @returns {string[]} - List of matching file names.
+   */
+  async getExistingVersionFiles(
+    version: number,
+    isPublished: boolean
+  ): Promise<string[]> {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+
+    const files = fs.readdirSync(downloadPath);
+    return files.filter(file =>
+      file.match(new RegExp(`^${filePrefix}${version}( \\(\\d+\\))?\\.zip$`))
+    );
+  }
+
+  /**
+   * Generates the expected filename based on the existing count.
+   * @param {number} version - The version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @param {number} fileCount - The number of existing files.
+   * @returns {string} - The expected filename.
+   */
+  getExpectedFileName(
+    version: number,
+    isPublished: boolean,
+    fileCount: number
+  ): string {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+    return fileCount === 0
+      ? `${filePrefix}${version}.zip`
+      : `${filePrefix}${version} (${fileCount}).zip`;
+  }
+
+  /**
+   * Function to download a specific version of Exploration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
+    const historyItems = await this.page.$$(historyListContent);
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await historyItem.$(historyTableIndex);
+      const versionText = await this.page.evaluate(
+        element => element.textContent,
+        versionNumberElement
+      );
+
+      // Check whether the current exploration version matches the given explorationVersion.
+      if (parseInt(versionText, 10) === explorationVersion) {
+        // Count existing files with same name before downloading.
+        const existingFiles = await this.getExistingVersionFiles(
+          explorationVersion,
+          isExplorationPublished
+        );
+        const nextNumber = existingFiles.length;
+        const expectedFileName = this.getExpectedFileName(
+          explorationVersion,
+          isExplorationPublished,
+          nextNumber
+        );
+
+        const dropdownButton = await historyItem.$(historyListOptions);
+        await this.page.evaluate(el => el.click(), dropdownButton);
+        await this.page.waitForTimeout(1000);
+        const downloadButton = await historyItem.$(downloadExplorationButton);
+        await this.page.evaluate(el => el.click(), downloadButton);
+        await this.page.waitForTimeout(5000);
+        const downloadedFile =
+          await this.waitForExplorationDownload(expectedFileName);
+        if (downloadedFile) {
+          showMessage(`${downloadedFile} file is successfully downloaded`);
+          return;
+        } else {
+          throw new Error(
+            `Download failed for Exploration version: ${explorationVersion}`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Waits for a downloaded file to appear and cleans up only the new one.
+   * @param {string} expectedFileName - The expected file name.
+   * @returns {Promise<string | null>} - The verified file name or null if not found.
+   */
+  async waitForExplorationDownload(
+    expectedFileName: string
+  ): Promise<string | null> {
+    // Wait for network to be idle after triggering the download.
+    await this.page.waitForNetworkIdle();
+    const files = fs.readdirSync(downloadPath);
+    const downloadedFile =
+      files.find(file => file === expectedFileName) || null;
+    if (
+      downloadedFile &&
+      fs.existsSync(path.join(downloadPath, downloadedFile))
+    ) {
+      fs.unlinkSync(path.join(downloadPath, downloadedFile));
+    }
+    return downloadedFile;
+  }
+
+  /**
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
@@ -1706,14 +1850,18 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
+   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    flag: boolean = true
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    await this.dismissWelcomeModal();
+    if (flag) {
+      await this.dismissWelcomeModal();
+    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -2056,6 +2204,145 @@ export class ExplorationEditor extends BaseUser {
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to create and save a new untitled exploration containing only the EndExploration interaction.
+   */
+  async createAndSaveAMinimalExploration(): Promise<void> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
+   * Function to verify the average rating and the number of users who submitted ratings.
+   * @param {number} expectedRating - The expected average rating.
+   * @param {number} expectedUsers - The expected count of users who submitted ratings.
+   */
+  async expectAverageRatingAndUsersToBe(
+    expectedRating: number,
+    expectedUsers: number
+  ): Promise<void> {
+    await this.page.waitForSelector(avarageRatingSelector, {
+      visible: true,
+    });
+    const avarageRating = await this.page.$eval(
+      avarageRatingSelector,
+      element => parseFloat((element as HTMLElement).innerText.trim())
+    );
+    if (avarageRating !== expectedRating) {
+      throw new Error(
+        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+      );
+    }
+    const totalUsersText = await this.page.$eval(
+      usersCountInRatingSelector,
+      el => (el as HTMLElement).innerText.trim() || ''
+    );
+    // Extract number from text (e.g., "by 3 users" → 3).
+    const totalUsersMatch = totalUsersText.match(/\d+/);
+    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
+    if (totalUsers !== expectedUsers) {
+      throw new Error(
+        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected number of open feedback entries.
+   * @param {number} number - The expected count of open feedback entries.
+   */
+  async expectOpenFeedbacksToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
+      visible: true,
+    });
+    const numberOfOpenFeedbacks = await this.page.$eval(
+      numberOfOpenFeedbacksSelector,
+      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfOpenFeedbacks !== number) {
+      throw new Error(
+        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of plays."
+   * @param {number} number - The expected total play count.
+   */
+  async expectTotalPlaysToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(totalPlaysSelector, {
+      visible: true,
+    });
+    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
+      parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfTotalPlays !== number) {
+      throw new Error(
+        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of explorations.
+   * @param {number} number - The expected count of total explorations.
+   */
+  async expectNumberOfExplorationsToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const count = titlesOnPage.length;
+
+    if (count !== number) {
+      throw new Error(
+        `Expected ${number} explorations, but found ${count} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the presence and expected number of occurrences of an exploration.
+   * @param {string} explorationName - The name of the exploration.
+   * @param {number} numberOfOccurrence - The expected occurrence count of the exploration.
+   */
+  async expectExplorationNameToAppearNTimes(
+    explorationName: string,
+    numberOfOccurrence: number = 1
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+
+    // Extract all exploration titles.
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+
+    // Count occurrences of the target exploration.
+    const count = titlesOnPage.filter(
+      title => title === explorationName
+    ).length;
+
+    if (numberOfOccurrence === 1 && count !== numberOfOccurrence) {
+      throw new Error(`Exploration "${explorationName}" not found.`);
+    } else if (count !== numberOfOccurrence) {
+      throw new Error(
+        `Exploration "${explorationName}" found ${count} times, but expected ${numberOfOccurrence} times.`
+      );
+    }
   }
 
   /**
