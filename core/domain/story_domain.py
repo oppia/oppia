@@ -2227,12 +2227,12 @@ class Story:
         if to_index != 0:
             left_neighbour = story_content_nodes[to_index - 1]
             self.update_node_destination_node_ids(
-                left_neighbour.id, [rearranged_node_id] )
+                left_neighbour.id, [rearranged_node_id])
         else:
             self.update_initial_node(rearranged_node_id)
 
         if to_index != len(story_content_nodes) - 1:
-            right_neighbour = story_content_nodes[to_index+1]
+            right_neighbour = story_content_nodes[to_index + 1]
             self.update_node_destination_node_ids(
                 rearranged_node_id, [right_neighbour.id])
 
