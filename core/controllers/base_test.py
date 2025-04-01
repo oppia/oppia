@@ -2480,10 +2480,10 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = (
             '\nType Exception: NotLoggedInException\n'
             'Error Message: Unauthenticated user\n'
-            'URL requested: /\n'
+            'URL requested: %s\n'
             'Request method: POST\n'
             'Handler class name: BaseHandler\n\n'
-        )
+        ) % (self.handler.request.uri,)
         self.assertIn(
             expected_log_message,
             self.logged_warnings,
@@ -2500,10 +2500,10 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = (
             '\nType Exception: NotFoundException\n'
             'Error Message: Invalid URL requested\n'
-            'URL requested: /\n'
+            'URL requested: %s\n'
             'Request method: POST\n'
             'Handler class name: BaseHandler\n\n'
-        )
+        ) % (self.handler.request.uri,)
         self.assertIn(
             expected_log_message,
             self.logged_warnings,
@@ -2520,10 +2520,10 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = (
             '\nType Exception: UnauthorizedUserException\n'
             'Error Message: Exception raised\n'
-            'URL requested: /\n'
+            'URL requested: %s\n'
             'Request method: POST\n'
             'Handler class name: BaseHandler\n\n'
-        )
+        ) % (self.handler.request.uri,)
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2540,10 +2540,10 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = (
             '\nType Exception: InvalidInputException\n'
             'Error Message: Exception raised\n'
-            'URL requested: /\n'
+            'URL requested: %s\n'
             'Request method: POST\n'
             'Handler class name: BaseHandler\n\n'
-        )
+        ) % (self.handler.request.uri,)
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2560,10 +2560,10 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         expected_log_message = (
             '\nType Exception: InternalErrorException\n'
             'Error Message: Exception raised\n'
-            'URL requested: /\n'
+            'URL requested: %s\n'
             'Request method: POST\n'
             'Handler class name: BaseHandler\n\n'
-        )
+        ) % (self.handler.request.uri,)
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2584,8 +2584,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
             expected_log_message = (
                 '\nType Exception: Exception\n'
                 'Error Message: Exception raised\n'
-                'URL requested: /\n'
+                'URL requested: %s\n'
                 'Request method: POST\n'
                 'Handler class name: BaseHandler\n\n'
-            )
+            ) % (self.handler.request.uri,)
             self.assertIn(expected_log_message, self.logged_exceptions)
