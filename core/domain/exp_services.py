@@ -705,6 +705,14 @@ def apply_change_list(
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
+                    if (
+                        is_voiceover_allowed_for_exploration(exploration_id)
+                        is False
+                    ):
+                        raise Exception(
+                            'Voiceover additions are not allowed for '
+                            'this exploration.')
+
                     # Explicitly convert the duration_secs value from
                     # int to float. Reason for this is the data from
                     # the frontend will be able to match the backend
@@ -2062,6 +2070,13 @@ def compute_models_to_put_when_saving_new_exp_version(
     for change in change_list:
         if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
             voiceover_changes.append(change)
+
+    if (
+        len(voiceover_changes) > 0 and
+        is_voiceover_allowed_for_exploration(exploration_id) is False
+    ):
+        raise utils.ValidationError(
+            'Voiceover additions are not allowed for this exploration.')
 
     new_voiceover_models = voiceover_services.compute_voiceover_related_change(
         updated_exploration,
@@ -3963,3 +3978,22 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
         caching_services.delete_multi(
             caching_services.CACHE_NAMESPACE_EXPLORATION, None, [exp_id])
     return last_known_safe_version
+
+
+def is_voiceover_allowed_for_exploration(exploration_id: str) -> bool:
+    """Checks if voiceover is allowed for the given exploration.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+
+    Returns:
+        bool. Whether voiceover is allowed for the given exploration.
+    """
+    if get_story_id_linked_to_exploration(exploration_id):
+        return True
+    else:
+        return feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.
+            SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
+            None
+        )

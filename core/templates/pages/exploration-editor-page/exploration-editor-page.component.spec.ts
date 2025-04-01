@@ -95,7 +95,7 @@ class MockPlatformFeatureService {
     ExplorationEditorCanModifyTranslations: {
       isEnabled: false,
     },
-    ShowVoiceoverTabForNonCuratedExploration: {
+    ShowVoiceoverTabForNonCuratedExplorations: {
       isEnabled: false,
     },
   };
@@ -1249,13 +1249,13 @@ describe('Exploration editor page component', () => {
 
       // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
-      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExploration.isEnabled =
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         false;
       expect(component.isVoiceoverTabEnabled()).toBeFalse();
 
       // Non curated exploration, when feature flag is enabled, must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
-      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExploration.isEnabled =
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         true;
       expect(component.isVoiceoverTabEnabled()).toBeTrue();
     });

@@ -462,7 +462,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       return true;
     }
     return this.platformFeatureService.status
-      .ShowVoiceoverTabForNonCuratedExploration.isEnabled;
+      .ShowVoiceoverTabForNonCuratedExplorations.isEnabled;
   }
 
   populateEntityTranslationsWithDraftChanges(
