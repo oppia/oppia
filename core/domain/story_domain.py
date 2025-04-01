@@ -1780,8 +1780,8 @@ class Story:
         previous_node_id = None
         for node in story_contents_dict['nodes']:
             if previous_node_id:
-                node.dest = [previous_node_id]
-            previous_node_id = node.id
+                node['destination_node_ids'] = [previous_node_id]
+            previous_node_id = node['id']
 
         return story_contents_dict
 
