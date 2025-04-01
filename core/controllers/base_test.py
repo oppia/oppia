@@ -2470,23 +2470,6 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
 
         self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
 
-    def _expected_log_message(self, exception_name: str, error_msg: str) -> str:
-        """Returns the expected log message format for a given exception."""
-        return (
-            '\nType Exception: %s\n'
-            'Error Message: %s\n'
-            'URL requested: %s\n'
-            'Request method: %s\n'
-            'Handler class name: %s\n\n'
-            % (
-                exception_name,
-                error_msg,
-                self.handler.request.uri,
-                self.handler.request.environ['REQUEST_METHOD'],
-                self.handler.__class__.__name__
-            )
-        )
-
     def test_handle_not_logged_in_exception_logs_warning(self) -> None:
         """Ensures NotLoggedInException logs a warning with the correct format."""
         with self.swap(logging, 'warning', self.mock_logging_warning):
@@ -2494,9 +2477,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.NotLoggedInException('Unauthenticated user'),
                 False
             )
-        expected_log_message = self._expected_log_message(
-            'NotLoggedInException',
-            'Unauthenticated user'
+        expected_log_message = (
+            '\nType Exception: NotLoggedInException\n'
+            'Error Message: Unauthenticated user\n'
+            'URL requested: /\n'
+            'Request method: POST\n'
+            'Handler class name: BaseHandler\n\n'
         )
         self.assertIn(
             expected_log_message,
@@ -2511,9 +2497,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.NotFoundException('Invalid URL requested'),
                 False
             )
-        expected_log_message = self._expected_log_message(
-            'NotFoundException',
-            'Invalid URL requested'
+        expected_log_message = (
+            '\nType Exception: NotFoundException\n'
+            'Error Message: Invalid URL requested\n'
+            'URL requested: /\n'
+            'Request method: POST\n'
+            'Handler class name: BaseHandler\n\n'
         )
         self.assertIn(
             expected_log_message,
@@ -2528,9 +2517,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.UnauthorizedUserException('Unauthorized User'),
                 False
             )
-        expected_log_message = self._expected_log_message(
-            'UnauthorizedUserException',
-            'Exception raised'
+        expected_log_message = (
+            '\nType Exception: UnauthorizedUserException\n'
+            'Error Message: Exception raised\n'
+            'URL requested: /\n'
+            'Request method: POST\n'
+            'Handler class name: BaseHandler\n\n'
         )
         self.assertIn(
             expected_log_message,
@@ -2545,9 +2537,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.InvalidInputException('Invalid Input'),
                 False
             )
-        expected_log_message = self._expected_log_message(
-            'InvalidInputException',
-            'Exception raised'
+        expected_log_message = (
+            '\nType Exception: InvalidInputException\n'
+            'Error Message: Exception raised\n'
+            'URL requested: /\n'
+            'Request method: POST\n'
+            'Handler class name: BaseHandler\n\n'
         )
         self.assertIn(
             expected_log_message,
@@ -2562,9 +2557,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.InternalErrorException('Internal Error'),
                 False
             )
-        expected_log_message = self._expected_log_message(
-            'InternalErrorException',
-            'Exception raised'
+        expected_log_message = (
+            '\nType Exception: InternalErrorException\n'
+            'Error Message: Exception raised\n'
+            'URL requested: /\n'
+            'Request method: POST\n'
+            'Handler class name: BaseHandler\n\n'
         )
         self.assertIn(
             expected_log_message,
@@ -2573,17 +2571,21 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         )
 
     def test_invalid_log_type_raises_exception(self) -> None:
-        """Tests that _log_exception_message raises an Exception when an 
-        invalid log type is passed."""  
-        with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):  
+        """Tests that _log_exception_message raises an Exception when an
+        invalid log type is passed."""
+        with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):
             self.handler._log_exception_message('TestException', cast(base.LogType, "invalid"), 'Test error')
 
     def test_generic_exception_logging_logs_exception(self) -> None:
-        """Tests that a generic exception logs using LogType.EXCEPTION."""  
-        with self.swap(logging, 'exception', self.mock_logging_exception):  
-            generic_exception = Exception('Generic error')  
-            self.handler.handle_exception(generic_exception, False)  
-            expected_log_message = self._expected_log_message(  
-                'Exception', 'Exception raised'
+        """Tests that a generic exception logs using LogType.EXCEPTION."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            generic_exception = Exception('Generic error')
+            self.handler.handle_exception(generic_exception, False)
+            expected_log_message = (
+                '\nType Exception: Exception\n'
+                'Error Message: Exception raised\n'
+                'URL requested: /\n'
+                'Request method: POST\n'
+                'Handler class name: BaseHandler\n\n'
             )
             self.assertIn(expected_log_message, self.logged_exceptions)
