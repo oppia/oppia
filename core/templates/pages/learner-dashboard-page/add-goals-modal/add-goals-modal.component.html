@@ -9,8 +9,8 @@
                     class="oppia-learner-dash-goals-checkbox"
                     (change)="onChange(topic.key)"
                     [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
-                    [disabled]="checkedTopics.length === 5 && !checkedTopics.has(topic.key) || completedTopics.has(topic.key)">
-                    {{ topic.value }}
+                    [disabled]="checkedTopics.size === 5 && !checkedTopics.has(topic.key) || completedTopics.has(topic.key)">
+        <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span>
       </mat-checkbox>
     </ng-container>
   </div>
@@ -33,6 +33,17 @@
   .oppia-learner-dash-goals-checkbox {
     font-size: 16px;
     gap: 0 12px;
+    overflow: hidden;
+  }
+
+  .oppia-learner-dash-goals-checkbox-text {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-all;
   }
 
   .oppia-learner-dash-goals-modal-content {
