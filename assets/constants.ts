@@ -121,7 +121,7 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
-  "MAX_QUESTIONS_FETCHABLE": 1000,
+  "MAX_QUESTIONS_FETCHABLE": 800,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {

@@ -191,6 +191,12 @@ class AndroidActivityHandler(base.BaseHandler[
         offset = self.normalized_request.get('offset')
         activities: List[ActivityDataResponseDict] = []
 
+        if (activity_type != constants.ACTIVITY_TYPE_QUESTIONS and
+                offset is not None):
+            raise self.InvalidInputException(
+                'Offset should only be provided for fetching questions'
+            )
+
         hashed_activities_data = [
             tuple(sorted((k, v) for k, v in activity_data.items()))
             for activity_data in activities_data]
