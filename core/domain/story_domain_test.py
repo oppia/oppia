@@ -2222,6 +2222,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(nodes[1].destination_node_ids[0], 'node_3')
         self.assertEqual(len(nodes[2].destination_node_ids), 0)
 
+        self.story.rearrange_node_in_story(0, 2)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_3')
+        self.assertEqual(nodes[2].id, 'node_1')
+
+        self.assertEqual(nodes[0].destination_node_ids[0], 'node_3')
+        self.assertEqual(nodes[1].destination_node_ids[0], 'node_1')
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
+
     def test_story_contents_export_import(self) -> None:
         """Test that to_dict and from_dict preserve all data within a
         story_contents object.
