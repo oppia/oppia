@@ -1966,8 +1966,7 @@ class Story:
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
                 for dest_id in delete_node_destination_ids:
-                    if not dest_id in node.destination_node_ids:
-                        node.destination_node_ids.append(dest_id)
+                    node.destination_node_ids.append(dest_id)
                 node.destination_node_ids.remove(node_id)
         del self.story_contents.nodes[node_index]
 
