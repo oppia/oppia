@@ -1739,18 +1739,14 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
-   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra',
-    flag: boolean = true
+    category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    if (flag) {
-      await this.dismissWelcomeModal();
-    }
+    await this.dismissWelcomeModal();
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
