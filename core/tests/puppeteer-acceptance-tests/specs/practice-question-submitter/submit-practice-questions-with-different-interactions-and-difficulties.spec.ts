@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for question submitters to submit practice questions.
+ * @fileoverview Acceptance Test for question submitters to submit practice questions with different interactions and difficulties.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -77,10 +77,6 @@ describe('Question Submitter', function () {
     // Add submit question rights to the question submitter.
     await questionAdmin.navigateToContributorDashboardAdminPage();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
-
-    // Close unnecessary browser windows.
-    UserFactory.closeBrowserForUser(questionAdmin);
-    UserFactory.closeBrowserForUser(curriculumAdmin);
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -180,17 +176,23 @@ describe('Question Submitter', function () {
       await questionSubmitter.viewQuestionSuggestion(
         '[Image] Test Question 1 [Math]'
       );
-      await questionSubmitter.expectQuestionSuggestionModalToAppear();
+      await questionSubmitter.expectQuestionSuggestionModalToHaveDifficulty(
+        'Easy'
+      );
 
       await questionSubmitter.viewQuestionSuggestion(
         '[Image] Test Question 2 [Math]'
       );
-      await questionSubmitter.expectQuestionSuggestionModalToAppear();
+      await questionSubmitter.expectQuestionSuggestionModalToHaveDifficulty(
+        'Medium'
+      );
 
       await questionSubmitter.viewQuestionSuggestion(
         '[Image] Test Question 3 [Math]'
       );
-      await questionSubmitter.expectQuestionSuggestionModalToAppear();
+      await questionSubmitter.expectQuestionSuggestionModalToHaveDifficulty(
+        'Hard'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

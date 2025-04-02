@@ -81,6 +81,7 @@ const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
 const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
+const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
 
 export class QuestionSubmitter extends BaseUser {
   /**
@@ -325,44 +326,30 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Function to view the question suggestion modal header.
    */
-  async expectQuestionSuggestionModalToAppear(): Promise<void> {
+  async expectQuestionSuggestionModalToHaveDifficulty(
+    difficulty: string
+  ): Promise<void> {
     await this.page.waitForSelector(viewQuestionSudggestionModalHeader, {
       visible: true,
-      timeout: 3000,
     });
-  }
 
-  /**
-   * Function to find a question suggestion in the contributor dashboard.
-   * @param {string} opportunityHeadingTitle - The heading of the opportunity to be found in the contributor dashboard.
-   */
-  async findQuestionSuggestionInContributorDashboard(
-    opportunityHeadingTitle: string
-  ): Promise<void> {
-    await this.page.waitForSelector(opportunityListItem, {visible: true});
-    const opportunityListItems = await this.page.$$(opportunityListItem);
-    for (const item of opportunityListItems) {
-      await item.waitForSelector(opportunityHeadingTitlSelector, {
-        visible: true,
-      });
-      const headingElement = await item.$(opportunityHeadingTitlSelector);
+    const questionDifficulty = await this.page.$(
+      questionSuggestionModalDifficultySelector
+    );
 
-      if (!headingElement) {
-        continue;
-      }
-
-      const heading = await headingElement.evaluate(el =>
-        el.textContent?.trim()
-      );
-
-      if (heading === opportunityHeadingTitle) {
-        return;
-      }
+    if (!questionDifficulty) {
+      throw new Error('Difficulty element not found');
     }
 
-    throw new Error(
-      `No opportunity found for heading "${opportunityHeadingTitle}"`
+    const difficultyText = await questionDifficulty.evaluate(el =>
+      el.textContent?.trim()
     );
+
+    if (difficultyText !== `Selected Difficulty: ${difficulty}`) {
+      throw new Error(
+        `Expected difficulty "${difficulty}", but found "${difficultyText}"`
+      );
+    }
   }
 
   /**
