@@ -705,10 +705,8 @@ def apply_change_list(
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
-                    if (
-                        is_voiceover_allowed_for_exploration(exploration_id)
-                        is False
-                    ):
+
+                    if not does_exploration_support_voiceovers(exploration_id):
                         raise Exception(
                             'Voiceover additions are not allowed for '
                             'this exploration.')
@@ -2072,8 +2070,8 @@ def compute_models_to_put_when_saving_new_exp_version(
             voiceover_changes.append(change)
 
     if (
-        len(voiceover_changes) > 0 and
-        is_voiceover_allowed_for_exploration(exploration_id) is False
+        voiceover_changes and
+        not does_exploration_support_voiceovers(exploration_id)
     ):
         raise utils.ValidationError(
             'Voiceover additions are not allowed for this exploration.')
@@ -3980,7 +3978,7 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     return last_known_safe_version
 
 
-def is_voiceover_allowed_for_exploration(exploration_id: str) -> bool:
+def does_exploration_support_voiceovers(exploration_id: str) -> bool:
     """Checks if voiceover is allowed for the given exploration.
 
     Args:
