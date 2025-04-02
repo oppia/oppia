@@ -337,17 +337,16 @@ export class ItemSelectionInputValidationService {
           rule.inputs as unknown as ItemSelectionRuleInputs;
         const input = JSON.stringify([...itemSelectionInputs.x].sort());
         const ruleKey = `${rule.type}:${input}`;
-        if (!ruleInputPerRuleTypeMap.hasOwnProperty(rule.type)) {
-          continue;
-        }
-        const inputsSet = ruleInputPerRuleTypeMap[rule.type];
-        if (inputsSet.has(input)) {
+        if (
+          ruleInputPerRuleTypeMap.hasOwnProperty(rule.type) &&
+          ruleInputPerRuleTypeMap[rule.type].has(input)
+        ) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: `The rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${(rulesPreAnswerGroup[ruleKey] ?? 0) + 1} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
           });
         } else {
-          inputsSet.add(input);
+          ruleInputPerRuleTypeMap[rule.type].add(input);
           rulesPreAnswerGroup[ruleKey] = answerGroupIndex;
         }
       }
