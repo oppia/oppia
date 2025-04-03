@@ -23,7 +23,7 @@ import {
 } from 'domain/exploration/voiceover.model';
 
 export interface VoiceoverTypeToVoiceovers {
-  [voiceoverType: string]: Voiceover | undefined;
+  [voiceoverType: string]: Voiceover;
 }
 
 export interface VoiceoverTypeToVoiceoversBackendDict {
@@ -38,31 +38,12 @@ export interface ContentIdToVoiceoversMappingBackendDict {
   [contentId: string]: VoiceoverTypeToVoiceoversBackendDict;
 }
 
-export interface AudioOffsetBackendType {
-  token: string;
-  audio_offset_msecs: number;
-}
-
-export interface AudioOffset {
-  token: string;
-  audioOffsetMsecs: number;
-}
-
-export interface ContentIdToVoiceoversAudioOffsetsMsecsBackendDict {
-  [contentId: string]: AudioOffsetBackendType[];
-}
-
-export interface ContentIdToVoiceoversAudioOffsetsMsecs {
-  [contentId: string]: AudioOffset[];
-}
-
 export interface EntityVoiceoversBackendDict {
   entity_id: string;
   entity_type: string;
   entity_version: number;
   language_accent_code: string;
   voiceovers_mapping: ContentIdToVoiceoversMappingBackendDict;
-  automated_voiceovers_audio_offsets_msecs: ContentIdToVoiceoversAudioOffsetsMsecsBackendDict;
 }
 
 export class EntityVoiceovers {
@@ -71,23 +52,19 @@ export class EntityVoiceovers {
   entityVersion: number;
   languageAccentCode: string;
   voiceoversMapping: ContentIdToVoiceoversMapping;
-  automatedVoiceoversAudioOffsetsMsecs: ContentIdToVoiceoversAudioOffsetsMsecs;
 
   constructor(
     entityId: string,
     entityType: string,
     entityVersion: number,
     languageAccentCode: string,
-    voiceoversMapping: ContentIdToVoiceoversMapping,
-    automatedVoiceoversAudioOffsetsMsecs: ContentIdToVoiceoversAudioOffsetsMsecs
+    voiceoversMapping: ContentIdToVoiceoversMapping
   ) {
     this.entityId = entityId;
     this.entityType = entityType;
     this.entityVersion = entityVersion;
     this.languageAccentCode = languageAccentCode;
     this.voiceoversMapping = voiceoversMapping;
-    this.automatedVoiceoversAudioOffsetsMsecs =
-      automatedVoiceoversAudioOffsetsMsecs;
   }
 
   static createFromBackendDict(
@@ -98,60 +75,28 @@ export class EntityVoiceovers {
       let voiceoverTypeToVoiceovers =
         entityVoiceoversBackendDict.voiceovers_mapping[contentId];
 
-      let manualVoiceovers!: Voiceover;
-      let automaticVoiceovers!: Voiceover;
-
-      if (voiceoverTypeToVoiceovers.manual) {
-        manualVoiceovers = Voiceover.createFromBackendDict(
-          voiceoverTypeToVoiceovers.manual
-        );
-      }
-
-      if (voiceoverTypeToVoiceovers.auto) {
-        automaticVoiceovers = Voiceover.createFromBackendDict(
-          voiceoverTypeToVoiceovers.auto
-        );
-      }
-
       contentIdToVoiceoversMapping[contentId] = {
-        manual: manualVoiceovers,
-        auto: automaticVoiceovers,
+        manual: Voiceover.createFromBackendDict(
+          voiceoverTypeToVoiceovers.manual
+        ),
       };
     }
-
-    let contentIdToVoiceoversAudioOffsetsMsecs: ContentIdToVoiceoversAudioOffsetsMsecs =
-      {};
-
-    for (let contentId in entityVoiceoversBackendDict.automated_voiceovers_audio_offsets_msecs) {
-      let audioOffsets =
-        entityVoiceoversBackendDict.automated_voiceovers_audio_offsets_msecs[
-          contentId
-        ];
-      contentIdToVoiceoversAudioOffsetsMsecs[contentId] = audioOffsets.map(
-        audioOffset => {
-          return {
-            token: audioOffset.token,
-            audioOffsetMsecs: audioOffset.audio_offset_msecs,
-          };
-        }
-      );
-    }
-
     return new EntityVoiceovers(
       entityVoiceoversBackendDict.entity_id,
       entityVoiceoversBackendDict.entity_type,
       entityVoiceoversBackendDict.entity_version,
       entityVoiceoversBackendDict.language_accent_code,
-      contentIdToVoiceoversMapping,
-      contentIdToVoiceoversAudioOffsetsMsecs
+      contentIdToVoiceoversMapping
     );
   }
 
   getManualVoiceover(contentId: string): Voiceover | undefined {
-    return this.voiceoversMapping[contentId]?.manual;
-  }
+    let voiceoverTypeToVoiceovers = this.voiceoversMapping[contentId];
 
-  getAutomaticVoiceover(contentId: string): Voiceover | undefined {
-    return this.voiceoversMapping[contentId]?.auto;
+    if (voiceoverTypeToVoiceovers) {
+      return voiceoverTypeToVoiceovers.manual;
+    } else {
+      return undefined;
+    }
   }
 }
