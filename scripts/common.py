@@ -223,6 +223,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     '-answer-group-hint-solution',
     'exploration-editor/validate-exploration-managers-collaborators'
     '-playtesters-access-permissions',
+    'exploration-editor/submit-review-and-respond-to-feedback',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/access-dashboards-from-profile-menu',

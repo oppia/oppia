@@ -158,6 +158,7 @@ export class TutorCardComponent {
   confettiAnimationTimeout!: NodeJS.Timeout;
   skipClickListener: Function | null = null;
   username!: string | null;
+  _viewHasLoadedOnce: boolean = false;
 
   constructor(
     private audioBarStatusService: AudioBarStatusService,
@@ -255,12 +256,25 @@ export class TutorCardComponent {
     ) {
       this.updateDisplayedCard();
     }
+    this.tryTriggerAnimation();
+  }
+
+  ngAfterViewInit(): void {
+    this._viewHasLoadedOnce = true;
+    this.tryTriggerAnimation();
+  }
+
+  tryTriggerAnimation(): void {
     if (
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
-      this.inStoryMode
+      this.inStoryMode &&
+      this._viewHasLoadedOnce
     ) {
-      this.triggerCelebratoryAnimation();
+      this._viewHasLoadedOnce = false;
+      setTimeout(() => {
+        this.triggerCelebratoryAnimation();
+      });
     }
   }
 
