@@ -238,6 +238,11 @@ const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
 const downloadExplorationButton =
   'a.dropdown-item.e2e-test-download-exploration';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
+
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -396,6 +401,10 @@ export class ExplorationEditor extends BaseUser {
 
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileFeedbackTabButton);
@@ -2496,6 +2505,72 @@ export class ExplorationEditor extends BaseUser {
   async expectStateContentEditorToBeHidden(): Promise<void> {
     const element = await this.page.$(stateContentEditorSelector);
     expect(element).toBe(null);
+  }
+
+  /**
+   * Navigates back to the feedback tab.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.type(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+    await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Checks if the current feedback status matches the expected value.
+   * @param {string} statusValue - The expected status value of the feedback.
+   */
+  async expectFeedbackStatusToBe(statusValue: string): Promise<void> {
+    const currentStatus = await this.page.$eval(
+      feedbackStatusMenu,
+      el => (el as HTMLSelectElement).value
+    );
+    if (currentStatus !== statusValue) {
+      throw new Error(
+        `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
+      );
+    }
+  }
+
+  /**
+   * Presses the back button in the feedback thread tab.
+   */
+  async pressFeedbackThreadBackButton(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Verifies that a feedback thread at the specified index has the expected status.
+   * @param {number} threadIndex - The 1-indexed position of the feedback thread.
+   * @param {string} expectedStatus - The status text expected for the feedback thread.
+   */
+  async expectFeedbackStatusInList(
+    threadIndex: number,
+    expectedStatus: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackTabRowSelector, {
+      visible: true,
+    });
+    let feedbackStatuses = await this.page.$$(feedbackStatusSelector);
+    const statusText = await this.page.evaluate(
+      el => el.textContent?.trim(),
+      feedbackStatuses[threadIndex - 1]
+    );
+    if (statusText !== expectedStatus) {
+      throw new Error(
+        `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
+      );
+    }
   }
 }
 
