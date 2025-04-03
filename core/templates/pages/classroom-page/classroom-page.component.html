@@ -45,7 +45,7 @@
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
         <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroomTranslationKeys.topicListIntro | translate }}</p>
       </div>
-      <div *ngIf="isDiagnosticTestFeatureFlagEnabled() && diagnosticTestIsEnabled()" class="content-section diagnostic-test-container">
+      <div *ngIf="diagnosticTestIsEnabled()" class="content-section diagnostic-test-container">
         <div class="diagnostic-test-box">
           <div class="diagnostic-test-info">
             <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}</h4>
