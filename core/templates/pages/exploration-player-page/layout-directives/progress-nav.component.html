@@ -2,7 +2,7 @@
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
-    <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
+    <!-- *ngIf on this second wrapping div because *ngIf lags on buttons. -->
     <div *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
       <button mat-raised-button
               aria-label="Previous Card"
@@ -41,7 +41,7 @@
               *ngIf="shouldGenericSubmitButtonBeShown()"
               class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="submit.emit()"
-              [disabled]="displayedCard.showNoResponseError()">
+              [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
         {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
       </button>
     </div>
