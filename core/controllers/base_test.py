@@ -2478,7 +2478,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = (
-            '\nType Exception: NotLoggedInException\n'
+            '\n\nStack Trace: \nNoneType: None\n\n'
+            'Type Exception: NotLoggedInException\n'
             'Error Message: Unauthenticated user\n'
             'URL requested: %s\n'
             'Request method: POST\n'
@@ -2498,7 +2499,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = (
-            '\nType Exception: NotFoundException\n'
+            '\n\nStack Trace: \nNoneType: None\n\n'
+            'Type Exception: NotFoundException\n'
             'Error Message: Invalid URL requested\n'
             'URL requested: %s\n'
             'Request method: POST\n'
@@ -2518,7 +2520,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = (
-            '\nType Exception: UnauthorizedUserException\n'
+            '\n\nStack Trace: \nNoneType: None\n\n'
+            'Type Exception: UnauthorizedUserException\n'
             'Error Message: Exception raised\n'
             'URL requested: %s\n'
             'Request method: POST\n'
@@ -2538,7 +2541,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = (
-            '\nType Exception: InvalidInputException\n'
+            '\n\nStack Trace: \nNoneType: None\n\n'
+            'Type Exception: InvalidInputException\n'
             'Error Message: Exception raised\n'
             'URL requested: %s\n'
             'Request method: POST\n'
@@ -2558,7 +2562,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = (
-            '\nType Exception: InternalErrorException\n'
+            '\n\nStack Trace: \nNoneType: None\n\n'
+            'Type Exception: InternalErrorException\n'
             'Error Message: Exception raised\n'
             'URL requested: %s\n'
             'Request method: POST\n'
@@ -2582,7 +2587,8 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
             generic_exception = Exception('Generic error')
             self.handler.handle_exception(generic_exception, False)
             expected_log_message = (
-                '\nType Exception: Exception\n'
+                '\n\nStack Trace: \nNoneType: None\n\n'
+                'Type Exception: Exception\n'
                 'Error Message: Exception raised\n'
                 'URL requested: %s\n'
                 'Request method: POST\n'

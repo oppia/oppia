@@ -28,6 +28,7 @@ import os
 import re
 import time
 import urllib
+import traceback
 
 from core import feconf
 from core import handler_schema_constants
@@ -789,14 +790,17 @@ class BaseHandler(
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
         url = self.request.uri
+        stack_trace = traceback.format_exc()
 
         msg = (
-            '\nType Exception: %s\n'
+            '\n\nStack Trace: \n%s\n'
+            'Type Exception: %s\n'
             'Error Message: %s\n'
             'URL requested: %s\n'
             'Request method: %s\n'
             'Handler class name: %s\n\n'
             % (
+                stack_trace,
                 exception_type,
                 error_message,
                 url,
