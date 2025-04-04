@@ -217,10 +217,18 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'exploration-editor/download-any-version-exploration',
     'exploration-editor/verify-statistics-and-previous-explorations',
+    'exploration-editor/create-exploration-with-multiple-states'
+    '-answer-group-hint-solution',
+    'exploration-editor/validate-exploration-managers-collaborators'
+    '-playtesters-access-permissions',
+    'exploration-editor/submit-review-and-respond-to-feedback',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
+    'logged-in-user/access-dashboards-from-profile-menu',
     'logged-in-user/create-and-delete-account',
+    'logged-in-user/edit-avatar-and-view-exploration-from-profile-page',
     'logged-in-user/save-an-exploration-to-play-later',
     'logged-in-user/restart-or-continue-exploration-on-revisit',
     'logged-in-user/edit-profile-preferences-and-export-their-account',
@@ -260,6 +268,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'to-voiceovers',
     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+    'logged-out-user/view-and-search-blog-posts',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',

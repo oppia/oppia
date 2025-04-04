@@ -16,4 +16,27 @@
  * @fileoverview This file imports the gif-frames library.
  */
 
-(window as Window).GifFrames = require('gif-frames');
+import {Injectable} from '@angular/core';
+import * as gifFrames from 'gif-frames';
+
+// Define options and frame interface for gif-frames.
+export type GifFramesOptions = Record<string, unknown>;
+
+interface GifFrame {
+  getImage: () => HTMLCanvasElement;
+  frameInfo: {
+    disposal: number;
+  };
+}
+
+// Angular service that directly imports the gif-frames library.
+// And utilize its functionality for use in the application.
+
+@Injectable({
+  providedIn: 'root',
+})
+export class GifFramesService {
+  getFrames(options: GifFramesOptions): Promise<GifFrame[]> {
+    return gifFrames(options);
+  }
+}
