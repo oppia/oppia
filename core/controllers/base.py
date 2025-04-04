@@ -27,8 +27,8 @@ import logging
 import os
 import re
 import time
-import urllib
 import traceback
+import urllib
 
 from core import feconf
 from core import handler_schema_constants
