@@ -350,14 +350,6 @@ describe('Classroom Page Component', () => {
     expect(component.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should return correct value for diagnostic test feature flag', () => {
-    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
-
-    mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
-
-    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
-  });
-
   it('should return false if diagnostic test is not enabled for the classroom', () => {
     let classroomData = ClassroomData.createFromBackendData(
       'mathid',
