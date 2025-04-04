@@ -275,29 +275,20 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_azure_speech_synthesis_services(cls) -> ModuleType:
-        """Imports and returns dev_mode_azure_speech_synthesis_services module.
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns the speech synthesis services module.
 
         Returns:
-            module. The dev_mode_azure_speech_synthesis_services module.
+            module. The speech synthesis services module based on the current
+            environment.
         """
-        # The Azure SDK requires Ubuntu 20.04 or higher, but our production
-        # environment uses Ubuntu 18.04 due to Python 3.9 compatibility.
-        # This causes azure_speech_synthesis_services to fail in production,
-        # see issue: #22248.
-
-        # As a temporary workaround, we are using
-        # dev_mode_azure_speech_synthesis_services in both development and
-        # production environments until the Python version is upgraded.
-
-        # TODO(#22301): Reinstate the logic to switch between
-        # dev_mode_azure_speech_synthesis_services and
-        # azure_speech_synthesis_services for development and production
-        # environments.
-
-        from core.platform.azure_speech_synthesis import (
-            dev_mode_azure_speech_synthesis_services)
-        return dev_mode_azure_speech_synthesis_services
+        if constants.DEV_MODE:
+            from core.platform.speech_synthesis import (
+                dev_mode_speech_synthesis_services)
+            return dev_mode_speech_synthesis_services
+        from core.platform.speech_synthesis import (
+            azure_speech_synthesis_services)
+        return azure_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
@@ -529,13 +520,13 @@ class Registry:
         return cls._get().import_app_identity_services()
 
     @classmethod
-    def import_azure_speech_synthesis_services(cls) -> ModuleType:
-        """Imports and returns azure_speech_synthesis_services module.
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns speech synthesis services module.
 
         Returns:
-            module. The azure_speech_synthesis_services module.
+            module. The speech synthesis services module.
         """
-        return cls._get().import_azure_speech_synthesis_services()
+        return cls._get().import_speech_synthesis_services()
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
