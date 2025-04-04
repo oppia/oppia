@@ -111,18 +111,6 @@ class CleanUpVoiceoverModelsTestsBaseClass(
             'needs_update': False,
             'duration_secs': 42.43
         }
-        self.voiceover_dict_6: state_domain.VoiceoverDict = {
-            'filename': 'filename6.mp3',
-            'file_size_bytes': 1000,
-            'needs_update': False,
-            'duration_secs': 25
-        }
-        self.voiceover_dict_7: state_domain.VoiceoverDict = {
-            'filename': 'filename7.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 42.43
-        }
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.
@@ -413,7 +401,7 @@ class AuditEntityVoiceoversModelJobTests(CleanUpVoiceoverModelsTestsBaseClass):
     def test_check_is_exploration_curated_for_invalid_id(self) -> None:
         is_exploration_curated = (
             clean_up_voiceover_models_job.
-            AuditExplorationVoiceArtistsLinkModelJob.
+            AuditEntityVoiceoversModelJob.
             is_exploration_curated(exploration_id='')
         )
         self.assertFalse(is_exploration_curated)
@@ -423,7 +411,7 @@ class AuditEntityVoiceoversModelJobTests(CleanUpVoiceoverModelsTestsBaseClass):
         # inputs that we can normally catch by typing.
         is_exploration_curated = (
             clean_up_voiceover_models_job.
-            AuditExplorationVoiceArtistsLinkModelJob.
+            AuditEntityVoiceoversModelJob.
             is_exploration_curated(exploration_id=None) # type: ignore[arg-type]
         )
         self.assertFalse(is_exploration_curated)
@@ -455,9 +443,11 @@ class AuditEntityVoiceoversModelJobTests(CleanUpVoiceoverModelsTestsBaseClass):
 class DeleteEntityVoiceoversModelsJobTests(
     CleanUpVoiceoverModelsTestsBaseClass):
     JOB_CLASS: Type[
-        clean_up_voiceover_models_job.AuditEntityVoiceoversModelJob
+        clean_up_voiceover_models_job.
+        DeleteNonCuratedInstanceofEntityVoiceoversModelJob
     ] = (
-        clean_up_voiceover_models_job.AuditEntityVoiceoversModelJob
+        clean_up_voiceover_models_job.
+        DeleteNonCuratedInstanceofEntityVoiceoversModelJob
     )
 
     def test_delete_entity_voiceovers_model_successfully(self) -> None:
