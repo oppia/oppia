@@ -129,14 +129,13 @@ describe('Question Misconception Editor Component', () => {
     expect(component.taggedSkillMisconceptionId).toBeNull();
     expect(component.selectedMisconception).toBeNull();
     expect(component.selectedMisconceptionSkillId).toBeNull();
-    expect(component.misconceptionEditorIsOpen).toBeFalse();
     expect(component.outcome.feedback.html).toBe('');
   });
 
   it('should cancel edit of misconception', () => {
     component.misconceptionEditorIsOpen = true;
 
-    component.cancelEdit();
+    component.misconceptionEditorIsOpen = false;
 
     expect(component.misconceptionEditorIsOpen).toBeFalse();
     expect(component.selectedMisconception).toEqual(

@@ -244,21 +244,12 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     };
     this.saveTaggedMisconception.emit(emptyTaggedMisconception);
     if (this.outcome) {
-      let outcome = cloneDeep(this.outcome);
-      outcome.taggedSkillMisconceptionId = null;
-      outcome.feedback.html = '';
+      this.outcome.taggedSkillMisconceptionId = null;
       this.outcome.feedback.html = '';
-      this.saveAnswerGroupFeedback.emit(outcome);
+      this.saveAnswerGroupFeedback.emit(this.outcome);
     }
     this.externalSaveService.onExternalSave.emit();
-    if (this.misconceptionEditorIsOpen) {
-      this.misconceptionEditorIsOpen = false;
-    }
     this.changeDetectorRef.detectChanges();
-  }
-
-  cancelEdit(): void {
-    this.misconceptionEditorIsOpen = false;
   }
 
   ngOnDestroy(): void {
