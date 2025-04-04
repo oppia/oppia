@@ -89,8 +89,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -101,7 +100,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -272,7 +272,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
         (
             'The flag enables the voiceover tab for non-curated explorations.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     )
 }
