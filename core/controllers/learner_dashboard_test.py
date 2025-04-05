@@ -25,9 +25,16 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import user_models
+
+(user_models,) = models.Registry.import_models([models.Names.USER])
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
@@ -97,6 +104,36 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
+    def _mark_story_as_completed(self, user_id: str, story_id: str) -> None:
+        """Adds the story id to the completed list of the user unless the
+        story has already been completed by the user. It is also removed from
+        the incomplete list(if present).
+
+        Args:
+            user_id: str. The id of the user who has completed the story.
+            story_id: str. The id of the completed story.
+        """
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(user_id, strict=False))
+        if not completed_activities_model:
+            completed_activities_model = (
+                user_models.CompletedActivitiesModel(id=user_id))
+
+        activities_completed = (
+            learner_progress_services._get_completed_activities_from_model( # pylint: disable=protected-access
+            completed_activities_model
+            )
+        )
+
+        if story_id not in activities_completed.story_ids:
+            learner_progress_services.remove_story_from_incomplete_list(
+                user_id, story_id
+            )
+            activities_completed.add_story_id(story_id)
+            learner_progress_services._save_completed_activities( # pylint: disable=protected-access
+                activities_completed)
+
     def test_can_see_completed_stories(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
@@ -118,7 +155,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-        learner_progress_services.mark_story_as_completed(
+        self._mark_story_as_completed(
             self.viewer_id, self.STORY_ID_1)
         response = self.get_json(
             feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
@@ -148,9 +185,9 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-        learner_progress_services.mark_story_as_completed(
+        self._mark_story_as_completed(
             self.viewer_id, self.STORY_ID_1)
-        learner_progress_services.mark_topic_as_learnt(
+        learner_progress_services._mark_topic_as_learnt( # pylint: disable=protected-access
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(
             feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
@@ -360,10 +397,10 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         learner_progress_services.add_collection_to_learner_playlist(
             self.viewer_id, self.COL_ID_3)
 
-        learner_progress_services.mark_story_as_completed(
+        self._mark_story_as_completed(
             self.viewer_id, self.STORY_ID_1)
 
-        learner_progress_services.mark_topic_as_learnt(
+        learner_progress_services._mark_topic_as_learnt( # pylint: disable=protected-access
             self.viewer_id, self.TOPIC_ID_1)
         learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_2)

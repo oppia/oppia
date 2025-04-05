@@ -126,7 +126,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
                 self.viewer_id), [self.TOPIC_ID_1, self.TOPIC_ID_2])
 
         # If a topic belongs to the completed list, it should not be added.
-        learner_progress_services.mark_topic_as_learnt(
+        learner_progress_services._mark_topic_as_learnt( # pylint: disable=protected-access
             self.viewer_id, self.TOPIC_ID_3)
         response = self.post_json(
             '%s/%s/%s' % (
