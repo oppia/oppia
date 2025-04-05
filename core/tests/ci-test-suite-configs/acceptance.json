@@ -61,6 +61,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts"
     },
     {
+      "name": "exploration-editor/submit-review-and-respond-to-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
       "name": "exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
     },
