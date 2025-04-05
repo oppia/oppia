@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -324,7 +324,7 @@ export class QuestionSubmitter extends BaseUser {
   }
 
   /**
-   * Function to view the question suggestion modal header.
+   * Function to expect the question suggestion modal to have a specific difficulty level.
    */
   async expectQuestionSuggestionModalToHaveDifficulty(
     difficulty: string
