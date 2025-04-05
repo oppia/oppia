@@ -62,6 +62,7 @@ export class TranslationAdmin extends BaseUser {
    */
   async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
+    await this.page.waitForSelector(viewContributorFilterMethodSelect);
   }
 
   /**
@@ -81,6 +82,8 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.viewContributionRightsForUser(username);
+    await this.expectDisplayedLanguagesToContain(languageCode);
   }
 
   /**
@@ -90,6 +93,9 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    await this.viewContributionRightsForUser(username);
+    await this.expectDisplayedLanguagesToContain(languageCode);
+
     await this.type(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
@@ -99,6 +105,8 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.viewContributionRightsForUser(username);
+    await this.expectUserToNotBeDisplayed(username);
   }
 
   /**
@@ -110,6 +118,8 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
+
+    await this.expectUserToBeDisplayed(username);
   }
 
   /**
@@ -124,6 +134,7 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.expectDisplayedLanguagesToContain(languageCode);
   }
 
   /**
