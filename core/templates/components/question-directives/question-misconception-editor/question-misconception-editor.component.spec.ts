@@ -132,7 +132,7 @@ describe('Question Misconception Editor Component', () => {
     expect(component.outcome.feedback.html).toBe('');
   });
 
-  it('should cancel edit of misconception', () => {
+  it('should close the misconception editor without saving changes when cancel button is clicked', () => {
     component.misconceptionEditorIsOpen = true;
 
     component.misconceptionEditorIsOpen = false;
