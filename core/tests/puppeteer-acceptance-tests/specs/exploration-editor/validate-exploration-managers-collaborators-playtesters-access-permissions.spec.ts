@@ -21,11 +21,13 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
+const ROLES = testConstants.Roles;
 
 ConsoleReporter.setConsoleErrorsToIgnore([/.404.*Not Found./]);
 
@@ -35,6 +37,7 @@ describe('Exploration User Roles', function () {
   let newCollaborator: ExplorationEditor;
   let playtester: ExplorationEditor;
   let explorationCreator: ExplorationEditor;
+  let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -64,6 +67,17 @@ describe('Exploration User Roles', function () {
     explorationCreator = await UserFactory.createNewUser(
       'explorationCreator',
       'explorationCreator@example.com'
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    // Enable the feature flag.
+    await releaseCoordinator.enableFeatureFlag(
+      'show_voiceover_tab_for_non_curated_explorations'
     );
 
     // Create exploration with explorationCreator user.

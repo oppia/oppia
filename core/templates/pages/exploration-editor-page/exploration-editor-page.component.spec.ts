@@ -95,6 +95,9 @@ class MockPlatformFeatureService {
     ExplorationEditorCanModifyTranslations: {
       isEnabled: false,
     },
+    ShowVoiceoverTabForNonCuratedExplorations: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -123,6 +126,7 @@ describe('Exploration editor page component', () => {
   let userService: UserService;
   let ueps: UserExplorationPermissionsService;
   let ics: InternetConnectivityService;
+  let contextService: ContextService;
   let mockEnterEditorForTheFirstTime: EventEmitter<void>;
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
@@ -283,6 +287,7 @@ describe('Exploration editor page component', () => {
             },
             setExplorationIsLinkedToStory: () => {},
             setExplorationVersion: expVersion => {},
+            isExplorationLinkedToStory: () => {},
           },
         },
         EditabilityService,
@@ -374,6 +379,7 @@ describe('Exploration editor page component', () => {
     entityBulkTranslationsBackendApiService = TestBed.inject(
       EntityBulkTranslationsBackendApiService
     );
+    contextService = TestBed.inject(ContextService);
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -1227,5 +1233,31 @@ describe('Exploration editor page component', () => {
       flush();
       discardPeriodicTasks();
     }));
+  });
+
+  describe('voiceover tab', () => {
+    it('should be shwon correctly', () => {
+      let isExplorationLinkedToStorySpy = spyOn(
+        contextService,
+        'isExplorationLinkedToStory'
+      );
+
+      // Curated exploration must show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(true);
+      let voiceoverTabIsEnabled = component.isVoiceoverTabEnabled();
+      expect(voiceoverTabIsEnabled).toBeTrue();
+
+      // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(false);
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
+        false;
+      expect(component.isVoiceoverTabEnabled()).toBeFalse();
+
+      // Non curated exploration, when feature flag is enabled, must show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(false);
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
+        true;
+      expect(component.isVoiceoverTabEnabled()).toBeTrue();
+    });
   });
 });
