@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for learner dashboard functionalities.
+ * @fileoverview Acceptance tests for learner dashboard functionalities, specfically
+ * interactions with components that use classroom data across all tabs.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -99,6 +100,19 @@ describe('Logged-in User', function () {
     );
   }, 480000);
 
+  /**
+   * TODO(#22070): Add tests for home tab. Interactions involving recommended
+   * lessons, in-progress lessons, topics available, and saved lessons sections.
+   */
+
+  /**
+   * TODO(#22070): Add tests for goals tab, all interactions.
+   */
+
+  /**
+   * TODO(#22070): Add tests for progress tab. Interactions involving in-progress
+   * and completed classroom lessons & skills sections.
+   */
   it(
     'should navigate to the new learner dashboard',
     async function () {
