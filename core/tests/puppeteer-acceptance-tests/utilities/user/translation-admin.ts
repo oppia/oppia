@@ -80,7 +80,6 @@ export class TranslationAdmin extends BaseUser {
     );
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
-    await this.page.waitForTimeout(1000);
 
     await this.waitForNetworkIdle();
   }
@@ -99,7 +98,6 @@ export class TranslationAdmin extends BaseUser {
     );
     await this.select(removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
-    await this.page.waitForTimeout(1000);
 
     await this.waitForNetworkIdle();
   }
@@ -111,7 +109,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
-    await this.page.waitForSelector(viewContributorLanguageResult, { timeout: 5000 });
+    await this.page.waitForSelector(viewContributorLanguageResult);
     await this.waitForNetworkIdle();
   }
 
@@ -125,7 +123,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
-    await this.page.waitForSelector(viewLanguageRoleUserResult, { timeout: 5000 });
+    await this.page.waitForSelector(viewLanguageRoleUserResult);
     await this.waitForNetworkIdle();
   }
 
@@ -133,7 +131,7 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the language is displayed as a translation right.
    */
   async expectDisplayedLanguagesToContain(language: string): Promise<void> {
-    await this.page.waitForSelector(viewContributorLanguageResult, { timeout: 5000 });
+    await this.page.waitForSelector(viewContributorLanguageResult);
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
       element => (element as HTMLElement).innerText
@@ -153,7 +151,7 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the user is displayed as a translator.
    */
   async expectUserToBeDisplayed(username: string): Promise<void> {
-    await this.page.waitForSelector(viewLanguageRoleUserResult, { timeout: 5000 });
+    await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
@@ -169,7 +167,7 @@ export class TranslationAdmin extends BaseUser {
    * Function to check that there are no translators for the selected language.
    */
   async expectUserToNotBeDisplayed(username: string): Promise<void> {
-    await this.page.waitForSelector(viewLanguageRoleUserResult, { timeout: 5000 });
+    await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
