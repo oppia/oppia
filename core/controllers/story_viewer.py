@@ -299,6 +299,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
         if next_node_id is not None:
+            print("recording of story do happening========================")
             learner_progress_services.record_story_started(
                 self.user_id, story.id)
             learner_progress_services.record_topic_started(
