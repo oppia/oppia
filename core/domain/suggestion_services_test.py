@@ -1398,7 +1398,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertIn('Alpha', original)
         self.assertIn('Beta', updated_suggestion.change_cmd.translation_html)
 
-    def test_update_translation_suggestion_error_with_multiple_component_discrepancies( # pylint: disable=line-too-long
+    def test_update_translation_suggestion_error_with_two_discrepancies(
         self
     ) -> None:
         content_html_with_image = (
@@ -1481,9 +1481,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.InvalidInputException,
-            f'Components in original text: 1 image. Components in translated text: 0 image.\\n' # pylint: disable=line-too-long
-            f'Original text preview: {truncated_original_expected}\\n'
-            f'Translated text preview: {truncated_updated_expected}'
+            (
+                f'Components in original text: 1 image. '
+                f'Components in translated text: 0 image.\n'
+                f'Original text preview: {truncated_original_expected}\n'
+                f'Translated text preview: {truncated_updated_expected}'
+            )
         ):
             suggestion_services.update_translation_suggestion(
                 suggestion.suggestion_id, long_updated_html
