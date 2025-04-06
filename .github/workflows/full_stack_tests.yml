@@ -119,6 +119,12 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24" 
           python -m scripts.run_acceptance_tests --skip-build 
           --suite=${{ matrix.suite }} --prod_env --mobile
+      - name: Upload mobile test failure screenshots as artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
       - name: Uploading Mobile test recordings as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
