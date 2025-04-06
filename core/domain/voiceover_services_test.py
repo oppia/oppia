@@ -994,6 +994,10 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
 
         self.assertEqual(total_files, 1)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
+        feature_flag_list.FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK])
     def test_auto_update_exploration_voice_artist_link_model(self) -> None:
         content_id_to_voiceovers_mapping = {
             'content_0': {
@@ -1086,10 +1090,6 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         updated_exploration = exp_fetchers.get_exploration_by_id(
             'exploration_id')
 
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.
-            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
-
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
         )
@@ -1171,6 +1171,10 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             expected_content_id_to_voiceovers_mapping
         )
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
+        feature_flag_list.FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK])
     def test_should_create_exp_link_model(self) -> None:
         expected_content_id_to_voiceovers_mapping = {
             'content_0': {
@@ -1221,10 +1225,6 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             'exploration_id', change_list
         )
 
-        feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.
-            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
-
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
         )
@@ -1241,6 +1241,9 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             expected_content_id_to_voiceovers_mapping
         )
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_not_create_link_model_when_feature_flag_is_false(
         self
     ) -> None:

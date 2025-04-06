@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
@@ -489,6 +490,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -568,6 +572,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_skip_voiceover_if_specific_snapshot_model_is_invalid(
         self
     ) -> None:
@@ -667,6 +674,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -708,6 +718,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
         # No models are being saved in the datastore since this is an audit job.
         self.assertEqual(total_exploration_voice_artist_link_models, 0)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_generate_exp_link_model_if_some_commit_log_models_are_missing(
         self
     ) -> None:
@@ -753,6 +766,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
             job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_generate_exp_link_model_if_some_snapshot_models_are_missing(
         self
     ) -> None:
@@ -798,6 +814,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
             job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_shoould_raise_error_for_non_existent_user(self) -> None:
         self._create_curated_explorations()
 
@@ -849,6 +868,9 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 ):
     """Test class to validate helper methods."""
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_create_exploration_link_for_voice_artist(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -948,6 +970,9 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         )
         self.assertFalse(is_exploration_curated)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_get_empty_filenames_successfully(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,

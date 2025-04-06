@@ -576,10 +576,6 @@ URLS = [
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
-        voiceover.RegenerateAutomaticVoiceoverHandler
-    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
