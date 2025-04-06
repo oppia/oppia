@@ -258,9 +258,9 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
-def _record_node_completion(
+def _check_if_terminal_exp(
         user_id: str, story_id: str, exp_id: str
-    ) -> Optional[str]:
+    ) -> bool:
     """Records the node completion for terminal nodes
 
     Args:
@@ -286,11 +286,38 @@ def _record_node_completion(
             next_exp_id = node.exploration_id
             break
     if next_exp_id is None:
-        return None
-    return next_exp_id
+        return True
+    return False
 
+def mark_story_as_completed(self, user_id: str, story_id: str) -> None:
+    """Adds the story id to the completed list of the user unless the
+    story has already been completed by the user. It is also removed from
+    the incomplete list(if present).
 
-def _mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
+    Args:
+        user_id: str. The id of the user who has completed the story.
+        story_id: str. The id of the completed story.
+    """
+
+    completed_activities_model = (
+        user_models.CompletedActivitiesModel.get(user_id, strict=False))
+    if not completed_activities_model:
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel(id=user_id))
+
+    activities_completed = (
+        _get_completed_activities_from_model( # pylint: disable=protected-access
+        completed_activities_model)
+    )
+
+    if story_id not in activities_completed.story_ids:
+        remove_story_from_incomplete_list(
+            user_id, story_id)
+        activities_completed.add_story_id(story_id)
+        _save_completed_activities( # pylint: disable=protected-access
+            activities_completed)
+
+def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     """Adds the topic id to the learnt list of the user unless the
     topic has already been learnt by the user. It is also removed from
     the partially learnt list and topics to learn list(if present).
@@ -358,9 +385,9 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         story_id = exp_services.get_story_id_linked_to_exploration(
         exp_id)
         if story_id is not None:
-            next_exp_id: Optional[str] = _record_node_completion(
+            is_terminal = _check_if_terminal_exp(
                 user_id, story_id, exp_id)
-            if next_exp_id is None:
+            if is_terminal:
                 story = story_fetchers.get_story_by_id(story_id)
                 topic = topic_fetchers.get_topic_by_id(
                     story.corresponding_topic_id)
@@ -384,7 +411,6 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
                             user_id,
                             [topic.id]
                         )
-                    print("here is the completed activities modal ===================================", activities_completed)
                     activities_completed.add_learnt_topic_id(topic.id)
         _save_completed_activities(activities_completed)
 
@@ -1525,9 +1551,9 @@ def _get_filtered_topics_to_learn_summaries(
             assert topic_rights is not None
             if (set(story_ids_in_topic).issubset(
                     set(completed_story_ids))):
-                # learner_goals_services.remove_topics_from_learn_goal(
-                #     user_id, [topic_id])
-                # _mark_topic_as_learnt(user_id, topic_id)
+                learner_goals_services.remove_topics_from_learn_goal(
+                    user_id, [topic_id])
+                mark_topic_as_learnt(user_id, topic_id)
                 pass
             elif not topic_rights.topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])

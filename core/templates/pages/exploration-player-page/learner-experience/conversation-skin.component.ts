@@ -1016,18 +1016,18 @@ export class ConversationSkinComponent {
                   }
                 );
               }
-              // this.learnerDashboardBackendApiService
-              //   .fetchLearnerCompletedChaptersCountDataAsync()
-              //   .then(responseData => {
-              //     let newCompletedChaptersCount =
-              //       responseData.completedChaptersCount;
-              //     if (
-              //       newCompletedChaptersCount !== this.completedChaptersCount
-              //     ) {
-              //       this.completedChaptersCount = newCompletedChaptersCount;
-              //       this.chapterIsCompletedForTheFirstTime = true;
-              //     }
-              //   });
+              this.learnerDashboardBackendApiService
+              .fetchLearnerCompletedChaptersCountDataAsync()
+              .then(responseData => {
+                let newCompletedChaptersCount =
+                  responseData.completedChaptersCount;
+                if (
+                  newCompletedChaptersCount !== this.completedChaptersCount
+                ) {
+                  this.completedChaptersCount = newCompletedChaptersCount;
+                  this.chapterIsCompletedForTheFirstTime = true;
+                }
+              });
             });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
