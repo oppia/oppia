@@ -129,7 +129,6 @@ export class SkillEditorPageComponent implements OnInit {
 
   onClosingSkillEditorBrowserTab(): void {
     const skill = this.skillEditorStateService.getSkill();
-
     const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
