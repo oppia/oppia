@@ -313,20 +313,6 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         if next_node_id is not None:
             learner_progress_services.record_story_started(
                 self.user_id, story.id)
-        
-        completed_story_ids = (
-            learner_progress_services.get_all_completed_story_ids(
-                self.user_id))
-        story_ids_in_topic = []
-        for story_reference in topic.canonical_story_references:
-            story_ids_in_topic.append(story_reference.story_id)
-
-        is_topic_completed = set(story_ids_in_topic).intersection(
-            set(completed_story_ids))
-
-        # If at least one story in the topic is completed,
-        # mark the topic as learnt else mark it as partially learnt.
-        if not is_topic_completed:
             learner_progress_services.record_topic_started(
                 self.user_id, topic.id)
 
