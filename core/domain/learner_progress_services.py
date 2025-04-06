@@ -1183,9 +1183,10 @@ def _get_filtered_learnt_topic_summaries(
             assert topic_right is not None
             if not set(story_ids_in_topic).intersection(
                     set(completed_story_ids)):
-                remove_topic_from_learnt_list(user_id, topic_id)
-                record_topic_started(user_id, topic_id)
-                learnt_to_partially_learnt_topics.append(topic_summary)
+                # remove_topic_from_learnt_list(user_id, topic_id)
+                # record_topic_started(user_id, topic_id)
+                # learnt_to_partially_learnt_topics.append(topic_summary)
+                pass
             elif not topic_right.topic_is_published:
                 nonexistent_learnt_topic_ids.append(topic_ids[index])
             else:
@@ -1524,9 +1525,10 @@ def _get_filtered_topics_to_learn_summaries(
             assert topic_rights is not None
             if (set(story_ids_in_topic).issubset(
                     set(completed_story_ids))):
-                learner_goals_services.remove_topics_from_learn_goal(
-                    user_id, [topic_id])
-                _mark_topic_as_learnt(user_id, topic_id)
+                # learner_goals_services.remove_topics_from_learn_goal(
+                #     user_id, [topic_id])
+                # _mark_topic_as_learnt(user_id, topic_id)
+                pass
             elif not topic_rights.topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])
             else:
