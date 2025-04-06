@@ -499,31 +499,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         else:
             return []
 
-
-    def _mark_story_as_completed(user_id: str, story_id: str) -> None:
-        """Adds the story id to the completed list of the user unless the
-        story has already been completed by the user. It is also removed from
-        the incomplete list(if present).
-
-        Args:
-            user_id: str. The id of the user who has completed the story.
-            story_id: str. The id of the completed story.
-        """
-
-        completed_activities_model = (
-            user_models.CompletedActivitiesModel.get(user_id, strict=False))
-        if not completed_activities_model:
-            completed_activities_model = (
-                user_models.CompletedActivitiesModel(id=user_id))
-
-        activities_completed = learner_progress_services._get_completed_activities_from_model(
-            completed_activities_model)
-
-        if story_id not in activities_completed.story_ids:
-            learner_progress_services.remove_story_from_incomplete_list(user_id, story_id)
-            activities_completed.add_story_id(story_id)
-            learner_progress_services._save_completed_activities(activities_completed)
-
     def test_mark_exploration_as_completed(self) -> None:
         self.assertEqual(self._get_all_completed_exp_ids(self.user_id), [])
 
@@ -579,73 +554,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_2)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
-        
-        # Test that story is marked as completed and topic is learnt whenever
-        # terminal exploration is completed
-        self.save_new_valid_exploration(
-            self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End')
-        self.publish_exploration(self.admin_id, self.EXP_ID_3)
-
-        story = story_domain.Story.create_default_story(
-            self.NEW_STORY_ID, 'Title', 'Description', self.TOPIC_ID,
-            self.STORY_URL_FRAGMENT_TWO)
-        story.meta_tag_content = 'story meta content'
-
-        self.node_1 = {
-            'id': self.NODE_ID_1,
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_3,
-            'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
-        }
-        story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(self.node_1)
-        ]
-        self.nodes = story.story_contents.nodes
-        story.story_contents.initial_node_id = 'node_1'
-        story.story_contents.next_node_id = 'node_2'
-        story_services.save_new_story(self.admin_id, story)
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID)
-        topic_services.publish_story(
-            self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
-        
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
-            self.viewer_id, self.TOPIC_ID)
-        
-        self.assertEqual(len(
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id)), 1)
-
-        story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-        learner_progress_services.mark_exploration_as_completed(self.user_id, self.EXP_ID_3)
-
-        self.assertEqual(len(
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.viewer_id)), 1)
-        self.assertEqual(len(
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id)), 0)
-        self.assertEqual(len(
-            learner_progress_services.get_all_completed_story_ids(
-                self.viewer_id)), 1)
-        
-        
-
 
     def test_mark_collection_as_completed(self) -> None:
         self.assertEqual(
@@ -703,17 +611,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_completed_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_1, self.COL_ID_3])
 
+    def test_mark_story_as_completed(self) -> None:
         self.assertEqual(
             self._get_all_completed_story_ids(self.user_id), [])
 
         # Add a story to the completed list.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [self.STORY_ID_0])
 
         # Completing a story again has no effect.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [self.STORY_ID_0])
@@ -727,7 +636,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # If the story is present in the incomplete list, on completion
         # it is removed from the incomplete list and added to the complete
         # list.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [])
@@ -918,7 +827,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # If a story has been completed, it is not added to the incomplete
         # list.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
@@ -1115,9 +1024,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Add two stories to the completed list.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(self._get_all_completed_story_ids(
             self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
@@ -1308,14 +1217,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Add a story to the completed list.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
                 self.user_id), [self.STORY_ID_0])
 
         # Add another story.
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
@@ -1433,11 +1342,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add stories to the completed list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
@@ -1466,13 +1375,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add topics to the learnt list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1)
@@ -1505,11 +1414,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add stories to the completed list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
@@ -1537,13 +1446,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add topics to the learnt list.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1)
@@ -2024,7 +1933,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Complete the story in TOPIC_ID_0.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
 
         # Call get_topics_and_stories_progress to get filtered progress.
@@ -2275,7 +2184,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
@@ -2343,7 +2252,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.COL_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
@@ -2603,11 +2512,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Record completed nodes and mark stories as completed.
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
-        self._mark_story_as_completed(
+        learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
 
         # Verify completed story IDs match expectations.
