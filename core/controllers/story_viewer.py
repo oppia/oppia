@@ -190,13 +190,24 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     next_node_id = node.id
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
-    
+
     def _check_if_terminal_node(
         self,
         node_id: str,
         completed_node_ids: List[str],
         ordered_nodes: List[story_domain.StoryNode]
     ) -> bool:
+        """Determines whether the provided node is a terminal node.
+
+        Args:
+            node_id: str. The node ID.
+            completed_node_ids: List[str]. A list of IDS of completed nodes.
+            ordered_nodes: List[story_domain.StoryNode]. A list of story
+                nodes in order.
+
+        Returns:
+            bool. Whether the provided node is a terminal node.
+        """
         next_node_id = None
         for node in ordered_nodes:
             if node.id not in completed_node_ids and node.id != node_id:
@@ -279,9 +290,13 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids = [
             completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
-        is_terminal = self._check_if_terminal_node(node_id, completed_node_ids, ordered_nodes)
+        is_terminal = self._check_if_terminal_node(
+            node_id,
+            completed_node_ids,
+            ordered_nodes
+        )
         if is_terminal:
-            next_exp_ids = []
+            next_exp_ids: List[str] = []
             next_node_id = None
             completed_node_ids.append(node_id)
         else:
@@ -321,6 +336,20 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         if next_node_id is not None:
             learner_progress_services.record_story_started(
                 self.user_id, story.id)
+
+        completed_story_ids = (
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id))
+        story_ids_in_topic = []
+        for story_reference in topic.canonical_story_references:
+            story_ids_in_topic.append(story_reference.story_id)
+
+        is_topic_completed = set(story_ids_in_topic).intersection(
+            set(completed_story_ids))
+
+        # If at least one story in the topic is completed,
+        # mark the topic as learnt else mark it as partially learnt.
+        if not is_topic_completed:
             learner_progress_services.record_topic_started(
                 self.user_id, topic.id)
 
