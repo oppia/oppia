@@ -76,17 +76,21 @@ describe('Topic Manager', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should not be able to navigate to a different tab while editing a question', async function () {
-    await topicManager.navigateToTopicAndSkillsDashboardPage();
-    await topicManager.openSkillEditor('Addition');
-    await topicManager.navigateToSkillQuestionEditorTab();
+  it(
+    'should not be able to navigate to a different tab while editing a question',
+    async function () {
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
+      await topicManager.openSkillEditor('Addition');
+      await topicManager.navigateToSkillQuestionEditorTab();
 
-    await topicManager.beingCreatingQuestion();
-    await topicManager.tryToNavigateToAnotherTab();
-    await topicManager.expectUnsavedChangesModalToBeVisible();
-    await topicManager.cancelQuestionMaking();
-    await topicManager.navigateToQuestionPreviewTab();
-  });
+      await topicManager.beingCreatingQuestion();
+      await topicManager.tryToNavigateToAnotherTab();
+      await topicManager.expectUnsavedChangesModalToBeVisible();
+      await topicManager.cancelQuestionMaking();
+      await topicManager.navigateToQuestionPreviewTab();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
