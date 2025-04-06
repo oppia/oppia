@@ -457,14 +457,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  isVoiceoverTabEnabled(): boolean {
-    if (this.contextService.isExplorationLinkedToStory()) {
-      return true;
-    }
-    return this.platformFeatureService.status
-      .ShowVoiceoverTabForNonCuratedExplorations.isEnabled;
-  }
-
   populateEntityTranslationsWithDraftChanges(
     draftChanges: ExplorationChange[] | null,
     version: number
