@@ -1405,7 +1405,6 @@ class ExplorationCompleteEventHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        print("Exploration completion is getting called what should i do know=========================")
         # This will be None if the exploration is not being played within the
         # context of a collection.
         collection_id = self.normalized_payload.get('collection_id')
@@ -1535,7 +1534,6 @@ class ExplorationMaybeLeaveHandler(
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        print("Maybe Leave handler is getting called now what should be done===============")
         assert self.normalized_payload is not None
         version = self.normalized_payload['version']
         state_name = self.normalized_payload['state_name']
