@@ -16,12 +16,15 @@
 
 from __future__ import annotations
 
+import logging
 
 from core import feconf
 from core.constants import constants
+from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_domain

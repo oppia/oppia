@@ -27,7 +27,6 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import learner_goals_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
@@ -35,6 +34,7 @@ from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import exp_services
 from core.domain import subscription_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -258,15 +258,12 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
-def _record_node_completion(
-        user_id: str, story_id: str, exp_id: str
-    ) -> Optional[str]:
+def _record_node_completion(user_id: str, story_id: str, exp_id: str) -> Optional[str]:
     """Records the node completion for terminal nodes
 
     Args:
         user_id: str. The id of the user.
         story_id: str. The id of the story.
-        exp_id: str. The id of the exploration.
 
     Returns:
         bool. Whether the story is learnt by the user.
@@ -282,15 +279,11 @@ def _record_node_completion(
     for node in ordered_nodes:
         if node.exploration_id == exp_id:
             node_id = node.id
-        if (
-            node.exploration_id not in completed_exp_ids and
-            node.exploration_id != exp_id
-        ):
+        if node.exploration_id not in completed_exp_ids and node.exploration_id != exp_id:
             next_exp_id = node.exploration_id
             break
     if next_exp_id is None:
-        if exp_id not in completed_exp_ids and node_id is not None:
-            story_services.record_completed_node_in_story_context(
+        story_services.record_completed_node_in_story_context(
                 user_id, story_id, node_id)
         return None
     return next_exp_id
@@ -352,6 +345,9 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
 
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
+    story_id = exp_services.get_story_id_linked_to_exploration(
+            exp_id)
+    next_exp_id: Optional[str] = _record_node_completion(user_id, story_id, exp_id)
 
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
@@ -361,35 +357,23 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         learner_playlist_services.remove_exploration_from_learner_playlist(
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
-        story_id = exp_services.get_story_id_linked_to_exploration(
-        exp_id)
-        if story_id is not None:
-            next_exp_id: Optional[str] = _record_node_completion(
-                user_id, story_id, exp_id)
-            if next_exp_id is None:
-                story = story_fetchers.get_story_by_id(story_id)
-                topic = topic_fetchers.get_topic_by_id(
-                    story.corresponding_topic_id)
+        if next_exp_id is not None:
+            story = story_fetchers.get_story_by_id(story_id)
+            topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
 
+            if story_id is not None:
                 if story_id not in activities_completed.story_ids:
                     remove_story_from_incomplete_list(user_id, story_id)
                     activities_completed.add_story_id(story_id)
-
-                if (
-                    topic.id is not None and
-                    topic.id not in activities_completed.learnt_topic_ids
-                ):
-                    topic_ids_to_learn = (
-                        learner_goals_services.get_all_topic_ids_to_learn(
-                            user_id)
-                    )
-                    remove_topic_from_partially_learnt_list(
-                        user_id, topic.id)
+            
+            if topic.id is not None:
+                if topic.id not in activities_completed.learnt_topic_ids:
+                    topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
+                        user_id)
+                    remove_topic_from_partially_learnt_list(user_id, topic.id)
                     if topic.id in topic_ids_to_learn:
                         learner_goals_services.remove_topics_from_learn_goal(
-                            user_id,
-                            [topic.id]
-                        )
+                            user_id, [topic.id])
                     activities_completed.add_learnt_topic_id(topic.id)
         _save_completed_activities(activities_completed)
 

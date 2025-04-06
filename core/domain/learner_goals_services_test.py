@@ -180,7 +180,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
             self._get_all_topic_ids_to_learn(
                 self.viewer_id), [self.TOPIC_ID_1])
 
-        learner_progress_services._mark_topic_as_learnt( # pylint: disable=protected-access
+        learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_2)
 
         # Test that the topic added to the in the learnt list doesn't get
