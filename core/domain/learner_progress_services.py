@@ -27,6 +27,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import learner_goals_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
@@ -257,6 +258,38 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
+def _check_if_terminal_exp(
+        user_id: str, story_id: str, exp_id: str
+    ) -> bool:
+    """Records the node completion for terminal nodes
+
+    Args:
+        user_id: str. The id of the user.
+        story_id: str. The id of the story.
+        exp_id: str. The id of the exploration.
+
+    Returns:
+        bool. Whether the story is learnt by the user.
+    """
+    story = story_fetchers.get_story_by_id(story_id)
+    completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            user_id, story_id)
+    completed_exp_ids = [
+        completed_node.exploration_id for completed_node in completed_nodes]
+    ordered_nodes = story.story_contents.get_ordered_nodes()
+    next_exp_id = None
+    for node in ordered_nodes:
+        if (
+            node.exploration_id not in completed_exp_ids and
+            node.exploration_id != exp_id
+        ):
+            next_exp_id = node.exploration_id
+            break
+    if next_exp_id is None:
+        return True
+    return False
+
+
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
@@ -292,6 +325,36 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         learner_playlist_services.remove_exploration_from_learner_playlist(
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
+        story_id = exp_services.get_story_id_linked_to_exploration(
+        exp_id)
+        if story_id is not None:
+            is_terminal = _check_if_terminal_exp(
+                user_id, story_id, exp_id)
+            if is_terminal:
+                story = story_fetchers.get_story_by_id(story_id)
+                topic = topic_fetchers.get_topic_by_id(
+                    story.corresponding_topic_id)
+
+                if story_id not in activities_completed.story_ids:
+                    remove_story_from_incomplete_list(user_id, story_id)
+                    activities_completed.add_story_id(story_id)
+
+                if (
+                    topic.id is not None and
+                    topic.id not in activities_completed.learnt_topic_ids
+                ):
+                    topic_ids_to_learn = (
+                        learner_goals_services.get_all_topic_ids_to_learn(
+                            user_id)
+                    )
+                    remove_topic_from_partially_learnt_list(
+                        user_id, topic.id)
+                    if topic.id in topic_ids_to_learn:
+                        learner_goals_services.remove_topics_from_learn_goal(
+                            user_id,
+                            [topic.id]
+                        )
+                    activities_completed.add_learnt_topic_id(topic.id)
         _save_completed_activities(activities_completed)
 
 
