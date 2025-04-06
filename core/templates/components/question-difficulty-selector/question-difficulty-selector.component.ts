@@ -42,7 +42,6 @@ export class QuestionDifficultySelectorComponent {
   availableDifficultyValues: number[] = [];
 
   ngOnInit(): void {
-    console.log(this.difficultyCount);
     for (let difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
         AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
