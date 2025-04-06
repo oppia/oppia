@@ -384,6 +384,7 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
                             user_id,
                             [topic.id]
                         )
+                    print("here is the completed activities modal ===================================", activities_completed)
                     activities_completed.add_learnt_topic_id(topic.id)
         _save_completed_activities(activities_completed)
 
