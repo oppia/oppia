@@ -190,6 +190,21 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     next_node_id = node.id
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
+    
+    def _check_if_terminal_node(
+        self,
+        node_id: str,
+        completed_node_ids: List[str],
+        ordered_nodes: List[story_domain.StoryNode]
+    ) -> bool:
+        next_node_id = None
+        for node in ordered_nodes:
+            if node.id not in completed_node_ids and node.id != node_id:
+                next_node_id = node.id
+                break
+        if next_node_id is None:
+            return True
+        return False
 
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
@@ -264,14 +279,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids = [
             completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
-        is_terminal = False
-        next_node_id = None
-        for node in ordered_nodes:
-            if node.id not in completed_node_ids and node.id != node_id:
-                next_node_id = node.id
-                break
-        if next_node_id is None:
-            is_terminal = True
+        is_terminal = self._check_if_terminal_node(node_id, completed_node_ids, ordered_nodes)
         if is_terminal:
             next_exp_ids = []
             next_node_id = None
