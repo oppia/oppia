@@ -264,7 +264,6 @@
 /app_dev.yaml @oppia/release-workflow-reviewers
 /cron.yaml @oppia/release-workflow-reviewers
 /index.yaml @oppia/release-workflow-reviewers
-/queue.yaml @oppia/release-workflow-reviewers
 
 
 # Global components and filters.

@@ -394,7 +394,10 @@ describe('Diagnostic test player component', () => {
   }));
 
   it('should register recommendation acceptance event', fakeAsync(() => {
-    spyOn(siteAnalyticsService, 'registerRecommendationAcceptedEvent');
+    spyOn(
+      siteAnalyticsService,
+      'registerDiagnosticTestRecommendationAcceptedEvent'
+    );
 
     component.recommendedTopicSummaries = [topicData2];
     component.classroomData = dummyClassroomData;
@@ -402,7 +405,7 @@ describe('Diagnostic test player component', () => {
     component.getRecommendationAcceptanceEvent(topicData2.getName());
 
     expect(
-      siteAnalyticsService.registerRecommendationAcceptedEvent
+      siteAnalyticsService.registerDiagnosticTestRecommendationAcceptedEvent
     ).toHaveBeenCalledWith('math', 'dummy2');
   }));
 });

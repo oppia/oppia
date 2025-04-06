@@ -961,7 +961,10 @@ describe('Site Analytics Service', () => {
       const classroomName = 'Math101';
       const topicId = 'algebra-fundamentals';
 
-      sas.registerRecommendationAcceptedEvent(classroomName, topicId);
+      sas.registerDiagnosticTestRecommendationAcceptedEvent(
+        classroomName,
+        topicId
+      );
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',

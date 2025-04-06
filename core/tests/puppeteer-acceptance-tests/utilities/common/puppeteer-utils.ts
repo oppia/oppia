@@ -71,8 +71,11 @@ export class BaseUser {
   username: string = '';
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
+  static instances: BaseUser[] = []; // Track instances.
 
-  constructor() {}
+  constructor() {
+    BaseUser.instances.push(this);
+  }
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -188,6 +191,21 @@ export class BaseUser {
           });
         }
 
+        // Set up Download Folder.
+        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+        // Ensure the folder exists.
+        if (!fs.existsSync(downloadDir)) {
+          fs.mkdirSync(downloadDir, {recursive: true});
+        }
+
+        // Enable download behavior using Chrome DevTools Protocol (CDP).
+        const client = await this.page.target().createCDPSession();
+        await client.send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: downloadDir,
+        });
+
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -200,6 +218,33 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * This function takes the screenshot of all the instances of browser during a test failure.
+   */
+  async captureScreenshotsForFailedTest(): Promise<void> {
+    let i: number = 0;
+    const specName = process.env.SPEC_NAME;
+    const outputDir = testConstants.TEST_SCREENSHOT_DIR;
+    const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
+      /[^a-z0-9.-]/gi,
+      '_'
+    );
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, {recursive: true});
+    }
+    for (const instance of BaseUser.instances) {
+      if (instance.page) {
+        await instance.page.screenshot({
+          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+        });
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+        );
+        i = i + 1;
+      }
+    }
   }
 
   /**
@@ -514,6 +559,21 @@ export class BaseUser {
     if (this.screenRecorder) {
       await this.screenRecorder.stop();
     }
+    const CONFIG_FILE = path.resolve(
+      __dirname,
+      '../../jest-runtime-config.json'
+    );
+    if (
+      fs.existsSync(CONFIG_FILE) &&
+      !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
+    ) {
+      const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+      if (configData.testFailureDetected) {
+        fs.unlinkSync(CONFIG_FILE);
+        // Signal all BaseUser instances to take screenshots.
+        await this.captureScreenshotsForFailedTest();
+      }
+    }
     await this.browserObject.close();
   }
 
@@ -688,7 +748,7 @@ export class BaseUser {
       } else {
         dirName = '/dev-mobile-screenshots';
       }
-      failureTrigger += 0.042;
+      failureTrigger += 0.048;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.0352;
       } else if (await currentPage.$(libraryBanner)) {
