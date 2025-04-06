@@ -82,6 +82,7 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.viewContributionRightsForUser(username);
   }
 
   /**
