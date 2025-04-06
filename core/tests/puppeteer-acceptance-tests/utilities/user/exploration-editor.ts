@@ -240,7 +240,7 @@ const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 
 export const INTERACTION_TYPES = {
   CODE_EDITOR: 'Code Editor',
-  END_EXPLORATION: 'End Explorarion',
+  END_EXPLORATION: 'End Exploration',
 };
 
 export const INTERACTION_TABS_OF_INTERACTION_TYPE = {
@@ -494,6 +494,10 @@ export class ExplorationEditor extends BaseUser {
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.page.waitForSelector(addInteractionButton, {
+      visible: true,
+    });
+
     await this.clickOn(addInteractionButton);
 
     // Change tab based on interaction.
@@ -1895,30 +1899,59 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function creates simple Programming Exploration
+   * This function creates simple Programming Exploration.
+   * Starts at new Exploration Editor Page.
+   * Ends at same page, after adding programming interaction and saving the
+   * draft.
    */
   async createSimpleProgrammingExploration(): Promise<string | null> {
+    // Check if element to add interaction is visible (pre-check)
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+
     await this.createMinimalExploration(
       'This is a test Programming Exploration',
       INTERACTION_TYPES.CODE_EDITOR
     );
 
+    const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, INTERACTION_TYPES.END_EXPLORATION);
+    await this.type(addStateInput, lastInteraction);
     await this.clickOn(addNewResponseButton);
     await this.clickOn(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedback('Wrong Answer. Please try again');
-    await this.navigateToCard(INTERACTION_TYPES.END_EXPLORATION);
-    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.navigateToCard(lastInteraction);
+    await this.createMinimalExploration(
+      'This is last card',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
 
     await this.saveExplorationDraft();
-    return await this.publishExplorationWithMetadata(
+    const explorationId = await this.publishExplorationWithMetadata(
       'Simple Code Editor',
       'This is goal here',
       'Algebra'
     );
+
+    // Check if publish button is disabled (post-check)
+    const publishButton = await this.page.$(saveChangesButton);
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      publishButton
+    );
+
+    if (isDisabled) {
+      showMessage('Publish Button is disabled, as expected');
+    } else {
+      showMessage(
+        'Error: Publish Button is enabled and clickable. Expected to be disabled'
+      );
+    }
+
+    return explorationId;
   }
 
   /**
