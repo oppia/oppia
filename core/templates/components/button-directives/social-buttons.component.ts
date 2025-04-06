@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import './social-buttons.component.css';
 
@@ -29,10 +28,3 @@ import './social-buttons.component.css';
 export class SocialButtonsComponent {
   constructor() {}
 }
-
-angular.module('oppia').directive(
-  'oppiaSocialButtons',
-  downgradeComponent({
-    component: SocialButtonsComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching contributor admin dashboard stats.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -366,10 +365,3 @@ export class ContributorDashboardAdminStatsBackendApiService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributorDashboardAdminStatsBackendApiService',
-    downgradeInjectable(ContributorDashboardAdminStatsBackendApiService)
-  );

@@ -18,7 +18,6 @@
  * or collapsed.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -39,7 +38,3 @@ export class AudioBarStatusService {
     return this.audioBarIsExpanded;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AudioBarStatusService', downgradeInjectable(AudioBarStatusService));

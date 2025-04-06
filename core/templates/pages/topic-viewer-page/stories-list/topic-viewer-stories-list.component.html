@@ -7,8 +7,8 @@
           <div class="classroom-name-container" *ngIf="classroomName">
             <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
             <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
-            <a [href]="'/learn/' + classroomUrlFragment" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
-            <a [href]="'/learn/' + classroomUrlFragment" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
+            <a [href]="getClassroomUrl()" *ngIf="!isHackyClassroomNameTranslationDisplayed()">{{ classroomName }}</a>
+            <a [href]="getClassroomUrl()" *ngIf="isHackyClassroomNameTranslationDisplayed()">{{ classroomNameTranslationKey | translate }}</a>
           </div>
           <i class="fa fa-angle-right" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-left" *ngIf="isLanguageRTL()"></i>
@@ -22,8 +22,8 @@
         <div class="mobile-breadcrumbs">
           <i class="fa fa-angle-left" *ngIf="!isLanguageRTL()"></i>
           <i class="fa fa-angle-right" *ngIf="isLanguageRTL()"></i>
-          <a [href]="'/learn/' + classroomName" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName}" *ngIf="classroomName"></a>
-          <a href="/learn" *ngIf="!classroomName">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+          <a [href]="getClassroomUrl()" [innerHTML]="'I18N_BACK_TO_CLASSROOM' | translate: { classroomName: classroomName }" *ngIf="classroomUrlFragment"></a>
+          <a [href]="getClassroomUrl()" *ngIf="!classroomUrlFragment">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
         </div>
       </div>
       <h1 class="tab-title" tabindex="0">

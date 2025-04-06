@@ -123,6 +123,12 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     newSkillWithDifficulty: SkillDifficulty,
     index: number
   ): void {
+    let oldSkillId = this.linkedSkillsWithDifficulty[index].getId();
+    if (this.isSkillSelected(oldSkillId)) {
+      let indexOfOldSelectedSkill = this.selectedSkills.indexOf(oldSkillId);
+      this.selectedSkills[indexOfOldSelectedSkill] =
+        newSkillWithDifficulty.getId();
+    }
     this.linkedSkillsWithDifficulty[index] = newSkillWithDifficulty;
   }
 

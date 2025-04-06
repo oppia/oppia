@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -160,10 +159,3 @@ export class EntityVoiceoversService {
     return this._voiceoversLoadedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EntityVoiceoversService',
-    downgradeInjectable(EntityVoiceoversService)
-  );

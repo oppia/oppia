@@ -64,8 +64,9 @@ var expCategoryDropdownElement =
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
 var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
+var topicUrlFragmentField =
+  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
 var topicNameField = '.e2e-test-new-topic-name-field';
-var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
 var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
@@ -77,7 +78,8 @@ var createdTopicLink = '.e2e-test-topic-name';
 
 var createStoryButtonSelector = '.e2e-test-create-story-button';
 var storyNameField = '.e2e-test-new-story-title-field';
-var storyUrlFragmentField = '.e2e-test-new-story-url-fragment-field';
+var storyUrlFragmentField =
+  '.e2e-test-create-new-story-url-fragment-field .e2e-test-url-fragment-field';
 var storyDescriptionField = '.e2e-test-new-story-description-field';
 var storyThumbnailButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
@@ -253,6 +255,9 @@ const getTopicEditorUrl = async function (browser, page) {
 
     await page.waitForSelector(topicNameField, {visible: true});
     await page.type(topicNameField, 'Topic1 TASD');
+    await page.waitForSelector(topicUrlFragmentField, {
+      visible: true,
+    });
     await page.type(topicUrlFragmentField, 'topic-tasd-one');
     await page.type(topicDescriptionField, 'Topic 1 description');
     await page.type(topicPageTitleFragmField, 'page-fragment');
@@ -297,6 +302,9 @@ const getStoryEditorUrl = async function (browser, page) {
 
     await page.waitForSelector(storyNameField, {visible: true});
     await page.type(storyNameField, 'Story TASD');
+    await page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
     await page.type(storyUrlFragmentField, 'storyurlone');
     await page.type(storyDescriptionField, 'Story 1 description');
     await page.click(storyThumbnailButton);

@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface TypeDefinitionObject {
   validate: (arg0: Object) => boolean;
@@ -127,10 +126,3 @@ export class ParamTypeObjectFactory {
     return this.registry[backendName];
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParamTypeObjectFactory',
-    downgradeInjectable(ParamTypeObjectFactory)
-  );

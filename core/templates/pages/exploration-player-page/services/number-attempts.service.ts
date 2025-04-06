@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +51,3 @@ export class NumberAttemptsService {
     return NumberAttemptsService.numberAttempts;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('NumberAttemptsService', downgradeInjectable(NumberAttemptsService));

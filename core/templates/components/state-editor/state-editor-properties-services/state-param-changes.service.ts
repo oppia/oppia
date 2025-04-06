@@ -16,7 +16,6 @@
  * @fileoverview A data service that stores the current list of
  * state parameter changes.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -39,10 +38,3 @@ export class StateParamChangesService extends StatePropertyService<
     this.setterMethodKey = 'saveStateParamChanges';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateParamChangesService',
-    downgradeInjectable(StateParamChangesService)
-  );

@@ -110,13 +110,6 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
     );
   }
 
-  changeSkillWithDifficulty(
-    newSkillWithDifficulty: SkillDifficulty,
-    idx: number
-  ): void {
-    this.linkedSkillsWithDifficulty[idx] = newSkillWithDifficulty;
-  }
-
   startQuestionCreation(): void {
     const result = {
       skill: this.skill,

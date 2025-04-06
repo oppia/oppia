@@ -16,7 +16,6 @@
  * @fileoverview Component for set of translatable html content id editor.
  */
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface Choice {
   val: string;
@@ -71,9 +70,3 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
-angular.module('oppia').directive(
-  'setOfTranslatableHtmlContentIdsEditor',
-  downgradeComponent({
-    component: SetOfTranslatableHtmlContentIdsEditorComponent,
-  })
-);

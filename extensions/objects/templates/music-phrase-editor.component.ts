@@ -18,7 +18,6 @@
 
 // This component is always editable.
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AlertsService} from 'services/alerts.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
@@ -150,9 +149,3 @@ export class MusicPhraseEditorComponent implements OnInit {
     return this.schema;
   }
 }
-angular.module('oppia').directive(
-  'musicPhraseEditor',
-  downgradeComponent({
-    component: MusicPhraseEditorComponent,
-  }) as angular.IDirectiveFactory
-);

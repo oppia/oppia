@@ -18,7 +18,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -118,10 +117,3 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     this.activeTab = this.TAB_ID_BEAM_JOBS;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaReleaseCoordinatorNavbar',
-    downgradeComponent({component: ReleaseCoordinatorNavbarComponent})
-  );

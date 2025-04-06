@@ -17,7 +17,6 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import {
   BackendChangeObject,
@@ -502,7 +501,3 @@ export class SkillUpdateService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SkillUpdateService', downgradeInjectable(SkillUpdateService));

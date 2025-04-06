@@ -23,7 +23,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-pre-logo-action',
@@ -81,9 +80,3 @@ export class StoryViewerNavbarPreLogoActionComponent
     return this.directiveSubscriptions.unsubscribe();
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryViewerNavbarPreLogoAction',
-    downgradeComponent({component: StoryViewerNavbarPreLogoActionComponent})
-  );

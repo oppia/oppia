@@ -56,7 +56,6 @@ import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {UserInfo} from 'domain/user/user-info.model';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
 class MockWindowRef {
@@ -76,9 +75,6 @@ class MockWindowRef {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EndChapterCelebration: {
-        isEnabled: true,
-      },
       EnableVoiceoverContribution: {
         isEnabled: false,
       },
@@ -116,7 +112,6 @@ describe('Tutor card component', () => {
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
-  let platformFeatureService: PlatformFeatureService;
   let translateService: TranslateService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
@@ -211,7 +206,6 @@ describe('Tutor card component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     windowRef = TestBed.inject(WindowRef);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     translateService = TestBed.inject(TranslateService);
 
@@ -343,7 +337,7 @@ describe('Tutor card component', () => {
     expect(componentInstance.isOnTerminalCard).toHaveBeenCalled();
   }));
 
-  it('should trigger celebratory animation if on the last card of a chapter', fakeAsync(() => {
+  it('should handle multiple calls when ngOnChanges runs before ngAfterViewInit', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
     spyOn(componentInstance, 'triggerCelebratoryAnimation');
@@ -359,19 +353,17 @@ describe('Tutor card component', () => {
     };
 
     componentInstance.ngOnChanges(changes);
-
+    componentInstance.ngAfterViewInit();
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
-    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
+    tick();
+    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalledTimes(
+      1
+    );
   }));
 
-  it('should not trigger celebratory animation if the feature is not enabled', () => {
+  it('should trigger celebratory animation once when on last card and ngAfterViewInit runs before ngOnChanges', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      EndChapterCelebration: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
     spyOn(componentInstance, 'triggerCelebratoryAnimation');
     componentInstance.animationHasPlayedOnce = false;
     componentInstance.inStoryMode = true;
@@ -383,14 +375,14 @@ describe('Tutor card component', () => {
         isFirstChange: () => false,
       },
     };
-
+    componentInstance.ngAfterViewInit();
     componentInstance.ngOnChanges(changes);
-
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
-    expect(
-      componentInstance.triggerCelebratoryAnimation
-    ).not.toHaveBeenCalled();
-  });
+    tick();
+    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalledTimes(
+      1
+    );
+  }));
 
   it('should not trigger celebratory animation if not in story mode', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
@@ -408,8 +400,8 @@ describe('Tutor card component', () => {
     };
 
     componentInstance.ngOnChanges(changes);
-
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+    tick();
     expect(
       componentInstance.triggerCelebratoryAnimation
     ).not.toHaveBeenCalled();

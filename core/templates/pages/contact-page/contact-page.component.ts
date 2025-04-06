@@ -17,17 +17,9 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-contact-page',
   templateUrl: './contact-page.component.html',
 })
 export class ContactPageComponent {}
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaContactPage',
-    downgradeComponent({component: ContactPageComponent})
-  );

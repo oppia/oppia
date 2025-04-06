@@ -22,7 +22,6 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {EditabilityService} from 'services/editability.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 interface DeleteValue {
@@ -99,10 +98,3 @@ export class ResponseHeaderComponent {
     this.delete.emit(value);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseHeader',
-  downgradeComponent({
-    component: ResponseHeaderComponent,
-  }) as angular.IDirectiveFactory
-);
