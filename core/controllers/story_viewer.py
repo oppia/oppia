@@ -191,6 +191,32 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     break
         return (next_exp_ids, next_node_id, completed_node_ids)
 
+    def _check_if_terminal_node(
+        self,
+        node_id: str,
+        completed_node_ids: List[str],
+        ordered_nodes: List[story_domain.StoryNode]
+    ) -> bool:
+        """Determines whether the provided node is a terminal node.
+
+        Args:
+            node_id: str. The node ID.
+            completed_node_ids: List[str]. A list of IDS of completed nodes.
+            ordered_nodes: List[story_domain.StoryNode]. A list of story
+                nodes in order.
+
+        Returns:
+            bool. Whether the provided node is a terminal node.
+        """
+        next_node_id = None
+        for node in ordered_nodes:
+            if node.id not in completed_node_ids and node.id != node_id:
+                next_node_id = node.id
+                break
+        if next_node_id is None:
+            return True
+        return False
+
     @acl_decorators.can_access_story_viewer_page_as_logged_in_user
     def get(self, story_id: str, node_id: str) -> None:
         """Redirects the user to the next appropriate node or the story page.
@@ -264,10 +290,19 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         completed_node_ids = [
             completed_node.id for completed_node in completed_nodes]
         ordered_nodes = story.story_contents.get_ordered_nodes()
-
-        (next_exp_ids, next_node_id, completed_node_ids) = (
-            self._record_node_completion(
-                story_id, node_id, completed_node_ids, ordered_nodes))
+        is_terminal = self._check_if_terminal_node(
+            node_id,
+            completed_node_ids,
+            ordered_nodes
+        )
+        if is_terminal:
+            next_exp_ids: List[str] = []
+            next_node_id = None
+            completed_node_ids.append(node_id)
+        else:
+            (next_exp_ids, next_node_id, completed_node_ids) = (
+                self._record_node_completion(
+                    story_id, node_id, completed_node_ids, ordered_nodes))
 
         ready_for_review_test = False
         exp_summaries = (

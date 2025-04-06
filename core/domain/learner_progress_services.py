@@ -278,7 +278,10 @@ def _record_node_completion(
         completed_node.exploration_id for completed_node in completed_nodes]
     ordered_nodes = story.story_contents.get_ordered_nodes()
     next_exp_id = None
+    node_id = None
     for node in ordered_nodes:
+        if node.exploration_id == exp_id:
+            node_id = node.id
         if (
             node.exploration_id not in completed_exp_ids and
             node.exploration_id != exp_id
@@ -286,6 +289,9 @@ def _record_node_completion(
             next_exp_id = node.exploration_id
             break
     if next_exp_id is None:
+        if exp_id not in completed_exp_ids and node_id is not None:
+            story_services.record_completed_node_in_story_context(
+                user_id, story_id, node_id)
         return None
     return next_exp_id
 
