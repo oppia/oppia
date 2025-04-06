@@ -85,6 +85,7 @@ const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 // Question Editor.
 const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
+const saveChangesModal = 'div.e2e-test-save-pending-changes-modal';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
 const removeQuestionConfirmationButton =
@@ -92,6 +93,7 @@ const removeQuestionConfirmationButton =
 const questionPreviewTab = '.e2e-test-question-preview-tab';
 const questionTextInput = '.e2e-test-question-text-input';
 const questionContentSelector = '.e2e-test-conversation-content';
+const cancelNavigationButton = '.e2e-test-cancel-button';
 const numericInputInteractionField = '.e2e-test-conversation-input';
 const skillNameInputSelector = '.e2e-test-skill-name-input';
 const radioInnerCircleSelector = '.mat-radio-inner-circle';
@@ -221,6 +223,9 @@ const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
+const createQuestionButton = '.e2e-test-create-question-button';
+const questionEditCancelButton = 'button.question-edit-cancel-button';
+const confirmQuestionExitButton = '.e2e-test-confirm-question-exit';
 
 export class TopicManager extends BaseUser {
   /**
@@ -379,6 +384,24 @@ export class TopicManager extends BaseUser {
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
     ]);
     await this.waitForStaticAssetsToLoad();
+  }
+
+  async beingCreatingQuestion(): Promise<void> {
+    await this.clickOn(createQuestionButton);
+  }
+
+  async tryToNavigateToAnotherTab(): Promise<void> {
+    await this.clickOn(questionPreviewTab);
+  }
+
+  async expectUnsavedChangesModalToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(saveChangesModal, {visible: true});
+    await this.clickOn(cancelNavigationButton);
+  }
+
+  async cancelQuestionMaking(): Promise<void> {
+    await this.clickOn(questionEditCancelButton);
+    await this.clickOn(confirmQuestionExitButton);
   }
 
   /**
