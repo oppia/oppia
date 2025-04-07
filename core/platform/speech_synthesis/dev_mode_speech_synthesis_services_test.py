@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core.platform import models
-from core.platform.azure_speech_synthesis import (
-    dev_mode_azure_speech_synthesis_services)
+from core.platform.speech_synthesis import dev_mode_speech_synthesis_services
 from core.tests import test_utils
 
 
@@ -58,7 +57,7 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         ]
 
         result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_azure_speech_synthesis_services.
+            dev_mode_speech_synthesis_services.
             regenerate_speech_from_text(plaintext, language_accent_code))
 
         self.assertTrue(isinstance(result_binary_data, bytes))
@@ -83,7 +82,7 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         ]
 
         result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_azure_speech_synthesis_services.
+            dev_mode_speech_synthesis_services.
             regenerate_speech_from_text(plaintext, language_accent_code))
 
         self.assertTrue(isinstance(result_binary_data, bytes))
