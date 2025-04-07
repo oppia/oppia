@@ -358,7 +358,9 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
     def test_public_exploration_requires_commit_message(self) -> None:
-        """Test that public explorations require a commit message when updated."""
+        """Test that public explorations require a commit message
+        when updated.
+        """
         self.login(self.OWNER_EMAIL)
 
         csrf_token = self.get_new_csrf_token()
@@ -389,7 +391,8 @@ class EditorTests(BaseEditorControllerTests):
 
         self.assertEqual(
             response['error'],
-            'Exploration is public so expected a commit message but received none.'
+            'Exploration is public so expected a commit message but received '
+            'none.'
         )
 
         response = self.put_json(
