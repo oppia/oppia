@@ -1947,8 +1947,9 @@ export class ExplorationEditor extends BaseUser {
       showMessage('Publish Button is disabled, as expected');
     } else {
       showMessage(
-        'Error: Publish Button is enabled and clickable. Expected to be disabled'
+        'Publish Button is enabled and clickable, expected to be disabled'
       );
+      throw new Error('Publish Button is enabled and clickable');
     }
 
     return explorationId;
