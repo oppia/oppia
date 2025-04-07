@@ -174,6 +174,7 @@ MATH_INTERACTION_DEPRECATED_RULES: Final = [
 ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
 
+
 def clean_math_expression(math_expression: str) -> str:
     """Cleans a given math expression and formats it so that it is compatible
     with the new interactions' validators.
@@ -6214,15 +6215,15 @@ class ExplorationRights:
                 view this exploration.
             community_owned: bool. Whether the exploration is community-owned.
             cloned_from: Optional[str]. The exploration id which this
-                exploration was cloned from. If None, this exploration was created
-                from scratch.
+                exploration was cloned from. If None, this exploration was
+                created from scratch.
             viewable_if_private: bool. For private explorations, whether this
                 exploration can be viewed by anyone who has the URL. If the
                 exploration is not private, this setting is ignored.
             first_published_msec: float|None. Time in milliseconds since the
                 Epoch, when the exploration was first published, or None if
                 Exploration is not published yet.
-            status: Literal['private', 'public'].The publication status
+            status: Literal['private', 'public']. The publication status
                 of this exploration.
             deleted: bool. Whether the exploration is marked as deleted.
         """
@@ -6263,7 +6264,8 @@ class ExplorationRights:
 
         if not isinstance(self.editor_ids, list):
             raise utils.ValidationError(
-                'Expected editor_ids to be list, received %s' % self.editor_ids)
+                'Expected editor_ids to be list, '
+                'received %s' % self.editor_ids)
         for editor_id in self.editor_ids:
             if not isinstance(editor_id, str):
                 raise utils.ValidationError(
@@ -6282,24 +6284,26 @@ class ExplorationRights:
 
         if not isinstance(self.viewer_ids, list):
             raise utils.ValidationError(
-                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
+                'Expected viewer_ids to be list, '
+                'received %s' % self.viewer_ids)
         for viewer_id in self.viewer_ids:
             if not isinstance(viewer_id, str):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
                     'be string, received %s' % viewer_id)
-            
+
         if not isinstance(self.viewable_if_private, bool):
             raise utils.ValidationError(
                 'Expected viewable_if_private to '
-                'be boolean, received %s' %self.viewable_if_private)
-        
-        if self.status not in (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC):
+                'be boolean, received %s' % self.viewable_if_private)
+
+        if self.status not in (
+            ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC):
             raise utils.ValidationError(
                 'Expected status to be either "%s" or "%s", received "%s"' %
                 (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, self.status)
             )
-        
+
         if self.first_published_msec is not None:
             if not isinstance(self.first_published_msec, float):
                 raise utils.ValidationError(
