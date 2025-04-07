@@ -399,7 +399,7 @@
         "scripts.check_github_workflow_status_test",
         "scripts.check_backend_test_times_test",
         "core.domain.voiceover_regeneration_services_test",
-        "core.platform.azure_speech_synthesis.azure_speech_synthesis_services_test",
-        "core.platform.azure_speech_synthesis.dev_mode_azure_speech_synthesis_services_test"
+        "core.platform.speech_synthesis.azure_speech_synthesis_services_test",
+        "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test"
     ]
 }
