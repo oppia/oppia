@@ -357,26 +357,25 @@ class EditorTests(BaseEditorControllerTests):
             'This exploration cannot be edited. Please contact the admin.')
         self.logout()
 
-
     def test_public_exploration_requires_commit_message(self) -> None:
         """Test that public explorations require a commit message when updated."""
         self.login(self.OWNER_EMAIL)
-        
+
         csrf_token = self.get_new_csrf_token()
-        
+
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, self.owner_id, end_state_name='End State')
-        
+
         rights_manager.publish_exploration(self.owner, exp_id)
-        
+
         change_list = [{
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
             'old_value': 'A title',
             'new_value': 'Updated Title'
         }]
-        
+
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -387,12 +386,12 @@ class EditorTests(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-        
+
         self.assertEqual(
             response['error'],
             'Exploration is public so expected a commit message but received none.'
         )
-        
+
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -402,10 +401,9 @@ class EditorTests(BaseEditorControllerTests):
             },
             csrf_token=csrf_token
         )
-        
+
         updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
         self.assertEqual(updated_exploration.title, 'Updated Title')
-        
         self.logout()
 
 
