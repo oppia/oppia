@@ -2694,7 +2694,7 @@ export class TopicManager extends BaseUser {
       );
     }
 
-    showMessage(`Found chapter err as required`);
+    showMessage(`Found expected error message: ${errorMessage}`);
   }
 
   /**
