@@ -53,14 +53,14 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-        feature_flag_list.FeatureNames.DIAGNOSTIC_TEST
+        feature_flag_list.FeatureNames.BLOG_PAGES
     ])
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
             'dummy_feature_flag_for_e2e_tests', None))
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            'diagnostic_test', None))
+            'blog_pages', None))
 
 
 class SetPlatformParametersTests(test_utils.GenericTestBase):
