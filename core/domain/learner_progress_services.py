@@ -269,7 +269,7 @@ def _check_if_terminal_exp(
         exp_id: str. The id of the exploration.
 
     Returns:
-        bool. True if the exploration is the last in the sequence, False otherwise.
+        bool. True if it's the last exploration, False otherwise.
     """
     story = story_fetchers.get_story_by_id(story_id)
     completed_nodes = story_fetchers.get_completed_nodes_in_story(
