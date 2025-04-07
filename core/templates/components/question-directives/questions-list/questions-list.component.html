@@ -4,10 +4,10 @@
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
         <h3>Difficulty
           <img *ngIf="difficultyCount === 1"
-                 class="info-icon"
-                 src="/assets/images/learner_dashboard/info.svg"
-                 matTooltip="The difficulty level of this question cannot be changed because the skill specifies only one difficulty option."
-                 aria-label="Locked to one difficulty level: This skill only has one difficulty setting.">
+               class="info-icon"
+               src="/assets/images/learner_dashboard/info.svg"
+               matTooltip="The difficulty level of this question cannot be changed because the skill specifies only one difficulty option."
+               aria-label="Locked to one difficulty level: This skill only has one difficulty setting.">
         </h3>
         <i class="fa fa-caret-down"
            *ngIf="!difficultyCardIsShown"
@@ -21,7 +21,7 @@
       <div class="oppia-mobile-collapsible-card-content" *ngIf="difficultyCardIsShown">
         <div class="list-group">
           <h4 *ngIf="difficultyCount != 1">Select Difficulty</h4>
-          <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index" 
+          <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index"
                [class.single-option]="difficultyCount === 1"
                class="difficulty-selection-container">
             <label class="list-group-item-heading">{{skillWithDifficulty.getDescription()}}</label>
@@ -355,7 +355,7 @@
     display: block;
     flex-direction: column;
   }
-  
+
   @media screen and (max-width: 768px) {
     .question-editor-container {
       margin-top: 30px;
