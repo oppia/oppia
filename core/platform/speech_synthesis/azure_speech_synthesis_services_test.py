@@ -21,7 +21,7 @@ from __future__ import annotations
 from unittest import mock
 
 from core.platform import models
-from core.platform.azure_speech_synthesis import azure_speech_synthesis_services
+from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Union
@@ -49,7 +49,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
-        'core.platform.azure_speech_synthesis.'
+        'core.platform.speech_synthesis.'
         'azure_speech_synthesis_services.WordBoundaryCollection')
     def test_regenerate_speech_from_text_success(
         self,
@@ -122,7 +122,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
-        'core.platform.azure_speech_synthesis.'
+        'core.platform.speech_synthesis.'
         'azure_speech_synthesis_services.WordBoundaryCollection')
     def test_regenerate_speech_from_math_text_success(
         self,
@@ -206,7 +206,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
-        'core.platform.azure_speech_synthesis.'
+        'core.platform.speech_synthesis.'
         'azure_speech_synthesis_services.WordBoundaryCollection')
     def test_regenerate_speech_from_text_failed(
         self,
