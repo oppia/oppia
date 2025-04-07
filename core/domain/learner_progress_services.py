@@ -261,7 +261,7 @@ def _save_last_playthrough_information(
 def _check_if_terminal_exp(
         user_id: str, story_id: str, exp_id: str
     ) -> bool:
-    """Records the node completion for terminal nodes
+    """Checks if the given exploration is the final one in the story.
 
     Args:
         user_id: str. The id of the user.
@@ -269,7 +269,7 @@ def _check_if_terminal_exp(
         exp_id: str. The id of the exploration.
 
     Returns:
-        bool. Whether the story is learnt by the user.
+        bool. True if the exploration is the last in the sequence, False otherwise.
     """
     story = story_fetchers.get_story_by_id(story_id)
     completed_nodes = story_fetchers.get_completed_nodes_in_story(
