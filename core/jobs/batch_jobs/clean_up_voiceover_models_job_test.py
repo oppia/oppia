@@ -128,35 +128,6 @@ class CleanUpVoiceoverModelsTestsBaseClass(
         )
         self.publish_exploration(self.owner_id, exploration_1.id)
 
-        new_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_1
-                },
-                'ca_placeholder_2': {},
-                'default_outcome_1': {}
-            }
-        }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
-            }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
-        exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
-
         topic_1 = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm')
         topic_1.thumbnail_filename = 'thumbnail.svg'
@@ -195,9 +166,41 @@ class CleanUpVoiceoverModelsTestsBaseClass(
                 'new_value': self.CURATED_EXPLORATION_ID_1
             })], 'Changes.')
 
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': self.voiceover_dict_1
+                },
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Translation commits')
+
+
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.
-        AUTO_UPDATE_EXP_VOICE_ARTIST_LINK])
+        AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def _create_non_curated_explorations(self) -> None:
         """The method generates two non curated exploration."""
         exploration_2 = self.save_new_valid_exploration(
