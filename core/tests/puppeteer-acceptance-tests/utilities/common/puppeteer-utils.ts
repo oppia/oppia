@@ -82,7 +82,9 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
-      '--start-fullscreen',
+      // We are facing issues in CI when using full-screen,
+      // so fixed window size of 1920x1080 is used.
+      '--window-size=1920,1080',
       '--use-fake-ui-for-media-stream',
     ];
 
@@ -140,7 +142,7 @@ export class BaseUser {
         // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const outputFileName =
-            `${specName}-${new Date().toISOString()}.mp4`.replace(
+            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
