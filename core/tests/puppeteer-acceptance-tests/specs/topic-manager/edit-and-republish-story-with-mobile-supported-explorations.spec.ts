@@ -22,17 +22,9 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-
-// TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor. Since this error is getting triggered on navigation only, it is causing "Execution context destroyed error". So, creating and switching to a new tab to avoid this error. Please remove the statement below that creates and switches to new tab and this errorToIgnore below.
-const errorsToIgnore = [
-  /Cannot read properties of undefined \(reading 'storyEditorStalenessDetectionService'\)/,
-];
-
-ConsoleReporter.setConsoleErrorsToIgnore(errorsToIgnore);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
