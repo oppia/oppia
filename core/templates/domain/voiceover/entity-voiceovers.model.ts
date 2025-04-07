@@ -99,4 +99,10 @@ export class EntityVoiceovers {
       return undefined;
     }
   }
+
+  removeVoiceover(contentId: string) {
+    if (this.voiceoversMapping[contentId]) {
+      delete this.voiceoversMapping[contentId];
+    }
+  }
 }

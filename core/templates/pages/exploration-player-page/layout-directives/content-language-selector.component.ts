@@ -93,10 +93,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
       }
     }
 
-    if (
-      this.isVoiceoverContributionWithAccentEnabled() &&
-      this.audioPreloaderService.exploration !== undefined
-    ) {
+    if (this.audioPreloaderService.exploration !== undefined) {
       this.voiceoverBackendApiService
         .fetchVoiceoverAdminDataAsync()
         .then(response => {
@@ -121,21 +118,15 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   onSelectLanguage(newLanguageCode: string): void {
-    if (this.isVoiceoverContributionWithAccentEnabled()) {
-      this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
 
-      this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-          newLanguageCode,
-          this.entityVoiceoversService.getLanguageAccentCodes()
-        );
-      });
-    }
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+    });
 
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(

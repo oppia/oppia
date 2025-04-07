@@ -71,6 +71,7 @@ import {
 } from 'domain/objects/BaseTranslatableObject.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -118,7 +119,8 @@ export class ExplorationStatesService {
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
-    private entityTranslationsService: EntityTranslationsService
+    private entityTranslationsService: EntityTranslationsService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   // Properties that have a different backend representation from the
@@ -292,25 +294,22 @@ export class ExplorationStatesService {
 
   markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
+    this.entityVoiceoversService.markManualVoiceoverAsNeedingUpdate(contentId);
+    this.changeListService.markVoiceoversAsNeedingUpdate(
+      contentId,
+      this.entityVoiceoversService.languageCode
+    );
   }
 
   removeTranslationAndVoiceover(contentId: string): void {
     this.changeListService.removeTranslations(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasVoiceovers(contentId)) {
-      recordedVoiceovers.voiceoversMapping[contentId] = {};
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
     this.entityTranslationsService.removeAllTranslationsForContent(contentId);
+
+    this.changeListService.removeVoiceovers(
+      contentId,
+      this.entityVoiceoversService.languageCode
+    );
+    this.entityVoiceoversService.removeAllVoiceoversForContent(contentId);
   }
 
   private _getElementsInFirstSetButNotInSecond(
@@ -511,24 +510,6 @@ export class ExplorationStatesService {
         this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._extractContentIds(backendName, oldValue);
-        let newContentIds = this._extractContentIds(backendName, newValue);
-        let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-          oldContentIds,
-          newContentIds
-        );
-        let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-          newContentIds,
-          oldContentIds
-        );
-        contentIdsToDelete.forEach(contentId => {
-          newStateData.recordedVoiceovers.deleteContentId(contentId);
-        });
-        contentIdsToAdd.forEach(contentId => {
-          newStateData.recordedVoiceovers.addContentId(contentId);
-        });
-      }
       let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
@@ -608,6 +589,11 @@ export class ExplorationStatesService {
 
   setState(stateName: string, stateData: State): void {
     this._setState(stateName, stateData, true);
+  }
+
+  getAllContentIdsByStateName(stateName: string): string[] {
+    let allContentIds = this._states.getState(stateName).getAllContentIds();
+    return allContentIds.filter(contentId => contentId !== undefined);
   }
 
   getCheckpointCount(): number {

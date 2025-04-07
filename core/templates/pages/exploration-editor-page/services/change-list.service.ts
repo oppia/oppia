@@ -479,6 +479,22 @@ export class ChangeListService {
     });
   }
 
+  markVoiceoversAsNeedingUpdate(contentId: string, languageCode: string): void {
+    this.addChange({
+      cmd: 'mark_voiceovers_needs_update',
+      content_id: contentId,
+      language_code: languageCode,
+    });
+  }
+
+  removeVoiceovers(contentId: string, languageCode: string): void {
+    this.addChange({
+      cmd: 'remove_voiceovers',
+      content_id: contentId,
+      language_code: languageCode,
+    });
+  }
+
   /**
    * Saves a change dict that represents removing translations in all languages
    * for the given content id.

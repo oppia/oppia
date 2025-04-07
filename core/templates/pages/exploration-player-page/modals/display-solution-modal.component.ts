@@ -65,15 +65,7 @@ export class DisplaySolutionModalComponent {
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex()
     );
-    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
-    this.audioTranslationManagerService.setSecondaryAudioTranslations(
-      this.recordedVoiceovers.getBindableVoiceovers(this.solutionContentId),
-      this.solution.explanation.html,
-      this.COMPONENT_NAME_SOLUTION
-    );
-
-    this.audioPlayerService.onAutoplayAudio.emit();
     this.interaction = this.displayedCard.getInteraction();
     this.shortAnswerHtml = this.solution.getOppiaShortAnswerResponseHtml(
       this.interaction

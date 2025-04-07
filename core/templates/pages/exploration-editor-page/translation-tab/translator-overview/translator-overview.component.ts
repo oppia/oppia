@@ -137,10 +137,6 @@ export class TranslatorOverviewComponent implements OnInit {
     );
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   changeActiveMode(modeName: string): void {
     if (modeName === this.VOICEOVER_MODE) {
       this.translationTabActiveModeService.activateVoiceoverMode();

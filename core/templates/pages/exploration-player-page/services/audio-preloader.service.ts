@@ -42,6 +42,7 @@ export class AudioPreloaderService {
   // The following property can be null, when there is no recently
   // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
+  public contentIdsToVoiceovers = {};
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -124,38 +125,22 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      if (this.isVoiceoverContributionWithAccentEnabled()) {
-        let contentIds = this.getAllContentIdsFromState(stateName) as string[];
-
-        let contentIdsToVoiceovers =
-          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
-
-        for (let contentId of contentIds) {
-          let voiceovers = contentIdsToVoiceovers[contentId];
-
-          if (voiceovers === undefined) {
-            continue;
-          }
-
-          for (let voiceover of voiceovers) {
-            let filename = voiceover.filename;
-            if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
-              audioFilenamesInBfsOrder.push(voiceover.filename);
-            }
-          }
+      let contentIds = this.getAllContentIdsFromState(stateName) as string[];
+      for (let contentId of contentIds) {
+        let voiceovers = this.contentIdsToVoiceovers[contentId];
+        if (voiceovers === undefined) {
+          continue;
         }
-      } else {
-        let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
-        for (const voiceover of allVoiceovers[stateName]) {
-          audioFilenamesInBfsOrder.push(voiceover.filename);
+
+        for (let voiceover of voiceovers) {
+          let filename = voiceover.filename;
+          if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+            audioFilenamesInBfsOrder.push(voiceover.filename);
+          }
         }
       }
     }
     return audioFilenamesInBfsOrder;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getAllContentIdsFromState(stateName: string): string[] | undefined {

@@ -155,6 +155,28 @@ export class EntityVoiceoversService {
     return contentIdToVoiceovers;
   }
 
+  markManualVoiceoverAsNeedingUpdate(contentId: string): void {
+    let allEntityVoiceovers = Object.values(
+      this.languageAccentCodeToEntityVoiceovers
+    );
+    for (let entityVoiceovers of allEntityVoiceovers) {
+      if (entityVoiceovers.getManualVoiceover(contentId)) {
+        entityVoiceovers.getManualVoiceover(contentId)?.markAsNeedingUpdate();
+      }
+    }
+  }
+
+  removeAllVoiceoversForContent(contentId: string): void {
+    let allEntityVoiceovers = Object.values(
+      this.languageAccentCodeToEntityVoiceovers
+    );
+    for (let entityVoiceovers of allEntityVoiceovers) {
+      if (entityVoiceovers.getManualVoiceover(contentId)) {
+        entityVoiceovers.removeVoiceover(contentId);
+      }
+    }
+  }
+
   get onVoiceoverLoad(): EventEmitter<void> {
     return this._voiceoversLoadedEventEmitter;
   }

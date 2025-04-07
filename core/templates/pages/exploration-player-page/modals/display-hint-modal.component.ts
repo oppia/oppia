@@ -64,18 +64,11 @@ export class DisplayHintModalComponent {
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex()
     );
-    this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
     let contentId = this.hint.contentId;
     if (contentId === null) {
       throw new Error('Content id not found.');
     }
     this.hintContentId = contentId;
-
-    this.audioTranslationManagerService.setSecondaryAudioTranslations(
-      this.recordedVoiceovers.getBindableVoiceovers(this.hintContentId),
-      this.hint.html,
-      this.COMPONENT_NAME_HINT
-    );
 
     this.audioPlayerService.onAutoplayAudio.emit();
   }

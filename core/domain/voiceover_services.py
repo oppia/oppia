@@ -830,7 +830,7 @@ def update_exploration_voice_artist_link_model(
         if (
             change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
             change.property_name == (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED)
         ):
             is_voiceover_changes_made = True
             break

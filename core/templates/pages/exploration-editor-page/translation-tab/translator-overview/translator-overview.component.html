@@ -1,15 +1,13 @@
 <div class="oppia-translator-overview">
   <div>
-    <div id="tutorialTranslationLanguage" *ngIf="inTranslationMode || !isVoiceoverContributionWithAccentEnabled()">
+    <div id="tutorialTranslationLanguage" *ngIf="inTranslationMode">
       <span class="e2e-test-language-selector-label oppia-language-selector-label">
         <strong>
-          <span *ngIf="inVoiceoverMode">Voiceovers</span>
-          <span *ngIf="inTranslationMode">Translations</span> for language:
+          <span>Translations</span> for language:
         </strong>
       </span>
       <select id="audioTranslationLanguageCodeField"
               class="oppia-translation-language-selector e2e-test-translation-language-selector oppia-autofocus"
-              [attr.aria-label]="inVoiceoverMode ? 'Voiceover language selector' : 'Translation language selector'"
               (change)="changeTranslationLanguage()"
               [(ngModel)]="languageCode">
         <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id" (focus)="audioTranslationLanguageCodeField">
@@ -17,7 +15,7 @@
         </option>
       </select>
     </div>
-    <div *ngIf="isVoiceoverContributionWithAccentEnabled() && inVoiceoverMode">
+    <div *ngIf="inVoiceoverMode">
       <div class="language-selector-container">
         <span class="language-selector-text">
           <strong>Voiceover Language Code: </strong>

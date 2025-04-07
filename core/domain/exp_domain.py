@@ -69,7 +69,7 @@ STATE_PROPERTY_PARAM_CHANGES: Final = 'param_changes'
 STATE_PROPERTY_CONTENT: Final = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
 STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
-STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
+STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED: Final = 'recorded_voiceovers'
 DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
 DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
@@ -305,7 +305,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
@@ -320,7 +319,8 @@ class ExplorationChange(change_domain.BaseChange):
         # Deprecated state properties.
         STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS_DEPRECATED,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS_DEPRECATED,
-        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED
+        STATE_PROPERTY_NEXT_CONTENT_ID_INDEX_DEPRECATED,
+        STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED
     ]
 
     # The allowed list of exploration properties which can be used in
@@ -1609,10 +1609,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 idict['confirmed_unclassified_answers'],
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
                 solution)
-
-            state.recorded_voiceovers = (
-                state_domain.RecordedVoiceovers.from_dict(
-                    sdict['recorded_voiceovers']))
 
             state.linked_skill_id = sdict['linked_skill_id']
 
@@ -5103,6 +5099,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v56_dict_to_v57_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from v56 to v57. Version 57 removes and RecordedVoiceovers
+        from State.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+        Returns:
+            Dict[str, state_domain.StateDict]. The converted v57
+            state dictionary.
+        """
+        for _, state_dict in states_dict.items():
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            del state_dict['recorded_voiceovers'] # type: ignore[misc]
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5157,7 +5174,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 61
+    CURRENT_EXP_SCHEMA_VERSION = 62
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5533,6 +5550,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v61_dict_to_v62_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v61 exploration dict into a v62 exploration dict.
+        Removes recorded_voiceovers field from state property.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v61.
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v62.
+        """
+        exploration_dict['schema_version'] = 61
+
+        exploration_dict['states'] = cls._convert_states_v56_dict_to_v57_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 57
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5648,6 +5686,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v60_dict_to_v61_dict(
                 exploration_dict)
             exploration_schema_version = 61
+
+        if exploration_schema_version == 61:
+            exploration_dict = cls._convert_v61_dict_to_v62_dict(
+                exploration_dict)
+            exploration_schema_version = 62
 
         return exploration_dict
 
@@ -6221,7 +6264,6 @@ class ExplorationChangeMergeVerifier:
     # cust args changes.
     PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
     ]
 
@@ -6233,7 +6275,6 @@ class ExplorationChangeMergeVerifier:
     # answer groups changes.
     PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
     ]
 
@@ -6245,7 +6286,6 @@ class ExplorationChangeMergeVerifier:
     # solution changes.
     PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
     ]
 
@@ -6409,13 +6449,6 @@ class ExplorationChangeMergeVerifier:
                     current_exploration.states[state_name])
                 if (change.property_name ==
                         STATE_PROPERTY_CONTENT):
-                    if (old_exp_states.content.html ==
-                            current_exp_states.content.html):
-                        if (STATE_PROPERTY_CONTENT not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_RECORDED_VOICEOVERS not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name ==
@@ -6511,14 +6544,6 @@ class ExplorationChangeMergeVerifier:
                             current_exp_states.interaction.id and
                             old_exp_states.solicit_answer_details ==
                             current_exp_states.solicit_answer_details):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not self.changed_properties[state_name].intersection(
-                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
-                            [STATE_PROPERTY_RECORDED_VOICEOVERS]):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
