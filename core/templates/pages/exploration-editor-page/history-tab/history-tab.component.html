@@ -35,7 +35,7 @@
         <span>Displaying {{ startingIndex }}-{{ endIndex }} of {{ totalExplorationVersionMetadata.length }}</span>
       </div>
       <div *ngFor="let metadata of explorationVersionMetadata; index as index" class="history-list-item e2e-test-history-list-item">
-        <div class="history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
+        <div class="history-table-index e2e-test-history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
           {{ metadata.versionNumber }}.
         </div>
         <div class="history-table-message e2e-test-history-table-message" [attr.aria-label]="'Notes: '+ metadata.commitMessage" tabindex="0">
@@ -49,7 +49,7 @@
         </div>
         <div class="history-table-options e2e-test-history-list-options">
           <div ngbDropdown class="dropdown">
-            <button ngbDropdownToggle class="history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
+            <button ngbDropdownToggle class="history-table-option e2e-test-history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
               <i class="fa fa-ellipsis-v"></i>
             </button>
             <div ngbDropdownMenu class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
@@ -59,7 +59,7 @@
                  (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
-              <a ngbDropdownItem class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
+              <a ngbDropdownItem class="dropdown-item e2e-test-download-exploration" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
                  title="Download exploration as a zip file.">
                 Download
               </a>

@@ -84,6 +84,7 @@ const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 const preferencesPageUrl = testConstants.URLs.Preferences;
 const topicsAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const baseUrl = testConstants.URLs.BaseURL;
 
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnTabBasicMathematicsButton =
@@ -4302,6 +4303,14 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.clickOn(pauseVoiceoverButton);
+  }
+
+  /**
+   * Navigates to and plays an exploration by its ID.
+   * @param {string | null} explorationId - The ID of the exploration to play.
+   */
+  async playExploration(explorationId: string | null): Promise<void> {
+    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
   }
 }
 
