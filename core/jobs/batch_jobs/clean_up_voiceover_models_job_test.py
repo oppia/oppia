@@ -195,7 +195,6 @@ class CleanUpVoiceoverModelsTestsBaseClass(
             self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
             change_list, 'Translation commits')
 
-
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.
         AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
