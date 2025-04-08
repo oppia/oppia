@@ -1892,6 +1892,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.process_and_flush_pending_tasks()
         summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertIsNotNone(summary_before)
+        # Delete the exploration.
         exp_services.delete_exploration(self.owner_id, exp_id)
         self.process_and_flush_pending_tasks()
         summary_after = exp_fetchers.get_exploration_summary_by_id(
