@@ -1885,19 +1885,17 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertIn(self.editor_id, summary_after.editor_ids)
 
-def test_exp_summary_model_after_deletion(self) -> None:
-    """Test that ExpSummaryModel is removed after exploration deletion."""
-    exp_id = self.EXP_0_ID
-    self.save_new_valid_exploration(exp_id, self.owner_id)
-    self.process_and_flush_pending_tasks()
-    summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
-    self.assertIsNotNone(summary_before)
-    # Delete the exploration.
-    exp_services.delete_exploration(self.owner_id, exp_id)
-    self.process_and_flush_pending_tasks()
-    # Use strict=False to return None instead of raising an error.
-    summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
-    self.assertIsNone(summary_after)
+    def test_exp_summary_model_after_deletion(self) -> None:
+        """Test that ExpSummaryModel is removed after exploration deletion."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        self.process_and_flush_pending_tasks()
+        summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertIsNotNone(summary_before)
+        exp_services.delete_exploration(self.owner_id, exp_id)
+        self.process_and_flush_pending_tasks()
+        summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
+        self.assertIsNone(summary_after)
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
