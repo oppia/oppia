@@ -403,22 +403,31 @@ export class BaseUser {
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */
-  async waitForElementToBeClickable(selectorOrElement: string | ElementHandle): Promise<void> {
+  async waitForElementToBeClickable(
+    selector: string | ElementHandle<Element>
+  ): Promise<void> {
     try {
-      const element = typeof selectorOrElement === 'string'
-        ? await this.page.waitForSelector(selectorOrElement, { visible: true })
-        : selectorOrElement;
+      const element =
+        typeof selector === 'string'
+          ? await this.page.waitForSelector(selector, {visible: true})
+          : selector;
 
       if (!element) {
-        throw new Error(`Element ${selectorOrElement} not found.`);
+        throw new Error(`Element ${selector} not found.`);
       }
 
+      // Ensure the element is in the viewport.
       await this.page.evaluate(el => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
       }, element);
 
+      // Ensure no overlay is blocking it.
       const isBlocked = await this.page.evaluate(el => {
-        const { left, top, width, height } = el.getBoundingClientRect();
+        const {left, top, width, height} = el.getBoundingClientRect();
         const centerX = left + width / 2;
         const centerY = top + height / 2;
         const topElement = document.elementFromPoint(centerX, centerY);
@@ -426,16 +435,14 @@ export class BaseUser {
       }, element);
 
       if (isBlocked) {
-        throw new Error('Element is blocked by another element.');
+        throw new Error(`Element ${selector} is blocked by another element.`);
       }
-
-      await this.page.waitForFunction(el =>
-        !el.disabled && el.offsetParent !== null, {}, element);
+      // Ensure the element is clickable.
+      await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
-      throw new Error(`Element is not clickable: ${error.message}`);
+      throw new Error(`Element ${selector} is not clickable: ${error.message}`);
     }
   }
-
 
   /**
    * The function clicks the element using the text on the button.
@@ -458,7 +465,7 @@ export class BaseUser {
         `Error clicking on the element with selector: ${selector}`,
         error
       );
-      throw new Error(`Click failed for selector: ${selector}: ${error.message}`);
+      throw error;
     }
   }
 
