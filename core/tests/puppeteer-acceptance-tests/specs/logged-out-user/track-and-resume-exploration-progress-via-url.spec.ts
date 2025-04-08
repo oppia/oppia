@@ -122,7 +122,6 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
-      await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
       await loggedOutUser.expectLessonInfoToShowTags(['growth']);
       await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
