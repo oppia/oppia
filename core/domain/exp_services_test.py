@@ -1660,7 +1660,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
                     'exp_id_1', [1]))
 
-<<<<<<< HEAD
     def test_exp_summary_model_after_creation(self) -> None:
         """Test that ExpSummaryModel is correctly initialized after 
         exploration creation.
@@ -1777,130 +1776,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         summary_after = exp_fetchers.get_exploration_summary_by_id(
             exp_id, strict=False)
         self.assertIsNone(summary_after)
-=======
-    def test_should_correctly_check_whether_voiceover_addition_is_allowed(
-        self) -> None:
-        self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
-
-        self.assertFalse(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID))
-
-        story_id = story_services.get_new_story_id()
-        topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, self.owner_id, name='Topic',
-            abbreviated_name='topic-one', url_fragment='topic-one',
-            description='A new topic',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=['skill_4'], subtopics=[],
-            next_subtopic_id=0)
-        self.save_new_story(story_id, self.owner_id, topic_id)
-        topic_services.add_canonical_story(self.owner_id, topic_id, story_id)
-        change_list = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                'title': 'Title 1'
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
-                'old_value': None,
-                'new_value': self.EXP_0_ID
-            })
-        ]
-        story_services.update_story(
-            self.owner_id, story_id, change_list, 'Added node.')
-
-        self.assertTrue(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID))
-
-    def test_raise_error_when_adding_voiceover_for_non_curated_exploration(
-        self
-    ) -> None:
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
-            ['TextInput'], category='Algebra')
-
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        change_list_voiceover = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict
-        })]
-
-        with self.assertRaisesRegex(
-            Exception,
-            'Voiceover additions are not allowed for this exploration.'
-        ):
-            exp_services.apply_change_list(
-                self.EXP_0_ID, change_list_voiceover)
-
-    def test_raise_error_while_adding_voiceover_with_accent(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'test_exp_id', title='some title', category='Algebra',
-            language_code=constants.DEFAULT_LANGUAGE_CODE
-        )
-        exploration.objective = 'An objective'
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-        self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'NumericInput',
-            content_id_generator
-        )
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        manual_voiceover_1: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-
-        voiceover_changes = [
-            exp_domain.ExplorationChange({
-                'cmd': 'update_voiceovers',
-                'language_accent_code': 'en-US',
-                'content_id': 'content_0',
-                'voiceovers': {
-                    'manual': manual_voiceover_1
-                }
-            })
-        ]
-
-        with self.assertRaisesRegex(
-            Exception,
-            'Voiceover additions are not allowed for this exploration.'
-        ):
-            exp_services.compute_models_to_put_when_saving_new_exp_version(
-                self.owner_id, 'test_exp_id', voiceover_changes,
-                'Added voiceover', False
-            )
->>>>>>> afe1c6b8f20db4e20eb5aa954d1a9c1ca9ea1eb9
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
