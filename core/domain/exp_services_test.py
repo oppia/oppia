@@ -4780,14 +4780,12 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End'
-        )
-        self.process_and_flush_pending_tasks()
+        original_timestamp = utils.get_current_time_in_millisecs()
 
-        creation_human_update_ms = exp_services.get_last_updated_by_human_ms(
-            self.EXP_0_ID
-        )
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
@@ -4795,16 +4793,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'New title'
-                })
-            ],
-            'Did migration.'
-        )
-        self.process_and_flush_pending_tasks()
+                })], 'Did migration.')
 
-        self.assertEqual(
+        self.assertLess(
+            original_timestamp,
+            exp_services.get_last_updated_by_human_ms(self.EXP_0_ID))
+        self.assertLess(
             exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
-            creation_human_update_ms
-        )
+            timestamp_after_first_edit)
 
     def test_get_exploration_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
