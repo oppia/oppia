@@ -1770,9 +1770,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         exp_services.delete_exploration(self.owner_id, exp_id)
         self.process_and_flush_pending_tasks()
         # Use strict=False to return None instead of raising an error.
-        summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
+        summary_after = exp_fetchers.get_exploration_summary_by_id(
+            exp_id, strict=False)
         self.assertIsNone(summary_after)
-
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
@@ -4786,7 +4786,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID
         )
 
-        # Update the exploration; this should NOT change the human update timestamp.
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
