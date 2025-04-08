@@ -119,6 +119,10 @@ describe('Logged-out User', function () {
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
       await loggedOutUser.continueToNextCard();
+      await loggedOutUser.submitAnswer('-25');
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyCheckpointModalAppears();
+      await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
@@ -147,6 +151,7 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-35');
+      await loggedOutUser.continueToNextCard();
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
