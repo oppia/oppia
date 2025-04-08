@@ -1759,6 +1759,21 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id)
         self.assertIn(self.editor_id, summary_after.editor_ids)
 
+    def test_exp_summary_model_after_deletion(self) -> None:
+        """Test that ExpSummaryModel is removed after exploration deletion."""
+        exp_id = self.EXP_0_ID
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        self.process_and_flush_pending_tasks()
+        summary_before = exp_fetchers.get_exploration_summary_by_id(exp_id)
+        self.assertIsNotNone(summary_before)
+        # Delete the exploration.
+        exp_services.delete_exploration(self.owner_id, exp_id)
+        self.process_and_flush_pending_tasks()
+        # Use strict=False to return None instead of raising an error.
+        summary_after = exp_fetchers.get_exploration_summary_by_id(exp_id, strict=False)
+        self.assertIsNone(summary_after)
+
+
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
@@ -4762,27 +4777,32 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
     SECOND_EMAIL: Final = 'abc123@gmail.com'
 
     def test_get_last_updated_by_human_ms(self) -> None:
-        original_timestamp = utils.get_current_time_in_millisecs()
-
         self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id, end_state_name='End')
+            self.EXP_0_ID, self.owner_id, end_state_name='End'
+        )
+        self.process_and_flush_pending_tasks()
 
-        timestamp_after_first_edit = utils.get_current_time_in_millisecs()
+        creation_human_update_ms = exp_services.get_last_updated_by_human_ms(
+            self.EXP_0_ID
+        )
 
+        # Update the exploration; this should NOT change the human update timestamp.
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })
+            ],
+            'Did migration.'
+        )
+        self.process_and_flush_pending_tasks()
 
-        self.assertLess(
-            original_timestamp,
-            exp_services.get_last_updated_by_human_ms(self.EXP_0_ID))
-        self.assertLess(
+        self.assertEqual(
             exp_services.get_last_updated_by_human_ms(self.EXP_0_ID),
-            timestamp_after_first_edit)
+            creation_human_update_ms
+        )
 
     def test_get_exploration_snapshots_metadata(self) -> None:
         self.signup(self.SECOND_EMAIL, self.SECOND_USERNAME)
