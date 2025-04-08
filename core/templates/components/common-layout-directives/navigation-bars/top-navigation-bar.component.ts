@@ -202,15 +202,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.currentUrl =
-      this.windowRef.nativeWindow.location.pathname.split('/')[1];
-    this.url = new URL(this.windowRef.nativeWindow.location.toString());
-    this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
-    this.focusManagerService.setFocus(this.labelForClearingFocus);
-    this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
-    this.inClassroomPage = false;
-    this.pageIsIframed = this.urlService.isIframed();
-    this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+    ngOnInit(): void {
+  const currentUrl = window.location.href;
+  const normalizedUrl = currentUrl.toLowerCase();
+  console.log('Normalized URL:', normalizedUrl);
+  this.currentUrl =
+  this.windowRef.nativeWindow.location.pathname.split('/')[1];
+  this.url = new URL(this.windowRef.nativeWindow.location.toString());
+  this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
+  this.focusManagerService.setFocus(this.labelForClearingFocus);
+  this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
+  this.inClassroomPage = false;
+  this.pageIsIframed = this.urlService.isIframed();
+  this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;
       }
