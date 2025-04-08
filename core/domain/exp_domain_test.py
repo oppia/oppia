@@ -23,6 +23,7 @@ import json
 import os
 from unittest import mock
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -17141,6 +17142,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, False)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
         self
     ) -> None:
@@ -17492,6 +17496,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 4, change_list_4)
         self.assertEqual(changes_are_not_mergeable, False)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_changes_are_not_mergeable_when_voiceovers_changes_conflict(
         self
     ) -> None:
