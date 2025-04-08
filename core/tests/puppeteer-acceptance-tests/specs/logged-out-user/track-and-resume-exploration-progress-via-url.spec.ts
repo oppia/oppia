@@ -125,6 +125,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
+      await loggedOutUser.saveProgress();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
       await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
