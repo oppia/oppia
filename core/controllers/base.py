@@ -555,14 +555,51 @@ class BaseHandler(
             not feconf.ENABLE_MAINTENANCE_MODE or
             self.current_user_is_site_maintainer)
 
+    def _log_exception_message(self, status_code: int, error_message: str, log_level: str = 'error') -> None:
+        """Template for logging exception message information.
+
+        Args:
+            status_code: The HTTP status code.
+            error_message: The error message to log.
+            log_level: The log level to use ('error', 'warning', 'exception', or 'info').
+        """
+        request_method = self.request.environ['REQUEST_METHOD']
+        url = self.request.uri
+        controller = self.__class__.__name__
+        msg = (
+            "Error message: %s\n"
+            "Request method: %s\n"
+            "Status code: %s\n"
+            "URL: %s\n"
+            "Controller who raised: %s\n"
+            % (error_message, request_method, status_code, url, controller)
+        )
+
+        if log_level == 'error':
+            logging.error(msg)
+        elif log_level == 'warning':
+            logging.warning(msg)
+        elif log_level == 'exception':
+            logging.exception(msg)
+        else:
+            logging.info(msg)
+
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
     def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
-        logging.warning('Invalid URL requested: %s', self.request.uri)
+        request_method = self.request.environ.get('REQUEST_METHOD', 'UNKNOWN')
+        request_url = self.request.uri
+        request_params = json.dumps(self.request.GET, default=str) if self.request.GET else "{}"
+
+        logging.warning(
+            "Invalid URL requested | 404 Not Found | Method=%s | URL=%s | Params=%s",
+            request_method, request_url, request_params
+        )
+        
         self.error(404)
         values: ResponseValueDict = {
-            'error': 'Could not find the resource %s.' % self.request.uri,
+            'error': 'Could not find the resource %s.' % request_url,
             'status_code': 404
         }
         self._render_exception(values)
@@ -788,6 +825,11 @@ class BaseHandler(
                 self.payload is not None and
                 not isinstance(self.payload, RaiseErrorOnGet)
             )
+            self._log_exception_message(
+                401,
+                "NotLoggedInException: Request to %s with method %s" % (self.request.uri, request_method),
+                log_level='warning'
+            )
             if (
                     payload_exists or
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
@@ -804,7 +846,11 @@ class BaseHandler(
             return
 
         if isinstance(exception, self.NotFoundException):
-            logging.warning('Invalid URL requested: %s', self.request.uri)
+            self._log_exception_message(
+                404,
+                "NotFoundException: Invalid URL requested %s with method %s" % (self.request.uri, request_method),
+                log_level='warning'
+            )
             self.error(404)
             values = {
                 'error': 'Could not find the resource %s.' % self.request.uri,
@@ -817,6 +863,11 @@ class BaseHandler(
             'Exception raised at %s: %s', self.request.uri, exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
+            self._log_exception_message(
+                401,
+                "UnauthorizedUserException: %s" % str(exception),
+                log_level='exception'
+            )
             self.error(401)
             values = {
                 'error': str(exception),
@@ -826,6 +877,11 @@ class BaseHandler(
             return
 
         if isinstance(exception, self.InvalidInputException):
+            self._log_exception_message(
+                400,
+                "InvalidInputException: %s" % str(exception),
+                log_level='exception'
+            )
             self.error(400)
             values = {
                 'error': str(exception),
@@ -835,6 +891,11 @@ class BaseHandler(
             return
 
         if isinstance(exception, self.InternalErrorException):
+            self._log_exception_message(
+                500,
+                "InternalErrorException: %s" % str(exception),
+                log_level='exception'
+            )
             self.error(500)
             values = {
                 'error': str(exception),
@@ -844,15 +905,24 @@ class BaseHandler(
             return
 
         if isinstance(exception, TypeError):
+            self._log_exception_message(
+                405,
+                "TypeError: Invalid method %s for %s" % (request_method, handler_class_name),
+                log_level='exception'
+            )
             self.error(405)
             values = {
-                'error': 'Invalid method %s for %s' % (
-                    request_method, handler_class_name),
+                'error': 'Invalid method %s for %s' % (request_method, handler_class_name),
                 'status_code': 405
             }
             self._render_exception(values)
             return
 
+        self._log_exception_message(
+            500,
+            "Unexpected exception: %s" % str(exception),
+            log_level='exception'
+        )
         self.error(500)
         values = {
             'error': str(exception),
