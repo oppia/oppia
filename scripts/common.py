@@ -272,6 +272,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties', # pylint: disable=line-too-long
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
