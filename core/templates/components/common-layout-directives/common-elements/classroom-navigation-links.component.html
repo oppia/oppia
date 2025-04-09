@@ -4,36 +4,35 @@
   </ng-container>
   <ng-template #content>
     <div class="classroom-navigation-links-content">
-      <span *ngIf="classroomSummaries.length === 0">No classrooms found. Visit the <a href="/classroom-admin">classroom admin</a> page in order to create a classroom. Note that you require the 'Curriculum Admin' role in order to create classrooms.</span>
+      <span *ngIf="classroomSummaries.length === 0">No classrooms found. Visit the <a href="/classroom-admin">classroom
+          admin</a> page in order to create a classroom. Note that you require the 'Curriculum Admin' role in order to
+        create classrooms.</span>
       <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 0">
         <div class="multiple-classrooms-intro">
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-      <div class="classroom-grid " [attr.data-classroom-count]="classroomSummaries.length">
-        <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
-          <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
-            <div class="classroom-text-container">
-              <a class="classroom-name e2e-mobile-test-classroom-link"
-                 [href]="'/learn/' + classroom.url_fragment"
-                 *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 >
-                 {{ classroom.name }}
-              </a>
-              <a class="classroom-name e2e-mobile-test-classroom-link"
-                 [href]="'/learn/' + classroom.url_fragment"
-                 *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 >
-                 {{ getClassroomNameTranslationkey(classroom.name) | translate }}
-              </a>
-              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
-            </div>
-            <div class="classroom-thumbnail">
-              <img alt="Classroom thumbnail image"
-                   [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+        <div class="classroom-grid " [attr.data-classroom-count]="classroomSummaries.length">
+          <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
+            <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
+              <div class="classroom-text-container">
+                <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroom.url_fragment"
+                  *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)">
+                  {{ classroom.name }}
+                </a>
+                <a class="classroom-name e2e-mobile-test-classroom-link" [href]="'/learn/' + classroom.url_fragment"
+                  *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)">
+                  {{ getClassroomNameTranslationkey(classroom.name) | translate }}
+                </a>
+                <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName:
+                  classroom.name } }}</p>
+              </div>
+              <div class="classroom-thumbnail">
+                <img alt="Classroom thumbnail image"
+                  [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
@@ -41,10 +40,9 @@
 </div>
 
 <style>
-
   .classroom-grid {
     display: grid;
-    grid-template-columns: repeat(3,1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-auto-flow: row;
     gap: 15px;
   }
@@ -161,20 +159,21 @@
     0% {
       background-position: 200% 0;
     }
+
     100% {
       background-position: -200% 0;
     }
   }
 
-  @media screen and (max-width : 1212px){
+  @media screen and (max-width : 1212px) {
     .classroom-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media screen and (max-width : 925px) {
     .classroom-grid {
-    grid-template-columns: repeat(1, 1fr);
+      grid-template-columns: repeat(1, 1fr);
     }
   }
 
@@ -185,14 +184,14 @@
     }
 
     .multiple-classroom-nav-links {
-        margin-top: 12px;
+      margin-top: 12px;
     }
 
     .multiple-classroom-nav-links .multiple-classrooms-intro,
     .multiple-classroom-nav-links .classroom-item {
-        left: 0;
-        padding-left: 12px;
-        width: 90vw;
+      left: 0;
+      padding-left: 12px;
+      width: 90vw;
     }
 
     .skeleton-loader {

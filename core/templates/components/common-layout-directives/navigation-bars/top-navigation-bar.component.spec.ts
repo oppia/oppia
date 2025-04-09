@@ -800,25 +800,20 @@ describe('TopNavigationBarComponent', () => {
   it('should check if dropdown offsets are updated', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     spyOn(component, 'getDropdownOffset')
-      .withArgs('.learn-tab', 688)
+      .withArgs('.learn-tab', '.learn-dropdown')
       .and.returnValue(-10)
-      .withArgs('.learn-tab', 300)
+      .withArgs('.get-involved', '.get-involved-dropdown')
       .and.returnValue(-10)
-      .withArgs('.donate-tab', 286)
-      .and.returnValue(-10)
-      .withArgs('.get-involved', 574)
-      .and.returnValue(-10);
+      .withArgs('.learn-tab', '.classroom-enabled');
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
-    expect(component.donateMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
-    expect(component.donateMenuOffset).toBe(-10);
   }));
 
   it('should check whether hacky translations are displayed or not', () => {
