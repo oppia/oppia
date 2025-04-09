@@ -803,3 +803,17 @@ class ValidateSkillIdsTests(test_utils.GenericTestBase):
     def test_valid_skill_ids_do_not_raise_exception(self) -> None:
         valid_skill_ids: str = 'skillid12345'
         domain_objects_validator.validate_skill_ids(valid_skill_ids)
+
+
+class ValidateSkillIdInGetSkillByIdTests(test_utils.GenericTestBase):
+    """Tests to validate skill_id in get_skill_by_id function"""
+
+    def test_empty_skill_id_raises_value_error(self) -> None:
+        with self.assertRaisesRegex(ValueError, 'skill_id cannot be empty'):
+            domain_objects_validator.validate_skill_ids('')
+
+    def test_non_empty_skill_id_does_not_raise_value_error(self) -> None:
+        try:
+            domain_objects_validator.validate_skill_ids('skillid12345')
+        except ValueError:
+            self.fail('validate_skill_ids() raised ValueError unexpectedly!')

@@ -8,7 +8,6 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -64,6 +63,8 @@ class QuestionCreationHandler(
                 'is not supported.' % constants.MAX_SKILLS_PER_QUESTION)
         try:
             for skill_id in skill_ids:
+                if not skill_id:
+                    raise self.InvalidInputException('Skill ID cannot be empty.')
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except Exception as e:
             raise self.InvalidInputException('Skill ID(s) aren\'t valid: ', e)

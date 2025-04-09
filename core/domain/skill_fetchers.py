@@ -10,7 +10,6 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.]
 
@@ -110,7 +109,13 @@ def get_skill_by_id(
     Returns:
         Skill or None. The domain object representing a skill with the
         given id, or None if it does not exist.
+
+    Raises:
+        ValueError. The skill_id is empty.
     """
+    if not skill_id:
+        raise ValueError('skill_id cannot be empty')
+
     sub_namespace = str(version) if version else None
     cached_skill = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_SKILL,
