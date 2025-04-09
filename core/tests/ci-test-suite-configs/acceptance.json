@@ -61,6 +61,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/verify-statistics-and-previous-explorations.spec.ts"
     },
     {
+      "name": "exploration-editor/submit-review-and-respond-to-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
+      "name": "exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
+    },
+    {
       "name": "logged-in-user/access-dashboards-from-profile-menu",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/access-dashboards-from-profile-menu.spec.ts"
     },
@@ -239,6 +247,10 @@
     {
       "name": "practice-question-admin/add-and-remove-contribution-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-admin/add-and-remove-contribution-rights.spec.ts"
+    },
+    {
+      "name": "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts"
     },
     {
       "name": "release-coordinator/edit-feature-rollout-configuration",

@@ -28,7 +28,6 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 
@@ -131,13 +130,11 @@ export class RteHelperModalComponent {
     private fb: FormBuilder,
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
-    private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
   ngOnInit(): void {
-    this.focusManagerService.setFocus('tmpFocusPoint');
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
