@@ -57,8 +57,7 @@ class BaseValidationError(job_run_result.JobRunResult):
             raise ValueError('message must be a non-empty string')
 
         model_id = job_utils.get_model_id(model)
-        if not model_id:
-            model_id = 'missing model Id'
+        assert model_id is not None, 'Model ID should not be none'
 
         error_message = '%s in %s(id=%s): %s' % (
             self.__class__.__name__,

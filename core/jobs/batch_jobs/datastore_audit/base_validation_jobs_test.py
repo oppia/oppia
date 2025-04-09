@@ -35,8 +35,8 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
-class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
-    """Child validation job with missing get validation implementation."""
+class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with missing get_validation_fns."""
 
     def validate_domain_object(
         self, unused_model: base_models.BaseModel) -> Iterator[
@@ -51,8 +51,8 @@ class MissingGetValidationJob(base_validation_jobs.BaseValidationJob):
         return self.validate_domain_object
 
 
-class MissingDomainValidationJob(base_validation_jobs.BaseValidationJob):
-    """Child validation job with missing domain object validation."""
+class MissingGetValidateDomainObjectFnJob(base_validation_jobs.BaseValidationJob):
+    """Child validation job with missing get_validate_domain_object_fn."""
 
     def validate_mock_error(
             self, unused_model: base_models.BaseModel
@@ -97,6 +97,15 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
         self, unused_model: base_models.BaseModel) -> Iterator[
             job_run_result.JobRunResult]:
         """Mock domain validate function."""
+        # The yield from () statement is used to ensure that the function
+        # returns an empty iterator. The following other approaches won't work:
+        # Using pass: The function would implicitly return None. Attempting to iterate
+        # over None in the calling code results in a
+        # TypeError: 'NoneType' object is not iterable.
+        # Using yield: The function would yield None. Subsequent processing
+        # steps in the validation pipeline would then try to access attributes
+        # of this None value (expecting a validation error object),
+        # leading to an AttributeError.
         yield from ()
 
     def get_validate_domain_object_fn(self) -> Callable[
@@ -196,7 +205,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
             )
 
     def test_get_validation_fns_not_implemented(self) -> None:
-        self.job = MissingGetValidationJob(self.pipeline)
+        self.job = MissingGetValidationFnsJob(self.pipeline)
 
         with self.assertRaisesRegex(
             NotImplementedError,
@@ -204,7 +213,7 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
             self.run_job()
 
     def test_validate_domain_object_not_implemented(self) -> None:
-        self.job = MissingDomainValidationJob(self.pipeline)
+        self.job = MissingGetValidateDomainObjectFnJob(self.pipeline)
 
         with self.assertRaisesRegex(
             NotImplementedError,
