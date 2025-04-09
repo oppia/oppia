@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import feature_flag_list
 from core import feconf
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -127,6 +128,9 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                     'version': 3
                 }, csrf_token=self.csrf_token)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_voice_artist_can_save_valid_change_list(self) -> None:
         response = self.put_json(
             '/createhandler/data/%s' % self.EXP_ID, {
@@ -227,6 +231,9 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         # Generate CSRF token.
         self.csrf_token = self.get_new_csrf_token()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_draft_updated_version_valid(self) -> None:
         payload = {
             'change_list': self.VALID_DRAFT_CHANGELIST,
@@ -261,6 +268,9 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
                            ' some changes in the change list.')
                       })
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_draft_updated_version_invalid(self) -> None:
         payload = {
             'change_list': self.VALID_DRAFT_CHANGELIST,
