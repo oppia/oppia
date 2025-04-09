@@ -191,21 +191,6 @@ export class BaseUser {
           });
         }
 
-        // Set up Download Folder.
-        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
-
-        // Ensure the folder exists.
-        if (!fs.existsSync(downloadDir)) {
-          fs.mkdirSync(downloadDir, {recursive: true});
-        }
-
-        // Enable download behavior using Chrome DevTools Protocol (CDP).
-        const client = await this.page.target().createCDPSession();
-        await client.send('Page.setDownloadBehavior', {
-          behavior: 'allow',
-          downloadPath: downloadDir,
-        });
-
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -409,38 +394,11 @@ export class BaseUser {
     try {
       const element =
         typeof selector === 'string'
-          ? await this.page.waitForSelector(selector, {visible: true})
+          ? await this.page.waitForSelector(selector)
           : selector;
-
-      if (!element) {
-        throw new Error(`Element ${selector} not found.`);
-      }
-
-      // Ensure the element is in the viewport.
-      await this.page.evaluate(el => {
-        el.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center',
-        });
-      }, element);
-
-      // Ensure no overlay is blocking it.
-      const isBlocked = await this.page.evaluate(el => {
-        const {left, top, width, height} = el.getBoundingClientRect();
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-        const topElement = document.elementFromPoint(centerX, centerY);
-        return topElement && topElement !== el && !el.contains(topElement);
-      }, element);
-
-      if (isBlocked) {
-        throw new Error(`Element ${selector} is blocked by another element.`);
-      }
-      // Ensure the element is clickable.
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
-      throw new Error(`Element ${selector} is not clickable: ${error.message}`);
+      throw new Error(`Element ${selector} took too long to be clickable.`);
     }
   }
 
@@ -448,24 +406,20 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
-    try {
-      const [button] = await this.page.$x(
-        `//*[contains(text(), normalize-space('${selector.replace(/'/g, "\\'")}'))]`
-      );
-
-      if (button) {
-        await this.waitForElementToBeClickable(button);
-        await button.click();
-      } else {
-        await this.waitForElementToBeClickable(selector);
-        await this.page.click(selector);
-      }
-    } catch (error) {
-      console.error(
-        `Error clicking on the element with selector: ${selector}`,
-        error
-      );
-      throw error;
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await button.click();
+    } else {
+      await this.waitForElementToBeClickable(selector);
+      await this.page.click(selector);
     }
   }
 
