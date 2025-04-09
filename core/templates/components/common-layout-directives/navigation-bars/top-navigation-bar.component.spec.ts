@@ -762,22 +762,39 @@ describe('TopNavigationBarComponent', () => {
   );
 
   it('should return proper offset for dropdown', () => {
-    var dummyElement = document.createElement('div');
-    spyOn(document, 'querySelector').and.returnValue(dummyElement);
+    var dummyLearnTab = document.createElement('div');
+    var dummyDropdown = document.createElement('div');
 
-    spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
-      jasmine
-        .createSpy('getBoundingClientRect')
-        .and.returnValue({top: 1, height: 100, left: 0, width: 200, right: 202})
-    );
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      if (selector === '.dummy') {
+        return dummyLearnTab;
+      } else if (selector === '.dropdown') {
+        return dummyDropdown;
+      }
+      return null;
+    });
 
-    expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
+      top: 1,
+      height: 100,
+      left: 0,
+      width: 200,
+      right: 202,
+    });
+
+    spyOn(window, 'getComputedStyle').and.callFake((el: HTMLElement) => {
+      return {
+        minWidth: '150px',
+      } as CSSStyleDeclaration;
+    });
+    expect(component.getDropdownOffset('.dummy', '.dropdown')).toBe(0);
   });
 
   it('should return proper offset for learn dropdown when element is undefined', () => {
-    spyOn(document, 'querySelector').and.returnValue(null);
-
-    expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      return null;
+    });
+    expect(component.getDropdownOffset('.dummy', '.dropdown')).toBe(0);
   });
 
   it('should check if dropdown offsets are updated', fakeAsync(() => {
