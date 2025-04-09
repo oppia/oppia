@@ -1496,10 +1496,6 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(blogButtonInTeachPage);
   }
 
-  async getCurrentUrl(): Promise<string> {
-    return await this.page.url();
-  }
-
   /**
    * Function to click the Explore Lessons button  at the top in the Teach page
    * and check if it opens the classrooms page.
