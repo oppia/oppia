@@ -156,7 +156,7 @@
   padding: 0;
 }
 .oppia-top-navigation-bar .classroom-enabled {
-  min-width: 1200px;
+  min-width: 610px;
 }
 .oppia-top-navigation-bar .classroom-disabled {
   min-width: 300px;
@@ -164,8 +164,8 @@
 .oppia-top-navigation-bar .two-classrooms {
   min-width: 855px;
 }
-.oppia-top-navigation-bar .one-classrooms {
-  min-width: 610px;
+.oppia-top-navigation-bar .three-classrooms {
+  min-width: 1200px;
 }
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;

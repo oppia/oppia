@@ -206,4 +206,10 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(component.classroomSummaries).toEqual([]);
     expect(component.isLoading).toBeTrue();
   }));
+
+  it('should return the correct number of classrooms from getClassroomCount', () => {
+    component.classroomSummaries = dummyClassroomSummaries;
+    const countLenght = component.getClassroomCount();
+    expect(countLenght).toBe(dummyClassroomSummaries.length);
+  });
 });

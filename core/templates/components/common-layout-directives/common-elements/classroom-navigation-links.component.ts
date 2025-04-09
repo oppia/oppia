@@ -81,10 +81,10 @@ export class ClassroomNavigationLinksComponent implements OnInit {
       this.classroomBackendApiService
         .getAllClassroomsSummaryAsync()
         .then((data: ClassroomSummaryDict[]) => {
-          // data
-          //   .filter((classroom) => classroom.is_published) // ✅ Keep only published classrooms
-          //   .sort((a, b) => a.name.localeCompare(b.name)) // ✅ Sort by lesson name
-          //   .forEach((classroom) => this.classroomSummaries.push(classroom)); // ✅ Push into array
+          data;
+          // .filter((classroom) => classroom.is_published) // ✅ Keep only published classrooms
+          // .sort((a, b) => a.name.localeCompare(b.name)) // ✅ Sort by lesson name
+          // .forEach((classroom) => this.classroomSummaries.push(classroom)); // ✅ Push into array
           for (let i = 0; i < 10; i++) {
             if (data[0].is_published) {
               this.classroomSummaries.push(data[0]);
@@ -98,9 +98,9 @@ export class ClassroomNavigationLinksComponent implements OnInit {
             }
           );
           this.isLoading = false;
-          console.log(this.classroomSummaries);
         });
     }
+    console.log(this.classroomSummaries.length, 'Length');
   }
   getClassroomCount(): number {
     return this.classroomSummaries.length;
