@@ -2299,8 +2299,8 @@ def update_translation_suggestion(
         # text for the error message.
         original_text_preview, translation_text_preview = (
             highlight_differences(
-            original_text_html,
-            translation_html,
+                original_text_html,
+                translation_html,
                 truncation_limit=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
             )
         )
