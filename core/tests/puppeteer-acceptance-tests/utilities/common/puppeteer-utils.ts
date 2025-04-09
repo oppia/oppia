@@ -206,7 +206,6 @@ export class BaseUser {
           downloadPath: downloadDir,
         });
 
-
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
