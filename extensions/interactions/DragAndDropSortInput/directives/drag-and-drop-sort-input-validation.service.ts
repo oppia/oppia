@@ -254,7 +254,7 @@ export class DragAndDropSortInputValidationService {
               .reduce((acc, val) => acc.concat(val), [])
               .map(contentId => choiceContentIdToHtml[contentId])
               .sort();
-            if (isEqual(sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
+            if (!isEqual(sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
