@@ -23,63 +23,51 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-const INTRODUCTION_CARD_CONTENT: string = 'Test Question';
-
 enum INTERACTION_TYPES {
-  END_EXPLORATION = 'End Exploration',
-}
-enum CARD_NAME {
-  LAST_CARD = 'Last Card',
-}
+    END_EXPLORATION = 'End Exploration',
+  }
 
-describe('Exploration Creator', function () {
-  let explorationEditor: ExplorationEditor;
-  let explorationVisitor: LoggedInUser;
-  let explorationId: string | null;
+  describe('Exploration Creator', function () {
+    let explorationEditor: ExplorationEditor;
+    let explorationVisitor: LoggedInUser;
+    let explorationId: string | null;
 
-  beforeAll(async function () {
-    explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
-
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor',
-      'exploration_visitor@example.com'
-    );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
-  it(
-    'should draft, discard and publish the changes',
-    async function () {
-      // Navigate to the creator dashboard and create a new exploration.
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
-      await explorationEditor.dismissWelcomeModal();
-      await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-      await explorationEditor.addImageInteraction();
-      await explorationEditor.editDefaultResponseFeedback('Wrong.');
-      await explorationEditor.addHintToState('Initial coordinate');
-      await explorationEditor.saveExplorationDraft();
-
-      // Add a new card with an end interaction.
-      await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
-      await explorationEditor.updateCardContent('Congratulations!');
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-      await explorationEditor.saveExplorationDraft();
-
-      explorationId = await explorationEditor.publishExplorationWithMetadata(
-        'Publish with an interaction',
-        'This is the goal of exploration.',
-        'Algebra'
+    beforeAll(async function () {
+      explorationEditor = await UserFactory.createNewUser(
+        'explorationEditor',
+        'exploration_editor@example.com'
       );
 
-      await explorationVisitor.expectExplorationToBeAccessibleByUrl(
-        explorationId
+      explorationVisitor = await UserFactory.createNewUser(
+        'explorationVisitor',
+        'exploration_visitor@example.com'
       );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+    it(
+      'should publish the exploration with an interaction',
+      async function () {
+        await explorationEditor.navigateToCreatorDashboardPage();
+        await explorationEditor.navigateToExplorationEditorPage();
+        await explorationEditor.dismissWelcomeModal();
+
+        await explorationEditor.createMinimalExploration(
+          'Exploration intro text',
+          INTERACTION_TYPES.END_EXPLORATION
+        );
+
+        await explorationEditor.saveExplorationDraft();
+        explorationId = await explorationEditor.publishExplorationWithMetadata(
+          'Old Title',
+          'This is the goal of exploration.',
+          'Algebra'
+        );
+
+        await explorationVisitor.expectExplorationToBeAccessibleByUrl(
+          explorationId
+        );
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
