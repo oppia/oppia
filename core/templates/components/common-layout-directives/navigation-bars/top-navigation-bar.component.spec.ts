@@ -800,11 +800,10 @@ describe('TopNavigationBarComponent', () => {
   it('should check if dropdown offsets are updated', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     spyOn(component, 'getDropdownOffset')
-      .withArgs('.learn-tab', '.learn-dropdown')
+      .withArgs('.learn-tab', '.classroom-enabled')
       .and.returnValue(-10)
       .withArgs('.get-involved', '.get-involved-dropdown')
-      .and.returnValue(-10)
-      .withArgs('.learn-tab', '.classroom-enabled');
+      .and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
