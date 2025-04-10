@@ -2468,7 +2468,9 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         self.mock_logging_warning = mock_logging_warning
         self.mock_logging_exception = mock_logging_exception
 
-        self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(self.mock_request, self.mock_response)
+        self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(
+            self.mock_request, self.mock_response
+        )
 
     def test_handle_not_logged_in_exception_logs_warning(self) -> None:
         """Ensures NotLoggedInException logs a warning with the correct format."""
@@ -2477,14 +2479,14 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.NotLoggedInException('Unauthenticated user'),
                 False
             )
-        expected_log_message = (
-            '\n\nStack Trace: \nNoneType: None\n\n'
-            'Type Exception: NotLoggedInException\n'
-            'Error Message: Unauthenticated user\n'
-            'URL requested: %s\n'
-            'Request method: POST\n'
-            'Handler class name: BaseHandler\n\n'
-        ) % (self.handler.request.uri,)
+        expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: NotLoggedInException
+Error Message: Unauthenticated user
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
         self.assertIn(
             expected_log_message,
             self.logged_warnings,
@@ -2498,14 +2500,14 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.NotFoundException('Invalid URL requested'),
                 False
             )
-        expected_log_message = (
-            '\n\nStack Trace: \nNoneType: None\n\n'
-            'Type Exception: NotFoundException\n'
-            'Error Message: Invalid URL requested\n'
-            'URL requested: %s\n'
-            'Request method: POST\n'
-            'Handler class name: BaseHandler\n\n'
-        ) % (self.handler.request.uri,)
+        expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: NotFoundException
+Error Message: Invalid URL requested
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
         self.assertIn(
             expected_log_message,
             self.logged_warnings,
@@ -2519,14 +2521,14 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.UnauthorizedUserException('Unauthorized User'),
                 False
             )
-        expected_log_message = (
-            '\n\nStack Trace: \nNoneType: None\n\n'
-            'Type Exception: UnauthorizedUserException\n'
-            'Error Message: Exception raised\n'
-            'URL requested: %s\n'
-            'Request method: POST\n'
-            'Handler class name: BaseHandler\n\n'
-        ) % (self.handler.request.uri,)
+        expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: UnauthorizedUserException
+Error Message: Exception raised
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2540,14 +2542,14 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.InvalidInputException('Invalid Input'),
                 False
             )
-        expected_log_message = (
-            '\n\nStack Trace: \nNoneType: None\n\n'
-            'Type Exception: InvalidInputException\n'
-            'Error Message: Exception raised\n'
-            'URL requested: %s\n'
-            'Request method: POST\n'
-            'Handler class name: BaseHandler\n\n'
-        ) % (self.handler.request.uri,)
+        expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: InvalidInputException
+Error Message: Exception raised
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2561,14 +2563,14 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 self.handler.InternalErrorException('Internal Error'),
                 False
             )
-        expected_log_message = (
-            '\n\nStack Trace: \nNoneType: None\n\n'
-            'Type Exception: InternalErrorException\n'
-            'Error Message: Exception raised\n'
-            'URL requested: %s\n'
-            'Request method: POST\n'
-            'Handler class name: BaseHandler\n\n'
-        ) % (self.handler.request.uri,)
+        expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: InternalErrorException
+Error Message: Exception raised
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
         self.assertIn(
             expected_log_message,
             self.logged_exceptions,
@@ -2586,12 +2588,12 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
         with self.swap(logging, 'exception', self.mock_logging_exception):
             generic_exception = Exception('Generic error')
             self.handler.handle_exception(generic_exception, False)
-            expected_log_message = (
-                '\n\nStack Trace: \nNoneType: None\n\n'
-                'Type Exception: Exception\n'
-                'Error Message: Exception raised\n'
-                'URL requested: %s\n'
-                'Request method: POST\n'
-                'Handler class name: BaseHandler\n\n'
-            ) % (self.handler.request.uri,)
+            expected_log_message = f"""
+\nStack Trace: \nNoneType: None\n
+Type Exception: Exception
+Error Message: Exception raised
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler\n
+"""
             self.assertIn(expected_log_message, self.logged_exceptions)
