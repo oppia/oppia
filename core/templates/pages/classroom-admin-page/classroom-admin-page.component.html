@@ -113,7 +113,7 @@
                             class="classroom-field form-control e2e-test-update-classroom-topic-list-intro">
                   </textarea>
                 </div>
-      
+
                 <div class="row oppia-classroom-input-container">
                   <span class="col-lg-3 col-md-3 col-sm-3">
                     <strong>Course Details</strong>
@@ -129,7 +129,7 @@
                             class="classroom-field form-control e2e-test-update-classroom-course-details">
                   </textarea>
                 </div>
-      
+
                 <div class="row oppia-classroom-input-container">
                   <span class="col-lg-3 col-md-3 col-sm-3">
                     <strong>Thumbnail</strong>
@@ -138,7 +138,7 @@
                     <oppia-image-uploader [imageUploaderParameters]="thumbnailParameters" (imageSave)="updateThumbnailData($event)"></oppia-image-uploader>
                   </div>
                 </div>
-      
+
                 <div class="row oppia-classroom-input-container">
                   <span class="col-lg-3 col-md-3 col-sm-3">
                     <strong>Banner</strong>
@@ -147,7 +147,7 @@
                     <oppia-image-uploader [imageUploaderParameters]="bannerParameters" (imageSave)="updateBannerData($event)"></oppia-image-uploader>
                   </div>
                 </div>
-      
+
                 <div class="row oppia-classroom-input-container">
                   <span class="col-lg-3 col-md-3 col-sm-3">
                     <strong>Publication Status</strong>
@@ -168,7 +168,7 @@
                     </div>
                   </div>
                 </div>
-      
+
                 <div class="row oppia-classroom-input-container">
                   <span class="col-lg-3 col-md-3 col-sm-3">
                     <strong>Diagnostic Test Status</strong>
@@ -189,7 +189,7 @@
                     </div>
                   </div>
                 </div>
-      
+
                 <div class="topic-and-prerequisites-container">
                   <hr>
                   <div class="topic-and-prerequisites-text-container">
@@ -205,21 +205,21 @@
                       The prerequisite topics below are used to generate the diagnostic test.
                     </em>
                   </p>
-      
+
                   <p *ngIf="tempClassroomData.getTopicsCount() == 0">
                     No topics are currently added in the classroom.
                   </p>
-      
+
                   <div *ngIf="topicDependencyIsLoaded"
                         cdkDropList
                         (cdkDropListDropped)="drop($event)"
                         class="nav oppia-option-list nav-stacked nav-pills drag-and-drop-list">
-      
+
                     <div *ngFor="let topicName of topicNames"
                           class="topic-dependency-container oppia-rule-block oppia-prevent-selection drag-and-drop-box"
                           cdkDrag
                           [cdkDragDisabled]="!classroomEditorMode">
-      
+
                       <div>
                         <div class="topic-and-prerequisites-wrapper">
                           <span *ngIf="classroomEditorMode"
@@ -239,19 +239,19 @@
                                 </mat-chip>
                               </mat-chip-list>
                             </div>
-      
+
                             <div *ngIf="classroomEditorMode" class="classroom-editor">
                               <mat-form-field class="topics-form-field"
                                               appearance="fill">
                                 <mat-label>Prerequisites</mat-label>
-      
+
                                 <mat-chip-list #chipList aria-label="Prerequisites list">
                                   <mat-chip *ngFor="let prerequisiteTopic of topicNameToPrerequisiteTopicNames[topicName]"
                                             (removed)="removeDependencyFromTopic(topicName, prerequisiteTopic)">
                                     {{ prerequisiteTopic }}
                                     <mat-icon matChipRemove>cancel</mat-icon>
                                   </mat-chip>
-      
+
                                   <input placeholder="Select prerequisites"
                                           [matAutocomplete]="auto"
                                           [matChipInputFor]="chipList"
@@ -260,7 +260,7 @@
                                           (ngModelChange)="onPrerequisiteInputChange()"
                                           (click)="getEligibleTopicPrerequisites(topicName)">
                                 </mat-chip-list>
-      
+
                                 <mat-autocomplete #auto="matAutocomplete"
                                                   (optionSelected)="addDependencyForTopic(topicName, $event.option.value)">
       
@@ -270,7 +270,7 @@
                                   </mat-option>
                                 </mat-autocomplete>
                               </mat-form-field>
-      
+
                               <button (click)="deleteTopic(topicName)"
                                       mat-button matSuffix mat-icon-button
                                       aria-label="Clear">
@@ -279,7 +279,7 @@
                             </div>
                           </div>
                         </div>
-      
+
                         <p *ngIf="classroomAdminDataService.topicsGraphValidationError.length > 0 && currentTopicOnEdit === topicName"
                             class="oppia-warning-text cyclic-check-error">
                           {{ classroomAdminDataService.topicsGraphValidationError }}
@@ -287,7 +287,7 @@
                       </div>
                     </div>
                   </div>
-      
+
                   <div *ngIf="classroomEditorMode">
                     <div class="new-topic-input-container" *ngIf="newTopicCanBeAdded">
                       <div class="topic-selector-container">
@@ -314,7 +314,7 @@
                           Cancel
                       </button>
                     </div>
-      
+
                     <button (click)="showNewTopicInputField()"
                             *ngIf="!newTopicCanBeAdded"
                             class="btn btn-secondary add-new-topic e2e-test-add-topic-to-classroom-button">
@@ -325,7 +325,7 @@
                     </p>
                   </div>
                 </div>
-      
+
                 <div *ngIf="classroomEditorMode" class="action-buttons">
                   <button class="btn btn-secondary cancel-classroom-changes e2e-cancel-classroom-changes"
                           (click)="closeClassroomConfigEditor()"
@@ -354,7 +354,7 @@
               </div>
             </div>
           </div>
-      
+
           <div matTooltip="Please save all edits before adding a new classroom"
                 [matTooltipDisabled]="!classroomEditorMode"
                 matTooltipPosition="right"
@@ -393,21 +393,23 @@
     background-repeat: repeat;
     display: flex;
     justify-content: center;
-    padding-top: 20px;
     padding-bottom: 300px;
+    padding-top: 20px;
   }
 
   .oppia-dashboard-content {
     background-color: transparent;
-    width: 100%;
     max-width: 960px;
+    width: 100%;
     padding: 10px;
   }
 
   .oppia-editor-card-with-avatar {
     background-color: white;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin-bottom: 200px;
+    margin-top: 200px;
   }
 
   .classroom-editor {
@@ -551,10 +553,6 @@
   .card-content {
     padding: 20px
   }
-  .oppia-editor-card-with-avatar {
-    margin-bottom: 200px;
-    margin-top: 200px;
-  }
   .add-new-classroom {
     background-color: #00645c;
     color: #fff;
@@ -639,7 +637,7 @@
     margin-top: -175px; /* makes the card float into the blue background */
   }
 
-  
+
 
   .dashboard-title {
     color: #01645c;
