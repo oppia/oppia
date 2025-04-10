@@ -15,8 +15,8 @@
           <hr>
           <div>
             <mat-spinner class="loading-spinner"
-                          *ngIf="!pageIsInitialized"
-                          [diameter]="30">
+              *ngIf="!pageIsInitialized"
+              [diameter]="30">
             </mat-spinner>
             <em *ngIf="pageIsInitialized && classroomCount === 0">
               No classroom exists at this moment.
