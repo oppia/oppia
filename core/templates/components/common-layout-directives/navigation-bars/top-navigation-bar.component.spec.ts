@@ -878,4 +878,25 @@ describe('TopNavigationBarComponent', () => {
     component.ngOnInit();
     expect(component.menuIconIsShown).toBeTrue();
   });
+
+  it('should set classroomSummariesLength from DOM data attribute', () => {
+    const mockCount = '5';
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    mockElement.setAttribute('data-classroom-count', mockCount);
+    document.body.appendChild(mockElement);
+
+    component.getClassroomSummariesLength();
+    expect(component.classroomSummariesLength).toBe(parseInt(mockCount, 10));
+    document.body.removeChild(mockElement);
+  });
+
+  it('should default classroomSummariesLength to 0 if attribute is missing', () => {
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    document.body.appendChild(mockElement);
+    component.getClassroomSummariesLength();
+    expect(component.classroomSummariesLength).toBe(0);
+    document.body.removeChild(mockElement);
+  });
 });
