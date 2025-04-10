@@ -28,10 +28,58 @@
               </div>
               <div class="classroom-thumbnail">
                 <img alt="Classroom thumbnail image"
-                   [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+                     [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<div class="classroom-navigation-links-container">
+  <ng-container *ngIf="isLoading; else content">
+    <div class="skeleton-loader"></div>
+  </ng-container>
+  <ng-template #content>
+    <div class="classroom-navigation-links-content">
+      <span *ngIf="classroomSummaries.length === 0">No classrooms found. Visit the <a href="/classroom-admin">classroom admin</a> page in order to create a classroom. Note that you require the 'Curriculum Admin' role in order to create classrooms.</span>
+      <div class="multiple-classroom-nav-links" *ngIf="classroomSummaries.length > 0">
+        <div class="multiple-classrooms-intro">
+          <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
+          <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
+        </div>
+        <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
+          <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
+            <div class="classroom-text-container">
+              <a class="classroom-name e2e-mobile-test-classroom-link"
+                 [href]="'/learn/' + classroom.url_fragment"
+                 *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
+                 >
+                 {{ classroom.name }}
+              </a>
+              <a class="classroom-name e2e-mobile-test-classroom-link"
+                 [href]="'/learn/' + classroom.url_fragment"
+                 *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
+                 >
+                 {{ getClassroomNameTranslationkey(classroom.name) | translate }}
+              </a>
+              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
+            </div>
+            <div class="classroom-thumbnail">
+              <img alt="Classroom thumbnail image"
+                   [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+            </div>
+          </div>
+        </div>
+        <div class="nav-item-bottom-link classrooms-page-link" *ngIf="classroomSummaries.length > 1">
+          <a class="underline nav-item-bottom-link" tabindex="0" href="/learn">
+            <span class="link">
+              {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
+            </span>
+            <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
+          </a>
         </div>
       </div>
     </div>

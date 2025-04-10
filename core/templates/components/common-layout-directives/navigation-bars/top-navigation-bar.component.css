@@ -554,12 +554,13 @@
 @media screen and (max-width : 925px) {
   .oppia-top-navigation-bar .classroom-enabled {
     min-width: 688px;
-  } 
-  
+  }
+
   .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
     width: 388px;
   }
 }
+
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {
     margin-left: 0;
