@@ -63,11 +63,11 @@ enum INTERACTION_TYPES {
           'Algebra'
         );
 
-        await explorationVisitor.expectExplorationToBeAccessibleByUrl(
-          explorationId
-        );
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
+      await explorationVisitor.expectExplorationToBeAccessibleByUrl(
+        explorationId
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
