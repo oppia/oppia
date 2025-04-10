@@ -418,9 +418,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   getClassroomSummariesLength(): void {
     const classrooomGrid = document.querySelector('.classroom-grid');
     if (classrooomGrid) {
-      this.classroomSummariesLength = parseInt(
-        classrooomGrid.getAttribute('data-classroom-count')
-      );
+      const countAttr = classrooomGrid.getAttribute('data-classroom-count');
+      this.classroomSummariesLength = parseInt(countAttr ?? '0', 10);
     }
   }
 
