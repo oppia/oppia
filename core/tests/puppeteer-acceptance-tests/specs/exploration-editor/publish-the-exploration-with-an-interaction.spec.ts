@@ -24,44 +24,44 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
-    END_EXPLORATION = 'End Exploration',
-  }
+  END_EXPLORATION = 'End Exploration',
+}
 
-  describe('Exploration Creator', function () {
-    let explorationEditor: ExplorationEditor;
-    let explorationVisitor: LoggedInUser;
-    let explorationId: string | null;
+describe('Exploration Creator', function () {
+  let explorationEditor: ExplorationEditor;
+  let explorationVisitor: LoggedInUser;
+  let explorationId: string | null;
 
-    beforeAll(async function () {
-      explorationEditor = await UserFactory.createNewUser(
-        'explorationEditor',
-        'exploration_editor@example.com'
+  beforeAll(async function () {
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
+
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationVisitor',
+      'exploration_visitor@example.com'
+    );
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it(
+    'should publish the exploration with an interaction',
+    async function () {
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.dismissWelcomeModal();
+
+      await explorationEditor.createMinimalExploration(
+        'Exploration intro text',
+        INTERACTION_TYPES.END_EXPLORATION
       );
 
-      explorationVisitor = await UserFactory.createNewUser(
-        'explorationVisitor',
-        'exploration_visitor@example.com'
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithMetadata(
+        'Old Title',
+        'This is the goal of exploration.',
+        'Algebra'
       );
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
-
-    it(
-      'should publish the exploration with an interaction',
-      async function () {
-        await explorationEditor.navigateToCreatorDashboardPage();
-        await explorationEditor.navigateToExplorationEditorPage();
-        await explorationEditor.dismissWelcomeModal();
-
-        await explorationEditor.createMinimalExploration(
-          'Exploration intro text',
-          INTERACTION_TYPES.END_EXPLORATION
-        );
-
-        await explorationEditor.saveExplorationDraft();
-        explorationId = await explorationEditor.publishExplorationWithMetadata(
-          'Old Title',
-          'This is the goal of exploration.',
-          'Algebra'
-        );
 
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId
