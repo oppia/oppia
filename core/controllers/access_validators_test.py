@@ -67,7 +67,8 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_valid_classroom()
         self.save_new_valid_classroom(
-            'history', 'history', 'history', is_published=False
+            'history', 'history', 'history',
+            is_published=False,
         )
 
     def test_validation_returns_true_if_classroom_is_available(self) -> None:
@@ -176,6 +177,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                         topic_id_to_prerequisite_topic_ids=(
                             topic_dependency_for_classroom_1),
                         is_published=True,
+                        diagnostic_test_is_enabled=False,
                         thumbnail_data=classroom_config_domain.ImageData(
                             'thumbnail.svg', 'transparent', 1000
                         ),
@@ -614,17 +616,7 @@ class DiagnosticTestPlayerPageAccessValidationHandlerTests(
         test_utils.GenericTestBase):
     """Test for diagnostic test player access validation."""
 
-    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
-        self) -> None:
-        self.get_json(
-            '%s/can_access_diagnostic_test_player_page' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX),
-                expected_status_int=404)
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
-    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
-        self) -> None:
+    def test_should_access_diagnostic_test(self) -> None:
         self.get_html_response(
            '%s/can_access_diagnostic_test_player_page' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX),

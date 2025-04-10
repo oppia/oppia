@@ -196,6 +196,7 @@ describe('Classroom Page Component', () => {
       'Topics covered',
       'Learn math',
       true,
+      false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
       1
@@ -349,13 +350,23 @@ describe('Classroom Page Component', () => {
     expect(component.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should return correct value for diagnostic test feature flag', () => {
-    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeFalse();
-
-    component.classroomUrlFragment = 'math';
-    mockPlatformFeatureService.status.DiagnosticTest.isEnabled = true;
-
-    expect(component.isDiagnosticTestFeatureFlagEnabled()).toBeTrue();
+  it('should return false if diagnostic test is not enabled for the classroom', () => {
+    let classroomData = ClassroomData.createFromBackendData(
+      'mathid',
+      'Math',
+      'math',
+      [],
+      'Course details',
+      'Topics covered',
+      'Learn math',
+      true,
+      false,
+      {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
+      {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},
+      1
+    );
+    component.classroomData = classroomData;
+    expect(component.diagnosticTestIsEnabled()).toBeFalse();
   });
 
   it('should show private classroom banner to curriculum admins', fakeAsync(() => {
@@ -378,6 +389,7 @@ describe('Classroom Page Component', () => {
       'Course details',
       'Topics covered',
       'Learn math',
+      false,
       false,
       {filename: 'thumbnail.svg', size_in_bytes: 100, bg_color: 'transparent'},
       {filename: 'banner.png', size_in_bytes: 100, bg_color: 'transparent'},

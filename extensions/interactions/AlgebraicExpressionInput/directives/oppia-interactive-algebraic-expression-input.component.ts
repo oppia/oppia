@@ -82,6 +82,7 @@ export class AlgebraicExpressionInputInteractionComponent
           this.guppyInitializationService.getAllowedVariables()
         );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
@@ -97,6 +98,11 @@ export class AlgebraicExpressionInputInteractionComponent
       this.value,
       this.algebraicExpressionInputRulesService
     );
+    let answerIsValid = this.mathInteractionsService.validateEquation(
+      this.value,
+      this.guppyInitializationService.getAllowedVariables()
+    );
+    this.currentInteractionService.updateAnswerIsValid(answerIsValid);
   }
 
   onAnswerChange(focusObj: FocusObj): void {
