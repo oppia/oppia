@@ -103,7 +103,7 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
         with get_model_id_swap, self.assertRaisesRegex(
             AssertionError, 'Model ID should not be none'
         ):
-           FooError(self.model)
+            FooError(self.model)
 
     def test_message_raises_type_error_if_assigned_a_non_string_value(
         self
