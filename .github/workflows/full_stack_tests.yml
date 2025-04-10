@@ -100,12 +100,12 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
-        run: |
-          set -o pipefail
-          VIDEO_RECORDING_IS_ENABLED=0 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_e2e_tests --skip-install \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info \
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E test logs
         if: ${{ failure() }}
@@ -115,12 +115,12 @@ jobs:
           path: e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Run E2E Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
-        run: |
-          set -o pipefail
-          VIDEO_RECORDING_IS_ENABLED=1 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_e2e_tests --skip-install \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info \
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_e2e_tests --skip-install
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E retry test logs
         if: ${{ failure() }}
@@ -174,12 +174,12 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        run: |
-          set -o pipefail
-          VIDEO_RECORDING_IS_ENABLED=0 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_acceptance_tests \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info \
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=0
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance test logs
         if: ${{ failure() }}
@@ -195,12 +195,12 @@ jobs:
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
-        run: |
-          set -o pipefail
-          VIDEO_RECORDING_IS_ENABLED=1 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_acceptance_tests \
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info \
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance retry test logs
         if: ${{ failure() }}
@@ -221,9 +221,12 @@ jobs:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        run: |
-          set -o pipefail
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+        run: >
+          set -o pipefail;
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
+          --prod_env --mobile --server_log_level=info
+          | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -240,12 +243,12 @@ jobs:
         if: ${{ failure() }}
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1285x1000x24 represents screen width, height and color depth respectively.
-        run: |
-          set -o pipefail
-          VIDEO_RECORDING_IS_ENABLED=1 \
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24" \
-          python -m scripts.run_acceptance_tests --skip-build \
-          --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info \
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          python -m scripts.run_acceptance_tests --skip-build
+          --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
