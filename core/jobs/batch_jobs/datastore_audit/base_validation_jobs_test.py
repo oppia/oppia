@@ -44,8 +44,8 @@ class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
         """Mock domain validate function."""
         # The yield from () statement is used to ensure that the function
         # returns an empty iterator. The following other approaches won't work:
-        # Using pass: The function would implicitly return None. Attempting to iterate
-        # over None in the calling code results in a
+        # Using pass: The function would implicitly return None. Attempting to
+        # iterate over None in the calling code results in a
         # TypeError: 'NoneType' object is not iterable.
         # Using yield: The function would yield None. Subsequent processing
         # steps in the validation pipeline would then try to access attributes
@@ -60,7 +60,8 @@ class MissingGetValidationFnsJob(base_validation_jobs.BaseValidationJob):
         return self.validate_domain_object
 
 
-class MissingGetValidateDomainObjectFnJob(base_validation_jobs.BaseValidationJob):
+class MissingGetValidateDomainObjectFnJob(
+    base_validation_jobs.BaseValidationJob):
     """Child validation job with missing get_validate_domain_object_fn."""
 
     def validate_mock_error(
@@ -69,8 +70,8 @@ class MissingGetValidateDomainObjectFnJob(base_validation_jobs.BaseValidationJob
         """Mock validation function."""
         # The yield from () statement is used to ensure that the function
         # returns an empty iterator. The following other approaches won't work:
-        # Using pass: The function would implicitly return None. Attempting to iterate
-        # over None in the calling code results in a
+        # Using pass: The function would implicitly return None. Attempting to
+        # iterate over None in the calling code results in a
         # TypeError: 'NoneType' object is not iterable.
         # Using yield: The function would yield None. Subsequent processing
         # steps in the validation pipeline would then try to access attributes
@@ -117,8 +118,8 @@ class MockChildValidationJob(base_validation_jobs.BaseValidationJob):
         """Mock domain validate function."""
         # The yield from () statement is used to ensure that the function
         # returns an empty iterator. The following other approaches won't work:
-        # Using pass: The function would implicitly return None. Attempting to iterate
-        # over None in the calling code results in a
+        # Using pass: The function would implicitly return None. Attempting to
+        # iterate over None in the calling code results in a
         # TypeError: 'NoneType' object is not iterable.
         # Using yield: The function would yield None. Subsequent processing
         # steps in the validation pipeline would then try to access attributes
