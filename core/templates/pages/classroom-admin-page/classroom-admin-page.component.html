@@ -263,7 +263,7 @@
 
                                 <mat-autocomplete #auto="matAutocomplete"
                                                   (optionSelected)="addDependencyForTopic(topicName, $event.option.value)">
-      
+
                                   <mat-option *ngFor="let option of tempEligibleTopicNamesForPrerequisites"
                                               [value]="option">
                                     {{ option }}
@@ -400,8 +400,8 @@
   .oppia-dashboard-content {
     background-color: transparent;
     max-width: 960px;
-    width: 100%;
     padding: 10px;
+    width: 100%;
   }
 
   .oppia-editor-card-with-avatar {
