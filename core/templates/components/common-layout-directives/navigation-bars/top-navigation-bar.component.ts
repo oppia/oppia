@@ -422,7 +422,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         classrooomGrid.getAttribute('data-classroom-count')
       );
     }
-    return;
+    return 0;
   }
 
   changeLanguage(languageCode: string): void {
