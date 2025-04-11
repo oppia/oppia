@@ -864,6 +864,10 @@ textarea {
   word-wrap: break-word;
 }
 
+.nav .dropdown:hover > .dropdown-menu {
+  border: none;
+}
+
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
   bottom: 100%;
@@ -962,7 +966,7 @@ textarea {
   width: 100%;
 }
 
-.navbar-light .dropdown-menu {
+.navbar-light {
   background: #fff;
   margin-top: 0;
 }
@@ -978,17 +982,6 @@ textarea {
   min-width: 160px;
 }
 
-.oppia-navbar-nav .dropdown-menu {
-  left: auto;
-  right: 0;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-
-.nav .dropdown:hover > .dropdown-menu {
-  border: none;
-}
 
 @media(max-width: 1050px) {
   .oppia-navbar-breadcrumb {
