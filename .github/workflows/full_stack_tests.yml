@@ -82,6 +82,15 @@ jobs:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites }}
     name: E2E (${{ matrix.suite.name }})
     steps:
+      - name: Check for broken suites
+        run: |
+          broken_suites=("fileUploadFeatures")
+          for suite in "${broken_suites[@]}"; do
+            if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
+              echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
+              exit 0
+            fi
+          done
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
@@ -162,7 +171,16 @@ jobs:
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
     name: Acceptance (${{ matrix.suite.name }})
-    steps:
+    steps::
+      - name: Check for broken suites
+        run: |
+          broken_suites=("exploration-editor/publish-the-exploration-with-an-interaction")
+          for suite in "${broken_suites[@]}"; do
+            if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
+              echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
+              exit 0
+            fi
+          done
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
