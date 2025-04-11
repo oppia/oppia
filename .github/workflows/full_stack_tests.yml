@@ -88,7 +88,8 @@ jobs:
           for suite in "${broken_suites[@]}"; do
             if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
               echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
-              exit 0
+              echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
+              break
             fi
           done
       - name: Checkout repository so that local actions can be used
@@ -110,6 +111,8 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run E2E Test ${{ matrix.suite.name }}
+        # TODO: Issue #22448 https://github.com/oppia/oppia/issues/22448
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=0
@@ -178,7 +181,8 @@ jobs:
           for suite in "${broken_suites[@]}"; do
             if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
               echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
-              exit 0
+              echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
+              break
             fi
           done
       - name: Checkout repository so that local actions can be used
@@ -194,6 +198,8 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+        # TODO: Issue #22448 https://github.com/oppia/oppia/issues/22448
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=0
@@ -241,6 +247,8 @@ jobs:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
+        # TODO: Issue #22448 https://github.com/oppia/oppia/issues/22448
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
