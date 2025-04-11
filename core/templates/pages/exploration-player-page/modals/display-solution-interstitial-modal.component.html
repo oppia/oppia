@@ -9,10 +9,10 @@
 </div>
 
 <div class="oppia-learner-solution-container">
-  <button class="oppia-modal-cancel-button md-button md-default-theme ml-auto" (click)="cancel()">
+  <button mat-button class="oppia-modal-cancel-button ml-auto" (click)="cancel()">
     <span [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></span>
   </button>
-  <button class="oppia-learner-got-it-button e2e-test-learner-got-it-button md-button md-default-theme e2e-test-continue-to-solution-btn"
+  <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button e2e-test-continue-to-solution-btn"
           (click)="confirm()">
     <span [innerHTML]="'I18N_SHOW_SOLUTION_BUTTON' | translate"></span>
   </button>
@@ -38,14 +38,14 @@
     flex-direction: row;
   }
 
-  .md-button.oppia-modal-cancel-button {
+  .mat-button.oppia-modal-cancel-button {
     background: #9a9a9a;
     color: #fff;
     height: 35px;
     padding: 6px 12px;
   }
-  .md-button.md-default-theme.oppia-modal-cancel-button:focus,
-  .md-button.md-default-theme.oppia-modal-cancel-button:hover {
+  .mat-button.md-default-theme.oppia-modal-cancel-button:focus,
+  .mat-button.md-default-theme.oppia-modal-cancel-button:hover {
     background: #7a7a7a;
   }
 </style>
