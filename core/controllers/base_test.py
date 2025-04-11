@@ -2597,3 +2597,24 @@ Request method: POST
 Handler class name: BaseHandler\n
 """
             self.assertIn(expected_log_message, self.logged_exceptions)
+
+    def test_stack_trace_logged_from_existing_handler(self) -> None:
+        """Ensures that calling an actual handler logs a real stack trace."""
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock', BaseHandlerTests.MockHandlerWithInvalidReturnType
+            )
+        ], debug=feconf.DEBUG))
+
+        self.logged_exceptions = []
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_exception):
+            self.testapp.get('/mock', status=500)
+
+        self.assertTrue(
+            any('Traceback (most recent call last)' in log for log in self.logged_exceptions),
+            msg='Expected non-empty stack trace in exception logs.'
+        )
