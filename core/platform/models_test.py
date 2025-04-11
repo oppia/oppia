@@ -285,14 +285,22 @@ class RegistryUnitTest(test_utils.TestBase):
             self.registry_instance.import_app_identity_services(),
             gae_app_identity_services)
 
-    def test_import_azure_speech_synthesis_services(self) -> None:
-        """Tests import azure speech synthesis services function."""
+    def test_import_speech_synthesis_services_in_dev_mode(self) -> None:
+        """Tests import the speech synthesis services function."""
+        from core.platform.speech_synthesis import (
+            dev_mode_speech_synthesis_services)
+        self.assertEqual(
+            dev_mode_speech_synthesis_services,
+            self.registry_instance.import_speech_synthesis_services())
+
+    def test_import_speech_synthesis_services_in_prod_mode(self) -> None:
+        """Tests import the speech synthesis services function."""
+        from core.platform.speech_synthesis import (
+            azure_speech_synthesis_services)
         with self.swap(constants, 'DEV_MODE', False):
-            from core.platform.azure_speech_synthesis import (
-                azure_speech_synthesis_services)
             self.assertEqual(
                 azure_speech_synthesis_services,
-                self.registry_instance.import_azure_speech_synthesis_services())
+                self.registry_instance.import_speech_synthesis_services())
 
     def test_import_email_services_mailgun(self) -> None:
         """Tests import email services method for when email service provider is
