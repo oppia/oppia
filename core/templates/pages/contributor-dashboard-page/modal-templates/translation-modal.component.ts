@@ -25,7 +25,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -51,6 +51,8 @@ import {
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -182,18 +184,23 @@ export class TranslationModalComponent {
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
 
+  private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined =
+    () => undefined;
+
   constructor(
     public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,
     private readonly imageLocalStorageService: ImageLocalStorageService,
+    private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly wds: WindowDimensionsService
+    private readonly wds: WindowDimensionsService,
+    private readonly windowRef: WindowRef
   ) {}
 
   public get expansionTabType(): typeof ExpansionTabType {
@@ -274,6 +281,21 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection(),
       },
     };
+
+    this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      if (
+        this.activeWrittenTranslation &&
+        this.activeWrittenTranslation.length > 0
+      ) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+    this.windowRef.nativeWindow.addEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
   }
 
   ngAfterViewInit(): void {
@@ -312,11 +334,39 @@ export class TranslationModalComponent {
     this.editorIsShown = true;
   }
 
-  close(): void {
-    this.activeModal.close();
+  private checkForUnsavedChanges(action: () => void): void {
+    if (
+      this.activeWrittenTranslation &&
+      this.activeWrittenTranslation.length > 0
+    ) {
+      const modalRef = this.ngbModal.open(
+        ConfirmTranslationExitModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
 
-    // Reset copyMode to the default value and avoid console errors.
-    this.ckEditorCopyContentService.copyModeActive = false;
+      modalRef.result.then(
+        () => {
+          // If user confirms, execute the passed action.
+          action();
+        },
+        () => {
+          // If user cancels or closes, no action is needed.
+        }
+      );
+    } else {
+      // No unsaved changes, directly execute the action.
+      action();
+    }
+  }
+
+  close(): void {
+    this.checkForUnsavedChanges(() => {
+      this.activeModal.close();
+      // Reset copyMode to the default value and avoid console errors.
+      this.ckEditorCopyContentService.copyModeActive = false;
+    });
   }
 
   getHtmlSchema(): HTMLSchema {
@@ -398,10 +448,12 @@ export class TranslationModalComponent {
   }
 
   skipActiveTranslation(): void {
-    const translatableItem = this.translateTextService.getTextToTranslate();
-    this.updateActiveState(translatableItem);
-    ({more: this.moreAvailable} = translatableItem);
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem = this.translateTextService.getTextToTranslate();
+      this.updateActiveState(translatableItem);
+      ({more: this.moreAvailable} = translatableItem);
+      this.resetEditor();
+    });
   }
 
   isSubmitted(): boolean {
@@ -409,11 +461,13 @@ export class TranslationModalComponent {
   }
 
   returnToPreviousTranslation(): void {
-    const translatableItem =
-      this.translateTextService.getPreviousTextToTranslate();
-    this.updateActiveState(translatableItem);
-    this.moreAvailable = true;
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem =
+        this.translateTextService.getPreviousTextToTranslate();
+      this.updateActiveState(translatableItem);
+      this.moreAvailable = true;
+      this.resetEditor();
+    });
   }
 
   isSetOfStringDataFormat(): boolean {
@@ -657,5 +711,12 @@ export class TranslationModalComponent {
       return;
     }
     this.activeModal.close(this.activeWrittenTranslation);
+  }
+
+  ngOnDestroy(): void {
+    this.windowRef.nativeWindow.removeEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
   }
 }
