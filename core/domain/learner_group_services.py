@@ -35,10 +35,10 @@ from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import base_models
     from mypy_imports import datastore_services
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
-    from mypy_imports import base_models
 
 (learner_group_models, user_models, base_models) = (
     models.Registry.import_models(
@@ -757,7 +757,7 @@ def get_model_remove_story_reference(
         ).fetch()
     )
 
-    models_to_put = []
+    models_to_put: List[base_models.BaseModel] = []
     for model in found_models:
         model.story_ids.remove(story_id)
         models_to_put.append(model)
@@ -820,7 +820,7 @@ def get_instance_for_subtopic_page_removal(
         ).fetch()
     )
 
-    models_to_put = []
+    models_to_put: List[base_models.BaseModel] = []
     for model in found_models:
         model.subtopic_page_ids.remove(subtopic_page_id)
         models_to_put.append(model)

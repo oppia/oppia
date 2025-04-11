@@ -53,14 +53,17 @@ from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import topic_models
-    from mypy_imports import datastore_services
-    from mypy_imports import subtopic_models
-    from mypy_imports import story_models
     from mypy_imports import base_models
+    from mypy_imports import datastore_services
+    from mypy_imports import story_models
+    from mypy_imports import subtopic_models
+    from mypy_imports import topic_models
 
-(topic_models,subtopic_models,story_models,base_models,) = models.Registry.import_models(
-    [models.Names.TOPIC,models.Names.SUBTOPIC,models.Names.STORY,models.Names.BASE_MODEL,])
+(topic_models, subtopic_models, story_models, base_models,) = (
+    models.Registry.import_models([
+     models.Names.TOPIC, models.Names.SUBTOPIC,
+     models.Names.STORY, models.Names.BASE_MODEL,]))
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -1117,10 +1120,16 @@ def delete_topic(
             story_model = story_models.StoryModel.get(
                 story_reference['story_id'], strict=False)
             if story_model is not None:
-                story_dict = story_services.get_model_keys_And_delete_story(
+                story_dict = story_services.get_model_keys_and_delete_story(
                     committer_id, story_reference['story_id'])
-                model_to_put.extend(story_dict['model_to_put'])
-                keys_to_delete.extend(story_dict['keys_to_delete'])
+                model_to_put.extend(
+                    cast(
+                        List[base_models.BaseModel],
+                        story_dict['model_to_put']))
+                keys_to_delete.extend(
+                    cast(
+                        List[datastore_services.Key],
+                        story_dict['keys_to_delete']))
         model_to_put.extend(topic_model.get_models_for_deletion(
             committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED))
 

@@ -40,17 +40,17 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Sequence, Tuple, cast, Dict
+from typing import List, Sequence, Tuple, cast, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import base_models
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import story_models
     from mypy_imports import user_models
-    from mypy_imports import datastore_services
-    from mypy_imports import base_models
 
-(exp_models, story_models, user_models,base_models) = (
+(exp_models, story_models, user_models, base_models) = (
     models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.STORY,
      models.Names.USER, models.Names.BASE_MODEL]))
@@ -915,26 +915,31 @@ def delete_story(
     learner_group_services.remove_story_reference_from_learner_groups(story_id)
 
 
-def get_model_keys_And_delete_story(
+class StoryDeletionResult(TypedDict):
+    """Dictionary representing the result of deleting a story.
+
+    Attributes:
+        model_to_put: List[base_models.BaseModel]. A list of models to be
+            updated or saved in the datastore.
+        keys_to_delete: List[datastore_services.Key]. A list of datastore keys
+            corresponding to models that should be deleted.
+    """
+
+    model_to_put: List[base_models.BaseModel]
+    keys_to_delete: List[datastore_services.Key]
+
+
+def get_model_keys_and_delete_story(
     committer_id: str, story_id: str
-) -> Dict[List[base_models.BaseModel],List[datastore_services.Key]]:
+) -> StoryDeletionResult:
     """Deletes the story with the given story_id.
 
     Args:
         committer_id: str. ID of the committer.
         story_id: str. ID of the story to be deleted.
-        force_deletion: bool. If true, the story and its history are fully
-            deleted and are unrecoverable. Otherwise, the story and all
-            its history are marked as deleted, but the corresponding models are
-            still retained in the datastore. This last option is the preferred
-            one.
-    
+
     Returns:
-        Dict[str, Union[List[base_models.BaseModel],
-        List[datastore_services.Key]]]:
-        A dictionary containing:
-            - "model_to_put": A list of BaseModel instances to be updated.
-            - "keys_to_delete": A list of datastore key instances to be deleted.
+        StoryDeletionResult. Dict with List of BaseModel and datastore keys
     """
 
     story_model = story_models.StoryModel.get(story_id, strict=False)
