@@ -80,15 +80,15 @@ jobs:
       fail-fast: false
       matrix:
         # suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites }}
-      suite: ${{ 
-        fromJson(toJson(
-          fromJson(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites
-        )) 
-        | map(select(.name != 'contributorDashboard' 
-          and .name != 'contributorAdminDashboard' 
-          and .name != 'explorationTranslationTab' 
-          and .name != 'fileUploadFeatures')) 
-        }}
+        suite: ${{ 
+          fromJson(toJson(
+            fromJson(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites
+          )) 
+          | map(select(.name != 'contributorDashboard' 
+            and .name != 'contributorAdminDashboard' 
+            and .name != 'explorationTranslationTab' 
+            and .name != 'fileUploadFeatures')) 
+          }}
     name: E2E (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
@@ -170,16 +170,16 @@ jobs:
       fail-fast: false
       matrix:
         # suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
-      suite: ${{ 
-        fromJson(toJson(
-          fromJson(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites
-        )) 
-        | map(select(.name != 'exploration-editor/manage-exploration-misconceptions' 
-          and .name != 'exploration-editor/modify-translations-through-modal' 
-          and .name != 'exploration-editor/publish-the-exploration-with-an-interaction' 
-          and .name != 'logged-out-user/play-through-lesson-while-getting-feedback-and-hints' 
-          and .name != 'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties')) 
-        }}
+        suite: ${{ 
+          fromJson(toJson(
+            fromJson(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites
+          )) 
+          | map(select(.name != 'exploration-editor/manage-exploration-misconceptions' 
+            and .name != 'exploration-editor/modify-translations-through-modal' 
+            and .name != 'exploration-editor/publish-the-exploration-with-an-interaction' 
+            and .name != 'logged-out-user/play-through-lesson-while-getting-feedback-and-hints' 
+            and .name != 'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties')) 
+          }}
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
