@@ -365,17 +365,26 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].
             planned_publication_date_msecs, (
-                datetime.datetime(2023, 1, 2, 0, 0).timestamp() * 1000),
+                datetime.datetime(
+                    2023, 1, 2, 0, 0,
+                    tzinfo=datetime.timezone.utc).timestamp() * 1000
+            ),
             msg='Incorrect planned publication date in milliseconds received.')
         self.assertEqual(
             story.story_contents.nodes[1].
             first_publication_date_msecs, (
-                datetime.datetime(2023, 1, 1, 0, 0).timestamp() * 1000),
+                datetime.datetime(
+                    2023, 1, 1, 0, 0,
+                    tzinfo=datetime.timezone.utc).timestamp() * 1000
+            ),
             msg='Incorrect first publication date in milliseconds received.')
         self.assertEqual(
             story.story_contents.nodes[1].
             last_modified_msecs, (
-                datetime.datetime(2023, 1, 1, 0, 0).timestamp() * 1000),
+                datetime.datetime(
+                    2023, 1, 1, 0, 0,
+                    tzinfo=datetime.timezone.utc).timestamp() * 1000
+            ),
             msg='Incorrect last modified date in milliseconds received.')
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
