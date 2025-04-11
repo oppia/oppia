@@ -171,7 +171,7 @@ jobs:
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
     name: Acceptance (${{ matrix.suite.name }})
-    steps::
+    steps:
       - name: Check for broken suites
         run: |
           broken_suites=("exploration-editor/publish-the-exploration-with-an-interaction")
