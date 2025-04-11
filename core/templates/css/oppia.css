@@ -78,7 +78,7 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input {
+mat-input-group.long > input {
   height: 45px;
   width: 100%;
 }
@@ -90,7 +90,7 @@ label {
   max-width: 100%;
 }
 
-md-input-group.md-default-theme label {
+mat-input-group.md-default-theme label {
   font-size: 16px;
   font-weight: 200;
   margin-bottom: 0;
@@ -467,7 +467,7 @@ a:focus {
 }
 
 /* Change all the borders of an input to red when there is validation errors. */
-input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-default-theme {
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, mat-form-field.ng-invalid .mat-form-field-outline {
   border-color: #f44336;
 }
 
@@ -1210,7 +1210,7 @@ textarea {
   padding-top: 55px;
 }
 
-.oppia-dashboard-aggregated-stats md-card {
+.oppia-dashboard-aggregated-stats mat-card {
   background: #fff;
   margin: 0 7.5px 70px 7.5px;
   padding: 8px;
@@ -2764,11 +2764,11 @@ div#ng-curtain {
   padding-left: 15px;
 }
 
-.oppia-profile-container md-card.md-default-theme {
+.oppia-profile-container mat-card.mat-mdc-card {
   background-color: transparent;
 }
 
-md-card.preview-conversation-skin-inline-interaction {
+mat-card.preview-conversation-skin-inline-interaction {
   background-color: #f6f6f6;
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
@@ -2779,7 +2779,7 @@ md-card.preview-conversation-skin-inline-interaction {
   max-width: 560px;
 }
 
-md-card.preview-conversation-skin-supplemental-card {
+mat-card.preview-conversation-skin-supplemental-card {
   background-color: #f6f6f6;
   margin: -5px 0;
   max-width: 560px;
@@ -2805,7 +2805,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-bottom: thin solid #eee;
   margin-bottom: 5px;
 }
-.trained-feedback-selection-container md-input-group.md-default-theme label {
+.trained-feedback-selection-container mat-form-field.mat-form-field-label {
   border-bottom: 0;
 }
 

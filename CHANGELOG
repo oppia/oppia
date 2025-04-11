@@ -7007,7 +7007,7 @@ Learner View:
 
 Exploration Editor:
 * Fix #3794: Complete milestone one of introducing the new fraction interaction. (#3967)
-* Replaced the correct CSS styling for md-checkbox
+* Replaced the correct CSS styling for mat-checkbox
 * Fix #3997: Added proper css for CodeRepl preview (#4053)
 * Shorten answer group header summaries so that the existence of multiple rules can be seen. (#4030)
 * Fix #3975: Removed repeated warnings for non-alphanumeric strings.
