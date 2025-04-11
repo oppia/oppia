@@ -182,22 +182,17 @@ why they need to be overriden.  */
   cursor: default;
 }
 
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover,
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button,
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
+  font-size: 16px;
   font: 16px;
+  line-height: 22px;
   margin: 0;
   min-width: 55px;
-}
-
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   border-radius: 2px;
-  font-size: 16px;
-  line-height: 22px;
   text-transform: uppercase;
 }
 
