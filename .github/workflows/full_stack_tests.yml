@@ -36,7 +36,7 @@ jobs:
     name: Compute which tests to run
     runs-on: ubuntu-22.04
     outputs:
-      TEST_SUITES_TO_RUN: ${{ steps.filter_suites.outputs.FILTERED_TEST_SUITES_TO_RUN }}
+      TEST_SUITES_TO_RUN: ${{ steps.compute_test_suites.outputs.TEST_SUITES_TO_RUN }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -53,30 +53,6 @@ jobs:
         # Note that the script also writes the output to $GITHUB_OUTPUT.
         run: |
           TEST_SUITES_TO_RUN=$(python -m scripts.check_ci_test_suites_to_run --github_head_ref="HEAD" --github_base_ref="origin/${{ github.event.pull_request.base.ref }}" ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }})
-      - id: filter_suites
-        name: Filter out broken test suites
-        run: |
-          # Define broken suites to exclude
-          declare -A broken_suites
-          broken_suites[e2e]="contributorDashboard contributorAdminDashboard explorationTranslationTab fileUploadFeatures"
-          broken_suites[acceptance.python]="exploration-editor/manage-exploration-misconceptions exploration-editor/modify-translations-through-modal exploration-editor/publish-the-exploration-with-an-interaction logged-out-user/play-through-lesson-while-getting-feedback-and-hints practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties"
-          
-          # Get the original test suites JSON
-          ORIGINAL_TEST_SUITES=${{ steps.compute_test_suites.outputs.TEST_SUITES_TO_RUN }}
-          
-          # Create a temporary file with the JSON content
-          echo "$ORIGINAL_TEST_SUITES" > original_suites.json
-          
-          # Filter out broken suites and update counts using jq
-          FILTERED_TEST_SUITES=$(jq --arg e2e_exclude "${broken_suites[e2e]}" --arg acceptance_exclude "${broken_suites[acceptance.python]}" '
-            (.e2e.suites = (.e2e.suites | map(select(.name as $name | ($e2e_exclude | split(" ")) | index($name) | not)))) |
-            (.acceptance.python.suites = (.acceptance.python.suites | map(select(.name as $name | ($acceptance_exclude | split(" ")) | index($name) | not)))) |
-            (.e2e.count = .e2e.suites | length) |
-            (.acceptance.python.count = .acceptance.python.suites | length)
-          ' original_suites.json)
-          
-          # Set filtered suites as output
-          echo "FILTERED_TEST_SUITES_TO_RUN=${FILTERED_TEST_SUITES}" >> $GITHUB_OUTPUT
       - name: Upload root files mapping as a GitHub artifact
         uses: actions/upload-artifact@v4
         with:
@@ -104,11 +80,7 @@ jobs:
       fail-fast: false
       matrix:
         # suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites }}
-        suite: ${{
-            fromJson(
-              toJson(fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites)
-            ) | map(select(.name as $n | contains(["broken-suite-1", "broken-suite-2"]) | not))
-          }}
+        suite: ${{ fromJson(toJson(fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.suites)) | map(select(.name as $n | contains(["contributorDashboard", "contributorAdminDashboard", "explorationTranslationTab", "fileUploadFeatures"]) | not))}}
     name: E2E (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
@@ -190,11 +162,7 @@ jobs:
       fail-fast: false
       matrix:
         # suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
-        suite: ${{
-          fromJson(
-              toJson(fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites)
-            ) | map(select(.name as $n | contains(["broken-acceptance-1"]) | not))
-          }}
+        suite: ${{ fromJson(toJson(fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites)) | map(select(.name as $n | contains(["exploration-editor/manage-exploration-misconceptions", "exploration-editor/modify-translations-through-modal", "exploration-editor/publish-the-exploration-with-an-interaction", "logged-out-user/play-through-lesson-while-getting-feedback-and-hints", "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties"]) | not))}}
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Checkout repository so that local actions can be used
