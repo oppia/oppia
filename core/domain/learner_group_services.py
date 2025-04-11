@@ -40,8 +40,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import user_models
     from mypy_imports import base_models
 
-(learner_group_models, user_models, base_models) = models.Registry.import_models(
-    [models.Names.LEARNER_GROUP, models.Names.USER, models.Names.BASE_MODEL,])
+(learner_group_models, user_models, base_models) = (
+    models.Registry.import_models(
+    [models.Names.LEARNER_GROUP, models.Names.USER, models.Names.BASE_MODEL,]))
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -736,7 +737,9 @@ def remove_story_reference_from_learner_groups(story_id: str) -> None:
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
 
 
-def get_model_remove_story_reference_from_learner_groups(story_id: str) -> List[base_models.BaseModel]:
+def get_model_remove_story_reference(
+    story_id: str
+) -> List[base_models.BaseModel]:
     """Removes a given story id from all learner groups that have it's
     reference.
 

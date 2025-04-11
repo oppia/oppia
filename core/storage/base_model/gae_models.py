@@ -1144,7 +1144,6 @@ class VersionedModel(BaseModel):
             BaseModel.update_timestamps_multi(models_to_put_values)
             BaseModel.put_multi(models_to_put_values)
 
-    # Here force_deletion is true.
     def get_datastore_keys_for_delete(
         self
     ) -> List[datastore_services.Key]:
@@ -1197,7 +1196,8 @@ class VersionedModel(BaseModel):
             """Get this models instance for deletion.
 
             Args:
-                committer_id: str. The user_id of the user who committed the change.
+                committer_id: str. The user_id of the user who committed
+                    the change.
                 commit_message: str. The commit description message.
 
             Returns:

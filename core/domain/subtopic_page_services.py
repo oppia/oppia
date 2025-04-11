@@ -360,11 +360,13 @@ def get_model_instances_for_delete_subtopic_page(
     subtopic_page_id = subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
         topic_id, subtopic_id)
     model_to_put = []
-    subtopic_models_instances = subtopic_models.SubtopicPageModel.get(subtopic_page_id).get_models_for_deletion(
+    subtopic_models_instances = subtopic_models.SubtopicPageModel.get(
+        subtopic_page_id).get_models_for_deletion(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED)
     model_to_put.extend(subtopic_models_instances)
-    subtopic_page_reference_models = learner_group_services.get_instance_for_subtopic_page_removal(
-        topic_id, subtopic_id)
+    subtopic_page_reference_models = (
+        learner_group_services.get_instance_for_subtopic_page_removal(
+        topic_id, subtopic_id))
     model_to_put.extend(subtopic_page_reference_models)
     return model_to_put
 

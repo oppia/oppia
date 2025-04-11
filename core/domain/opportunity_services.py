@@ -526,7 +526,9 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
     exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
 
 
-def get_model_for_delete_exp_opportunities_corresponding_to_story(story_id: str) -> List[base_models.BaseModel]:
+def get_model_for_delete_exp_opportunities(
+    story_id: str
+) -> List[base_models.BaseModel]:
     """Deletes the ExplorationOpportunitySummaryModel models which corresponds
     to the given story_id.
 

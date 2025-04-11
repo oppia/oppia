@@ -50,8 +50,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import base_models
 
-(exp_models, story_models, user_models,base_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER, models.Names.BASE_MODEL])
+(exp_models, story_models, user_models,base_models) = (
+    models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.STORY,
+     models.Names.USER, models.Names.BASE_MODEL]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -928,7 +930,8 @@ def get_model_keys_And_delete_story(
             one.
     
     Returns:
-        Dict[str, Union[List[base_models.BaseModel], List[datastore_services.Key]]]: 
+        Dict[str, Union[List[base_models.BaseModel],
+        List[datastore_services.Key]]]:
         A dictionary containing:
             - "model_to_put": A list of BaseModel instances to be updated.
             - "keys_to_delete": A list of datastore key instances to be deleted.
@@ -964,16 +967,19 @@ def get_model_keys_And_delete_story(
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
-    keys_to_delete.append(story_models.StorySummaryModel.get(story_id).get_datastore_key())
+    keys_to_delete.append(
+        story_models.StorySummaryModel.get(story_id).get_datastore_key())
 
     # Delete the opportunities available.
-    model_to_put.extend(opportunity_services.get_model_for_delete_exp_opportunities_corresponding_to_story(
+    model_to_put.extend(
+        opportunity_services.get_model_for_delete_exp_opportunities(
         story_id))
 
     # Delete references of the story from all related learner groups.
-    model_to_put.extend(learner_group_services.get_model_remove_story_reference_from_learner_groups(story_id))
+    model_to_put.extend(
+        learner_group_services.get_model_remove_story_reference(story_id))
 
-    return {"model_to_put": model_to_put, "keys_to_delete": keys_to_delete}
+    return {'model_to_put': model_to_put, 'keys_to_delete': keys_to_delete}
 
 
 def post_delete_story(
@@ -1012,7 +1018,7 @@ def post_delete_story(
 
     # Delete references of the story from all related learner groups.
     learner_group_services.remove_story_reference_from_learner_groups(story.id)
-    
+
 
 def delete_story_summary(story_id: str) -> None:
     """Delete a story summary model.

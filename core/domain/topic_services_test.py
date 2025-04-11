@@ -1653,7 +1653,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
 
-        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID, False)
         self.assertIsNone(
             topic_fetchers.get_topic_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(

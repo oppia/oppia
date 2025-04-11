@@ -489,14 +489,15 @@ def delete_threads_for_multiple_entities(
 def get_delete_thread_keys_for_multiple_entities(
     entity_type: str, entity_ids: List[str]
 ) -> List[datastore_services.Key]:
-    """Retrieves model keys for deleting threads associated with multiple entities.
+    """Retrieves model keys for deleting threads associated with
+    multiple entities.
 
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_ids: list(str). The ids of the entities.
 
     Returns:
-            list(datastore_services.Key). The models associated datastore keys.
+        list(datastore_services.Key). The models associated datastore keys.
     """
     threads = []
     for entity_id in entity_ids:
@@ -519,7 +520,8 @@ def get_delete_thread_keys_for_multiple_entities(
                     suggestion_models.GeneralSuggestionModel, thread.id)
             )
 
-    model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
+    model_keys += _get_threads_user_info_keys(
+        [thread.id for thread in threads])
 
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
