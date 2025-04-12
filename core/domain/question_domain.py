@@ -1837,8 +1837,8 @@ class Question(translation_domain.BaseTranslatableObject):
     def _convert_states_v56_dict_to_v57_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
     ) -> Dict[str, state_domain.StateDict]:
-        """Converts from v56 to v57. Version 57 removes and RecordedVoiceovers
-        from State.
+        """Converts from v56 to v57. Version 57 removes the RecordedVoiceovers
+        property from the State.
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
