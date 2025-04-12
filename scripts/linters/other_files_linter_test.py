@@ -322,3 +322,16 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             task_results = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
+
+    def test_perform_all_lint_checks(self) -> None:
+        lint_task_report = other_files_linter.CustomLintChecksManager(
+            FILE_CACHE).perform_all_lint_checks()
+        self.assertTrue(isinstance(lint_task_report, list))
+
+    def test_get_linters_with_success(self) -> None:
+        custom_linter, third_party_linter = (
+            other_files_linter.get_linters(FILE_CACHE))
+        self.assertTrue(
+            isinstance(
+                custom_linter, other_files_linter.CustomLintChecksManager))
+        self.assertEqual(third_party_linter, None)

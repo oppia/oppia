@@ -95,13 +95,13 @@ class ImageCompressor:
             output_file_path: pathlib.Path. The path to the output file.
 
         Returns:
-            result_image: List[CompressedImageInfo]. List of all compressible
-            images over repository with attributes as path, original_size
-            and new_size.
+            image_compressibility_dicts: List[CompressedImageInfo]. List of all
+            compressible images over repository with attributes as path, 
+            original_size and new_size.
         """
 
         file_extension = file_path.suffix.lower()
-        result_image: List[CompressedImageInfo] = []
+        image_compressibility_dicts: List[CompressedImageInfo] = []
         with Image.open(file_path):
 
             compression_type = self.get_compression_type(file_extension)
@@ -122,7 +122,7 @@ class ImageCompressor:
                 new_size = output_file_path.stat().st_size
 
                 if new_size < original_size * self.tolerance:
-                    result_image.append({
+                    image_compressibility_dicts.append({
                         'path': file_path,
                         'original_size': original_size,
                         'new_size': new_size
@@ -134,7 +134,7 @@ class ImageCompressor:
                         result.stderr
                 )
 
-        return result_image
+        return image_compressibility_dicts
 
     def find_compressible_images(self) -> List[CompressedImageInfo]:
         """Find images that can be compressed further.
@@ -175,13 +175,7 @@ class ImageCompressor:
         """
         # Remove existing output directory and create a new one.
         if os.path.exists(self.output_dir):
-            try:
-                shutil.rmtree(self.output_dir, ignore_errors=True)
-            except OSError as e:
-                logging.error(
-                    '[ERROR]: %s occurred on file %s',
-                    e, self.output_dir
-                )
+            shutil.rmtree(self.output_dir, ignore_errors=True)
 
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -204,27 +198,25 @@ class ImageCompressor:
 
         Returns: int. Exit code.
         """
-        compressed_images = self.find_compressible_images()
+        image_compressibility_dicts = self.find_compressible_images()
 
-        if compressed_images:
+        if image_compressibility_dicts:
             space_saved = sum(
                 image['original_size'] - image['new_size']
-                for image in compressed_images
+                for image in image_compressibility_dicts
             )
 
             print(
-                f'{len(compressed_images)} images '
+                f'{len(image_compressibility_dicts)} images '
                 'could be compressed further:\n'
             )
-            for image in compressed_images:
+            for image in image_compressibility_dicts:
                 print('    ', image['path'])
 
             print(f'\nTotal space saved: {space_saved} bytes\n')
 
-            i = 0
-            while i < 10:
-                self.compress_images(compressed_images)
-                i += 1
+            for _ in range(10):
+                self.compress_images(image_compressibility_dicts)
 
             print(
                 '\nCompressed images have been saved '

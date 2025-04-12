@@ -1501,7 +1501,7 @@ class ModifiableUserData:
             raise Exception(
                 'Invalid version %s received. At present we can only process v1'
                 ' to v%s modifiable user data.' % (
-                  data_schema_version, cls.CURRENT_SCHEMA_VERSION)
+                data_schema_version, cls.CURRENT_SCHEMA_VERSION)
             )
 
         return cls.from_dict(raw_user_data_dict)
