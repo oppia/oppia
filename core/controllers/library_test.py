@@ -501,7 +501,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
 
-        # Using 7 instead of 1 due to fuzzy match allowing broader 
+        # Using 7 instead of 1 due to fuzzy match allowing broader
         # category inclusion across different headers.
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 7)
