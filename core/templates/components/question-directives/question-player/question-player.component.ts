@@ -463,13 +463,13 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     let iconHtml = '';
     if (actionButtonType === 'REVIEW_LOWEST_SCORED_SKILL') {
       iconHtml =
-        '<i class="material-icons mat-icon-18 ' + 'action-button-icon">&#xe869</i>';
+        '<i class="material-icons md-18 ' + 'action-button-icon">&#xe869</i>';
     } else if (actionButtonType === 'RETRY_SESSION') {
       iconHtml =
-        '<i class="material-icons mat-icon-18 ' + 'action-button-icon">&#xE5D5</i>';
+        '<i class="material-icons md-18 ' + 'action-button-icon">&#xE5D5</i>';
     } else if (actionButtonType === 'DASHBOARD') {
       iconHtml =
-        '<i class="material-icons mat-icon-18 ' + 'action-button-icon">&#xE88A</i>';
+        '<i class="material-icons md-18 ' + 'action-button-icon">&#xE88A</i>';
     }
     return this._sanitizer.sanitize(SecurityContext.HTML, iconHtml) as string;
   }
