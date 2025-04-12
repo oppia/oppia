@@ -452,7 +452,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
 
         # Due to fuzzy matching logic in the search functionality,
-        # more results are included under top-rated explorations, which 
+        # more results are included under top-rated explorations, which
         # increases the number of categories returned. Hence, expecting 7 here.
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 7)
@@ -501,7 +501,8 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
 
-        # Using 7 instead of 1 due to fuzzy match allowing broader category inclusion.
+        # Using 7 instead of 1 due to fuzzy match allowing broader 
+        # category inclusion across different headers.
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 7)
         self.assertDictContainsSubset({
