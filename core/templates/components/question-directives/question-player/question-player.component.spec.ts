@@ -279,12 +279,12 @@ describe('Question Player Component', () => {
   it('should get html for action button icon', () => {
     expect(
       component.getActionButtonIconHtml('REVIEW_LOWEST_SCORED_SKILL').toString()
-    ).toBe('<i class="material-icons mat-icon-18 action-button-icon">&#59497;</i>');
+    ).toBe('<i class="material-icons md-18 action-button-icon">&#59497;</i>');
     expect(component.getActionButtonIconHtml('RETRY_SESSION').toString()).toBe(
-      '<i class="material-icons mat-icon-18 action-button-icon">&#58837;</i>'
+      '<i class="material-icons md-18 action-button-icon">&#58837;</i>'
     );
     expect(component.getActionButtonIconHtml('DASHBOARD').toString()).toBe(
-      '<i class="material-icons mat-icon-18 action-button-icon">&#59530;</i>'
+      '<i class="material-icons md-18 action-button-icon">&#59530;</i>'
     );
   });
 
