@@ -274,12 +274,6 @@ describe('Exploration editor tab component', () => {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -384,20 +378,6 @@ describe('Exploration editor tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {
-                en: {
-                  filename: 'myfile2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2,
-                },
-              },
-            },
-          },
         },
         'Second State': {
           classifier_model_id: null,
@@ -405,13 +385,6 @@ describe('Exploration editor tab component', () => {
           content: {
             content_id: 'content',
             html: 'Second State Content',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-            },
           },
           interaction: {
             id: 'TextInput',

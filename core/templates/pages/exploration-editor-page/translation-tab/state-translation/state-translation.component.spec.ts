@@ -251,9 +251,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -441,28 +438,6 @@ describe('State translation component', () => {
         } as FeatureStatusChecker);
 
         expect(component.isVoiceoverContributionEnabled()).toBeTrue();
-      });
-
-      it('should disable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(
-          component.isVoiceoverContributionWithAccentEnabled()
-        ).toBeFalse();
-      });
-
-      it('should enable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
       });
 
       it(
@@ -960,9 +935,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -1417,9 +1389,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -1484,9 +1453,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -2133,9 +2099,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -2169,9 +2132,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 

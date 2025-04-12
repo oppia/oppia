@@ -104,7 +104,10 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     contentId: string,
     languageCode: string
   ): void {
-    if (this.entityVoiceoversService.languageCode === languageCode) {
+    let canShowModal =
+      this.entityVoiceoversService.languageCode === languageCode &&
+      this.entityVoiceoversService.getAllVoiceovers().length > 0;
+    if (canShowModal) {
       this.ngbModal
         .open(MarkAudioAsNeedingUpdateModalComponent, {
           backdrop: 'static',

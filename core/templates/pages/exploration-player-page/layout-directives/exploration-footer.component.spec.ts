@@ -494,11 +494,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,
@@ -585,11 +580,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,
@@ -710,15 +700,6 @@ describe('ExplorationFooterComponent', () => {
         states: {
           Start: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -791,11 +772,6 @@ describe('ExplorationFooterComponent', () => {
           },
           End: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -820,15 +796,6 @@ describe('ExplorationFooterComponent', () => {
           },
           Mid: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -986,11 +953,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
@@ -1120,12 +1082,6 @@ describe('ExplorationFooterComponent', () => {
         },
         linked_skill_id: null,
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
         card_is_checkpoint: true,
       })
@@ -1176,7 +1132,6 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,
@@ -1269,7 +1224,6 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,

@@ -88,12 +88,6 @@ const dummyExplorationBackendDict = {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -128,12 +122,6 @@ const dummyExplorationBackendDict = {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],

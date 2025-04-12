@@ -143,10 +143,7 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
-  _getContentAvailabilityStatus(
-    stateName: string,
-    contentId: string
-  ): AvailabilityStatus {
+  _getContentAvailabilityStatus(contentId: string): AvailabilityStatus {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
@@ -226,10 +223,8 @@ export class TranslationStatusService implements OnInit {
         }
 
         allContentIds.forEach(contentId => {
-          let availabilityStatus = this._getContentAvailabilityStatus(
-            stateName,
-            contentId
-          );
+          let availabilityStatus =
+            this._getContentAvailabilityStatus(contentId);
           if (!availabilityStatus.available) {
             noTranslationCount++;
             if (

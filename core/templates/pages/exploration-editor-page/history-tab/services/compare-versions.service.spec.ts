@@ -91,12 +91,6 @@ describe('Compare versions service', () => {
           content_id: 'content',
           html: stateDetail.contentStr,
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         interaction: {
           id: 'EndExploration',
           answer_groups: [],

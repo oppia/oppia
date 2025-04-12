@@ -159,15 +159,6 @@ describe('Question player engine service ', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 45,
       next_content_id_index: 5,
@@ -237,15 +228,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'en',
@@ -313,15 +295,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'br',
@@ -389,15 +362,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'ab',

@@ -155,6 +155,17 @@ export class EntityVoiceoversService {
     return contentIdToVoiceovers;
   }
 
+  getAllVoiceovers(): Voiceover[] {
+    let allVoiceovers: Voiceover[] = [];
+    let allContentIdsToVoiceovers = this.getAllContentIdsToVoiceovers();
+    for (let contentId in allContentIdsToVoiceovers) {
+      allVoiceovers = allVoiceovers.concat(
+        allContentIdsToVoiceovers[contentId]
+      );
+    }
+    return allVoiceovers;
+  }
+
   markManualVoiceoverAsNeedingUpdate(contentId: string): void {
     let allEntityVoiceovers = Object.values(
       this.languageAccentCodeToEntityVoiceovers
@@ -175,6 +186,15 @@ export class EntityVoiceoversService {
         entityVoiceovers.removeVoiceover(contentId);
       }
     }
+  }
+
+  toggleManualVoiceoverNeedsUpdate(languageAccentCode, contentId): void {
+    let entityVoiceovers =
+      this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
+    entityVoiceovers.toggleManualVoiceoverNeedsUpdate(contentId);
+
+    this.languageAccentCodeToEntityVoiceovers[languageAccentCode] =
+      entityVoiceovers;
   }
 
   get onVoiceoverLoad(): EventEmitter<void> {

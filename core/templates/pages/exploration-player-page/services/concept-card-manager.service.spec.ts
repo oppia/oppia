@@ -193,11 +193,6 @@ describe('ConceptCardManager service', () => {
   it('should return if concept card for the state with the new name exists', fakeAsync(() => {
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,

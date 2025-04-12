@@ -134,9 +134,6 @@ export class ExplorationStatesService {
     content: (content: SubtitledHtml): SubtitledHtmlBackendDict => {
       return content.toBackendDict();
     },
-    recorded_voiceovers: (recordedVoiceovers: RecordedVoiceovers) => {
-      return recordedVoiceovers.toBackendDict();
-    },
     default_outcome: (defaultOutcome: Outcome | null) => {
       if (defaultOutcome) {
         return defaultOutcome.toBackendDict();
@@ -184,7 +181,6 @@ export class ExplorationStatesService {
       'confirmedUnclassifiedAnswers',
     ],
     content: ['content'],
-    recorded_voiceovers: ['recordedVoiceovers'],
     linked_skill_id: ['linkedSkillId'],
     default_outcome: ['interaction', 'defaultOutcome'],
     param_changes: ['paramChanges'],
@@ -365,10 +361,6 @@ export class ExplorationStatesService {
   ): SubtitledHtml;
   getStatePropertyMemento(
     stateName: string,
-    backendName: 'recorded_voiceovers'
-  ): RecordedVoiceovers;
-  getStatePropertyMemento(
-    stateName: string,
     backendName: 'solicit_answer_details'
   ): boolean;
   getStatePropertyMemento(
@@ -451,11 +443,6 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: 'solution',
     newValue: SubtitledHtml
-  ): void;
-  saveStateProperty(
-    stateName: string,
-    backendName: 'recorded_voiceovers',
-    newValue: RecordedVoiceovers
   ): void;
   saveStateProperty(
     stateName: string,
@@ -747,21 +734,6 @@ export class ExplorationStatesService {
 
   saveSolution(stateName: string, newSolution: SubtitledHtml): void {
     this.saveStateProperty(stateName, 'solution', newSolution);
-  }
-
-  getRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
-    return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
-  }
-
-  saveRecordedVoiceovers(
-    stateName: string,
-    newRecordedVoiceovers: RecordedVoiceovers
-  ): void {
-    this.saveStateProperty(
-      stateName,
-      'recorded_voiceovers',
-      newRecordedVoiceovers
-    );
   }
 
   getSolicitAnswerDetailsMemento(stateName: string): boolean {

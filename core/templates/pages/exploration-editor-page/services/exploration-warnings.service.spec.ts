@@ -115,9 +115,6 @@ describe('Exploration Warnings Service', () => {
             content_id: 'content',
             html: '{{HtmlValue}}',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],
@@ -222,9 +219,6 @@ describe('Exploration Warnings Service', () => {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
           },
           param_changes: [],
           interaction: {
@@ -350,9 +344,6 @@ describe('Exploration Warnings Service', () => {
             content_id: 'content',
             html: '{{HtmlValue}}',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],
@@ -421,9 +412,6 @@ describe('Exploration Warnings Service', () => {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
           },
           param_changes: [],
           interaction: {
@@ -539,9 +527,6 @@ describe('Exploration Warnings Service', () => {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
           },
           param_changes: [],
           interaction: {
@@ -678,12 +663,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -799,9 +778,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -867,9 +843,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: 'content',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -993,9 +966,6 @@ describe('Exploration Warnings Service', () => {
             content_id: 'content',
             html: '{{HtmlValue}}',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],
@@ -1077,12 +1047,6 @@ describe('Exploration Warnings Service', () => {
             content_id: 'content',
             html: '{{HtmlValue}}',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],
@@ -1141,9 +1105,6 @@ describe('Exploration Warnings Service', () => {
           content: {
             content_id: 'content',
             html: '{{HtmlValue}}',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
           },
           param_changes: [],
           interaction: {
@@ -1213,9 +1174,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1299,9 +1257,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1349,9 +1304,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1401,9 +1353,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1451,9 +1400,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1503,9 +1449,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1553,9 +1496,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1605,9 +1545,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1655,9 +1592,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1763,9 +1697,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1831,9 +1762,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1881,9 +1809,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -1933,9 +1858,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -1983,9 +1905,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -2035,9 +1954,6 @@ describe('Exploration Warnings Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -2085,9 +2001,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -2147,9 +2060,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {
@@ -2215,9 +2125,6 @@ describe('Exploration Warnings Service', () => {
             content: {
               content_id: 'content',
               html: '{{HtmlValue}}',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {},
             },
             param_changes: [],
             interaction: {

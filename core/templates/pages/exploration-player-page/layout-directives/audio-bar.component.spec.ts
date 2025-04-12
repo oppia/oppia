@@ -253,11 +253,10 @@ describe('Audio Bar Component', () => {
   });
 
   it('should check if the audio bar is available with enabled accent', () => {
-    component.languageAccentDecriptions = ['English (India)', 'English (US)'];
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
+    component.languageAccentDecriptions = [
+      'English (India)',
+      'English (United States)',
+    ];
 
     let result = component.isAudioBarAvailable();
     expect(result).toBe(true);
@@ -393,42 +392,8 @@ describe('Audio Bar Component', () => {
     }
   );
 
-  it('should check if the audio is available in selected language', () => {
-    let audioTranslation = {
-      en: Voiceover.createFromBackendDict({
-        filename: 'audio-en.mp3',
-        file_size_bytes: 0.5,
-        needs_update: false,
-        duration_secs: 0.5,
-      }),
-      es: Voiceover.createFromBackendDict({
-        filename: 'audio-es.mp3',
-        file_size_bytes: 0.5,
-        needs_update: false,
-        duration_secs: 0.5,
-      }),
-    };
-    spyOn(
-      audioTranslationManagerService,
-      'getCurrentAudioTranslations'
-    ).and.returnValue(audioTranslation);
-    // Setting selected language to be 'en'.
-    spyOn(
-      audioTranslationLanguageService,
-      'getCurrentAudioLanguageCode'
-    ).and.returnValue('en');
-
-    let result = component.isAudioAvailableInCurrentLanguage();
-    expect(result).toBe(true);
-  });
-
-  it('should check if the audio is available in selected language with accent feature flag enabled', () => {
+  it('should check if the audio is available in selected language-accent', () => {
     component.voiceoverToBePlayed = undefined;
-
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
 
     let result = component.isAudioAvailableInCurrentLanguage();
     expect(result).toBe(false);
@@ -687,10 +652,6 @@ describe('Audio Bar Component', () => {
           duration_secs: 0.5,
         }),
       };
-      spyOn(
-        component,
-        'isVoiceoverContributionWithAccentEnabled'
-      ).and.returnValue(true);
 
       component.voiceoverToBePlayed = Voiceover.createFromBackendDict({
         filename: 'audio-en.mp3',
@@ -717,10 +678,7 @@ describe('Audio Bar Component', () => {
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
       // Settings audio tracks loaded to be false.
       spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
-      let loadAndPlaySpy = spyOn(
-        component,
-        'loadAndPlayAudioTranslation'
-      ).and.returnValue();
+      let loadAndPlaySpy = spyOn(component, 'loadAndPlayAudioTranslation');
       spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
         'Start'
       );
@@ -874,10 +832,7 @@ describe('Audio Bar Component', () => {
         duration_secs: 0.5,
       });
       spyOn(component, 'getVoiceoverInCurrentLanguage');
-      spyOn(
-        component,
-        'isVoiceoverContributionWithAccentEnabled'
-      ).and.returnValue(true);
+
       spyOn(audioTranslationManagerService, 'getCurrentAudioTranslations');
       // Setting selected language to be 'en'.
       spyOn(audioTranslationLanguageService, 'getCurrentAudioLanguageCode');

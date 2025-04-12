@@ -91,15 +91,6 @@ describe('Exploration engine service ', () => {
       states: {
         Start: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -172,11 +163,6 @@ describe('Exploration engine service ', () => {
         },
         End: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -201,15 +187,6 @@ describe('Exploration engine service ', () => {
         },
         Mid: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,

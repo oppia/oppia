@@ -167,9 +167,6 @@ describe('Exploration editor page component', () => {
           id: null,
           hints: [],
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
       },
       Final: {
         param_changes: [],
@@ -193,9 +190,6 @@ describe('Exploration editor page component', () => {
           confirmed_unclassified_answers: [],
           id: null,
           hints: [],
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
         },
       },
     },
