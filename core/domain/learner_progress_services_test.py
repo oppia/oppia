@@ -675,35 +675,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_exploration_as_completed(
             self.viewer_id, self.EXP_ID_8)
 
-        self.assertEqual(len(
+        self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
-                self.viewer_id)), 0)
-        self.assertEqual(len(
+                self.viewer_id), [])
+        self.assertEqual(
             learner_progress_services.get_all_learnt_topic_ids(
-                self.viewer_id)), 0)
-        self.assertEqual(len(
+                self.viewer_id), [])
+        self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id)), 1)
-
-        learner_progress_services.remove_topic_from_learnt_list(
-            self.viewer_id, self.TOPIC_ID
-        )
-        learner_progress_services.remove_story_from_completed_list(
-            self.viewer_id, self.NEW_STORY_ID
-        )
+                self.viewer_id), [self.TOPIC_ID])
 
         learner_progress_services.mark_exploration_as_completed(
             self.viewer_id, self.EXP_ID_9)
 
-        self.assertEqual(len(
+        self.assertEqual(
             learner_progress_services.get_all_completed_story_ids(
-                self.viewer_id)), 1)
-        self.assertEqual(len(
+                self.viewer_id), [self.NEW_STORY_ID])
+        self.assertEqual(
             learner_progress_services.get_all_learnt_topic_ids(
-                self.viewer_id)), 1)
-        self.assertEqual(len(
+                self.viewer_id), [self.TOPIC_ID])
+        self.assertEqual(
             learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id)), 0)
+                self.viewer_id), [])
 
     def test_mark_collection_as_completed(self) -> None:
         self.assertEqual(
