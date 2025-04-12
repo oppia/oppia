@@ -90,7 +90,7 @@ label {
   max-width: 100%;
 }
 
-mat-input-group.md-default-theme label {
+.mat-input-group label {
   font-size: 16px;
   font-weight: 200;
   margin-bottom: 0;
@@ -155,7 +155,7 @@ why they need to be overriden.  */
   color: #009688;
 }
 
-.md-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
+.mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
 .mat-button.mat-fab {
   box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
 }
@@ -231,18 +231,18 @@ why they need to be overriden.  */
   padding-top: 12px;
 }
 
-.mat-button.mat-default-theme.oppia-learner-reload-image-button:focus,
-.mat-button.mat-default-theme.oppia-learner-reload-image-button:hover {
+.mat-button.oppia-learner-reload-image-button:focus,
+.mat-button.oppia-learner-reload-image-button:hover {
   background-color: rgba(224,242,241,1);
   text-decoration: none;
 }
 
-.mat-button.md-default-theme.oppia-learner-confirm-button:focus,
-.mat-button.md-default-theme.oppia-learner-confirm-button:hover,
-.mat-button.md-default-theme.oppia-learner-got-it-button:focus,
-.mat-button.md-default-theme.oppia-learner-got-it-button:hover,
-.mat-button.md-default-theme.oppia-learner-hint-solution-button:focus,
-.mat-button.md-default-theme.oppia-learner-hint-solution-button:hover {
+.mat-button.oppia-learner-confirm-button:focus,
+.mat-button.oppia-learner-confirm-button:hover,
+.mat-button.oppia-learner-got-it-button:focus,
+.mat-button.oppia-learner-got-it-button:hover,
+.mat-button.oppia-learner-hint-solution-button:focus,
+.mat-button.oppia-learner-hint-solution-button:hover {
   background-color: #115fd4;
   text-decoration: none;
 }
@@ -261,19 +261,19 @@ why they need to be overriden.  */
   line-height: 1;
   vertical-align: middle;
 }
-.material-icons.md-18 {
+.material-icons.mat-icon-18 {
   font-size: 18px;
 }
-.material-icons.md-32 {
+.material-icons.mat-icon-32 {
   font-size: 32px;
 }
-.material-icons.md-40 {
+.material-icons.mat-icon-40 {
   font-size: 40px;
 }
-.material-icons.md-100 {
+.material-icons.mat-icon-100 {
   font-size: 100px;
 }
-.material-icons.md-dark {
+.material-icons.mat-icon-dark {
   color: rgba(0, 0, 0, 0.54);
 }
 

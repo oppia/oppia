@@ -20,8 +20,8 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
   </div>
 </div>
 <div (click)="toggleMisconceptionFeedbackUsage()" (keydown.space)="toggleMisconceptionFeedbackUsage()" tabindex="0" class="misconception-feedback-usage-container">
-  <i *ngIf="!misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE835;</i>
-  <i *ngIf="misconceptionFeedbackIsUsed" class="material-icons md-18 misconception-feedback-usage-checkbox">&#xE834;</i>
+  <i *ngIf="!misconceptionFeedbackIsUsed" class="material-icons mat-icon-18 misconception-feedback-usage-checkbox">&#xE835;</i>
+  <i *ngIf="misconceptionFeedbackIsUsed" class="material-icons mat-icon-18 misconception-feedback-usage-checkbox">&#xE834;</i>
   Use misconception feedback as answer group feedback.
 </div>
 <style>
