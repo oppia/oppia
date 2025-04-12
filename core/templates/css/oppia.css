@@ -806,6 +806,13 @@ textarea {
     height: 270px;
   }
 }
+/*
+  This is needed for proper display of tabs. See
+  https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
+*/
+.navbar-nav {
+  cursor: pointer;
+}
 
 .navbar {
   border: 0;
