@@ -261,19 +261,19 @@ why they need to be overriden.  */
   line-height: 1;
   vertical-align: middle;
 }
-.material-icons.mat-icon-18 {
+.material-icons.md-18 {
   font-size: 18px;
 }
-.material-icons.mat-icon-32 {
+.material-icons.md-32 {
   font-size: 32px;
 }
-.material-icons.mat-icon-40 {
+.material-icons.md-40 {
   font-size: 40px;
 }
-.material-icons.mat-icon-100 {
+.material-icons.md-100 {
   font-size: 100px;
 }
-.material-icons.mat-icon-dark {
+.material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
 
