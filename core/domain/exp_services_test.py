@@ -38,7 +38,6 @@ from core.domain import opportunity_domain
 from core.domain import opportunity_services
 from core.domain import param_domain
 from core.domain import rating_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -5944,10 +5943,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         # Owner makes viewer a viewer and editor an editor.
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.viewer_id,
-            rights_domain.ROLE_VIEWER)
+            exp_domain.ROLE_VIEWER)
         rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.editor_id,
-            rights_domain.ROLE_EDITOR)
+            exp_domain.ROLE_EDITOR)
 
         # Check that owner and editor may edit, but not viewer.
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID)
@@ -6219,7 +6218,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'Algebra', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC,
+                exp_domain.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [], [self.albert_id],
                 {self.albert_id: 1},
                 self.EXPECTED_VERSION_2,
@@ -6254,7 +6253,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'Algebra', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PRIVATE, False,
+                exp_domain.ACTIVITY_STATUS_PRIVATE, False,
                 [self.albert_id], [], [], [], [self.albert_id, self.bob_id],
                 {self.albert_id: 1, self.bob_id: 1}, self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -6265,7 +6264,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'Algebra', 'An objective', 'en', [],
                 feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC,
+                exp_domain.ACTIVITY_STATUS_PUBLIC,
                 False, [self.albert_id], [], [], [], [self.albert_id],
                 {self.albert_id: 1}, self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -8250,7 +8249,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             'exp_id', self.admin_id, title='title')
 
         rights_manager.assign_role_for_exploration(
-            self.admin, 'exp_id', self.editor_id, rights_domain.ROLE_EDITOR)
+            self.admin, 'exp_id', self.editor_id, exp_domain.ROLE_EDITOR)
 
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.editor_id, 'exp_id')

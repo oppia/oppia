@@ -174,6 +174,12 @@ MATH_INTERACTION_DEPRECATED_RULES: Final = [
 ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
 
+ROLE_OWNER = feconf.ROLE_OWNER
+ROLE_EDITOR = feconf.ROLE_EDITOR
+ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
+ROLE_VIEWER = feconf.ROLE_VIEWER
+ROLE_NONE = feconf.ROLE_NONE
+
 
 def clean_math_expression(math_expression: str) -> str:
     """Cleans a given math expression and formats it so that it is compatible
@@ -6184,7 +6190,12 @@ class ExplorationSummary:
         self.contributor_ids = list(self.contributors_summary.keys())
 
 
-class ExplorationRights:
+def get_activity_rights_class():
+    from core.domain.rights_domain import ActivityRights
+    return ActivityRights
+
+
+class ExplorationRights(get_activity_rights_class()):
     """Domain object for an Oppia exploration rights."""
 
     def __init__(
@@ -6227,16 +6238,18 @@ class ExplorationRights:
                 of this exploration.
             deleted: bool. Whether the exploration is marked as deleted.
         """
-        self.id = exploration_id
-        self.owner_ids = owner_ids
-        self.editor_ids = editor_ids
-        self.voice_artist_ids = voice_artist_ids
-        self.viewer_ids = viewer_ids
-        self.community_owned = community_owned
-        self.cloned_from = cloned_from
-        self.viewable_if_private = viewable_if_private
-        self.first_published_msec = first_published_msec
-        self.status = status
+        super().__init__(
+            exploration_id,
+            owner_ids,
+            editor_ids,
+            voice_artist_ids,
+            viewer_ids,
+            community_owned,
+            cloned_from,
+            status,
+            viewable_if_private,
+            first_published_msec
+        )
         self.deleted = deleted
 
     def validate(self) -> None:
@@ -6316,55 +6329,7 @@ class ExplorationRights:
                     f'received {self.first_published_msec}'
                 )
 
-        if self.community_owned:
-            if (self.owner_ids or self.editor_ids or self.voice_artist_ids or
-                    self.viewer_ids):
-                raise utils.ValidationError(
-                    'Community-owned explorations should have no owners, '
-                    'editors, voice artists or viewers specified.')
-
-        if self.community_owned and self.status == ACTIVITY_STATUS_PRIVATE:
-            raise utils.ValidationError(
-                'Community-owned explorations cannot be private.')
-
-        if self.status != ACTIVITY_STATUS_PRIVATE and self.viewer_ids:
-            raise utils.ValidationError(
-                'Public explorations should have no viewers specified.')
-
-        owner_editor = set(self.owner_ids) & set(self.editor_ids)
-        owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
-        owner_viewer = set(self.owner_ids) & set(self.viewer_ids)
-        editor_voice_artist = set(self.editor_ids) & set(self.voice_artist_ids)
-        editor_viewer = set(self.editor_ids) & set(self.viewer_ids)
-        voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
-        if owner_editor:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s' %
-                owner_editor)
-        if owner_voice_artist:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and a voice artist: %s' %
-                owner_voice_artist)
-        if owner_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an owner and a viewer: %s' %
-                owner_viewer)
-        if editor_voice_artist:
-            raise utils.ValidationError(
-                'A user cannot be both an editor and a voice artist: %s' %
-                editor_voice_artist)
-        if editor_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both an editor and a viewer: %s' %
-                editor_viewer)
-        if voice_artist_viewer:
-            raise utils.ValidationError(
-                'A user cannot be both a voice artist and a viewer: %s' %
-                voice_artist_viewer)
-
-        if not self.community_owned and len(self.owner_ids) == 0:
-            raise utils.ValidationError(
-                'Activity should have atleast one owner.')
+        super().validate()
 
 
 class ExplorationChangeMergeVerifier:
