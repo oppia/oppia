@@ -297,10 +297,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-property.service';
 import {
-  StateRecordedVoiceoversService,
-  // eslint-disable-next-line max-len
-} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import {
   StateSolicitAnswerDetailsService,
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
@@ -790,11 +786,6 @@ export class UpgradedServices {
       upgradedServices['AlertsService'],
       upgradedServices['UtilsService']
     );
-    upgradedServices['StateRecordedVoiceoversService'] =
-      new StateRecordedVoiceoversService(
-        upgradedServices['AlertsService'],
-        upgradedServices['UtilsService']
-      );
     upgradedServices['StateSolicitAnswerDetailsService'] =
       new StateSolicitAnswerDetailsService(
         upgradedServices['AlertsService'],

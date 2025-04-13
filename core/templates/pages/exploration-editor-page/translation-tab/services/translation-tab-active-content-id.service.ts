@@ -19,15 +19,11 @@
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationTabActiveContentIdService {
-  constructor(
-    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService
-  ) {}
+  constructor() {}
 
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
   // has not been set.

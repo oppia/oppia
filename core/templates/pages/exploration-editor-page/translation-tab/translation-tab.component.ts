@@ -29,7 +29,6 @@ import {JoyrideService} from 'ngx-joyride';
 import {Subscription} from 'rxjs';
 import {WelcomeTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {ContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
 import {LoaderService} from 'services/loader.service';
@@ -72,7 +71,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
     private stateEditorService: StateEditorService,
-    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,

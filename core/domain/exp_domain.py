@@ -131,6 +131,10 @@ CMD_EDIT_TRANSLATION: Final = 'edit_translation'
 # This takes additional 'content_id' parameters.
 CMD_REMOVE_TRANSLATIONS: Final = 'remove_translations'
 CMD_UPDATE_VOICEOVERS: Final = 'update_voiceovers'
+# This takes additional 'content_id' and 'language_code' parameters.
+CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE = 'mark_voiceovers_needs_update'
+# This takes additional 'content_id' and 'language_code' parameters.
+CMD_REMOVE_VOICEOVERS = 'remove_voiceovers'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY: Final = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -437,6 +441,20 @@ class ExplorationChange(change_domain.BaseChange):
         'allowed_values': {},
         'deprecated_values': {}
     }, {
+        'name': CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE,
+        'required_attribute_names': ['content_id', 'language_code'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    }, {
+        'name': CMD_REMOVE_VOICEOVERS,
+        'required_attribute_names': ['content_id', 'language_code'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
+    },{
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'state_name', 'new_value'],
