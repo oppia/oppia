@@ -26,18 +26,14 @@ from __future__ import annotations
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain.rights_domain import ActivityRights
+from core.domain import rights_domain
 
-from typing import (List, Optional)
+from typing import List, Optional
 
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-
-MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
@@ -51,7 +47,7 @@ ROLE_VIEWER = feconf.ROLE_VIEWER
 ROLE_NONE = feconf.ROLE_NONE
 
 
-class ExplorationRights(ActivityRights):
+class ExplorationRights(rights_domain.ActivityRights):
     """Domain object for an Oppia exploration rights."""
 
     def __init__(

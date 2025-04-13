@@ -50,22 +50,22 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_type_of_community_owned(
         self
     ) -> None:
-        self.exploration_rights.community_owned = "owned"  # type: ignore[assignment]
+        self.exploration_rights.community_owned = 'owned'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected community_owned to be bool, received owned'):
             self.exploration_rights.validate()
-    
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_type_of_owner_ids(self) -> None:
-        self.exploration_rights.owner_ids = "owner_id_1"  # type: ignore[assignment]
+        self.exploration_rights.owner_ids = 'owner_id_1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected owner_ids to be list, received owner_id_1'):
             self.exploration_rights.validate()
-    
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
@@ -75,17 +75,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected each id in owner_ids to be string, received 123'):
             self.exploration_rights.validate()
-    
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_type_of_editor_ids(self) -> None:
-        self.exploration_rights.editor_ids = "editor"  # type: ignore[assignment]
+        self.exploration_rights.editor_ids = 'editor'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected editor_ids to be list, received editor'):
             self.exploration_rights.validate()
-    
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
@@ -159,9 +159,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             'received "archived"'):
             self.exploration_rights.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_negative_first_published_msec(self) -> None:
         self.exploration_rights.first_published_msec = -123.456
         with self.assertRaisesRegex(
@@ -176,7 +173,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_validation_fails_with_non_float_first_published_msec(
         self
     ) -> None:
-        self.exploration_rights.first_published_msec = "123"  # type: ignore[assignment]
+        self.exploration_rights.first_published_msec = '123'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected first_published_msec to be a float, received 123'):
