@@ -42,7 +42,7 @@ if MYPY: # pragma: no cover
     models.Names.VOICEOVER])
 
 speech_synthesis_services = (
-    models.Registry.import_azure_speech_synthesis_services())
+    models.Registry.import_speech_synthesis_services())
 
 
 ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [

@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h5 class="modal-title">Unsaved Changes</h5>
+  <button type="button" class="close" aria-label="Close" (click)="cancel()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p>
+    Are you sure you want to exit the translation editor? There are unsaved changes.
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="confirm()">Discard changes</button>
+  <button class="btn btn-success" (click)="cancel()">Continue editing</button>
+</div>
