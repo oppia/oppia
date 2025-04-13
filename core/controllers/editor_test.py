@@ -378,6 +378,7 @@ class EditorTests(BaseEditorControllerTests):
             'new_value': 'Updated Title'
         }]
 
+        # Test with commit_message set to None
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -388,13 +389,29 @@ class EditorTests(BaseEditorControllerTests):
             csrf_token=csrf_token,
             expected_status_int=400
         )
-
         self.assertEqual(
             response['error'],
             'Exploration is public so expected a commit message but received '
             'none.'
         )
 
+        # Test without commit_message field
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'change_list': change_list
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Exploration is public so expected a commit message but received '
+            'none.'
+        )
+
+        # Test with a valid commit_message
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -404,9 +421,44 @@ class EditorTests(BaseEditorControllerTests):
             },
             csrf_token=csrf_token
         )
-
         updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
         self.assertEqual(updated_exploration.title, 'Updated Title')
+
+        self.logout()
+
+    def test_private_exploration_does_not_require_commit_message(
+        self
+    ) -> None:
+        """Test that private explorations do not require a commit message
+        when updated.
+        """
+        self.login(self.OWNER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, end_state_name='End State')
+
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'old_value': 'A title',
+            'new_value': 'Updated Title'
+        }]
+
+        # Test updating a private exploration without a commit message.
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'change_list': change_list
+            },
+            csrf_token=csrf_token
+        )
+        updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(updated_exploration.title, 'Updated Title')
+
         self.logout()
 
 
