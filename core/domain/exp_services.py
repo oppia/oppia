@@ -47,6 +47,7 @@ from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import exp_rights_domain
 from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
@@ -2230,7 +2231,7 @@ def regenerate_exploration_and_contributors_summaries(
 
 def update_exploration_summary(
     exploration: exp_domain.Exploration,
-    exp_rights: exp_domain.ExplorationRights,
+    exp_rights: exp_rights_domain.ExplorationRights,
     exp_summary: exp_domain.ExplorationSummary,
     skip_exploration_model_last_updated: bool = False
 ) -> exp_domain.ExplorationSummary:
@@ -2290,7 +2291,7 @@ def update_exploration_summary(
 
 def generate_new_exploration_summary(
     exploration: exp_domain.Exploration,
-    exp_rights: exp_domain.ExplorationRights
+    exp_rights: exp_rights_domain.ExplorationRights
 ) -> exp_domain.ExplorationSummary:
     """Generates a new exploration summary domain object from a given
     exploration and its rights.
@@ -2472,7 +2473,8 @@ def get_exploration_validation_error(
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     try:
         exploration.validate(
-            exploration_rights.status == exp_domain.ACTIVITY_STATUS_PUBLIC)
+            exploration_rights.status
+            == exp_rights_domain.ACTIVITY_STATUS_PUBLIC)
     except Exception as ex:
         return str(ex)
 
@@ -2520,7 +2522,7 @@ def revert_exploration(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     exploration_is_public = (
-        exploration_rights.status != exp_domain.ACTIVITY_STATUS_PRIVATE
+        exploration_rights.status != exp_rights_domain.ACTIVITY_STATUS_PRIVATE
     )
     exploration.validate(strict=exploration_is_public)
 
