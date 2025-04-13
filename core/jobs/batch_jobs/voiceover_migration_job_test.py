@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
@@ -506,6 +507,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
@@ -581,6 +585,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 model.voiceovers_mapping
             )
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_raise_exception_for_empty_accent_code(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
@@ -606,6 +613,9 @@ class AuditExplorationVoiceArtistLinkModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
