@@ -216,7 +216,7 @@
               [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
         Save
       </button>
-      <li ngbDropdown class="nav-item icon nav-list-item">
+      <li ngbDropdown class="dropdown icon nav-list-item">
         <ul ngbDropdownMenu class="oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
           <span class="oppia-editor-warnings-header">Please fix the errors below before saving</span>
           <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(platformParameter); index as index">
