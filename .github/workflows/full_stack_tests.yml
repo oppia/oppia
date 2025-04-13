@@ -84,6 +84,7 @@ jobs:
     steps:
       - name: Check for broken suites
         id: check_skip
+        # TODO(#22448): Remove once all suites are fixed.
         run: |
           broken_suites=("contributorDashboard" "contributorAdminDashboard" "explorationTranslationTab" "fileUploadFeatures")
           for suite in "${broken_suites[@]}"; do
@@ -178,6 +179,7 @@ jobs:
     steps:
       - name: Check for broken suites
         id: check_skip
+        # TODO(#22448): Remove once all suites are fixed.
         run: |
           broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "logged-out-user/play-through-lesson-while-getting-feedback-and-hints" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
           for suite in "${broken_suites[@]}"; do
