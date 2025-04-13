@@ -180,7 +180,7 @@ export class TranslationModalComponent {
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly wds: WindowDimensionsService,
-    private readonly translationValidationService: TranslationValidationService
+    private readonly translationValidationService: TranslationValidationService,
     private readonly windowRef: WindowRef
   ) {}
 
