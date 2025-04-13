@@ -151,11 +151,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             'Expected viewable_if_private to be boolean, received yes'):
             self.exploration_rights.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_status(self) -> None:
-        self.exploration_rights.status = 'archived'  # type: ignore[assignment]
+        self.exploration_rights.status = 'archived'
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected status to be either "private" or "public", '
