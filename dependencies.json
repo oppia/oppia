@@ -224,23 +224,6 @@
       "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
       "rootDirPrefix": "BootstrapCK4-Skin-",
       "targetDirPrefix": "ckeditor-bootstrapck-"
-    },
-    "uiCodemirror": {
-      "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
-      "downloadFormat": "zip",
-      "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
-      "rootDirPrefix": "ui-codemirror-",
-      "targetDir": "ui-codemirror-5d04fa"
-    },
-    "uiTree": {
-      "version": "",
-      "downloadFormat": "zip",
-      "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
-      "rootDirPrefix": "angular-ui-tree-master",
-      "targetDirPrefix": "ui-tree-2.22.6",
-      "bundle": {
-        "css": ["dist/angular-ui-tree.min.css"]
-      }
     }
   }
 }
