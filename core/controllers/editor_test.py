@@ -378,7 +378,7 @@ class EditorTests(BaseEditorControllerTests):
             'new_value': 'Updated Title'
         }]
 
-        # Test with commit_message set to None
+        # Test with commit_message set to None.
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -395,7 +395,7 @@ class EditorTests(BaseEditorControllerTests):
             'none.'
         )
 
-        # Test without commit_message field
+        # Test without commit_message field.
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -411,7 +411,7 @@ class EditorTests(BaseEditorControllerTests):
             'none.'
         )
 
-        # Test with a valid commit_message
+        # Test with a valid commit_message.
         response = self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
@@ -448,7 +448,7 @@ class EditorTests(BaseEditorControllerTests):
         }]
 
         # Test updating a private exploration without a commit message.
-        response = self.put_json(
+        self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
             {
                 'version': 1,
