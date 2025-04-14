@@ -839,14 +839,14 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # Search for collections containing 'Oppia'.
         col_ids = collection_services.get_collection_ids_matching_query(
             'Oppia', [], [])[0]
-        self.assertTrue(set([self.COL_ID_1, self.COL_ID_2])
-            .issubset(set(col_ids)))
+        self.assertTrue(set([self.COL_ID_1, self.COL_ID_2]).issubset(
+            set(col_ids)))
 
         # Search for collections containing 'Oppia' and 'Introduce'.
         col_ids = collection_services.get_collection_ids_matching_query(
             'Oppia Introduce', [], [])[0]
-        self.assertTrue(set([self.COL_ID_1, self.COL_ID_2])
-            .issubset(set(col_ids)))
+        self.assertTrue(set([self.COL_ID_1, self.COL_ID_2]).issubset(
+            set(col_ids)))
 
         # Search for collections containing 'England'.
         col_ids = collection_services.get_collection_ids_matching_query(
@@ -857,15 +857,15 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         col_ids = collection_services.get_collection_ids_matching_query(
             'in', [], [])[0]
         self.assertTrue(
-            set([self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
-                .issubset(set(col_ids)))
+            set([self.COL_ID_0, self.COL_ID_2, self.COL_ID_4]).issubset(
+                set(col_ids)))
 
         # Search for collections containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
         col_ids = collection_services.get_collection_ids_matching_query(
             'in', ['Architecture', 'Welcome'], [])[0]
-        self.assertTrue(set([self.COL_ID_0, self.COL_ID_2])
-            .issubset(set(col_ids)))
+        self.assertTrue(set([self.COL_ID_0, self.COL_ID_2]).issubset(
+            set(col_ids)))
 
     def test_collection_summaries_pagination_in_filled_search_results(
         self
