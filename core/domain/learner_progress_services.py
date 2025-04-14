@@ -199,7 +199,7 @@ def _save_completed_activities(
         'learnt_topic_ids': activities_completed.learnt_topic_ids
     }
 
-    completed_activities_model = (
+    completed_activities_model: Optional[user_models.CompletedActivitiesModel] = (
         user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)

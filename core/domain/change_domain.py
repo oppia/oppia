@@ -314,7 +314,7 @@ class BaseChange:
         # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
-    def __getattr__(self, name: str) -> str:
+    def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
         # Here we use cast because in method to_dict(), we are calling
@@ -327,6 +327,6 @@ class BaseChange:
         # here because that will be written after `self.__dict__[name]` and
         # never be executed, which causes backend coverage to throw error.
         try:
-            return cast(str, self.__dict__[name])
+            return self.__dict__[name]
         except KeyError as e:
             raise AttributeError(name) from e
