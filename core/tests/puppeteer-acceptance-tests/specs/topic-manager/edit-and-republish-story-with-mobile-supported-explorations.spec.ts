@@ -91,7 +91,7 @@ describe('Topic Manager', function () {
       'Algebra II'
     );
     // Setup is taking longer than the Default timeout of 300000 ms.
-  }, 360000);
+  }, 380000);
 
   it(
     'should be able to modify chapter details, preview the chapter card, add skills, and save the changes.',
