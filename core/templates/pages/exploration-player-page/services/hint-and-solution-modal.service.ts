@@ -21,7 +21,6 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DisplayHintModalComponent} from '../modals/display-hint-modal.component';
 import {DisplaySolutionInterstititalModalComponent} from '../modals/display-solution-interstitial-modal.component';
 import {DisplaySolutionModalComponent} from '../modals/display-solution-modal.component';
-import {MultipleChoiceInputSelectionClearService} from './multiple-choice-input-interaction-clear.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +28,6 @@ import {MultipleChoiceInputSelectionClearService} from './multiple-choice-input-
 export class HintAndSolutionModalService {
   constructor(
     private ngbModal: NgbModal,
-    private multipleChoiceInputSelectionClearService: MultipleChoiceInputSelectionClearService
   ) {}
 
   displayHintModal(index: number): NgbModalRef {
@@ -41,7 +39,6 @@ export class HintAndSolutionModalService {
   }
 
   displaySolutionModal(): NgbModalRef {
-    this.multipleChoiceInputSelectionClearService.triggerClearSelection();
     return this.ngbModal.open(DisplaySolutionModalComponent, {
       backdrop: 'static',
     });

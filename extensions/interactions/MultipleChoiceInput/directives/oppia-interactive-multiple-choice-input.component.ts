@@ -34,10 +34,8 @@ import {
   MultipleChoiceInputOrderedChoicesService,
   ChoiceWithIndex,
 } from './multiple-choice-input-ordered-choices-service';
-import {Subscription} from 'rxjs';
 
 import '../static/multiple_choice_input.css';
-import {MultipleChoiceInputSelectionClearService} from 'pages/exploration-player-page/services/multiple-choice-input-interaction-clear.service';
 
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
@@ -52,7 +50,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;
-  subscription!: Subscription;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -62,7 +59,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService,
-    private selectionService: MultipleChoiceInputSelectionClearService
   ) {}
 
   private getAttrs() {
@@ -149,13 +145,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       () => this.submitAnswer(),
       () => this.validate()
     );
-    this.subscription = this.selectionService.clearSelection$.subscribe(
-      (clear: boolean) => {
-        if (clear) {
-          this.clearSelection();
-        }
-      }
-    );
   }
 
   selectAnswer(event: MouseEvent, answer: string): void {
@@ -195,21 +184,5 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       this.answer,
       this.multipleChoiceInputRulesService
     );
-  }
-
-  clearSelection(): void {
-    // The radio buttons become unselected when the solution modal is open.
-    var selectedElement = document.querySelector(
-      'button.multiple-choice-option.selected'
-    );
-    if (selectedElement) {
-      selectedElement.classList.remove('selected');
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
   }
 }
