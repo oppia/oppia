@@ -26,51 +26,36 @@ jobs:
         with:
           script: |
             const { google } = require('@googleapis/sheets');
-
-
             const auth = new google.auth.GoogleAuth({
               scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
             });
-
             const authClient = await auth.getClient();
-
             const sheets = google.sheets({ version: 'v4', auth: authClient });
-
 
             const response = await sheets.spreadsheets.values.get({
               spreadsheetId: process.env.SPREADSHEET_ID,
               range: 'Usernames!A:A',
             });
-
-
             const username = process.env.USERNAME.toLowerCase();
-
             const rows = response.data.values || [];
-
             const hasSignedCla = rows.some(row => row[0].toLowerCase() ===
             username);
 
-
             core.setOutput('has-signed-cla', hasSignedCla);
-
             console.log(`User ${username} has ${hasSignedCla ? '' : 'not
             '}signed the CLA`);
+
       - name: Remove assignee and notify if CLA not signed
         if: steps.check-cla.outputs.has-signed-cla == 'false'
         uses: actions/github-script@v6
         with:
-          script: >
+          script: |
             const issue = context.payload.issue;
-
             const assignee = context.payload.assignee;
-
-
             if (!issue || !assignee) {
               core.setFailed('Invalid event payload');
               return;
             }
-
-
             const linkToCla =
             '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
 
@@ -86,16 +71,12 @@ jobs:
               issue_number: issue.number,
               body: commentBody
             });
-
-
             await github.rest.issues.removeAssignees({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue.number,
               assignees: [assignee.login]
             });
-
-
             console.log(`Removed assignee ${assignee.login} from issue
             #${issue.number} due to unsigned CLA`);
       - name: Report failure
