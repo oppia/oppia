@@ -810,7 +810,7 @@ textarea {
   This is needed for proper display of tabs. See
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
-.navbar-nav {
+.navbar-nav, .pagination {
   cursor: pointer;
 }
 
@@ -869,6 +869,11 @@ textarea {
   right: 0;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.navbar-light .dropdown-menu {
+  background: #fff;
+  margin-top: 0;
 }
 
 .dropup .dropdown-menu,
@@ -967,11 +972,6 @@ textarea {
   background: #00645c;
   height: 56px;
   width: 100%;
-}
-
-.navbar-light {
-  background: #fff;
-  margin-top: 0;
 }
 
 /* In Bootstrap, the link at the top of the default dropdown menu cannot be
