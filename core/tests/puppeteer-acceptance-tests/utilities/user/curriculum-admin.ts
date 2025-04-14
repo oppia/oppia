@@ -221,6 +221,13 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const rteSelector = '.e2e-test-rte';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -625,6 +632,57 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Updates a rubric.
+   * @param {string} difficulty - The difficulty level to update.
+   * @param {string} explanation - The explanation to update.
+   */
+  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    let difficultyValue: string;
+    switch (difficulty) {
+      case 'Easy':
+        difficultyValue = '0';
+        break;
+      case 'Medium':
+        difficultyValue = '1';
+        break;
+      case 'Hard':
+        difficultyValue = '2';
+        break;
+      default:
+        throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+    await this.waitForElementToBeClickable(selectRubricDifficultySelector);
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.type(rteSelector, explanation);
+    await this.clickOn(saveRubricExplanationButton);
+  }
+
+  /**
+   * Publishes an updated skill.
+   * @param {string} updateMessage - The update message.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(saveOrPublishSkillSelector, {
+      visible: true,
+    });
+    await this.clickOn(saveOrPublishSkillSelector);
+
+    await this.page.waitForSelector(commitMessageInputSelector, {
+      visible: true,
+    });
+    await this.type(commitMessageInputSelector, updateMessage);
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(closeSaveModalButtonSelector);
+    showMessage('Skill updated successful');
   }
 
   /**
