@@ -24,7 +24,6 @@
  */
 export enum FeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
-  DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
   ShowTranslationSize = 'show_translation_size',
@@ -44,6 +43,7 @@ export enum FeatureNames {
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   LabelAccentToVoiceArtist = 'label_accent_to_voice_artist',
+  ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
 }
 
 export interface FeatureStatusSummaryBackendDict {
