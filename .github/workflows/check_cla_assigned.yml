@@ -1,0 +1,106 @@
+name: Check Issue Assignee CLA
+on:
+  issues:
+    types:
+      - assigned
+  push:
+    branches:
+      - issue#21643-cla
+permissions: read-all
+jobs:
+  check-cla:
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Check CLA signature
+        id: check-cla
+        uses: actions/github-script@v6
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          SPREADSHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
+          USERNAME: '${{ github.event.assignee.login }}'
+        with:
+          script: |
+            const { google } = require('@googleapis/sheets');
+
+
+            const auth = new google.auth.GoogleAuth({
+              scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
+            });
+
+            const authClient = await auth.getClient();
+
+            const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+
+            const response = await sheets.spreadsheets.values.get({
+              spreadsheetId: process.env.SPREADSHEET_ID,
+              range: 'Usernames!A:A',
+            });
+
+
+            const username = process.env.USERNAME.toLowerCase();
+
+            const rows = response.data.values || [];
+
+            const hasSignedCla = rows.some(row => row[0].toLowerCase() ===
+            username);
+
+
+            core.setOutput('has-signed-cla', hasSignedCla);
+
+            console.log(`User ${username} has ${hasSignedCla ? '' : 'not
+            '}signed the CLA`);
+      - name: Remove assignee and notify if CLA not signed
+        if: steps.check-cla.outputs.has-signed-cla == 'false'
+        uses: actions/github-script@v6
+        with:
+          script: >
+            const issue = context.payload.issue;
+
+            const assignee = context.payload.assignee;
+
+
+            if (!issue || !assignee) {
+              core.setFailed('Invalid event payload');
+              return;
+            }
+
+
+            const linkToCla =
+            '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
+
+            const commentBody = 'Hi @' + assignee.login + ', you need to sign
+            the ' +
+              'CLA before you can get assigned to issues. Follow the instructions ' +
+              linkToCla + ' to get started. I am unassigning you for now, feel ' +
+              'free to assign yourself once you have signed the CLA. Thanks!';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: commentBody
+            });
+
+
+            await github.rest.issues.removeAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              assignees: [assignee.login]
+            });
+
+
+            console.log(`Removed assignee ${assignee.login} from issue
+            #${issue.number} due to unsigned CLA`);
+      - name: Report failure
+        if: failure()
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: Failed to check CLA for issue assignee
+          webhook-url: '${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}'
