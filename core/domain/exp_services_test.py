@@ -413,7 +413,8 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
             'Oppia', [], [])
         self.assertTrue(
-            set([self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]).issubset(set(exp_ids)))
+            set([self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]).issubset(
+                set(exp_ids)))
 
         # Search for explorations containing 'Oppia' and 'Introduce'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
