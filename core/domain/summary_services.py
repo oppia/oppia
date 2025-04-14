@@ -692,19 +692,19 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
     return results
 
 
-def require_activities_to_be_public(
+def check_activity_id_validity(
     activity_references: List[activity_domain.ActivityReference]
-) -> None:
-    """Raises an exception if any activity reference in the list does not
-    exist, or is not public.
+) -> Tuple[List[str], List[str], List[str], List[str]]:
+    """Returns four lists of each type of invalid Activity ID.
 
     Args:
         activity_references: list(ActivityReference). A list of
             ActivityReference domain objects.
 
-    Raises:
-        Exception. Any activity reference in the list does not
-            exist, or is not public.
+    Returns:
+        List[str]. Each type of invalid Activity ID has its own list
+        in order for moderator.py to determine which Activity ID
+        is invalid and why.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)
@@ -721,16 +721,35 @@ def require_activities_to_be_public(
             collection_ids),
     }]
 
+    dne_exp = []
+    dne_col = []
+    priv_exp = []
+    priv_col = []
+
     for activities_info in activity_summaries_by_type:
-        for index, summary in enumerate(activities_info['summaries']):
-            if summary is None:
-                raise Exception(
-                    'Cannot feature non-existent %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
-            if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-                raise Exception(
-                    'Cannot feature private %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
+
+        # If the activity is an Exploration.
+        if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
+            for index, summary in enumerate(activities_info['summaries']):
+                # If there's no summary for the Exploration ID,
+                # it means it doesn't exist.
+                if summary is None:
+                    dne_exp.append(activities_info['ids'][index])
+                # If the Exploration is set to private.
+                elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+                    priv_exp.append(activities_info['ids'][index])
+        # If the activity isn't an Exploration, it's a Collection.
+        else:
+            for index, summary in enumerate(activities_info['summaries']):
+                # If there's no summary for the Collection ID,
+                # it means it doesn't exist.
+                if summary is None:
+                    dne_col.append(activities_info['ids'][index])
+                # If the Collection is set to private.
+                elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+                    priv_col.append(activities_info['ids'][index])
+
+    return dne_exp, dne_col, priv_exp, priv_col
 
 
 def get_featured_activity_summary_dicts(
