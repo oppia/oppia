@@ -2017,8 +2017,13 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     voiceover_changes = []
     for change in change_list:
-        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
-            voiceover_changes.append(change)
+        if change.cmd not in [
+            exp_domain.CMD_UPDATE_VOICEOVERS,
+            exp_domain.CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE,
+            exp_domain.CMD_REMOVE_VOICEOVERS,
+        ]:
+            continue
+        voiceover_changes.append(change)
 
     new_voiceover_models = voiceover_services.compute_voiceover_related_change(
         updated_exploration,
@@ -2495,12 +2500,16 @@ def revert_exploration(
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_changes_upon_revert(
             reverted_exploration, revert_to_version))
+    new_voiceover_models = (
+        voiceover_services.compute_voiceover_related_changes_upon_revert(
+            reverted_exploration, revert_to_version))
 
     translation_and_opportunity_models_to_put: List[
         base_models.BaseModel
     ] = []
 
     translation_and_opportunity_models_to_put.extend(new_translation_models)
+    translation_and_opportunity_models_to_put.extend(new_voiceover_models)
 
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id

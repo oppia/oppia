@@ -213,57 +213,84 @@ def compute_voiceover_related_change(
         entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
             entity_voiceovers)
 
+    language_code_to_language_accent_mapping = (
+        get_all_language_accent_codes_for_voiceovers())
     for change in voiceover_changes:
-        # Here we use cast because this forces change to have type
-        # VoiceoversChangesCmd.
-        voiceover_change = cast(exp_domain.VoiceoversChangesCmd, change)
-        content_id = voiceover_change.content_id
-        language_accent_code = voiceover_change.language_accent_code
+        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
+            # Here we use cast because this forces change to have type
+            # VoiceoversChangesCmd.
+            voiceover_change = cast(exp_domain.VoiceoversChangesCmd, change)
+            content_id = voiceover_change.content_id
+            language_accent_code = voiceover_change.language_accent_code
 
-        entity_voiceover_id = generate_id_method(
-            entity_type, entity_id, entity_version, language_accent_code)
+            entity_voiceover_id = generate_id_method(
+                entity_type, entity_id, entity_version, language_accent_code)
 
-        empty_entity_voiceovers = (
-            voiceover_domain.EntityVoiceovers.create_empty(
-                entity_id, entity_type, entity_version, language_accent_code)
-        )
+            empty_entity_voiceovers = (
+                voiceover_domain.EntityVoiceovers.create_empty(
+                    entity_id, entity_type, entity_version,
+                    language_accent_code))
 
-        entity_voiceovers = (
-            entity_voiceover_id_to_entity_voiceovers.get(
-                entity_voiceover_id, empty_entity_voiceovers)
-        )
-
-        if content_id not in entity_voiceovers.voiceovers_mapping:
-            manual_voiceover_dict: state_domain.VoiceoverDict = (
-                voiceover_change.voiceovers['manual'])
-            manual_voiceover = state_domain.Voiceover.from_dict(
-                manual_voiceover_dict)
-
-            entity_voiceovers.add_new_content_id_without_voiceovers(content_id)
-            entity_voiceovers.add_voiceover(
-                content_id,
-                feconf.VoiceoverType.MANUAL,
-                manual_voiceover
+            entity_voiceovers = (
+                entity_voiceover_id_to_entity_voiceovers.get(
+                    entity_voiceover_id, empty_entity_voiceovers)
             )
-        else:
-            if 'manual' not in voiceover_change.voiceovers:
-                entity_voiceovers.remove_voiceover(
-                    content_id,
-                    feconf.VoiceoverType.MANUAL
-                )
-            else:
-                manual_voiceover_dict = (
+
+            if content_id not in entity_voiceovers.voiceovers_mapping:
+                manual_voiceover_dict: state_domain.VoiceoverDict = (
                     voiceover_change.voiceovers['manual'])
                 manual_voiceover = state_domain.Voiceover.from_dict(
                     manual_voiceover_dict)
 
-                entity_voiceovers.voiceovers_mapping[content_id][
-                    feconf.VoiceoverType.MANUAL] = manual_voiceover
+                entity_voiceovers.add_new_content_id_without_voiceovers(
+                    content_id)
+                entity_voiceovers.add_voiceover(
+                    content_id,
+                    feconf.VoiceoverType.MANUAL,
+                    manual_voiceover
+                )
+            else:
+                if 'manual' not in voiceover_change.voiceovers:
+                    entity_voiceovers.remove_voiceover(
+                        content_id,
+                        feconf.VoiceoverType.MANUAL
+                    )
+                else:
+                    manual_voiceover_dict = (
+                        voiceover_change.voiceovers['manual'])
+                    manual_voiceover = state_domain.Voiceover.from_dict(
+                        manual_voiceover_dict)
 
-        entity_voiceovers.validate()
+                    entity_voiceovers.voiceovers_mapping[content_id][
+                        feconf.VoiceoverType.MANUAL] = manual_voiceover
 
-        entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
-            entity_voiceovers)
+            entity_voiceovers.validate()
+            entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
+                entity_voiceovers)
+        elif change.cmd == exp_domain.CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE:
+            language_code = change.language_code
+            language_accent_codes = language_code_to_language_accent_mapping[
+                language_code].keys()
+            all_entity_voiceovers = (
+                entity_voiceover_id_to_entity_voiceovers.values())
+
+            for entity_voiceovers in all_entity_voiceovers:
+                if entity_voiceovers.language_accent_code in (
+                    language_accent_codes):
+                    entity_voiceovers.mark_manual_voiceovers_as_needing_update(
+                        change.content_id)
+        elif change.cmd == exp_domain.CMD_REMOVE_VOICEOVERS:
+            language_code = change.language_code
+            language_accent_codes = language_code_to_language_accent_mapping[
+                language_code].keys()
+            all_entity_voiceovers = (
+                entity_voiceover_id_to_entity_voiceovers.values())
+
+            for entity_voiceovers in all_entity_voiceovers:
+                if entity_voiceovers.language_accent_code in (
+                    language_accent_codes):
+                    entity_voiceovers.remove_voiceover(
+                        change.content_id, feconf.VoiceoverType.MANUAL)
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
         entity_voiceovers_dict = entity_voiceovers.to_dict()
@@ -882,3 +909,38 @@ def update_exploration_voice_artist_link_model(
 
     exp_voice_artist_link_model.update_timestamps()
     exp_voice_artist_link_model.put()
+
+
+def compute_voiceover_related_changes_upon_revert(
+    reverted_exploration: exp_domain.Exploration,
+    revert_to_version: int
+) -> List[voiceover_models.EntityVoiceoversModel]:
+    """Creates new EntityVoiceovers models corresponding to voiceover related
+    changes upon reverting an exploration.
+    Args:
+        reverted_exploration: Exploration. The reverted exploration object.
+        revert_to_version: int. The version to which the exploration is being
+            reverted.
+    Returns:
+        list(EntityVoiceoversModel). A list of EntityVoiceoversModel's with
+        respect to reverted exploration version.
+    """
+    entity_voiceovers_domain_objects = (
+        get_entity_voiceovers_for_given_exploration(
+            reverted_exploration.id, 'exploration', revert_to_version
+        ))
+    new_entity_voiceovers_models = []
+
+    for entity_voiceovers in entity_voiceovers_domain_objects:
+        entity_voiceovers_dict = entity_voiceovers.to_dict()
+        new_entity_voiceovers_models.append(
+            voiceover_models.EntityVoiceoversModel.create_new(
+                entity_voiceovers_dict['entity_type'],
+                entity_voiceovers_dict['entity_id'],
+                reverted_exploration.version,
+                entity_voiceovers_dict['language_accent_code'],
+                entity_voiceovers_dict['voiceovers_mapping'],
+                entity_voiceovers_dict['automated_voiceovers_audio_offsets_msecs']
+            )
+        )
+    return new_entity_voiceovers_models
