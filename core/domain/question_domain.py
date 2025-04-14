@@ -1834,25 +1834,20 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_states_v56_dict_to_v57_dict(
-        cls, states_dict: Dict[str, state_domain.StateDict]
+    def _convert_state_v56_dict_to_v57_dict(
+        cls, question_state_dict: state_domain.StateDict
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from v56 to v57. Version 57 removes the RecordedVoiceovers
         property from the State.
         Args:
-            states_dict: dict. A dict where each key-value pair represents,
-                respectively, a state name and a dict used to initialize a
-                State domain object.
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
         Returns:
-            Dict[str, state_domain.StateDict]. The converted v57
-            state dictionary.
+            dict. The converted question_state_dict.
         """
-        for _, state_dict in states_dict.items():
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains recorded_voiceovers property.
-            del state_dict['recorded_voiceovers'] # type: ignore[misc]
-
-        return states_dict
+        del question_state_dict['recorded_voiceovers']
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(
