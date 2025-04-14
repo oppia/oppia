@@ -26,9 +26,7 @@ import {DisplaySolutionModalComponent} from '../modals/display-solution-modal.co
   providedIn: 'root',
 })
 export class HintAndSolutionModalService {
-  constructor(
-    private ngbModal: NgbModal,
-  ) {}
+  constructor(private ngbModal: NgbModal) {}
 
   displayHintModal(index: number): NgbModalRef {
     let modalRef: NgbModalRef = this.ngbModal.open(DisplayHintModalComponent, {

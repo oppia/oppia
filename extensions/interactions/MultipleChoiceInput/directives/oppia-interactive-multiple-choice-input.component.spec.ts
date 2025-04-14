@@ -28,7 +28,6 @@ import {AudioTranslationLanguageService} from 'pages/exploration-player-page/ser
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {BehaviorSubject, Observable} from 'rxjs';
 
 describe('InteractiveMultipleChoiceInputComponent', () => {
   let component: InteractiveMultipleChoiceInputComponent;

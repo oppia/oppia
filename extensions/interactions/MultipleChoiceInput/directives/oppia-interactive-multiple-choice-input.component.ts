@@ -58,7 +58,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService,
+    private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService
   ) {}
 
   private getAttrs() {
