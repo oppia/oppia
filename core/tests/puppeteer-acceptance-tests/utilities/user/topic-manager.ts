@@ -110,6 +110,8 @@ const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const cancelButtonInNewChapterAdditionPrompt =
+  'button.e2e-test-cancel-chapter-creation-button';
 
 const newChapterErrorMessageSelector =
   '.acceptance-restricted-interaction-error';
@@ -2456,7 +2458,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Save a story as a curriculum admin.
+   * Save a story as a topic manager.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -2472,7 +2474,7 @@ export class TopicManager extends BaseUser {
     }
     await this.type(
       saveChangesMessageInput,
-      'Test saving story as curriculum admin.'
+      'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
@@ -2671,6 +2673,13 @@ export class TopicManager extends BaseUser {
    */
   async clickOnSaveNewChapterButton(): Promise<void> {
     await this.clickOn(createChapterButton);
+  }
+
+  /**
+   * Clicks the cancel button in the new chapter addition prompt.
+   */
+  async clickOnCancelButtonInNewChapterAdditionPrompt(): Promise<void> {
+    await this.clickOn(cancelButtonInNewChapterAdditionPrompt);
   }
 
   /**

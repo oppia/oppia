@@ -56,11 +56,11 @@ describe('Topic Manager', function () {
     await curriculumAdmin.navigateToExplorationEditorPage();
     await curriculumAdmin.dismissWelcomeModal();
 
+    // Create an exlporation unsupported by mobile.
     explorationId3 = await curriculumAdmin.createSimpleProgrammingExploration();
 
-    // Create Topics.
+    // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
-
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
       'Algebra II'
@@ -70,6 +70,7 @@ describe('Topic Manager', function () {
       'Algebra II'
     );
 
+    // Add story to topic.
     await curriculumAdmin.addStoryToTopic(
       'Journey into Quadratic Equations',
       'journey-into-quadratic-equations',
@@ -103,7 +104,7 @@ describe('Topic Manager', function () {
         'Algebra II'
       );
 
-      // Update story with mobile supported exploration and expect to save it successfully.
+      // Update story with mobile supported exploration.
       await topicManager.editChapterDetails(
         'Intro to Quadratic Equations',
         'Introductory chapter on Quadratic Equations',
@@ -130,6 +131,10 @@ describe('Topic Manager', function () {
       await topicManager.expectNewChapterErrorSpan(
         'The states [Introduction] contain restricted interaction types.'
       );
+
+      // Click on cancel button and navigate to dashboard page.
+      await topicManager.clickOnCancelButtonInNewChapterAdditionPrompt();
+      await topicManager.navigateToTopicAndSkillsDashboardPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
