@@ -26,24 +26,34 @@ jobs:
         with:
           script: |
             const { google } = require('@googleapis/sheets');
-            const auth = new google.auth.GoogleAuth({
-              scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
-            });
-            const authClient = await auth.getClient();
-            const sheets = google.sheets({ version: 'v4', auth: authClient });
+            const { OAuth2Client } = require('google-auth-library');
+            const authorize = (credentials) => {
+              const clientSecret = credentials.installed.client_secret;
+              const clientId = credentials.installed.client_id;
+              const redirectUrl = credentials.installed.redirect_uris[0];
+              const oauth2Client = new OAuth2Client(clientId, clientSecret, redirectUrl);
+              oauth2Client.credentials = JSON.parse(process.env.CREDENTIALS);
+              return oauth2Client;
+            };
+
+            const clientSecret = process.env.CLIENT_SECRET;
+            const oauthClient = authorize(JSON.parse(clientSecret));
+            const sheets = google.sheets('v4');
 
             const response = await sheets.spreadsheets.values.get({
+              auth: oauthClient,
               spreadsheetId: process.env.SPREADSHEET_ID,
               range: 'Usernames!A:A',
             });
             const username = process.env.USERNAME.toLowerCase();
             const rows = response.data.values || [];
-            const hasSignedCla = rows.some(row => row[0].toLowerCase() ===
-            username);
-
+            const hasSignedCla = rows.some(row => 
+              row[0] && row[0].toLowerCase() === username
+            );
+            
             core.setOutput('has-signed-cla', hasSignedCla);
-            console.log(`User ${username} has ${hasSignedCla ? '' : 'not
-            '}signed the CLA`);
+            console.log(`User ${username} has ${hasSignedCla ? '' : 'not '}signed the CLA`);
+
 
       - name: Remove assignee and notify if CLA not signed
         if: steps.check-cla.outputs.has-signed-cla == 'false'
