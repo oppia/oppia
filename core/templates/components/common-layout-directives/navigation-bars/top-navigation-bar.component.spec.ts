@@ -815,6 +815,39 @@ describe('TopNavigationBarComponent', () => {
     expect(component.getInvolvedMenuOffset).toBe(-10);
   }));
 
+  it('should handle non-numeric minWidth gracefully', () => {
+    const dummyLearnTab = document.createElement('div');
+    const dummyDropdown = document.createElement('div');
+
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      return selector === '.dummy' ? dummyLearnTab : dummyDropdown;
+    });
+
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
+      top: 1,
+      height: 100,
+      left: 0,
+      width: 200,
+      right: 202,
+    });
+
+    spyOn(window, 'getComputedStyle').and.returnValue({
+      minWidth: 'invalid-px',
+    } as CSSStyleDeclaration);
+
+    const offset = component.getDropdownOffset('.dummy', '.dropdown');
+    expect(offset).toBe(0);
+  });
+
+  it('should handle null bounding rect gracefully', () => {
+    const dummyLearnTab = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dummyLearnTab);
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue(null);
+
+    const offset = component.getDropdownOffset('.dummy', '.dropdown');
+    expect(offset).toBe(0);
+  });
+
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(
       i18nLanguageCodeService,
@@ -887,6 +920,7 @@ describe('TopNavigationBarComponent', () => {
     document.body.appendChild(mockElement);
 
     component.getClassroomSummariesLength();
+
     expect(component.classroomSummariesLength).toBe(parseInt(mockCount, 10));
     document.body.removeChild(mockElement);
   });
@@ -895,7 +929,21 @@ describe('TopNavigationBarComponent', () => {
     const mockElement = document.createElement('div');
     mockElement.classList.add('classroom-grid');
     document.body.appendChild(mockElement);
+
     component.getClassroomSummariesLength();
+
+    expect(component.classroomSummariesLength).toBe(0);
+    document.body.removeChild(mockElement);
+  });
+
+  it('should default classroomSummariesLength to 0 if count is NaN', () => {
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    mockElement.setAttribute('data-classroom-count', 'invalid');
+    document.body.appendChild(mockElement);
+
+    component.getClassroomSummariesLength();
+
     expect(component.classroomSummariesLength).toBe(0);
     document.body.removeChild(mockElement);
   });

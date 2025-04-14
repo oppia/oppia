@@ -381,6 +381,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       '.get-involved',
       '.get-involved-dropdown'
     );
+    // The '.donate-tab' no longer has a dropdown, so
+    // offset calculation has been removed.
     this.learnDropdownOffset = this.getDropdownOffset(
       '.learn-tab',
       '.classroom-enabled'
@@ -403,6 +405,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
     let computedStyle = window.getComputedStyle(dropdown);
     let width: number = parseFloat(computedStyle.minWidth);
+
+    const rect = learnTab.getBoundingClientRect();
+    if (!rect) {
+      return 0;
+    }
+
     if (learnTab) {
       let leftOffset = learnTab.getBoundingClientRect().left;
       let space = window.innerWidth - leftOffset;
@@ -419,7 +427,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     const classrooomGrid = document.querySelector('.classroom-grid');
     if (classrooomGrid) {
       const countAttr = classrooomGrid.getAttribute('data-classroom-count');
-      this.classroomSummariesLength = parseInt(countAttr ?? '0', 10);
+      const parsed = parseInt(countAttr ?? '0', 10);
+      this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
     }
   }
 
