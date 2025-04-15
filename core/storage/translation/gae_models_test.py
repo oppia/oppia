@@ -275,7 +275,7 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
 
         models = translation_models.EntityTranslationsModel.get_model_multi(
             references)
-        self.assertIsNotNone(models[0])
+        assert models is not None
         self.assertEqual(models[0].id, 'exploration-exp_id-1-en')
 
     def test_get_model_multi_with_invalid_language(self) -> None:
