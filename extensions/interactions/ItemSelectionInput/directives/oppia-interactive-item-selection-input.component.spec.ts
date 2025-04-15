@@ -31,8 +31,6 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {ItemSelectionClearService} from 'pages/exploration-player-page/services/itemselection-clear.service';
 
 describe('oppiaInteractiveItemSelectionInput', function () {
   let component: InteractiveItemSelectionInputComponent;
@@ -40,7 +38,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
   let browserCheckerService: BrowserCheckerService;
   let currentInteractionService: CurrentInteractionService;
   let playerTranscriptService: PlayerTranscriptService;
-  let itemSelectionClearService: ItemSelectionClearService;
   let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
@@ -79,15 +76,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     }
   }
 
-  class MockItemSelectionClearService {
-    private clearSelectionSubject: BehaviorSubject<boolean> =
-      new BehaviorSubject<boolean>(false);
-    clearSelection$: Observable<boolean> =
-      this.clearSelectionSubject.asObservable();
-    triggerClearSelection(): void {
-      this.clearSelectionSubject.next(true);
-    }
-  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -101,10 +89,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
           provide: CurrentInteractionService,
           useClass: MockCurrentInteractionService,
         },
-        {
-          provide: ItemSelectionClearService,
-          useClass: MockItemSelectionClearService,
-        },
         BrowserCheckerService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -116,7 +100,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveItemSelectionInputComponent);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    itemSelectionClearService = TestBed.inject(ItemSelectionClearService);
     component = fixture.componentInstance;
 
     let contentId: string = 'content_id';
@@ -171,25 +154,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       expect(component.displayCheckboxes).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
-    });
-
-    it('should subscribe to clearSelection$ and call clearSelection when true is emitted', () => {
-      spyOn(component, 'clearSelection');
-      const serviceSpy = spyOn(
-        itemSelectionClearService.clearSelection$,
-        'subscribe'
-      ).and.callFake(callback => callback(true));
-      component.ngOnInit();
-      expect(serviceSpy).toHaveBeenCalled();
-      expect(component.clearSelection).toHaveBeenCalled();
-    });
-
-    it('should unsubscribe from clearSelection$ on destroy', () => {
-      component.subscription = jasmine.createSpyObj('Subscription', [
-        'unsubscribe',
-      ]);
-      component.ngOnDestroy();
-      expect(component.subscription.unsubscribe).toHaveBeenCalled();
     });
 
     it('should throw error if content id is null', () => {
@@ -350,19 +314,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ).toHaveBeenCalledOnceWith(['ca_choices_1']);
       }
     );
-
-    it('should remove "selected" class from the selected button', function () {
-      const mockButton = document.createElement('button');
-      mockButton.classList.add('multiple-choice-option', 'selected');
-      spyOn(document, 'querySelector')
-        .withArgs('button.multiple-choice-option.selected')
-        .and.returnValue(mockButton);
-      component.userSelections = {
-        'choice 2': true,
-      };
-      component.clearSelection();
-      expect(mockButton.classList.contains('selected')).toBeFalse();
-    });
   });
 
   describe('when multiple choices are allowed to be selected', () => {
@@ -459,22 +410,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ).toHaveBeenCalledOnceWith(['ca_choices_1', 'ca_choices_2']);
       }
     );
-
-    it('should deselect all choices when solution button is clicked', () => {
-      component.maxAllowableSelectionCount = 2;
-      component.minAllowableSelectionCount = 1;
-      component.userSelections = {
-        'choice 1': true,
-        'choice 2': true,
-        'choice 3': false,
-      };
-      component.selectionCount = 2;
-      component.clearSelection();
-      expect(component.selectionCount).toBe(0);
-      expect(component.userSelections['choice 1']).toBeFalse();
-      expect(component.userSelections['choice 2']).toBeFalse();
-      expect(component.userSelections['choice 3']).toBeFalse();
-    });
   });
 
   describe('when an exact number of choices are allowed to be selected', () => {
@@ -578,18 +513,5 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ]);
       }
     );
-    it('should deselect all choices when solution button is clicked', () => {
-      component.userSelections = {
-        'choice 1': true,
-        'choice 2': true,
-        'choice 3': true,
-      };
-      component.selectionCount = 3;
-      component.clearSelection();
-      expect(component.selectionCount).toBe(0);
-      expect(component.userSelections['choice 1']).toBeFalse();
-      expect(component.userSelections['choice 2']).toBeFalse();
-      expect(component.userSelections['choice 3']).toBeFalse();
-    });
   });
 });
