@@ -24,7 +24,8 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 const INTRODUCTION_CARD_CONTENT: string = 'Test Question';
-const LAST_CARD_CONTENT: string = 'Congratulations! You have completed the lesson.';
+const LAST_CARD_CONTENT: string =
+  'Congratulations! You have completed the lesson.';
 const DEFAULT_FEEDBACK: string = 'Wrong.';
 const HINT_TEXT: string = 'Initial coordinate.';
 
@@ -91,7 +92,9 @@ describe('Exploration Creator', function () {
       }
 
       // Step 5: Validate the published exploration is publicly accessible.
-      await explorationVisitor.expectExplorationToBeAccessibleByUrl(explorationId);
+      await explorationVisitor.expectExplorationToBeAccessibleByUrl(
+        explorationId
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
