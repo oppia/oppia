@@ -76,7 +76,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     }
   }
 
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [InteractiveItemSelectionInputComponent, MockTranslatePipe],
