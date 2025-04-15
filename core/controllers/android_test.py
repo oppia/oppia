@@ -413,7 +413,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     }
                 }))
 
-        translation_model.update_timestamps()    
+        translation_model.update_timestamps()
         translation_model.put()
 
         with self.secrets_swap:
