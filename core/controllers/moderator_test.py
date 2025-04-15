@@ -28,6 +28,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'exp_id_1'
     EXP_ID_2: Final = 'exp_id_2'
+    EXP_ID_3: Final = 'exp_id_3'
+    COL_ID_1: Final = 'col_id_1'
+    COL_ID_2: Final = 'col_id_2'
+    COL_ID_3: Final = 'col_id_3'
     username = 'albert'
     user_email = 'albert@example.com'
 
@@ -43,6 +47,92 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
+        self.save_new_valid_collection(self.COL_ID_1, self.user_id, self.EXP_ID_1)
+        rights_manager.publish_collection(self.user, self.COL_ID_1)
+
+        self.save_new_valid_collection(self.COL_ID_2, self.user_id, self.EXP_ID_1)
+
+    def test_nonexistent_activities_cannot_be_added_to_featured_list(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes nonexistent activities results in an error.
+
+        # Nonexistent Exploration.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Exploration & Nonexistent Exploration.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Nonexistent Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Collection & Nonexistent Collection
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Nonexistent Exploration & Nonexistent Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Exploration & Nonexistent Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Collection & Nonexistent Exploration
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
     def test_unpublished_activities_cannot_be_added_to_featured_list(
         self
     ) -> None:
@@ -50,6 +140,8 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         # Posting a list that includes private activities results in an error.
+
+        # Private Exploration.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -57,6 +149,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Exploration & Private Exploration.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -67,18 +160,84 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-
-        # Posting a list that only contains public activities succeeds.
+        # Private Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Collection & Private Collection
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Private Exploration & Private Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Exploration & Private Collection.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
                     'type': 'exploration',
                     'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        # Public Collection & Private Exploration
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_published_activites_are_added_to_featured_list(
+        self
+        ) -> None:
+
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that only contains public activities succeeds.
+
+        # Public Exploration & Public Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
                 }],
             }, csrf_token=csrf_token)
         featured_activity_references = self.get_json(
             '/moderatorhandler/featured')['featured_activity_references']
         self.assertEqual(featured_activity_references[0]['id'], self.EXP_ID_1)
+        self.assertEqual(featured_activity_references[1]['id'], self.COL_ID_1)
         self.logout()
 
 
