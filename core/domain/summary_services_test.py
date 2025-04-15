@@ -317,7 +317,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         # Previously, we expected only one library group to be returned.
         # However, due to changes in platform search logic multiple groups
-        # may be returned even if only one activity is loaded. So we 
+        # may be returned even if only one activity is loaded. So we
         # now just check that the expected group is present in the results.
         self.assertGreaterEqual(len(library_groups), 1)
         self.assertDictContainsSubset(expected_group, library_groups[0])
