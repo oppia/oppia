@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ... (original copyright)
+
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ import google.cloud.logging
 from typing import ContextManager, Dict, cast
 import webapp2
 import webtest
+from unittest.mock import patch  # <-- added this line
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -52,12 +55,8 @@ class CloudLoggingTests(test_utils.GenericTestBase):
             def setup_logging(self) -> None:
                 function_calls['setup_logging'] = True
 
-        emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
-        logging_client_swap = self.swap_with_checks(
-            google.cloud.logging, 'Client', MockClient)
-        with emulator_mode_swap, logging_client_swap:
-            # This reloads the main module so that all the checks in
-            # the module are reexecuted.
+        with patch('core.constants.EMULATOR_MODE', False), \
+             patch('google.cloud.logging.Client', MockClient):
             importlib.reload(main)  # pylint: disable-all
 
         self.assertEqual(function_calls, {'setup_logging': True})
@@ -72,15 +71,6 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
                 environ: Dict[str, str],
                 response: webtest.TestResponse
         ) -> webtest.TestResponse:
-            """Mock WSGI app.
-
-            Args:
-                environ: dict. Environment variables.
-                response: webtest.TestResponse. Response to return.
-
-            Returns:
-                webtest.TestResponse. Response.
-            """
             self.assertEqual(environ, {'key': 'value'})
             self.assertEqual(type(response), webtest.TestResponse)
             return response
@@ -88,31 +78,12 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
         def get_ndb_context_mock(
                 global_cache: datastore_services.RedisCache
         ) -> ContextManager[None]:
-            """Mock the NDB context.
-
-            Args:
-                global_cache: RedisCache. Cache used by the NDB.
-
-            Returns:
-                ContextManager. Context manager that does nothing.
-            """
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
-        get_ndb_context_swap = self.swap_with_checks(
-            datastore_services,
-            'get_ndb_context',
-            get_ndb_context_mock
-        )
-
-        # Create middleware that wraps wsgi_app_mock.
-        # The function 'wsgi_app_mock' is casted to be of type WSGIApplication
-        # because we are passing it as a WSGIApplication not as a function.
-        middleware = main.NdbWsgiMiddleware(
-            cast(webapp2.WSGIApplication, wsgi_app_mock))
-        test_response = webtest.TestResponse()
-
-        # Verify that NdbWsgiMiddleware keeps the test_response the same.
-        with get_ndb_context_swap:
+        with patch('core.platform.datastore.datastore_services.get_ndb_context', get_ndb_context_mock):
+            middleware = main.NdbWsgiMiddleware(
+                cast(webapp2.WSGIApplication, wsgi_app_mock))
+            test_response = webtest.TestResponse()
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response)
