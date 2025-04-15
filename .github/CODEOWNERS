@@ -135,6 +135,8 @@
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
 /core/templates/services/iso-datepicker-adapter.service.ts @oppia/contributor-experience-team
+/core/templates/services/translation-validation.service.ts @oppia/contributor-experience-team
+/core/templates/services/translation-validation.service.spec.ts @oppia/contributor-experience-team
 /core/templates/components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component.html @oppia/contributor-experience-team
 /core/templates/components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component.ts @oppia/contributor-experience-team
 /core/templates/components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component.spec.ts @oppia/contributor-experience-team
