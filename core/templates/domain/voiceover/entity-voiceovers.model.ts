@@ -100,13 +100,13 @@ export class EntityVoiceovers {
     }
   }
 
-  removeVoiceover(contentId: string) {
+  removeVoiceover(contentId: string): void {
     if (this.voiceoversMapping[contentId]) {
       delete this.voiceoversMapping[contentId];
     }
   }
 
-  toggleManualVoiceoverNeedsUpdate(contentId: string) {
+  toggleManualVoiceoverNeedsUpdate(contentId: string): void {
     let voiceover = this.getManualVoiceover(contentId);
     if (voiceover) {
       voiceover.needsUpdate = !voiceover.needsUpdate;

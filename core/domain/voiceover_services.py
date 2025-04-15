@@ -917,10 +917,12 @@ def compute_voiceover_related_changes_upon_revert(
 ) -> List[voiceover_models.EntityVoiceoversModel]:
     """Creates new EntityVoiceovers models corresponding to voiceover related
     changes upon reverting an exploration.
+
     Args:
         reverted_exploration: Exploration. The reverted exploration object.
         revert_to_version: int. The version to which the exploration is being
             reverted.
+
     Returns:
         list(EntityVoiceoversModel). A list of EntityVoiceoversModel's with
         respect to reverted exploration version.
@@ -940,7 +942,8 @@ def compute_voiceover_related_changes_upon_revert(
                 reverted_exploration.version,
                 entity_voiceovers_dict['language_accent_code'],
                 entity_voiceovers_dict['voiceovers_mapping'],
-                entity_voiceovers_dict['automated_voiceovers_audio_offsets_msecs']
+                entity_voiceovers_dict[
+                    'automated_voiceovers_audio_offsets_msecs']
             )
         )
     return new_entity_voiceovers_models

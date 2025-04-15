@@ -2086,8 +2086,7 @@ title: Title
 
     def test_can_load_yaml_with_stripped_voiceovers(self) -> None:
         exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [],
-            strip_voiceovers=True)
+            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [])
         exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
         state = exp.states[exp.init_state_name]

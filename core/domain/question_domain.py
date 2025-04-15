@@ -1839,10 +1839,12 @@ class Question(translation_domain.BaseTranslatableObject):
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from v56 to v57. Version 57 removes the RecordedVoiceovers
         property from the State.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """

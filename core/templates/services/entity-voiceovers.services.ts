@@ -188,7 +188,10 @@ export class EntityVoiceoversService {
     }
   }
 
-  toggleManualVoiceoverNeedsUpdate(languageAccentCode, contentId): void {
+  toggleManualVoiceoverNeedsUpdate(
+    languageAccentCode: string,
+    contentId: string
+  ): void {
     let entityVoiceovers =
       this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
     entityVoiceovers.toggleManualVoiceoverNeedsUpdate(contentId);

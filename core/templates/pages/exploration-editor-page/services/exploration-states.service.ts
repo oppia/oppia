@@ -49,7 +49,6 @@ import {State} from 'domain/state/StateObjectFactory';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';

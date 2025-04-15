@@ -454,7 +454,7 @@ class ExplorationChange(change_domain.BaseChange):
         'user_id_attribute_names': [],
         'allowed_values': {},
         'deprecated_values': {}
-    },{
+    }, {
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'state_name', 'new_value'],
@@ -5122,10 +5122,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> Dict[str, state_domain.StateDict]:
         """Converts from v56 to v57. Version 57 removes the RecordedVoiceovers
         property from the State.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             Dict[str, state_domain.StateDict]. The converted v57
             state dictionary.
@@ -5573,9 +5575,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> VersionedExplorationDict:
         """Converts a v61 exploration dict into a v62 exploration dict.
         Removes recorded_voiceovers field from state property.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v61.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v62.

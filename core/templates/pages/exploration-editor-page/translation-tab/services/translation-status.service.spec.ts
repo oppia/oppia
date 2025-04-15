@@ -59,7 +59,6 @@ describe('Translation status service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let generateContentIdService: GenerateContentIdService;
   let ess: ExplorationStatesService;
-  let srvs: StateRecordedVoiceoversService;
   let ttams: TranslationTabActiveModeService;
   let tls: TranslationLanguageService;
   let platformFeatureService: PlatformFeatureService;
@@ -596,7 +595,6 @@ describe('Translation status service', () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
       stateEditorService.setActiveStateName('First');
-      // srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
       tss.refresh();
 
       var activeStateComponentStatus =
@@ -708,7 +706,6 @@ describe('Translation status service', () => {
       activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('feedback_3');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      var value = srvs.displayed;
 
       stateEditorService.setActiveStateName('Second');
       activeStateContentIdStatusColor =

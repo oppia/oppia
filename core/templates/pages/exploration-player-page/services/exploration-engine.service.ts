@@ -28,10 +28,6 @@ import {
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  BindableVoiceovers,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
@@ -419,7 +415,6 @@ export class ExplorationEngineService {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
       this.version = explorationVersion;
       this.initParams([]);
-      // update audio language codes.
       this.audioTranslationLanguageService.init(
         ['en'],
         preferredAudioLanguage,
@@ -587,7 +582,6 @@ export class ExplorationEngineService {
       classificationResult.outcome,
       [oldParams]
     );
-    let feedbackContentId: string = outcome.feedback.contentId;
     if (feedbackHtml === null) {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Feedback content should not be empty.');
