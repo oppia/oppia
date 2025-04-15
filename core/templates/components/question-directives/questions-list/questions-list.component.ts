@@ -89,6 +89,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() skillsCategorizedByTopics: CategorizedSkills;
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() skillDescriptionsAreShown: boolean;
+  @Input() difficultyCount: number;
 
   associatedSkillSummaries: ShortSkillSummary[];
   deletedQuestionIds: string[];
@@ -112,7 +113,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
-  difficultyCount: number;
 
   constructor(
     private alertsService: AlertsService,
