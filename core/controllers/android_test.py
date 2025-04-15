@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_services
 from core.domain import exp_domain
@@ -403,27 +404,32 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_exploration_translation_returns_correct_json(self) -> None:
         translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                'exploration', 'translation_id', 1, 'es', {
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                'translation_id', 1, 'es', {
                     'content_id_123': {
                         'content_value': 'Hello world!',
                         'needs_update': False,
                         'content_format': 'html'
                     }
                 }))
-        translation_model.update_timestamps()
+
+        translation_model.update_timestamps()    
         translation_model.put()
+
         with self.secrets_swap:
+            response = self.get_json(
+                '/android_data?activity_type=exp_translations&'
+                'activities_data=[{'
+                '    "id": "translation_id", '
+                '    "language_code": "es", '
+                '    "version": 1'
+                '}]',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=200
+            )
+
             self.assertEqual(
-                self.get_json(
-                    '/android_data?activity_type=exp_translations&'
-                    'activities_data=[{'
-                    '    "id": "translation_id", '
-                    '    "language_code": "es", '
-                    '    "version": 1'
-                    '}]',
-                    headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
-                ),
+                response,
                 [{
                     'id': 'translation_id',
                     'language_code': 'es',
@@ -436,6 +442,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                         }
                     }
                 }]
+            )
+
+            self.assertEqual(
+                translation_model.entity_type,
+                feconf.TranslatableEntityType.EXPLORATION.value
             )
 
     def test_get_exploration_translation_with_zero_items_returns_correct_json(

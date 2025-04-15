@@ -157,7 +157,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         """
         model_ids = [
             cls._generate_id(
-                feconf.TranslatableEntityType(reference['entity_type']),
+                reference['entity_type'],
                 reference['entity_id'],
                 reference['entity_version'],
                 reference['language_code'])

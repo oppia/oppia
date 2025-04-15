@@ -21,11 +21,13 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 from core.tests import test_utils
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import translation_models
+    from core.storage.translation.gae_models import EntityTranslationReferenceDict
 
 (base_models, translation_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.TRANSLATION
@@ -249,6 +251,32 @@ class EntityTranslationsModelTest(test_utils.GenericTestBase):
             'Translation 2')
 
         self.assertIsNone(results[3])
+
+    def test_get_model_multi_with_enum_entity_type(self) -> None:
+        translation = translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            'exp_id', 1, 'en',
+            {
+                'content': {
+                'content_value': 'Hello',
+                'needs_update': False,
+                'content_format': 'html'
+                }
+            }
+        )
+        translation.put()
+
+        references = [{
+            'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+            'entity_id': 'exp_id',
+            'entity_version': 1,
+            'language_code': 'en'
+        }]
+
+        models = translation_models.EntityTranslationsModel.get_model_multi(
+            references)
+        self.assertIsNotNone(models[0])
+        self.assertEqual(models[0].id, 'exploration-exp_id-1-en')
 
     def test_get_model_multi_with_invalid_language(self) -> None:
         """Test fetching translations with invalid language codes."""
