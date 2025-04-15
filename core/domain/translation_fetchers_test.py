@@ -201,20 +201,20 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 4)
 
-        self.assertIsNotNone(results[0])
+        assert results[0] is not None
         self.assertEqual(results[0].entity_id, exp_id_1)
         self.assertEqual(results[0].entity_version, 1)
         translated_content = results[0].translations['content_1']
         self.assertEqual(translated_content.content_value, 'Translation 1')
 
-        self.assertIsNotNone(results[1])
+        assert results[1] is not None
         self.assertEqual(results[1].entity_id, exp_id_1)
         self.assertEqual(results[1].entity_version, 2)
         translated_content = results[1].translations['content_1']
         self.assertEqual(
             translated_content.content_value, 'Updated Translation 1')
 
-        self.assertIsNotNone(results[2])
+        assert results[2] is not None
         self.assertEqual(results[2].entity_id, exp_id_2)
         self.assertEqual(results[2].entity_version, 1)
         translated_content = results[2].translations['content_2']
@@ -269,13 +269,13 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(results), 2)
 
-        self.assertIsNotNone(results[0])
+        assert results[0] is not None
         self.assertEqual(results[0].entity_type, 'exploration')
         translated_content = results[0].translations['content_1']
         self.assertEqual(
             translated_content.content_value, 'Exploration Translation')
 
-        self.assertIsNotNone(results[1])
+        assert results[1] is not None
         self.assertEqual(results[1].entity_type, 'question')
         translated_content = results[1].translations['content_2']
         self.assertEqual(
