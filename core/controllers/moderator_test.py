@@ -47,10 +47,12 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
-        self.save_new_valid_collection(self.COL_ID_1, self.user_id, self.EXP_ID_1)
+        self.save_new_valid_collection(self.COL_ID_1, self.user_id,
+            self.EXP_ID_1)
         rights_manager.publish_collection(self.user, self.COL_ID_1)
 
-        self.save_new_valid_collection(self.COL_ID_2, self.user_id, self.EXP_ID_1)
+        self.save_new_valid_collection(self.COL_ID_2, self.user_id,
+            self.EXP_ID_1)
 
     def test_nonexistent_activities_cannot_be_added_to_featured_list(
         self
@@ -87,7 +89,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.COL_ID_3,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        # Public Collection & Nonexistent Collection
+        # Public Collection & Nonexistent Collection.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -120,7 +122,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.COL_ID_3,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        # Public Collection & Nonexistent Exploration
+        # Public Collection & Nonexistent Exploration.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -168,7 +170,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.COL_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        # Public Collection & Private Collection
+        # Public Collection & Private Collection.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -201,7 +203,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.COL_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        # Public Collection & Private Exploration
+        # Public Collection & Private Exploration.
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
