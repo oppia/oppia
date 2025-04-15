@@ -27,7 +27,6 @@ import {
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
@@ -128,7 +127,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
@@ -304,7 +302,6 @@ describe('State translation component', () => {
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
@@ -342,9 +339,6 @@ describe('State translation component', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
     subtitledUnicodeObjectFactory = TestBed.inject(
       SubtitledUnicodeObjectFactory
     );
@@ -357,10 +351,6 @@ describe('State translation component', () => {
     );
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.entityTranslation =
@@ -389,11 +379,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
-
     component.isTranslationTabBusy = false;
     component.stateName = 'Introduction';
 
@@ -816,7 +801,6 @@ describe('State translation component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
@@ -989,7 +973,6 @@ describe('State translation component', () => {
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
@@ -1025,9 +1008,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
     subtitledUnicodeObjectFactory = TestBed.inject(
       SubtitledUnicodeObjectFactory
     );
@@ -1039,10 +1019,6 @@ describe('State translation component', () => {
       TranslationTabActiveModeService
     );
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1071,10 +1047,6 @@ describe('State translation component', () => {
     ).and.returnValue(false);
 
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     spyOnProperty(
       stateEditorService,
       'onShowTranslationTabBusyModal'
@@ -1269,7 +1241,6 @@ describe('State translation component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
@@ -1506,7 +1477,6 @@ describe('State translation component', () => {
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
@@ -1542,9 +1512,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
     subtitledUnicodeObjectFactory = TestBed.inject(
       SubtitledUnicodeObjectFactory
     );
@@ -1557,10 +1524,6 @@ describe('State translation component', () => {
     );
     routerService = TestBed.inject(RouterService);
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1590,10 +1553,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState2, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     component.isTranslationTabBusy = false;
     component.stateName = 'Introduction';
@@ -1977,7 +1936,6 @@ describe('State translation component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -2186,7 +2144,6 @@ describe('State translation component', () => {
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
         StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
@@ -2222,9 +2179,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -2233,10 +2187,6 @@ describe('State translation component', () => {
       TranslationTabActiveModeService
     );
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
@@ -2260,22 +2210,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState4, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-          content_1: {},
-          feedback_1: {},
-          hint_1: {},
-          solution: {},
-          solution_1: {},
-          ca_0: {},
-          ca_1: {},
-        },
-      })
-    );
     // Because the customization arguments we are passing for testing are
     // invalid, we will skip getInteractionHtml(), which would error
     // otherwise.

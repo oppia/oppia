@@ -25,7 +25,6 @@ import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/tra
 import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
@@ -76,7 +75,6 @@ describe('Translation status service', () => {
       providers: [
         TranslationStatusService,
         TranslationLanguageService,
-        StateRecordedVoiceoversService,
         StateWrittenTranslationsService,
         TranslationTabActiveModeService,
         ExplorationStatesService,
@@ -105,7 +103,6 @@ describe('Translation status service', () => {
     ess = TestBed.inject(ExplorationStatesService);
     ttams = TestBed.inject(TranslationTabActiveModeService);
     tls = TestBed.inject(TranslationLanguageService);
-    srvs = TestBed.inject(StateRecordedVoiceoversService);
     stateEditorService = TestBed.inject(StateEditorService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
