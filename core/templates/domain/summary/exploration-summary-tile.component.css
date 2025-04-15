@@ -1,0 +1,15 @@
+.exploration-summary-tile {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+  }
+  .exploration-summary-tile h3 {
+    font-size: 1.5em;
+    color: #333;
+  }
+  .exploration-summary-tile p {
+    font-size: 1em;
+    color: #666;
+  }
+  
