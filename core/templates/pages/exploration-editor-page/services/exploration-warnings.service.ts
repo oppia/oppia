@@ -539,9 +539,7 @@ export class ExplorationWarningsService {
 
     if (Object.keys(this.stateWarnings).length) {
       for (const [key, value] of Object.entries(this.stateWarnings)) {
-        const formattedValue = Array.isArray(value)
-          ? value.join('; ') + '.'
-          : value;
+        const formattedValue = value.join('; ') + '.';
         const error = value.length > 1 ? 'Errors' : 'Error';
         this._warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
