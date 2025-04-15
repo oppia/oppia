@@ -47,14 +47,13 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
-        self.save_new_valid_collection(self.COL_ID_1, self.user_id,
-            self.EXP_ID_1)
+        self.save_new_valid_collection(
+            self.COL_ID_1, self.user_id, self.EXP_ID_1)
 
         rights_manager.publish_collection(self.user, self.COL_ID_1)
 
-        self.save_new_valid_collection(self.COL_ID_2, self.user_id,
-            self.EXP_ID_1)
-        
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.user_id, self.EXP_ID_1)
 
     def test_nonexistent_activities_cannot_be_added_to_featured_list(
         self
@@ -62,7 +61,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Posting a list that includes nonexistent activities 
+        # Posting a list that includes nonexistent activities
         # results in an error.
 
         # Nonexistent Exploration.
