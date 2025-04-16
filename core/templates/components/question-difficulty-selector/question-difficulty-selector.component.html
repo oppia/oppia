@@ -2,7 +2,7 @@
                  (change)="updateSkillWithDifficulty($event)"
                  class="mat-radio-group-questions"
                  [class.single-option]="difficultyCount === 1"
-                 *ngIf="!isLoading; else loadingTemplate"">
+                 *ngIf="difficultyCount !== undefined">
   <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
@@ -26,12 +26,6 @@
     </mat-radio-button>
   </ng-container>
 </mat-radio-group>
-<ng-template #loadingTemplate>
-  <div class="loading-message" @fadeOut>
-    <mat-spinner diameter="24"></mat-spinner>
-    <span>Fetching difficulty options...</span>
-  </div>
-</ng-template>
 
 <style>
   .mat-radio-button {

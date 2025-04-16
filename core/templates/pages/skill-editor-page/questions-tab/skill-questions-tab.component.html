@@ -1,5 +1,6 @@
 <div class="questions">
-  <oppia-questions-list [allSkillSummaries]="[]"
+  <oppia-questions-list *ngIf="difficultyCount"
+                        [allSkillSummaries]="[]"
                         [skillDescriptionsAreShown]="false"
                         [selectSkillModalIsShown]="false"
                         [canEditQuestion]="true"
