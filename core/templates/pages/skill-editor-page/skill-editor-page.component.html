@@ -1,9 +1,13 @@
 <div>
   <div class="skill-editor-main">
     <div class="navbar-helper">
-      <div class="navbar-text">
-        Skill Editor
+      <!-- Skill name moved to its own container -->
+      <div class="navbar-text-container">
+        <div class="navbar-text">
+          Skill Editor
+        </div>
       </div>
+      <!-- Tabs remain below the skill name -->
       <div class="navbar-tabs navbar-icons">
         <ul>
           <li [ngClass]="{'dropdown': getWarningsCount(), 'navbar-tab-active': getActiveTabName() === 'main'}"
@@ -74,32 +78,34 @@
   </div>
 </div>
 
-
 <style>
   .skill-editor-main .navbar-helper {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
     background-color: #00609c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
-    display: flex;
-    height: 70px;
+    height: auto;
     margin-bottom: 20px;
     text-align: center;
     width: 100%;
     z-index: 10;
   }
 
-  .skill-editor-main .navbar-text {
-    align-items: center;
-    color: #fff;
+  .skill-editor-main .navbar-text-container {
     display: flex;
-    font-family: Capriola, Roboto, Arial, sans-serif;
-    font-size: 20px;
-    margin-left: 4%;
-    width: 35%;
+    justify-content: center; /* Center the skill name horizontally */
+    margin-bottom: 10px; /* Add spacing between the skill name and tabs */
   }
 
-  .skill-editor-main .oppia-editor-warnings-box {
-    cursor: default;
-    max-width: none;
+  .skill-editor-main .navbar-text {
+    color: #fff;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 20px; /* Adjust font size for better visibility */
+  }
+
+  .skill-editor-main .navbar-tabs {
+    display: flex;
+    justify-content: center;
   }
 
   .skill-editor-main ul {
@@ -126,10 +132,12 @@
     color: #333;
     font-size: 12px;
   }
+
   .skill-editor-main .navbar-tab-active {
     background-color: #e6e6e6;
     box-shadow: 0 3px 2px 0 #e6e6e6;
   }
+
   .skill-editor-main .nav-list-item {
     align-items: center;
     cursor: pointer;
@@ -137,16 +145,20 @@
     justify-content: center;
     width: 90px;
   }
+
   .skill-editor-main .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
   }
+
   .skill-editor-warning-box {
     display: block;
     width: 250px;
   }
+
   .skill-editor-main .navbar-tab-active-icon {
     color: #00609c;
   }
+
   @media screen and (max-width: 768px) {
     .skill-editor-main .navbar-helper {
       display: none;
@@ -155,6 +167,6 @@
     .skill-editor-main .oppia-editor-warnings-box {
       display: block;
       width: 200px;
-  }
+    }
   }
 </style>
