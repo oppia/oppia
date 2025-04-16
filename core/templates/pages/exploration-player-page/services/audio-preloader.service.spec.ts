@@ -333,10 +333,7 @@ describe('Audio preloader service', () => {
     let manualVoiceover = Voiceover.createFromBackendDict(
       manualVoiceoverBackendDict
     );
-    spyOn(
-      entityVoiceoversService,
-      'getAllContentIdsToVoiceovers'
-    ).and.returnValue({content: [manualVoiceover]});
+    audioPreloaderService.contentIdsToVoiceovers = {content: [manualVoiceover]};
 
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
