@@ -55,7 +55,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1)
 
-    def test_nonexistent_activities_cannot_be_added_to_featured_list(
+    def test_scenarios_for_valid_and_invalid_activity_ids(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -135,13 +135,6 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_3,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        self.logout()
-
-    def test_unpublished_activities_cannot_be_added_to_featured_list(
-        self
-    ) -> None:
-        self.login(self.MODERATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Posting a list that includes private activities results in an error.
 
@@ -216,14 +209,6 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
-        self.logout()
-
-    def test_published_activites_are_added_to_featured_list(
-        self
-        ) -> None:
-
-        self.login(self.MODERATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         # Posting a list that only contains public activities succeeds.
 
