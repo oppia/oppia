@@ -15,13 +15,14 @@
         {{ misconceptionName }}
       </div>
     </div>
-
   </div>
-  <span *ngIf="isEditable && !misconceptionEditorIsOpen"
-        class="oppia-delete-misconception-button oppia-transition-200 e2e-test-delete-misconception"
-        (click)="removeMisconception()">
-    <i class="material-icons md-18">&#xE5CD;</i>
-  </span>
+  <button *ngIf="isEditable && !misconceptionEditorIsOpen"
+          class="oppia-delete-misconception-button oppia-transition-200 e2e-test-delete-misconception"
+          (click)="removeMisconception()"
+          title="Delete Misconception"
+          aria-label="Delete tagged misconception">
+    <i class="material-icons md-18" aria-hidden="true">&#xE5CD;</i>
+  </button>
 </div>
 <div class="clearfix oppia-misconception-selector-container" *ngIf="misconceptionEditorIsOpen">
   <oppia-question-misconception-selector (updateMisconceptionValues)="updateValues($event)"
@@ -30,7 +31,7 @@
                                          [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
                                          [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-selector>
-  <div class="misconception-save-button">
+  <div class="oppia-misconception-save-button">
     <button class="btn btn-secondary e2e-test-cancel-misconception-button"
             (click)="misconceptionEditorIsOpen = false">
       Cancel
@@ -50,8 +51,12 @@
 </button>
 <style>
   .oppia-delete-misconception-button {
+    background: none;
+    border: none;
     cursor: pointer;
     opacity: 0.5;
+    outline: none;
+    padding: 0;
     position: absolute;
     right: 8px;
     top: 8px;
@@ -100,13 +105,7 @@
     width: 100%;
   }
 
-  .misconception-selector-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .misconception-save-button {
+  .oppia-misconception-save-button {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
