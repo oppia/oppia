@@ -730,11 +730,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.misconceptionIdsForSelectedSkill = responseObject.skill
             .getMisconceptions()
             .map(misconception => misconception.getId());
-          this.difficultyCount = responseObject.skill
-            .getRubrics()
-            .filter(
-              rubric => rubric._explanations && rubric._explanations.length > 0
-            ).length;
         });
     }
 
