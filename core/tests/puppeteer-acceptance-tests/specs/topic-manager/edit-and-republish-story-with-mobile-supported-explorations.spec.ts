@@ -121,6 +121,7 @@ describe('Topic Manager', function () {
       );
 
       // Add exploration with interaction unsupported on mobile and expect topic can't be updated.
+      await topicManager.createAndSwitchToNewTab();
       await topicManager.addChapterWithoutSaving(
         'Introduction to Python Programmin',
         explorationId3 as string,
@@ -131,10 +132,6 @@ describe('Topic Manager', function () {
       await topicManager.expectNewChapterErrorSpan(
         'The states [Introduction] contain restricted interaction types.'
       );
-
-      // Click on cancel button and navigate to dashboard page.
-      await topicManager.clickOnCancelButtonInNewChapterAdditionPrompt();
-      await topicManager.navigateToTopicAndSkillsDashboardPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
