@@ -1000,7 +1000,7 @@ describe('Translation Modal Component', () => {
 
   it('should close modal and return the new translation when updating translated text', () => {
     spyOn(activeModal, 'close');
-    spyOn(component, 'translatedTextCanBeSubmitted').and.returnValue(true);
+    spyOn(component, 'canTranslatedTextBeSubmitted').and.returnValue(true);
     component.activeWrittenTranslation = 'Test translation';
     component.updateTranslatedText();
 

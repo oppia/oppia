@@ -30,6 +30,7 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -1034,6 +1035,463 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id, 'test_translation'
             )
 
+    def create_translation_suggestion(
+            self, content_html: str, translation_html: str
+        ) -> suggestion_registry.SuggestionTranslateContent:
+        """Creates a translation suggestion for testing purposes."""
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', content_html).to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content_0',
+                'html': content_html
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'state 1',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': content_html,
+            'translation_html': translation_html,
+            'data_format': 'html'
+        }
+        return suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+    def test_update_translation_suggestion_error_on_rte_removal(self) -> None:
+        """Tests that an InvalidInputException is raised when a translation
+        suggestion update removes an RTE component.
+        """
+        content_html_with_rte_components = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        translation_html_with_rte_components = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        suggestion = self.create_translation_suggestion(
+            content_html=content_html_with_rte_components,
+            translation_html=translation_html_with_rte_components
+        )
+
+        updated_translation_without_image = (
+            '<p>Updated translation without image</p>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 1 image. '
+            'Components in translated text: 0 image.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id,
+                updated_translation_without_image
+            )
+
+    def test_update_translation_suggestion_error_when_component_is_added(
+        self
+    ) -> None:
+        content_html_without_image = (
+            '<p>Original content without image.</p>'
+        )
+        translation_html_without_image = (
+            '<p>Translation for original content without image.</p>'
+        )
+
+        suggestion = self.create_translation_suggestion(
+            content_html_without_image,
+            translation_html_without_image
+        )
+        new_translation_html_with_image = (
+            '<p><oppia-noninteractive-image '
+            'alt-with-value="Another description" '
+            'caption-with-value="Another caption" ' 
+            'filepath-with-value="another_img.svg">'
+            '</oppia-noninteractive-image> '
+            'Updated translation with image</p>'
+        )
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 0 image. '
+            'Components in translated text: 1 image.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id,
+                new_translation_html_with_image
+            )
+
+    def test_update_translation_suggestion_error_when_component_count_changes(
+        self
+    ) -> None:
+        content_html_with_multiple_images = (
+            '<p>Original content with multiple images.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description 1" '
+            'caption-with-value="Sample Caption 1" '
+            'filepath-with-value="img1.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description 2" '
+            'caption-with-value="Sample Caption 2" '
+            'filepath-with-value="img2.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        translation_html_with_multiple_images = (
+            '<p>Translation with multiple images.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description 1" '
+            'caption-with-value="Sample Caption 1" '
+            'filepath-with-value="img1.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description 2" '
+            'caption-with-value="Sample Caption 2" '
+            'filepath-with-value="img2.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        suggestion = self.create_translation_suggestion(
+            content_html_with_multiple_images,
+            translation_html_with_multiple_images
+        )
+        updated_translation = (
+            '<p>Updated translation with an extra video.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description 1" '
+            'caption-with-value="Sample Caption 1" '
+            'filepath-with-value="img1.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 2 image, 0 math. '
+            'Components in translated text: 1 image, 2 math.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id,
+                updated_translation
+            )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        original_component_counts = suggestion_services.count_rte_components(
+            updated_suggestion.change_cmd.translation_html
+        )
+
+        rte_tags_with_attrs = (
+            rte_component_registry.Registry.get_tag_list_with_attrs()
+        )
+        rte_tags = list(rte_tags_with_attrs.keys())
+
+        expected_counts = {tag: 0 for tag in rte_tags}
+
+        expected_counts['oppia-noninteractive-image'] = 2
+
+        self.assertEqual(expected_counts, original_component_counts)
+
+    def test_update_translation_suggestion_error_when_component_types_mismatch(
+        self
+    ) -> None:
+        content_html_with_image = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        translation_html_with_image = (
+            '<p>Translation with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        suggestion = self.create_translation_suggestion(
+            content_html_with_image,
+            translation_html_with_image
+        )
+        updated_translation_with_math = (
+            '<p>Updated translation with math instead of image.</p>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 1 image, 0 math. '
+            'Components in translated text: 0 image, 1 math.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id,
+                updated_translation_with_math
+            )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+        self.assertEqual(
+            updated_suggestion.change_cmd.translation_html,
+            translation_html_with_image
+        )
+
+    def test_update_translation_suggestion_with_extra_characters(self) -> None:
+        original = 'This is a test string.'
+        updated = 'This is a test string. Extra text.'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = (
+            suggestion_services.highlight_differences(
+                original, updated
+            )
+        )
+
+        self.assertTrue(truncated_original.startswith('...'))
+        self.assertTrue(truncated_updated.startswith('...'))
+        self.assertTrue(truncated_updated.endswith('Extra text.'))
+
+    def test_update_translation_suggestion_with_long_text(self) -> None:
+        original = f'{"A" * 50}DIFFERENT{"B" * 50}'
+        updated = f'{"A" * 50}CHANGED{"B" * 50}'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = (
+            suggestion_services.highlight_differences(
+                original, updated
+            )
+        )
+
+        self.assertTrue(truncated_original.startswith('...'))
+        self.assertTrue(truncated_updated.startswith('...'))
+
+        self.assertIn('DIFFERENT', truncated_original)
+        self.assertIn('CHANGED', truncated_updated)
+
+    def test_highlight_differences_identical_strings(self) -> None:
+        original_string = 'This is the same string.'
+        updated_string = 'This is the same string.'
+
+        suggestion = self.create_translation_suggestion(
+            original_string, original_string
+        )
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated_string
+        )
+
+        suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        truncated_original, truncated_updated = (
+            suggestion_services.highlight_differences(
+                original_string, updated_string
+            )
+        )
+
+        self.assertEqual(truncated_original, original_string)
+        self.assertEqual(truncated_updated, updated_string)
+
+    def test_update_translation_suggestion_with_change_in_middle(self) -> None:
+        original = 'This is a test string.'
+        updated = 'This is a best string.'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertIn('test', original)
+        self.assertIn('best', updated_suggestion.change_cmd.translation_html)
+
+    def test_update_translation_suggestion_with_change_at_start(self) -> None:
+        original = 'Alpha test string.'
+        updated = 'Beta test string.'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id
+        )
+
+        self.assertIn('Alpha', original)
+        self.assertIn('Beta', updated_suggestion.change_cmd.translation_html)
+
+    def test_update_translation_suggestion_error_with_two_discrepancies(
+        self
+    ) -> None:
+        content_html_with_image = (
+            '<p>Original content with image.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-math '
+            'math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)&amp;quot;, '
+            '&amp;quot;svg_filename&amp;quot;: &amp;quot;file.svg&amp;quot;}">'
+            '</oppia-noninteractive-math>'
+        )
+        translation_html_without_math = (
+            '<p>Translation without math.</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Image description" '
+            'caption-with-value="Sample Caption" '
+            'filepath-with-value="img.svg"> '
+            '</oppia-noninteractive-image>'
+        )
+        suggestion = self.create_translation_suggestion(
+            content_html_with_image, content_html_with_image
+        )
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Components in original text: 1 image, 1 math. '
+            'Components in translated text: 2 image, 0 math.'
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, translation_html_without_math
+            )
+
+    def test_update_translation_suggestion_no_rte_components(self) -> None:
+        original = 'This is a test string.'
+        updated = 'This is a best string.'
+
+        suggestion = self.create_translation_suggestion(original, original)
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, updated)
+
+    def test_update_translation_suggestion_error_with_truncated_text(
+        self
+    ) -> None:
+        truncation_limit = (
+            suggestion_services.MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+        )
+        long_original_html = (
+            f'<p>{"a" * 250}</p>'
+            '<oppia-noninteractive-image '
+            'alt-with-value="Original Alt" '
+            'caption-with-value="Original Caption" '
+            'filepath-with-value="original.svg">'
+            '</oppia-noninteractive-image>'
+        )
+        long_updated_html = f'<p>{"b" * 250}</p>'
+        suggestion = self.create_translation_suggestion(
+            long_original_html, long_original_html
+        )
+
+        original_preview_start = long_original_html.find('<p>')
+        original_preview_end = original_preview_start + truncation_limit
+        truncated_original_expected = long_original_html[
+            original_preview_start:original_preview_end
+        ]
+
+        updated_preview_start = long_updated_html.find('<p>')
+        updated_preview_end = updated_preview_start + truncation_limit
+        truncated_updated_expected = long_updated_html[
+            updated_preview_start:updated_preview_end
+        ]
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            (
+                f'Components in original text: 1 image. '
+                f'Components in translated text: 0 image.\n'
+                f'Original text preview: {truncated_original_expected}\n'
+                f'Translated text preview: {truncated_updated_expected}'
+            )
+        ):
+            suggestion_services.update_translation_suggestion(
+                suggestion.suggestion_id, long_updated_html
+            )
+
     def test_wrong_suggestion_raise_error_when_updating_add_question_suggestion(
         self
     ) -> None:
@@ -1900,7 +2358,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertCountEqual(
-            target_ids, [fetched_target_id_1, fetched_target_id_2]
+            target_ids, [
+                fetched_target_id_1,
+                fetched_target_id_2
+            ]
         )
 
     def test_get_no_translation_target_ids_when_user_cannot_review_in_given_language( # pylint: disable=line-too-long
