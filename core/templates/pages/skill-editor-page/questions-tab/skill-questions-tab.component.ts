@@ -16,7 +16,7 @@
  * @fileoverview Component for the questions tab.
  */
 
-import {Component, OnDestroy, OnInit, Input} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Rubric} from 'domain/skill/rubric.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {Subscription} from 'rxjs';
