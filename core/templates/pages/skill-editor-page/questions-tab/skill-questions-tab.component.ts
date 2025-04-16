@@ -43,6 +43,9 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   _init(): void {
     this.skill = this.skillEditorStateService.getSkill();
+    this.difficultyCount = this.skill
+      .getRubrics()
+      .filter(r => r._explanations?.length > 0).length;
     this.groupedSkillSummaries =
       this.skillEditorStateService.getGroupedSkillSummaries();
     this.skillIdToRubricsObject = {};
@@ -53,9 +56,6 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
     if (this.skillEditorStateService.getSkill() !== undefined) {
       this._init();
     }
-    this.difficultyCount = this.skill
-      .getRubrics()
-      .filter(r => r._explanations?.length > 0).length;
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(() => this._init())
     );
