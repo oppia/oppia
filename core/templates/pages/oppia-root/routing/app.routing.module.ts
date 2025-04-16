@@ -21,6 +21,7 @@ import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
+import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/guards/normalize-url-case.guard';
 import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
 // All paths must be defined in constants.ts file.
@@ -147,6 +148,7 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+    canActivate: [NormalizeUrlCaseGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
