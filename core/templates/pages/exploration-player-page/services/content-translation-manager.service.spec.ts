@@ -206,7 +206,6 @@ describe('Content translation manager service', () => {
           null
         ),
         interaction,
-        RecordedVoiceovers.createEmpty(),
         'content',
         atls
       )
@@ -410,7 +409,6 @@ describe('Content translation manager service', () => {
           null
         ),
         newInteraction,
-        RecordedVoiceovers.createEmpty(),
         'content',
         atls
       )
