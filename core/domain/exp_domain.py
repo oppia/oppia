@@ -6471,6 +6471,11 @@ class ExplorationChangeMergeVerifier:
                     current_exploration.states[state_name])
                 if (change.property_name ==
                         STATE_PROPERTY_CONTENT):
+                    if (old_exp_states.content.html ==
+                            current_exp_states.content.html):
+                        if (STATE_PROPERTY_CONTENT not in
+                                self.changed_translations[state_name]):
+                            change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True
                 elif (change.property_name ==

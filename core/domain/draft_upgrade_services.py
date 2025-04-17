@@ -1071,7 +1071,7 @@ class DraftUpgradeUtil:
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
-                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED):
                 # Here we use cast because this 'if' condition forces change to
                 # have type EditExpStatePropertyRecordedVoiceoversCmd.
                 edit_recorded_voiceovers_cmd = cast(
@@ -1093,7 +1093,8 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                        exp_domain.
+                        STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED),
                     'state_name': change.state_name,
                     'new_value': {
                         'voiceovers_mapping': new_voiceovers_mapping
@@ -1195,7 +1196,8 @@ class DraftUpgradeUtil:
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                        exp_domain.
+                        STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED),
                     'state_name': change.state_name,
                     'new_value': {
                         'voiceovers_mapping': voiceovers_dict

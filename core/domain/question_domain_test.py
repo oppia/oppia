@@ -742,6 +742,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v27_to_v28(self) -> None:
+        # Here we use MyPy ignore because we are defining an older version
+        # dictionary of state which contains `recorded_voiceovers`
+        # key, but question_data is of type StateDict (latest version dictionary
+        # for state) and StateDict do not contain this older key. So, because of
+        # this MyPy throws an `TypedDict "StateDict" has no key` error. Thus to
+        # avoid the error, we used ignore here.
+        self.question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': {
+                'content': {
+                    'duration_secs': 0.0,
+                    'filename': 'test.mp3',
+                    'file_size_bytes': 1234,
+                    'needs_update': False
+                }
+            }
+        }
         test_data = self.question_state_dict['recorded_voiceovers']
         # Here we use MyPy ignore because we are defining an older version
         # dictionary of state which contains `content_ids_to_audio_translations`
@@ -839,10 +855,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # functions, keys are populated automatically or not. So, due to the
         # absence of keys MyPy throws an `Missing key` error. Thus to avoid
         # the error, we used ignore here.
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
-            'content': {
-                'audio_metadata': {}  # type: ignore[typeddict-item]
+        self.question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': {
+                'content': {
+                    'audio_metadata': {}  # type: ignore[typeddict-item]
+                }
             }
         }
 
@@ -1047,9 +1064,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+        self.question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': {
+                'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
+            }
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
@@ -1343,6 +1361,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         }
+        test_value['state']['recorded_voiceovers'] = {
+            'voiceovers_mapping': {}}
         test_value['state_schema_version'] = 35
 
         with self.swap_to_always_return(
@@ -1380,7 +1400,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }
             }
         }
-        test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
+        test_value['state']['recorded_voiceovers'] = {'voiceovers_mapping': {}}
         test_value['state_schema_version'] = 35
 
         with self.swap_to_always_return(
@@ -1586,8 +1606,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
         self.question_state_dict['interaction']['customization_args'] = {}
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        self.question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': {}}
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         self.question_state_dict['written_translations'] = { # type: ignore[misc]
@@ -1702,8 +1722,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains next_content_id_index property.
         self.question_state_dict['next_content_id_index'] = 0 # type: ignore[misc]
-        self.question_state_dict[
-            'recorded_voiceovers']['voiceovers_mapping'] = {}
+        self.question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': {}}
 
         test_value: question_domain.VersionedQuestionStateDict = {
             'state': self.question_state_dict,

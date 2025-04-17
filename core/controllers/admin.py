@@ -158,7 +158,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
     'category': 'Algorithms',
     'author_notes': '',
     'blurb': '',
-    'states_schema_version': 55,
+    'states_schema_version': 57,
     'init_state_name': 'Introduction',
     'language_code': 'en',
     'objective': 'Learn the exploration',
@@ -194,11 +194,6 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
-            'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                    'content_0': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': True,
             'inapplicable_skill_misconception_ids': []
