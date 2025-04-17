@@ -578,7 +578,9 @@ export class ExplorationStatesService {
   }
 
   getAllContentIdsByStateName(stateName: string): string[] {
-    let allContentIds = this._states.getState(stateName).getAllContentIds();
+    let allContentIds = (
+      this._states.getState(stateName) as State
+    ).getAllContentIds();
     return allContentIds.filter(contentId => contentId !== undefined);
   }
 

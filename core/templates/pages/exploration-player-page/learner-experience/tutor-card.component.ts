@@ -141,7 +141,6 @@ export class TutorCardComponent {
   interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
   interactionInstructions!: string | null;
-  contentAudioTranslations!: BindableVoiceovers;
   isIframed!: boolean;
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
@@ -420,7 +419,6 @@ export class TutorCardComponent {
     if (!this.conceptCardIsBeingShown) {
       this.interactionInstructions =
         this.displayedCard.getInteractionInstructions();
-      this.contentAudioTranslations = null;
 
       this.voiceoverPlayerService.setActiveVoiceover(
         this.displayedCard.contentId

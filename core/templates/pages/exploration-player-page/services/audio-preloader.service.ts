@@ -20,6 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
@@ -42,7 +43,7 @@ export class AudioPreloaderService {
   // The following property can be null, when there is no recently
   // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
-  public contentIdsToVoiceovers = {};
+  public contentIdsToVoiceovers: {[contentIddd: string]: Voiceover[]} = {};
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,

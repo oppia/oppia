@@ -345,8 +345,9 @@ export class TranslationStatusService implements OnInit {
 
   _getAvailableContentIds(): string[] {
     let stateName = this.stateEditorService.getActiveStateName();
-    let contentIds =
-      this.explorationStatesService.getAllContentIdsByStateName(stateName);
+    let contentIds = this.explorationStatesService.getAllContentIdsByStateName(
+      stateName as string
+    ) as string[];
     return contentIds;
   }
 
