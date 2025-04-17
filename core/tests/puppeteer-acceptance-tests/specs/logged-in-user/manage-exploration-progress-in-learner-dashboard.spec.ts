@@ -65,6 +65,14 @@ describe('Logged-in User', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
+  it(
+    'should navigate to the new learner dashboard',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
