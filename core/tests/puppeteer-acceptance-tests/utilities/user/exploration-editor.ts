@@ -445,7 +445,7 @@ export class ExplorationEditor extends BaseUser {
       });
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
+      showMessage(`Welcome modal not found: ${error.message}`);
     }
   }
 

@@ -74,27 +74,27 @@ export class CreatorExplorationSummary {
   ) {}
 
   static createFromBackendDict(
-    expSummaryBacknedDict: CreatorExplorationSummaryBackendDict
+    backendDict: CreatorExplorationSummaryBackendDict
   ): CreatorExplorationSummary {
     return new CreatorExplorationSummary(
-      expSummaryBacknedDict.category,
-      expSummaryBacknedDict.community_owned,
-      expSummaryBacknedDict.id,
-      expSummaryBacknedDict.language_code,
-      expSummaryBacknedDict.num_views,
-      expSummaryBacknedDict.objective,
-      expSummaryBacknedDict.status,
-      expSummaryBacknedDict.tags,
-      expSummaryBacknedDict.thumbnail_bg_color,
-      expSummaryBacknedDict.thumbnail_icon_url,
-      expSummaryBacknedDict.title,
-      expSummaryBacknedDict.activity_type,
-      expSummaryBacknedDict.last_updated_msec,
-      expSummaryBacknedDict.created_on_msec,
-      expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary,
-      expSummaryBacknedDict.num_total_threads,
-      expSummaryBacknedDict.num_open_threads
+      backendDict.category,
+      backendDict.community_owned,
+      backendDict.id,
+      backendDict.language_code,
+      backendDict.num_views,
+      backendDict.objective,
+      backendDict.status,
+      backendDict.tags,
+      backendDict.thumbnail_bg_color,
+      backendDict.thumbnail_icon_url,
+      backendDict.title,
+      backendDict.activity_type,
+      backendDict.last_updated_msec,
+      backendDict.created_on_msec,
+      backendDict.ratings,
+      backendDict.human_readable_contributors_summary,
+      backendDict.num_total_threads,
+      backendDict.num_open_threads
     );
   }
 }

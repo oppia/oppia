@@ -16,12 +16,12 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a subtopic, story, adding chapters to it, and deleting the story, subtopics and chapters.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
+import { UserFactory } from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import { TopicManager } from '../../utilities/user/topic-manager';
+import { CurriculumAdmin } from '../../utilities/user/curriculum-admin';
+import { ExplorationEditor } from '../../utilities/user/exploration-editor';
+import { ConsoleReporter } from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -52,7 +52,9 @@ describe('Topic Manager', function () {
       );
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'test exploration 2'
+        'test exploration 2',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createTopic('Addition', 'add');
@@ -86,7 +88,7 @@ describe('Topic Manager', function () {
         'test-story-one',
         'Addition'
       );
-      // Creating 2 chapter in the story so that we can test delete the second one (cannot delete the first chapter).
+      // Creating 2 chapters in the story so that we can test deleting the second one (cannot delete the first chapter).
       await topicManager.addChapter('Test Chapter 1', explorationId1 as string);
       await topicManager.addChapter('Test Chapter 2', explorationId2 as string);
       await topicManager.saveStoryDraft();

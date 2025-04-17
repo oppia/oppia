@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for CreatorExplorationSummary.
  */
 
-import {CreatorExplorationSummary} from 'domain/summary/creator-exploration-summary.model';
+import { CreatorExplorationSummary } from './creator-exploration-summary.model';
 
 describe('Creator Exploration summary model', () => {
   it('should correctly convert backend dict to exp summary object', () => {
-    let backendDict = {
+    const backendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
       objective: 'Test Objective',
@@ -47,7 +47,7 @@ describe('Creator Exploration summary model', () => {
       num_open_threads: 0,
     };
 
-    let expSummaryObject =
+    const expSummaryObject =
       CreatorExplorationSummary.createFromBackendDict(backendDict);
 
     expect(expSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
@@ -74,5 +74,68 @@ describe('Creator Exploration summary model', () => {
     expect(expSummaryObject.title).toEqual('Test Title');
     expect(expSummaryObject.numTotalThreads).toEqual(0);
     expect(expSummaryObject.numOpenThreads).toEqual(0);
+  });
+
+  it('should handle missing optional fields in backend dict', () => {
+    const backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      num_total_threads: 0,
+      num_open_threads: 0,
+    };
+
+    const expSummaryObject =
+      CreatorExplorationSummary.createFromBackendDict(backendDict);
+
+    expect(expSummaryObject.tags).toEqual([]);
+    expect(expSummaryObject.humanReadableContributorsSummary).toEqual({});
+  });
+
+  it('should correctly handle empty ratings', () => {
+    const backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {},
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      num_total_threads: 0,
+      num_open_threads: 0,
+    };
+
+    const expSummaryObject =
+      CreatorExplorationSummary.createFromBackendDict(backendDict);
+
+    expect(expSummaryObject.ratings).toEqual({});
   });
 });

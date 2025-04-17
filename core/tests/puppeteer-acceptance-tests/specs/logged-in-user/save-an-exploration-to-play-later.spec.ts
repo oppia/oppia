@@ -18,11 +18,11 @@
  * playing the exploration from the learner dashboard, and then removing it from 'play later'.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
+import { UserFactory } from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import { LoggedOutUser } from '../../utilities/user/logged-out-user';
+import { LoggedInUser } from '../../utilities/user/logged-in-user';
+import { ExplorationEditor } from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
@@ -36,11 +36,14 @@ describe('Logged-in User', function () {
       'exploration_editor@example.com'
     );
 
+    // Create and publish explorations.
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
       'Positive Numbers'
     );
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-      'Negative Numbers'
+      'Negative Numbers',
+      'Algebra',
+      false
     );
 
     loggedInUser = await UserFactory.createNewUser(

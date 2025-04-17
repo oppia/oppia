@@ -20,11 +20,11 @@
  * - Loading the next chapter, loading the practice session page, and returning to the story from the last state of an exploration.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
+import { UserFactory } from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import { LoggedOutUser } from '../../utilities/user/logged-out-user';
+import { ExplorationEditor } from '../../utilities/user/exploration-editor';
+import { CurriculumAdmin } from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -48,7 +48,9 @@ describe('Logged-out User', function () {
       );
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'positive-numbers'
+        'positive-numbers',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createAndPublishTopic(
@@ -84,7 +86,7 @@ describe('Logged-out User', function () {
   }, 400000);
 
   it(
-    'should be able to return to the respective story, sign-in, sign-up and load the next chapter form the last state of an exploration',
+    'should be able to return to the respective story, sign-in, sign-up and load the next chapter from the last state of an exploration',
     async function () {
       await loggedOutUser.navigateToClassroomPage('math');
 
