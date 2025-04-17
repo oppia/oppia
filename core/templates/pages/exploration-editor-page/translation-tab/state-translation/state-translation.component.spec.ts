@@ -32,7 +32,6 @@ import {StateWrittenTranslationsService} from 'components/state-editor/state-edi
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -251,22 +250,6 @@ describe('State translation component', () => {
       solicit_answer_details: false,
     },
   } as StateObjectsBackendDict;
-
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
@@ -922,22 +905,6 @@ describe('State translation component', () => {
     },
   } as StateObjectsBackendDict;
 
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
-
   let refreshStateTranslationEmitter = new EventEmitter();
   let showTranslationTabBusyModalEmitter = new EventEmitter();
 
@@ -1426,22 +1393,6 @@ describe('State translation component', () => {
       solicit_answer_details: false,
     },
   } as StateObjectsBackendDict;
-
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
@@ -2092,22 +2043,6 @@ describe('State translation component', () => {
       solicit_answer_details: false,
     },
   } as StateObjectsBackendDict;
-
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
 
   let refreshStateTranslationEmitter = new EventEmitter();
 

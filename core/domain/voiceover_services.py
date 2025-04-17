@@ -18,15 +18,12 @@
 
 from __future__ import annotations
 
-import collections
 import json
 import os
 
-from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.domain import exp_domain
-from core.domain import feature_flag_services
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
@@ -825,6 +822,7 @@ def create_exploration_voice_artists_link_model_instance(
     exploration_voice_artists_link_model.update_timestamps()
 
     return exploration_voice_artists_link_model
+
 
 def compute_voiceover_related_changes_upon_revert(
     reverted_exploration: exp_domain.Exploration,

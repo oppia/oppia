@@ -28,7 +28,6 @@ import {AppConstants} from 'app.constants';
 import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import {Subscription} from 'rxjs';
 import {AudioBarStatusService} from 'services/audio-bar-status.service';

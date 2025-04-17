@@ -25,7 +25,6 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
