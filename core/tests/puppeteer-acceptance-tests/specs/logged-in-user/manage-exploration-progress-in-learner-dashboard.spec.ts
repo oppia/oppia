@@ -31,6 +31,40 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
+
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
+
+    const explorationTitles = [
+      'Exploration 1',
+      'Exploration 2',
+      'Exploration 3',
+    ];
+
+    for (const title of explorationTitles) {
+      await curriculumAdmin.createAndPublishExplorationWithCards(title);
+    }
+
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser1',
+      'logged_in_user1@example.com'
+    );
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
