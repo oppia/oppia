@@ -108,7 +108,7 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should verify progress, checkpoints, resume flow, and restrict answering after resuming.',
+    'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
