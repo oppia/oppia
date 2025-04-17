@@ -410,9 +410,7 @@ describe('Full exploration editor', function () {
     await libraryPage.get();
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
-    var recommendedExplorationTile = element(
-      by.css('.e2e-test-exp-summary-tile-title')
-    );
+    var recommendedExplorationTile = $('.e2e-test-exp-summary-tile-title');
     var recommendedExplorationName = await action.getText(
       'Recommended Exploration Tile',
       recommendedExplorationTile
