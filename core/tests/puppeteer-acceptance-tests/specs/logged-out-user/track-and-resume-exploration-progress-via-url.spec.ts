@@ -98,6 +98,7 @@ describe('Logged-out User', function () {
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
+    // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
@@ -117,7 +118,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-      
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
@@ -126,7 +126,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
       await loggedOutUser.expectLessonInfoToShowTags(['growth']);
       await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
-      
       await loggedOutUser.shareExplorationFromLessonInfoModal(
         'Facebook',
         explorationId
@@ -135,7 +134,6 @@ describe('Logged-out User', function () {
         'Twitter',
         explorationId
       );
-      
       await loggedOutUser.closeLessonInfoModal();
 
       await loggedOutUser.submitAnswer('-99');
@@ -148,9 +146,7 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.reloadPage();
       await loggedOutUser.expectProgressRemainder(false);
-      
       await loggedOutUser.continueToNextCard();
-
       await loggedOutUser.submitAnswer('-35');
       await loggedOutUser.continueToNextCard();
 
