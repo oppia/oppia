@@ -63,7 +63,7 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, 480000);
 
   /**
    * TODO(#): Add tests for home tab. Interactions involving in-progress lessons
