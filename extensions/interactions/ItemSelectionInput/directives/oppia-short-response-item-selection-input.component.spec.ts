@@ -66,4 +66,28 @@ describe('ShortResponseItemSelectionInput', () => {
 
     expect(component.responses).toEqual(['choice 1']);
   });
+
+  it('should strip wrapping <p> tags', () => {
+    const input = '<p>Hello World</p>';
+    const output = component.stripWrappingPTag(input);
+    expect(output).toBe('Hello World');
+  });
+
+  it('should return unchanged input if not wrapped with <p>...</p>', () => {
+    const input = 'Hello <p>World</p>';
+    const output = component.stripWrappingPTag(input);
+    expect(output).toBe(input);
+  });
+
+  it('should handle empty <p> tags', () => {
+    const input = '<p></p>';
+    const output = component.stripWrappingPTag(input);
+    expect(output).toBe('');
+  });
+
+  it('should not strip nested <p> tags inside the outer <p>', () => {
+    const input = '<p>Hello <p>World</p></p>';
+    const output = component.stripWrappingPTag(input);
+    expect(output).toBe('Hello <p>World</p>');
+  });
 });
