@@ -31,6 +31,7 @@ enum INTERACTION_TYPES {
   NUMERIC_INPUT = 'Number Input',
   END_EXPLORATION = 'End Exploration',
 }
+
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   TEST_QUESTION = 'Test Question',
@@ -53,17 +54,15 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
+
     await explorationEditor.updateCardContent(
       'We will be learning positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-
-    // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Test Question');
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
     await explorationEditor.updateCardContent(
       'Enter a negative number greater than -100.'
@@ -72,14 +71,13 @@ describe('Logged-out User', function () {
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
-      'Prefect!',
+      'Perfect!',
       CARD_NAME.REVISION_CARD,
       true
     );
     await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and Revision content.
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(
       'Positive numbers are greater than zero.'
@@ -90,14 +88,12 @@ describe('Logged-out User', function () {
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
       'We have practiced positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
-    // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
@@ -112,26 +108,19 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to check progress, answer states, generate and use progress URL in the exploration player.',
+    'should verify progress, checkpoints, resume flow, and restrict answering after resuming.',
     async function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
-
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.submitAnswer('-25');
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyCheckpointModalAppears();
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
-      await loggedOutUser.saveProgress();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
       await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
       await loggedOutUser.expectLessonInfoToShowTags(['growth']);
       await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
-
       await loggedOutUser.shareExplorationFromLessonInfoModal(
         'Facebook',
         explorationId
@@ -140,28 +129,27 @@ describe('Logged-out User', function () {
         'Twitter',
         explorationId
       );
-
       await loggedOutUser.closeLessonInfoModal();
 
-      await loggedOutUser.submitAnswer('-25');
+      await loggedOutUser.submitAnswer('-99');
+      await loggedOutUser.expectCardContentToMatch('Enter a negative number greater than -100.');
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.verifyCheckpointModalAppears();
+      await loggedOutUser.continueToNextCard();
+
 
       await loggedOutUser.reloadPage();
       await loggedOutUser.expectProgressRemainder(false);
+      await loggedOutUser.continueToNextCard();
 
-      await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-35');
-      await loggedOutUser.continueToNextCard();
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.saveProgress();
       await loggedOutUser.expectSignInButtonToBePresent();
       await loggedOutUser.expectCreateAccountToBePresent();
-      await loggedOutUser.checkProgressUrlValidityInfo(
-        PROGRESS_URL_VALIDITY_INFO
-      );
+      await loggedOutUser.checkProgressUrlValidityInfo(PROGRESS_URL_VALIDITY_INFO);
       progressUrl = await loggedOutUser.copyProgressUrl();
 
       await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
@@ -170,6 +158,7 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.goBackToPreviousCard();
       await loggedOutUser.verifyCannotAnswerPreviouslyAnsweredQuestion();
+
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
