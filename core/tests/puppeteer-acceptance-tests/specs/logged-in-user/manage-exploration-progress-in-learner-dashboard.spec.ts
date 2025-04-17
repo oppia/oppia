@@ -18,8 +18,19 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
+  let loggedInUser: LoggedInUser;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let releaseCoordinator: ReleaseCoordinator;
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
