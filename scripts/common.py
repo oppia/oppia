@@ -223,6 +223,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     '-answer-group-hint-solution',
     'exploration-editor/validate-exploration-managers-collaborators'
     '-playtesters-access-permissions',
+    'exploration-editor/submit-review-and-respond-to-feedback',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/access-dashboards-from-profile-menu',
@@ -271,6 +272,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties', # pylint: disable=line-too-long
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
