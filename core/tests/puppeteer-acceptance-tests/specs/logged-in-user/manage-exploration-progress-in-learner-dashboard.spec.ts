@@ -65,6 +65,16 @@ describe('Logged-in User', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
+  /**
+   * TODO(#): Add tests for home tab. Interactions involving in-progress lessons
+   * and saved lessons sections.
+   */
+
+  /**
+   * TODO(#): Add tests for progress tab. Interactions involving in-progress
+   * and completed explorations.
+   */
+
   it(
     'should navigate to the new learner dashboard',
     async function () {
