@@ -52,4 +52,8 @@ export class ShortResponseItemSelectionInputComponent implements OnInit {
       contentId => choices[choicesContentIds.indexOf(contentId)]._html
     );
   }
+
+  stripWrappingPTag(input: string): string {
+    return input.replace(/^<p>(.*?)<\/p>$/, '$1');
+  }
 }

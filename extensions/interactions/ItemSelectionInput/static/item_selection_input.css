@@ -82,6 +82,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   display: inline-block;
   height: 16px;
   margin-bottom: -1px;
+  margin-top: 4px;
   width: 16px;
 }
 
