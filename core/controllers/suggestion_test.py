@@ -1453,7 +1453,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertIn(
             'An image in the submitted translation\'s original content '
             'named "img.png" cannot be found. Please save it to the '
-            'backend file system at /exploration/%s/assets/image/ '  
+            'backend file system at /exploration/%s/assets/image/ '
             'before submitting this translation again.' % exp_id,
             response_dict['error']
         )
@@ -2373,7 +2373,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
-            'recorded_voiceovers': {
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            'recorded_voiceovers': {    # type: ignore[typeddict-item]
                 'voiceovers_mapping': {
                     'content_0': {},
                     'default_outcome_1': {},

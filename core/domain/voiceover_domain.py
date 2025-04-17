@@ -310,8 +310,10 @@ class EntityVoiceovers:
         """
         if content_id not in self.voiceovers_mapping:
             return
-        self.voiceovers_mapping[content_id][
-            feconf.VoiceoverType.MANUAL].needs_update = True
+        manual_voiceover = self.voiceovers_mapping[content_id][
+            feconf.VoiceoverType.MANUAL]
+        if manual_voiceover is not None:
+            manual_voiceover.needs_update = True
 
     @classmethod
     def create_empty(

@@ -4584,7 +4584,9 @@ class State(translation_domain.BaseTranslatableObject):
             state: StateDict = states_dict[state_name]
             new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
             old_to_new_content_id: Dict[str, str] = {}
-            old_voiceovers_mapping = state['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            old_voiceovers_mapping = state['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping']
 
             for content, content_type, extra_prefix in (
@@ -4611,7 +4613,9 @@ class State(translation_domain.BaseTranslatableObject):
                 new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
                     old_content_id]
 
-            state['recorded_voiceovers']['voiceovers_mapping'] = (
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            state['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
                 new_voiceovers_mapping
             )
 

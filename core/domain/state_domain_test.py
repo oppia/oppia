@@ -1471,9 +1471,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1554,9 +1551,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1732,9 +1726,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1807,9 +1798,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
@@ -1943,9 +1931,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2010,9 +1995,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         self.assertEqual(
@@ -2110,9 +2092,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2230,9 +2209,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2331,9 +2307,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }
                 ]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2417,9 +2390,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2464,9 +2434,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         solution_dict: state_domain.SolutionDict = {

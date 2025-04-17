@@ -3145,13 +3145,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
             new_translations_mapping)
 
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         voiceovers_mapping = (
-            state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            state_dict['recorded_voiceovers']['voiceovers_mapping']) # type: ignore[misc]
         new_voiceovers_mapping = {}
         for content_id, voiceover_item in voiceovers_mapping.items():
             if content_id in content_id_list:
                 new_voiceovers_mapping[content_id] = voiceover_item
-        state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        state_dict['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
             new_voiceovers_mapping)
 
     @classmethod
@@ -3382,8 +3386,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'translations_mapping'][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
-
-            choice_voiceovers = state_dict['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
@@ -3665,8 +3670,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'translations_mapping'][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
-
-            choice_voiceovers = state_dict['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True

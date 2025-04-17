@@ -59,7 +59,9 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
             'Introduction': {
                 'card_is_checkpoint': True,
                 'solicit_answer_details': False,
-                'recorded_voiceovers': {
+                # Here we use MyPy ignore because the latest schema of state
+                # dict doesn't contains recorded_voiceovers property.
+                'recorded_voiceovers': {    # type: ignore[typeddict-item]
                     'voiceovers_mapping': {
                         'hint_5': {},
                         'feedback_4': {},
