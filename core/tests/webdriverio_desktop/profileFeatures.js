@@ -195,10 +195,10 @@ describe('Playing the exploration', function () {
   };
 
   var backButtonSelector = function () {
-    return $('.e2e-test-back-button');
+    return element(by.css('.e2e-test-back-button'));
   };
   var nextButtonSelector = function () {
-    return $('.e2e-test-next-button');
+    return element(by.css('.e2e-test-next-button'));
   };
 
   beforeAll(async function () {

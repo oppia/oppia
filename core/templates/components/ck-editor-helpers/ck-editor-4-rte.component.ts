@@ -48,6 +48,7 @@ import {
   SimpleChanges,
   OnInit,
   ViewChild,
+  Renderer2,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -98,7 +99,8 @@ export class CkEditor4RteComponent
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef,
-    private internetConnectivityService: InternetConnectivityService
+    private internetConnectivityService: InternetConnectivityService,
+    private renderer: Renderer2
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
     this.subscriptions = new Subscription();
@@ -444,15 +446,16 @@ export class CkEditor4RteComponent
       };
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_button')
-        .css('height', '29px')
-        .css('width', '62px')
-        .css('margin-right', '25px')
-        .on('click', () => {
-          // Timeout is required to ensure that the format dropdown
-          // has been initialized and the iframe has been loaded into DOM.
-          setTimeout(() => changeComboPanel(), 25);
-        });
+      Array.from(document.querySelectorAll('.cke_combo_button')).forEach(
+        (button: HTMLElement) => {
+          this.renderer.setStyle(button, 'height', '29px');
+          this.renderer.setStyle(button, 'width', '62px');
+          this.renderer.setStyle(button, 'margin-right', '25px');
+          this.renderer.listen(button, 'click', () => {
+            setTimeout(() => changeComboPanel(), 25);
+          });
+        }
+      );
 
       // TODO(#12882): Remove the use of jQuery.
       $('.cke_combo_open').css('margin-left', '-20px').css('margin-top', '2px');

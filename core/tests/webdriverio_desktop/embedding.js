@@ -222,7 +222,9 @@ describe('Embedding', function () {
         await $('.e2e-test-exploration-id-input-field')
       ).setValue(explorationId);
 
-      await (await $('.e2e-test-exploration-id-submit-button')).click();
+      await (
+        await element(by.css('.e2e-test-exploration-id-submit-button'))
+      ).click();
 
       // Test of standard loading (new and old versions).
       await browser.switchToFrame(await $('.e2e-test-standard > iframe'));
@@ -231,7 +233,9 @@ describe('Embedding', function () {
 
       if (TEST_PAGES[i].isVersion1) {
         // Test of deferred loading (old version).
-        await $('.e2e-test-old-version > oppia > div > button').click();
+        await element(
+          by.css('.e2e-test-old-version > oppia > div > button')
+        ).click();
       }
 
       await browser.switchToFrame(await $('.e2e-test-old-version > iframe'));
@@ -303,7 +307,9 @@ describe('Embedding', function () {
         await $('.e2e-test-exploration-id-input-field')
       ).setValue(explorationId);
 
-      await (await $('.e2e-test-exploration-id-submit-button')).click();
+      await (
+        await element(by.css('.e2e-test-exploration-id-submit-button'))
+      ).click();
 
       await browser.switchToFrame(
         await $('.e2e-test-embedded-exploration > iframe')

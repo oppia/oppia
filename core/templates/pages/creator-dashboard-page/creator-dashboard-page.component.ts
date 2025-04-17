@@ -16,7 +16,7 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import {CreatorDashboardConstants} from './creator-dashboard-page.constants';
@@ -160,6 +160,8 @@ export class CreatorDashboardPageComponent {
     return this.windowDimensionsService.getWidth() < 768;
   }
 
+  // This will automatically call the method when the window is resized.
+  @HostListener('window:resize', [])
   updatesGivenScreenWidth(): void {
     if (this.checkMobileView()) {
       // For mobile users, the view of the creators
@@ -271,9 +273,6 @@ export class CreatorDashboardPageComponent {
       );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
-    angular.element(this.windowRef.nativeWindow).on('resize', () => {
-      this.updatesGivenScreenWidth();
-    });
   }
 
   createNewExploration(): void {
