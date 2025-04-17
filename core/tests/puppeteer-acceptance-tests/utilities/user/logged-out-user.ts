@@ -4030,18 +4030,24 @@ export class LoggedOutUser extends BaseUser {
     const buttonHandle = await this.page.$(selector);
 
     if (buttonHandle !== null) {
-      const isDisabled = await this.page.evaluate((btn) => {
-        return btn.hasAttribute('disabled') || btn.getAttribute('aria-disabled') === 'true';
+      const isDisabled = await this.page.evaluate(btn => {
+        return (
+          btn.hasAttribute('disabled') ||
+          btn.getAttribute('aria-disabled') === 'true'
+        );
       }, buttonHandle);
 
       if (!isDisabled) {
-        throw new Error('"Save Progress" button is enabled before reaching checkpoint, which is not expected.');
+        throw new Error(
+          '"Save Progress" button is enabled before reaching checkpoint, which is not expected.'
+        );
       }
     }
 
-    showMessage('"Save Progress" button is present but disabled, as expected before reaching checkpoint.');
+    showMessage(
+      '"Save Progress" button is present but disabled, as expected before reaching checkpoint.'
+    );
   }
-
 
   /**
    * Shares the exploration.

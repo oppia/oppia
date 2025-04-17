@@ -132,11 +132,12 @@ describe('Logged-out User', function () {
       await loggedOutUser.closeLessonInfoModal();
 
       await loggedOutUser.submitAnswer('-99');
-      await loggedOutUser.expectCardContentToMatch('Enter a negative number greater than -100.');
+      await loggedOutUser.expectCardContentToMatch(
+        'Enter a negative number greater than -100.'
+      );
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.verifyCheckpointModalAppears();
       await loggedOutUser.continueToNextCard();
-
 
       await loggedOutUser.reloadPage();
       await loggedOutUser.expectProgressRemainder(false);
@@ -149,7 +150,9 @@ describe('Logged-out User', function () {
       await loggedOutUser.saveProgress();
       await loggedOutUser.expectSignInButtonToBePresent();
       await loggedOutUser.expectCreateAccountToBePresent();
-      await loggedOutUser.checkProgressUrlValidityInfo(PROGRESS_URL_VALIDITY_INFO);
+      await loggedOutUser.checkProgressUrlValidityInfo(
+        PROGRESS_URL_VALIDITY_INFO
+      );
       progressUrl = await loggedOutUser.copyProgressUrl();
 
       await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
