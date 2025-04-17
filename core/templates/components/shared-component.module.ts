@@ -65,7 +65,6 @@ import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summar
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
 import {TakeBreakModalComponent} from 'pages/exploration-player-page/templates/take-break-modal.component';
-import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
 import {LearnerDashboardIconsComponent} from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
@@ -332,7 +331,6 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     DonationBoxModalComponent,
     ThumbnailDisplayComponent,
     ThreadTableComponent,
-    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     UploadActivityModalComponent,
@@ -490,7 +488,6 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     EditThumbnailModalComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
-    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TagMisconceptionModalComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
@@ -655,7 +652,6 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ThumbnailDisplayComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
-    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TutorCardComponent,
     UploadActivityModalComponent,
     SummarizeNonnegativeNumberPipe,
