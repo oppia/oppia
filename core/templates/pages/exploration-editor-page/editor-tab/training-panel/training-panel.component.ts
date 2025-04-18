@@ -90,7 +90,7 @@ export class TrainingPanelComponent implements OnInit {
     );
     let currentStateName = this.stateEditorService.getActiveStateName();
     if (currentStateName) {
-      this.classification.newOutcome = this.outcome.createNew(
+      this.classification.newOutcome = Outcome.createNew(
         currentStateName,
         contentId,
         '',

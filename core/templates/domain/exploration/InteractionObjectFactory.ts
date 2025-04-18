@@ -308,7 +308,6 @@ export class InteractionObjectFactory {
   constructor(
     private answerGroupFactory: AnswerGroupObjectFactory,
     private solutionFactory: SolutionObjectFactory,
-    private outcomeFactory: Outcome,
     private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory
   ) {}
 
@@ -577,7 +576,7 @@ export class InteractionObjectFactory {
   createOutcomeFromBackendDict(
     outcomeBackendDict: OutcomeBackendDict
   ): Outcome {
-    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
+    return Outcome.createFromBackendDict(outcomeBackendDict);
   }
 
   createSolutionFromBackendDict(

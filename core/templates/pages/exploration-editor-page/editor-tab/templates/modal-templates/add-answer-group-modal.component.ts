@@ -198,7 +198,7 @@ export class AddAnswerGroupModalComponent
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );
-    this.tmpOutcome = this.outcome.createNew(
+    this.tmpOutcome = Outcome.createNew(
       this.questionModeEnabled ? null : this.stateName,
       feedbackContentId,
       '',

@@ -109,7 +109,6 @@ export class ResponsesService {
   constructor(
     private alertsService: AlertsService,
     private loggerService: LoggerService,
-    private outcome: Outcome,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -356,7 +355,7 @@ export class ResponsesService {
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();
         if (stateName) {
-          this._defaultOutcome = this.outcome.createNew(
+          this._defaultOutcome = Outcome.createNew(
             stateName,
             ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
             '',
