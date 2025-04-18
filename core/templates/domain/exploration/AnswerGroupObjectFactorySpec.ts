@@ -23,14 +23,12 @@ import {Outcome} from 'domain/exploration/Outcome.model';
 
 describe('Outcome object factory', () => {
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
-  let outcome: Outcome;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AnswerGroupObjectFactory],
     });
 
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    outcome = TestBed.get(Outcome);
   });
 
   it('should be able to get contentId to html of an answer group', () => {

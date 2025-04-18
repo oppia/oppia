@@ -197,7 +197,7 @@ describe('Lost Change Object Factory', () => {
           ],
         },
         old_value: {
-          outcome: oof.createFromBackendDict({
+          outcome: Outcome.createFromBackendDict({
             dest: 'outcome 1',
             dest_if_really_stuck: null,
             feedback: {
@@ -278,7 +278,7 @@ describe('Lost Change Object Factory', () => {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 2',
           dest_if_really_stuck: null,
           feedback: {
@@ -305,7 +305,7 @@ describe('Lost Change Object Factory', () => {
         ],
       },
       old_value: {
-        outcome: oof.createFromBackendDict({
+        outcome: Outcome.createFromBackendDict({
           dest: 'outcome 1',
           dest_if_really_stuck: null,
           feedback: {

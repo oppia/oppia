@@ -44,7 +44,6 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let oof: Outcome;
   let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
@@ -58,7 +57,6 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    oof = TestBed.inject(Outcome);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
