@@ -224,8 +224,6 @@ const mobileCollapsibleCardHeaderSelector =
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
 const createQuestionButton = '.e2e-test-create-question-button';
-const questionEditCancelButton = 'button.question-edit-cancel-button';
-const confirmQuestionExitButton = '.e2e-test-confirm-question-exit';
 
 export class TopicManager extends BaseUser {
   /**
