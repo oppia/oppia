@@ -127,9 +127,10 @@ class TestGitHubService(unittest.TestCase):
         self.assertEqual(issues[0].number, 1)
         self.assertEqual(issues[0].assignee_username, 'user1')
         self.assertIsNone(issues[1].assignee_username)
-
+        search_url = 'https://api.github.com/search/issues'
+        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
         mock_get.assert_called_once_with(
-            f'{self.base_url}/issues?state=open',
+            url,
             headers=self.service.rest_headers,
             timeout=10
         )
@@ -147,8 +148,10 @@ class TestGitHubService(unittest.TestCase):
             str(context.exception),
             'Received null res while fetching issues'
         )
+        search_url = 'https://api.github.com/search/issues'
+        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
         mock_get.assert_called_once_with(
-            f'{self.base_url}/issues?state=open',
+            url,
             headers=self.service.rest_headers,
             timeout=10
         )
@@ -164,8 +167,10 @@ class TestGitHubService(unittest.TestCase):
             str(context.exception),
             'Network error'
         )
+        search_url = 'https://api.github.com/search/issues'
+        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
         mock_get.assert_called_once_with(
-            f'{self.base_url}/issues?state=open',
+            url,
             headers=self.service.rest_headers,
             timeout=10
         )
