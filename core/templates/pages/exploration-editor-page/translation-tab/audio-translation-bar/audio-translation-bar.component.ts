@@ -586,8 +586,6 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
       translationTab.length > 0 ? translationTab : [];
     const mainBodyElement = mainBody;
 
-    console.log(translationTab);
-    console.log(mainBody);
     this.userService
       .getUserInfoAsync()
       .then(userInfo => {
