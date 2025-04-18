@@ -192,15 +192,15 @@ export class TranslatorOverviewComponent implements OnInit {
           this.LAST_SELECTED_TRANSLATION_LANGUAGE,
           this.languageCode
         );
-        this.routerService.onCenterGraph.emit();
-        this.loaderService.hideLoadingScreen();
-      });
 
-    this.entityVoiceoversService.setLanguageCode(this.languageCode);
-    this.localStorageService.setLastSelectedLanguageAccentCode('');
-    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-      this.updateLanguageAccentCodesDropdownOptions();
-    });
+        this.entityVoiceoversService.setLanguageCode(this.languageCode);
+        this.localStorageService.setLastSelectedLanguageAccentCode('');
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.routerService.onCenterGraph.emit();
+          this.loaderService.hideLoadingScreen();
+          this.updateLanguageAccentCodesDropdownOptions();
+        });
+      });
   }
 
   getTranslationProgressAriaLabel(): string {
