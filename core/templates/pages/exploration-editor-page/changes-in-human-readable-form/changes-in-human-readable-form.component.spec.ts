@@ -24,7 +24,7 @@ import {
   LostChangeObjectFactory,
   LostChangeValue,
 } from 'domain/exploration/LostChangeObjectFactory';
-import {Outcome, OutcomeBackendDict} from 'domain/exploration/Outcome';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/Outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ChangesInHumanReadableFormComponent} from './changes-in-human-readable-form.component';
 
@@ -32,7 +32,6 @@ describe('Changes in Human Readable Form Component', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
   let lostChangeObjectFactory: LostChangeObjectFactory;
-  let outcome: Outcome;
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
@@ -58,7 +57,6 @@ describe('Changes in Human Readable Form Component', () => {
 
   beforeEach(waitForAsync(() => {
     lostChangeObjectFactory = TestBed.inject(LostChangeObjectFactory);
-    outcome = TestBed.inject(Outcome);
 
     fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
     component = fixture.componentInstance;
@@ -521,7 +519,7 @@ describe('Changes in Human Readable Form Component', () => {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {
-            outcome: outcome.createFromBackendDict({
+            outcome: Outcome.createFromBackendDict({
               dest: 'outcome 2',
               dest_if_really_stuck: null,
               feedback: {
@@ -606,7 +604,7 @@ describe('Changes in Human Readable Form Component', () => {
             ],
           },
           old_value: {
-            outcome: outcome.createFromBackendDict({
+            outcome: Outcome.createFromBackendDict({
               dest: 'outcome 1',
               dest_if_really_stuck: null,
               feedback: {
@@ -673,7 +671,7 @@ describe('Changes in Human Readable Form Component', () => {
           state_name: 'Edited state name',
           new_value: {} as LostChangeValue,
           old_value: {
-            outcome: outcome.createFromBackendDict({
+            outcome: Outcome.createFromBackendDict({
               dest: 'outcome 1',
               dest_if_really_stuck: null,
               feedback: {
@@ -738,7 +736,7 @@ describe('Changes in Human Readable Form Component', () => {
         lostChangeObjectFactory.createNew({
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
-          new_value: outcome.createFromBackendDict({
+          new_value: Outcome.createFromBackendDict({
             dest: 'outcome 2',
             dest_if_really_stuck: null,
             feedback: {
@@ -811,14 +809,14 @@ describe('Changes in Human Readable Form Component', () => {
         lostChangeObjectFactory.createNew({
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
-          new_value: outcome.createFromBackendDict({
+          new_value: Outcome.createFromBackendDict({
             dest: 'outcome 2',
             feedback: {
               content_id: 'feedback_2',
               html: 'Html',
             } as LostChangeValue,
           } as OutcomeBackendDict),
-          old_value: outcome.createFromBackendDict({
+          old_value: Outcome.createFromBackendDict({
             dest: 'outcome 1',
             dest_if_really_stuck: null,
             feedback: {
@@ -887,7 +885,7 @@ describe('Changes in Human Readable Form Component', () => {
           state_name: 'Edited state name',
           new_value: {} as LostChangeValue,
           old_value: {
-            outcome: outcome.createFromBackendDict({
+            outcome: Outcome.createFromBackendDict({
               dest: 'outcome 1',
               dest_if_really_stuck: null,
               feedback: {
