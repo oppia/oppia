@@ -793,16 +793,15 @@ class BaseHandler(
         stack_trace = traceback.format_exc()
 
         msg = (
-            '\n\nStack Trace: \n%s\n'
-            'Type Exception: %s\n'
-            'Error Message: %s\n'
+            '\n\n%s: %s\n\n'
+            'Stack Trace: \n%s\n'
             'URL requested: %s\n'
             'Request method: %s\n'
-            'Handler class name: %s\n\n'
+            'Handler class name: %s\n'
             % (
-                stack_trace,
                 exception_type,
                 error_message,
+                stack_trace,
                 url,
                 request_method,
                 handler_class_name

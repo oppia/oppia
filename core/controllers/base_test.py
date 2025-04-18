@@ -2480,12 +2480,15 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
                 False
             )
         expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: NotLoggedInException
-Error Message: Unauthenticated user
+
+NotLoggedInException: Unauthenticated user
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
         self.assertIn(
             expected_log_message,
@@ -2501,12 +2504,15 @@ Handler class name: BaseHandler\n
                 False
             )
         expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: NotFoundException
-Error Message: Invalid URL requested
+
+NotFoundException: Invalid URL requested
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
         self.assertIn(
             expected_log_message,
@@ -2522,12 +2528,15 @@ Handler class name: BaseHandler\n
                 False
             )
         expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: UnauthorizedUserException
-Error Message: Exception raised
+
+UnauthorizedUserException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
         self.assertIn(
             expected_log_message,
@@ -2543,12 +2552,15 @@ Handler class name: BaseHandler\n
                 False
             )
         expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: InvalidInputException
-Error Message: Exception raised
+
+InvalidInputException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
         self.assertIn(
             expected_log_message,
@@ -2564,12 +2576,15 @@ Handler class name: BaseHandler\n
                 False
             )
         expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: InternalErrorException
-Error Message: Exception raised
+
+InternalErrorException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
         self.assertIn(
             expected_log_message,
@@ -2589,12 +2604,15 @@ Handler class name: BaseHandler\n
             generic_exception = Exception('Generic error')
             self.handler.handle_exception(generic_exception, False)
             expected_log_message = f"""
-\nStack Trace: \nNoneType: None\n
-Type Exception: Exception
-Error Message: Exception raised
+
+Exception: Exception raised
+
+Stack Trace: 
+NoneType: None
+
 URL requested: {self.handler.request.uri}
 Request method: POST
-Handler class name: BaseHandler\n
+Handler class name: BaseHandler
 """
             self.assertIn(expected_log_message, self.logged_exceptions)
 
