@@ -137,14 +137,14 @@ class GitHubService:
             requests.HTTPError. Raised if the request fails.
         """
         search_url = 'https://api.github.com/search/issues'
-        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
+        url = f'{search_url}?q=repo:{self.repo_owner}/{self.repo_name}+is:issue+state:open'
         response = requests.get(url, headers=self.rest_headers, timeout=10)
         if response is None:
             raise AssertionError('Received null res while fetching issues')
         response.raise_for_status()
 
         issues_list = []
-        for issue_data in response.json():
+        for issue_data in response.get('items', []):
             assert isinstance(issue_data, dict)
             typed_issue_data: IssueDict = {
                 'number': issue_data['number'],
