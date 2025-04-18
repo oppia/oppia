@@ -25,7 +25,6 @@ import {
 } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
-import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import isEqual from 'lodash/isEqual';
