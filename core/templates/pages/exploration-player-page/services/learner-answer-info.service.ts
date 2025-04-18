@@ -179,14 +179,22 @@ export class LearnerAnswerInfoService {
   }
 
   getSolicitAnswerDetailsQuestion(): string {
-    var el = $('<p>');
-    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
-    return $('<span>').append(el).html();
+    var el = document.createElement('p');
+    el.setAttribute('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
+
+    var span = document.createElement('span');
+    span.appendChild(el);
+
+    return span.textContent || '';
   }
 
   getSolicitAnswerDetailsFeedback(): string {
-    var el = $('<p>');
-    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
-    return $('<span>').append(el).html();
+    var el = document.createElement('p');
+    el.setAttribute('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
+
+    var span = document.createElement('span');
+    span.appendChild(el);
+
+    return span.textContent || '';
   }
 }
