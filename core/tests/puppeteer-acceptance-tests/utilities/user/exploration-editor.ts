@@ -254,8 +254,12 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<INTERACTION_TYPES, string> = {
-  [INTERACTION_TYPES.CODE_EDITOR]: 'PROGRAMMING',
+enum INTERACTION_TABS {
+  PROGRAMMING = 'PROGRAMMING',
+}
+
+export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
+  [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
 };
 
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -1994,7 +1998,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     return explorationId;
-}
+  }
 
   /**
    * Function for creating an exploration with two cards.
