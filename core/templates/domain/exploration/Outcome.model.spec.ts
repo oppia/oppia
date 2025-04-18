@@ -18,16 +18,16 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 
 describe('Outcome object factory', () => {
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [OutcomeObjectFactory],
+      providers: [Outcome],
     });
 
-    oof = TestBed.get(OutcomeObjectFactory);
+    oof = TestBed.get(Outcome);
   });
 
   it(

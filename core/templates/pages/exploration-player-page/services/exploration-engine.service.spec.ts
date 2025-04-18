@@ -27,7 +27,7 @@ import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChangeObjectFactory,
@@ -80,7 +80,7 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let translateService: TranslateService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let outcome: Outcome;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -417,7 +417,7 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    outcome = TestBed.inject(Outcome);
   });
 
   beforeEach(() => {
@@ -518,7 +518,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -587,7 +587,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -655,7 +655,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -725,7 +725,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {
@@ -794,7 +794,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {
@@ -874,7 +874,7 @@ describe('Exploration engine service ', () => {
         missing_prerequisite_skill_id: null,
       };
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict(defaultOutcomeDict),
+        outcome.createFromBackendDict(defaultOutcomeDict),
         1,
         0,
         'default_outcome'
@@ -1136,7 +1136,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {

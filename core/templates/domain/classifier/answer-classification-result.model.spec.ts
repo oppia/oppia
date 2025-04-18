@@ -17,14 +17,14 @@
  */
 
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 
 describe('Answer classification result model', () => {
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   let DEFAULT_OUTCOME_CLASSIFICATION: string;
 
   beforeEach(() => {
-    oof = new OutcomeObjectFactory();
+    oof = new Outcome();
     DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome';
   });
 

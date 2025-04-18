@@ -27,10 +27,7 @@ import {
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import {of} from 'rxjs';
@@ -56,7 +53,7 @@ describe('Outcome Editor Component', () => {
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
   let ngbModal: NgbModal;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let outcomes: Outcome;
   let windowDimensionsService: MockWindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
@@ -80,7 +77,7 @@ describe('Outcome Editor Component', () => {
     fixture = TestBed.createComponent(OutcomeEditorComponent);
     component = fixture.componentInstance;
     externalSaveService = TestBed.inject(ExternalSaveService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    outcomes = TestBed.inject(Outcome);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     ngbModal = TestBed.inject(NgbModal);
@@ -368,11 +365,11 @@ describe('Outcome Editor Component', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'State Name'
     );
-    let outcome = outcomeObjectFactory.createNew('State Name', '1', '', []);
+    let outcome = outcomes.createNew('State Name', '1', '', []);
 
     expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
-    outcome = outcomeObjectFactory.createNew('', '', '', []);
+    outcome = outcomes.createNew('', '', '', []);
 
     expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(false);
   });
@@ -383,18 +380,8 @@ describe('Outcome Editor Component', () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'State Name'
       );
-      component.outcome = outcomeObjectFactory.createNew(
-        'Introduction',
-        '1',
-        '',
-        []
-      );
-      component.savedOutcome = outcomeObjectFactory.createNew(
-        'State Name',
-        '1',
-        '',
-        []
-      );
+      component.outcome = outcomes.createNew('Introduction', '1', '', []);
+      component.savedOutcome = outcomes.createNew('State Name', '1', '', []);
 
       expect(component.invalidStateAfterFeedbackSave()).toBeTrue();
     }
@@ -406,18 +393,8 @@ describe('Outcome Editor Component', () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         'Introduction'
       );
-      component.outcome = outcomeObjectFactory.createNew(
-        'Introduction',
-        '1',
-        '',
-        []
-      );
-      component.savedOutcome = outcomeObjectFactory.createNew(
-        'State Name',
-        '1',
-        '',
-        []
-      );
+      component.outcome = outcomes.createNew('Introduction', '1', '', []);
+      component.savedOutcome = outcomes.createNew('State Name', '1', '', []);
 
       expect(component.invalidStateAfterDestinationSave()).toBeTrue();
     }

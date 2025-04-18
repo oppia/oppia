@@ -30,7 +30,7 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
@@ -45,7 +45,7 @@ describe('Diagnostic test engine service', () => {
   let question4: Question;
   let stateObject: StateObjectFactory;
   let textInputService: InteractionRulesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let outcome: Outcome;
   let answerClassificationService: AnswerClassificationService;
   let alertsService: AlertsService;
   let questionObjectFactory: QuestionObjectFactory;
@@ -62,7 +62,7 @@ describe('Diagnostic test engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     stateObject = TestBed.inject(StateObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    outcome = TestBed.inject(Outcome);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
@@ -376,7 +376,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -461,7 +461,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -650,7 +650,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -715,7 +715,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -793,7 +793,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -901,7 +901,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -961,7 +961,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -1260,7 +1260,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'

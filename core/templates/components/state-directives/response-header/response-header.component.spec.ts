@@ -22,7 +22,7 @@ import {ResponseHeaderComponent} from './response-header.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 
 const mockInteractionState = {
   TextInput: {
@@ -37,14 +37,14 @@ describe('Response Header Component', () => {
   let component: ResponseHeaderComponent;
   let fixture: ComponentFixture<ResponseHeaderComponent>;
   let stateEditorService: StateEditorService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let outcome: Outcome;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseHeaderComponent],
       providers: [
         StateEditorService,
-        OutcomeObjectFactory,
+        Outcome,
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState,
@@ -63,9 +63,9 @@ describe('Response Header Component', () => {
     component = fixture.componentInstance;
 
     stateEditorService = TestBed.inject(StateEditorService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    outcome = TestBed.inject(Outcome);
 
-    component.outcome = outcomeObjectFactory.createNew('/', '0', '0', []);
+    component.outcome = outcome.createNew('/', '0', '0', []);
     component.index = 0;
 
     fixture.detectChanges();

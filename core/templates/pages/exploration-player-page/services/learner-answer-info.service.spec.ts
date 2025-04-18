@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {
   State,
   StateBackendDict,
@@ -36,7 +36,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Learner answer info service', () => {
   let sof: StateObjectFactory;
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   let stateDict: StateBackendDict;
   let firstState: State;
   let secondState: State;
@@ -178,7 +178,7 @@ describe('Learner answer info service', () => {
     };
 
     sof = TestBed.get(StateObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
+    oof = TestBed.get(Outcome);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);

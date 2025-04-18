@@ -26,10 +26,7 @@ import {
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {Subscription} from 'rxjs';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
@@ -60,7 +57,7 @@ class MockPlatformFeatureService {
 describe('Add Answer Group Modal Component', () => {
   let component: AddAnswerGroupModalComponent;
   let fixture: ComponentFixture<AddAnswerGroupModalComponent>;
-  var outcomeObjectFactory: OutcomeObjectFactory;
+  var outcome: Outcome;
   var stateEditorService: StateEditorService;
   var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
@@ -74,7 +71,7 @@ describe('Add Answer Group Modal Component', () => {
       providers: [
         EditorFirstTimeEventsService,
         GenerateContentIdService,
-        OutcomeObjectFactory,
+        Outcome,
         StateEditorService,
         {
           provide: NgbActiveModal,
@@ -93,7 +90,7 @@ describe('Add Answer Group Modal Component', () => {
     fixture = TestBed.createComponent(AddAnswerGroupModalComponent);
     component = fixture.componentInstance;
 
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    outcome = TestBed.inject(Outcome);
     stateEditorService = TestBed.inject(StateEditorService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
@@ -177,37 +174,22 @@ describe('Add Answer Group Modal Component', () => {
   });
 
   it('should check if outcome has no feedback with self loop', fakeAsync(() => {
-    var outcome = outcomeObjectFactory.createNew('State Name', '1', '', []);
+    var outcome = outcome.createNew('State Name', '1', '', []);
     component.stateName = 'State Name';
     tick();
 
     expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
-    var outcome2 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'Feedback Text',
-      []
-    );
+    var outcome2 = outcome.createNew('State Name', '1', 'Feedback Text', []);
     tick();
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   }));
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
-    var outcome1 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10000),
-      []
-    );
+    var outcome1 = outcome.createNew('State Name', '1', 'a'.repeat(10000), []);
     expect(component.isFeedbackLengthExceeded(outcome1)).toBe(false);
 
-    var outcome2 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10001),
-      []
-    );
+    var outcome2 = outcome.createNew('State Name', '1', 'a'.repeat(10001), []);
     expect(component.isFeedbackLengthExceeded(outcome2)).toBe(true);
   });
 

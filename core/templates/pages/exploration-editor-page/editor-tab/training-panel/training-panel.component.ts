@@ -20,10 +20,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
@@ -72,7 +69,7 @@ export class TrainingPanelComponent implements OnInit {
     private explorationStatesService: ExplorationStatesService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private generateContentIdService: GenerateContentIdService,
-    private outcomeObjectFactory: OutcomeObjectFactory
+    private outcome: Outcome
   ) {}
 
   _updateAnswerTemplate(): void {
@@ -93,7 +90,7 @@ export class TrainingPanelComponent implements OnInit {
     );
     let currentStateName = this.stateEditorService.getActiveStateName();
     if (currentStateName) {
-      this.classification.newOutcome = this.outcomeObjectFactory.createNew(
+      this.classification.newOutcome = this.outcome.createNew(
         currentStateName,
         contentId,
         '',

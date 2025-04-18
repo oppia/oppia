@@ -27,7 +27,7 @@ import {
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from 'services/alerts.service';
@@ -38,7 +38,7 @@ describe('Answer Classification Service', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let interactionSpecsService: InteractionSpecsService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
+  let outcome: Outcome;
   let stateObjectFactory: StateObjectFactory;
   let textInputRulesService: InteractionRulesService;
 
@@ -51,7 +51,7 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
+    outcome = TestBed.get(Outcome);
     stateObjectFactory = TestBed.get(StateObjectFactory);
     textInputRulesService = TestBed.get(TextInputRulesService);
   });
@@ -259,7 +259,7 @@ describe('Answer Classification Service', () => {
           )
         ).toEqual(
           new AnswerClassificationResult(
-            outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
+            outcome.createNew('outcome 1', 'feedback_1', '', []),
             0,
             0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION
@@ -275,7 +275,7 @@ describe('Answer Classification Service', () => {
           )
         ).toEqual(
           new AnswerClassificationResult(
-            outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+            outcome.createNew('outcome 2', 'feedback_2', '', []),
             1,
             0,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION
@@ -291,7 +291,7 @@ describe('Answer Classification Service', () => {
           )
         ).toEqual(
           new AnswerClassificationResult(
-            outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
+            outcome.createNew('outcome 2', 'feedback_2', '', []),
             1,
             1,
             ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION
@@ -315,7 +315,7 @@ describe('Answer Classification Service', () => {
         )
       ).toEqual(
         new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
+          outcome.createNew('default', 'default_outcome', '', []),
           3,
           0,
           ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION

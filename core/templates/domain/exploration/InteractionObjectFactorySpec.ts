@@ -29,10 +29,7 @@ import {
   Interaction,
   InteractionBackendDict,
 } from 'domain/exploration/InteractionObjectFactory';
-import {
-  OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/Outcome.model';
 import {
   SolutionBackendDict,
   SolutionObjectFactory,
@@ -47,7 +44,7 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
@@ -61,7 +58,7 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
+    oof = TestBed.inject(Outcome);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {

@@ -21,19 +21,19 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
 import {Rule, RuleInputs} from 'domain/exploration/rule.model';
 import {TestBed} from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService;
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   let inputBackend: RuleInputs;
   let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
-    oof = TestBed.inject(OutcomeObjectFactory);
+    oof = TestBed.inject(Outcome);
     pcevs = TestBed.inject(PencilCodeEditorValidationService);
     agof = TestBed.inject(AnswerGroupObjectFactory);
   });

@@ -18,19 +18,19 @@
 
 import {TestBed} from '@angular/core/testing';
 import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
-import {OutcomeObjectFactory} from './OutcomeObjectFactory';
+import {Outcome} from './Outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
 
 describe('Lost Change Object Factory', () => {
   let lcof: LostChangeObjectFactory;
-  let oof: OutcomeObjectFactory;
+  let oof: Outcome;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LostChangeObjectFactory],
     });
 
     lcof = TestBed.inject(LostChangeObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
+    oof = TestBed.inject(Outcome);
   });
 
   it('should evaluate values from a Lost Change', () => {

@@ -43,10 +43,7 @@ import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/servi
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/Outcome.model';
 import {AppConstants} from 'app.constants';
 import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -106,7 +103,7 @@ export class AddAnswerGroupModalComponent
     private stateEditorService: StateEditorService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private generateContentIdService: GenerateContentIdService,
-    private outcomeObjectFactory: OutcomeObjectFactory,
+    private outcome: Outcome,
     private platformFeatureService: PlatformFeatureService,
     private editabilityService: EditabilityService
   ) {
@@ -201,7 +198,7 @@ export class AddAnswerGroupModalComponent
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );
-    this.tmpOutcome = this.outcomeObjectFactory.createNew(
+    this.tmpOutcome = this.outcome.createNew(
       this.questionModeEnabled ? null : this.stateName,
       feedbackContentId,
       '',
