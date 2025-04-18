@@ -66,12 +66,12 @@ describe('Logged-in User', function () {
   }, 480000);
 
   /**
-   * TODO(#): Add tests for home tab. Interactions involving in-progress lessons
+   * TODO(#22493): Add tests for home tab. Interactions involving in-progress lessons
    * and saved lessons sections.
    */
 
   /**
-   * TODO(#): Add tests for progress tab. Interactions involving in-progress
+   * TODO(#22493): Add tests for progress tab. Interactions involving in-progress
    * and completed explorations.
    */
 
