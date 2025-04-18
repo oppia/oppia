@@ -245,6 +245,11 @@ const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  END_EXPLORATION = 'End Exploration',
+}
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -1910,6 +1915,36 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
+      category
+    );
+  }
+
+  /**
+   * Function for creating an exploration with two cards.
+   */
+  async createAndPublishExplorationWithCards(
+    explorationTitle: string,
+    category: string = 'Mathematics'
+  ): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+
+    await this.updateCardContent('Content 0');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 1');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 1');
+    await this.updateCardContent('Content 1');
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.navigateToCard('Introduction');
+    await this.saveExplorationDraft();
+
+    return await this.publishExplorationWithMetadata(
+      explorationTitle,
+      `This is ${explorationTitle}\`s goals.`,
       category
     );
   }
