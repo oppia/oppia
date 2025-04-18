@@ -4038,7 +4038,7 @@ export class LoggedOutUser extends BaseUser {
         throw new Error('Mismatch between "disabled" and "aria-disabled" attributes.');
       }
 
-      return hasDisabledAttr; // or isAriaDisabled — both are now guaranteed to be the same.
+      return hasDisabledAttr; // Or isAriaDisabled — both are now guaranteed to be the same.
     }, buttonHandle);
 
     if (!isDisabled) {
