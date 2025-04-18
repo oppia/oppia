@@ -182,7 +182,7 @@ class ImageCompressor:
             file_path = image['path']
 
             # Maintain original directory structure.
-            rel_path = os.path.relpath(file_path)
+            rel_path = os.path.relpath(file_path, self.input_path)
             output_file_path = pathlib.Path(self.output_dir) / rel_path
 
             # Create necessary directories.
