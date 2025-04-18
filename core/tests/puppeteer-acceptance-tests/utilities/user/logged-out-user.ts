@@ -4026,28 +4026,34 @@ export class LoggedOutUser extends BaseUser {
    * reached.
    */
   async expectNoSaveProgressBeforeCheckpointInfo(): Promise<void> {
-    const selector = '.save-progress-btn';
-    const buttonHandle = await this.page.$(selector);
+  const selector = '.save-progress-btn';
+  const buttonHandle = await this.page.$(selector);
 
-    if (buttonHandle !== null) {
-      const isDisabled = await this.page.evaluate(btn => {
-        return (
-          btn.hasAttribute('disabled') ||
-          btn.getAttribute('aria-disabled') === 'true'
-        );
-      }, buttonHandle);
+  if (buttonHandle !== null) {
+    const isDisabled = await this.page.evaluate(btn => {
+      const hasDisabledAttr = btn.hasAttribute('disabled');
+      const isAriaDisabled = btn.getAttribute('aria-disabled') === 'true';
 
-      if (!isDisabled) {
-        throw new Error(
-          '"Save Progress" button is enabled before reaching checkpoint, which is not expected.'
-        );
+      if (hasDisabledAttr !== isAriaDisabled) {
+        throw new Error('Mismatch between "disabled" and "aria-disabled" attributes.');
       }
+
+      return hasDisabledAttr; // or isAriaDisabled — both are now guaranteed to be the same.
+    }, buttonHandle);
+
+    if (!isDisabled) {
+      throw new Error(
+        '"Save Progress" button is enabled before reaching checkpoint, which is not expected.'
+      );
     }
 
     showMessage(
       '"Save Progress" button is present but disabled, as expected before reaching checkpoint.'
     );
+  } else {
+    showMessage('"Save Progress" button not found, as expected.');
   }
+}
 
   /**
    * Shares the exploration.
