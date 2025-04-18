@@ -123,14 +123,14 @@ class TestGitHubService(unittest.TestCase):
             ]
         }
         mock_get.return_value = mock_response
-        
+
         issues = self.service.get_open_issues()
-        
+
         self.assertEqual(len(issues), 2)
         self.assertEqual(issues[0].number, 1)
         self.assertEqual(issues[0].assignee_username, 'user1')
         self.assertIsNone(issues[1].assignee_username)
-        
+
         search_url = 'https://api.github.com/search/issues'
         url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
@@ -874,6 +874,3 @@ class TestMainFunction(unittest.TestCase):
             self.assertIn(f'INFO:root:{expected}', log_capture.output)
 
         self.issue_manager.unassign_issues.assert_called_once_with(issues)
-
-if __name__ == '__main__':
-    unittest.main()
