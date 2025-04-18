@@ -22,9 +22,16 @@ jobs:
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge-develop-and-set-up-dependencies
 
+    - name: Generate a JWT token for github app
+      id: generate_jwt_token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.OPPIA_GITHUB_APP_ID }}
+        private-key: ${{ secrets.OPPIA_GITHUB_APP_PRIVATE_KEY }}
+
     - name: Check inactive issues
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ steps.generate_jwt_token.outputs.token }}
         DEASSIGN_INACTIVE_CONTRIBUTORS: ${{ secrets.DEASSIGN_INACTIVE_CONTRIBUTORS }}
       run: |
         python -m scripts.inactive_issue_checker
