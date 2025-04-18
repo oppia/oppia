@@ -2682,13 +2682,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Clicks the cancel button in the new chapter addition prompt.
-   */
-  async clickOnCancelButtonInNewChapterAdditionPrompt(): Promise<void> {
-    await this.clickOn(cancelButtonInNewChapterAdditionPrompt);
-  }
-
-  /**
    * Expect create new chapter to have error
    */
   async expectNewChapterErrorSpan(errorSpan: string): Promise<void> {
