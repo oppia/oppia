@@ -72,7 +72,6 @@ jobs:
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
       fail-fast: false
-      fail-fast: false
       matrix:
         repeat: [1, 2, 3, 4, 5]
         suite: ["logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard"]
