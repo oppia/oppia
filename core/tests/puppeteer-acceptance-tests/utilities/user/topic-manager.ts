@@ -110,9 +110,6 @@ const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
-const cancelButtonInNewChapterAdditionPrompt =
-  'button.e2e-test-cancel-chapter-creation-button';
-
 const newChapterErrorMessageSelector =
   '.acceptance-restricted-interaction-error';
 
