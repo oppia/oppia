@@ -346,7 +346,11 @@ export class ConversationSkinComponent {
           }
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
+          if (
+            !this._editorPreviewMode &&
+            this.nextCard.isTerminal() &&
+            !(this.inStoryMode && this.isLoggedIn)
+          ) {
             const currentEngineService =
               this.explorationPlayerStateService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
