@@ -338,6 +338,27 @@ describe('Questions List Component', () => {
         })
       );
 
+      expect(component.difficultyCount).toEqual(undefined);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.difficultyCount).toEqual(0);
+    })
+  );
+
+  it(
+    'should fetch difficulty count for selected skill on' + ' initialization',
+    fakeAsync(() => {
+      component.selectedSkillId = 'true';
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+        Promise.resolve({
+          skill: skill,
+          assignedSkillTopicData: {},
+          groupedSkillSummaries: {},
+        })
+      );
+
       expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
 
       component.ngOnInit();
