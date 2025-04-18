@@ -23,14 +23,12 @@ import {SubtitledHtml} from './subtitled-html.model';
 
 describe('Lost Change Object Factory', () => {
   let lcof: LostChangeObjectFactory;
-  let oof: Outcome;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LostChangeObjectFactory],
     });
 
     lcof = TestBed.inject(LostChangeObjectFactory);
-    oof = TestBed.inject(Outcome);
   });
 
   it('should evaluate values from a Lost Change', () => {
@@ -173,7 +171,7 @@ describe('Lost Change Object Factory', () => {
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
-          outcome: oof.createFromBackendDict({
+          outcome: Outcome.createFromBackendDict({
             dest: 'outcome 2',
             dest_if_really_stuck: null,
             feedback: {

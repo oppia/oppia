@@ -36,7 +36,7 @@ describe('Outcome object factory', () => {
   it('should be able to get contentId to html of an answer group', () => {
     const testAnswerGroup = answerGroupObjectFactory.createNew(
       [],
-      outcome.createNew('Hola', 'feedback_1', 'Feedback text', []),
+      Outcome.createNew('Hola', 'feedback_1', 'Feedback text', []),
       ['Training data text'],
       '0'
     );

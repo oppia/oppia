@@ -664,9 +664,11 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
-    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    const newDefaultOutcome = Outcome.createFromBackendDict(
+      newDefaultOutcomeDict
+    );
     expect(testInteraction.defaultOutcome).toEqual(
-      oof.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'dest_default',
         dest_if_really_stuck: null,
         feedback: {
