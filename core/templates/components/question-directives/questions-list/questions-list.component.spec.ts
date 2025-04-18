@@ -351,9 +351,37 @@ describe('Questions List Component', () => {
     'should fetch difficulty count for selected skill on' + ' initialization',
     fakeAsync(() => {
       component.selectedSkillId = 'true';
+
+      const skillWithExplanations = skillObjectFactory.createFromBackendDict({
+        id: 'skillId1',
+        description: 'test description 1',
+        misconceptions: [],
+        rubrics: [
+          {
+            difficulty: 'Easy',
+            explanations: ['explanation1'],
+          },
+          {
+            difficulty: 'Medium',
+            explanations: [],
+          },
+        ],
+        skill_contents: {
+          explanation: {html: 'test explanation', content_id: 'explanation'},
+          worked_examples: [],
+          recorded_voiceovers: {voiceovers_mapping: {}},
+        },
+        language_code: 'en',
+        version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: null,
+        next_misconception_id: null,
+        superseding_skill_id: null,
+      });
+
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         Promise.resolve({
-          skill: skill,
+          skill: skillWithExplanations,
           assignedSkillTopicData: {},
           groupedSkillSummaries: {},
         })
@@ -364,7 +392,7 @@ describe('Questions List Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.difficultyCount).toEqual(0);
+      expect(component.difficultyCount).toEqual(1);
     })
   );
 
