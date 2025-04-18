@@ -731,7 +731,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumericExpressionInputValidationService',
     NumericExpressionInputValidationService],
   ['NumericInputRulesService', NumericInputRulesService],
-  ['NumericInputValidationService', NumericInputValidationService], 
+  ['NumericInputValidationService', NumericInputValidationService],
   ['OppiaRteParserService', OppiaRteParserService],
   ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],

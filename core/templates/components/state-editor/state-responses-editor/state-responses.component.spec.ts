@@ -921,9 +921,9 @@ describe('State Responses Component', () => {
       'Hola'
     );
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
+    expect(component.isSelfLoopThatIsMarkedCorrect(outcomes)).toBe(true);
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+    expect(component.isSelfLoopThatIsMarkedCorrect(outcomes)).toBe(false);
   });
 
   it(
@@ -946,7 +946,7 @@ describe('State Responses Component', () => {
         'State Name'
       );
 
-      expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
+      expect(component.isSelfLoopThatIsMarkedCorrect(outcomes)).toBe(true);
     }
   );
 

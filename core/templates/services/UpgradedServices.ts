@@ -209,7 +209,6 @@ import {
   NumericExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {Outcome} from 'domain/exploration/Outcome.model';
 import {PageTitleService} from 'services/page-title.service';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
