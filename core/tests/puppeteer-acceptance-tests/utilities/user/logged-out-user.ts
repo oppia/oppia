@@ -4035,12 +4035,10 @@ export class LoggedOutUser extends BaseUser {
         const isAriaDisabled = btn.getAttribute('aria-disabled') === 'true';
 
         if (hasDisabledAttr !== isAriaDisabled) {
-          throw new Error(
-            'Mismatch between "disabled" and "aria-disabled" attributes.'
-          );
+          throw new Error('Mismatch between "disabled" and "aria-disabled" attributes.');
         }
 
-        return hasDisabledAttr; // Or isAriaDisabled — both are now guaranteed to be the same.
+        return hasDisabledAttr;
       }, buttonHandle);
 
       if (!isDisabled) {
