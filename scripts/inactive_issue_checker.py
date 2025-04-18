@@ -29,8 +29,8 @@ from typing import Dict, List, Optional, Set, TypedDict
 
 INACTIVE_DAYS_THRESHOLD = 7
 UNASSIGN_DAYS_THRESHOLD = 10
-REPO_OWNER = 'Ashu463'
-REPO_NAME = 'grid6.0'
+REPO_OWNER = 'oppia'
+REPO_NAME = 'oppia'
 
 
 class IssueDict(TypedDict, total=False):
