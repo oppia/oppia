@@ -338,12 +338,12 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toEqual(undefined);
+      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
 
       component.ngOnInit();
       tick();
 
-      expect(component.difficultyCount).toEqual(0);
+      expect(component.misconceptionIdsForSelectedSkill).toEqual([2]);
     })
   );
 
@@ -359,12 +359,12 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
+      expect(component.difficultyCount).toEqual(undefined);
 
       component.ngOnInit();
       tick();
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual([2]);
+      expect(component.difficultyCount).toEqual(0);
     })
   );
 
