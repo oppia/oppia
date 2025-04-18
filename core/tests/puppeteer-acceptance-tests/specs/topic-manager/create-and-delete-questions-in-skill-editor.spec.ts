@@ -83,11 +83,9 @@ describe('Topic Manager', function () {
       await topicManager.openSkillEditor('Addition');
       await topicManager.navigateToSkillQuestionEditorTab();
 
-      await topicManager.beingCreatingQuestion();
-      await topicManager.tryToNavigateToAnotherTab();
-      await topicManager.expectUnsavedChangesModalToBeVisible();
-      await topicManager.cancelQuestionMaking();
-      await topicManager.navigateToQuestionPreviewTab();
+      await topicManager.clickCreateQuestionButton();
+      await topicManager.navigateToAnotherTab();
+      await topicManager.expectSaveChangesModalToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

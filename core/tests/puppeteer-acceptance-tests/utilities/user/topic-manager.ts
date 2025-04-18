@@ -386,22 +386,20 @@ export class TopicManager extends BaseUser {
     await this.waitForStaticAssetsToLoad();
   }
 
-  async beingCreatingQuestion(): Promise<void> {
+  async clickCreateQuestionButton(): Promise<void> {
+    // Create a new question when on the question editor page.
     await this.clickOn(createQuestionButton);
   }
 
-  async tryToNavigateToAnotherTab(): Promise<void> {
+  async navigateToAnotherTab(): Promise<void> {
     await this.clickOn(questionPreviewTab);
   }
 
-  async expectUnsavedChangesModalToBeVisible(): Promise<void> {
+  async expectSaveChangesModalToBeVisible(): Promise<void> {
+    // When the user tries to navigate away from the question editor page while creating a question,
+    // a modal should appear informing them that they have unsaved changes.
     await this.page.waitForSelector(saveChangesModal, {visible: true});
     await this.clickOn(cancelNavigationButton);
-  }
-
-  async cancelQuestionMaking(): Promise<void> {
-    await this.clickOn(questionEditCancelButton);
-    await this.clickOn(confirmQuestionExitButton);
   }
 
   /**
