@@ -332,7 +332,7 @@ export class ItemSelectionInputValidationService {
         const itemSelectionInputs =
           rule.inputs as unknown as ItemSelectionRuleInputs;
         // Serialize all rule inputs in a general and reversible way,
-        // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
+        // Supporting multiple input keys and ensuring consistent ordering.
         const inputs = Object.fromEntries(
           Object.entries(itemSelectionInputs).map(([key, value]) => [
             key,
