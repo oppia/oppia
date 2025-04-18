@@ -325,14 +325,14 @@ export class ItemSelectionInputValidationService {
         }
       });
     });
-    // map serialized rule + input to answer group index
+    // Map serialized rule + input to answer group index.
     const mapRulesToAnswerGroupIndex: {[key: string]: number} = {};
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
           rule.inputs as unknown as ItemSelectionRuleInputs;
         // Serialize all rule inputs in a general and reversible way,
-        // supporting multiple input keys (not just 'x') and ensuring consistent ordering
+        // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
         const inputs = Object.fromEntries(
           Object.entries(itemSelectionInputs).map(([key, value]) => [
             key,
