@@ -83,15 +83,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     TOPIC_ID_3: Final = 'topic_3'
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
-    NEW_TOPIC_ID: Final = 'new_topic_id'
-    NEW_STORY_ID: Final = 'new_story_id'
-    STORY_URL_FRAGMENT_TWO = 'story-two'
-    NODE_ID_1: Final = 'node_1'
-    NODE_ID_2: Final = 'node_2'
-    EXP_ID_8: Final = 'exp_8'
-    EXP_ID_9: Final = 'exp_9'
-    STORY_ID: Final = 'story_id'
-    TOPIC_ID: Final = 'topic_id'
 
     def setUp(self) -> None:
         super().setUp()
@@ -321,60 +312,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
-        self.node_1: story_domain.StoryNodeDict = {
-            'id': self.NODE_ID_1,
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_0,
-            'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
-        }
-        self.node_2: story_domain.StoryNodeDict = {
-            'id': self.NODE_ID_2,
-            'title': 'Title 2',
-            'description': 'Description 2',
-            'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'thumbnail_size_in_bytes': 21131,
-            'destination_node_ids': ['node_1'],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': self.EXP_ID_1,
-            'status': None,
-            'planned_publication_date_msecs': None,
-            'last_modified_msecs': None,
-            'first_publication_date_msecs': None,
-            'unpublishing_reason': None
-        }
-        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
-        subtopic_1.skill_ids = ['skill_id_1']
-        subtopic_1.url_fragment = 'sub-one-frag'
-        self.save_new_topic(
-            self.TOPIC_ID, 'user', name='Topic01',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1], next_subtopic_id=2)
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
-        self.nodes: list[story_domain.StoryNode] = []
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.login(self.VIEWER_EMAIL)
 
     def _get_all_completed_exp_ids(self, user_id: str) -> List[str]:
         """Gets the ids of all the explorations completed by the learner
@@ -617,86 +554,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_2)
         self.assertEqual(self._get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_3])
-
-        # Test that the story is marked as completed, and the topic is marked
-        # as learnt, whenever the terminal exploration is completed.
-        self.save_new_valid_exploration(
-            self.EXP_ID_8, self.admin_id, title='Title 4', end_state_name='End')
-        self.save_new_valid_exploration(
-            self.EXP_ID_9, self.admin_id, title='Title 5', end_state_name='End')
-        self.publish_exploration(self.admin_id, self.EXP_ID_8)
-        self.publish_exploration(self.admin_id, self.EXP_ID_9)
-
-        story = story_domain.Story.create_default_story(
-            self.NEW_STORY_ID, 'Title', 'Description', self.TOPIC_ID,
-            self.STORY_URL_FRAGMENT_TWO)
-        story.meta_tag_content = 'story meta content'
-
-        story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(self.node_1),
-            story_domain.StoryNode.from_dict(self.node_2)
-        ]
-        self.nodes = story.story_contents.nodes
-        story.story_contents.initial_node_id = 'node_2'
-        story.story_contents.next_node_id = 'node_3'
-        story_services.save_new_story(self.admin_id, story)
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID)
-
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'old_value': self.EXP_ID_0,
-                'new_value': self.EXP_ID_8,
-                'node_id': 'node_1'
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'old_value': self.EXP_ID_1,
-                'new_value': self.EXP_ID_9,
-                'node_id': 'node_2'
-            }),
-        ]
-        story_services.update_story(
-            self.owner_id, self.NEW_STORY_ID, changelist, 'Added exp_ids')
-        topic_services.publish_story(
-            self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
-
-        learner_progress_services.validate_and_add_topic_to_learn_goal(
-            self.viewer_id, self.TOPIC_ID)
-
-        story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.NEW_STORY_ID, self.NODE_ID_1)
-
-        learner_progress_services.mark_exploration_as_completed(
-            self.viewer_id, self.EXP_ID_8)
-
-        self.assertEqual(
-            learner_progress_services.get_all_completed_story_ids(
-                self.viewer_id), [])
-        self.assertEqual(
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.viewer_id), [])
-        self.assertEqual(
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id), [self.TOPIC_ID])
-
-        learner_progress_services.mark_exploration_as_completed(
-            self.viewer_id, self.EXP_ID_9)
-
-        self.assertEqual(
-            learner_progress_services.get_all_completed_story_ids(
-                self.viewer_id), [self.NEW_STORY_ID])
-        self.assertEqual(
-            learner_progress_services.get_all_learnt_topic_ids(
-                self.viewer_id), [self.TOPIC_ID])
-        self.assertEqual(
-            learner_goals_services.get_all_topic_ids_to_learn(
-                self.viewer_id), [])
 
     def test_mark_collection_as_completed(self) -> None:
         self.assertEqual(

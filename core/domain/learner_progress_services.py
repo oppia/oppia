@@ -27,7 +27,6 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import learner_goals_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
@@ -258,38 +257,6 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.put()
 
 
-def _check_if_terminal_exp(
-        user_id: str, story_id: str, exp_id: str
-    ) -> bool:
-    """Checks if the given exploration is the final one in the story.
-
-    Args:
-        user_id: str. The id of the user.
-        story_id: str. The id of the story.
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        bool. True if it's the last exploration, False otherwise.
-    """
-    story = story_fetchers.get_story_by_id(story_id)
-    completed_nodes = story_fetchers.get_completed_nodes_in_story(
-            user_id, story_id)
-    completed_exp_ids = [
-        completed_node.exploration_id for completed_node in completed_nodes]
-    ordered_nodes = story.story_contents.get_ordered_nodes()
-    next_exp_id = None
-    for node in ordered_nodes:
-        if (
-            node.exploration_id not in completed_exp_ids and
-            node.exploration_id != exp_id
-        ):
-            next_exp_id = node.exploration_id
-            break
-    if next_exp_id is None:
-        return True
-    return False
-
-
 def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
@@ -329,16 +296,6 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
             user_id, exp_id)
         activities_completed.add_exploration_id(exp_id)
         _save_completed_activities(activities_completed)
-
-    if story_id is not None:
-        is_terminal = _check_if_terminal_exp(
-            user_id, story_id, exp_id)
-        if is_terminal:
-            story = story_fetchers.get_story_by_id(story_id)
-            topic = topic_fetchers.get_topic_by_id(
-                story.corresponding_topic_id)
-            mark_story_as_completed(user_id, story_id)
-            mark_topic_as_learnt(user_id, topic.id)
 
 
 def mark_story_as_completed(user_id: str, story_id: str) -> None:
