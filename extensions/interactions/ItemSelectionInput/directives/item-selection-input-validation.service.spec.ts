@@ -802,7 +802,7 @@ describe('ItemSelectionInputValidationService', () => {
     }
   );
 
-  it('should warn about duplicated rules', () => {
+  it('should warn about duplicated rules in the same answer group', () => {
     const answerGroups = [
       agof.createNew(
         [
@@ -841,6 +841,56 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'The rule 2 of answer group 1 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
+
+  it('should warn about duplicated rules in the different answer group', () => {
+    const answerGroups = [
+      agof.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      agof.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'The rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
       },
     ]);
   });

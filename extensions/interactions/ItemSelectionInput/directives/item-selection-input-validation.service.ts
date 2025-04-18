@@ -325,29 +325,30 @@ export class ItemSelectionInputValidationService {
         }
       });
     });
-    const ruleInputPerRuleTypeMap: {[key: string]: Set<string>} = {
-      IsProperSubsetOf: new Set<string>(),
-      Equals: new Set<string>(),
-      ContainsAtLeastOneOf: new Set<string>(),
-    };
-    const rulesPreAnswerGroup: {[key: string]: number} = {};
+    // map serialized rule + input to answer group index
+    const mapRulesToAnswerGroupIndex: {[key: string]: number} = {};
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
           rule.inputs as unknown as ItemSelectionRuleInputs;
-        const input = JSON.stringify([...itemSelectionInputs.x].sort());
+        // Serialize all rule inputs in a general and reversible way,
+        // supporting multiple input keys (not just 'x') and ensuring consistent ordering
+        const inputs = Object.fromEntries(
+          Object.entries(itemSelectionInputs).map(([key, value]) => [
+            key,
+            [...value].sort(),
+          ])
+        );
+        const input = JSON.stringify(inputs);
         const ruleKey = `${rule.type}:${input}`;
-        if (ruleInputPerRuleTypeMap.hasOwnProperty(rule.type)) {
-          const inputsSet = ruleInputPerRuleTypeMap[rule.type];
-          if (inputsSet.has(input)) {
-            warningsList.push({
-              type: AppConstants.WARNING_TYPES.ERROR,
-              message: `The rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${(rulesPreAnswerGroup[ruleKey] ?? 0) + 1} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
-            });
-          } else {
-            inputsSet.add(input);
-            rulesPreAnswerGroup[ruleKey] = answerGroupIndex;
-          }
+        if (mapRulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
+          const ag = mapRulesToAnswerGroupIndex[ruleKey];
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: `The rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
+          });
+        } else {
+          mapRulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;
         }
       }
     }
