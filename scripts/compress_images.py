@@ -95,7 +95,7 @@ class ImageCompressor:
             output_file_path: pathlib.Path. The path to the output file.
 
         Returns:
-            image_compressibility_dicts: List[CompressedImageInfo]. List of all
+            image_compressibility_dicts: List(CompressedImageInfo). List of all
             compressible images over repository with attributes as path, 
             original_size and new_size.
         """
@@ -130,8 +130,8 @@ class ImageCompressor:
             else:
                 logging.error(
                     '[ERROR]: %s occurred on file %s',
-                        file_path,
-                        result.stderr
+                        result.stderr,
+                        file_path
                 )
 
         return image_compressibility_dicts
@@ -170,12 +170,11 @@ class ImageCompressor:
         """Compress the identified images.
 
         Args:
-            result_images: List[CompressedImageInfo]. List of images
+            result_images: List(CompressedImageInfo). List of images
                 to be compressed.
         """
         # Remove existing output directory and create a new one.
-        if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir, ignore_errors=True)
+        shutil.rmtree(self.output_dir, ignore_errors=True)
 
         os.makedirs(self.output_dir, exist_ok=True)
 
