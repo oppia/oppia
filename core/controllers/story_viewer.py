@@ -183,6 +183,10 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 completed_node.id for completed_node in completed_nodes]
 
             for node in ordered_nodes:
+                if node.id == node_id:
+                    learner_progress_services.mark_exploration_as_completed(
+                        self.user_id, node.exploration_id
+                    )
                 if node.id not in completed_node_ids:
                     next_exp_ids = (
                         [node.exploration_id] if node.exploration_id else []

@@ -346,7 +346,13 @@ export class ConversationSkinComponent {
           }
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
+          console.log('Here is the new state-name :', newStateName);
+          if (
+            !this._editorPreviewMode &&
+            this.nextCard.isTerminal() &&
+            !(this.inStoryMode && this.isLoggedIn)
+          ) {
+            console.log(this.inStoryMode);
             const currentEngineService =
               this.explorationPlayerStateService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
@@ -996,6 +1002,7 @@ export class ConversationSkinComponent {
             this.recommendedExplorationSummaries = nextStoryNode;
           });
         if (this.isLoggedIn) {
+          console.log('recordChapterCOmpletion');
           this.storyViewerBackendApiService
             .recordChapterCompletionAsync(
               topicUrlFragment,
@@ -1015,19 +1022,20 @@ export class ConversationSkinComponent {
                     story_url_fragment: storyUrlFragment,
                   }
                 );
-                this.learnerDashboardBackendApiService
-                  .fetchLearnerCompletedChaptersCountDataAsync()
-                  .then(responseData => {
-                    let newCompletedChaptersCount =
-                      responseData.completedChaptersCount;
-                    if (
-                      newCompletedChaptersCount !== this.completedChaptersCount
-                    ) {
-                      this.completedChaptersCount = newCompletedChaptersCount;
-                      this.chapterIsCompletedForTheFirstTime = true;
-                    }
-                  });
               }
+              console.log('fetchCOmpletedCHaptersCount');
+              this.learnerDashboardBackendApiService
+                .fetchLearnerCompletedChaptersCountDataAsync()
+                .then(responseData => {
+                  let newCompletedChaptersCount =
+                    responseData.completedChaptersCount;
+                  if (
+                    newCompletedChaptersCount !== this.completedChaptersCount
+                  ) {
+                    this.completedChaptersCount = newCompletedChaptersCount;
+                    this.chapterIsCompletedForTheFirstTime = true;
+                  }
+                });
             });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
