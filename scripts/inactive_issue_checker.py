@@ -143,8 +143,9 @@ class GitHubService:
             raise AssertionError('Received null res while fetching issues')
         response.raise_for_status()
 
+        response_data = response.json()
         issues_list = []
-        for issue_data in response.get('items', []):
+        for issue_data in response_data.get('items', []):
             assert isinstance(issue_data, dict)
             typed_issue_data: IssueDict = {
                 'number': issue_data['number'],

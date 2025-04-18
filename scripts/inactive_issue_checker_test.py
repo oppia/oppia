@@ -107,28 +107,32 @@ class TestGitHubService(unittest.TestCase):
         """Test fetching open issues."""
         mock_response = mock.Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = [
-            {
-                'number': 1,
-                'assignee': {'login': 'user1'},
-                'events_url': f'{self.base_url}/issues/1/events'
-            },
-            {
-                'number': 2,
-                'assignee': None,
-                'events_url': f'{self.base_url}/issues/2/events'
-            }
-        ]
+        mock_response.json.return_value = {
+            'total_count': 2,
+            'items': [
+                {
+                    'number': 1,
+                    'assignee': {'login': 'user1'},
+                    'events_url': f'{self.base_url}/issues/1/events'
+                },
+                {
+                    'number': 2,
+                    'assignee': None,
+                    'events_url': f'{self.base_url}/issues/2/events'
+                }
+            ]
+        }
         mock_get.return_value = mock_response
-
+        
         issues = self.service.get_open_issues()
-
+        
         self.assertEqual(len(issues), 2)
         self.assertEqual(issues[0].number, 1)
         self.assertEqual(issues[0].assignee_username, 'user1')
         self.assertIsNone(issues[1].assignee_username)
+        
         search_url = 'https://api.github.com/search/issues'
-        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
+        url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
             url,
             headers=self.service.rest_headers,
@@ -149,7 +153,7 @@ class TestGitHubService(unittest.TestCase):
             'Received null res while fetching issues'
         )
         search_url = 'https://api.github.com/search/issues'
-        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
+        url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
             url,
             headers=self.service.rest_headers,
@@ -168,7 +172,7 @@ class TestGitHubService(unittest.TestCase):
             'Network error'
         )
         search_url = 'https://api.github.com/search/issues'
-        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
+        url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
             url,
             headers=self.service.rest_headers,
@@ -870,3 +874,6 @@ class TestMainFunction(unittest.TestCase):
             self.assertIn(f'INFO:root:{expected}', log_capture.output)
 
         self.issue_manager.unassign_issues.assert_called_once_with(issues)
+
+if __name__ == '__main__':
+    unittest.main()
