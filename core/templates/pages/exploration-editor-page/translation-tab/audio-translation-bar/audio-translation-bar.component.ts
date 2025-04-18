@@ -581,7 +581,6 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     const translationTab = document.querySelectorAll('.oppia-translation-tab');
     const mainBody = document.querySelector('.oppia-main-body');
 
-    // Now just work with the actual DOM elements, or safely handle their absence
     const translationTabElements =
       translationTab.length > 0 ? translationTab : [];
     const mainBodyElement = mainBody;

@@ -325,7 +325,7 @@ describe('Audio translation bar Component', () => {
     component.ngOnInit();
     tick();
 
-    // Simulate dragleave
+    // Simulate dragleave.
     const dragLeaveEvent = new DragEvent('dragleave', {
       bubbles: true,
       cancelable: true,
@@ -337,7 +337,7 @@ describe('Audio translation bar Component', () => {
     mainBodyEl.dispatchEvent(dragLeaveEvent);
     tick();
 
-    // Simulate dragover
+    // Simulate dragover.
     const dragOverEvent = new DragEvent('dragover', {
       bubbles: true,
       cancelable: true,
@@ -349,7 +349,7 @@ describe('Audio translation bar Component', () => {
     translationTabEl.dispatchEvent(dragOverEvent);
     tick();
 
-    // Simulate drop
+    // Simulate drop.
     const dropAreaMessageDiv = fixture.nativeElement.querySelector(
       '.oppia-drop-area-message'
     );
