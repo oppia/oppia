@@ -78,6 +78,10 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       this.groupedSkillSummaries.others
     );
     const allowSkillsFromOtherTopics = true;
+    const skillIdsToExclude = new Set([
+      ...this.skill.getPrerequisiteSkillIds(),
+      this.skill.getId(),
+    ]);
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent,
@@ -95,6 +99,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       allowSkillsFromOtherTopics;
     modalRef.componentInstance.untriagedSkillSummaries =
       this.untriagedSkillSummaries;
+    modalRef.componentInstance.skillIdsToExclude = skillIdsToExclude;
 
     const whenResolved = (summary: SkillSummary): void => {
       let skillId = summary.id;

@@ -127,6 +127,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     userService = TestBed.inject(UserService);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     languageUtilService = TestBed.inject(LanguageUtilService);
+
     spyOn(
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview'
@@ -153,6 +154,36 @@ describe('Translation Suggestion Review Modal Component', function () {
       new ElementRef({offsetHeight: 200}),
       null
     );
+    component.initialSuggestionId = 'suggestion_1';
+    component.suggestionIdToContribution = {
+      suggestion_1: {
+        suggestion: {
+          author_name: 'author_name',
+          language_code: 'language_code',
+          last_updated_msecs: 1559074000000,
+          status: 'status',
+          suggestion_id: 'suggestion_1',
+          target_id: '1',
+          target_type: 'target_type',
+          suggestion_type: 'translate_content',
+          change_cmd: {
+            content_id: 'hint_1',
+            content_html: '<p>content</p>',
+            translation_html: 'Translation content',
+            state_name: 'StateName',
+            cmd: 'edit_state_property',
+            data_format: 'html',
+            language_code: 'language_code',
+          },
+          exploration_content_html: '<p>content</p>',
+        },
+        details: {
+          topic_name: 'topic_1',
+          story_title: 'story_1',
+          chapter_title: 'chapter_1',
+        },
+      },
+    };
   });
 
   describe('when initializing the modal ', () => {
@@ -2683,5 +2714,474 @@ describe('Translation Suggestion Review Modal Component', function () {
     const result = component.getImageInfoForSuggestion(content);
 
     expect(result).toEqual(expectedHtmlString);
+  });
+
+  describe('Translation Suggestion Review Modal - Component Validation', () => {
+    const htmlWithComponents = `
+    <p>Content with components</p>
+    <oppia-noninteractive-image
+      alt-with-value="&amp;quot;Image description&amp;quot;"
+      caption-with-value="&amp;quot;Image caption&amp;quot;"
+      filepath-with-value="&amp;quot;img_20241109_030945_oc195e5356_height_350_width_450.svg&amp;quot;">
+    </oppia-noninteractive-image>
+    <oppia-noninteractive-math 
+      math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;,\u0026amp;quot;svg_filename\u0026amp;quot;:\u0026amp;quot;mathImg_20250126_225215_x5vy0sjj6v_height_3d205_width_1d784_vertical_1d306.svg\u0026amp;quot;}">
+    </oppia-noninteractive-math>
+    <oppia-noninteractive-skillreview 
+      skill_id-with-value="&amp;quot;wfLsQD3CTfrI&amp;quot;" 
+      text-with-value="&amp;quot;concept card&amp;quot;">
+    </oppia-noninteractive-skillreview>
+  `;
+    const htmlWithoutComponents = '<p>Content without components</p>';
+    const htmlWithMultipleComponents = `
+  <p>Content with multiple components</p>
+  <oppia-noninteractive-image
+    alt-with-value="&amp;quot;Image 1&amp;quot;"
+    caption-with-value="&amp;quot;Image 1 caption&amp;quot;"
+    filepath-with-value="&amp;quot;img1.svg&amp;quot;">
+  </oppia-noninteractive-image>
+  <oppia-noninteractive-image
+    alt-with-value="&amp;quot;Image 2&amp;quot;"
+    caption-with-value="&amp;quot;Image 2 caption&amp;quot;"
+    filepath-with-value="&amp;quot;img2.svg&amp;quot;">
+  </oppia-noninteractive-image>
+  <oppia-noninteractive-math 
+    math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;}">
+  </oppia-noninteractive-math>
+  <oppia-noninteractive-math 
+    math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{a}{b}\u0026amp;quot;}">
+  </oppia-noninteractive-math>
+  <oppia-noninteractive-skillreview 
+    skill_id-with-value="&amp;quot;skill1&amp;quot;"
+    text-with-value="&amp;quot;concept card 1&amp;quot;">
+  </oppia-noninteractive-skillreview>
+  <oppia-noninteractive-skillreview 
+    skill_id-with-value="&amp;quot;skill2&amp;quot;"
+    text-with-value="&amp;quot;concept card 2&amp;quot;">
+  </oppia-noninteractive-skillreview>
+`;
+
+    beforeEach(() => {
+      component.initialSuggestionId = 'suggestion_1';
+      component.suggestionIdToContribution = {
+        suggestion_1: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_1',
+              content_html: htmlWithComponents,
+              translation_html: htmlWithComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_1',
+            story_title: 'story_1',
+            chapter_title: 'chapter_1',
+          },
+        },
+        suggestion_2: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_2',
+            target_id: '2',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_2',
+              content_html: htmlWithoutComponents,
+              translation_html: htmlWithoutComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_2',
+            story_title: 'story_2',
+            chapter_title: 'chapter_2',
+          },
+        },
+        suggestion_3: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_3',
+            target_id: '3',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_3',
+              content_html: htmlWithMultipleComponents,
+              translation_html: htmlWithMultipleComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_3',
+            story_title: 'story_3',
+            chapter_title: 'chapter_3',
+          },
+        },
+      };
+    });
+
+    it('should initialize validation state correctly from original content', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(component.suggestionIdToContribution.suggestion_1).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion
+      ).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+      ).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      expect(component.translationHtml).toBe(htmlWithComponents);
+    });
+
+    it('should detect component mismatch when removing components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithoutComponents);
+
+      expect(component.areComponentsMismatched()).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should detect component mismatch when adding components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.initialSuggestionId = 'suggestion_2';
+      expect(
+        component.suggestionIdToContribution.suggestion_2.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithoutComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      expect(component.areComponentsMismatched()).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should detect no mismatch when components match', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      expect(component.areComponentsMismatched()).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+    });
+
+    it('should handle multiple components correctly', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.initialSuggestionId = 'suggestion_3';
+      expect(
+        component.suggestionIdToContribution.suggestion_3.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithMultipleComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithMultipleComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithMultipleComponents);
+
+      expect(component.areComponentsMismatched()).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+    });
+
+    it('should disable update button when components mismatch', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.startedEditing).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.startedEditing = true;
+      expect(component.startedEditing).toBeTrue();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithoutComponents);
+
+      expect(component.updateIsDisabled).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should handle successful update when components match', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.errorFound).toBeFalse();
+
+      const updateSpy = spyOn(
+        contributionAndReviewService,
+        'updateTranslationSuggestionAsync'
+      );
+      expect(updateSpy).not.toHaveBeenCalled();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      component.updateSuggestion();
+      expect(component.errorFound).toBeFalse();
+      expect(updateSpy).toHaveBeenCalledWith(
+        component.initialSuggestionId,
+        htmlWithComponents,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+    });
+
+    it('should show error message when attempting update with mismatched components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+
+      component.translationHtml = htmlWithComponents;
+      component.ngOnInit();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      component.updateSuggestion();
+
+      expect(component.errorMessage).toBe(
+        'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
+      );
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should clear error when no component mismatch', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.incompleteTranslationErrorIsShown = false;
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.editedContent = {html: htmlWithComponents};
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: {html: htmlWithComponents},
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.errorMessage).toBe('');
+      expect(component.errorFound).toBeFalse();
+    });
+
+    it('should keep error when component mismatch exists', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.incompleteTranslationErrorIsShown = true;
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.editedContent = {html: htmlWithoutComponents};
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: {html: htmlWithoutComponents},
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.errorMessage).toBe('Some error');
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should not process when editedContent is null', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.editedContent = {html: ''};
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: null,
+          previousValue: {html: htmlWithComponents},
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.errorMessage).toBe('Some error');
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should not update when an image is replaced with a math formula', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.translationHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-image
+          alt-with-value="&amp;quot;Image description&amp;quot;"
+          caption-with-value="&amp;quot;Image caption&amp;quot;"
+          filepath-with-value="&amp;quot;img_20241109_030945_oc195e5356_height_350_width_450.svg&amp;quot;">
+        </oppia-noninteractive-image>
+      `;
+      component.ngOnInit();
+      const updatedHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-math
+          math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;,\u0026amp;quot;svg_filename\u0026amp;quot;:\u0026amp;quot;mathImg_20250126_225215_x5vy0sjj6v_height_3d205_width_1d784_vertical_1d306.svg\u0026amp;quot;}">
+        </oppia-noninteractive-math>
+      `;
+      component.editedContent = {
+        html: updatedHtml,
+      };
+
+      component.updateSuggestion();
+
+      expect(component.errorMessage).toBe(
+        'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
+      );
+      expect(component.errorFound).toBeTrue();
+    });
   });
 });
