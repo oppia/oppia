@@ -137,7 +137,8 @@ class GitHubService:
             requests.HTTPError. Raised if the request fails.
         """
         search_url = 'https://api.github.com/search/issues'
-        url = f'{search_url}?q=repo:{self.repo_owner}/{self.repo_name}+is:issue+state:open'
+        end = 'is:issue+state:open'
+        url = f'{search_url}?q=repo:{self.repo_owner}/{self.repo_name}+{end}'
         response = requests.get(url, headers=self.rest_headers, timeout=10)
         if response is None:
             raise AssertionError('Received null res while fetching issues')
