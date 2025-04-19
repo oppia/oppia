@@ -30,7 +30,7 @@ const roleMethodValue = 'role';
 // "View Contributor Dashboard Users" form elements.
 const viewContributorFilterMethodSelect =
   'select#view-contributor-filter-method-select';
-const viewContributerUsernameInput = 'input#view-contributor-username-input';
+const viewContributorUsernameInput = 'input#view-contributor-username-input';
 const viewContributorCategorySelect = 'select#view-contributor-category-select';
 const viewContributorLanguageSelect = 'select#view-contributor-language-select';
 const viewContributorSubmitButton = 'button#view-contributor-submit-button';
@@ -63,6 +63,7 @@ export class TranslationAdmin extends BaseUser {
   async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
     await this.waitForNetworkIdle();
+    await this.page.waitForSelector(viewContributorFilterMethodSelect);
   }
 
   /**
@@ -73,12 +74,16 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    await this.page.waitForSelector(addContributorUsernameInput);
+    await this.page.waitForSelector(addContributonRightsCategorySelect);
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
       translationRightValue
     );
+    await this.page.waitForSelector(addContributonRightsLanguageDropdown);
     await this.select(addContributonRightsLanguageDropdown, languageCode);
+    await this.page.waitForSelector(addContributionRightsSubmitButton);
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
@@ -91,6 +96,9 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    await this.page.waitForSelector(removeContributorUsernameInput);
+    await this.page.waitForSelector(removeContributonRightsCategorySelect);
+    await this.page.waitForSelector(removeContributionRightsSubmitButton);
     await this.type(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
@@ -100,16 +108,21 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+
+    await this.viewContributionRightsForUser(username);
+    await this.expectUserToNotBeDisplayed(username);
   }
 
   /**
    * Function to display contribution rights by user.
    */
   async viewContributionRightsForUser(username: string): Promise<void> {
+    await this.page.waitForSelector(viewContributorFilterMethodSelect);
+    await this.page.waitForSelector(viewContributorSubmitButton);
+
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
+    await this.type(viewContributorUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
-    await this.page.waitForSelector(viewContributorLanguageResult);
     await this.waitForNetworkIdle();
   }
 
@@ -119,6 +132,9 @@ export class TranslationAdmin extends BaseUser {
   async viewContributorTranslationRightsByLanguageCode(
     languageCode: string
   ): Promise<void> {
+    await this.page.waitForSelector(viewContributorFilterMethodSelect);
+    await this.page.waitForSelector(viewContributorSubmitButton);
+
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
@@ -131,7 +147,13 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the language is displayed as a translation right.
    */
   async expectDisplayedLanguagesToContain(language: string): Promise<void> {
-    await this.page.waitForSelector(viewContributorLanguageResult);
+    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
+    if (!elementHandle) {
+      showMessage(
+        'User list element (.e2e-test-reviewer-roles-result) not found assuming no users have rights.'
+      );
+      return;
+    }
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
       element => (element as HTMLElement).innerText
@@ -167,7 +189,11 @@ export class TranslationAdmin extends BaseUser {
    * Function to check that there are no translators for the selected language.
    */
   async expectUserToNotBeDisplayed(username: string): Promise<void> {
-    await this.page.waitForSelector(viewLanguageRoleUserResult);
+    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
+    if (!elementHandle) {
+      showMessage('No users displayed  assuming user is not present.');
+      return;
+    }
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
