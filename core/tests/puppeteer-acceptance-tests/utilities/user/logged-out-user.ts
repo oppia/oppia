@@ -4029,7 +4029,7 @@ export class LoggedOutUser extends BaseUser {
     const selector = '.save-progress-btn';
 
     try {
-      await this.page.waitForSelector(selector, { timeout: 3000 });
+      await this.page.waitForSelector(selector, {timeout: 3000});
       throw new Error('"Save Progress" button found, which is not expected.');
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
