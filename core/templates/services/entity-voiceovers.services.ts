@@ -90,7 +90,6 @@ export class EntityVoiceoversService {
         )
         .then(entityVoiceoversList => {
           this.languageAccentCodeToEntityVoiceovers = {};
-          this.activeLanguageAccentCode = undefined;
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
           this._voiceoversLoadedEventEmitter.emit();
           resolve();
