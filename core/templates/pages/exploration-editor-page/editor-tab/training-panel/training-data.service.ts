@@ -27,7 +27,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {State} from 'domain/state/StateObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 interface AnswerGroupData {
   answerGroupIndex: number;

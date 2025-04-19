@@ -28,7 +28,7 @@ import {
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -88,7 +88,6 @@ describe('Exploration editor tab component', () => {
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
@@ -216,7 +215,6 @@ describe('Exploration editor tab component', () => {
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -834,7 +832,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
-      outcomeObjectFactory.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'default',
         dest_if_really_stuck: null,
         feedback: {
@@ -848,7 +846,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = outcomeObjectFactory.createFromBackendDict({
+    let displayedValue = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
