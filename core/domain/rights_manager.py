@@ -75,7 +75,7 @@ def get_activity_rights_from_model(
         assert isinstance(
             activity_rights_model,
             exp_models.ExplorationRightsModel
-        )
+        ), "Expected ExplorationRightsModel when activity type is exploration"
         return get_exploration_rights_from_model(activity_rights_model)
 
     return rights_domain.ActivityRights(

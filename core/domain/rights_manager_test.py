@@ -16,9 +16,11 @@
 
 from __future__ import annotations
 
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_rights_domain
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import rights_domain
@@ -35,8 +37,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([
-    models.Names.EXPLORATION
+(exp_models, collection_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.COLLECTION
 ])
 
 
@@ -83,6 +85,74 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.user_voiceover_admin = user_services.get_user_actions_info(
             self.user_id_voiceover_admin)
+
+    def test_get_exploration_rights_from_model_raises_error_for_invalid_type(
+        self
+    ) -> None:
+        COLLECTION_ID_1 = 'collection_id'
+        USER_ID_1 = 'user_id_1'
+        USER_ID_2 = 'user_id_2'
+        USER_ID_COMMITTER = 'user_comit_id_1'
+        
+        collection_models.CollectionRightsModel(
+        id=COLLECTION_ID_1,
+        owner_ids=[USER_ID_1],
+        editor_ids=[USER_ID_1],
+        voice_artist_ids=[USER_ID_1],
+        viewer_ids=[USER_ID_2],
+        community_owned=False,
+        status=constants.ACTIVITY_STATUS_PUBLIC,
+        viewable_if_private=False,
+        first_published_msec=0.1
+        ).save(
+            USER_ID_COMMITTER, 'Created new collection right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+        
+        activity_rights_model = (
+            collection_models.CollectionRightsModel.get_by_id(
+                COLLECTION_ID_1)
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected ExplorationRightsModel when activity type is exploration'
+        ):
+            rights_manager.get_activity_rights_from_model(
+                activity_rights_model,
+                constants.ACTIVITY_TYPE_EXPLORATION
+            )
+
+    def get_exploration_rights_domain_object(
+        self
+    ) -> None:
+        EXPLORATION_ID_1 = 'exploration_id_1'
+        USER_ID_1 = 'user_id_1'
+        USER_ID_2 = 'user_id_2'
+        USER_ID_COMMITTER = 'user_commit_id_1'
+        exp_models.ExplorationRightsModel(
+            id=EXPLORATION_ID_1,
+            owner_ids=[USER_ID_1],
+            editor_ids=[USER_ID_1],
+            voice_artist_ids=[USER_ID_2],
+            viewer_ids=[USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        ).save(
+            USER_ID_COMMITTER, 'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+        exp_rights_model = exp_models.ExplorationRightsModel.get_by_id(
+                EXPLORATION_ID_1)
+        exp_rights = rights_manager.get_activity_rights_from_model(
+            exp_rights_model,
+            constants.ACTIVITY_TYPE_EXPLORATION
+        )
+        self.assertTrue(
+            isinstance(exp_rights, exp_rights_domain.ExplorationRights),
+            'Expected ExplorationRights domain object when storage model is '
+            'ExplorationRightsModel'
+        )
 
     def test_get_exploration_rights_for_nonexistent_exploration(self) -> None:
         non_exp_id = 'this_exp_does_not_exist_id'
