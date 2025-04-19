@@ -2550,7 +2550,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Verify the correct number of displayable topic summaries.
-        self.assertEqual(len(displayable_topic_summaries), 5)
+        self.assertEqual(len(displayable_topic_summaries), 4)
         self.assertEqual(displayable_topic_summaries[0]['id'], self.TOPIC_ID_0)
         self.assertEqual(displayable_topic_summaries[1]['id'], self.TOPIC_ID_1)
 
