@@ -148,6 +148,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         stack.callback(notify_about_successful_shutdown)
         stack.callback(call_extend_index_yaml)
 
+        if not parsed_args.skip_install:
+            # This installs third party libraries before
+            # importing other files or importing
+            # libraries that use the builtins python module (e.g. build).
+            install_third_party_libs.main()
+
         build_args = []
         if parsed_args.prod_env:
             build_args.append('--prod_env')
@@ -166,11 +172,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 recover_users=parsed_args.save_datastore))
             stack.enter_context(servers.managed_cloud_datastore_emulator(
                 clear_datastore=not parsed_args.save_datastore))
-        if not parsed_args.skip_install:
-            # This installs third party libraries before
-            # importing other files or importing
-            # libraries that use the builtins python module (e.g. build).
-            install_third_party_libs.main()
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:
