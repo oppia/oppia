@@ -52,7 +52,8 @@
         "core.jobs.batch_jobs.translation_migration_jobs_test",
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
-        "scripts.generate_root_files_mapping_test"
+        "scripts.generate_root_files_mapping_test",
+        "core.jobs.batch_jobs.clean_up_voiceover_models_job_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -366,6 +367,7 @@
         "core.jobs.transforms.validation.skill_validation_test",
         "core.jobs.batch_jobs.user_validation_jobs_test",
         "core.jobs.batch_jobs.user_bios_change_jobs_test",
+        "core.jobs.batch_jobs.skill_inspection_jobs_test",
         "core.jobs.transforms.validation.story_validation_test",
         "core.tests.load_tests.feedback_thread_summaries_test",
         "core.tests.test_utils_test",
@@ -400,7 +402,7 @@
         "scripts.check_github_workflow_status_test",
         "scripts.check_backend_test_times_test",
         "core.domain.voiceover_regeneration_services_test",
-        "core.platform.azure_speech_synthesis.azure_speech_synthesis_services_test",
-        "core.platform.azure_speech_synthesis.dev_mode_azure_speech_synthesis_services_test"
+        "core.platform.speech_synthesis.azure_speech_synthesis_services_test",
+        "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test"
     ]
 }

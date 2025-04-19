@@ -40,7 +40,9 @@ describe('Logged-in User', function () {
       'Positive Numbers'
     );
     await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
-      'Negative Numbers'
+      'Negative Numbers',
+      'Algebra',
+      false
     );
 
     loggedInUser = await UserFactory.createNewUser(
