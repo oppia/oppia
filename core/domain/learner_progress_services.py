@@ -284,9 +284,6 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model)
 
-    story_id = exp_services.get_story_id_linked_to_exploration(
-        exp_id)
-
     if (exp_id not in subscribed_exploration_ids and
             exp_id not in activities_completed.exploration_ids):
         # Remove the exploration from the in progress and learner playlist
