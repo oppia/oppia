@@ -4027,33 +4027,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNoSaveProgressBeforeCheckpointInfo(): Promise<void> {
     const selector = '.save-progress-btn';
-    const buttonHandle = await this.page.$(selector);
 
-    if (buttonHandle !== null) {
-      const isDisabled = await this.page.evaluate(btn => {
-        const hasDisabledAttr = btn.hasAttribute('disabled');
-        const isAriaDisabled = btn.getAttribute('aria-disabled') === 'true';
-
-        if (hasDisabledAttr !== isAriaDisabled) {
-          throw new Error(
-            'Mismatch between "disabled" and "aria-disabled" attributes.'
-          );
-        }
-
-        return hasDisabledAttr;
-      }, buttonHandle);
-
-      if (!isDisabled) {
-        throw new Error(
-          '"Save Progress" button is enabled before reaching checkpoint, which is not expected.'
-        );
+    try {
+      await this.page.waitForSelector(selector, { timeout: 3000 });
+      throw new Error('"Save Progress" button found, which is not expected.');
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('"Save Progress" button not found, as expected.');
+      } else {
+        throw error;
       }
-
-      showMessage(
-        '"Save Progress" button is present but disabled, as expected before reaching checkpoint.'
-      );
-    } else {
-      showMessage('"Save Progress" button not found, as expected.');
     }
   }
 
