@@ -12,9 +12,7 @@
             <img alt="" class="tab-icon"
                  [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
           </div>
-          <div class="topic-preview-text">
-            Lessons
-          </div>
+          <div class="topic-preview-text">Lessons</div>
         </div>
         <div class="topic-preview-navbar-tab"
              [ngClass]="{'topic-preview-nav-active': activeTab === 'practice'}"
@@ -22,9 +20,7 @@
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
           </div>
-          <div class="topic-preview-text">
-            Practice
-          </div>
+          <div class="topic-preview-text">Practice</div>
         </div>
         <div class="topic-preview-navbar-tab"
              [ngClass]="{'topic-preview-nav-active': activeTab === 'subtopic'}"
@@ -33,9 +29,7 @@
             <img alt="" class="tab-icon"
                  [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
           </div>
-          <div class="topic-preview-text">
-            Revision
-          </div>
+          <div class="topic-preview-text">Revision</div>
         </div>
       </div>
     </div>
@@ -71,16 +65,18 @@
     background-color: #fff;
     margin: 0 auto;
     position: relative;
-    top: 50px;
-    width: 50%;
+    top: 36px;
+    width: 45%;
+    max-width: 700px;
+    box-sizing: border-box;
   }
   .topic-preview-parent {
-    margin-top: -40px;
+    margin-top: -30px;
   }
   .topic-preview-nav {
     background-color: #00645c;
-    box-shadow: 0 2px 8px #000000cf;
-    margin-bottom: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    margin-bottom: 0;
   }
   .topic-preview-navbar-tabs {
     display: flex;
@@ -94,44 +90,69 @@
     cursor: pointer;
     display: inline-block;
     height: 100%;
-    padding: 20px 0;
+    padding: 12px 0;
     text-align: center;
     width: 25%;
   }
   .topic-preview-icon img {
-    height: 40px;
+    height: 32px;
   }
   .topic-preview-text {
     color: #fff;
     font-family: Capriola, Roboto, Arial, sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     margin-top: 4px;
     text-transform: uppercase;
   }
   .topic-preview-container md-card {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
     margin-top: 0;
+    padding: 0;
   }
   .topic-preview-parent .topic-preview-container md-card {
     box-shadow: none;
+    padding: 0;
+  }
+  /* Ensure practice-tab and subtopics-list fill width */
+  .topic-preview-container practice-tab,
+  .topic-preview-container subtopics-list {
+    display: block;
+    width: 100%;
+    /* keep overflow visible */
+    overflow: hidden;
+  }
+  /* Style overrides for practice & story to remove padding */
+  .topic-preview-container :host ::ng-deep .practice-tab-container,
+  .topic-preview-container :host ::ng-deep .story-container {
+    padding: 0;
+    margin: 0;
+  }
+  /* Restore original padding for revision cards */
+  .topic-preview-container :host ::ng-deep .subtopics-list-container {
+    padding: 12px;
+    margin: 0;
+  }
+  .topic-preview-container :host ::ng-deep subtopics-list md-card {
+    margin: 0;
+    padding: 12px;
   }
   @media screen and (max-width: 1000px) {
     .topic-preview-container {
-      width: 70%;
+      width: 60%;
    }
   }
   @media screen and (max-width: 800px) {
     .topic-preview-container {
-      width: 80%;
+      width: 70%;
     }
     .topic-preview-parent .background-banner-position {
-      top: 30px;
+      top: 24px;
     }
   }
   @media screen and (max-width: 650px) {
     .topic-preview-container {
-      margin-top: 80px;
-      width: 100%;
+      margin-top: 60px;
+      width: 90%;
     }
   }
 </style>
