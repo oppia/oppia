@@ -41,7 +41,6 @@ import {
 } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AudioBarStatusService} from 'services/audio-bar-status.service';
 import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
