@@ -34,9 +34,8 @@ from typing import Final
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
-    from mypy_imports import collection_models
 
-(exp_models) = models.Registry.import_models([
+(exp_models,) = models.Registry.import_models([
     models.Names.EXPLORATION
 ])
 
