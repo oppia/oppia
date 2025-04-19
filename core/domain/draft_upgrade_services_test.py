@@ -168,6 +168,50 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v56_dict_to_v57_dict_without_state_changes(
+        self
+    ) -> None:
+        draft_change_list_1_v56 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New Title'
+            })
+        ]
+
+        self.create_and_migrate_new_exploration('56', '57')
+        migrated_draft_change_list_1_v57 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v56, 1, 2, self.EXP_ID))
+
+        self.assertFalse(migrated_draft_change_list_1_v57 is None)
+
+    def test_convert_states_v56_dict_to_v57_dict_with_state_changes(
+        self
+    ) -> None:
+        new_value: Dict[str, str] = {}
+        draft_change_list_1_v56 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            }),
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'widget_id',
+                'new_value': 'MathExpressionInput'
+            })
+        ]
+
+        # Migrate exploration to state schema version 57.
+        self.create_and_migrate_new_exploration('56', '57')
+        migrated_draft_change_list_1_v57 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_1_v56, 1, 2, self.EXP_ID))
+        self.assertIsNone(migrated_draft_change_list_1_v57)
+
     def test_convert_states_v55_dict_to_v56_dict(self) -> None:
         draft_change_list_v55 = [
             exp_domain.ExplorationChange({

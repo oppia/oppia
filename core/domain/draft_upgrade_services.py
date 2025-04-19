@@ -307,6 +307,31 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
+    def _convert_states_v56_dict_to_v57_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts draft change list from state version 56 to 57. Version 57
+        removes recorded_voiceovers property form the state, converting draft to
+        a new version won't be possible.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        for exp_change in draft_change_list:
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v55_dict_to_v56_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
