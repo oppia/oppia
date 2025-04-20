@@ -28,7 +28,6 @@ import {
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -286,7 +285,6 @@ describe('State translation component', () => {
         StateInteractionIdService,
         StateEditorRefreshService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -941,7 +939,6 @@ describe('State translation component', () => {
         StateInteractionIdService,
         StateEditorRefreshService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1429,7 +1426,6 @@ describe('State translation component', () => {
         StateInteractionIdService,
         StateEditorRefreshService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -2080,7 +2076,6 @@ describe('State translation component', () => {
         StateInteractionIdService,
         StateEditorRefreshService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
