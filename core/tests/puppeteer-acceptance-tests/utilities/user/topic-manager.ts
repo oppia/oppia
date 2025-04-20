@@ -224,6 +224,8 @@ const mobileCollapsibleCardHeaderSelector =
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
 const createQuestionButton = '.e2e-test-create-question-button';
+const questionEditCancelButton = 'button.question-edit-cancel-button';
+const confirmQuestionExitButton = 'button.e2e-test-confirm-question-exit';
 
 export class TopicManager extends BaseUser {
   /**
@@ -398,6 +400,11 @@ export class TopicManager extends BaseUser {
     // a modal should appear informing them that they have unsaved changes.
     await this.page.waitForSelector(saveChangesModal, {visible: true});
     await this.clickOn(cancelNavigationButton);
+  }
+
+  async cancelQuestionMaking(): Promise<void> {
+    await this.clickOn(questionEditCancelButton);
+    await this.clickOn(confirmQuestionExitButton);
   }
 
   /**

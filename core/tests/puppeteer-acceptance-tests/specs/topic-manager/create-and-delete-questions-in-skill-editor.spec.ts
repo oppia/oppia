@@ -86,6 +86,7 @@ describe('Topic Manager', function () {
       await topicManager.clickCreateQuestionButton();
       await topicManager.navigateToAnotherTab();
       await topicManager.expectSaveChangesModalToBeVisible();
+      await topicManager.cancelQuestionMaking();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
