@@ -28,7 +28,6 @@ angular.module('oppia', [
   'ngSanitize',
   'ngTouch',
   'pascalprecht.translate',
-  'ui.bootstrap',
   'ui.tree',
   uiValidate,
 ]);

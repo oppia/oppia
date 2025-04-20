@@ -95,7 +95,7 @@ export class SetInputValidationService {
 
     let buttonText =
       customizationArgs.buttonText && customizationArgs.buttonText.value;
-    if (!buttonText || !angular.isString(buttonText.unicode)) {
+    if (!buttonText || typeof buttonText.unicode !== 'string') {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.',
