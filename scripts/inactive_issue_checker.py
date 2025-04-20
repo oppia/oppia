@@ -136,8 +136,8 @@ class GitHubService:
             AssertionError. Raised if the response from the request is None.
             requests.HTTPError. Raised if the request fails.
         """
-        url = f'{self.base_url}/issues?state=open'
-
+        search_url = 'https://api.github.com/search/issues'
+        url = f'{search_url}?q=repo:oppia/oppia+is:issue+state:open'
         response = requests.get(url, headers=self.rest_headers, timeout=10)
         if response is None:
             raise AssertionError('Received null res while fetching issues')
