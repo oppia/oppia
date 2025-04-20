@@ -180,7 +180,8 @@
 
             <div class="oppia-library-carousel"
                  (swiperight)="scroll(idx, true)"
-                 (swipeleft)="scroll(idx, false)">
+                 (swipeleft)="scroll(idx, false)"
+                 [style.max-width]="carouselMaxWidth">
               <div class="oppia-library-carousel-tiles">
                 <div *ngFor="let tile of group.activity_summary_dicts" class="d-inline-block">
                   <oppia-collection-summary-tile *ngIf="tile.activity_type == 'collection'"

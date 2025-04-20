@@ -112,7 +112,7 @@ export class MusicNotesInputComponent
     private musicPhrasePlayerService: MusicPhrasePlayerService,
     private alertsService: AlertsService,
     private elementRef: ElementRef,
-    private renderer: Renderer2,
+    private renderer: Renderer2
   ) {}
 
   private _getAttributes() {

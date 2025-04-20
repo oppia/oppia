@@ -415,7 +415,10 @@ export class CkEditor4RteComponent
 
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
-      (this.elementRef.nativeElement as HTMLElement).setAttribute('style', 'display: block');
+      (this.elementRef.nativeElement as HTMLElement).setAttribute(
+        'style',
+        'display: block'
+      );
 
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
@@ -424,37 +427,56 @@ export class CkEditor4RteComponent
       names.forEach((name, index) => {
         var icon = icons[index];
 
-        const buttonElement = this.elementRef.nativeElement.querySelector('.cke_button__oppia' + name);
+        const buttonElement = this.elementRef.nativeElement.querySelector(
+          '.cke_button__oppia' + name
+        );
         if (buttonElement) {
-          this.renderer.setStyle(buttonElement, 'background-image', `url("/extensions${icon}")`);
-          this.renderer.setStyle(buttonElement, 'background-position', 'center');
-          this.renderer.setStyle(buttonElement, 'background-repeat', 'no-repeat');
+          this.renderer.setStyle(
+            buttonElement,
+            'background-image',
+            `url("/extensions${icon}")`
+          );
+          this.renderer.setStyle(
+            buttonElement,
+            'background-position',
+            'center'
+          );
+          this.renderer.setStyle(
+            buttonElement,
+            'background-repeat',
+            'no-repeat'
+          );
           this.renderer.setStyle(buttonElement, 'height', '24px');
           this.renderer.setStyle(buttonElement, 'width', '24px');
           this.renderer.setStyle(buttonElement, 'padding', '0px 0px');
         }
       });
 
-      const toolbarSeparator = this.elementRef.nativeElement.querySelector('.cke_toolbar_separator');
+      const toolbarSeparator = this.elementRef.nativeElement.querySelector(
+        '.cke_toolbar_separator'
+      );
       if (toolbarSeparator) {
         this.renderer.setStyle(toolbarSeparator, 'height', '22px');
       }
 
-      const buttonIcon = this.elementRef.nativeElement.querySelector('.cke_button_icon');
+      const buttonIcon =
+        this.elementRef.nativeElement.querySelector('.cke_button_icon');
       if (buttonIcon) {
         this.renderer.setStyle(buttonIcon, 'height', '24px');
         this.renderer.setStyle(buttonIcon, 'width', '24px');
       }
 
       const changeComboPanel = () => {
-        const comboPanel = this.elementRef.nativeElement.querySelector('.cke_combopanel');
+        const comboPanel =
+          this.elementRef.nativeElement.querySelector('.cke_combopanel');
         if (comboPanel) {
           this.renderer.setStyle(comboPanel, 'height', '100px');
           this.renderer.setStyle(comboPanel, 'width', '120px');
         }
       };
 
-      const comboButton = this.elementRef.nativeElement.querySelector('.cke_combo_button');
+      const comboButton =
+        this.elementRef.nativeElement.querySelector('.cke_combo_button');
       if (comboButton) {
         this.renderer.setStyle(comboButton, 'height', '29px');
         this.renderer.setStyle(comboButton, 'width', '62px');
@@ -464,19 +486,22 @@ export class CkEditor4RteComponent
         });
       }
 
-      const comboOpen = this.elementRef.nativeElement.querySelector('.cke_combo_open');
+      const comboOpen =
+        this.elementRef.nativeElement.querySelector('.cke_combo_open');
       if (comboOpen) {
         this.renderer.setStyle(comboOpen, 'margin-left', '-20px');
         this.renderer.setStyle(comboOpen, 'margin-top', '2px');
       }
 
-      const comboText = this.elementRef.nativeElement.querySelector('.cke_combo_text');
+      const comboText =
+        this.elementRef.nativeElement.querySelector('.cke_combo_text');
       if (comboText) {
         this.renderer.setStyle(comboText, 'padding', '2px 5px 0px');
       }
 
       if (!this.headersEnabled) {
-        const formatCombo = this.elementRef.nativeElement.querySelector('.cke_combo__format');
+        const formatCombo =
+          this.elementRef.nativeElement.querySelector('.cke_combo__format');
         if (formatCombo) {
           this.renderer.setStyle(formatCombo, 'display', 'none');
         }
