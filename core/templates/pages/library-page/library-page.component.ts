@@ -94,6 +94,7 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
+  carouselMaxWidth: string;
   classroomSummaries: ClassroomSummaryDict[] = [];
   publicClassroomsCount: number = 0;
   // The translateX state controls the horizontal movement of the classroom carousel.
@@ -101,7 +102,6 @@ export class LibraryPageComponent {
   translateX: number = 0;
   currentCardIndex: number = 0;
   cardsToShow: number = 3;
-  carouselMaxWidth: number = 0;
   dots: number[] = [];
 
   constructor(
