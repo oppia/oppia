@@ -29,7 +29,6 @@ import {
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
