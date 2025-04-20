@@ -51,7 +51,7 @@ export class ExprUndefinedVarError extends ExpressionError {
     public varname: string,
     public envs: EnvDict[]
   ) {
-    super(varname + ' not found in ' + angular.toJson(envs));
+    super(varname + ' not found in ' + JSON.stringify(envs));
   }
 }
 
