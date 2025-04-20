@@ -161,6 +161,7 @@ class VoiceArtistMetadataHandler(
             voiceover_services.get_all_voice_artist_language_accent_mapping())
         voice_artist_id_to_voice_artist_name = (
             voiceover_services.get_voice_artist_ids_to_voice_artist_names())
+
         self.values.update({
             'voice_artist_id_to_language_mapping':
                 voice_artist_id_to_language_mapping,
