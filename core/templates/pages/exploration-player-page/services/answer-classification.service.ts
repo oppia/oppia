@@ -31,6 +31,7 @@ import {
   InteractionRuleInputs,
   TranslatableSetOfNormalizedString,
 } from 'interactions/rule-input-defs';
+import isEqual from 'lodash/isEqual';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -158,7 +159,7 @@ export class AnswerClassificationService {
           continue;
         }
         for (const trainingDatum of answerGroup.trainingData) {
-          if (angular.equals(answer, trainingDatum)) {
+          if (isEqual(answer, trainingDatum)) {
             return new AnswerClassificationResult(
               answerGroup.outcome,
               i,
