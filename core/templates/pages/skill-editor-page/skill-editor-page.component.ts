@@ -141,8 +141,8 @@ export class SkillEditorPageComponent implements OnInit {
     ) {
       skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(false);
     }
-
     skillEditorBrowserTabsInfo.decrementNumberOfOpenedTabs();
+
     this.localStorageService.updateEntityEditorBrowserTabsInfo(
       skillEditorBrowserTabsInfo,
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
