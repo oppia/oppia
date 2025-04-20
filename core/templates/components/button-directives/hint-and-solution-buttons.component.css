@@ -166,10 +166,6 @@ oppia-hint-and-solution-buttons .hint-box::before {
   float: left;
 }
 
-.oppia-hint-and-solution-buttons .uib-position-measure {
-  visibility: visible !important;
-}
-
 .md-button.md-default-theme.oppia-learner-hint-solution-button {
   border-radius: 50%;
   height: 32px;
