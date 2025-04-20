@@ -30,7 +30,6 @@
     "core/templates/components/forms/validators/README.md",
     "core/templates/components/state-editor/state-editor-properties-services/state-written-translations.service.ts",
     "core/templates/css/README.md",
-    "core/templates/domain/exploration/outcome.model.spec.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamChangesObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamSpecObjectFactorySpec.ts",
