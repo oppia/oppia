@@ -89,7 +89,6 @@ export class LibraryPageComponent {
   bannerImageFileUrl!: string;
   currentPath!: string;
   groupName!: string;
-  carouselMaxWidth: string;
   groupHeaderI18nId!: string;
   libraryGroups!: SummaryDict[];
   libraryWindowIsNarrow!: boolean;
@@ -102,6 +101,7 @@ export class LibraryPageComponent {
   translateX: number = 0;
   currentCardIndex: number = 0;
   cardsToShow: number = 3;
+  carouselMaxWidth: number = 0;
   dots: number[] = [];
 
   constructor(
