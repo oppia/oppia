@@ -23,7 +23,6 @@ import {TranslationLanguageService} from 'pages/exploration-editor-page/translat
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';

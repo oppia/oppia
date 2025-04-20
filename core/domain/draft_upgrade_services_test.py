@@ -189,7 +189,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     def test_convert_states_v56_dict_to_v57_dict_with_state_changes(
         self
     ) -> None:
-        new_value: Dict[str, str] = {}
         draft_change_list_1_v56 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

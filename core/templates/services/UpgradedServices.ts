@@ -1123,9 +1123,7 @@ export class UpgradedServices {
       upgradedServices['AssetsBackendApiService'],
       upgradedServices['AudioTranslationLanguageService'],
       upgradedServices['ComputeGraphService'],
-      upgradedServices['ContextService'],
-      upgradedServices['PlatformFeatureService'],
-      upgradedServices['EntityVoiceoversService']
+      upgradedServices['ContextService']
     );
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(
