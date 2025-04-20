@@ -30,7 +30,6 @@
     "core/templates/components/forms/validators/README.md",
     "core/templates/components/state-editor/state-editor-properties-services/state-written-translations.service.ts",
     "core/templates/css/README.md",
-    "core/templates/domain/exploration/outcome.model.spec.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamChangesObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamSpecObjectFactorySpec.ts",
@@ -58,7 +57,6 @@
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md",
     "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
-    "core/templates/domain/exploration/AnswerGroupObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"

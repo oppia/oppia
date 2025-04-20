@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
