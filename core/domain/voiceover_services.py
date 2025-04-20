@@ -493,7 +493,6 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         return autogeneratable_language_accent_list
 
 
-
 def get_exploration_voice_artists_link(
     exploration_id: str
 ) -> Optional[voiceover_domain.ExplorationVoiceArtistsLink]:
@@ -513,28 +512,29 @@ def get_exploration_voice_artists_link(
         return None
 
     return voiceover_domain.ExplorationVoiceArtistsLink(
-        exp_id=model.id,
         content_id_to_voiceovers_mapping=model.content_id_to_voiceovers_mapping
     )
 
 
-def set_exploration_voice_artists_link(
+def save_exploration_voice_artists_link(
+    exp_id: str,
     exploration_voice_artists_link: voiceover_domain.ExplorationVoiceArtistsLink
 ) -> None:
     """Saves the ExplorationVoiceArtistsLink domain object to storage.
 
     Args:
+        exp_id: str. The ID of the exploration.
         exploration_voice_artists_link: ExplorationVoiceArtistsLink. The domain
             object to save.
     """
     exploration_voice_artists_link.validate()
 
     model = voiceover_models.ExplorationVoiceArtistsLinkModel.get(
-        exploration_voice_artists_link.exp_id, strict=False)
+        exp_id, strict=False)
 
     if model is None:
         model = voiceover_models.ExplorationVoiceArtistsLinkModel(
-            id=exploration_voice_artists_link.exp_id,
+            id=exp_id,
             content_id_to_voiceovers_mapping=(
                 exploration_voice_artists_link.content_id_to_voiceovers_mapping)
         )
@@ -588,7 +588,6 @@ def get_exploration_voice_artists_links() -> (
 
     return [
         voiceover_domain.ExplorationVoiceArtistsLink(
-            exp_id=model.id,
             content_id_to_voiceovers_mapping=(
                 model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
@@ -606,21 +605,36 @@ def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
     """
     voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = (
         get_voice_artist_metadata_mapping())
-    exp_voice_artist_link: (
+    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
+
+    exploration_voice_artist_links: (
         List[voiceover_domain.ExplorationVoiceArtistsLink]) = (
         get_exploration_voice_artists_links()
     )
 
-    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
-    for link in exp_voice_artist_link:
-        link_mappings = link.get_voice_artist_language_mappings(
-            voice_artist_id_to_language_mapping)
+    for exp_voice_artist_link in exploration_voice_artist_links:
+        lang_code_to_voiceovers_mapping = (
+            exp_voice_artist_link.get_lang_code_to_artist_id_mapping()
+        )
+        for lang_code, voice_artist_id in (
+                lang_code_to_voiceovers_mapping.items()):
 
-        for voice_artist_id, language_mapping in link_mappings.items():
+            accent_type = ''
+            if (
+                voice_artist_id in voice_artist_id_to_language_mapping and
+                lang_code in (
+                    voice_artist_id_to_language_mapping[voice_artist_id])
+            ):
+                accent_type = (
+                    voice_artist_id_to_language_mapping[voice_artist_id]
+                    [lang_code]
+                )
+
             if voice_artist_id not in all_voice_artist_to_language_mapping:
                 all_voice_artist_to_language_mapping[voice_artist_id] = {}
-            all_voice_artist_to_language_mapping[voice_artist_id].update(
-                language_mapping)
+
+            all_voice_artist_to_language_mapping[
+                voice_artist_id][lang_code] = accent_type
 
     return all_voice_artist_to_language_mapping
 
@@ -642,7 +656,6 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
 
     exploration_voice_artist_links = [
         voiceover_domain.ExplorationVoiceArtistsLink(
-            exp_id=model.id,
             content_id_to_voiceovers_mapping=(
                 model.content_id_to_voiceovers_mapping)
         ) for model in exploration_voice_artist_link_models
@@ -701,16 +714,8 @@ def get_voiceover_filenames(
             get_all().fetch()
         )
 
-    exploration_voice_artist_links = [
-        voiceover_domain.ExplorationVoiceArtistsLink(
-            exp_id=model.id,
-            content_id_to_voiceovers_mapping=(
-                model.content_id_to_voiceovers_mapping)
-        ) for model in exp_voice_artist_link_models
-    ]
-
-    for exploration_voice_artist_link in exploration_voice_artist_links:
-        exploration_id = exploration_voice_artist_link.exp_id
+    for exploration_voice_artist_link in exp_voice_artist_link_models:
+        exploration_id = exploration_voice_artist_link.id
         content_id_to_voiceovers_mapping = (
             exploration_voice_artist_link.content_id_to_voiceovers_mapping)
 
@@ -878,7 +883,6 @@ def create_exploration_voice_artists_link_model_instance(
     """
     exploration_voice_artists_link = (
         voiceover_domain.ExplorationVoiceArtistsLink(
-            exp_id=exploration_id,
             content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
         )
     )
@@ -963,7 +967,6 @@ def update_exploration_voice_artist_link_model(
     if exploration_voice_artists_link is None:
         exploration_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id=updated_exploration.id,
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping))
         )
@@ -971,4 +974,5 @@ def update_exploration_voice_artist_link_model(
         exploration_voice_artists_link.content_id_to_voiceovers_mapping = (
             content_id_to_voiceovers_mapping)
 
-    set_exploration_voice_artists_link(exploration_voice_artists_link)
+    save_exploration_voice_artists_link(
+        updated_exploration.id, exploration_voice_artists_link)

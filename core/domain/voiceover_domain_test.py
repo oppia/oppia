@@ -399,59 +399,6 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
 class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
     """Test for ExplorationVoiceArtistsLink domain object."""
 
-    def test_validate_exp_id_type(self) -> None:
-        voiceover_dict: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_0': {
-                'en': ('voice_artist_1', voiceover_dict)
-            }
-        }
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id=123, # type: ignore[arg-type]
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping))
-            )
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected exploration id to be string'
-        ):
-            exp_voice_artists_link.validate()
-
-    def test_validate_exp_id_if_send_empty(self) -> None:
-        voiceover_dict: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_0': {
-                'en': ('voice_artist_1', voiceover_dict)
-            }
-        }
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='',
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping))
-            )
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Exploration ID should not be empty'
-        ):
-            exp_voice_artists_link.validate()
-
     def test_validate_content_id_to_voiceovers_mapping(self) -> None:
         content_id_to_voiceovers_mapping = 'invalid_mapping'
         # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -459,7 +406,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -487,7 +433,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -512,7 +457,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping))
             )
@@ -532,7 +476,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -560,7 +503,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -585,7 +527,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping))
             )
@@ -615,7 +556,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -639,7 +579,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         }
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping))
             )
@@ -660,7 +599,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -686,7 +624,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -715,7 +652,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -743,7 +679,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -772,7 +707,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -800,7 +734,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -828,7 +761,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -856,7 +788,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -885,7 +816,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -913,7 +843,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         exp_voice_artists_link = (
             voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp_id_1',
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
             )
@@ -924,67 +853,3 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
                 'or zero if not yet specified %s' % -1
         ):
             exp_voice_artists_link.validate()
-
-    def test_get_voice_artist_language_mappings_empty_input(self) -> None:
-        """Tests get_voice_artist_language_mappings with empty input mapping."""
-        voiceover_dict: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_0': {
-                'en': ('voice_artist_1', voiceover_dict)
-            }
-        }
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp123',
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping))
-            )
-
-        result = exp_voice_artists_link.get_voice_artist_language_mappings({})
-
-        expected_result = {'voice_artist_1': {'en': ''}}
-        self.assertEqual(result, expected_result)
-
-    def test_get_voice_artist_language_mappings_multiple_langs(self) -> None:
-        """Tests get_voice_artist_language_mappings with multiple languages."""
-        voiceover_dict: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_0': {
-                'en': ('voice_artist_1', voiceover_dict),
-                'es': ('voice_artist_1', voiceover_dict)
-            }
-        }
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                exp_id='exp123',
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping))
-            )
-
-        voice_artist_id_to_language_mapping = {
-            'voice_artist_1': {
-                'en': 'British',
-                'es': 'Castilian'
-            }
-        }
-
-        result = exp_voice_artists_link.get_voice_artist_language_mappings(
-            voice_artist_id_to_language_mapping)
-
-        expected_result = {
-            'voice_artist_1': {
-                'en': 'British',
-                'es': 'Castilian'
-            }
-        }
-        self.assertEqual(result, expected_result)

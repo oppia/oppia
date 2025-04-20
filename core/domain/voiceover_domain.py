@@ -323,7 +323,6 @@ class ExplorationVoiceArtistsLink:
 
     def __init__(
             self,
-            exp_id: str,
             content_id_to_voiceovers_mapping: Dict[
                 str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
             ]
@@ -331,32 +330,23 @@ class ExplorationVoiceArtistsLink:
         """Construct a ExplorationVoiceArtistsLink domain object.
 
         Args: 
-            exp_id: str. ID of exploration.
             content_id_to_voiceovers_mapping: Dict. A dictionary with content
                 IDs as keys and nested dicts as values. Each nested dict
                 contains language codes as keys and a 2-tuple as values.
                 The 2-tuple contains voice artist ID as the first element 
                 and VoiceoverDict as the second element.
         """
-        self.exp_id = exp_id
         self.content_id_to_voiceovers_mapping = content_id_to_voiceovers_mapping
 
     def validate(self) -> None:
         """Validates attributes of ExplorationVoiceArtistsLink."""
 
-        if not isinstance(self.exp_id, str):
-            raise utils.ValidationError(
-                'Expected exploration id to be string, recieved: %s.'
-                % self.exp_id
-            )
-        if not self.exp_id:
-            raise utils.ValidationError('Exploration ID should not be empty.')
         if not isinstance(self.content_id_to_voiceovers_mapping, dict):
             raise utils.ValidationError(
                 'Expected content_id_to_voiceovers_mapping to be Dict'
                 'But recieved: %s' % self.content_id_to_voiceovers_mapping
             )
-        for content_id, nested_dict in (
+        for content_id, langauge_to_voiceover_dict in (
             self.content_id_to_voiceovers_mapping.items()):
             if not isinstance(content_id, str):
                 raise utils.ValidationError(
@@ -365,13 +355,13 @@ class ExplorationVoiceArtistsLink:
                 )
             if not content_id:
                 raise utils.ValidationError('Content ID should not be empty.')
-            if not isinstance(nested_dict, dict):
+            if not isinstance(langauge_to_voiceover_dict, dict):
                 raise utils.ValidationError(
                     'Expected nested dict to be dict, recieved: %s.'
-                    % nested_dict
+                    % langauge_to_voiceover_dict
                 )
             for language_code, (artist_id, voiceover_dict) in (
-                nested_dict.items()):
+                langauge_to_voiceover_dict.items()):
                 if not isinstance(language_code, str):
                     raise utils.ValidationError(
                         'Expected language to be string, recieved: %s'
@@ -420,40 +410,24 @@ class ExplorationVoiceArtistsLink:
                 state_domain.Voiceover.from_dict(
                     voiceover_dict).validate()
 
-    def get_voice_artist_language_mappings(
-        self,
-        voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]]
-    ) -> Dict[str, Dict[str, str]]:
-        """Gets voice artist language accent mappings from this link.
+    def get_lang_code_to_artist_id_mapping(self) -> Dict[str, str]:
+        """Gets the mapping of language code to artist ID.
 
-        Args:
-            voice_artist_id_to_language_mapping: dict. A dict mapping voice
-                artist IDs to language-accent mappings.
-
-        Returns: 
-            VoiceArtistMetadataModel. Dictionary of the data 
-            from VoiceArtistMetadataModel.
+        Returns:
+            dict. A dictionary mapping language codes to artist IDs.
         """
-        result: Dict[str, Dict[str, str]] = {}
-        for lang_voiceover_mapping_tuple in (
-            self.content_id_to_voiceovers_mapping.values()):
 
-            for lang_code, voiceover_tuple in (
-                lang_voiceover_mapping_tuple.items()):
+        lang_code_to_artist_ids: Dict[str, str] = {}
 
+        for contents in self.content_id_to_voiceovers_mapping.values():
+            for lang_code, voiceover_tuple in contents.items():
                 voice_artist_id = voiceover_tuple[0]
-                accent_type = ''
-                if (voice_artist_id in voice_artist_id_to_language_mapping and
-                lang_code in voice_artist_id_to_language_mapping[
-                voice_artist_id]
-                ):
-                    accent_type = (
-                        voice_artist_id_to_language_mapping[
-                            voice_artist_id][lang_code])
+                if lang_code not in lang_code_to_artist_ids:
+                    lang_code_to_artist_ids[lang_code] = voice_artist_id
+                else:
+                    if lang_code_to_artist_ids[lang_code] != voice_artist_id:
+                        raise utils.ValidationError(
+                            'Multiple artists found for the same language code'
+                        )
 
-                if voice_artist_id not in result:
-                    result[voice_artist_id] = {}
-
-                result[voice_artist_id][lang_code] = accent_type
-
-        return result
+        return lang_code_to_artist_ids
