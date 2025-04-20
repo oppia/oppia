@@ -16,7 +16,6 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-
 import {Component, Renderer2} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
@@ -275,7 +274,6 @@ export class CreatorDashboardPageComponent {
     this.renderer.listen('window', 'resize', () => {
       this.updatesGivenScreenWidth();
     });
-
   }
 
   createNewExploration(): void {
@@ -286,7 +284,7 @@ export class CreatorDashboardPageComponent {
     // This function is used as a custom function to
     // sort heading in the list view. Directly assigning
     // keyvalue : 0 gives error "TypeError: The comparison function
-    // must be either a function or undefined" .
+    // must be either a function or undefined".
     return 0;
   }
 }
