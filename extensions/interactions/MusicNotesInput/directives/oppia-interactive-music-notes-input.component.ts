@@ -214,13 +214,19 @@ export class MusicNotesInputComponent
   // must be recalculated in order for the grid to work properly.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
-    $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
-    setTimeout(() => {
-      $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
-      this.init();
-    }, 20);
-  }
+    const validNoteArea = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-valid-note-area'
+    );
 
+    if (validNoteArea) {
+      this.renderer.setStyle(validNoteArea, 'visibility', 'hidden');
+
+      setTimeout(() => {
+        this.renderer.setStyle(validNoteArea, 'visibility', 'visible');
+        this.init();
+      }, 20);
+    }
+  }
   init(): void {
     this.CONTAINER_WIDTH = this.staffContainerElt.width();
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
