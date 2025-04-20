@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import collections
 import logging
-import threading
 
 from core.domain import opportunity_services
 from core.domain import state_domain
@@ -77,37 +76,6 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 'Not able to check whether exploration is curated or not'
                 ' for exploration ID %s.' % exploration_id)
             return False
-
-    @classmethod
-    def is_voiceover_changes_made(
-        cls, exp_snapshot_metadata_model: (
-            exp_models.ExplorationSnapshotMetadataModel)
-    ) -> bool:
-        """Checks whether the given snapshot model contains voiceover-related
-        changes.
-
-        Args:
-            exp_snapshot_metadata_model: ExplorationSnapshotMetadataModel.
-                The exploration snapshot metadata model.
-
-        Returns:
-            bool. Whether the given snapshot model contains voiceover-related
-            changes.
-        """
-
-        try:
-            for change in exp_snapshot_metadata_model.commit_cmds:
-                if (
-                    change['cmd'] == 'edit_state_property' and
-                    change['property_name'] == 'recorded_voiceovers'
-                ):
-                    return True
-        except Exception:
-            logging.exception(
-                'Not able to check voiceover changes for snapshot model ID %s.'
-                % exp_snapshot_metadata_model.id
-            )
-        return False
 
     @classmethod
     def extract_added_voiceovers_between_successive_snapshots(
@@ -215,6 +183,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # Collects all the debug logs.
         debug_logs: str = (
             'Exp ID: %s.\n' % exploration_model.id)
+        logging.info('Exp ID: %s.\n' % exploration_model.id)
+
         debug_logs += ('Snapshots: %s\n' % len(snapshot_models))
 
         # The dictionary contains information about voice artists and their
@@ -225,6 +195,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 collections.defaultdict(dict)
             )
 
+        language_code_to_voiceovers_count: Dict[str, int] = {}
+
         for state in exploration_model.states.values():
             voiceovers_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping'])
@@ -233,13 +205,25 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 for lang_code, voiceover_dict in (
                         lang_code_to_voiceovers.items()):
 
+                    if lang_code in language_code_to_voiceovers_count:
+                        language_code_to_voiceovers_count[lang_code] += 1
+                    else:
+                        language_code_to_voiceovers_count[lang_code] = 1
+
                     latest_content_id_to_voiceover_mapping[
                         content_id][lang_code] = voiceover_dict
                     total_number_of_voiceovers_to_identify += 1
 
-        current_version = exploration_model.version
+        for language_code, voiceovers_count in (
+                language_code_to_voiceovers_count.items()):
+            debug_logs += (
+                'Language code: %s, voiceovers count: %s.\n' % (
+                    language_code, voiceovers_count))
 
-        logging.info('Logs for exploration: %s.\n' % exploration_model.id)
+        debug_logs += (
+            'Total voiceovers: %s.\n' % total_number_of_voiceovers_to_identify)
+
+        current_version = exploration_model.version
 
         # Note that, in this code, we don't need to explicitly handle the case
         # where explorations were reverted to previous versions. This is
@@ -253,33 +237,41 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             new_snapshot_id = exploration_model.id + '-' + str(version)
             old_snapshot_id = exploration_model.id + '-' + str(version - 1)
 
-            logging.info(
-                'Current iteration for snapshots: %s and %s\n' % (
+            debug_logs += (
+                'Iteration for snapshots: %s and %s\n' % (
                     old_snapshot_id, new_snapshot_id))
-            logging.info('Thread ID: %s\n' % threading.get_native_id())
+            logging.info('Iteration for snapshots: %s and %s\n' % (
+                old_snapshot_id, new_snapshot_id))
 
             if old_snapshot_id not in snapshot_models_dict:
+                logging.info(
+                    '%s not present in snapshot model dict.' % old_snapshot_id)
                 continue
             if new_snapshot_id not in snapshot_models_dict:
+                logging.info(
+                    '%s not present in snapshot model dict.' % new_snapshot_id)
                 continue
             if new_snapshot_id not in metadata_models_dict:
+                logging.info(
+                    '%s not present in metadata model dict.' % new_snapshot_id)
                 continue
 
             new_snapshot_model = snapshot_models_dict[new_snapshot_id]
             old_snapshot_model = snapshot_models_dict[old_snapshot_id]
 
-            # If the commit does not contain voiceover changes, then we should
-            # skip the snapshot model.
-            if not cls.is_voiceover_changes_made(
-                    metadata_models_dict[new_snapshot_model.id]):
-                continue
+            logging.info('Fetched old and new snapshot model correctly.')
 
             try:
                 filenames_in_this_version = (
                     cls.extract_added_voiceovers_between_successive_snapshots(
                         new_snapshot_model, old_snapshot_model))
             except Exception as e:
-                logging.exception(
+                debug_logs += (
+                    'Failed to get newly added voiceover between snapshot '
+                    'versions %s and %s, with error: %s' % (
+                        old_snapshot_model.id, new_snapshot_model.id, e)
+                )
+                logging.info(
                     'Failed to get newly added voiceover between snapshot '
                     'versions %s and %s, with error: %s' % (
                         old_snapshot_model.id, new_snapshot_model.id, e)
@@ -293,17 +285,21 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             # If no voiceover-related changes were made during the commit,
             # then the rest of the for loop body can be skipped.
             if len(filenames_in_this_version) == 0:
+                logging.info('No files added in this version.')
                 continue
 
             voice_artist_id = (
                 metadata_models_dict[new_snapshot_model.id].committer_id
             )
+            logging.info('Got the voice artist ID: %s.' % voice_artist_id)
 
             try:
                 with datastore_services.get_ndb_context():
                     voice_artist_username = (
                         user_services.get_username(voice_artist_id))
-            except Exception:
+            except Exception as e:
+                logging.info(e)
+                logging.info('\n')
                 voice_artist_username = (
                     'Not Found for user ID: %s.' % voice_artist_id)
 
@@ -385,8 +381,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         Returns:
             str. The exploration ID extracted from the snapshot model ID.
         """
-
-        return snapshot_model_id.split('-')[0]
+        # The length of exploration ID must be 12.
+        exploration_id = snapshot_model_id[:12]
+        return exploration_id
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results for the exploration for which an

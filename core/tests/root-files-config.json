@@ -28,7 +28,6 @@
     "core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.ts",
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
     "core/templates/components/forms/validators/README.md",
-    "core/templates/components/state-editor/state-editor-properties-services/state-written-translations.service.ts",
     "core/templates/css/README.md",
     "core/templates/domain/exploration/OutcomeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",

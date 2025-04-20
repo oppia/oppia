@@ -27,7 +27,6 @@ angular.module('oppia', [
   'ngMaterial',
   'ngSanitize',
   'ngTouch',
-  'ui.bootstrap',
   'ui.tree',
   uiValidate,
 ]);
