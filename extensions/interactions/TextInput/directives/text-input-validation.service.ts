@@ -71,7 +71,7 @@ export class TextInputValidationService {
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
-      !angular.isString(placeholder.unicode)
+      typeof placeholder.unicode !== 'string'
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
