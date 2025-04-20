@@ -772,7 +772,7 @@ textarea {
   font-weight: bold;
 }
 
-.oppia-help-dropdown .uib-popover {
+.oppia-help-dropdown .popover {
   color: white;
   font-size: 14px;
   max-width: 200px;
@@ -810,7 +810,7 @@ textarea {
   This is needed for proper display of tabs. See
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
-.navbar-nav, .uib-pagination {
+.navbar-nav, .pagination {
   cursor: pointer;
 }
 
@@ -869,6 +869,11 @@ textarea {
   right: 0;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.navbar-light .dropdown-menu {
+  background: #fff;
+  margin-top: 0;
 }
 
 .dropup .dropdown-menu,
@@ -969,11 +974,6 @@ textarea {
   width: 100%;
 }
 
-.navbar-light .uib-dropdown-menu {
-  background: #fff;
-  margin-top: 0;
-}
-
 /* In Bootstrap, the link at the top of the default dropdown menu cannot be
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
@@ -985,33 +985,7 @@ textarea {
   min-width: 160px;
 }
 
-.oppia-navbar-nav .uib-dropdown-menu {
-  left: auto;
-  right: 0;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.oppia-dropdown-submenu > .uib-dropdown-menu {
-  -moz-border-radius: 0 6px 6px;
-  -webkit-border-radius: 0 6px 6px 6px;
-  border-radius: 0 6px 6px 6px;
-  left: 100%;
-  margin-left: -1px;
-  margin-top: -6px;
-  top: 0;
-}
-.oppia-dropdown-submenu:hover > .uib-dropdown-menu {
-  display: block;
-}
-.oppia-dropdown-submenu.float-left > .uib-dropdown-menu {
-  -moz-border-radius: 6px 0 6px 6px;
-  -webkit-border-radius: 6px 0 6px 6px;
-  border-radius: 6px 0 6px 6px;
-  left: -100%;
-  margin-left: 10px;
-}
-.nav .uib-dropdown:hover > .uib-dropdown-menu {
+.nav .dropdown:hover > .dropdown-menu {
   border: none;
 }
 
@@ -1054,13 +1028,13 @@ textarea {
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
-  .nav .uib-dropdown:hover > .uib-dropdown-menu {
+  .nav .dropdown:hover > .dropdown-menu {
     display: block;
   }
-  .nav .uib-dropdown:hover > .uib-dropdown-menu > li > a {
+  .nav .dropdown:hover > .dropdown-menu > li > a {
     color: #009688;
   }
-  .nav .uib-dropdown:hover > .uib-dropdown-menu > li > a:hover {
+  .nav .dropdown:hover > .dropdown-menu > li > a:hover {
     background-color: #eee;
     color: #888;
   }
@@ -1681,10 +1655,10 @@ pre.oppia-pre-wrapped-text {
 }
 
 /* Bootstrap override for popovers & tooltip */
-.oppia-help-dropdown .uib-popover.bottom > .arrow {
+.oppia-help-dropdown .popover.bottom > .arrow {
   border-bottom-color: #000;
 }
-.oppia-help-dropdown .uib-popover.bottom > .arrow:after {
+.oppia-help-dropdown .popover.bottom > .arrow:after {
   border-bottom-color: #000;
 }
 
@@ -2547,18 +2521,18 @@ div#ng-curtain {
   top: 28px;
   width: 100%;
 }
-.oppia-editor-sidebar uib-accordion .card {
+.oppia-editor-sidebar ngb-accordion .card {
   border-radius: 0;
 }
-.oppia-editor-sidebar uib-accordion .card .card-heading {
+.oppia-editor-sidebar ngb-accordion .card .card-heading {
   background-color: #ddd;
   border-radius: 0;
   padding: 3px 10px;
 }
-.oppia-editor-sidebar uib-accordion .card .card-title {
+.oppia-editor-sidebar ngb-accordion .card .card-title {
   font-weight: bold;
 }
-.oppia-editor-sidebar uib-accordion .card .card-body {
+.oppia-editor-sidebar ngb-accordion .card .card-body {
   border-radius: 0;
   padding-right: 25px;
 }
@@ -2603,7 +2577,7 @@ div#ng-curtain {
   text-align: center;
 }
 
-.uib-dropdown-menu.oppia-editor-warnings-box {
+.dropdown-menu.oppia-editor-warnings-box {
   background: #fcf8e3;
   overflow: hidden;
 }

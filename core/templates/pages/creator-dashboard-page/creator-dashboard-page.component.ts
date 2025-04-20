@@ -16,7 +16,8 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-import {Component, HostListener} from '@angular/core';
+
+import {Component, Renderer2} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import {CreatorDashboardConstants} from './creator-dashboard-page.constants';
@@ -24,7 +25,6 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
-import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
@@ -91,7 +91,7 @@ export class CreatorDashboardPageComponent {
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
     private userService: UserService,
-    private alertsService: AlertsService,
+    private renderer: Renderer2,
     private windowDimensionsService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
@@ -160,8 +160,6 @@ export class CreatorDashboardPageComponent {
     return this.windowDimensionsService.getWidth() < 768;
   }
 
-  // This will automatically call the method when the window is resized.
-  @HostListener('window:resize', [])
   updatesGivenScreenWidth(): void {
     if (this.checkMobileView()) {
       // For mobile users, the view of the creators
@@ -273,6 +271,11 @@ export class CreatorDashboardPageComponent {
       );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
+
+    this.renderer.listen('window', 'resize', () => {
+      this.updatesGivenScreenWidth();
+    });
+
   }
 
   createNewExploration(): void {

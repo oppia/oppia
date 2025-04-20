@@ -28,6 +28,7 @@ import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
+import isEqual from 'lodash/isEqual';
 
 @Injectable({
   providedIn: 'root',
@@ -253,12 +254,7 @@ export class DragAndDropSortInputValidationService {
               .reduce((acc, val) => acc.concat(val), [])
               .map(contentId => choiceContentIdToHtml[contentId])
               .sort();
-            if (
-              !angular.equals(
-                sortedCustomArgsChoices,
-                flattenedAndSortedXInputs
-              )
-            ) {
+            if (!isEqual(sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
