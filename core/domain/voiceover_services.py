@@ -546,19 +546,6 @@ def save_exploration_voice_artists_link(
     model.put()
 
 
-def get_autogeneratable_language_accent_codes() -> List[str]:
-    """The method returns the list of language accent codes that are supported
-    by cloud service for autogeneration.
-
-    Returns:
-        List[str]. A list of language accent codes that are supported by the
-        cloud service for autogeneration.
-    """
-    language_accent_codes = list(
-        get_autogeneratable_language_accent_list().keys())
-    return language_accent_codes
-
-
 def get_voice_artist_metadata_mapping() -> Dict[str, Dict[str, str]]:
     """Gets a mapping of voice artist IDs to language-accent mappings.
 

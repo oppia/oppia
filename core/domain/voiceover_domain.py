@@ -407,8 +407,12 @@ class ExplorationVoiceArtistsLink:
                         'Unexpected keys in voiceoverDict: %s'
                         % unexpected_keys
                     )
-                state_domain.Voiceover.from_dict(
-                    voiceover_dict).validate()
+                try:
+                    state_domain.Voiceover.from_dict(
+                        voiceover_dict).validate()
+                except utils.ValidationError as e:
+                    raise utils.ValidationError(
+                        'Missing required key in voiceoverDict: %s' % e)
 
     def get_lang_code_to_artist_id_mapping(self) -> Dict[str, str]:
         """Gets the mapping of language code to artist ID.

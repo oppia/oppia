@@ -853,3 +853,32 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
                 'or zero if not yet specified %s' % -1
         ):
             exp_voice_artists_link.validate()
+
+    def test_lang_code_to_artist_id_mapping_method(self) -> None:
+        voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        content_id_to_voiceovers_mapping = {
+            'content_id_1': {
+                'en': ('voice_artist_1', voiceover_dict),
+                'hi': ('voice_artist_2', voiceover_dict)
+            }
+        }
+        exp_voice_artists_link = (
+            voiceover_domain.ExplorationVoiceArtistsLink(
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping))
+            )
+        exp_voice_artists_link.validate()
+        expected_mapping = {
+            'en': 'voice_artist_1',
+            'hi': 'voice_artist_2'
+        }
+        lang_code_to_artist_id = (
+            exp_voice_artists_link.get_lang_code_to_artist_id_mapping())
+        self.assertEqual(
+            lang_code_to_artist_id,
+            expected_mapping)
