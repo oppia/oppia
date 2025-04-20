@@ -25,7 +25,7 @@ jobs:
           USERNAME: '${{ github.event.assignee.login }}'
         with:
           script: |
-            const { google } = require('@googleapis/sheets');
+            const { google } = require('googleapis');
             const { OAuth2Client } = require('google-auth-library');
             const authorize = (credentials) => {
               const clientSecret = credentials.installed.client_secret;
@@ -40,15 +40,14 @@ jobs:
             const oauthClient = authorize(JSON.parse(clientSecret));
             const sheets = google.sheets('v4');
 
-            const response = await sheets.spreadsheets.values.get({
+            const rows = await sheets.spreadsheets.values.get({
               auth: oauthClient,
               spreadsheetId: process.env.SPREADSHEET_ID,
               range: 'Usernames!A:A',
             });
             const username = process.env.USERNAME.toLowerCase();
-            const rows = response.data.values || [];
-            const hasSignedCla = rows.some(row => 
-              row[0] && row[0].toLowerCase() === username
+            const hasSignedCla = rows.data.values.some(row => 
+              row[0].toLowerCase() === username
             );
             
             core.setOutput('has-signed-cla', hasSignedCla);
