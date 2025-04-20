@@ -77,27 +77,6 @@ export class TranslationStatusService implements OnInit {
     this.explorationVoiceoverContentNotAvailableCount = 0;
   }
 
-  _getVoiceOverStatus(
-    recordedVoiceovers: RecordedVoiceovers,
-    contentId: string
-  ): AvailabilityStatus {
-    let availabilityStatus = {
-      available: false,
-      needsUpdate: false,
-    };
-    let availableLanguages = recordedVoiceovers.getLanguageCodes(contentId);
-
-    if (availableLanguages.indexOf(this.langCode) !== -1) {
-      availabilityStatus.available = true;
-      let audioTranslation = recordedVoiceovers.getVoiceover(
-        contentId,
-        this.langCode
-      );
-      availabilityStatus.needsUpdate = audioTranslation.needsUpdate;
-    }
-    return availabilityStatus;
-  }
-
   _getEntityVoiceoverStatus(contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,

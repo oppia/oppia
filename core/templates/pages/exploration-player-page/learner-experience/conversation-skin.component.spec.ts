@@ -176,7 +176,6 @@ describe('Conversation skin component', () => {
     null,
     new Interaction([], [], null, null, [], '', null),
     [],
-    null,
     '',
     null
   );
@@ -700,7 +699,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -852,7 +850,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -993,7 +990,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -1139,7 +1135,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'EndExploration', null),
         [],
-        null,
         '',
         null
       );
@@ -1256,7 +1251,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'EndExploration', null),
         [],
-        null,
         '',
         null
       );
@@ -1316,7 +1310,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'EndExploration', null),
         [],
-        null,
         '',
         null
       );
@@ -1339,7 +1332,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -1423,7 +1415,6 @@ describe('Conversation skin component', () => {
             null,
             new Interaction([], [], null, null, [], 'Continue', null),
             [],
-            null,
             'content',
             null
           )
@@ -1616,7 +1607,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -1735,7 +1725,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -1916,7 +1905,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'Continue', null),
       [],
-      null,
       '',
       null
     );
@@ -1947,7 +1935,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'Continue', null),
       [],
-      null,
       '',
       null
     );
@@ -2114,7 +2101,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'NumberWithUnits', null),
       [],
-      null,
       '',
       null
     );
@@ -2201,7 +2187,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -2295,7 +2280,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -2442,7 +2426,6 @@ describe('Conversation skin component', () => {
         nextCard: StateCard,
         refreshInteraction: boolean,
         feedbackHtml: string,
-        feedbackAudioTranslations: BindableVoiceovers,
         refresherExplorationId: string,
         missingPrerequisiteSkillId: string,
         remainOnCurrentCard: boolean,
@@ -2460,7 +2443,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'EndExploration', null),
         [],
-        null,
         '',
         null
       );
@@ -2468,7 +2450,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         'feedback',
-        null,
         'refresherId',
         '',
         false,
@@ -2483,7 +2464,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         '',
-        null,
         'refresherId',
         '',
         false,
@@ -2498,7 +2478,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         'feedback',
-        null,
         'refresherId',
         '',
         false,
@@ -2513,7 +2492,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         '',
-        null,
         'refresherId',
         '',
         false,
@@ -2528,7 +2506,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         'feedback',
-        null,
         '',
         'skill_id',
         true,
@@ -2546,7 +2523,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'TextInput', null),
         [],
-        null,
         '',
         null
       );
@@ -2558,7 +2534,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         'feedback',
-        null,
         '',
         'skill_id',
         true,
@@ -2575,7 +2550,6 @@ describe('Conversation skin component', () => {
         null,
         new Interaction([], [], null, null, [], 'ImageClickInput', null),
         [],
-        null,
         '',
         null
       );
@@ -2584,7 +2558,6 @@ describe('Conversation skin component', () => {
         stateCard,
         true,
         'feedback',
-        null,
         'refresherId',
         'skill_id',
         true,
@@ -2688,7 +2661,6 @@ describe('Conversation skin component', () => {
       null,
       interaction,
       [],
-      null,
       '',
       null
     );
@@ -2744,7 +2716,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );
@@ -2781,7 +2752,6 @@ describe('Conversation skin component', () => {
       '',
       new Interaction([], [], null, null, [], null, null),
       [],
-      null,
       '',
       null
     );
@@ -2921,7 +2891,6 @@ describe('Conversation skin component', () => {
       null,
       new Interaction([], [], null, null, [], 'EndExploration', null),
       [],
-      null,
       '',
       null
     );

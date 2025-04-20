@@ -26,7 +26,6 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {ContextService} from 'services/context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
   providedIn: 'root',
@@ -50,7 +49,6 @@ export class AudioPreloaderService {
     private audioTranslationLanguageService: AudioTranslationLanguageService,
     private computeGraphService: ComputeGraphService,
     private contextService: ContextService,
-    private platformFeatureService: PlatformFeatureService,
     private entityVoiceoversService: EntityVoiceoversService
   ) {}
 

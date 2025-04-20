@@ -34,6 +34,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 class MockNgbModal {
   open() {
@@ -722,6 +723,15 @@ describe('Translation status service', () => {
     () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
+
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi.updateTranslation(
+        'content_8',
+        TranslatedContent.createFromBackendDict({
+          content_value: '<p>This is a content.</p>',
+          content_format: 'html',
+          needs_update: false,
+        })
+      );
       tss.refresh();
 
       var activeStateContentIdStatusColor =

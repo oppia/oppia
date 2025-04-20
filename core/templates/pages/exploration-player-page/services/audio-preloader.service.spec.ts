@@ -320,28 +320,79 @@ describe('Audio preloader service', () => {
     audioPreloaderService.init(exploration);
     audioTranslationLanguageService.init(['en'], 'en', 'en', false);
 
-    let manualVoiceoverBackendDict: VoiceoverBackendDict = {
+    let manualVoiceoverBackendDict1: VoiceoverBackendDict = {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
       duration_secs: 10.0,
     };
 
-    let manualVoiceover = Voiceover.createFromBackendDict(
-      manualVoiceoverBackendDict
+    let manualVoiceover1 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict1
     );
-    audioPreloaderService.contentIdsToVoiceovers = {content: [manualVoiceover]};
+
+    let manualVoiceoverBackendDict2: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover2 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict2
+    );
+
+    let manualVoiceoverBackendDict3: VoiceoverBackendDict = {
+      filename: 'c.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover3 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict3
+    );
+
+    let manualVoiceoverBackendDict4: VoiceoverBackendDict = {
+      filename: 'd.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover4 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict4
+    );
+
+    audioPreloaderService.contentIdsToVoiceovers = {
+      content: [manualVoiceover1],
+      feedback_1: [manualVoiceover2],
+      feedback_2: [manualVoiceover3],
+      default_outcome: [manualVoiceover4],
+    };
 
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
     );
     expect(
       audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['a.mp3']);
+    ).toEqual(['a.mp3', 'b.mp3', 'c.mp3']);
 
-    let requestUrl = '/assetsdevhandler/exploration/1/assets/audio/a.mp3';
+    let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/a.mp3';
+    let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/b.mp3';
+    let requestUrl3 = '/assetsdevhandler/exploration/1/assets/audio/c.mp3';
+    let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/d.mp3';
 
-    httpTestingController.expectOne(requestUrl).flush(audioBlob);
+    httpTestingController.expectOne(requestUrl1).flush(audioBlob);
+    httpTestingController.expectOne(requestUrl2).flush(audioBlob);
+    httpTestingController.expectOne(requestUrl3).flush(audioBlob);
+    flushMicrotasks();
+
+    expect(
+      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
+    ).toEqual(['d.mp3']);
+
+    httpTestingController.expectOne(requestUrl4).flush(audioBlob);
     flushMicrotasks();
 
     expect(

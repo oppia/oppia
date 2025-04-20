@@ -23,6 +23,7 @@ import {
   discardPeriodicTasks,
   fakeAsync,
   TestBed,
+  flush,
   tick,
   waitForAsync,
 } from '@angular/core/testing';
@@ -101,6 +102,32 @@ describe('Audio Bar Component', () => {
   afterEach(() => {
     component.ngOnDestroy();
   });
+
+  it(
+    'should correctly set audio for autoplay when audio bar ' +
+      'is opened and audio is playing',
+    fakeAsync(() => {
+      let mockOnAutoplayAudioEventEmitter = new EventEmitter();
+      spyOnProperty(audioPlayerService, 'onAutoplayAudio').and.returnValue(
+        mockOnAutoplayAudioEventEmitter
+      );
+
+      component.ngOnInit();
+      component.expandAudioBar();
+      component.isPaused = false;
+      fixture.detectChanges();
+
+      mockOnAutoplayAudioEventEmitter.emit();
+      voiceoverPlayerService.onActiveVoiceoverChanged.emit();
+      voiceoverPlayerService.onTranslationLanguageChanged.emit();
+
+      flush();
+      discardPeriodicTasks();
+      fixture.detectChanges();
+
+      expect(component.isPaused).toBe(true);
+    })
+  );
 
   it("should set current time when calling 'setProgress'", () => {
     // This time period is used to set progress
