@@ -48,6 +48,7 @@ import {
   SimpleChanges,
   OnInit,
   ViewChild,
+  Renderer2,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
@@ -98,6 +99,7 @@ export class CkEditor4RteComponent
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private elementRef: ElementRef,
+    private renderer: Renderer2,
     private internetConnectivityService: InternetConnectivityService
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
@@ -315,9 +317,9 @@ export class CkEditor4RteComponent
     var editable = document.querySelectorAll('.oppia-rte-resizer');
     var resize = () => {
       // TODO(#12882): Remove the use of jQuery.
-      $('.oppia-rte-resizer').css({
-        width: '100%',
-      });
+      for (var i = 0; i < editable.length; i++) {
+        (editable[i] as HTMLElement).style.width = '100%';
+      }
     };
     for (let i of Object.keys(editable)) {
       (editable[i] as HTMLElement).onchange = () => {
@@ -413,56 +415,71 @@ export class CkEditor4RteComponent
 
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
-      (this.elementRef.nativeElement as HTMLElement).setAttribute(
-        'style',
-        'display: block'
-      );
+      (this.elementRef.nativeElement as HTMLElement).setAttribute('style', 'display: block');
+
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
+
       // Set the css and icons for each toolbar button.
       names.forEach((name, index) => {
         var icon = icons[index];
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_button__oppia' + name)
-          .css('background-image', 'url("/extensions' + icon + '")')
-          .css('background-position', 'center')
-          .css('background-repeat', 'no-repeat')
-          .css('height', '24px')
-          .css('width', '24px')
-          .css('padding', '0px 0px');
+
+        const buttonElement = this.elementRef.nativeElement.querySelector('.cke_button__oppia' + name);
+        if (buttonElement) {
+          this.renderer.setStyle(buttonElement, 'background-image', `url("/extensions${icon}")`);
+          this.renderer.setStyle(buttonElement, 'background-position', 'center');
+          this.renderer.setStyle(buttonElement, 'background-repeat', 'no-repeat');
+          this.renderer.setStyle(buttonElement, 'height', '24px');
+          this.renderer.setStyle(buttonElement, 'width', '24px');
+          this.renderer.setStyle(buttonElement, 'padding', '0px 0px');
+        }
       });
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_toolbar_separator').css('height', '22px');
+      const toolbarSeparator = this.elementRef.nativeElement.querySelector('.cke_toolbar_separator');
+      if (toolbarSeparator) {
+        this.renderer.setStyle(toolbarSeparator, 'height', '22px');
+      }
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_button_icon').css('height', '24px').css('width', '24px');
+      const buttonIcon = this.elementRef.nativeElement.querySelector('.cke_button_icon');
+      if (buttonIcon) {
+        this.renderer.setStyle(buttonIcon, 'height', '24px');
+        this.renderer.setStyle(buttonIcon, 'width', '24px');
+      }
 
-      var changeComboPanel = () => {
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combopanel').css('height', '100px').css('width', '120px');
+      const changeComboPanel = () => {
+        const comboPanel = this.elementRef.nativeElement.querySelector('.cke_combopanel');
+        if (comboPanel) {
+          this.renderer.setStyle(comboPanel, 'height', '100px');
+          this.renderer.setStyle(comboPanel, 'width', '120px');
+        }
       };
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_button')
-        .css('height', '29px')
-        .css('width', '62px')
-        .css('margin-right', '25px')
-        .on('click', () => {
-          // Timeout is required to ensure that the format dropdown
-          // has been initialized and the iframe has been loaded into DOM.
+      const comboButton = this.elementRef.nativeElement.querySelector('.cke_combo_button');
+      if (comboButton) {
+        this.renderer.setStyle(comboButton, 'height', '29px');
+        this.renderer.setStyle(comboButton, 'width', '62px');
+        this.renderer.setStyle(comboButton, 'margin-right', '25px');
+        comboButton.addEventListener('click', () => {
           setTimeout(() => changeComboPanel(), 25);
         });
+      }
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_open').css('margin-left', '-20px').css('margin-top', '2px');
+      const comboOpen = this.elementRef.nativeElement.querySelector('.cke_combo_open');
+      if (comboOpen) {
+        this.renderer.setStyle(comboOpen, 'margin-left', '-20px');
+        this.renderer.setStyle(comboOpen, 'margin-top', '2px');
+      }
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_text').css('padding', '2px 5px 0px');
+      const comboText = this.elementRef.nativeElement.querySelector('.cke_combo_text');
+      if (comboText) {
+        this.renderer.setStyle(comboText, 'padding', '2px 5px 0px');
+      }
 
       if (!this.headersEnabled) {
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combo__format').css('display', 'none');
+        const formatCombo = this.elementRef.nativeElement.querySelector('.cke_combo__format');
+        if (formatCombo) {
+          this.renderer.setStyle(formatCombo, 'display', 'none');
+        }
       }
 
       if (!this.internetConnectivityService.isOnline()) {

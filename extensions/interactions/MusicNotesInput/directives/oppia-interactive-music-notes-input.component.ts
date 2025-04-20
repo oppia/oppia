@@ -27,6 +27,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  Renderer2,
 } from '@angular/core';
 import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
@@ -78,6 +79,7 @@ export class MusicNotesInputComponent
   staffTop!: number;
   staffBottom!: number;
   readableSequence!: string;
+  isNoteOnStaff: boolean = false;
   CONTAINER_WIDTH!: number;
   CONTAINER_HEIGHT!: number;
   HORIZONTAL_GRID_SPACING!: number;
@@ -109,7 +111,8 @@ export class MusicNotesInputComponent
     private musicNotesInputRulesService: MusicNotesInputRulesService,
     private musicPhrasePlayerService: MusicPhrasePlayerService,
     private alertsService: AlertsService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private renderer: Renderer2,
   ) {}
 
   private _getAttributes() {
@@ -554,9 +557,8 @@ export class MusicNotesInputComponent
             this._sortNoteSequence();
 
             // Sounds the note when it is dropped onto staff.
+            this.isNoteOnStaff = true;
             this.playSequence([[this._convertNoteToMidiPitch(note)]]);
-            $(ui.helper).addClass('oppia-music-input-on-staff');
-
             this.repaintLedgerLines();
           },
         });
