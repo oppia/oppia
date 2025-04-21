@@ -345,7 +345,7 @@ export class ItemSelectionInputValidationService {
           const ag = mapRulesToAnswerGroupIndex[ruleKey];
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
-            message: `The rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
+            message: `The Rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
           });
         } else {
           mapRulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;

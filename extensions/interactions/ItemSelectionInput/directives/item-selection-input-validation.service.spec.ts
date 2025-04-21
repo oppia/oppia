@@ -840,7 +840,7 @@ describe('ItemSelectionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The rule 2 of answer group 1 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+          'The Rule 2 of answer group 1 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
       },
     ]);
   });
@@ -890,7 +890,7 @@ describe('ItemSelectionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+          'The Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
       },
     ]);
   });
