@@ -34,22 +34,14 @@ import {
 } from 'domain/skill/MisconceptionObjectFactory';
 import {ExternalSaveService} from 'services/external-save.service';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
-import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Subscription} from 'rxjs';
-
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
   skillId: string;
   feedbackIsUsed: boolean;
 }
-
-export interface Outcome {
-  feedback: SubtitledHtmlBackendDict;
-  labelledAsCorrect: boolean;
-  taggedSkillMisconceptionId: string | null;
-}
-
 @Component({
   selector: 'oppia-question-misconception-editor',
   templateUrl: './question-misconception-editor.component.html',
@@ -244,7 +236,6 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     };
     this.saveTaggedMisconception.emit(emptyTaggedMisconception);
     if (this.outcome) {
-      this.outcome.taggedSkillMisconceptionId = null;
       this.outcome.feedback.html = '';
       this.saveAnswerGroupFeedback.emit(this.outcome);
     }
