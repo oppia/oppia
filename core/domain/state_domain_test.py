@@ -3299,6 +3299,26 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             recorded_voiceovers.get_content_ids_for_voiceovers(),
             ['content_id'])
 
+    def test_should_be_able_to_strip_voiceovers(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        recorded_voiceovers.strip_all_existing_voiceovers()
+        self.assertEqual(recorded_voiceovers.voiceovers_mapping['content'], {})
+
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong
     # inputs that we can normally catch by typing.

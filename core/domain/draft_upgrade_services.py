@@ -326,7 +326,10 @@ class DraftUpgradeUtil:
                 completed.
         """
         for exp_change in draft_change_list:
-            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+            if (
+                exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+                exp_change.property_name ==
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS_DEPRECATED):
                 raise InvalidDraftConversionException(
                     'Conversion cannot be completed.')
         return draft_change_list

@@ -1683,7 +1683,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             )
 
     def test_exp_summary_model_after_creation(self) -> None:
-        """Test that ExpSummaryModel is correctly initialized after 
+        """Test that ExpSummaryModel is correctly initialized after
         exploration creation.
         """
         exp_id = self.EXP_0_ID
@@ -1725,7 +1725,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(summary.version, initial_version + 2)
 
     def test_exp_summary_model_after_reversion(self) -> None:
-        """Test that ExpSummaryModel reflects the reverted state after 
+        """Test that ExpSummaryModel reflects the reverted state after
         reversion.
         """
         exp_id = self.EXP_0_ID
@@ -1753,7 +1753,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(summary.version, 3)
 
     def test_exp_summary_model_after_publishing(self) -> None:
-        """Test that ExpSummaryModel updates correctly after publishing 
+        """Test that ExpSummaryModel updates correctly after publishing
         an exploration.
         """
         exp_id = self.EXP_0_ID
@@ -8227,7 +8227,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 55,
+            'from_version': 56,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(

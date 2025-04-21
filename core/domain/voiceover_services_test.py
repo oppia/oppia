@@ -523,6 +523,77 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             'manual' not in retrieved_entity_voiceovers.voiceovers_mapping[
                 'content_0'])
 
+    def test_should_get_entity_voiceovers_for_reverted_version(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id_1', title='Title', category='Category')
+        exploration.add_states(['New state'])
+        exploration.version += 1
+
+        dummy_manual_voiceover_dict_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        dummy_manual_voiceover_dict_2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover_models.EntityVoiceoversModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 1, 'en-US', {
+                'content_0': {
+                    feconf.VoiceoverType.MANUAL.value: (
+                        dummy_manual_voiceover_dict_1),
+                    feconf.VoiceoverType.AUTO.value: (
+                        None)
+                }
+            }, {}
+        ).put()
+
+        # Updating the version of exploration and entity voiceovers.
+        exploration.version += 1
+        voiceover_models.EntityVoiceoversModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 2, 'en-US', {
+                'content_0': {
+                    feconf.VoiceoverType.MANUAL.value: (
+                        dummy_manual_voiceover_dict_2),
+                    feconf.VoiceoverType.AUTO.value: (
+                        None)
+                }
+            }, {}
+        ).put()
+
+        entity_voiceovers_id = (
+            voiceover_models.EntityVoiceoversModel.generate_id(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 2, 'en-US'))
+
+        entity_voicovers_model = (
+            voiceover_models.EntityVoiceoversModel.get(entity_voiceovers_id))
+        self.assertEqual(entity_voicovers_model.entity_version, 2)
+
+        # Reverting exploration from version 2 to version 1 and the new
+        # version is 3.
+        exploration.version += 1
+        new_entity_voiceovers_models = (
+            voiceover_services.compute_voiceover_related_changes_upon_revert(
+                exploration, 1))
+        new_entity_voiceovers_models[0].update_timestamps()
+        new_entity_voiceovers_models[0].put()
+
+        entity_voiceovers_id = (
+            voiceover_models.EntityVoiceoversModel.generate_id(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 3, 'en-US'))
+        entity_voicovers_model = (
+            voiceover_models.EntityVoiceoversModel.get(entity_voiceovers_id))
+
+        self.assertEqual(entity_voicovers_model.entity_version, 3)
+        self.assertEqual(
+            entity_voicovers_model.voiceovers_mapping[
+                'content_0']['manual']['filename'],
+            'filename1.mp3')
+
 
 class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
     """Unit tests to validate the saving and fetching behavior in the
