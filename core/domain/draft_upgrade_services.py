@@ -195,7 +195,7 @@ class DraftUpgradeUtil:
                 # Here we use MyPy ignore because the latest schema of state
                 # dict doesn't contains translations_mapping of
                 # written_translations property.
-                translations_mapping = change.new_value['translations_mapping'] # type: ignore[index]
+                translations_mapping = change.new_value['translations_mapping']
                 assert isinstance(translations_mapping, dict)
                 for content_id, language_code_to_written_translation in (
                         translations_mapping.items()):

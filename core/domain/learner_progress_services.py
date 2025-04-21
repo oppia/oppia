@@ -41,12 +41,13 @@ from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 
-
-from typing import Dict, List, Optional, Tuple, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from mypy_imports import collection_models
     from mypy_imports import datastore_services
+    from mypy_imports import exp_models
     from mypy_imports import story_models
     from mypy_imports import topic_models
     from mypy_imports import user_models
@@ -191,7 +192,7 @@ def _save_completed_activities(
         activities_completed: CompletedActivities. The activities
             completed domain object to be saved in the datastore.
     """
-    activities_completed_dict = {
+    activities_completed_dict: Dict[str, Union[List[str], str]] = {
         'exploration_ids': (
             activities_completed.exploration_ids),
         'collection_ids': activities_completed.collection_ids,
@@ -199,7 +200,9 @@ def _save_completed_activities(
         'learnt_topic_ids': activities_completed.learnt_topic_ids
     }
 
-    completed_activities_model: Optional[user_models.CompletedActivitiesModel] = (
+    completed_activities_model: Optional[
+        user_models.CompletedActivitiesModel
+    ] = (
         user_models.CompletedActivitiesModel.get_by_id(activities_completed.id))
     if completed_activities_model is not None:
         completed_activities_model.populate(**activities_completed_dict)
@@ -1889,7 +1892,7 @@ def get_learner_dashboard_activities(
         ActivityIdsInLearnerDashboard. The domain object containing the ids of
         all activities in the learner dashboard.
     """
-    learner_progress_models = (
+    learner_progress_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('CompletedActivitiesModel', [user_id]),
@@ -2040,7 +2043,7 @@ def get_topics_and_stories_progress(
         set(
             partially_learnt_topic_ids + learnt_topic_ids + topic_ids_to_learn +
             all_topic_ids + untracked_topic_ids))
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [
                 ('TopicSummaryModel', unique_topic_ids),
@@ -2203,7 +2206,7 @@ def get_collection_progress(
         set(
             incomplete_collection_ids + completed_collection_ids +
             collection_playlist_ids))
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('CollectionSummaryModel', unique_collection_ids)]))
 
@@ -2212,6 +2215,7 @@ def get_collection_progress(
     ] = {}
     for model in activity_models[0]:
         if model is not None:
+            assert isinstance(model, collection_models.CollectionSummaryModel)
             collection_id_to_model_dict[model.id] = (
                 collection_services.get_collection_summary_from_model(model))
 
@@ -2321,7 +2325,7 @@ def get_exploration_progress(
         set(
             incomplete_exploration_ids + completed_exploration_ids +
             exploration_playlist_ids))
-    activity_models = (
+    activity_models: List[List[Optional[datastore_services.Model]]] = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
             [('ExpSummaryModel', unique_exploration_ids)]))
 
@@ -2330,6 +2334,7 @@ def get_exploration_progress(
     ] = {}
     for model in activity_models[0]:
         if model is not None:
+            assert isinstance(model, exp_models.ExpSummaryModel)
             exploration_id_to_model_dict[model.id] = (
                 exp_fetchers.get_exploration_summary_from_model(model))
 

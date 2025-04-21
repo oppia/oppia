@@ -23,7 +23,7 @@ import copy
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Mapping, Union, cast
+from typing import Any, Dict, List, Mapping, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -314,18 +314,15 @@ class BaseChange:
         # to verify that the domain object is correct.
         self.validate_dict(self.to_dict())
 
+    # Here we use type Any because in method to_dict(), we are calling
+    # getattr() but if for some reason getattr() is not able to fetch
+    # the attribute, it calls `__getattr__` so that an AttributeError
+    # is raised, and in __getattr__ we are doing self.__dict__[name]
+    # to raise and catch the exception. But the return value of
+    # `self.__dict__[name]` is Any type.
     def __getattr__(self, name: str) -> Any:
         # AttributeError needs to be thrown in order to make
         # instances of this class picklable.
-        # Here we use cast because in method to_dict(), we are calling
-        # getattr() but if for some reason getattr() is not able to fetch
-        # the attribute, it calls `__getattr__` so that an AttributeError
-        # is raised, and in __getattr__ we are doing self.__dict__[name]
-        # to raise and catch the exception. But the return value of
-        # `self.__dict__[name]` is Any type which causes MyPy to throw error.
-        # Thus to avoid the error, we used cast here. We have not used assert
-        # here because that will be written after `self.__dict__[name]` and
-        # never be executed, which causes backend coverage to throw error.
         try:
             return self.__dict__[name]
         except KeyError as e:
