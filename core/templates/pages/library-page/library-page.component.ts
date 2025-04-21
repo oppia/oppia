@@ -94,7 +94,6 @@ export class LibraryPageComponent {
   libraryWindowIsNarrow!: boolean;
   mobileLibraryGroupsProperties!: MobileLibraryGroupProperties[];
   pageMode!: string;
-  carouselMaxWidth: string;
   classroomSummaries: ClassroomSummaryDict[] = [];
   publicClassroomsCount: number = 0;
   // The translateX state controls the horizontal movement of the classroom carousel.
@@ -153,7 +152,10 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    this.carouselMaxWidth = `${this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX}px`;
+    $('.oppia-library-carousel').css({
+      'max-width':
+        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px',
+    });
 
     // The following determines whether to enable left scroll after
     // resize.
