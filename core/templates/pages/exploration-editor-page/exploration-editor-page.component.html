@@ -19,7 +19,7 @@
       Skip Editor Navigation Bar
     </a>
     <ul class="navbar-icons">
-      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'uib-dropdown': countWarnings()}" (click)="selectMainTab()"
+      <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'main', 'dropdown': countWarnings()}" (click)="selectMainTab()"
           class="nav-item icon nav-list-item position-relative">
         <a href="#"
            class="nav-link navbar-tab e2e-test-main-tab"
@@ -37,7 +37,7 @@
           <span class="oppia-editor-warnings-count" [attr.aria-label]="generateAriaLabelForWarnings()">
             {{ countWarnings() }}
           </span>
-          <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
+          <ul class="oppia-editor-warnings-box dropdown-menu exploration-editor-warning-box" *ngIf="warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(); index as index">
               <hr class="oppia-editor-warnings-separator">
@@ -171,7 +171,7 @@
   <div class="container-fluid oppia-editor-page-container">
     <div class="row" *ngIf="explorationRightsService.isCloned()">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div class="oppia-align-center uib-alert alert-warning oppia-alert-warning">
+        <div class="oppia-align-center alert alert-warning oppia-alert-warning">
           <strong>Note:</strong> This is a private, unpublishable copy of a
           <a [href]="getExplorationUrl(explorationRightsService.clonedFrom())" target="_blank" rel="noopener">public exploration</a>.
         </div>

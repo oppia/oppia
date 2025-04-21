@@ -22,6 +22,8 @@ import {ElementHandle} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const curriculumAdminThumbnailImage =
+  testConstants.data.curriculumAdminThumbnailImage;
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -102,6 +104,14 @@ const questionTextSelector = '.e2e-test-question-text';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
+
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const newChapterErrorMessageSelector =
+  '.acceptance-restricted-interaction-error';
 
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
@@ -2445,7 +2455,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Save a story as a curriculum admin.
+   * Save a story as a topic manager.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -2461,7 +2471,7 @@ export class TopicManager extends BaseUser {
     }
     await this.type(
       saveChangesMessageInput,
-      'Test saving story as curriculum admin.'
+      'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
@@ -2623,6 +2633,67 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Create a chapter for a certain story.
+   */
+  async addChapterWithoutSaving(
+    chapterName: string,
+    explorationId: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileChapterCollapsibleCard);
+      }
+    }
+    await this.clickOn(addChapterButton);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
+
+    await this.clickOn(newChapterPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+  }
+
+  /**
+   * Click on save new chapter button.
+   */
+  async clickOnSaveNewChapterButton(): Promise<void> {
+    await this.clickOn(createChapterButton);
+  }
+
+  /**
+   * Expect create new chapter to have error
+   */
+  async expectNewChapterErrorSpan(errorSpan: string): Promise<void> {
+    await this.page.waitForSelector(newChapterErrorMessageSelector);
+
+    const errorSpanElement = await this.page.$(newChapterErrorMessageSelector);
+
+    const errorMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      errorSpanElement
+    );
+
+    if (!errorMessage.startsWith(errorSpan)) {
+      showMessage(errorMessage);
+      showMessage(errorSpan);
+      throw new Error(
+        `Expected error message to be ${errorSpan} but found ${errorMessage}`
+      );
+    }
+
+    showMessage(`Found expected error message: ${errorMessage}`);
   }
 
   /**
