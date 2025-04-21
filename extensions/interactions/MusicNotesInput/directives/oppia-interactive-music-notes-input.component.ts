@@ -79,6 +79,7 @@ export class MusicNotesInputComponent
   staffTop!: number;
   staffBottom!: number;
   readableSequence!: string;
+  notes: string[] = [];
   isNoteOnStaff: boolean = false;
   CONTAINER_WIDTH!: number;
   CONTAINER_HEIGHT!: number;
