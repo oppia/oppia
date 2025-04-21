@@ -43,7 +43,6 @@ describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
   let progressUrl: string;
-  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -102,7 +101,7 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadata(
       'Positive Numbers',
       'Learn positive numbers.',
       'Algebra',
