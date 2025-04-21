@@ -155,7 +155,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
 
-    if (langCode == this.explorationLanguageCodeService.displayed) {
+    if (!this.needsTranslation()) {
       return subtitledHtml.html;
     }
 
@@ -534,59 +534,42 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     this.updateTranslatedContent();
   }
 
-  tabStatusColorStyle(tabId: string): object {
-    if (!this.isDisabled(tabId)) {
-      let color =
-        this.translationStatusService.getActiveStateComponentStatusColor(tabId);
-      return {'border-top-color': color};
-    }
-  }
-
-  tabStatusColorStyleFeedback(tabId: string): object {
-    if (this.isDisabled(tabId)) {
-      return {};
-    }
-
-    const hasFeedbackContent =
-      this.stateAnswerGroups.some(ag => !ag.outcome.feedback.isEmpty()) ||
-      (this.stateDefaultOutcome &&
-        !this.stateDefaultOutcome.feedback.isEmpty());
-
-    if (
-      (!hasFeedbackContent || this.needsTranslation()) &&
-      this.translationTabActiveModeService.isVoiceoverModeActive()
-    ) {
+  getTabStatusColorStyle(tabId: string): object {
+    if (!this.isDisabled(tabId) && (tabId === this.TAB_ID_CUSTOMIZATION_ARGS || tabId === this.TAB_ID_RULE_INPUTS)) {
       return {
         'border-top-color':
-          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+          this.translationStatusService.getActiveStateComponentStatusColor(tabId),
       };
     }
-
-    return {
-      'border-top-color':
-        this.translationStatusService.getActiveStateComponentStatusColor(tabId),
-    };
-  }
-
-  tabStatusColorStyleContent(tabId: string): object {
+    
     if (this.isDisabled(tabId)) {
       return {};
     }
 
     if (
-      this.needsTranslation() &&
-      this.translationTabActiveModeService.isVoiceoverModeActive()
+      (tabId === this.TAB_ID_FEEDBACK &&
+        this.translationTabActiveModeService.isVoiceoverModeActive() &&
+        (!this.hasFeedbackContent() || this.needsTranslation())) ||
+      ((tabId === this.TAB_ID_CONTENT || tabId === this.TAB_ID_HINTS) &&
+        this.needsTranslation() &&
+        this.translationTabActiveModeService.isVoiceoverModeActive())
     ) {
       return {
         'border-top-color':
-          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+          this.translationStatusService.SOURCE_CONTENT_IS_EMPTY_COLOR,
       };
     }
 
-    return {
-      'border-top-color':
-        this.translationStatusService.getActiveStateComponentStatusColor(tabId),
-    };
+    let color =
+      this.translationStatusService.getActiveStateComponentStatusColor(tabId)
+    
+    return {'border-top-color': color};
+  }
+  
+  private hasFeedbackContent(): boolean {
+    return this.stateAnswerGroups.some(ag => !ag.outcome.feedback.isEmpty()) ||
+           (this.stateDefaultOutcome &&
+            !this.stateDefaultOutcome.feedback.isEmpty());
   }
 
   tabNeedUpdatesStatus(tabId: string): boolean {
@@ -604,11 +587,12 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   contentIdStatusColorStyle(content: SubtitledHtml | SubtitledUnicode): object {
-    if (content.isEmpty() || this.needsTranslation()) {
+    if ((typeof content.isEmpty === 'function' && content.isEmpty()) ||
+        this.needsTranslation()) {
       return {
         'border-left':
           '3px solid ' +
-          this.translationStatusService.NULL_ASSETS_AVAILABLE_COLOR,
+          this.translationStatusService.SOURCE_CONTENT_IS_EMPTY_COLOR,
       };
     }
 

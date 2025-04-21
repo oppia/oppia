@@ -47,7 +47,7 @@ export class TranslationStatusService implements OnInit {
   ALL_ASSETS_AVAILABLE_COLOR: string = '#16A765';
   FEW_ASSETS_AVAILABLE_COLOR: string = '#E9B330';
   NO_ASSETS_AVAILABLE_COLOR: string = '#D14836';
-  NULL_ASSETS_AVAILABLE_COLOR: string = '#6E6E6E';
+  SOURCE_CONTENT_IS_EMPTY_COLOR: string = '#6E6E6E';
   // These properties are initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -203,7 +203,7 @@ export class TranslationStatusService implements OnInit {
             this.entityTranslationsService
               .languageCodeToLatestEntityTranslations[this.langCode];
 
-          let filteredVoiceoversMapping = {};
+            let filteredVoiceoversMapping: { [key: string]: any } = {};
 
           for (let contentId in nonEmptyContent.voiceoversMapping) {
             if (entityTranslations) {

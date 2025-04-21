@@ -512,13 +512,13 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('content_1', 'html');
-        expect(component.tabStatusColorStyleContent('content')).toEqual({
-          'border-top-color': '#D14836',
+        expect(component.getTabStatusColorStyle('content')).toEqual({
+          'border-top-color': '#6E6E6E',
         });
         expect(component.tabNeedUpdatesStatus('content')).toBe(false);
         expect(component.contentIdNeedUpdates('content_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('content_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #6E6E6E',
         });
       });
 
@@ -534,14 +534,14 @@ describe('State translation component', () => {
           expect(
             translationTabActiveContentIdService.setActiveContent
           ).toHaveBeenCalledWith('ca_placeholder', 'unicode');
-          expect(component.tabStatusColorStyle('ca')).toEqual({
-            'border-top-color': '#D14836',
+          expect(component.getTabStatusColorStyle('ca')).toEqual({
+            'border-top-color': '#6E6E6E',
           });
           expect(component.tabNeedUpdatesStatus('ca')).toBe(false);
           expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
           expect(component.contentIdStatusColorStyle('ca_placeholder')).toEqual(
             {
-              'border-left': '3px solid #D14836',
+              'border-left': '3px solid #6E6E6E',
             }
           );
         }
@@ -556,7 +556,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('feedback_1', 'html');
-        expect(component.tabStatusColorStyleFeedback('feedback')).toEqual({
+        expect(component.getTabStatusColorStyle('feedback')).toEqual({
           'border-top-color': '#6E6E6E',
         });
         expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
@@ -575,13 +575,13 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('hint_1', 'html');
-        expect(component.tabStatusColorStyleContent('hint')).toEqual({
-          'border-top-color': '#D14836',
+        expect(component.getTabStatusColorStyle('hint')).toEqual({
+          'border-top-color': '#6E6E6E',
         });
         expect(component.tabNeedUpdatesStatus('hint')).toBe(false);
         expect(component.contentIdNeedUpdates('hint_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('hint_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #6E6E6E',
         });
       });
 
@@ -594,13 +594,13 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('solution_1', 'html');
-        expect(component.tabStatusColorStyle('solution')).toEqual({
-          'border-top-color': '#D14836',
+        expect(component.getTabStatusColorStyle('solution')).toEqual({
+          'border-top-color': '#6E6E6E',
         });
         expect(component.tabNeedUpdatesStatus('solution')).toBe(false);
         expect(component.contentIdNeedUpdates('solution')).toBe(false);
         expect(component.contentIdStatusColorStyle('solution_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #6E6E6E',
         });
       });
 
@@ -1724,12 +1724,12 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
-  it('should return original html when translation not available', () => {
+  it('should return null when translation not available', () => {
     const htmlData = component.getRequiredHtml(
       new SubtitledHtml('<p>HTML data</p>', 'content_0')
     );
 
-    expect(htmlData).toBe('<p>HTML data</p>');
+    expect(htmlData).toBe(null);
   });
 
   it('should return unicode when translation tab is active', () => {
@@ -1771,7 +1771,7 @@ describe('State translation component', () => {
     expect(unicodeData).toBe('This is the unicode');
   });
 
-  it('should return translation html when translation no available', () => {
+  it('should not return translation html when translation not available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
@@ -1781,7 +1781,7 @@ describe('State translation component', () => {
       new SubtitledHtml('<p>HTML data</p>', 'content_0')
     );
 
-    expect(htmlData).toBe('<p>HTML data</p>');
+    expect(htmlData).toBe(null);
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
