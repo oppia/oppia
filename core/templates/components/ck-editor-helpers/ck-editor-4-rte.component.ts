@@ -316,7 +316,6 @@ export class CkEditor4RteComponent
 
     var editable = document.querySelectorAll('.oppia-rte-resizer');
     var resize = () => {
-      // TODO(#12882): Remove the use of jQuery.
       for (var i = 0; i < editable.length; i++) {
         (editable[i] as HTMLElement).style.width = '100%';
       }
@@ -481,7 +480,8 @@ export class CkEditor4RteComponent
         this.renderer.setStyle(comboButton, 'height', '29px');
         this.renderer.setStyle(comboButton, 'width', '62px');
         this.renderer.setStyle(comboButton, 'margin-right', '25px');
-        comboButton.addEventListener('click', () => {
+
+        this.renderer.listen(comboButton, 'click', () => {
           setTimeout(() => changeComboPanel(), 25);
         });
       }
