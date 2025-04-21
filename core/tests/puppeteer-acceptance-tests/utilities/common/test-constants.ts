@@ -246,4 +246,5 @@ export default {
   TEST_SCREENSHOT_DIR: path.resolve(
     '../oppia_full_stack_test_failure_screenshots/acceptance'
   ),
+  TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
 };

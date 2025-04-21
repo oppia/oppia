@@ -124,7 +124,6 @@ export class ClassroomPageComponent implements OnDestroy {
       this.urlInterpolationService.getStaticImageUrl('/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
-    this.isDiagnosticTestFeatureFlagEnabled();
 
     this.accessValidationBackendApiService
       .validateAccessToClassroomPage(this.classroomUrlFragment)
@@ -247,10 +246,6 @@ export class ClassroomPageComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  }
-
-  isDiagnosticTestFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status.DiagnosticTest.isEnabled;
   }
 
   diagnosticTestIsEnabled(): boolean {

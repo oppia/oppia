@@ -217,9 +217,13 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'exploration-editor/load-complete-and-restart-exploration-preview',
     'exploration-editor/publish-the-exploration-with-an-interaction',
     'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'exploration-editor/download-any-version-exploration',
     'exploration-editor/verify-statistics-and-previous-explorations',
     'exploration-editor/create-exploration-with-multiple-states'
     '-answer-group-hint-solution',
+    'exploration-editor/validate-exploration-managers-collaborators'
+    '-playtesters-access-permissions',
+    'exploration-editor/submit-review-and-respond-to-feedback',
     'logged-in-user/subscribe-to-creator-and-view-all-'
     'explorations-by-that-creator',
     'logged-in-user/access-dashboards-from-profile-menu',
@@ -231,6 +235,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
     'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/manage-classroom-progress-in-learner-dashboard',
     'logged-in-user/deny-access-to-pages-without-additional-roles',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
@@ -268,6 +273,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties', # pylint: disable=line-too-long
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
@@ -286,6 +292,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
     'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-and-republish-story-with-mobile-supported-explorations',
     'topic-manager/edit-preview-and-save-a-chapter',
     'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
