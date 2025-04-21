@@ -417,12 +417,18 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
 
         entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
             'content')
-        self.assertFalse(
-            entity_voiceovers_object.voiceovers_mapping[
-                'content_0'][feconf.VoiceoverType.MANUAL].needs_update)
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertFalse(voiceover.needs_update)
 
         entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
             'content_0')
-        self.assertTrue(
-            entity_voiceovers_object.voiceovers_mapping[
-                'content_0'][feconf.VoiceoverType.MANUAL].needs_update)
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertTrue(voiceover.needs_update)

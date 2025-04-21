@@ -446,12 +446,18 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             voiceover_services.get_voiceovers_for_given_language_accent_code(
                 'exploration', 'exp_id_1', 2, 'en-US'))
 
-        self.assertEqual(
-            retrieved_entity_voiceovers.voiceovers_mapping['content_0'][
-                feconf.VoiceoverType.MANUAL].needs_update, True)
-        self.assertEqual(
-            retrieved_entity_voiceovers.voiceovers_mapping['content_0'][
-                feconf.VoiceoverType.AUTO].needs_update, False)
+        manual_voiceover = retrieved_entity_voiceovers.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert manual_voiceover is not None
+
+        auto_voiceover = retrieved_entity_voiceovers.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.AUTO]
+        # Ruling out the possibility of None for mypy type checking.
+        assert auto_voiceover is not None
+
+        self.assertTrue(manual_voiceover.needs_update)
+        self.assertFalse(auto_voiceover.needs_update)
 
     def test_should_remove_entity_voiceovers(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -519,9 +525,9 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             voiceover_services.get_voiceovers_for_given_language_accent_code(
                 'exploration', 'exp_id_1', 2, 'en-US'))
 
-        self.assertTrue(
-            'manual' not in retrieved_entity_voiceovers.voiceovers_mapping[
-                'content_0'])
+        self.assertIsNone(
+            retrieved_entity_voiceovers.voiceovers_mapping[
+                'content_0'][feconf.VoiceoverType.MANUAL])
 
     def test_should_get_entity_voiceovers_for_reverted_version(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
