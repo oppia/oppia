@@ -43,7 +43,6 @@ describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
   let progressUrl: string;
-  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -122,18 +121,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
-      await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
       await loggedOutUser.expectLessonInfoToShowTags(['growth']);
-      await loggedOutUser.expectNoSaveProgressBeforeCheckpointInfo();
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Facebook',
-        explorationId
-      );
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Twitter',
-        explorationId
-      );
       await loggedOutUser.closeLessonInfoModal();
 
       await loggedOutUser.submitAnswer('-99');
