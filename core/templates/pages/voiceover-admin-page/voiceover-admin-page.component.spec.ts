@@ -33,8 +33,6 @@ import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockNgbModal {
   open() {
@@ -44,22 +42,11 @@ class MockNgbModal {
   }
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      LabelAccentToVoiceArtist: {
-        isEnabled: true,
-      },
-    };
-  }
-}
-
 describe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
-  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -79,10 +66,6 @@ describe('Voiceover Admin Page component ', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -90,7 +73,6 @@ describe('Voiceover Admin Page component ', () => {
     component = fixture.componentInstance;
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -130,10 +112,6 @@ describe('Voiceover Admin Page component ', () => {
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
     ).and.returnValue(Promise.resolve(voiceoverAdminDataResponse));
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceArtistMetadataAsync'
-    ).and.returnValue(Promise.resolve(voiceArtistMetadataInfo));
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
@@ -145,9 +123,6 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
-    ).toHaveBeenCalled();
-    expect(
-      voiceoverBackendApiService.fetchVoiceArtistMetadataAsync
     ).toHaveBeenCalled();
     expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
       'Hindi (India)': 'hi-IN',
@@ -274,87 +249,5 @@ describe('Voiceover Admin Page component ', () => {
     component.removeLanguageAccentDropdown();
 
     expect(component.languageAccentDropdownIsShown).toBeFalse();
-  });
-
-  it('should be able to add accent for voiceovers', fakeAsync(() => {
-    component.languageAccentMasterList = {
-      hi: {
-        'hi-IN': 'Hindi (India)',
-      },
-      en: {
-        'en-US': 'English (United States)',
-      },
-    };
-    component.voiceArtistIdToVoiceArtistName = {
-      voiceArtistId: 'Voice Artist',
-    };
-    component.voiceArtistIdToLanguageMapping = {
-      voiceArtistId: {
-        en: '',
-      },
-    };
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve('en-US'),
-    } as NgbModalRef);
-
-    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
-    tick();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
-      'en-US'
-    );
-  }));
-
-  it('should not add accent for voiceovers when confirm modal is cancelled', fakeAsync(() => {
-    component.languageAccentMasterList = {
-      hi: {
-        'hi-IN': 'Hindi (India)',
-      },
-      en: {
-        'en-US': 'English (United States)',
-      },
-    };
-    component.voiceArtistIdToVoiceArtistName = {
-      voiceArtistId: 'Voice Artist',
-    };
-    component.voiceArtistIdToLanguageMapping = {
-      voiceArtistId: {
-        en: '',
-      },
-    };
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.reject(),
-    } as NgbModalRef);
-
-    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
-    tick();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
-      ''
-    );
-  }));
-
-  it('should disable voice artist accent labeling feature flag', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      LabelAccentToVoiceArtist: {
-        isEnabled: false,
-      },
-    } as FeatureStatusChecker);
-
-    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeFalse();
-  });
-
-  it('should enable voice artist accent labeling feature flag', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      LabelAccentToVoiceArtist: {
-        isEnabled: true,
-      },
-    } as FeatureStatusChecker);
-
-    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeTrue();
   });
 });

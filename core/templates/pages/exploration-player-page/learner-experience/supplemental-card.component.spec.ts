@@ -54,9 +54,6 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EnableVoiceoverContribution: {
-        isEnabled: false,
-      },
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },

@@ -50,9 +50,6 @@ import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EnableVoiceoverContribution: {
-        isEnabled: false,
-      },
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },

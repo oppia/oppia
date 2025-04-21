@@ -73,9 +73,6 @@ class MockContextService {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },

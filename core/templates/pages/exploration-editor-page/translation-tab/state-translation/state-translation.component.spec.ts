@@ -77,9 +77,6 @@ class MockNgbModal {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },
@@ -419,26 +416,6 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('content_1', 'html');
-      });
-
-      it('should get disabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeFalse();
-      });
-
-      it('should get enabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeTrue();
       });
 
       it('should disable voiceover with accent feature flag data', () => {

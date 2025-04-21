@@ -29,7 +29,6 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
 import {VoiceoverAdminNavbarComponent} from './navbar/voiceover-admin-navbar.component';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
-import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
 import {SharedFormsModule} from 'components/forms/shared-forms.module';
 import {VoiceoverAdminPageRootComponent} from './voiceover-admin-page-root.component';
 import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
@@ -58,14 +57,12 @@ import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
-    AddAccentToVoiceoverLanguageModalComponent,
   ],
   entryComponents: [
     VoiceoverAdminPageRootComponent,
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
-    AddAccentToVoiceoverLanguageModalComponent,
   ],
 })
 export class VoiceoverAdminPageModule {}

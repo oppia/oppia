@@ -45,9 +45,6 @@ import {
 class MockPlatformFeatureService {
   get status(): object {
     return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
       AddVoiceoverWithAccent: {
         isEnabled: false,
       },
