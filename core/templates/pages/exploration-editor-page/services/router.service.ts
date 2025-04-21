@@ -263,24 +263,30 @@ export class RouterService {
 
   navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
-    let oldState = decodeURI(this._getCurrentStateFromLocationPath());
+    const oldState = decodeURI(this._getCurrentStateFromLocationPath());
 
     if (oldState === '/' + stateName) {
       return;
     }
 
     if (this._activeTabName === this.TABS.MAIN.name) {
-      $('.oppia-editor-cards-container').fadeOut(() => {
-        this._actuallyNavigate(this.SLUG_GUI, stateName);
-        // In Angular 2+, we use NgZone to manage change detection. Here, we
-        // use runOutsideAngular to avoid triggering Angular's change detection
-        // during the fadeOut animation. After the animation completes, we use
-        // run to re-enter Angular's zone and trigger change detection.
+      const container = document.querySelector<HTMLElement>(
+        '.oppia-editor-cards-container'
+      );
 
-        setTimeout(() => {
-          $('.oppia-editor-cards-container').fadeIn();
-        }, 150);
-      });
+      if (container) {
+        container.classList.replace('show', 'hide');
+
+        container.addEventListener(
+          'transitionend',
+          () => {
+            this._actuallyNavigate(this.SLUG_GUI, stateName);
+
+            container.classList.replace('hide', 'show');
+          },
+          {once: true}
+        );
+      }
     } else {
       this._actuallyNavigate(this.SLUG_GUI, stateName);
     }

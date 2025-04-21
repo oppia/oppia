@@ -1638,37 +1638,33 @@ export class ConversationSkinComponent {
 
   scrollToBottom(): void {
     setTimeout(() => {
-      let tutorCard = $('.conversation-skin-main-tutor-card');
+      let tutorCard = document.querySelector(
+        '.conversation-skin-main-tutor-card'
+      ) as HTMLElement;
 
-      if (tutorCard && tutorCard.length === 0) {
+      if (!tutorCard) {
         return;
       }
-      let tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
-      if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
-        $('html, body').animate(
-          {
-            scrollTop: tutorCardBottom - $(window).height() + 12,
-          },
-          {
-            duration: this.TIME_SCROLL_MSEC,
-            easing: 'easeOutQuad',
-          }
-        );
+
+      const tutorCardBottom = tutorCard.offsetTop + tutorCard.offsetHeight;
+      const windowBottom = window.scrollY + window.innerHeight;
+
+      if (windowBottom < tutorCardBottom) {
+        window.scrollTo({
+          top: tutorCardBottom - window.innerHeight + 12,
+          behavior: 'smooth',
+        });
       }
     }, 100);
   }
 
   scrollToTop(): void {
     setTimeout(() => {
-      $('html, body').animate(
-        {
-          scrollTop: 0,
-        },
-        800,
-        'easeOutQuart'
-      );
-      return false;
-    });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 0);
   }
 
   onNavigateFromIframe(): void {

@@ -1482,7 +1482,19 @@ span.sort-explorations-select .sort-order {
 .oppia-editor-cards-container {
   margin: auto;
   max-width: 700px;
+  transition: opacity 150ms ease-in-out;
 }
+
+.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
   border: 1px solid #ccc;

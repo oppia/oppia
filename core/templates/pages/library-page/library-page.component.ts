@@ -216,21 +216,37 @@ export class LibraryPageComponent {
       carouselScrollPositionPx +
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
-    $(carouselJQuerySelector).animate(
-      {
-        scrollLeft: newScrollPositionPx,
-      },
-      {
-        duration: 800,
-        queue: false,
-        start: () => {
-          this.isAnyCarouselCurrentlyScrolling = true;
-        },
-        complete: () => {
+    const carouselElement = document.querySelector(
+      carouselJQuerySelector
+    ) as HTMLElement;
+
+    if (carouselElement) {
+      const currentScrollPosition = carouselElement.scrollLeft;
+      const scrollDistance = newScrollPositionPx - currentScrollPosition;
+      const duration = 800;
+
+      let startTime: number;
+
+      const scrollStep = (timestamp: number) => {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+        const timeElapsed = timestamp - startTime;
+
+        const progress = Math.min(timeElapsed / duration, 1);
+        carouselElement.scrollLeft =
+          currentScrollPosition + scrollDistance * progress;
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(scrollStep);
+        } else {
           this.isAnyCarouselCurrentlyScrolling = false;
-        },
-      }
-    );
+        }
+      };
+
+      this.isAnyCarouselCurrentlyScrolling = true;
+      requestAnimationFrame(scrollStep);
+    }
   }
 
   // The carousels do not work when the width is 1 card long, so we need

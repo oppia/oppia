@@ -114,7 +114,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       })
       .subscribe(
         value => {
-          // This code make the joyride visible over navbar
+          // This code makes the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
           document.querySelector<HTMLElement>(
             '.joyride-step__holder'
@@ -129,12 +129,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             .focus();
 
           if (value.number === 2) {
-            $('html, body').animate(
-              {
-                scrollTop: true ? 0 : 20,
-              },
-              1000
-            );
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -150,13 +148,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            $('html, body').animate(
-              {
-                scrollTop:
-                  document.getElementById(idToScrollTo)?.offsetTop - 200,
-              },
-              1000
-            );
+            const targetElement = document.getElementById(idToScrollTo);
+            if (targetElement) {
+              window.scrollTo({
+                top: targetElement.offsetTop - 200,
+                behavior: 'smooth',
+              });
+            }
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -172,13 +170,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            $('html, body').animate(
-              {
-                scrollTop:
-                  document.getElementById(idToScrollTo)?.offsetTop - 200,
-              },
-              1000
-            );
+            const targetElement = document.getElementById(idToScrollTo);
+            if (targetElement) {
+              window.scrollTo({
+                top: targetElement.offsetTop - 200,
+                behavior: 'smooth',
+              });
+            }
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
