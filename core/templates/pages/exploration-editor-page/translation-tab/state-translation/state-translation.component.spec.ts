@@ -29,7 +29,6 @@ import {
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -309,7 +308,6 @@ describe('State translation component', () => {
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1019,7 +1017,6 @@ describe('State translation component', () => {
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1542,7 +1539,6 @@ describe('State translation component', () => {
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -2228,7 +2224,6 @@ describe('State translation component', () => {
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
