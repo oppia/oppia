@@ -31,10 +31,7 @@ import {
 import {Rule} from 'domain/exploration/rule.model';
 import {Unit} from 'interactions/answer-defs';
 import {Fraction, FractionDict} from 'domain/objects/fraction.model';
-import {
-  NumberWithUnits,
-  NumberWithUnitsObjectFactory,
-} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {Units} from 'domain/objects/units.model';
 
 describe('NumberWithUnitsValidationService', () => {
@@ -50,10 +47,8 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoRule: Rule;
   let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
-  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
-    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
@@ -333,7 +328,7 @@ describe('NumberWithUnitsValidationService', () => {
   );
 
   it('should throw error when rule equivalency check fails', () => {
-    spyOn(numberWithUnitsObjectFactory, 'fromDict').and.returnValue({
+    spyOn(NumberWithUnits, 'fromDict').and.returnValue({
       type: 'real',
       real: 0.0,
       // This throws "Type '{ toFloat: () => number; }' is missing the

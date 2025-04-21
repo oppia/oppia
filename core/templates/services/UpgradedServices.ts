@@ -195,7 +195,6 @@ import {
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import {
   NumberWithUnitsValidationService,
@@ -598,17 +597,12 @@ export class UpgradedServices {
       new NumericInputValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['NumberWithUnitsObjectFactory'] =
-      new NumberWithUnitsObjectFactory();
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
     upgradedServices['NumberWithUnitsRulesService'] =
-      new NumberWithUnitsRulesService(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['UtilsService']
-      );
+      new NumberWithUnitsRulesService(upgradedServices['UtilsService']);
     upgradedServices['OutcomeObjectFactory'] = new OutcomeObjectFactory();
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'],
@@ -747,7 +741,6 @@ export class UpgradedServices {
     );
     upgradedServices['NumberWithUnitsValidationService'] =
       new NumberWithUnitsValidationService(
-        upgradedServices['NumberWithUnitsObjectFactory'],
         upgradedServices['BaseInteractionValidationService']
       );
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
