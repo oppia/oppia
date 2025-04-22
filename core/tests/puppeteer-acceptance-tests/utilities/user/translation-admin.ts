@@ -186,11 +186,7 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the user is displayed as a translator.
    */
   async expectUserToBeDisplayed(username: string): Promise<void> {
-    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
-    if (!elementHandle) {
-      showMessage('No users displayed  assuming user is not present.');
-      return;
-    }
+    await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
