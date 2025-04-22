@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import base64
 import datetime
+import enum
 import functools
 import hmac
 import io
@@ -26,6 +27,7 @@ import logging
 import os
 import re
 import time
+import traceback
 import urllib
 
 from core import feconf
@@ -59,6 +61,15 @@ AUTH_HANDLER_PATHS: Final = (
     '/session_begin',
     '/session_end',
 )
+
+
+class LogType(str, enum.Enum):
+    """Enum for logging types."""
+
+    # Represents the warning logging level.
+    WARNING = 'warning'
+    # Represents the exception logging level.
+    EXCEPTION = 'exception'
 
 
 class ResponseValueDict(TypedDict):
@@ -762,6 +773,48 @@ class BaseHandler(
                 feconf.HANDLER_TYPE_JSON, values
             )
 
+    def _log_exception_message(
+        self, exception_type: str, log_type: LogType, error_message: str
+    ) -> None:
+        """Logs exception details.
+
+        Args:
+            exception_type: str. Name of the exception.
+            log_type: LogType. Log level ('warning', 'exception').
+            error_message: str. Detailed error message.
+
+        Raises:
+            Exception. Invalid log type value.
+        """
+
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url = self.request.uri
+        stack_trace = traceback.format_exc()
+
+        msg = (
+            '\n\n%s: %s\n\n'
+            'Stack Trace: \n%s\n'
+            'URL requested: %s\n'
+            'Request method: %s\n'
+            'Handler class name: %s\n'
+            % (
+                exception_type,
+                error_message,
+                stack_trace,
+                url,
+                request_method,
+                handler_class_name
+            )
+        )
+
+        if log_type == LogType.WARNING:
+            logging.warning(msg)
+        elif log_type == LogType.EXCEPTION:
+            logging.exception(msg)
+        else:
+            raise Exception('Invalid log type value: %s' % log_type)
+
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
     ) -> None:
@@ -774,6 +827,7 @@ class BaseHandler(
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
+        exception_type = type(exception).__name__
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
@@ -787,6 +841,11 @@ class BaseHandler(
             payload_exists = (
                 self.payload is not None and
                 not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            self._log_exception_message(
+                exception_type,
+                LogType.WARNING,
+                'Unauthenticated user'
             )
             if (
                     payload_exists or
@@ -804,7 +863,11 @@ class BaseHandler(
             return
 
         if isinstance(exception, self.NotFoundException):
-            logging.warning('Invalid URL requested: %s', self.request.uri)
+            self._log_exception_message(
+                exception_type,
+                LogType.WARNING,
+                'Invalid URL requested'
+            )
             self.error(404)
             values = {
                 'error': 'Could not find the resource %s.' % self.request.uri,
@@ -813,8 +876,11 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        logging.exception(
-            'Exception raised at %s: %s', self.request.uri, exception)
+        self._log_exception_message(
+            exception_type,
+            LogType.EXCEPTION,
+            'Exception raised'
+        )
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)

@@ -311,10 +311,6 @@ import {
 import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
 import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
-import {
-  StateWrittenTranslationsService,
-  // eslint-disable-next-line max-len
-} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
 import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
@@ -804,11 +800,6 @@ export class UpgradedServices {
       upgradedServices['AlertsService'],
       upgradedServices['UtilsService']
     );
-    upgradedServices['StateWrittenTranslationsService'] =
-      new StateWrittenTranslationsService(
-        upgradedServices['AlertsService'],
-        upgradedServices['UtilsService']
-      );
     upgradedServices['StoryEditorNavigationService'] =
       new StoryEditorNavigationService(upgradedServices['WindowRef']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
