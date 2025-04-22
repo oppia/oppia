@@ -165,7 +165,6 @@ export class TranslationAdmin extends BaseUser {
       showMessage(
         'User list element (.e2e-test-reviewer-roles-result) not found assuming no users have rights.'
       );
-      return;
     }
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
