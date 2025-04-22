@@ -16,7 +16,13 @@
  * @fileoverview Component for the skill editor section in the state editor.
  */
 
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 import {SkillSummaryBackendDict} from 'core/templates/domain/skill/skill-summary.model';
 import {SelectSkillModalComponent} from 'components/skill-selector/select-skill-modal.component';
 import {
@@ -41,6 +47,7 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 @Component({
   selector: 'state-skill-editor',
   templateUrl: './state-skill-editor.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class StateSkillEditorComponent implements OnInit {
   @Output() onSaveLinkedSkillId: EventEmitter<string | null> = new EventEmitter<

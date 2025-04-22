@@ -40,6 +40,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  ViewEncapsulation,
 } from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -47,6 +48,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
   selector: 'oppia-noninteractive-collapsible',
   templateUrl: './collapsible.component.html',
   styleUrls: [],
+  encapsulation: ViewEncapsulation.None,
 })
 export class NoninteractiveCollapsible implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks

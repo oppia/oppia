@@ -15,7 +15,14 @@
 /**
  * @fileoverview Component for set of translatable html content id editor.
  */
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 
 interface Choice {
   val: string;
@@ -25,6 +32,7 @@ interface Choice {
   selector: 'set-of-translatable-html-content-ids-editor',
   templateUrl: './set-of-translatable-html-content-ids-editor.component.html',
   styleUrls: [],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

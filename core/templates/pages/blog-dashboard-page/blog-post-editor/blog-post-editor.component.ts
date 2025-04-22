@@ -28,6 +28,7 @@ import {
   ElementRef,
   OnInit,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {
@@ -53,6 +54,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 @Component({
   selector: 'oppia-blog-post-editor',
   templateUrl: './blog-post-editor.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogPostEditorComponent implements OnInit {
   @ViewChild('titleInput') titleInput!: ElementRef;
