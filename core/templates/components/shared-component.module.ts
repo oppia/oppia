@@ -179,6 +179,7 @@ import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/mo
 import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -405,6 +406,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   entryComponents: [
@@ -559,6 +561,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   exports: [
@@ -710,6 +713,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     UrlFragmentEditorComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 })
 export class SharedComponentsModule {}
