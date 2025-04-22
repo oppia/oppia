@@ -16,7 +16,7 @@
  * @fileoverview Component for managing an Apache Beam job.
  */
 
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ViewEncapsulation} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {catchError, take} from 'rxjs/operators';
 
@@ -28,6 +28,7 @@ import {of} from 'rxjs';
 @Component({
   selector: 'cancel-beam-job-dialog',
   templateUrl: './cancel-beam-job-dialog.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class CancelBeamJobDialogComponent {
   isRunning = false;

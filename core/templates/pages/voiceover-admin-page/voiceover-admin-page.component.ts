@@ -16,7 +16,7 @@
  * @fileoverview Voiceover admin component.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   VoiceoverBackendApiService,
@@ -42,6 +42,7 @@ export interface LanguageAccentDescriptionToCode {
 @Component({
   selector: 'oppia-voiceover-admin-page',
   templateUrl: './voiceover-admin-page.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class VoiceoverAdminPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks

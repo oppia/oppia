@@ -559,6 +559,11 @@ p:last-child {
   padding: 10px 15px;
   position: relative;
 }
+
+.oppia-cookie-banner-container .oppia-cookie-banner-explanation a {
+  color: #aed2e9;
+}
+
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
   box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
@@ -4121,4 +4126,90 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 .oppia-save-draft-warning {
   color: #fc0;
   margin-left: 5px;
+}
+
+/* 
+   the below css is for classroom admin page.
+*/
+
+.oppia-create-classroom-spinning-button circle {
+  stroke: #fff;
+}
+
+.oppia-update-classroom-data-spinning-button circle {
+  stroke: #fff;
+}
+
+.oppia-noninteractive-video-iframe iframe {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+
+/* 
+  the below css is for blogdashboard and blog-editor page.
+*/
+.blog-post-thumbnail-image-uploader .image-uploader-drop-area {
+  border: #666 dashed;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 0;
+  width: 300px;
+}
+
+@media(max-width: 768px) {
+  .blog-post-thumbnail-image-uploader .image-uploader-drop-area {
+    height: auto;
+    width: 164px;
+  }
+}
+
+.mat-menu-content:not(:empty) {
+  padding-bottom: unset;
+  padding-top: unset;
+}
+
+.cdk-overlay-pane .mat-menu-panel {
+  border-radius: 90px;
+  min-height: unset;
+}
+
+.blog-dashboard-card .mat-tab-label {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.6rem;
+}
+
+.blog-dashboard-card .mat-tab-labels {
+  flex-grow: 1;
+  justify-content: space-evenly;
+}
+
+.blog-dashboard-card .mat-tab-label:focus {
+  color: #00645c;
+}
+
+.blog-dashboard-card .mat-tab-body-content {
+  overflow: hidden;
+}
+
+.blog-dashboard-card  mat-card-header .mat-card-header-text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+@media(max-width: 870px) {
+  .blog-dashboard-card  .mat-tab-label {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.1rem;
+  }
+}
+
+@media(max-width: 620px) {
+  .blog-dashboard-card  .mat-card-header-text {
+    margin-right: 0;
+  }
 }

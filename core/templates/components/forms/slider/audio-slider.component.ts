@@ -16,7 +16,13 @@
  * @fileoverview Wrapper over mat-slider for audio-bar.
  */
 
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewEncapsulation,
+} from '@angular/core';
 
 @Component({
   selector: 'oppia-audio-slider',
@@ -34,13 +40,14 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
   </mat-slider>`,
   styles: [
     `
-      .mat-accent /deep/ .mat-slider-track-fill,
-      .mat-accent /deep/ .mat-slider-thumb,
-      .mat-accent /deep/ .mat-slider-thumb-label {
+      .mat-accent .mat-slider-track-fill,
+      .mat-accent .mat-slider-thumb,
+      .mat-accent .mat-slider-thumb-label {
         background: #ff4081;
       }
     `,
   ],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AudioSliderComponent {
   // These properties are initialized using component interactions

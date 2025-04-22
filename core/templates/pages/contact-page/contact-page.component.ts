@@ -16,10 +16,11 @@
  * @fileoverview Component for the contact page.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 
 @Component({
   selector: 'oppia-contact-page',
   templateUrl: './contact-page.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ContactPageComponent {}

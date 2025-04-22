@@ -16,12 +16,13 @@
  * @fileoverview Controller for the donation box modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, ViewEncapsulation} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'donation-box-modal',
   templateUrl: './donation-box-modal.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class DonationBoxModalComponent {
   constructor(private activeModal: NgbActiveModal) {}

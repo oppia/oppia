@@ -16,7 +16,7 @@
  * @fileoverview Component for the login page.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import firebase from 'firebase/app';
 
@@ -30,6 +30,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 @Component({
   selector: 'login-page',
   templateUrl: './login-page.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
