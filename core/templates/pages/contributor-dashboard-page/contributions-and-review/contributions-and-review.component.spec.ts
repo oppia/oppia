@@ -37,7 +37,6 @@ import {
 } from './contributions-and-review.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {ContextService} from 'services/context.service';
 import {UserService} from 'services/user.service';
@@ -146,7 +145,6 @@ describe('Contributions and review component', () => {
         ContextService,
         ContributionAndReviewService,
         ContributionOpportunitiesService,
-        MisconceptionObjectFactory,
         SkillBackendApiService,
         FormatRtePreviewPipe,
         HtmlEscaperService,

@@ -46,7 +46,7 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {ContextService} from 'services/context.service';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 
