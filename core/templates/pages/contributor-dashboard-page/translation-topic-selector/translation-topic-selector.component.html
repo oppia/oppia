@@ -11,14 +11,30 @@
   <div *ngIf="dropdownShown" class="oppia-translation-topic-selector-dropdown-container e2e-test-topic-selector-dropdown">
     <!-- TODO(#15648): Re-enable "All Topics" after fetching latency is fixed. -->
     <!-- <div class="oppia-translation-topic-selector-dropdown-label">All Topics</div> -->
-    <div class="oppia-translation-topic-selector-dropdown-option e2e-test-topic-selector-option"
-         *ngFor="let option of options"
-         (click)="selectOption(option)"
-         (keydown.enter)="selectOption(option)"
-         tabindex="0"
-         [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
-      {{option}}
-    </div>
+    <ng-container *ngFor="let subject of topicsPerClassroomMap | keyvalue">
+      <ng-container *ngIf="subject.key !== ''; else noClassroomTopics">
+        <div class="oppia-translation-topic-selector-dropdown-label">{{subject.key}}</div>
+        <div class="oppia-translation-topic-selector-dropdown-option oppia-translation-topic-selector-dropdown-option-indented e2e-test-topic-selector-option"
+             *ngFor="let option of subject.value"
+             (click)="selectOption(option)"
+             (keydown.enter)="selectOption(option)"
+             tabindex="0"
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
+          {{option}}
+        </div>
+      </ng-container>
+
+      <ng-template #noClassroomTopics>
+        <div class="oppia-translation-topic-selector-dropdown-option e2e-test-topic-selector-option"
+             *ngFor="let option of subject.value"
+             (click)="selectOption(option)"
+             (keydown.enter)="selectOption(option)"
+             tabindex="0"
+             [ngClass]="{'oppia-translation-topic-selector-dropdown-option-selected' : option === activeTopicName}">
+          {{option}}
+        </div>
+      </ng-template>
+    </ng-container>
   </div>
 </div>
 
@@ -94,7 +110,6 @@
     color: rgb(104, 104, 104);
     display: flex;
     flex: 1;
-    margin-left: 16px;
     padding: 8px;
   }
 
@@ -113,6 +128,10 @@
     right: 0;
     width: 250px;
     z-index: 1;
+  }
+
+  .oppia-translation-topic-selector-dropdown-option-indented {
+    margin-left: 16px;
   }
 
   @media screen and (max-width: 700px) {

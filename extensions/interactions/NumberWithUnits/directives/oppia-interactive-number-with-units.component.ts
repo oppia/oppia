@@ -19,7 +19,6 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -71,16 +70,10 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
           distinctUntilChanged()
         )
         .subscribe(newValue => {
-          try {
-            this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
-            this.errorMessageI18nKey = '';
-            this.isValid = true;
-          } catch (parsingError) {
-            if (parsingError instanceof Error) {
-              this.errorMessageI18nKey = parsingError.message;
-            }
-            this.isValid = false;
-          }
+          this.answer = newValue;
+          this.currentInteractionService.updateCurrentAnswer(this.answer);
+          this.isValid = true;
+          this.errorMessageI18nKey = '';
           this.currentInteractionService.updateViewWithNewAnswer();
         })
     );
@@ -115,12 +108,16 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   }
 
   submitAnswer(): void {
+    this.isValid = true;
+    this.errorMessageI18nKey = '';
     try {
       if (
         this.answer.trim() === '' &&
         this.currentInteractionService.showNoResponseError()
       ) {
         this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
+        this.isValid = false;
+        this.currentInteractionService.updateAnswerIsValid(false);
         return;
       }
       const numberWithUnits =
@@ -136,6 +133,7 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
         throw parsingError;
       }
       this.isValid = false;
+      this.currentInteractionService.updateAnswerIsValid(false);
     }
   }
 
@@ -161,17 +159,9 @@ export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
-    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveNumberWithUnits',
-  downgradeComponent({
-    component: InteractiveNumberWithUnitsComponent,
-  }) as angular.IDirectiveFactory
-);

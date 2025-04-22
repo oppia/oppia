@@ -49,7 +49,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {ContextService} from 'services/context.service';
@@ -587,10 +586,3 @@ export class CkEditor4RteComponent
     this.subscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'ckEditor4Rte',
-  downgradeComponent({
-    component: CkEditor4RteComponent,
-  })
-);

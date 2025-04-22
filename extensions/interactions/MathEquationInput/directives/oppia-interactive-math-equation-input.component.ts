@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {GuppyConfigurationService} from 'services/guppy-configuration.service';
@@ -78,6 +77,7 @@ export class InteractiveMathEquationInput implements OnInit {
         this.guppyInitializationService.getAllowedVariables()
       );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
@@ -102,6 +102,11 @@ export class InteractiveMathEquationInput implements OnInit {
       this.hasBeenTouched = true;
       this.value = activeGuppyObject.guppyInstance.asciimath();
       this.currentInteractionService.updateCurrentAnswer(this.value);
+      let answerIsValid = this.mathInteractionsService.validateEquation(
+        this.value,
+        this.guppyInitializationService.getAllowedVariables()
+      );
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
     }
 
     if (!focusObj.focused) {
@@ -152,10 +157,3 @@ export class InteractiveMathEquationInput implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveMathEquationInput',
-  downgradeComponent({
-    component: InteractiveMathEquationInput,
-  }) as angular.IDirectiveFactory
-);

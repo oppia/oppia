@@ -16,12 +16,11 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -57,7 +56,7 @@ interface Warning {
   providedIn: 'root',
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
     customizationArgs: TextInputCustomizationArgs
@@ -72,7 +71,7 @@ export class TextInputValidationService {
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
-      !angular.isString(placeholder.unicode)
+      typeof placeholder.unicode !== 'string'
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -260,10 +259,3 @@ export class TextInputValidationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TextInputValidationService',
-    downgradeInjectable(TextInputValidationService)
-  );

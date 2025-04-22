@@ -65,9 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    error: commonPrefix + '/pages/error-pages/error-page.import.ts',
-    maintenance:
-      commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
@@ -99,42 +96,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-400.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 400,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-401.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 401,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['error'],
-      filename: 'error-page-500.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-      statusCode: 500,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['maintenance'],
-      filename: 'maintenance-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['oppia_root'],

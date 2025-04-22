@@ -32,6 +32,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {SubtopicValidationService} from '../services/subtopic-validation.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -67,8 +68,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
-  maxCharsInSubtopicUrlFragment!: number;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
+  generatedUrlPrefix: string;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -89,6 +91,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.topic = this.topicEditorStateService.getTopic();
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment();
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${this.topic.getUrlFragment()}/revision`;
     this.subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
     this.subtopic = this.topic.getSubtopicById(this.subtopicId);
     if (!this.subtopic) {
@@ -165,6 +168,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  onSubtopicUrlFragmentChange(urlFragment: string): void {
+    this.editableUrlFragment = urlFragment;
+    this.updateSubtopicUrlFragment(urlFragment);
+  }
+
   updateSubtopicUrlFragment(urlFragment: string): void {
     this.subtopicUrlFragmentIsValid =
       this.subtopicValidationService.isUrlFragmentValid(urlFragment);
@@ -234,7 +242,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
 
   updateHtmlData(): void {
     if (this.htmlData !== this.subtopicPage.getPageContents().getHtml()) {
-      var subtitledHtml = angular.copy(
+      var subtitledHtml = cloneDeep(
         this.subtopicPage.getPageContents().getSubtitledHtml()
       );
       subtitledHtml.html = this.htmlData;
@@ -256,7 +264,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
 
   showSchemaEditor(): void {
     this.schemaEditorIsShown = true;
-    this.htmlDataBeforeUpdate = angular.copy(this.htmlData);
+    this.htmlDataBeforeUpdate = cloneDeep(this.htmlData);
   }
 
   toggleSubtopicPreview(): void {
@@ -340,7 +348,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.initEditor();
     }
     this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
-    this.maxCharsInSubtopicUrlFragment =
+    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 

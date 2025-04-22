@@ -16,7 +16,6 @@
  * @fileoverview Backend service for creating a new skills
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
@@ -136,10 +135,3 @@ export class SkillCreationBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillCreationBackendApiService',
-    downgradeInjectable(SkillCreationBackendApiService)
-  );

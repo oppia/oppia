@@ -16,7 +16,6 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -107,10 +106,3 @@ export class PretestQuestionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PretestQuestionBackendApiService',
-    downgradeInjectable(PretestQuestionBackendApiService)
-  );

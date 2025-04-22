@@ -19,7 +19,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
@@ -87,10 +86,3 @@ export class PromoBarComponent implements OnInit {
     this.setPromoDismissed(true);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaPromoBar',
-    downgradeComponent({component: PromoBarComponent})
-  );

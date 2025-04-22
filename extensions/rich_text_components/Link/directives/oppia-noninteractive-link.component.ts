@@ -41,7 +41,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ContextService} from 'services/context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -113,10 +112,3 @@ export class NoninteractiveLink implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveLink',
-  downgradeComponent({
-    component: NoninteractiveLink,
-  })
-);

@@ -15,7 +15,6 @@
 /**
  * @fileoverview A data service that stores the card is checkpoint value.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -34,10 +33,3 @@ export class StateCardIsCheckpointService extends StatePropertyService<boolean> 
     this.setterMethodKey = 'saveCardIsCheckpoint';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateCardIsCheckpointService',
-    downgradeInjectable(StateCardIsCheckpointService)
-  );

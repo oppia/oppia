@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
+import hashlib
+
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, Optional, Sequence
+from typing import Dict, Final, List, Optional, Sequence, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -64,6 +66,17 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # as values.
     voiceovers_mapping = datastore_services.JsonProperty(required=True)
 
+    # A dictionary where each key represents a content ID, and the corresponding
+    # value is a list of dictionaries. Each dictionary contains two keys:
+    # 'token', which holds a string representing a word or punctuations from the
+    # content, and 'audio_offset_msecs', which stores a float value representing
+    # the associated time offset in the audio in milliseconds.
+    # Note: This field only contains the audio offset for automated voiceovers
+    # that are synthesized from Azure. These audio offsets are not provided or
+    # stored for manual voiceovers.
+    automated_voiceovers_audio_offsets_msecs = datastore_services.JsonProperty(
+        required=True)
+
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """Model doesn't contain any data directly corresponding to a user."""
@@ -84,6 +97,8 @@ class EntityVoiceoversModel(base_models.BaseModel):
             'entity_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'voiceovers_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'automated_voiceovers_audio_offsets_msecs': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 
     @staticmethod
@@ -147,7 +162,9 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str,
         voiceovers_mapping: Dict[str, Dict[
-            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
+            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]],
+        automated_voiceovers_audio_offsets_msecs: Dict[
+        str, List[Dict[str, Union[str, float]]]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -160,6 +177,16 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 dict(str, dict(VoiceoverType.value, VoiceoverDict)). A dict
                 containing content IDs as keys and nested dicts as values. Each
                 nested dict contains str as keys and VoiceoverDict as values.
+            automated_voiceovers_audio_offsets_msecs:
+                dict(str, list(dict)). A dictionary where each key represents a
+                content ID, and the corresponding value is a list of
+                dictionaries. Each dictionary contains two keys: 'token', which
+                holds a string representing a word or punctionation from the
+                content, and 'audio_offset_msec', which stores a float value
+                representing the associated time offset in the audio in msecs.
+                Note: This field only contains the audio offset for automated
+                voiceovers that are synthesized from Azure. These audio offsets
+                are not provided or stored for manual voiceovers.
 
         Returns:
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
@@ -171,7 +198,9 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id=entity_id,
             entity_version=entity_version,
             language_accent_code=language_accent_code,
-            voiceovers_mapping=voiceovers_mapping
+            voiceovers_mapping=voiceovers_mapping,
+            automated_voiceovers_audio_offsets_msecs=(
+                automated_voiceovers_audio_offsets_msecs)
         )
 
     @classmethod
@@ -443,3 +472,164 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
         entity.put()
 
         return entity
+
+
+class CachedAutomaticVoiceoversModel(base_models.BaseModel):
+    """Model to store voiceover cache to prevent repeated voiceover synthesis
+    for the same Oppia lesson texts.
+    """
+
+    # The language accent code associated with the stored voiceovers.
+    language_accent_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The cloud service provider used for generating the synthesized voiceover.
+    provider = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # A SHA-256 hash code generated from the text associated with the stored
+    # voiceovers.
+    hash_code = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The plaintext linked to the stored voiceover.
+    plaintext = datastore_services.StringProperty(
+        required=True)
+    # The filename of the stored voiceover, saved either in Google Cloud for
+    # production or in Datastore for development.
+    voiceover_filename = datastore_services.StringProperty(
+        required=True)
+    # A list of dictionaries. Each dictionary contains two keys: 'token',
+    # which holds a string representing a word or punctuations from the
+    # content, and 'audio_offset_msecs', which stores a float value representing
+    # the associated time offset in the audio in milliseconds.
+    # Note: This field only contains the audio offset for automated voiceovers
+    # that are synthesized from Azure. These audio offsets are not provided or
+    # stored for manual voiceovers.
+    audio_offset_list = datastore_services.JsonProperty(
+        required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'hash_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'provider': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'plaintext': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voiceover_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'audio_offset_list': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        })
+
+    @staticmethod
+    def generate_hash_from_text(plaintext: str) -> str:
+        """The method generates a hash code for the given text using the SHA-256
+        hashing algorithm.
+
+        Args:
+            plaintext: str. The input text for which the hash code is to be
+                generated.
+
+        Returns:
+            str. The hash code generated for the given input text.
+        """
+        return hashlib.sha256(plaintext.encode()).hexdigest()
+
+    @classmethod
+    def get_cached_automatic_voiceover_model(
+        cls, hash_code: str, language_accent_code: str, provider: str
+    ) -> CachedAutomaticVoiceoversModel:
+        """The method returns an instance of `CachedAutomaticVoiceoversModel`
+        based on the specified parameters.
+
+        Args:
+            hash_code: str. The SHA-256 hash code generated from the text.
+            language_accent_code: str. The language accent of the requested
+                `CachedAutomaticVoiceoversModel` instance.
+            provider: str. The cloud service provider used for automatic
+                voiceover synthesis.
+
+        Returns:
+            CachedAutomaticVoiceoversModel. An instance of
+            `CachedAutomaticVoiceoversModel` based on the specified parameters.
+        """
+        model_id = cls.generate_id(language_accent_code, hash_code, provider)
+        return cls.get_by_id(model_id)
+
+    @staticmethod
+    def generate_id(
+        language_accent_code: str,
+        hash_code: str,
+        provider: str,
+    ) -> str:
+        """Generates the ID for CachedAutomaticVoiceoversModel.
+
+        Args:
+            language_accent_code: str.
+                The language-accent code in which the voiceover is stored.
+            hash_code: str. The sha-256 generated hash code of the text.
+            provider: str. The cloud service provider used for automatic
+                voiceover synthesis.
+
+        Returns:
+            str. Returns a unique id of the form
+            [language_accent_code]:[hash_code]:[provider].
+        """
+        return '%s:%s:%s' % (
+            language_accent_code, hash_code, provider)
+
+    @classmethod
+    def create_cache_model(
+        cls,
+        language_accent_code: str,
+        plaintext: str,
+        voiceover_filename: str,
+        audio_offset_list: List[Dict[str, Union[str, float]]]
+    ) -> CachedAutomaticVoiceoversModel:
+        """Creates automatic voiceovers cached model.
+
+        Args:
+            language_accent_code: str. The language accent code for storing the
+                voiceover.
+            plaintext: str. The text associated with the stored voiceover.
+            voiceover_filename: str.  The filename of the stored voiceover.
+            audio_offset_list:
+                list(dict(str, str|float)). A list of dictionaries. Each
+                dictionary contains two keys: 'token', which holds a string
+                representing a word or punctionation from the content, and
+                'audio_offset_msecs', which stores a float value representing
+                the associated time offset in the audio in msecs.
+                Note: This field only contains the audio offset for automated
+                voiceovers that are synthesized from Azure. These audio offsets
+                are not provided or stored for manual voiceovers.
+
+        Returns:
+            CachedAutomaticVoiceoversModel. An instance of
+            `CachedAutomaticVoiceoversModel` created using the provided input
+            data.
+        """
+        hash_code = cls.generate_hash_from_text(plaintext)
+        new_model_id = cls.generate_id(
+            language_accent_code,
+            hash_code,
+            feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
+        )
+
+        return cls(
+            id=new_model_id,
+            language_accent_code=language_accent_code,
+            hash_code=hash_code,
+            provider=feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER,
+            plaintext=plaintext,
+            voiceover_filename=voiceover_filename,
+            audio_offset_list=audio_offset_list
+        )

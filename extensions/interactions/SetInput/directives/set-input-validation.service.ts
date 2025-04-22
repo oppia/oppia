@@ -16,14 +16,13 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
@@ -41,7 +40,7 @@ interface PreviousRule {
 })
 export class SetInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   /**
@@ -96,7 +95,7 @@ export class SetInputValidationService {
 
     let buttonText =
       customizationArgs.buttonText && customizationArgs.buttonText.value;
-    if (!buttonText || !angular.isString(buttonText.unicode)) {
+    if (!buttonText || typeof buttonText.unicode !== 'string') {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.',
@@ -214,10 +213,3 @@ export class SetInputValidationService {
     ];
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SetInputValidationService',
-    downgradeInjectable(SetInputValidationService)
-  );

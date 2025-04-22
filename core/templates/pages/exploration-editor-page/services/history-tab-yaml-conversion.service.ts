@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {
@@ -80,10 +79,3 @@ export class HistoryTabYamlConversionService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'HistoryTabYamlConversionService',
-    downgradeInjectable(HistoryTabYamlConversionService)
-  );

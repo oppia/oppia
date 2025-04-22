@@ -20,7 +20,6 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 
 @Component({
@@ -64,10 +63,3 @@ export class PositionOfTermsEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'positionOfTermsEditor',
-  downgradeComponent({
-    component: PositionOfTermsEditorComponent,
-  })
-);

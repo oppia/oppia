@@ -23,7 +23,6 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 @Component({
@@ -58,10 +57,3 @@ export class SubtitledUnicodeEditorComponent {
     return this.schema;
   }
 }
-
-angular.module('oppia').directive(
-  'subtitledUnicodeEditor',
-  downgradeComponent({
-    component: SubtitledUnicodeEditorComponent,
-  }) as angular.IDirectiveFactory
-);

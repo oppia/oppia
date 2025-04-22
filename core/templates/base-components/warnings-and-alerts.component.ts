@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AlertsService, Message, Warning} from 'services/alerts.service';
 
 @Component({
@@ -39,10 +38,3 @@ export class WarningsAndAlertsComponent {
     return this.alertsService.messages;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaWarningsAndAlerts',
-  downgradeComponent({
-    component: WarningsAndAlertsComponent,
-  }) as angular.IDirectiveFactory
-);

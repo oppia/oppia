@@ -179,6 +179,7 @@ import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/mo
 import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -200,8 +201,9 @@ import {DynamicComponentModule} from 'value_generators/templates/dynamic-compone
 import {ThanksForDonatingModalComponent} from 'pages/donate-page/thanks-for-donating-modal.component';
 import {DonationBoxComponent} from 'pages/donate-page/donation-box/donation-box.component';
 import {DonationBoxModalComponent} from 'pages/donate-page/donation-box/donation-box-modal.component';
-import {RteHelperModalComponent} from 'services/rte-helper-modal.controller';
+import {RteHelperModalComponent} from 'services/rte-helper-modal.component';
 import {DirectivesModule} from 'directives/directives.module';
+import {UrlFragmentEditorComponent} from './url-fragment-editor/url-fragment-editor.component';
 import {PreviewSummaryTileModalComponent} from 'pages/exploration-editor-page/settings-tab/templates/preview-summary-tile-modal.component';
 import {LostChangesModalComponent} from 'pages/exploration-editor-page/modal-templates/lost-changes-modal.component';
 import {ChangesInHumanReadableFormComponent} from 'pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component';
@@ -388,6 +390,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
     ExplorationSaveModalComponent,
     ConfirmDiscardChangesModalComponent,
     EditorReloadingModalComponent,
@@ -403,6 +406,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   entryComponents: [
@@ -541,6 +545,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
     ExplorationSaveModalComponent,
     ConfirmDiscardChangesModalComponent,
     EditorReloadingModalComponent,
@@ -556,6 +561,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   exports: [
@@ -704,8 +710,10 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     UndoSnackbarComponent,
     TranslationModalComponent,
     FullExpandAccordionComponent,
+    UrlFragmentEditorComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 })
 export class SharedComponentsModule {}

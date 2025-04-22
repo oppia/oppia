@@ -868,6 +868,52 @@ class TranslatableTopicNamesHandler(
         self.render_json(self.values)
 
 
+class TranslatableTopicNamesPerClassroomHandlerDict(TypedDict):
+    """A dictionary representing all topics associated to classroom."""
+
+    classroom: str
+    topics: List[str]
+
+
+class TranslatableTopicNamesPerClassroomHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Provides names of all translatable topics associated with classroom in
+    the datastore."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Gets all translatable topics grouped by classroom.
+        Returns a JSON response containing topics organized by classroom name.
+        """
+        # Build mapping of topic IDs to classroom names.
+        topic_id_to_classroom = {
+            topic_id: classroom.name
+            for classroom in classroom_config_services.get_all_classrooms()
+            for topic_id in classroom.get_topic_ids()
+        }
+
+        # Group topics by classroom and format response.
+        topics_per_classroom: Dict[str, List[str]] = {}
+        for summary in topic_fetchers.get_published_topic_summaries():
+            classroom_name = topic_id_to_classroom.get(summary.id, '')
+            topics_per_classroom.setdefault(
+                classroom_name, []).append(summary.name)
+
+        self.values = {
+            'topic_names_per_classroom': [
+                TranslatableTopicNamesPerClassroomHandlerDict(
+                    classroom=classroom, topics=topics)
+                for classroom, topics in topics_per_classroom.items()
+            ]
+        }
+        self.render_json(self.values)
+
+
 class TranslationPreferenceHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of TranslationPreferenceHandler's
     normalized_request dictionary.

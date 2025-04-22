@@ -24,8 +24,10 @@ import {TestToModulesMatcher} from '../../../test-dependencies/test-to-modules-m
 import {showMessage} from './show-message';
 
 var path = require('path');
+var fs = require('fs');
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
+import {PuppeteerScreenRecorder} from 'puppeteer-screen-recorder';
 expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
@@ -68,8 +70,12 @@ export class BaseUser {
   email: string = '';
   username: string = '';
   startTimeInMilliseconds: number = -1;
+  screenRecorder!: PuppeteerScreenRecorder;
+  static instances: BaseUser[] = []; // Track instances.
 
-  constructor() {}
+  constructor() {
+    BaseUser.instances.push(this);
+  }
 
   /**
    * This is a function that opens a new browser instance for the user.
@@ -130,6 +136,76 @@ export class BaseUser {
         } else {
           this.page.setViewport({width: 1920, height: 1080});
         }
+
+        // Enable Video Recording.
+        if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          const outputFileName =
+            `${specName}-${new Date().toISOString()}.mp4`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+
+          const outputDir = testConstants.TEST_VIDEO_DIR;
+          if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, {recursive: true});
+          }
+
+          const config = {
+            followNewTab: true,
+            fps: 25,
+            ffmpeg_Path: null,
+            // Below dimensions are of recorded video.
+            videoFrame: {
+              width: 1920,
+              height: 1080,
+            },
+            aspectRatio: '16:9',
+            videoCrf: 18,
+            videoCodec: 'libx264',
+            videoPreset: 'medium',
+            videoBitrate: 1000,
+            autopad: {
+              color: 'black',
+            },
+            waitForFrameBeforeStart: 2000,
+            waitForFrameAfterPageLoad: 2000,
+            maxRetries: 3, // Add retry mechanism.
+            ffmpegFlags: [
+              // Additional ffmpeg flags for stability.
+              '-movflags',
+              '+faststart',
+              '-max_muxing_queue_size',
+              '9999',
+            ],
+          };
+
+          this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
+          await this.screenRecorder.start(path.join(outputDir, outputFileName));
+
+          // Ensure recording is stopped when the test fails.
+          process.on('SIGTERM', async () => {
+            await this.screenRecorder.stop();
+          });
+          process.on('SIGINT', async () => {
+            await this.screenRecorder.stop();
+          });
+        }
+
+        // Set up Download Folder.
+        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+        // Ensure the folder exists.
+        if (!fs.existsSync(downloadDir)) {
+          fs.mkdirSync(downloadDir, {recursive: true});
+        }
+
+        // Enable download behavior using Chrome DevTools Protocol (CDP).
+        const client = await this.page.target().createCDPSession();
+        await client.send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: downloadDir,
+        });
+
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -142,6 +218,33 @@ export class BaseUser {
       });
 
     return this.page;
+  }
+
+  /**
+   * This function takes the screenshot of all the instances of browser during a test failure.
+   */
+  async captureScreenshotsForFailedTest(): Promise<void> {
+    let i: number = 0;
+    const specName = process.env.SPEC_NAME;
+    const outputDir = testConstants.TEST_SCREENSHOT_DIR;
+    const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
+      /[^a-z0-9.-]/gi,
+      '_'
+    );
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, {recursive: true});
+    }
+    for (const instance of BaseUser.instances) {
+      if (instance.page) {
+        await instance.page.screenshot({
+          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+        });
+        showMessage(
+          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+        );
+        i = i + 1;
+      }
+    }
   }
 
   /**
@@ -453,6 +556,24 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    if (this.screenRecorder) {
+      await this.screenRecorder.stop();
+    }
+    const CONFIG_FILE = path.resolve(
+      __dirname,
+      '../../jest-runtime-config.json'
+    );
+    if (
+      fs.existsSync(CONFIG_FILE) &&
+      !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
+    ) {
+      const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+      if (configData.testFailureDetected) {
+        fs.unlinkSync(CONFIG_FILE);
+        // Signal all BaseUser instances to take screenshots.
+        await this.captureScreenshotsForFailedTest();
+      }
+    }
     await this.browserObject.close();
   }
 
@@ -627,7 +748,7 @@ export class BaseUser {
       } else {
         dirName = '/dev-mobile-screenshots';
       }
-      failureTrigger += 0.042;
+      failureTrigger += 0.048;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.0352;
       } else if (await currentPage.$(libraryBanner)) {

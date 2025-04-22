@@ -16,26 +16,26 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {DragAndDropSortInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
+import isEqual from 'lodash/isEqual';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DragAndDropSortInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -254,12 +254,7 @@ export class DragAndDropSortInputValidationService {
               .reduce((acc, val) => acc.concat(val), [])
               .map(contentId => choiceContentIdToHtml[contentId])
               .sort();
-            if (
-              !angular.equals(
-                sortedCustomArgsChoices,
-                flattenedAndSortedXInputs
-              )
-            ) {
+            if (!isEqual(sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message:
@@ -306,10 +301,3 @@ export class DragAndDropSortInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'DragAndDropSortInputValidationService',
-    downgradeInjectable(DragAndDropSortInputValidationService)
-  );

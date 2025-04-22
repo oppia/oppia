@@ -17,7 +17,6 @@
  */
 
 import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
@@ -105,7 +104,3 @@ export class InsertScriptService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('InsertScriptService', downgradeInjectable(InsertScriptService));

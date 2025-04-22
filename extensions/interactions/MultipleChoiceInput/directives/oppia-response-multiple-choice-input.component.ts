@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -46,10 +45,3 @@ export class ResponseMultipleChoiceInputComponent implements OnInit {
     this.response = _choices[_answer]._html;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseMultipleChoiceInput',
-  downgradeComponent({
-    component: ResponseMultipleChoiceInputComponent,
-  })
-);

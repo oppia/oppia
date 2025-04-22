@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -50,6 +49,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
+import isEqual from 'lodash/isEqual';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -179,7 +179,7 @@ export class ResponsesService {
     if (
       newAnswerGroups &&
       oldAnswerGroups &&
-      !angular.equals(newAnswerGroups, oldAnswerGroups)
+      !isEqual(newAnswerGroups, oldAnswerGroups)
     ) {
       this._answerGroups = newAnswerGroups;
       this._answerGroupsChangedEventEmitter.emit();
@@ -260,7 +260,7 @@ export class ResponsesService {
 
   private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
-    if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
+    if (!isEqual(newDefaultOutcome, oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
       this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
@@ -273,10 +273,7 @@ export class ResponsesService {
     const oldConfirmedUnclassifiedAnswers =
       this._confirmedUnclassifiedAnswersMemento;
     if (
-      !angular.equals(
-        newConfirmedUnclassifiedAnswers,
-        oldConfirmedUnclassifiedAnswers
-      )
+      !isEqual(newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
@@ -718,7 +715,3 @@ export class ResponsesService {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ResponsesService', downgradeInjectable(ResponsesService));

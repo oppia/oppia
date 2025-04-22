@@ -59,42 +59,17 @@
               <em>The maximum length of subtopic title is {{ maxCharsInSubtopicTitle }} characters.</em>
             </span>
           </div>
-          <div class="subtopic-url-fragment" tabindex="0">
-            <p>
-              <strong>Url Fragment*</strong>
-            </p>
-            <form class="form-horizontal" role="form">
-              <input class="form-control e2e-test-subtopic-url-fragment-field"
-                     [ngClass]="{'is-invalid': subtopicUrlFragmentExists || !subtopicUrlFragmentIsValid}"
-                     type="text"
-                     (blur)="updateSubtopicUrlFragment(editableUrlFragment)"
-                     [(ngModel)]="editableUrlFragment"
-                     aria-label="Input field to add Subtopic URL"
-                     [ngModelOptions]="{standalone: true}"
-                     [maxlength]="maxCharsInSubtopicUrlFragment">
-              <div class="oppia-input-box-subtitle text-danger" [hidden]="editableUrlFragment === '' || subtopicUrlFragmentIsValid">
-                <b>
-                  Please use only lowercase letters, optionally separated by hyphen.
-                </b>
-              </div>
-              <span class="oppia-input-box-subtitle">
-                <em>
-                  The subtopic URL fragment is used to uniquely access the subtopic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ maxCharsInSubtopicUrlFragment }} characters in total and must be unique across the topic. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
-                  This subtopic can be accessed at the following URL:<br>
-                  {{ hostname }}/learn/{{ classroomUrlFragment }}/{{ topic?.getUrlFragment() }}/revision/{{ editableUrlFragment }}
-                </em>
-              </span>
-            </form>
-            <span class="form-text error-msg" *ngIf="errorMsg">
-              <em>{{ errorMsg }}</em>
-            </span>
-            <span class="form-text error-message" *ngIf="editableUrlFragment?.length === maxCharsInSubtopicUrlFragment">
-              <em>The maximum length of subtopic title is {{ maxCharsInSubtopicUrlFragment }} characters.</em>
-            </span>
-            <div class="oppia-input-box-subtitle text-danger"
-                 *ngIf="editableUrlFragment && subtopicUrlFragmentExists" aria-live="polite">
-              <em>The subtopic url fragment is not unique.</em>
-            </div>
+          <div class="subtopic-url-fragment e2e-test-subtopic-url-fragment-field" tabindex="0">
+            <url-fragment-editor-component label="Url Fragment"
+                                           placeholder="Enter url fragment for the subtopic."
+                                           maxLength="{{MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT}}"
+                                           fragmentType="subtopic"
+                                           [generatedUrlPrefix]="generatedUrlPrefix"
+                                           [fragmentIsDuplicate]="subtopicUrlFragmentExists"
+                                           [disabled]="false"
+                                           [(urlFragment)]="editableUrlFragment"
+                                           (urlFragmentChange)="onSubtopicUrlFragmentChange($event)">
+            </url-fragment-editor-component>
           </div>
           <div class="subtopic-html" tabindex="0">
             <div (click)="showSchemaEditor()"

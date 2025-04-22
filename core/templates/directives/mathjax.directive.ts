@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview MathjaxBind Directive (not associated with reusable
+ * @fileoverview Mathjax Directive (not associated with reusable
  * components.)
  * NB: Reusable component directives should go in the components/ folder.
  */

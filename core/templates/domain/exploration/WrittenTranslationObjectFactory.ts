@@ -17,7 +17,6 @@
  * WrittenTranslation domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -133,10 +132,3 @@ export class WrittenTranslationObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'WrittenTranslationObjectFactory',
-    downgradeInjectable(WrittenTranslationObjectFactory)
-  );

@@ -17,7 +17,6 @@
  * SubtitledHtml domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {NativeDateAdapter} from '@angular/material/core';
 import {formatDate} from '@angular/common';
@@ -34,10 +33,3 @@ export class ISODatePickerAdapter extends NativeDateAdapter {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GenerateContentIdService',
-    downgradeInjectable(ISODatePickerAdapter)
-  );

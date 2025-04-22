@@ -157,14 +157,14 @@ describe('AudioPlayerService', () => {
 
     it('should not pause track when audio is not being played', fakeAsync(() => {
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
-      spyOn(audioPlayerService, 'getCurrentTime');
+      spyOn(audioPlayerService, 'getCurrentTimeInSecs');
       let subjectNext = spyOn(Subject.prototype, 'next');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
       audioPlayerService.pause();
 
-      expect(audioPlayerService.getCurrentTime).not.toHaveBeenCalled();
+      expect(audioPlayerService.getCurrentTimeInSecs).not.toHaveBeenCalled();
       expect(subjectNext).toHaveBeenCalledTimes(1);
     }));
 
@@ -173,13 +173,13 @@ describe('AudioPlayerService', () => {
       fakeAsync(() => {
         spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
         let subjectNext = spyOn(Subject.prototype, 'next');
-        spyOn(audioPlayerService, 'getCurrentTime');
+        spyOn(audioPlayerService, 'getCurrentTimeInSecs');
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
 
         audioPlayerService.pause();
 
-        expect(audioPlayerService.getCurrentTime).toHaveBeenCalled();
+        expect(audioPlayerService.getCurrentTimeInSecs).toHaveBeenCalled();
         expect(subjectNext).toHaveBeenCalled();
       })
     );
@@ -231,7 +231,7 @@ describe('AudioPlayerService', () => {
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
-      expect(audioPlayerService.getCurrentTime()).toBe(10);
+      expect(audioPlayerService.getCurrentTimeInSecs()).toBe(10);
     }));
 
     it('should set the time when user clicks on the track', fakeAsync(() => {
@@ -405,7 +405,7 @@ describe('AudioPlayerService', () => {
     it(
       'should not get the current time of track when no audio is' + ' loaded',
       () => {
-        expect(audioPlayerService.getCurrentTime()).toBe(0);
+        expect(audioPlayerService.getCurrentTimeInSecs()).toBe(0);
       }
     );
 
@@ -416,7 +416,7 @@ describe('AudioPlayerService', () => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
 
-        expect(audioPlayerService.getCurrentTime()).toBe(0);
+        expect(audioPlayerService.getCurrentTimeInSecs()).toBe(0);
       })
     );
 

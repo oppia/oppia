@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -268,10 +268,3 @@ export class ExplorationObjectFactory {
     return this.createFromBackendDict(explorationBackendDict);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationObjectFactory',
-    downgradeInjectable(ExplorationObjectFactory)
-  );

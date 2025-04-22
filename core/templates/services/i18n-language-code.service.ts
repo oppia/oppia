@@ -16,7 +16,6 @@
  * @fileoverview Service for informing of the i18n language code changes.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {ClassroomTranslationKeys} from 'pages/classroom-page/classroom-page.component';
@@ -213,10 +212,3 @@ export class I18nLanguageCodeService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'I18nLanguageCodeService',
-    downgradeInjectable(I18nLanguageCodeService)
-  );
