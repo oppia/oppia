@@ -31,7 +31,7 @@ describe('States Object Factory', () => {
   let newState2 = null;
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
-  let stateDictsToDelete = null;
+  let stateDictToDelete = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -301,7 +301,7 @@ describe('States Object Factory', () => {
       },
     };
 
-    stateDictsToDelete = {
+    stateDictToDelete = {
       'first state': {
         content: {
           content_id: 'content',
@@ -407,7 +407,7 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly delete a state', () => {
-    let states = ssof.createFromBackendDict(stateDictsToDelete);
+    let states = ssof.createFromBackendDict(stateDictToDelete);
     states.deleteState('first state');
     expect(states).toEqual(
       ssof.createFromBackendDict({

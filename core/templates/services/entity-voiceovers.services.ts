@@ -189,7 +189,7 @@ export class EntityVoiceoversService {
     }
   }
 
-  toggleManualVoiceoverNeedsUpdate(
+  toggleManualVoiceoverByLanguageAccent(
     languageAccentCode: string,
     contentId: string
   ): void {

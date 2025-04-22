@@ -368,7 +368,7 @@ describe('Translation status service', () => {
 
       const languageAccentCode = 'en-US';
       const contentId = 'content_0';
-      entityVoiceoversService.toggleManualVoiceoverNeedsUpdate(
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
         languageAccentCode,
         contentId
       );
@@ -642,7 +642,7 @@ describe('Translation status service', () => {
 
       const languageAccentCode = 'en-US';
       const contentId = 'feedback_2';
-      entityVoiceoversService.toggleManualVoiceoverNeedsUpdate(
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
         languageAccentCode,
         contentId
       );
@@ -756,7 +756,7 @@ describe('Translation status service', () => {
       // contain audio that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
-      entityVoiceoversService.toggleManualVoiceoverNeedsUpdate(
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
         'en-US',
         'feedback_3'
       );

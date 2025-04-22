@@ -2373,16 +2373,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
-            # Here we use MyPy ignore because the latest schema of state
-            # dict doesn't contains recorded_voiceovers property.
-            'recorded_voiceovers': {    # type: ignore[typeddict-item]
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'feedback_2': {},
-                    'hint_3': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'inapplicable_skill_misconception_ids': []
