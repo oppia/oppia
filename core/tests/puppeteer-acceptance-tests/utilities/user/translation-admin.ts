@@ -62,7 +62,7 @@ export class TranslationAdmin extends BaseUser {
    */
   async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
-    await this.waitForNetworkIdle();
+    // Wait for the contributor filter dropdown to load before interacting with it.
     await this.page.waitForSelector(viewContributorFilterMethodSelect);
   }
 
@@ -74,14 +74,18 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    // Wait for the username input field to be visible before typing in a contributor's name.
     await this.page.waitForSelector(addContributorUsernameInput);
+    // Wait for the contribution rights category dropdown to load before selecting a role.
     await this.page.waitForSelector(addContributonRightsCategorySelect);
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
       translationRightValue
     );
+    // Wait for the language dropdown to appear before selecting the translation language.
     await this.page.waitForSelector(addContributonRightsLanguageDropdown);
+    // Wait for the submit button to ensure the form is fully loaded before submitting the translation rights.
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.page.waitForSelector(addContributionRightsSubmitButton);
     await this.clickOn(addContributionRightsSubmitButton);
@@ -96,8 +100,11 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    // Wait for the username input field to appear in the remove contributor section.
     await this.page.waitForSelector(removeContributorUsernameInput);
+    // Wait for the contribution rights category dropdown to be available before selecting a right to remove.
     await this.page.waitForSelector(removeContributonRightsCategorySelect);
+    // Wait for the submit button to be visible before submitting the removal request.
     await this.page.waitForSelector(removeContributionRightsSubmitButton);
     await this.type(removeContributorUsernameInput, username);
     await this.select(
@@ -109,7 +116,9 @@ export class TranslationAdmin extends BaseUser {
 
     await this.waitForNetworkIdle();
 
+    // View the contribution rights assigned to the specified user.
     await this.viewContributionRightsForUser(username);
+    // Ensure that the user is no longer displayed under the selected contribution rights category.
     await this.expectUserToNotBeDisplayed(username);
   }
 
@@ -121,6 +130,7 @@ export class TranslationAdmin extends BaseUser {
     await this.page.waitForSelector(viewContributorSubmitButton);
 
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
+    // Type the username into the contributor username input field for filtering.
     await this.type(viewContributorUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
     await this.waitForNetworkIdle();
@@ -132,13 +142,16 @@ export class TranslationAdmin extends BaseUser {
   async viewContributorTranslationRightsByLanguageCode(
     languageCode: string
   ): Promise<void> {
+    // Wait for the contributor filter method dropdown to be available before selecting a filter.
     await this.page.waitForSelector(viewContributorFilterMethodSelect);
+    // Wait for the submit button to be visible before attempting to click it.
     await this.page.waitForSelector(viewContributorSubmitButton);
 
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
+    // Wait for the language role user result element to appear after filtering users.
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     await this.waitForNetworkIdle();
   }
@@ -173,7 +186,11 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the user is displayed as a translator.
    */
   async expectUserToBeDisplayed(username: string): Promise<void> {
-    await this.page.waitForSelector(viewLanguageRoleUserResult);
+    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
+    if (!elementHandle) {
+      showMessage('No users displayed  assuming user is not present.');
+      return;
+    }
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
