@@ -74,6 +74,7 @@ from core.controllers import subscriptions
 from core.controllers import subtopic_viewer
 from core.controllers import suggestion
 from core.controllers import tasks
+from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import voice_artist
@@ -507,7 +508,7 @@ URLS = [
         topic_viewer.TopicNameHandler),
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
-        topic_viewer.TopicUrlFragmentHandler),
+        topic_editor.TopicUrlFragmentHandler),
     get_redirect_route(
         r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
         skill_editor.SkillDescriptionHandler),
@@ -586,7 +587,7 @@ URLS = [
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
-        topic_viewer.TopicEditorStoryHandler),
+        topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         % feconf.TOPIC_DATA_HANDLER,
@@ -967,23 +968,23 @@ URLS = [
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-        topic_viewer.EditableTopicDataHandler),
+        topic_editor.EditableTopicDataHandler),
     get_redirect_route(
         r'%s/<topic_id>/<subtopic_id>' %
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-        topic_viewer.EditableSubtopicPageDataHandler),
+        topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
-        topic_viewer.TopicRightsHandler),
+        topic_editor.TopicRightsHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
-        topic_viewer.TopicPublishHandler),
+        topic_editor.TopicPublishHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_SEND_MAIL_URL_PREFIX,
-        topic_viewer.TopicPublishSendMailHandler),
+        topic_editor.TopicPublishSendMailHandler),
     get_redirect_route(
         r'%s/' % feconf.TOPIC_ID_TO_TOPIC_NAME,
-        topic_viewer.TopicIdToTopicNameHandler),
+        topic_editor.TopicIdToTopicNameHandler),
 
     get_redirect_route(
         r'%s/<selected_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
