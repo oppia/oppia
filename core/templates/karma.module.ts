@@ -27,6 +27,7 @@ angular.module('oppia', [
   'ngMaterial',
   'ngSanitize',
   'ngTouch',
+  'pascalprecht.translate',
   'ui.tree',
   uiValidate,
 ]);

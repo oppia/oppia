@@ -35,6 +35,17 @@
       "targetDirPrefix": "angularjs-",
       "files": ["angular-mocks.js"]
     },
+    "angularTranslate": {
+      "version": "2.18.1",
+      "downloadFormat": "files",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1",
+      "rootDirPrefix": "bower-angular-translate-",
+      "targetDirPrefix": "bower-angular-translate-",
+      "files": ["angular-translate.min.js"],
+      "bundle": {
+        "js": ["angular-translate.min.js"]
+      }
+    },
     "messageFormat": {
       "version": "2.0.5",
       "downloadFormat": "zip",
