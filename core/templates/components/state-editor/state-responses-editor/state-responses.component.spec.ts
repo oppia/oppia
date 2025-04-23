@@ -32,10 +32,7 @@ import {
   Interaction,
   InteractionObjectFactory,
 } from 'domain/exploration/InteractionObjectFactory';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
@@ -115,7 +112,6 @@ describe('State Responses Component', () => {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let interactionObjectFactory: InteractionObjectFactory;
   let interactionData: Interaction;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let externalSaveService: ExternalSaveService;
@@ -173,7 +169,6 @@ describe('State Responses Component', () => {
         StateSolicitAnswerDetailsService,
         AlertsService,
         InteractionObjectFactory,
-        OutcomeObjectFactory,
         AnswerGroupObjectFactory,
         MisconceptionObjectFactory,
         {
@@ -202,7 +197,6 @@ describe('State Responses Component', () => {
     component = fixture.componentInstance;
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
@@ -317,7 +311,7 @@ describe('State Responses Component', () => {
         'TextInput'
       ),
     ];
-    defaultOutcome = outcomeObjectFactory.createFromBackendDict({
+    defaultOutcome = Outcome.createFromBackendDict({
       dest: 'Hola',
       dest_if_really_stuck: null,
       feedback: {
@@ -891,13 +885,8 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'State Name'
     );
-    let outcome1 = outcomeObjectFactory.createNew('State Name', '1', '', []);
-    let outcome2 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'Feedback Text',
-      []
-    );
+    let outcome1 = Outcome.createNew('State Name', '1', '', []);
+    let outcome2 = Outcome.createNew('State Name', '1', 'Feedback Text', []);
 
     expect(component.isSelfLoopWithNoFeedback(outcome1)).toBe(true);
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
@@ -912,7 +901,7 @@ describe('State Responses Component', () => {
   });
 
   it('should check if outcome marked as correct has self loop', () => {
-    let outcome = outcomeObjectFactory.createFromBackendDict({
+    let outcome = Outcome.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
       feedback: {
@@ -938,7 +927,7 @@ describe('State Responses Component', () => {
     'should check if outcome marked as correct has self loop and return' +
       ' true if correctness feedback is enabled',
     () => {
-      let outcome = outcomeObjectFactory.createFromBackendDict({
+      let outcome = Outcome.createFromBackendDict({
         dest: 'State Name',
         dest_if_really_stuck: null,
         feedback: {
@@ -959,8 +948,8 @@ describe('State Responses Component', () => {
   );
 
   it('should show state name input if user is creating new state', () => {
-    let outcome1 = outcomeObjectFactory.createNew('/', '', '', []);
-    let outcome2 = outcomeObjectFactory.createNew('Hola', '', '', []);
+    let outcome1 = Outcome.createNew('/', '', '', []);
+    let outcome2 = Outcome.createNew('Hola', '', '', []);
 
     expect(component.isCreatingNewState(outcome1)).toBe(true);
     expect(component.isCreatingNewState(outcome2)).toBe(false);
@@ -978,29 +967,29 @@ describe('State Responses Component', () => {
 
   it('should check if the interaction is linear and has feedback', () => {
     stateInteractionIdService.savedMemento = 'Continue';
-    let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
+    let outcome1 = Outcome.createNew('Hola', '', '', []);
 
     expect(component.isLinearWithNoFeedback(outcome1)).toBe(true);
 
     stateInteractionIdService.savedMemento = 'Continue';
-    let outcome2 = outcomeObjectFactory.createNew('Hola', '', 'Right!', []);
+    let outcome2 = Outcome.createNew('Hola', '', 'Right!', []);
 
     expect(component.isLinearWithNoFeedback(outcome2)).toBe(false);
 
     stateInteractionIdService.savedMemento = 'TextInput';
-    let outcome3 = outcomeObjectFactory.createNew('Hola', '', '', []);
+    let outcome3 = Outcome.createNew('Hola', '', '', []);
 
     expect(component.isLinearWithNoFeedback(outcome3)).toBe(false);
 
     stateInteractionIdService.savedMemento = 'TextInput';
-    let outcome4 = outcomeObjectFactory.createNew('Hola', '', 'Wrong!', []);
+    let outcome4 = Outcome.createNew('Hola', '', 'Wrong!', []);
 
     expect(component.isLinearWithNoFeedback(outcome4)).toBe(false);
   });
 
   it('should get outcome tooltip text', () => {
     // When outcome has self loop and is labelled correct.
-    let outcome = outcomeObjectFactory.createFromBackendDict({
+    let outcome = Outcome.createFromBackendDict({
       dest: 'State Name',
       dest_if_really_stuck: null,
       feedback: {
@@ -1022,7 +1011,7 @@ describe('State Responses Component', () => {
 
     // When interaction is linear with no feedback.
     stateInteractionIdService.savedMemento = 'Continue';
-    let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
+    let outcome1 = Outcome.createNew('Hola', '', '', []);
 
     expect(component.getOutcomeTooltip(outcome1)).toBe(
       'Please direct the learner to a different card.'
@@ -1106,12 +1095,7 @@ describe('State Responses Component', () => {
               x: 'TranslatableSetOfNormalizedString',
             }
           ),
-          tmpOutcome: outcomeObjectFactory.createNew(
-            'Hola',
-            '1',
-            'Feedback text',
-            []
-          ),
+          tmpOutcome: Outcome.createNew('Hola', '1', 'Feedback text', []),
           tmpTaggedSkillMisconceptionId: '',
         }),
       } as NgbModalRef,
@@ -1139,12 +1123,7 @@ describe('State Responses Component', () => {
               x: 'TranslatableSetOfNormalizedString',
             }
           ),
-          tmpOutcome: outcomeObjectFactory.createNew(
-            'Hola',
-            '1',
-            'Feedback text',
-            []
-          ),
+          tmpOutcome: Outcome.createNew('Hola', '1', 'Feedback text', []),
           tmpTaggedSkillMisconceptionId: '',
         }),
       } as NgbModalRef
@@ -1463,7 +1442,7 @@ describe('State Responses Component', () => {
       component.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
           [],
-          outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+          Outcome.createNew('unused', '1', 'Feedback text', []),
           [],
           '0'
         ),
@@ -1477,7 +1456,7 @@ describe('State Responses Component', () => {
       component.summarizeAnswerGroup(
         answerGroupObjectFactory.createNew(
           [],
-          outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
+          Outcome.createNew('unused', '1', 'Feedback text', []),
           [],
           '0'
         ),
@@ -1491,7 +1470,7 @@ describe('State Responses Component', () => {
   it('should get summary default outcome when outcome is linear', () => {
     expect(
       component.summarizeDefaultOutcome(
-        outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+        Outcome.createNew('unused', '1', 'Feedback Text', []),
         'Continue',
         0,
         true
@@ -1505,7 +1484,7 @@ describe('State Responses Component', () => {
     () => {
       expect(
         component.summarizeDefaultOutcome(
-          outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+          Outcome.createNew('unused', '1', 'Feedback Text', []),
           'TextInput',
           1,
           true
@@ -1520,7 +1499,7 @@ describe('State Responses Component', () => {
     () => {
       expect(
         component.summarizeDefaultOutcome(
-          outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+          Outcome.createNew('unused', '1', 'Feedback Text', []),
           'TextInput',
           0,
           true
@@ -1546,14 +1525,10 @@ describe('State Responses Component', () => {
   it('should check if outcome is looping', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
     expect(
-      component.isOutcomeLooping(
-        outcomeObjectFactory.createNew('Hola', '', '', [])
-      )
+      component.isOutcomeLooping(Outcome.createNew('Hola', '', '', []))
     ).toBe(true);
     expect(
-      component.isOutcomeLooping(
-        outcomeObjectFactory.createNew('Second Last', '', '', [])
-      )
+      component.isOutcomeLooping(Outcome.createNew('Second Last', '', '', []))
     ).toBe(false);
   });
 
