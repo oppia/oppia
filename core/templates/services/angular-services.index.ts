@@ -46,7 +46,6 @@ import { StatePropertyService } from 'components/state-editor/state-editor-prope
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { StateSolicitAnswerDetailsService } from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateWrittenTranslationsService } from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { MailingListBackendApiService } from 'domain/mailing-list/mailing-list-backend-api.service';
 import { BlogAdminBackendApiService } from 'domain/blog-admin/blog-admin-backend-api.service';
@@ -70,7 +69,6 @@ import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFa
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
@@ -733,7 +731,6 @@ export const angularServices: [string, Type<{}>][] = [
     NumericExpressionInputValidationService],
   ['NumericInputRulesService', NumericInputRulesService],
   ['NumericInputValidationService', NumericInputValidationService],
-  ['OutcomeObjectFactory', OutcomeObjectFactory],
   ['OppiaRteParserService', OppiaRteParserService],
   ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
@@ -844,7 +841,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
   ['TutorialEventsBackendApiService',
     TutorialEventsBackendApiService],
-  ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],

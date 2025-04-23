@@ -58,6 +58,8 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
+const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
+
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
@@ -247,9 +249,19 @@ const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 
 enum INTERACTION_TYPES {
+  CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
 }
+
+enum INTERACTION_TABS {
+  PROGRAMMING = 'PROGRAMMING',
+}
+
+export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
+  [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+};
+
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -503,7 +515,19 @@ export class ExplorationEditor extends BaseUser {
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.page.waitForSelector(addInteractionButton, {
+      visible: true,
+    });
+
     await this.clickOn(addInteractionButton);
+
+    // Change tab based on interaction.
+    // Add more conditional tab changes here.
+    if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
+    ) {
+      await this.clickOn(programmingInteractionsButton);
+    }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -1917,6 +1941,63 @@ export class ExplorationEditor extends BaseUser {
       'This is Goal here.',
       category
     );
+  }
+
+  /**
+   * This function creates simple Programming Exploration.
+   * Starts at new Exploration Editor Page.
+   * Ends at same page, after adding programming interaction and saving the
+   * draft.
+   */
+  async createSimpleProgrammingExploration(): Promise<string | null> {
+    // Check if element to add interaction is visible (pre-check)
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+
+    await this.createMinimalExploration(
+      'This is a test Programming Exploration',
+      INTERACTION_TYPES.CODE_EDITOR
+    );
+
+    const lastInteraction = 'Last Card';
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, lastInteraction);
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    await this.editDefaultResponseFeedback('Wrong Answer. Please try again');
+    await this.navigateToCard(lastInteraction);
+    await this.createMinimalExploration(
+      'This is last card',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+
+    await this.saveExplorationDraft();
+    const explorationId = await this.publishExplorationWithMetadata(
+      'Simple Code Editor',
+      'This is goal here',
+      'Algebra'
+    );
+
+    // Check if publish button is disabled (post-check)
+    const publishButton = await this.page.$(saveChangesButton);
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      publishButton
+    );
+
+    if (isDisabled) {
+      showMessage('Publish Button is disabled, as expected');
+    } else {
+      showMessage(
+        'Publish Button is enabled and clickable, expected to be disabled'
+      );
+      throw new Error('Publish Button is enabled and clickable');
+    }
+
+    return explorationId;
   }
 
   /**
