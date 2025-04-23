@@ -23,10 +23,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
@@ -39,7 +36,7 @@ describe('SetInputValidationService', () => {
 
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   let goodCustomizationArgs: SetInputCustomizationArgs;
 
@@ -53,7 +50,6 @@ describe('SetInputValidationService', () => {
     validatorService = TestBed.get(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
 
     goodCustomizationArgs = {
@@ -64,7 +60,7 @@ describe('SetInputValidationService', () => {
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {

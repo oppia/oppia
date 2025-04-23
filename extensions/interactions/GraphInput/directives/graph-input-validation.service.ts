@@ -24,7 +24,7 @@ import {
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {GraphInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {GraphAnswer} from 'interactions/answer-defs';
 
 import {AppConstants} from 'app.constants';
