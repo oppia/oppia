@@ -29,7 +29,6 @@
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
-    "core/templates/domain/exploration/OutcomeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamChangesObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamSpecObjectFactorySpec.ts",
