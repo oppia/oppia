@@ -109,6 +109,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator.spec.ts"
     },
     {
+      "name": "logged-in-user/manage-classroom-progress-in-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-classroom-progress-in-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
