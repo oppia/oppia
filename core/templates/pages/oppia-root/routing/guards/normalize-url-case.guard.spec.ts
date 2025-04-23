@@ -19,9 +19,16 @@
 import {TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {NormalizeUrlCaseGuard} from './normalize-url-case.guard';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
 
 describe('NormalizeUrlCaseGuard', () => {
   let guard: NormalizeUrlCaseGuard;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -29,9 +36,44 @@ describe('NormalizeUrlCaseGuard', () => {
       providers: [NormalizeUrlCaseGuard],
     });
     guard = TestBed.inject(NormalizeUrlCaseGuard);
+    router = TestBed.inject(Router);
   });
+
+  function mockRouterState(url: string): RouterStateSnapshot {
+    return {url} as RouterStateSnapshot;
+  }
 
   it('should be created', () => {
     expect(guard).toBeTruthy();
+  });
+
+  it('should allow navigation if URL is already lowercase', () => {
+    const state = mockRouterState('/learn/science');
+    const route = {} as ActivatedRouteSnapshot;
+
+    const result = guard.canActivate(route, state);
+    expect(result).toBe(true);
+  });
+
+  it('should redirect if URL contains uppercase characters', () => {
+    const state = mockRouterState('/learn/SCIENCE');
+    const route = {} as ActivatedRouteSnapshot;
+
+    const result = guard.canActivate(route, state);
+    expect(result instanceof UrlTree).toBeTrue();
+
+    const urlTree = result as UrlTree;
+    expect(urlTree.toString()).toBe('/learn/science');
+  });
+
+  it('should redirect if URL has mixed case', () => {
+    const state = mockRouterState('/learn/ScIeNcE');
+    const route = {} as ActivatedRouteSnapshot;
+
+    const result = guard.canActivate(route, state);
+    expect(result instanceof UrlTree).toBeTrue();
+
+    const urlTree = result as UrlTree;
+    expect(urlTree.toString()).toBe('/learn/science');
   });
 });
