@@ -30,7 +30,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
@@ -125,7 +125,6 @@ describe('State translation component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
@@ -302,7 +301,6 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -340,7 +338,6 @@ describe('State translation component', () => {
 
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
@@ -754,7 +751,7 @@ describe('State translation component', () => {
       it('should get summary default outcome when outcome is linear', () => {
         expect(
           component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+            Outcome.createNew('unused', '1', 'Feedback Text', []),
             'Continue',
             0,
             'true'
@@ -768,12 +765,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               1,
               'true'
@@ -788,12 +780,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               0,
               'true'
@@ -813,12 +800,7 @@ describe('State translation component', () => {
           component.summarizeAnswerGroup(
             answerGroupObjectFactory.createNew(
               [],
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
             ),
@@ -1011,7 +993,6 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -1533,7 +1514,6 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
@@ -2218,7 +2198,6 @@ describe('State translation component', () => {
         ExternalSaveService,
         NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
