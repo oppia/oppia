@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import inspect
+import importlib.util
 import os
 import pkgutil
 
@@ -123,10 +124,12 @@ class Registry:
 
         for loader, name, _ in pkgutil.iter_modules(path=rte_path):
             if name == 'components':
-                fetched_module = loader.find_module(name)
+                spec = loader.find_spec(name)
                 # Ruling out the possibility of None for mypy type checking.
-                assert fetched_module is not None
-                module = fetched_module.load_module(name)
+                assert spec is not None
+
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
                 break
 
         component_types_to_component_classes = {}
