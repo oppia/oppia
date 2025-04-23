@@ -184,7 +184,9 @@
                       {{misconception.getName()}}
                       <span class="pl-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
                     </div>
-                    <div class="small text-muted" ng-bind="getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId())"></div>
+                    <div class="small text-muted">
+                      {{ getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId()) }}
+                    </div>
                   </div>
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
                     <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
