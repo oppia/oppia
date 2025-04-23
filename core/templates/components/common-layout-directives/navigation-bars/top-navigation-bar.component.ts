@@ -410,13 +410,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     if (!rect) {
       return 0;
     }
-
-    if (learnTab) {
-      let leftOffset = learnTab.getBoundingClientRect().left;
-      let space = window.innerWidth - leftOffset;
-      return space < width ? Math.round(space - width) : 0;
-    }
-    return 0;
+    let leftOffset = learnTab.getBoundingClientRect().left;
+    let space = window.innerWidth - leftOffset;
+    return space < width ? Math.round(space - width) : 0;
   }
 
   getStaticImageUrl(imagePath: string): string {
