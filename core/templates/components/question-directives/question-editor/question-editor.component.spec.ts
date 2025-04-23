@@ -27,7 +27,7 @@ import {
 } from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';

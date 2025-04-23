@@ -49,7 +49,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';

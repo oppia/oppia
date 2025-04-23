@@ -28,7 +28,7 @@ import {
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';

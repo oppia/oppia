@@ -49,10 +49,7 @@ import {
   AnswerGroupBackendDict,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
-import {
-  Outcome,
-  OutcomeBackendDict,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
