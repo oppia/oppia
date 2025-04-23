@@ -49,10 +49,7 @@ import {
   AnswerGroupBackendDict,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
-import {
-  Outcome,
-  OutcomeBackendDict,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {
   RecordedVoiceOverBackendDict,
   RecordedVoiceovers,

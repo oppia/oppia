@@ -36,6 +36,7 @@ from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -238,10 +239,19 @@ class ExplorationHandler(
         commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload['change_list']
 
+        # Validate commit message for public explorations.
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id
+        )
+        if exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC:
+            if not commit_message:
+                raise self.InvalidInputException(
+                    'Exploration is public so expected a commit '
+                    'message but received none.'
+                )
+
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
             self.user, exploration_rights)
         can_voiceover = rights_manager.check_can_voiceover_activity(
