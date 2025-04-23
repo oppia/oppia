@@ -798,6 +798,7 @@ describe('State translation component', () => {
             AnswerGroup.createNew(
               [],
               Outcome.createNew('unused', '1', 'Feedback text', []),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
             ),
