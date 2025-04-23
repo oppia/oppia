@@ -96,7 +96,7 @@ class Elasticsearch(object):
         headers: Optional[MutableMapping[str, str]] = ...
     ) -> Any: ...
 
-     def delete_by_query(
+    def delete_by_query(
         self,
         index: Any,
         query: Any,
