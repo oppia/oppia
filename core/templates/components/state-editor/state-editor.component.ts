@@ -42,7 +42,7 @@ import {StateSolutionService} from './state-editor-properties-services/state-sol
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionData} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';

@@ -23,10 +23,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
@@ -39,7 +36,7 @@ describe('InteractiveMapValidationService', () => {
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customizationArguments: InteractiveMapCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,10 +45,9 @@ describe('InteractiveMapValidationService', () => {
 
     validatorService = TestBed.get(InteractiveMapValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
