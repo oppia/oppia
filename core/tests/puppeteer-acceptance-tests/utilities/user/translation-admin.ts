@@ -203,7 +203,7 @@ export class TranslationAdmin extends BaseUser {
   async expectUserToNotBeDisplayed(username: string): Promise<void> {
     const elementHandle = await this.page.$(viewLanguageRoleUserResult);
 
-    // If no users are displayed, throw an error
+    // If no users are displayed, throw an error.
     if (!elementHandle) {
       throw new Error(
         'No users are displayed — expected at least one user to verify absence.'
@@ -215,7 +215,7 @@ export class TranslationAdmin extends BaseUser {
       element => (element as HTMLElement).innerText
     );
 
-    // If the username is present in the list, throw an error
+    // If the username is present in the list, throw an error.
     if (displayedUsers.includes(username)) {
       throw new Error(
         `${username} has translation rights for the selected language!`
