@@ -20,8 +20,10 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
-import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {
+  ContentTranslationLanguageService,
+  ExplorationLanguageInfo,
+} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {
