@@ -78,7 +78,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a nonexistent collection
         # results in an error.
 
@@ -96,10 +96,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a public exploration
         # and a nonexistent exploration results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -111,16 +111,16 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
-        
+
     def test_public_and_nonexistent_collection_ids(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a public collection
         # and a nonexistent collection results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -138,10 +138,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a nonexistent exploration
         # and a nonexistent collection results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -159,10 +159,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a public exploration
         # and a nonexistent collection results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -180,10 +180,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        
+
         # Posting a list that includes a publlic collection
         # and a nonexistent exploration results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -222,7 +222,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Posting a list that includes a private collection
         # results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -240,7 +240,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Posting a list that includes a public exploration
         # and private exploration results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -282,7 +282,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Posting a list that includes a private exploration
         # and private collection results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -303,7 +303,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Posting a list that includes a public exploration
         # and private collection results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -324,7 +324,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Posting a list that includes a public collection
         # and private exploration results in an error.
-        
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{

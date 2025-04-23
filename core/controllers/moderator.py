@@ -89,7 +89,7 @@ class FeaturedActivitiesHandler(
             )
 
             # If all of the lists are empty, there are no invalid IDs.
-            # Since there are no invalid IDs, the Featured Activity 
+            # Since there are no invalid IDs, the Featured Activity
             # References are allowed to be updated.
             if ((not dne_exp) & (not dne_col) &
                 (not priv_exp) & (not priv_col)):
@@ -103,8 +103,8 @@ class FeaturedActivitiesHandler(
                 error_message = ''
 
                 # If there are IDs for non-existent Explorations,
-                # create new error message by joining all of the 
-                # strings in the dne_exp list with the beginning 
+                # create new error message by joining all of the
+                # strings in the dne_exp list with the beginning
                 # component of the message.
                 if dne_exp:
                     error = (
@@ -116,8 +116,8 @@ class FeaturedActivitiesHandler(
                     error_message = error_message + error
 
                 # If there are IDs for non-existent Collections,
-                # create new error message by joining all of the 
-                # strings in the dne_col list with the beginning 
+                # create new error message by joining all of the
+                # strings in the dne_col list with the beginning
                 # component of the message.
                 if dne_col:
                     error = (
@@ -129,8 +129,8 @@ class FeaturedActivitiesHandler(
                     error_message = error_message + error
 
                 # If there are IDs for private Explorations,
-                # create new error message by joining all of the 
-                # strings in the priv_exp list with the beginning 
+                # create new error message by joining all of the
+                # strings in the priv_exp list with the beginning
                 # component of the message.
                 if priv_exp:
                     error = (
@@ -142,8 +142,8 @@ class FeaturedActivitiesHandler(
                     error_message = error_message + error
 
                 # If there are IDs for private Collections,
-                # create new error message by joining all of the 
-                # strings in the priv_col list with the beginning 
+                # create new error message by joining all of the
+                # strings in the priv_col list with the beginning
                 # component of the message.
                 if priv_col:
                     error = (
@@ -157,9 +157,9 @@ class FeaturedActivitiesHandler(
                 # Join large and general error message with final piece.
                 error_message = f'{error_message}Please enter a different ID.'
 
-                # Raise final error message composed of smaller, more 
+                # Raise final error message composed of smaller, more
                 # specific error messages as an Exception to be caught by
-                # moderator-page.component.ts
+                # moderator-page.component.ts.
                 raise self.InvalidInputException(error_message)
 
         except Exception as e:

@@ -725,7 +725,6 @@ def check_activity_id_validity(
             collection_ids),
     }]
 
-
     # Initialize lists for each type of invalid ID:
     # dne_exp = list of nonexistent Explorations,
     # dne_col = list of nonexistent Collections,
@@ -742,11 +741,11 @@ def check_activity_id_validity(
         if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Exploration ID,
-                # it means it doesn't exist. ID string is added to 
+                # it means it doesn't exist. ID string is added to
                 # dne_exp list.
                 if summary is None:
                     dne_exp.append(activities_info['ids'][index])
-                # If the Exploration is set to private. ID string is added to 
+                # If the Exploration is set to private. ID string is added to
                 # priv_exp list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                     priv_exp.append(activities_info['ids'][index])
@@ -754,11 +753,11 @@ def check_activity_id_validity(
         else:
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Collection ID,
-                # it means it doesn't exist. ID string is added to 
+                # it means it doesn't exist. ID string is added to
                 # dne_col list.
                 if summary is None:
                     dne_col.append(activities_info['ids'][index])
-                # If the Collection is set to private. ID string is added to 
+                # If the Collection is set to private. ID string is added to
                 # priv_col list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                     priv_col.append(activities_info['ids'][index])
