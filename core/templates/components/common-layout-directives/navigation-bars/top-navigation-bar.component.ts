@@ -389,7 +389,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
-    this.getClassroomSummariesLength();
+    this.setClassroomSummariesLength();
   }
 
   // This function is required to shift the dropdown towards left if
@@ -423,7 +423,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getClassroomSummariesLength(): void {
+  setClassroomSummariesLength(): void {
     const classrooomGrid = document.querySelector('.classroom-grid');
     if (classrooomGrid) {
       const countAttr = classrooomGrid.getAttribute('data-classroom-count');

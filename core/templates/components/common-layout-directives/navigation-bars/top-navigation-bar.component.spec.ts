@@ -919,7 +919,7 @@ describe('TopNavigationBarComponent', () => {
     mockElement.setAttribute('data-classroom-count', mockCount);
     document.body.appendChild(mockElement);
 
-    component.getClassroomSummariesLength();
+    component.setClassroomSummariesLength();
 
     expect(component.classroomSummariesLength).toBe(parseInt(mockCount, 10));
     document.body.removeChild(mockElement);
@@ -930,7 +930,7 @@ describe('TopNavigationBarComponent', () => {
     mockElement.classList.add('classroom-grid');
     document.body.appendChild(mockElement);
 
-    component.getClassroomSummariesLength();
+    component.setClassroomSummariesLength();
 
     expect(component.classroomSummariesLength).toBe(0);
     document.body.removeChild(mockElement);
@@ -942,7 +942,7 @@ describe('TopNavigationBarComponent', () => {
     mockElement.setAttribute('data-classroom-count', 'invalid');
     document.body.appendChild(mockElement);
 
-    component.getClassroomSummariesLength();
+    component.setClassroomSummariesLength();
 
     expect(component.classroomSummariesLength).toBe(0);
     document.body.removeChild(mockElement);
