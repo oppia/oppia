@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import importlib.abc
 import importlib.util
 import inspect
 import os
@@ -27,7 +28,7 @@ from core import constants
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Type, TypedDict, Union
+from typing import Any, Dict, List, Type, TypedDict, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -127,9 +128,14 @@ class Registry:
                 spec = loader.find_spec(name)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec is not None
-
                 module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
+                # Ruling out the possibility of None for mypy type checking.
+                assert spec.loader is not None
+                # Here we use cast because we are narrowing down the type of
+                # 'spec.loader' from Optional[_Loader] to the more specific
+                # importlib.abc.Loader type.
+                loader_with_exec = cast(importlib.abc.Loader, spec.loader)
+                loader_with_exec.exec_module(module)
                 break
 
         component_types_to_component_classes = {}
