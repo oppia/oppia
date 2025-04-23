@@ -20,11 +20,7 @@
 import {Injectable} from '@angular/core';
 
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {
-  Outcome,
-  OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {Rule, RuleBackendDict} from 'domain/exploration/rule.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
@@ -79,7 +75,7 @@ export class AnswerGroup extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class AnswerGroupObjectFactory {
-  constructor(private outcomeObjectFactory: OutcomeObjectFactory) {}
+  constructor() {}
 
   generateRulesFromBackendDict(
     ruleBackendDicts: RuleBackendDict[],
@@ -113,9 +109,7 @@ export class AnswerGroupObjectFactory {
         answerGroupBackendDict.rule_specs,
         interactionId
       ),
-      this.outcomeObjectFactory.createFromBackendDict(
-        answerGroupBackendDict.outcome
-      ),
+      Outcome.createFromBackendDict(answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,
       answerGroupBackendDict.tagged_skill_misconception_id
     );

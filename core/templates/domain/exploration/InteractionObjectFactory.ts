@@ -27,11 +27,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
-import {
-  OutcomeBackendDict,
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   Solution,
@@ -312,7 +308,6 @@ export class InteractionObjectFactory {
   constructor(
     private answerGroupFactory: AnswerGroupObjectFactory,
     private solutionFactory: SolutionObjectFactory,
-    private outcomeFactory: OutcomeObjectFactory,
     private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory
   ) {}
 
@@ -581,7 +576,7 @@ export class InteractionObjectFactory {
   createOutcomeFromBackendDict(
     outcomeBackendDict: OutcomeBackendDict
   ): Outcome {
-    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
+    return Outcome.createFromBackendDict(outcomeBackendDict);
   }
 
   createSolutionFromBackendDict(

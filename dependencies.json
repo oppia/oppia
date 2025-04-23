@@ -225,17 +225,6 @@
       "rootDirPrefix": "BootstrapCK4-Skin-",
       "targetDirPrefix": "ckeditor-bootstrapck-"
     },
-    "uiBootstrap": {
-      "version": "2.5.0",
-      "downloadFormat": "files",
-      "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
-      "rootDirPrefix": "ui-bootstrap-",
-      "targetDirPrefix": "ui-bootstrap-",
-      "files": ["ui-bootstrap-tpls-2.5.0.js", "ui-bootstrap-tpls-2.5.0.min.js"],
-      "bundle": {
-        "js": ["ui-bootstrap-tpls-2.5.0.js"]
-      }
-    },
     "uiCodemirror": {
       "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
       "downloadFormat": "zip",

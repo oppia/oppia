@@ -19,24 +19,22 @@
 import {TestBed} from '@angular/core/testing';
 
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 describe('Outcome object factory', () => {
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AnswerGroupObjectFactory],
     });
 
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
   });
 
   it('should be able to get contentId to html of an answer group', () => {
     const testAnswerGroup = answerGroupObjectFactory.createNew(
       [],
-      outcomeObjectFactory.createNew('Hola', 'feedback_1', 'Feedback text', []),
+      Outcome.createNew('Hola', 'feedback_1', 'Feedback text', []),
       ['Training data text'],
       '0'
     );
