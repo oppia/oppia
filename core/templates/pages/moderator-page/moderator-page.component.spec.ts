@@ -429,4 +429,36 @@ describe('Moderator Page Component', () => {
       'These Collection IDs are private: priv_collection. Please enter a different ID.'
     );
   });
+
+  it('should display message for miscellaneous errors', () => {
+    spyOn(alertsService, 'addWarning');
+
+    const mockError = {
+      status: 404,
+      error: {
+        error: '',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'An unexpected error occurred. Please try again later.'
+    );
+  });
 });

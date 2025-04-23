@@ -702,9 +702,13 @@ def check_activity_id_validity(
             ActivityReference domain objects.
 
     Returns:
-        List[str]. Each type of invalid Activity ID has its own list
-        in order for moderator.py to determine which Activity ID
-        is invalid and why.
+        Tuple[List[str], List[str], List[str], List[str]]. 
+        The Tuple contains 4 Lists of string type. Each List
+        corresponds to a type of Invalid ID: 
+        dne_exp = nonexistent Explorations,
+        dne_col = nonexistent Collections,
+        priv_exp = private Explorations, &
+        priv_col = private Collecctions.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)
@@ -721,6 +725,12 @@ def check_activity_id_validity(
             collection_ids),
     }]
 
+
+    # Initialize lists for each type of invalid ID:
+    # dne_exp = list of nonexistent Explorations,
+    # dne_col = list of nonexistent Collections,
+    # priv_exp = list of private Explorations, &
+    # priv_col = list of private Collections.
     dne_exp = []
     dne_col = []
     priv_exp = []
@@ -732,23 +742,28 @@ def check_activity_id_validity(
         if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Exploration ID,
-                # it means it doesn't exist.
+                # it means it doesn't exist. ID string is added to 
+                # dne_exp list.
                 if summary is None:
                     dne_exp.append(activities_info['ids'][index])
-                # If the Exploration is set to private.
+                # If the Exploration is set to private. ID string is added to 
+                # priv_exp list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                     priv_exp.append(activities_info['ids'][index])
         # If the activity isn't an Exploration, it's a Collection.
         else:
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Collection ID,
-                # it means it doesn't exist.
+                # it means it doesn't exist. ID string is added to 
+                # dne_col list.
                 if summary is None:
                     dne_col.append(activities_info['ids'][index])
-                # If the Collection is set to private.
+                # If the Collection is set to private. ID string is added to 
+                # priv_col list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
                     priv_col.append(activities_info['ids'][index])
 
+    # Return Tuple of lists containing any invalid IDs.
     return dne_exp, dne_col, priv_exp, priv_col
 
 
