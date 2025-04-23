@@ -21,14 +21,12 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {NormalizeUrlCaseGuard} from './normalize-url-case.guard';
 import {
   ActivatedRouteSnapshot,
-  Router,
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
 
-describe('NormalizeUrlCaseGuard', () => {
+describe('NormalizeUrlCaseGuard', function () {
   let guard: NormalizeUrlCaseGuard;
-  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -36,7 +34,6 @@ describe('NormalizeUrlCaseGuard', () => {
       providers: [NormalizeUrlCaseGuard],
     });
     guard = TestBed.inject(NormalizeUrlCaseGuard);
-    router = TestBed.inject(Router);
   });
 
   function mockRouterState(url: string): RouterStateSnapshot {
