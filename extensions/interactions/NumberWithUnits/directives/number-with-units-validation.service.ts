@@ -27,7 +27,7 @@ import {
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {NumberWithUnits} from 'domain/objects/number-with-units.model';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {NumberWithUnitsCustomizationArgs} from 'interactions/customization-args-defs';
 import {Rule} from 'domain/exploration/rule.model';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
