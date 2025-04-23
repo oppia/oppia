@@ -82,9 +82,7 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
-      // We are facing issues in CI when using full-screen,
-      // so fixed window size of 1920x1080 is used.
-      '--window-size=1920,1080',
+      '--start-fullscreen',
       '--use-fake-ui-for-media-stream',
     ];
 
@@ -136,13 +134,14 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1920, height: 1080});
+          this.page.setViewport({width: 1280, height: 720});
         }
 
         // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          const uniqueString = Math.random().toString(36).substring(2, 8);
           const outputFileName =
-            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}.mp4`.replace(
+            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
@@ -158,8 +157,8 @@ export class BaseUser {
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
             videoFrame: {
-              width: 1920,
-              height: 1080,
+              width: 1280,
+              height: 720,
             },
             aspectRatio: '16:9',
             videoCrf: 18,
