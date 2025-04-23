@@ -30,7 +30,7 @@ import {
   Warning,
 } from './base-interaction-validation.service';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 describe('BaseInteractionValidationService', () => {
   let bivs: BaseInteractionValidationService;

@@ -25,7 +25,7 @@ import {
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {TranslatableSetOfUnicodeString} from 'interactions/rule-input-defs';
 
