@@ -36,15 +36,15 @@ describe('NormalizeUrlCaseGuard', function () {
     guard = TestBed.inject(NormalizeUrlCaseGuard);
   });
 
-  function mockRouterState(url: string): RouterStateSnapshot {
+  const mockRouterState = function (url: string): RouterStateSnapshot {
     return {url} as RouterStateSnapshot;
-  }
+  };
 
-  it('should be created', () => {
+  it('should be created', function () {
     expect(guard).toBeTruthy();
   });
 
-  it('should allow navigation if URL is already lowercase', () => {
+  it('should allow navigation if URL is already lowercase', function () {
     const state = mockRouterState('/learn/science');
     const route = {} as ActivatedRouteSnapshot;
 
@@ -52,7 +52,7 @@ describe('NormalizeUrlCaseGuard', function () {
     expect(result).toBe(true);
   });
 
-  it('should redirect if URL contains uppercase characters', () => {
+  it('should redirect if URL contains uppercase characters', function () {
     const state = mockRouterState('/learn/SCIENCE');
     const route = {} as ActivatedRouteSnapshot;
 
@@ -63,7 +63,7 @@ describe('NormalizeUrlCaseGuard', function () {
     expect(urlTree.toString()).toBe('/learn/science');
   });
 
-  it('should redirect if URL has mixed case', () => {
+  it('should redirect if URL has mixed case', function () {
     const state = mockRouterState('/learn/ScIeNcE');
     const route = {} as ActivatedRouteSnapshot;
 
