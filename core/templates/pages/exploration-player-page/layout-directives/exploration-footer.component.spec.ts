@@ -55,7 +55,6 @@ import {PlayerPositionService} from '../services/player-position.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
 import {
@@ -131,7 +130,6 @@ describe('ExplorationFooterComponent', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
@@ -218,9 +216,6 @@ describe('ExplorationFooterComponent', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     userService = TestBed.inject(UserService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     checkpointCelebrationUtilityService = TestBed.inject(
@@ -359,8 +354,7 @@ describe('ExplorationFooterComponent', () => {
           },
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
 
       component.ngOnInit();
@@ -1039,8 +1033,7 @@ describe('ExplorationFooterComponent', () => {
       '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(

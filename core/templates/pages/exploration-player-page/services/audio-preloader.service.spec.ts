@@ -33,7 +33,6 @@ import {
 } from 'domain/exploration/ExplorationObjectFactory';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {ContextService} from 'services/context.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
@@ -76,7 +75,6 @@ describe('Audio preloader service', () => {
   });
 
   let audioPreloaderService: AudioPreloaderService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
 
@@ -306,9 +304,6 @@ describe('Audio preloader service', () => {
   beforeEach(() => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     contextService = TestBed.inject(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
@@ -318,7 +313,6 @@ describe('Audio preloader service', () => {
     const exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
     audioPreloaderService.init(exploration);
-    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
 
     let manualVoiceoverBackendDict1: VoiceoverBackendDict = {
       filename: 'a.mp3',
@@ -401,15 +395,9 @@ describe('Audio preloader service', () => {
   }));
 
   it('should return empty audioFiles list if language code is null', () => {
-    spyOn(
-      audioTranslationLanguageService,
-      'getCurrentAudioLanguageCode'
-    ).and.returnValue(null);
-
     const exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
     audioPreloaderService.init(exploration);
-    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
     );
@@ -429,5 +417,13 @@ describe('Audio preloader service', () => {
     expect(
       audioPreloaderService.getMostRecentlyRequestedAudioFilename()
     ).toEqual(filename);
+  });
+
+  it('should be able to restart audio preloader', () => {
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader');
+    audioPreloaderService.restartAudioPreloader('State 1');
+    expect(audioPreloaderService.kickOffAudioPreloader).toHaveBeenCalledWith(
+      'State 1'
+    );
   });
 });

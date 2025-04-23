@@ -28,7 +28,6 @@ import {PlayerTranscriptService} from '../services/player-transcript.service';
 import {DisplaySolutionModalComponent} from './display-solution-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {InteractionDisplayComponent} from 'components/interaction-display/interaction-display.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
@@ -101,15 +100,13 @@ describe('Display Solution Modal', () => {
   it('should intialize', () => {
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
-    let audioTranslation = {} as AudioTranslationLanguageService;
     let displayedCard = new StateCard(
       'test_name',
       'content',
       'interaction',
       interaction,
       [],
-      contentId,
-      audioTranslation
+      contentId
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
 

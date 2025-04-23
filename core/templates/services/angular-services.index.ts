@@ -234,7 +234,6 @@ import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/t
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
-import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
@@ -477,7 +476,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['AudioBarStatusService', AudioBarStatusService],
   ['AudioPreloaderService', AudioPreloaderService],
   ['AudioPlayerService', AudioPlayerService],
-  ['AudioTranslationLanguageService', AudioTranslationLanguageService],
   ['AudioTranslationManagerService', AudioTranslationManagerService],
   ['AuthBackendApiService', AuthBackendApiService],
   ['AuthService', AuthService],

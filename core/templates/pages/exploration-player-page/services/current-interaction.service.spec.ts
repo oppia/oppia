@@ -31,7 +31,6 @@ import {ContextService} from 'services/context.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -41,7 +40,6 @@ describe('Current Interaction Service', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   const displayedCard = new StateCard(
     '',
     '',
@@ -49,8 +47,7 @@ describe('Current Interaction Service', () => {
     {} as Interaction,
     [],
     {} as RecordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
 
   // This mock is required since ContextService is used in
@@ -163,8 +160,7 @@ describe('Current Interaction Service', () => {
         '<oppia-text-input-html></oppia-text-input-html>',
         interaction,
         recordedVoiceovers,
-        '',
-        audioTranslationLanguageService
+        ''
       )
     );
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');

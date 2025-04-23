@@ -95,7 +95,6 @@ import {ConversationSkinComponent} from './conversation-skin.component';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {ConversationFlowService} from '../services/conversation-flow.service';
@@ -164,7 +163,6 @@ describe('Conversation skin component', () => {
   let stateObjectFactory: StateObjectFactory;
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let conceptCardManagerService: ConceptCardManagerService;
   let solutionObjectFactory: SolutionObjectFactory;
   let voiceoverPlayerService: VoiceoverPlayerService;
@@ -504,9 +502,6 @@ describe('Conversation skin component', () => {
     fatigueDetectionService = TestBed.inject(FatigueDetectionService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     guestCollectionProgressService = TestBed.inject(
       GuestCollectionProgressService
     );
@@ -549,9 +544,6 @@ describe('Conversation skin component', () => {
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService
-    );
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
     );
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
   }));
@@ -2379,8 +2371,7 @@ describe('Conversation skin component', () => {
       'Interaction text',
       lastCardInteraction,
       null,
-      'content_id',
-      audioTranslationLanguageService
+      'content_id'
     );
     spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
@@ -2938,8 +2929,7 @@ describe('Conversation skin component', () => {
       // @ts-ignore
       null,
       null,
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
 
     let callback = (successCallback: (nextCard: StateCard) => void) => {

@@ -18,7 +18,6 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {
   InteractionBackendDict,
@@ -34,7 +33,6 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let solutionObjectFactory: SolutionObjectFactory;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
 
@@ -45,9 +43,6 @@ describe('State card object factory', () => {
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
@@ -101,8 +96,7 @@ describe('State card object factory', () => {
       '<p>Content</p>',
       '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     _sampleCard2 = StateCard.createNewCard(
       'State 2',
@@ -113,8 +107,7 @@ describe('State card object factory', () => {
       // because of the need to test validations.
       // @ts-ignore
       null,
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 

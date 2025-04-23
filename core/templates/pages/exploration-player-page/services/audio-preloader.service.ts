@@ -21,7 +21,6 @@ import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
 import {Voiceover} from 'domain/exploration/voiceover.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {ContextService} from 'services/context.service';
@@ -45,7 +44,6 @@ export class AudioPreloaderService {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private computeGraphService: ComputeGraphService,
     private contextService: ContextService
   ) {}
@@ -103,13 +101,6 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode =
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode();
-    // If the language code is not selected then there are no audio
-    // files available, so we directly return empty array.
-    if (languageCode === null) {
-      return [];
-    }
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {

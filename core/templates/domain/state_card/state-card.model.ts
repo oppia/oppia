@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {AppConstants} from 'app.constants';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
@@ -50,15 +49,13 @@ export class StateCard {
   _inputResponsePairs: InputResponsePair[];
   _contentId: string;
   _completed: boolean;
-  audioTranslationLanguageService: AudioTranslationLanguageService;
   constructor(
     stateName: string,
     contentHtml: string,
     interactionHtml: string,
     interaction: Interaction,
     inputResponsePairs: InputResponsePair[],
-    contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService
+    contentId: string
   ) {
     this._stateName = stateName;
     this._contentHtml = contentHtml;
@@ -67,7 +64,6 @@ export class StateCard {
     this._interaction = interaction;
     this._contentId = contentId;
     this._completed = false;
-    this.audioTranslationLanguageService = audioTranslationLanguageService;
   }
 
   toggleSubmitClicked(value: boolean): void {
@@ -307,15 +303,13 @@ export class StateCard {
    * @param {Interaction} interaction - An interaction object that stores all
    *        the properties of the card's interaction.
    * @param {string} contentId
-   * @param {AudioTranslationLanguageService} audioTranslationLanguageService
    */
   static createNewCard(
     stateName: string,
     contentHtml: string,
     interactionHtml: string,
     interaction: Interaction,
-    contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService
+    contentId: string
   ): StateCard {
     return new StateCard(
       stateName,
@@ -323,8 +317,7 @@ export class StateCard {
       interactionHtml,
       cloneDeep(interaction),
       [],
-      contentId,
-      audioTranslationLanguageService
+      contentId
     );
   }
 

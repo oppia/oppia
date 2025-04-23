@@ -46,7 +46,6 @@ import {
   InteractionRulesService,
 } from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ImagePreloaderService} from './image-preloader.service';
@@ -89,7 +88,6 @@ export class ExplorationEngineService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private audioPreloaderService: AudioPreloaderService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contextService: ContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -310,8 +308,7 @@ export class ExplorationEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId,
-      this.audioTranslationLanguageService
+      initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -403,12 +400,6 @@ export class ExplorationEngineService {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
-      this.audioTranslationLanguageService.init(
-        ['en'],
-        null,
-        this.exploration.getLanguageCode(),
-        explorationDict.auto_tts_enabled
-      );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this._loadInitialState(successCallback);
@@ -416,12 +407,6 @@ export class ExplorationEngineService {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
       this.version = explorationVersion;
       this.initParams([]);
-      this.audioTranslationLanguageService.init(
-        ['en'],
-        preferredAudioLanguage,
-        this.exploration.getLanguageCode(),
-        autoTtsEnabled
-      );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
         this.exploration.getInitialState().name
@@ -644,8 +629,7 @@ export class ExplorationEngineService {
       questionHtml,
       nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
-      this.exploration.getState(this.nextStateName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(this.nextStateName).content.contentId
     );
 
     const nextCardIfReallyStuck = this._getNextCardIfReallyStuck(
@@ -713,8 +697,7 @@ export class ExplorationEngineService {
       questionHtmlIfStuck,
       nextInteractionIfStuckHtml,
       this.exploration.getInteraction(this.nextStateIfStuckName),
-      this.exploration.getState(this.nextStateIfStuckName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(this.nextStateIfStuckName).content.contentId
     );
   }
 
@@ -749,8 +732,7 @@ export class ExplorationEngineService {
       contentHtml,
       interactionHtml,
       this.exploration.getInteraction(stateName),
-      this.exploration.getState(stateName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(stateName).content.contentId
     );
   }
 

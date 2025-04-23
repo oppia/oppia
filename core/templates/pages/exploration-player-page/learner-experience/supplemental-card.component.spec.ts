@@ -45,7 +45,6 @@ import {SupplementalCardComponent} from './supplemental-card.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -80,8 +79,7 @@ describe('Supplemental card component', () => {
     {} as Interaction,
     [],
     recordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
 
   class MockChangeDetectorRef {
@@ -268,8 +266,7 @@ describe('Supplemental card component', () => {
       {} as Interaction,
       [],
       recordedVoiceovers,
-      '',
-      {} as AudioTranslationLanguageService
+      ''
     );
     const changes: SimpleChanges = {
       displayedCard: {

@@ -31,7 +31,6 @@ import {ContentTranslationManagerService} from 'pages/exploration-player-page/se
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
@@ -43,7 +42,6 @@ describe('Content translation manager service', () => {
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
   let suof: SubtitledUnicodeObjectFactory;
-  let atls: AudioTranslationLanguageService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
   let imagePreloaderService: ImagePreloaderService;
@@ -57,7 +55,6 @@ describe('Content translation manager service', () => {
     iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
     suof = TestBed.inject(SubtitledUnicodeObjectFactory);
-    atls = TestBed.inject(AudioTranslationLanguageService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
 
@@ -205,8 +202,7 @@ describe('Content translation manager service', () => {
           null
         ),
         interaction,
-        'content',
-        atls
+        'content'
       )
     );
   });
@@ -408,8 +404,7 @@ describe('Content translation manager service', () => {
           null
         ),
         newInteraction,
-        'content',
-        atls
+        'content'
       )
     );
 
