@@ -45,7 +45,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {AppConstants} from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AlertsService} from 'services/alerts.service';
 import {
   AnswerGroup,

@@ -28,7 +28,7 @@ import {Rule} from 'domain/exploration/rule.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {State} from 'domain/state/StateObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 class MockNgbModal {
