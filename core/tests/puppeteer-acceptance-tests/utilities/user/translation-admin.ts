@@ -147,10 +147,10 @@ export class TranslationAdmin extends BaseUser {
   async viewContributorTranslationRightsByLanguageCode(
     languageCode: string
   ): Promise<void> {
-     // Wait for the contributor filter method dropdown to be available before selecting a filter.
-     await this.page.waitForSelector(viewContributorFilterMethodSelect);
-     // Wait for the submit button to be visible before attempting to click it.
-     await this.page.waitForSelector(viewContributorSubmitButton);
+    // Wait for the contributor filter method dropdown to be available before selecting a filter.
+    await this.page.waitForSelector(viewContributorFilterMethodSelect);
+    // Wait for the submit button to be visible before attempting to click it.
+    await this.page.waitForSelector(viewContributorSubmitButton);
 
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
