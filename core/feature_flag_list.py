@@ -51,6 +51,8 @@ class FeatureNames(enum.Enum):
     NEW_LESSON_PLAYER = 'new_lesson_player'
     ADD_VOICEOVER_WITH_ACCENT = 'add_voiceover_with_accent'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
+    ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
+    AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
     EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = (
         'exploration_editor_can_modify_translations')
     EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
@@ -59,6 +61,7 @@ class FeatureNames(enum.Enum):
     REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
     AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
         'automatic_voiceover_regeneration_from_exp')
+    LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
     SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
         'show_voiceover_tab_for_non_curated_explorations')
 
@@ -122,6 +125,9 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
