@@ -511,6 +511,10 @@ export class QuestionSubmitter extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
+    // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+    // To avoid unexpected behavior, ensure that any modifications here are also
+    // made in editDefaultResponseFeedback() in exploration-editor.ts.
+
     await this.clickOn(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
