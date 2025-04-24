@@ -490,17 +490,6 @@ export class QuestionSubmitter extends BaseUser {
 
     showMessage('Image interaction has been added successfully.');
   }
-
-  /**
-   * Function to edit the default response feedback.
-   */
-  async editDefaultResponseFeedback(): Promise<void> {
-    await this.clickOn(defaultResponseTab);
-    await this.clickOn(openOutcomeFeedBackEditorSelector);
-    await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Wrong Answer');
-    await this.clickOn(saveOutcomeFeedbackButton);
-  }
 }
 
 export let QuestionSubmitterFactory = (): QuestionSubmitter =>
