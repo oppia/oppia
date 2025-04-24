@@ -18,7 +18,7 @@
             <span class="oppia-editor-warnings-count e2e-test-warning-indicator">
               {{ getTotalWarningsCount() }}
             </span>
-            <ul class="uib-dropdown-menu dropdown-menu oppia-editor-warnings-box story-editor-warning-box" *ngIf="warningsAreShown">
+            <ul class="dropdown-menu oppia-editor-warnings-box story-editor-warning-box" *ngIf="warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
               <li class="oppia-editor-warnings-text e2e-test-warnings-text"
                   *ngFor="let issue of validationIssues.concat(explorationValidationIssues);trackBy: $index">

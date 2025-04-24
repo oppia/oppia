@@ -29,10 +29,7 @@ import {
   Interaction,
   InteractionBackendDict,
 } from 'domain/exploration/InteractionObjectFactory';
-import {
-  OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   SolutionObjectFactory,
@@ -47,7 +44,6 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
@@ -61,7 +57,6 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
@@ -667,9 +662,11 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
-    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    const newDefaultOutcome = Outcome.createFromBackendDict(
+      newDefaultOutcomeDict
+    );
     expect(testInteraction.defaultOutcome).toEqual(
-      oof.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'dest_default',
         dest_if_really_stuck: null,
         feedback: {
