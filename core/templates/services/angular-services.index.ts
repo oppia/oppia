@@ -422,7 +422,6 @@ import { ContributionAndReviewStatsService } from 'pages/contributor-dashboard-p
 import { EntityCreationService } from 'pages/topic-editor-page/services/entity-creation.service';
 import { ClassroomAdminDataService } from 'pages/classroom-admin-page/services/classroom-admin-data.service';
 import { StoryCreationBackendApiService } from 'components/entity-creation-services/story-creation-backend-api.service';
-import { VoiceoverRecordingService } from 'pages/exploration-editor-page/translation-tab/services/voiceover-recording.service';
 import { VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
 import { ConceptCardManagerService } from 'pages/exploration-player-page/services/concept-card-manager.service';
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
@@ -930,9 +929,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationNextContentIdIndexService],
   ['EntityCreationService', EntityCreationService],
   ['ClassroomAdminDataService', ClassroomAdminDataService],
-  ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['VersionHistoryService', VersionHistoryService],
-  ['VoiceoverRecordingService', VoiceoverRecordingService],
   ['RteHelperService', RteHelperService],
   ['HtmlLengthService', HtmlLengthService],
   ['ContributorDashboardAdminStatsBackendApiService',
