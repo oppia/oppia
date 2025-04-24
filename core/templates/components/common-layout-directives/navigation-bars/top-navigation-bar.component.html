@@ -114,8 +114,8 @@
                 <div
                 [ngClass]="{
                   'nav-item-left d-flex flex-column justify-content-between' : true,
-                  'nav-item-left-two-classrooms': classroomSummariesLength==2,
-                  'nav-item-left-three-classrooms': classroomSummariesLength>=3
+                  'two-columns': classroomSummariesLength == 2,
+                  'three-columns': classroomSummariesLength >= 3
                 }"
                 >
                   <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
