@@ -119,7 +119,7 @@ disable=abstract-method,
         consider-using-f-string,
         duplicate-code,
         import-outside-toplevel,
-        line-too-long
+        line-too-long,
         logging-not-lazy,
         no-else-return,
         no-member,
