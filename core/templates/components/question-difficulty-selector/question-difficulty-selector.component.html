@@ -1,6 +1,8 @@
 <mat-radio-group [ngModel]="skillWithDifficulty.getDifficulty()"
                  (change)="updateSkillWithDifficulty($event)"
-                 class="mat-radio-group-questions">
+                 class="mat-radio-group-questions"
+                 [class.single-option]="difficultyCount === 1"
+                 *ngIf="difficultyCount !== undefined">
   <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
@@ -52,6 +54,12 @@
     margin-left: 30px;
     white-space: normal;
     word-break: break-word;
+  }
+
+  /* :ng-deep is used to style the inner elements of the radio button.*/
+  /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+  ::ng-deep .single-option .mat-radio-container {
+    display: none;
   }
 
   @media only screen and (max-width: 700px) {
