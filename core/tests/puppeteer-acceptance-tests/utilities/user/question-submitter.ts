@@ -145,40 +145,6 @@ export class QuestionSubmitter extends BaseUser {
       `No opportunity found for topic "${topicName}" and skill "${skillName}"`
     );
   }
-  /**
-   * Function to add feedback for default responses of a state interaction.
-   * @param {string} defaultResponseFeedback - The feedback for the default responses.
-   * @param {string} [directToCard] - The card to direct to (optional).
-   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
-   */
-  async editDefaultResponseFeedback(
-    defaultResponseFeedback: string,
-    directToCard?: string,
-    directToCardWhenStuck?: string
-  ): Promise<void> {
-    await this.clickOn(defaultFeedbackTab);
-
-    if (defaultResponseFeedback) {
-      await this.clickOn(openOutcomeFeedBackEditor);
-      await this.clickOn(stateContentInputField);
-      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
-      await this.clickOn(saveOutcomeFeedbackButton);
-    }
-
-    if (directToCard) {
-      await this.clickOn(openOutcomeDestButton);
-      await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
-    }
-
-    if (directToCardWhenStuck) {
-      await this.clickOn(outcomeDestWhenStuckSelector);
-      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
-      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
-      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
-    }
-  }
 
   /**
    * Function to select the difficulty level of the question to be suggested.
@@ -532,6 +498,41 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(addNewResponseButton);
 
     showMessage('Image interaction has been added successfully.');
+  }
+
+  /**
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
+   */
+  async editDefaultResponseFeedback(
+    defaultResponseFeedback: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.clickOn(defaultFeedbackTab);
+
+    if (defaultResponseFeedback) {
+      await this.clickOn(openOutcomeFeedBackEditor);
+      await this.clickOn(stateContentInputField);
+      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.clickOn(saveOutcomeFeedbackButton);
+    }
+
+    if (directToCard) {
+      await this.clickOn(openOutcomeDestButton);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
   }
 }
 
