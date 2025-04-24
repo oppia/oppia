@@ -91,6 +91,10 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+
+    // Verify that the user has the translation rights.
+    await this.viewContributionRightsForUser(username);
+    await this.expectDisplayedLanguagesToContain(languageCode);
   }
 
   /**
@@ -134,6 +138,8 @@ export class TranslationAdmin extends BaseUser {
     await this.type(viewContributorUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
     await this.waitForNetworkIdle();
+    // Verify that the user is displayed in the results.
+    await this.expectUserToBeDisplayed(username);
   }
 
   /**
@@ -160,12 +166,7 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the language is displayed as a translation right.
    */
   async expectDisplayedLanguagesToContain(language: string): Promise<void> {
-    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
-    if (!elementHandle) {
-      showMessage(
-        'User list element (.e2e-test-reviewer-roles-result) not found assuming no users have rights.'
-      );
-    }
+    await this.page.waitForSelector(viewContributorLanguageResult);
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
       element => (element as HTMLElement).innerText
@@ -185,40 +186,41 @@ export class TranslationAdmin extends BaseUser {
    * Function to check if the user is displayed as a translator.
    */
   async expectUserToBeDisplayed(username: string): Promise<void> {
+    showMessage(`Waiting for user list element: ${viewLanguageRoleUserResult}`);
+    try {
+      await this.page.waitForSelector(viewLanguageRoleUserResult, { timeout: 30000 });
+      showMessage(`User list element found. Checking for username: ${username}`);
+  
+      const displayedUsers = await this.page.$eval(
+        viewLanguageRoleUserResult,
+        element => (element as HTMLElement).innerText
+      );
+  
+      if (!displayedUsers.includes(username)) {
+        throw new Error(
+          `${username} does not have translation rights for the selected language!`
+        );
+      } else {
+        showMessage(`${username} has translation rights for the selected language.`);
+      }
+    } catch (error) {
+      showMessage(`Error while waiting for user list element: ${error.message}`);
+      await this.page.screenshot({ path: 'debug-screenshot.png' });
+      throw error;
+    }
+  }
+  /**
+   * Function to check that there are no translators for the selected language.
+   */
+  async expectUserToNotBeDisplayed(username: string): Promise<void> {
     await this.page.waitForSelector(viewLanguageRoleUserResult);
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
     );
-    if (!displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} does not have translation rights for selected language!`
-      );
-    }
-  }
-
-  /**
-   * Function to check that there are no translators for the selected language.
-   */
-  async expectUserToNotBeDisplayed(username: string): Promise<void> {
-    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
-
-    // If no users are displayed, throw an error.
-    if (!elementHandle) {
-      throw new Error(
-        'No users are displayed — expected at least one user to verify absence.'
-      );
-    }
-
-    const displayedUsers = await this.page.$eval(
-      viewLanguageRoleUserResult,
-      element => (element as HTMLElement).innerText
-    );
-
-    // If the username is present in the list, throw an error.
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} has translation rights for the selected language!`
+        `${username} has translation rights for selected language!`
       );
     }
   }
