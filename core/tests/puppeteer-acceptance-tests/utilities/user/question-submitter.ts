@@ -71,10 +71,6 @@ const solutionInputTextArea =
 const submitQuestionButon = '.e2e-test-save-question-button';
 const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
-const defaultResponseTab = '.e2e-test-default-response-tab';
-const saveOutcomeFeedbackButton = '.e2e-test-save-outcome-feedback';
-const openOutcomeFeedBackEditorSelector =
-  'div.e2e-test-open-outcome-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
 const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
