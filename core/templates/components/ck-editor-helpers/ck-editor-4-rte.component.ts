@@ -314,21 +314,19 @@ export class CkEditor4RteComponent
       }
     });
 
-    var editable = document.querySelectorAll('.oppia-rte-resizer');
+    var editable =
+      this.elementRef.nativeElement.querySelectorAll('.oppia-rte-resizer');
+
     var resize = () => {
-      // TODO(#12882): Remove the use of jQuery.
-      $('.oppia-rte-resizer').css({
-        width: '100%',
+      editable.forEach((element: HTMLElement) => {
+        this.renderer.setStyle(element, 'width', '100%');
       });
     };
-    for (let i of Object.keys(editable)) {
-      (editable[i] as HTMLElement).onchange = () => {
-        resize();
-      };
-      (editable[i] as HTMLElement).onclick = () => {
-        resize();
-      };
-    }
+
+    editable.forEach((element: HTMLElement) => {
+      this.renderer.listen(element, 'change', resize);
+      this.renderer.listen(element, 'click', resize);
+    });
 
     /**
      * Create rules to allow all the rich text components and
@@ -424,48 +422,80 @@ export class CkEditor4RteComponent
       // Set the css and icons for each toolbar button.
       names.forEach((name, index) => {
         var icon = icons[index];
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_button__oppia' + name)
-          .css('background-image', 'url("/extensions' + icon + '")')
-          .css('background-position', 'center')
-          .css('background-repeat', 'no-repeat')
-          .css('height', '24px')
-          .css('width', '24px')
-          .css('padding', '0px 0px');
+        var button = this.elementRef.nativeElement.querySelector(
+          '.cke_button__oppia' + name
+        );
+
+        if (button) {
+          this.renderer.setStyle(
+            button,
+            'background-image',
+            `url("/extensions${icon}")`
+          );
+          this.renderer.setStyle(button, 'background-position', 'center');
+          this.renderer.setStyle(button, 'background-repeat', 'no-repeat');
+          this.renderer.setStyle(button, 'height', '24px');
+          this.renderer.setStyle(button, 'width', '24px');
+          this.renderer.setStyle(button, 'padding', '0px 0px');
+        }
       });
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_toolbar_separator').css('height', '22px');
+      var separators = this.elementRef.nativeElement.querySelectorAll(
+        '.cke_toolbar_separator'
+      );
+      separators.forEach((separator: HTMLElement) => {
+        this.renderer.setStyle(separator, 'height', '22px');
+      });
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_button_icon').css('height', '24px').css('width', '24px');
+      var buttonIcon =
+        this.elementRef.nativeElement.querySelector('.cke_button_icon');
+      if (buttonIcon) {
+        this.renderer.setStyle(buttonIcon, 'height', '24px');
+        this.renderer.setStyle(buttonIcon, 'width', '24px');
+      }
 
       var changeComboPanel = () => {
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combopanel').css('height', '100px').css('width', '120px');
+        var comboPanel =
+          this.elementRef.nativeElement.querySelector('.cke_combopanel');
+        if (comboPanel) {
+          this.renderer.setStyle(comboPanel, 'height', '100px');
+          this.renderer.setStyle(comboPanel, 'width', '120px');
+        }
       };
 
-      // TODO(#12882): Remove the use of jQuery.
-      Array.from(document.querySelectorAll('.cke_combo_button')).forEach(
-        (button: HTMLElement) => {
-          this.renderer.setStyle(button, 'height', '29px');
-          this.renderer.setStyle(button, 'width', '62px');
-          this.renderer.setStyle(button, 'margin-right', '25px');
-          this.renderer.listen(button, 'click', () => {
-            setTimeout(() => changeComboPanel(), 25);
-          });
-        }
-      );
+      var comboButton =
+        this.elementRef.nativeElement.querySelector('.cke_combo_button');
+      if (comboButton) {
+        this.renderer.setStyle(comboButton, 'height', '29px');
+        this.renderer.setStyle(comboButton, 'width', '62px');
+        this.renderer.setStyle(comboButton, 'margin-right', '25px');
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_open').css('margin-left', '-20px').css('margin-top', '2px');
+        this.renderer.listen(comboButton, 'click', () => {
+          setTimeout(() => changeComboPanel(), 25);
+        });
+      }
 
-      // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_text').css('padding', '2px 5px 0px');
+      var comboOpen =
+        this.elementRef.nativeElement.querySelector('.cke_combo_open');
+      if (comboOpen) {
+        this.renderer.setStyle(comboOpen, 'margin-left', '-20px');
+        this.renderer.setStyle(comboOpen, 'margin-top', '2px');
+      }
+
+      const comboText =
+        this.elementRef.nativeElement.querySelector('.cke_combo_text');
+      if (comboText) {
+        this.renderer.setStyle(comboText, 'padding', '2px 5px 0px');
+      }
 
       if (!this.headersEnabled) {
-        // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combo__format').css('display', 'none');
+        const formatCombo =
+          this.elementRef.nativeElement.querySelector('.cke_combo__format');
+        if (formatCombo) {
+          this.renderer.setStyle(formatCombo, 'display', 'none');
+        }
       }
 
       if (!this.internetConnectivityService.isOnline()) {
