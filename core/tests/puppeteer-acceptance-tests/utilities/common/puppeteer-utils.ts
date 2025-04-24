@@ -82,7 +82,7 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
-      '--start-fullscreen',
+      '--window-size=1285,1000',
       '--use-fake-ui-for-media-stream',
     ];
 
