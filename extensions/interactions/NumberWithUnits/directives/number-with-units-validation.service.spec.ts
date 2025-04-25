@@ -278,19 +278,21 @@ describe('NumberWithUnitsValidationService', () => {
     ]);
   });
 
-  it('should not catch equivalent followed by equals with non-equivalent' +
-      ' values', () => {
-    answerGroups[0].rules = [
-      equivalentToTwoThousandRule,
-      equalsTwoByThreeRule,
-    ];
-    var warnings = validatorService.getAllWarnings(
-      currentState,
-      {},
-      answerGroups,
-      goodDefaultOutcome
-    );
-    expect(warnings).toEqual([]);
+  it(
+    'should not catch equivalent followed by equals with non-equivalent' +
+      ' values',
+    () => {
+      answerGroups[0].rules = [
+        equivalentToTwoThousandRule,
+        equalsTwoByThreeRule,
+      ];
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        {},
+        answerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([]);
     }
   );
 
