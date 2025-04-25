@@ -17,7 +17,6 @@
  */
 
 import path from 'path';
-import {VoiceoverAdmin} from '../user/voiceover-admin';
 
 export default {
   URLs: {

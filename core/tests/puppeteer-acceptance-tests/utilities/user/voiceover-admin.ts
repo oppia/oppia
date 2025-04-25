@@ -284,7 +284,6 @@ export class VoiceoverAdmin extends BaseUser {
       const textContent = await option.evaluate(
         el => el.textContent?.trim() || ''
       );
-      console.log(textContent);
       if (textContent === languageAccentCode) {
         await option.click();
         break;
