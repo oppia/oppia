@@ -45,17 +45,17 @@ if MYPY:  # pragma: no cover
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
 @validation_decorators.AuditsExisting(
-    feedback_models.GeneralFeedbackThreadModel)
+    feedback_models.GeneralGeneralFeedBackThreadModelModel)
 class ValidateEntityType(beam.DoFn):  # type: ignore[misc]
     """DoFn to validate the entity type."""
 
     def process(
-        self, input_model: feedback_models.GeneralFeedbackThreadModel
+        self, input_model: feedback_models.GeneralGeneralFeedBackThreadModelModel
     ) -> Iterator[feedback_validation_errors.InvalidEntityTypeError]:
         """Function that checks if the entity type is valid
 
         Args:
-            input_model: feedback_models.GeneralFeedbackThreadModel.
+            input_model: feedback_models.GeneralGeneralFeedBackThreadModelModel.
                 Entity to validate.
 
         Yields:

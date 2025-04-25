@@ -426,7 +426,7 @@ class BlogPostReadsAggregatedStatsModel(base_models.BaseModel):
         return entity
 
 
-class BlogPostReadingTimeModel(base_models.BaseModel):
+class AuthorBlogPostAggregatedReadingTimeModel(base_models.BaseModel):
     """A summary model to store total number of users staying for a particular
     time on the blog post. It will be updated as soon as the user leaves the
     blog post completely.
@@ -500,15 +500,15 @@ class BlogPostReadingTimeModel(base_models.BaseModel):
         })
 
     @classmethod
-    def create(cls, blog_post_id: str) -> BlogPostReadingTimeModel:
-        """Creates a new BlogPostReadingTimeModel entry.
+    def create(cls, blog_post_id: str) -> AuthorBlogPostAggregatedReadingTimeModel:
+        """Creates a new AuthorBlogPostAggregatedReadingTimeModel entry.
 
         Args:
             blog_post_id: str. Blog Post ID of the newly-published blog post for
                 which the stats model has to be created.
 
         Returns:
-            BlogPostReadingTimeModel. The newly created BlogPostReadingTimeModel
+            AuthorBlogPostAggregatedReadingTimeModel. The newly created AuthorBlogPostAggregatedReadingTimeModel
             instance.
 
         Raises:

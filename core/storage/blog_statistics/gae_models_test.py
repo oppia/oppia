@@ -569,8 +569,8 @@ class BlogPostReadsAggregatedStatsModelUnitTests(test_utils.GenericTestBase):
         )
 
 
-class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
-    """Test the BlogPostReadingTimeModel class."""
+class AuthorBlogPostAggregatedReadingTimeModelUnitTests(test_utils.GenericTestBase):
+    """Test the AuthorBlogPostAggregatedReadingTimeModel class."""
 
     BLOG_POST_ONE_ID: Final = 'blog_post_one'
     BLOG_POST_TWO_ID: Final = 'blog_post_two'
@@ -583,7 +583,7 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.model_one = (
-            blog_stats_models.BlogPostReadingTimeModel(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel(
                 id=self.BLOG_POST_ONE_ID,
                 zero_to_one_min=0,
                 one_to_two_min=0,
@@ -603,22 +603,22 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
     def test_create_and_get_stats_models(self) -> None:
-        blog_stats_models.BlogPostReadingTimeModel.create(
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
             self.BLOG_POST_TWO_ID
         )
-        stats_model = blog_stats_models.BlogPostReadingTimeModel.get(
+        stats_model = blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.get(
             self.BLOG_POST_TWO_ID)
 
         self.assertEqual(stats_model.id, self.BLOG_POST_TWO_ID)
 
     def test_create_raises_exception_with_existing_blog_id(self) -> None:
-        blog_stats_models.BlogPostReadingTimeModel.create(
+        blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
             self.BLOG_POST_THREE_ID
         )
 
@@ -626,13 +626,13 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
             Exception,
             'A blog post reading time model with the given blog post ID'
             'exists already.'):
-            blog_stats_models.BlogPostReadingTimeModel.create(
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel.create(
                 self.BLOG_POST_THREE_ID
             )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
                 .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
@@ -655,7 +655,7 @@ class BlogPostReadingTimeModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
-            blog_stats_models.BlogPostReadingTimeModel
+            blog_stats_models.AuthorBlogPostAggregatedReadingTimeModel
                 .get_export_policy(),
             expected_export_policy_dict
         )

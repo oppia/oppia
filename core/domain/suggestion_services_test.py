@@ -156,7 +156,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         create_suggestion.
         """
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
                 exp_fetchers, 'get_exploration_by_id',
@@ -532,7 +532,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             }
         }
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             with self.swap(
                 exp_fetchers, 'get_exploration_by_id',
@@ -2771,7 +2771,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_create_and_accept_suggestion(self) -> None:
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -4839,7 +4839,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_create_and_reject_suggestion(self) -> None:
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -4866,7 +4866,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_create_and_accept_suggestion_with_message(self) -> None:
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -4895,7 +4895,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     def test_auto_reject_translation_suggestions_for_content_ids(self) -> None:
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             self.create_translation_suggestion_associated_with_exp(
                 self.EXP_ID, self.author_id)

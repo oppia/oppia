@@ -24,7 +24,7 @@ from core.domain import feedback_domain
 from core.tests import test_utils
 
 
-class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     THREAD_ID = 'exp0.thread0'
 
@@ -36,7 +36,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_thread_dict: feedback_domain.FeedbackThreadDict = {
+        expected_thread_dict: feedback_domain.GeneralFeedBackThreadModelDict = {
             'thread_id': self.THREAD_ID,
             'status': 'open',
             'state_name': 'a_state_name',
@@ -48,7 +48,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'last_nonempty_message_text': 'last message',
             'last_nonempty_message_author_id': self.viewer_id,
         }
-        observed_thread = feedback_domain.FeedbackThread(
+        observed_thread = feedback_domain.GeneralFeedBackThreadModel(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
@@ -61,7 +61,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        thread = feedback_domain.FeedbackThread(
+        thread = feedback_domain.GeneralFeedBackThreadModel(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             'a_state_name', self.viewer_id, 'open', 'a subject',
             # This value of "5" decides the number of messages.
@@ -76,7 +76,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        thread = feedback_domain.FeedbackThread(
+        thread = feedback_domain.GeneralFeedBackThreadModel(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             'a_state_name', self.viewer_id, 'open', 'a subject',
             # This value of "1" decides the number of messages.
@@ -87,7 +87,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             thread.get_last_two_message_ids(), ['exp0.thread0.0', None])
 
 
-class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
+class GeneralFeedbackMessageModel1DomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     MESSAGE_ID = 0
     THREAD_ID = 'exploration.exp0.thread0'
@@ -100,7 +100,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        expected_message_dict: feedback_domain.FeedbackMessageDict = {
+        expected_message_dict: feedback_domain.GeneralFeedbackMessageModel1Dict = {
             'author_id': self.owner_id,
             'created_on_msecs': utils.get_time_in_millisecs(fake_date),
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
@@ -110,7 +110,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             'updated_status': 'open',
             'updated_subject': 'an updated subject'
         }
-        observed_message = feedback_domain.FeedbackMessage(
+        observed_message = feedback_domain.GeneralFeedbackMessageModel1(
             self.FULL_MESSAGE_ID, self.THREAD_ID, self.MESSAGE_ID,
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
@@ -131,7 +131,7 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
         })
 
 
-class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
+class GeneralFeedbackMessageModel1ReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -141,7 +141,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         expected_feedback_message_reference: (
-            feedback_domain.FeedbackMessageReferenceDict
+            feedback_domain.GeneralFeedbackMessageModel1ReferenceDict
         ) = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
@@ -150,7 +150,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         }
 
         observed_feedback_message_reference = (
-            feedback_domain.FeedbackMessageReference(
+            feedback_domain.GeneralFeedbackMessageModel1Reference(
                 feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.thread_id,
                 self.message_id))
 

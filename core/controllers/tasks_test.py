@@ -235,8 +235,8 @@ class TasksTests(test_utils.EmailTestBase):
                 self.USER_A_EMAIL)
             self.assertEqual(len(mock_email_messages), 0)
 
-            # Invoke InstantFeedbackMessageEmail which sends
-            # instantFeedbackMessage.
+            # Invoke InstantGeneralFeedbackMessageModel1Email which sends
+            # instantGeneralFeedbackMessageModel1.
             self.process_and_flush_pending_tasks()
 
             # Ensure that user A has an email sent now.

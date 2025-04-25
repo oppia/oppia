@@ -261,7 +261,7 @@ class RelationshipsOfTests(test_utils.TestBase):
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'general_feedback_thread_ids'),
-            ['GeneralFeedbackThreadModel'])
+            ['GeneralGeneralFeedBackThreadModelModel'])
         self.assertItemsEqual(
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserSubscriptionsModel', 'creator_ids'),

@@ -112,8 +112,8 @@ class MatchEntityTypeCollectionJob(base_jobs.JobBase):
         """
         feedback_model_matched_as_collection = (
             self.pipeline
-            | 'Get all GeneralFeedbackThread models' >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadModel.get_all())
+            | 'Get all GeneralGeneralFeedBackThreadModel models' >> ndb_io.GetModels(
+                feedback_models.GeneralGeneralFeedBackThreadModelModel.get_all())
             | 'Extract entity_type' >> beam.Map(
                     lambda feeback_model: feeback_model.entity_type)
             | 'Match entity_type' >> beam.Filter(

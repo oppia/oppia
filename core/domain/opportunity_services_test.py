@@ -150,7 +150,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
     def mock_generate_new_thread_id_for_suggestion(
         self,
-        unused_entity_type: feedback_models.GeneralFeedbackThreadModel,
+        unused_entity_type: feedback_models.GeneralGeneralFeedBackThreadModelModel,
         unused_entity_id: str
     ) -> str:
         """Mock generate_new_thread_id function when creating suggestions."""
@@ -163,7 +163,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         assertions.
         """
         with self.swap(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id_for_suggestion):
             suggestion_services.create_suggestion(

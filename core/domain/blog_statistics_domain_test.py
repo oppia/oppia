@@ -101,7 +101,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         """Set up for testing blog post reading domain object."""
         super().setUp()
 
-        self.stats_obj = blog_statistics_domain.BlogPostReadingTime(
+        self.stats_obj = blog_statistics_domain.AuthorBlogPostAggregatedReadingTime(
             blog_post_id='sampleId2345',
             zero_to_one_min=100,
             one_to_two_min=20,

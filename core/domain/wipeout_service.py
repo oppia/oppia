@@ -1443,9 +1443,9 @@ def _pseudonymize_feedback_models(
     # for each collection (e.g. a suggestion thread with a few messages) of
     # these models we generate a pseudonymous user ID and replace the user ID
     # with that pseudonymous user ID in all the models.
-    feedback_thread_model_class = feedback_models.GeneralFeedbackThreadModel
+    feedback_thread_model_class = feedback_models.GeneralGeneralFeedBackThreadModelModel
     feedback_thread_models: Sequence[
-        feedback_models.GeneralFeedbackThreadModel
+        feedback_models.GeneralGeneralFeedBackThreadModelModel
     ] = feedback_thread_model_class.query(
         datastore_services.any_of(
             feedback_thread_model_class.original_author_id == user_id,
@@ -1454,9 +1454,9 @@ def _pseudonymize_feedback_models(
         )).fetch()
     feedback_ids = set(model.id for model in feedback_thread_models)
 
-    feedback_message_model_class = feedback_models.GeneralFeedbackMessageModel
+    feedback_message_model_class = feedback_models.GeneralGeneralFeedbackMessageModel1Model
     feedback_message_models: Sequence[
-        feedback_models.GeneralFeedbackMessageModel
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model
     ] = feedback_message_model_class.query(
         feedback_message_model_class.author_id == user_id
     ).fetch()

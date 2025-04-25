@@ -134,7 +134,7 @@ class BlogPostReadsAggregatedStats:
                 'Blog ID %s is invalid' % self.blog_post_id)
 
 
-class BlogPostReadingTime:
+class AuthorBlogPostAggregatedReadingTime:
     """Domain object representing blog post reading time model."""
 
     def __init__(
@@ -152,7 +152,7 @@ class BlogPostReadingTime:
         nine_to_ten_min: int,
         more_than_ten_min: int,
     ) -> None:
-        """Constructs an BlogPostReadingTime domain object.
+        """Constructs an AuthorBlogPostAggregatedReadingTime domain object.
 
         Args:
             blog_post_id: str. ID of the blog post.
@@ -344,7 +344,7 @@ class AuthorBlogPostsReadingTime:
         nine_to_ten_min: int,
         more_than_ten_min: int,
     ) -> None:
-        """Constructs an BlogPostReadingTime domain object.
+        """Constructs an AuthorBlogPostAggregatedReadingTime domain object.
 
         Args:
             author_id: str. User ID of the author.

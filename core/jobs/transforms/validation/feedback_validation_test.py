@@ -37,7 +37,7 @@ if MYPY:  # pragma: no cover
 class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
 
     def test_model_with_invalid_entity_type_raises_error(self) -> None:
-        model = feedback_models.GeneralFeedbackThreadModel(
+        model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id='123',
             entity_id='123',
             subject='test_subject',
@@ -56,7 +56,7 @@ class ValidateEntityTypeTests(job_test_utils.PipelinedTestBase):
         ])
 
     def test_model_with_valid_entity_type_raises_no_error(self) -> None:
-        model = feedback_models.GeneralFeedbackThreadModel(
+        model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id='123',
             entity_id='123',
             subject='test_subject',

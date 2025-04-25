@@ -162,7 +162,7 @@ def create_suggestion(
     change_cmd: Mapping[str, change_domain.AcceptableChangeDictTypes],
     description: Optional[str]
 ) -> suggestion_registry.BaseSuggestion:
-    """Creates a new SuggestionModel and the corresponding FeedbackThread.
+    """Creates a new SuggestionModel and the corresponding GeneralFeedBackThreadModel.
 
     Args:
         suggestion_type: str. The type of the suggestion. This parameter should

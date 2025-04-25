@@ -314,33 +314,33 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
-class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelCreatedEventHandlerTests(test_utils.GenericTestBase):
 
     def test_new_feedback_thread_creation_events(self) -> None:
 
         exp_id = 'exp_id'
 
-        event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
+        event_services.GeneralFeedBackThreadModelCreatedEventHandler.record(exp_id)
         thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 1)
         self.assertEqual(thread.num_total_threads, 1)
 
-        event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
+        event_services.GeneralFeedBackThreadModelCreatedEventHandler.record(exp_id)
         thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 2)
         self.assertEqual(thread.num_total_threads, 2)
 
 
-class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelStatusChangedEventHandlerTests(test_utils.GenericTestBase):
 
     def test_recording_reopening_feedback_thread_events(self) -> None:
 
         exp_id = 'exp_id'
 
         # Changing Status from closed to open.
-        event_services.FeedbackThreadStatusChangedEventHandler.record(
+        event_services.GeneralFeedBackThreadModelStatusChangedEventHandler.record(
             exp_id, '', feedback_models.STATUS_CHOICES_OPEN)
 
         thread = feedback_services.get_thread_analytics(exp_id)
@@ -348,7 +348,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(thread.num_open_threads, 1)
 
         # Changing Status from open to closed.
-        event_services.FeedbackThreadStatusChangedEventHandler.record(
+        event_services.GeneralFeedBackThreadModelStatusChangedEventHandler.record(
             exp_id, feedback_models.STATUS_CHOICES_OPEN, '')
 
         thread = feedback_services.get_thread_analytics(exp_id)
@@ -527,8 +527,8 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
             'CompleteExplorationEventHandler', 'RateExplorationEventHandler',
             'StateHitEventHandler', 'StateCompleteEventHandler',
             'LeaveForRefresherExpEventHandler',
-            'FeedbackThreadCreatedEventHandler',
-            'FeedbackThreadStatusChangedEventHandler'
+            'GeneralFeedBackThreadModelCreatedEventHandler',
+            'GeneralFeedBackThreadModelStatusChangedEventHandler'
         ]
 
         self.assertEqual(

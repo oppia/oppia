@@ -169,7 +169,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
     def test_match_single_collection(self) -> None:
         feedback_thread_model = self.create_model(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
             entity_type=self.ENTITY_TYPE,
             entity_id=self.ENTITY_ID,
@@ -189,7 +189,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
     def test_match_multiple_collection(self) -> None:
         feedback_thread_model = self.create_model(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             id='%s.%s.%s' % (self.ENTITY_TYPE, self.ENTITY_ID, 'random'),
             entity_type=self.ENTITY_TYPE,
             entity_id=self.ENTITY_ID,
@@ -204,7 +204,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
         feedback_thread_model.put()
 
         feedback_thread_model1 = self.create_model(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             id='%s.%s.%s' % (self.ENTITY_TYPE_1, self.ENTITY_ID_1, 'random'),
             entity_type=self.ENTITY_TYPE_1,
             entity_id=self.ENTITY_ID_1,
@@ -219,7 +219,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
         feedback_thread_model1.put()
 
         feedback_thread_model2 = self.create_model(
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             id='%s.%s.%s' % (self.ENTITY_TYPE_2, self.ENTITY_ID_2, 'random'),
             entity_type=self.ENTITY_TYPE_2,
             entity_id=self.ENTITY_ID_2,

@@ -929,9 +929,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         exp_services.delete_explorations(self.owner_id, [self.EXP_0_ID])
 
-        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+        self.assertIsNone(feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
             thread_1_id))
-        self.assertIsNone(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+        self.assertIsNone(feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
             thread_2_id))
 
     def test_exploration_is_removed_from_index_when_deleted(self) -> None:

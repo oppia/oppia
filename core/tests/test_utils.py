@@ -4042,7 +4042,7 @@ version: 1
         }
         if suggestion_id is None:
             suggestion_id = (
-                feedback_models.GeneralFeedbackThreadModel.
+                feedback_models.GeneralGeneralFeedBackThreadModelModel.
                 generate_new_thread_id(
                     feconf.ENTITY_TYPE_SKILL, skill_id))
         suggestion_models.GeneralSuggestionModel.create(

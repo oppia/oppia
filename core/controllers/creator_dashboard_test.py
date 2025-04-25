@@ -478,7 +478,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
         user_models.UserContributionProficiencyModel.create(
             self.owner_id, 'category1', 15)
-        model1 = feedback_models.GeneralFeedbackThreadModel.create(
+        model1 = feedback_models.GeneralGeneralFeedBackThreadModelModel.create(
             'exploration.exp1.thread_1')
         model1.entity_type = 'exploration'
         model1.entity_id = 'exp1'

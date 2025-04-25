@@ -1688,7 +1688,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 sent_email_model1.email_hash, sent_email_model3.email_hash)
 
 
-class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
+class GeneralFeedbackMessageModel1BatchEmailTests(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -1711,7 +1711,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False)]
     )
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
+        feedback_messages: Dict[str, email_manager.GeneralFeedbackMessageModel1sDict] = {
             self.exploration.id: {
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
@@ -1729,7 +1729,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
     def test_email_not_sent_if_can_send_transactional_emails_is_false(
         self
     ) -> None:
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
+        feedback_messages: Dict[str, email_manager.GeneralFeedbackMessageModel1sDict] = {
             self.exploration.id: {
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
@@ -1746,7 +1746,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_that_email_not_sent_if_feedback_messages_are_empty(self) -> None:
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
+        feedback_messages: Dict[str, email_manager.GeneralFeedbackMessageModel1sDict] = {}
         with self.can_send_feedback_email_ctx:
             email_manager.send_feedback_message_email(
                 self.editor_id, feedback_messages)
@@ -1802,7 +1802,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             '\n'
             'You can change your email preferences via the Preferences page.')
 
-        feedback_messages: Dict[str, email_manager.FeedbackMessagesDict] = {
+        feedback_messages: Dict[str, email_manager.GeneralFeedbackMessageModel1sDict] = {
             self.exploration.id: {
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
@@ -2063,7 +2063,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION)
 
 
-class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
+class GeneralFeedbackMessageModel1InstantEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
         super().setUp()
 

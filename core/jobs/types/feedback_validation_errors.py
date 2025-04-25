@@ -32,7 +32,7 @@ class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
     """Error class for models that have invalid entity type."""
 
     def __init__(
-        self, model: feedback_models.GeneralFeedbackThreadModel
+        self, model: feedback_models.GeneralGeneralFeedBackThreadModelModel
     ) -> None:
         message = 'entity type %s is invalid.' % model.entity_type
         super().__init__(message, model)

@@ -625,7 +625,7 @@ URLS = [
     get_redirect_route(
         r'%s/<thread_id>' %
         feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
-        feedback_updates.FeedbackThreadHandler),
+        feedback_updates.GeneralFeedBackThreadModelHandler),
     get_redirect_route(
         r'%s' % feconf.MERGE_SKILLS_URL,
         topics_and_skills_dashboard.MergeSkillHandler),
@@ -892,11 +892,11 @@ URLS = [
         recent_commits.RecentCommitsHandler),
     get_redirect_route(
         r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
-        feedback.RecentFeedbackMessagesHandler),
+        feedback.RecentGeneralFeedbackMessageModel1sHandler),
 
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
-        feedback.FeedbackThreadViewEventHandler),
+        feedback.GeneralFeedBackThreadModelViewEventHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler),
@@ -1346,10 +1346,10 @@ URLS.extend((
         tasks.FlagExplorationEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
-        tasks.InstantFeedbackMessageEmailHandler),
+        tasks.InstantGeneralFeedbackMessageModel1EmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_FEEDBACK_STATUS_EMAILS,
-        tasks.FeedbackThreadStatusChangeEmailHandler),
+        tasks.GeneralFeedBackThreadModelStatusChangeEmailHandler),
     get_redirect_route(
         r'%s' % feconf.TASK_URL_DEFERRED, tasks.DeferredTasksHandler),
 ))

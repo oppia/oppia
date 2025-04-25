@@ -30,9 +30,9 @@ from __future__ import annotations
 
 HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'DeferredTasksHandler',
-    'FeedbackThreadStatusChangeEmailHandler',
+    'GeneralFeedBackThreadModelStatusChangeEmailHandler',
     'FlagExplorationEmailHandler',
-    'InstantFeedbackMessageEmailHandler',
+    'InstantGeneralFeedbackMessageModel1EmailHandler',
     'PreferencesHandler',
     'QuestionCreationHandler',
     'UnsentFeedbackEmailHandler',

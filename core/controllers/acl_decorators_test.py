@@ -1152,7 +1152,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
-class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
+class CommentOnGeneralFeedBackThreadModelTests(test_utils.GenericTestBase):
     """Tests for can_comment_on_feedback_thread decorator."""
 
     published_exp_id = 'exp_0'
@@ -1287,7 +1287,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class CreateFeedbackThreadTests(test_utils.GenericTestBase):
+class CreateGeneralFeedBackThreadModelTests(test_utils.GenericTestBase):
     """Tests for can_create_feedback_thread decorator."""
 
     published_exp_id = 'exp_0'
@@ -1380,7 +1380,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ViewFeedbackThreadTests(test_utils.GenericTestBase):
+class ViewGeneralFeedBackThreadModelTests(test_utils.GenericTestBase):
     """Tests for can_view_feedback_thread decorator."""
 
     published_exp_id = 'exp_0'

@@ -35,7 +35,7 @@ class InvalidEntityTypeErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self) -> None:
-        model = feedback_models.GeneralFeedbackThreadModel(
+        model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id='123',
             entity_id='123',
             subject='test_subject',
@@ -47,5 +47,5 @@ class InvalidEntityTypeErrorTests(
 
         self.assertEqual(
             error.stderr,
-            'InvalidEntityTypeError in GeneralFeedbackThreadModel(id="123"):'
+            'InvalidEntityTypeError in GeneralGeneralFeedBackThreadModelModel(id="123"):'
             ' entity type %s is invalid.' % model.entity_type)

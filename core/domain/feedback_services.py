@@ -119,9 +119,9 @@ def _create_models_for_thread_and_first_message(
         str. The id of the new thread.
     """
     thread_id = (
-        feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
+        feedback_models.GeneralGeneralFeedBackThreadModelModel.generate_new_thread_id(
             entity_type, entity_id))
-    thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
+    thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.create(thread_id)
     thread.entity_type = entity_type
     thread.entity_id = entity_id
     thread.original_author_id = original_author_id
@@ -176,7 +176,7 @@ def create_message(
     text: str,
     received_via_email: bool = False,
     should_send_email: bool = True
-) -> feedback_domain.FeedbackMessage:
+) -> feedback_domain.GeneralFeedbackMessageModel1:
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
@@ -197,11 +197,11 @@ def create_message(
             the email buffer.
 
     Returns:
-        FeedbackMessage. The domain object representing the new message added
+        GeneralFeedbackMessageModel1. The domain object representing the new message added
         in the datastore.
 
     Raises:
-        Exception. GeneralFeedbackThreadModel entity not found.
+        Exception. GeneralGeneralFeedBackThreadModelModel entity not found.
     """
     return create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
@@ -217,7 +217,7 @@ def create_messages(
     text: str,
     received_via_email: bool = False,
     should_send_email: bool = True
-) -> List[feedback_domain.FeedbackMessage]:
+) -> List[feedback_domain.GeneralFeedbackMessageModel1]:
     """Creates a new message for each of the distinct threads in thread_ids and
     for each message, subscribes the author to the thread.
 
@@ -239,12 +239,12 @@ def create_messages(
             the email buffer.
 
     Returns:
-        list(FeedbackMessage). The domain objects representing the new messages
+        list(GeneralFeedbackMessageModel1). The domain objects representing the new messages
         added in the datastore.
 
     Raises:
         Exception. Thread_ids must be distinct.
-        Exception. One or more GeneralFeedbackThreadModel entities not found.
+        Exception. One or more GeneralGeneralFeedBackThreadModelModel entities not found.
     """
     from core.domain import event_services
 
@@ -256,11 +256,11 @@ def create_messages(
     # Get the threads at the outset, in order to check that there are models
     # corresponding to each of the thread_ids.
     thread_models_with_none = (
-        feedback_models.GeneralFeedbackThreadModel.get_multi(
+        feedback_models.GeneralGeneralFeedBackThreadModelModel.get_multi(
             thread_ids
         )
     )
-    thread_models: List[feedback_models.GeneralFeedbackThreadModel] = []
+    thread_models: List[feedback_models.GeneralGeneralFeedBackThreadModelModel] = []
     thread_ids_that_do_not_have_models = []
     for index, thread_model in enumerate(thread_models_with_none):
         if thread_model is None:
@@ -272,7 +272,7 @@ def create_messages(
             len(thread_ids_that_do_not_have_models) > 1
         )
         raise Exception(
-            'Thread%s belonging to the GeneralFeedbackThreadModel class with '
+            'Thread%s belonging to the GeneralGeneralFeedBackThreadModelModel class with '
             'id%s:[%s] %s not found.' % (
                 's' if multiple_thread_models_are_missing else '',
                 's' if multiple_thread_models_are_missing else '',
@@ -284,7 +284,7 @@ def create_messages(
     # Get the corresponding message ids, which are required for message
     # creation.
     message_ids = (
-        feedback_models.GeneralFeedbackMessageModel.get_message_counts(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_message_counts(
             thread_ids)
     )
 
@@ -296,8 +296,8 @@ def create_messages(
             feedback_domain.FullyQualifiedMessageIdentifier(
                 thread_id, message_id))
 
-    # Create the GeneralFeedbackMessageModel instances.
-    message_models = feedback_models.GeneralFeedbackMessageModel.create_multi(
+    # Create the GeneralGeneralFeedbackMessageModel1Model instances.
+    message_models = feedback_models.GeneralGeneralFeedbackMessageModel1Model.create_multi(
         message_identifiers)
 
     # Update the message instances.
@@ -314,23 +314,23 @@ def create_messages(
             if message_model.message_id == 0:
                 # New thread.
                 if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                    event_services.FeedbackThreadCreatedEventHandler.record(
+                    event_services.GeneralFeedBackThreadModelCreatedEventHandler.record(
                         thread_model.entity_id)
             else:
                 # Thread status changed.
                 if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
                     (
                         event_services
-                        .FeedbackThreadStatusChangedEventHandler
+                        .GeneralFeedBackThreadModelStatusChangedEventHandler
                         .record(
                             thread_model.entity_id, thread_model.status,
                             updated_status)
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
-    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+    feedback_models.GeneralGeneralFeedbackMessageModel1Model.update_timestamps_multi(
         message_models)
-    feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
+    feedback_models.GeneralGeneralFeedbackMessageModel1Model.put_multi(message_models)
 
     # Update the message data cache of the threads.
     for thread_model in thread_models:
@@ -355,9 +355,9 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
-    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+    feedback_models.GeneralGeneralFeedBackThreadModelModel.update_timestamps_multi(
         thread_models)
-    feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
+    feedback_models.GeneralGeneralFeedBackThreadModelModel.put_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
     # the thread, so that the last_updated time changes to show that there is
@@ -408,7 +408,7 @@ def create_messages(
         subscription_services.subscribe_to_threads(author_id, thread_ids)
         add_message_ids_to_read_by_list(author_id, message_identifiers)
 
-    # Convert the GeneralFeedbackMessageModels into a list of FeedbackMessage
+    # Convert the GeneralGeneralFeedbackMessageModel1Models into a list of GeneralFeedbackMessageModel1
     # domain objects.
     feedback_messages = [
         _get_message_from_model(message_model) for message_model in
@@ -431,8 +431,8 @@ def _get_threads_user_info_keys(
         model.
     """
     if thread_ids:
-        datastore_keys = feedback_models.GeneralFeedbackThreadUserModel.query(
-            feedback_models.GeneralFeedbackThreadUserModel.thread_id.IN(
+        datastore_keys = feedback_models.GeneralGeneralFeedBackThreadModelUserModel.query(
+            feedback_models.GeneralGeneralFeedBackThreadModelUserModel.thread_id.IN(
                 thread_ids)
         ).fetch(keys_only=True)
         # Here, we are narrowing down the type from sequence to list.
@@ -462,11 +462,11 @@ def delete_threads_for_multiple_entities(
         for message in get_messages(thread.id):
             model_keys.append(
                 datastore_services.Key(
-                    feedback_models.GeneralFeedbackMessageModel, message.id)
+                    feedback_models.GeneralGeneralFeedbackMessageModel1Model, message.id)
             )
         model_keys.append(
             datastore_services.Key(
-                feedback_models.GeneralFeedbackThreadModel, thread.id)
+                feedback_models.GeneralGeneralFeedBackThreadModelModel, thread.id)
         )
         if thread.has_suggestion:
             model_keys.append(
@@ -499,9 +499,9 @@ def update_messages_read_by_the_user(
             the user.
     """
     feedback_thread_user_model = (
-        feedback_models.GeneralFeedbackThreadUserModel.get(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.get(
             user_id, thread_id) or
-        feedback_models.GeneralFeedbackThreadUserModel.create(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.create(
             user_id, thread_id))
     feedback_thread_user_model.message_ids_read_by_user = message_ids
     feedback_thread_user_model.update_timestamps()
@@ -532,11 +532,11 @@ def add_message_ids_to_read_by_list(
         in message_identifiers
     ]
 
-    # Get all of the GeneralFeedbackThreadUserModels that already exist. These
-    # models will be None if a GeneralFeedbackThreadUserModel does not exist
+    # Get all of the GeneralGeneralFeedBackThreadModelUserModels that already exist. These
+    # models will be None if a GeneralGeneralFeedBackThreadModelUserModel does not exist
     # for the user_id and thread_id yet.
     current_feedback_thread_user_models_with_possible_nones = (
-        feedback_models.GeneralFeedbackThreadUserModel.get_multi(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.get_multi(
             user_id, thread_ids))
 
     # Keep track of which thread_ids do not have feedback thread user models
@@ -561,12 +561,12 @@ def add_message_ids_to_read_by_list(
             feedback_thread_user_model.message_ids_read_by_user.append(
                 message_ids[index])
 
-    # Create the new GeneralFeedbackThreadUserModels for each of the thread_ids
+    # Create the new GeneralGeneralFeedBackThreadModelUserModels for each of the thread_ids
     # that do not have a model yet.
     new_feedback_thread_user_models = []
     if thread_ids_missing_user_models:
         new_feedback_thread_user_models = (
-            feedback_models.GeneralFeedbackThreadUserModel.create_multi(
+            feedback_models.GeneralGeneralFeedBackThreadModelUserModel.create_multi(
                 user_id, thread_ids_missing_user_models)
         )
 
@@ -581,25 +581,25 @@ def add_message_ids_to_read_by_list(
     # Update both the new and previously existing models in the datastore.
     current_feedback_thread_user_models.extend(
         new_feedback_thread_user_models)
-    feedback_models.GeneralFeedbackThreadUserModel.update_timestamps_multi(
+    feedback_models.GeneralGeneralFeedBackThreadModelUserModel.update_timestamps_multi(
         current_feedback_thread_user_models)
-    feedback_models.GeneralFeedbackThreadUserModel.put_multi(
+    feedback_models.GeneralGeneralFeedBackThreadModelUserModel.put_multi(
         current_feedback_thread_user_models)
 
 
 def _get_message_from_model(
-    message_model: feedback_models.GeneralFeedbackMessageModel
-) -> feedback_domain.FeedbackMessage:
-    """Converts the FeedbackMessageModel to a FeedbackMessage.
+    message_model: feedback_models.GeneralGeneralFeedbackMessageModel1Model
+) -> feedback_domain.GeneralFeedbackMessageModel1:
+    """Converts the GeneralFeedbackMessageModel1Model to a GeneralFeedbackMessageModel1.
 
     Args:
-        message_model: FeedbackMessageModel. The FeedbackMessageModel to be
+        message_model: GeneralFeedbackMessageModel1Model. The GeneralFeedbackMessageModel1Model to be
             converted.
 
     Returns:
-        FeedbackMessage. The resulting FeedbackMessage domain object.
+        GeneralFeedbackMessageModel1. The resulting GeneralFeedbackMessageModel1 domain object.
     """
-    return feedback_domain.FeedbackMessage(
+    return feedback_domain.GeneralFeedbackMessageModel1(
         message_model.id, message_model.thread_id, message_model.message_id,
         message_model.author_id, message_model.updated_status,
         message_model.updated_subject, message_model.text,
@@ -607,25 +607,25 @@ def _get_message_from_model(
         message_model.received_via_email)
 
 
-def get_messages(thread_id: str) -> List[feedback_domain.FeedbackMessage]:
+def get_messages(thread_id: str) -> List[feedback_domain.GeneralFeedbackMessageModel1]:
     """Fetches all messages of the given thread.
 
     Args:
         thread_id: str. The id of the thread.
 
     Returns:
-        list(FeedbackMessage). Contains all the messages in the thread.
+        list(GeneralFeedbackMessageModel1). Contains all the messages in the thread.
     """
     return [
         _get_message_from_model(model)
-        for model in feedback_models.GeneralFeedbackMessageModel.get_messages(
+        for model in feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_messages(
             thread_id)
     ]
 
 
 def get_message(
     thread_id: str, message_id: int
-) -> feedback_domain.FeedbackMessage:
+) -> feedback_domain.GeneralFeedbackMessageModel1:
     """Fetches the message indexed by thread_id and message_id.
 
     Args:
@@ -633,16 +633,16 @@ def get_message(
         message_id: int. The id of the message, relative to the thread.
 
     Returns:
-        FeedbackMessage. The fetched message.
+        GeneralFeedbackMessageModel1. The fetched message.
     """
     return _get_message_from_model(
-        feedback_models.GeneralFeedbackMessageModel.get(thread_id, message_id))
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get(thread_id, message_id))
 
 
 def get_next_page_of_all_feedback_messages(
     page_size: int = feconf.FEEDBACK_TAB_PAGE_SIZE,
     urlsafe_start_cursor: Optional[str] = None
-) -> Tuple[List[feedback_domain.FeedbackMessage], Optional[str], bool]:
+) -> Tuple[List[feedback_domain.GeneralFeedbackMessageModel1], Optional[str], bool]:
     """Fetches a single page from the list of all feedback messages that have
     been posted to any exploration on the site.
 
@@ -655,7 +655,7 @@ def get_next_page_of_all_feedback_messages(
 
     Returns:
         tuple(messages_on_page, next_urlsafe_start_cursor, more). Where:
-            messages_on_page: list(FeedbackMessage). Contains the slice of
+            messages_on_page: list(GeneralFeedbackMessageModel1). Contains the slice of
                 messages that are part of the page pointed to by the given start
                 cursor.
             next_urlsafe_start_cursor: str|None. The cursor to the next page.
@@ -663,7 +663,7 @@ def get_next_page_of_all_feedback_messages(
                 this batch.
     """
     models_on_page, next_urlsafe_start_cursor, more = (
-        feedback_models.GeneralFeedbackMessageModel.get_all_messages(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_all_messages(
             page_size, urlsafe_start_cursor))
     messages_on_page = [_get_message_from_model(m) for m in models_on_page]
     return (messages_on_page, next_urlsafe_start_cursor, more)
@@ -731,18 +731,18 @@ def get_total_open_threads(
 
 def get_multiple_threads(
     thread_ids: List[str]
-) -> List[feedback_domain.FeedbackThread]:
+) -> List[feedback_domain.GeneralFeedBackThreadModel]:
     """Gets multiple feedback threads.
 
     Args:
         thread_ids: list(str). The list of thread ids.
 
     Returns:
-        list(FeedbackThread). The list of feedback threads.
+        list(GeneralFeedBackThreadModel). The list of feedback threads.
     """
     return [
         _get_thread_from_model(model)
-        for model in feedback_models.GeneralFeedbackThreadModel.get_multi(
+        for model in feedback_models.GeneralGeneralFeedBackThreadModelModel.get_multi(
             thread_ids
         )
         if model is not None
@@ -750,22 +750,22 @@ def get_multiple_threads(
 
 
 def _get_thread_from_model(
-    thread_model: feedback_models.GeneralFeedbackThreadModel
-) -> feedback_domain.FeedbackThread:
-    """Converts the given FeedbackThreadModel to a FeedbackThread object.
+    thread_model: feedback_models.GeneralGeneralFeedBackThreadModelModel
+) -> feedback_domain.GeneralFeedBackThreadModel:
+    """Converts the given GeneralFeedBackThreadModelModel to a GeneralFeedBackThreadModel object.
 
     Args:
-        thread_model: FeedbackThreadModel. The FeedbackThread model object to be
-            converted to FeedbackThread object.
+        thread_model: GeneralFeedBackThreadModelModel. The GeneralFeedBackThreadModel model object to be
+            converted to GeneralFeedBackThreadModel object.
 
     Returns:
-        FeedbackThread. The corresponding FeedbackThread domain object.
+        GeneralFeedBackThreadModel. The corresponding GeneralFeedBackThreadModel domain object.
     """
     message_count = (
         thread_model.message_count or
-        feedback_models.GeneralFeedbackMessageModel.get_message_count(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_message_count(
             thread_model.id))
-    return feedback_domain.FeedbackThread(
+    return feedback_domain.GeneralFeedBackThreadModel(
         thread_model.id, thread_model.entity_type, thread_model.entity_id, None,
         thread_model.original_author_id, thread_model.status,
         thread_model.subject, thread_model.summary, thread_model.has_suggestion,
@@ -776,7 +776,7 @@ def _get_thread_from_model(
 
 def get_exp_thread_summaries(
     user_id: str, thread_ids: List[str]
-) -> Tuple[List[feedback_domain.FeedbackThreadSummary], int]:
+) -> Tuple[List[feedback_domain.GeneralFeedBackThreadModelSummary], int]:
     """Returns a list of summaries corresponding to the exploration threads from
     the given thread ids. Non-exploration threads are not included in the list.
     It also returns the number of threads that are currently not read by the
@@ -789,20 +789,20 @@ def get_exp_thread_summaries(
 
     Returns:
         tuple(thread_summaries, number_of_unread_threads). Where:
-            thread_summaries: list(FeedbackThreadSummary).
+            thread_summaries: list(GeneralFeedBackThreadModelSummary).
             number_of_unread_threads: int. The number of threads not read by the
                 user.
     """
     # We need to fetch the thread models first to filter out the threads which
     # don't refer to an exploration.
     exp_thread_models = [
-        model for model in feedback_models.GeneralFeedbackThreadModel.get_multi(
+        model for model in feedback_models.GeneralGeneralFeedBackThreadModelModel.get_multi(
             thread_ids)
         if model and model.entity_type == feconf.ENTITY_TYPE_EXPLORATION
     ]
 
     exp_thread_user_model_ids = [
-        feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.generate_full_id(
             user_id, model.id)
         for model in exp_thread_models
     ]
@@ -814,13 +814,13 @@ def get_exp_thread_summaries(
     exp_thread_user_models, exploration_models = (
         cast(
             Tuple[
-                List[Optional[feedback_models.GeneralFeedbackThreadUserModel]],
+                List[Optional[feedback_models.GeneralGeneralFeedBackThreadModelUserModel]],
                 List[Optional[exp_models.ExplorationModel]]
             ],
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
                     (
-                        'GeneralFeedbackThreadUserModel',
+                        'GeneralGeneralFeedBackThreadModelUserModel',
                         exp_thread_user_model_ids
                     ),
                     ('ExplorationModel', exp_model_ids)
@@ -831,7 +831,7 @@ def get_exp_thread_summaries(
 
     threads = [_get_thread_from_model(m) for m in exp_thread_models]
     flattened_last_two_message_models_of_threads = (
-        feedback_models.GeneralFeedbackMessageModel.get_multi(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_multi(
             list(itertools.chain.from_iterable(
                 t.get_last_two_message_ids() for t in threads))))
     last_two_message_models_of_threads = [
@@ -879,7 +879,7 @@ def get_exp_thread_summaries(
         if not last_message_is_read:
             number_of_unread_threads += 1
         thread_summaries.append(
-            feedback_domain.FeedbackThreadSummary(
+            feedback_domain.GeneralFeedBackThreadModelSummary(
                 thread.status, thread.original_author_id, thread.last_updated,
                 last_message_model.text, thread.message_count,
                 last_message_is_read, second_last_message_is_read,
@@ -890,7 +890,7 @@ def get_exp_thread_summaries(
 
 def get_threads(
     entity_type: str, entity_id: str
-) -> List[feedback_domain.FeedbackThread]:
+) -> List[feedback_domain.GeneralFeedBackThreadModel]:
     """Fetches all the threads for the given entity id.
 
     Args:
@@ -898,29 +898,29 @@ def get_threads(
         entity_id: str. The id of the entity.
 
     Returns:
-        list(FeedbackThread). The corresponding Suggestion domain object.
+        list(GeneralFeedBackThreadModel). The corresponding Suggestion domain object.
     """
-    thread_models = feedback_models.GeneralFeedbackThreadModel.get_threads(
+    thread_models = feedback_models.GeneralGeneralFeedBackThreadModelModel.get_threads(
         entity_type, entity_id)
     return [_get_thread_from_model(m) for m in thread_models]
 
 
-def get_thread(thread_id: str) -> feedback_domain.FeedbackThread:
+def get_thread(thread_id: str) -> feedback_domain.GeneralFeedBackThreadModel:
     """Fetches the thread by thread id.
 
     Args:
         thread_id: str. The id of the thread.
 
     Returns:
-        FeedbackThread. The resulting FeedbackThread domain object.
+        GeneralFeedBackThreadModel. The resulting GeneralFeedBackThreadModel domain object.
     """
     return _get_thread_from_model(
-        feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(thread_id))
 
 
 def get_closed_threads(
     entity_type: str, entity_id: str, has_suggestion: bool
-) -> List[feedback_domain.FeedbackThread]:
+) -> List[feedback_domain.GeneralFeedBackThreadModel]:
     """Fetches all closed threads of the given entity id.
 
     Args:
@@ -931,7 +931,7 @@ def get_closed_threads(
             threads that do not have a suggestion.
 
     Returns:
-        list(FeedbackThread). The resulting FeedbackThread domain objects.
+        list(GeneralFeedBackThreadModel). The resulting GeneralFeedBackThreadModel domain objects.
     """
     return [
         thread for thread in get_threads(entity_type, entity_id)
@@ -943,7 +943,7 @@ def get_closed_threads(
 
 def get_all_threads(
     entity_type: str, entity_id: str, has_suggestion: bool
-) -> List[feedback_domain.FeedbackThread]:
+) -> List[feedback_domain.GeneralFeedBackThreadModel]:
     """Fetches all threads (regardless of their status) that correspond to the
     given entity id.
 
@@ -955,7 +955,7 @@ def get_all_threads(
             not have a suggestion.
 
     Returns:
-        list(FeedbackThread). The resulting FeedbackThread domain objects.
+        list(GeneralFeedBackThreadModel). The resulting GeneralFeedBackThreadModel domain objects.
     """
     return [
         thread for thread in get_threads(entity_type, entity_id)
@@ -975,13 +975,13 @@ def enqueue_feedback_message_batch_email_task(user_id: str) -> None:
 
 
 def enqueue_feedback_message_instant_email_task_transactional(
-    user_id: str, reference: feedback_domain.FeedbackMessageReference
+    user_id: str, reference: feedback_domain.GeneralFeedbackMessageModel1Reference
 ) -> None:
     """Adds a 'send feedback email' (instant) task into the task queue.
 
     Args:
         user_id: str. The user to be notified.
-        reference: FeedbackMessageReference. A reference that contains the data
+        reference: GeneralFeedbackMessageModel1Reference. A reference that contains the data
             needed to identify the feedback message.
     """
     payload = {
@@ -995,7 +995,7 @@ def enqueue_feedback_message_instant_email_task_transactional(
 @transaction_services.run_in_transaction_wrapper
 def _enqueue_feedback_thread_status_change_email_task_transactional(
     user_id: str,
-    reference: feedback_domain.FeedbackMessageReference,
+    reference: feedback_domain.GeneralFeedbackMessageModel1Reference,
     old_status: str,
     new_status: str
 ) -> None:
@@ -1003,7 +1003,7 @@ def _enqueue_feedback_thread_status_change_email_task_transactional(
 
     Args:
         user_id: str. The user to be notified.
-        reference: FeedbackMessageReference. The feedback message reference
+        reference: GeneralFeedbackMessageModel1Reference. The feedback message reference
             object to be converted to dict.
         old_status: str. One of STATUS_CHOICES.
         new_status: str. One of STATUS_CHOICES.
@@ -1020,22 +1020,22 @@ def _enqueue_feedback_thread_status_change_email_task_transactional(
 
 def get_feedback_message_references(
     user_id: str
-) -> List[feedback_domain.FeedbackMessageReference]:
-    """Fetches all FeedbackMessageReference objects written by the given user。
+) -> List[feedback_domain.GeneralFeedbackMessageModel1Reference]:
+    """Fetches all GeneralFeedbackMessageModel1Reference objects written by the given user。
 
     Args:
         user_id: str. If the user id is invalid or there is no message for this
             user, return an empty list.
 
     Returns:
-        list(FeedbackMessageReference). The resulting FeedbackMessageReference
+        list(GeneralFeedbackMessageModel1Reference). The resulting GeneralFeedbackMessageModel1Reference
         domain objects.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     feedback_message_references = (
         () if model is None else model.feedback_message_references)
     return [
-        feedback_domain.FeedbackMessageReference(
+        feedback_domain.GeneralFeedbackMessageModel1Reference(
             reference['entity_type'], reference['entity_id'],
             reference['thread_id'], reference['message_id'])
         for reference in feedback_message_references
@@ -1044,7 +1044,7 @@ def get_feedback_message_references(
 
 @transaction_services.run_in_transaction_wrapper
 def _add_feedback_message_reference_transactional(
-    user_id: str, reference: feedback_domain.FeedbackMessageReference
+    user_id: str, reference: feedback_domain.GeneralFeedbackMessageModel1Reference
 ) -> None:
     """Adds a new message to the feedback message buffer that is used to
     generate the next notification email to the given user.
@@ -1053,7 +1053,7 @@ def _add_feedback_message_reference_transactional(
         user_id: str. If there's an UnsentFeedbackEmailModel for the given user,
             update the instance with given reference, otherwise create a new
             instance.
-        reference: FeedbackMessageReference. The new message reference to add to
+        reference: GeneralFeedbackMessageModel1Reference. The new message reference to add to
             the buffer.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
@@ -1196,18 +1196,18 @@ def _get_all_recipient_ids(
 
 def _send_batch_emails(
     recipient_list: List[str],
-    feedback_message_reference: feedback_domain.FeedbackMessageReference,
+    feedback_message_reference: feedback_domain.GeneralFeedbackMessageModel1Reference,
     exploration_id: str,
     has_suggestion: bool
 ) -> None:
-    """Adds the given FeedbackMessageReference to each of the recipient's email
+    """Adds the given GeneralFeedbackMessageModel1Reference to each of the recipient's email
     buffers. The collected messages will be sent out as a batch after a short
     delay.
 
     Args:
         recipient_list: list(str). A list of user_ids of all recipients of the
             email.
-        feedback_message_reference: FeedbackMessageReference. The reference to
+        feedback_message_reference: GeneralFeedbackMessageModel1Reference. The reference to
             add to each email buffer.
         exploration_id: str. The id of exploration that received new message.
         has_suggestion: bool. Whether this thread has a related learner
@@ -1224,17 +1224,17 @@ def _send_batch_emails(
 
 def _send_instant_emails(
     recipient_list: List[str],
-    feedback_message_reference: feedback_domain.FeedbackMessageReference,
+    feedback_message_reference: feedback_domain.GeneralFeedbackMessageModel1Reference,
     exploration_id: str,
     has_suggestion: bool
 ) -> None:
-    """Adds the given FeedbackMessageReference to each of the recipient's email
+    """Adds the given GeneralFeedbackMessageModel1Reference to each of the recipient's email
     buffers. The collected messages will be sent out immediately.
 
     Args:
         recipient_list: list(str). A list of user_ids of all recipients of the
             email.
-        feedback_message_reference: FeedbackMessageReference. The reference to
+        feedback_message_reference: GeneralFeedbackMessageModel1Reference. The reference to
             add to each email buffer.
         exploration_id: str. The id of exploration that received new message.
         has_suggestion: bool. Whether this thread has a related learner
@@ -1251,7 +1251,7 @@ def _send_instant_emails(
 
 def _send_feedback_thread_status_change_emails(
     recipient_list: List[str],
-    feedback_message_reference: feedback_domain.FeedbackMessageReference,
+    feedback_message_reference: feedback_domain.GeneralFeedbackMessageModel1Reference,
     old_status: str,
     new_status: str,
     exploration_id: str,
@@ -1261,7 +1261,7 @@ def _send_feedback_thread_status_change_emails(
 
     Args:
         recipient_list: list(str). A list of recipient ids.
-        feedback_message_reference: FeedbackMessageReference. The reference to
+        feedback_message_reference: GeneralFeedbackMessageModel1Reference. The reference to
             add to each email buffer.
         old_status: str. One of STATUS_CHOICES.
         new_status: str. One of STATUS_CHOICES.
@@ -1299,10 +1299,10 @@ def _add_message_to_email_buffer(
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
-    thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+    thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(thread_id)
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
-    feedback_message_reference = feedback_domain.FeedbackMessageReference(
+    feedback_message_reference = feedback_domain.GeneralFeedbackMessageModel1Reference(
         thread.entity_type, thread.entity_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))

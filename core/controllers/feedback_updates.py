@@ -119,7 +119,7 @@ class FeedbackUpdatesHandler(
         self.render_json(self.values)
 
 
-class FeedbackThreadHandler(
+class GeneralFeedBackThreadModelHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Gets all the messages in a thread."""

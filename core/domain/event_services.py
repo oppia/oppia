@@ -352,7 +352,7 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
             time_spent_in_state_secs)
 
 
-class FeedbackThreadCreatedEventHandler(BaseEventHandler):
+class GeneralFeedBackThreadModelCreatedEventHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_NEW_THREAD_CREATED
@@ -365,7 +365,7 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
         feedback_services.handle_new_thread_created(exp_id)
 
 
-class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
+class GeneralFeedBackThreadModelStatusChangedEventHandler(BaseEventHandler):
     """Event handler for recording reopening feedback thread events."""
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED

@@ -2269,7 +2269,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        feedback_models.GeneralFeedbackThreadModel(
+        feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id=self.FEEDBACK_1_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,
@@ -2279,7 +2279,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             last_nonempty_message_text='Some text',
             last_nonempty_message_author_id=self.user_2_id
         ).put()
-        feedback_models.GeneralFeedbackMessageModel(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model(
             id=self.MESSAGE_1_ID,
             thread_id=self.FEEDBACK_1_ID,
             message_id=0,
@@ -2314,7 +2314,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.FEEDBACK.value]
         )
         feedback_thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.FEEDBACK_1_ID)
         )
         self.assertEqual(
@@ -2338,7 +2338,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
         # Return feedback thread model to the original user ID.
         feedback_thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.FEEDBACK_1_ID)
         )
         feedback_thread_model.original_author_id = self.user_1_id
@@ -2357,7 +2357,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             ).pseudonymizable_entity_mappings[models.Names.FEEDBACK.value]
         )
         new_feedback_thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.FEEDBACK_1_ID)
         )
         self.assertEqual(
@@ -2369,7 +2369,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_thread_models = []
         for i in range(self.NUMBER_OF_MODELS):
             feedback_thread_models.append(
-                feedback_models.GeneralFeedbackThreadModel(
+                feedback_models.GeneralGeneralFeedBackThreadModelModel(
                     id='feedback-%s' % i,
                     entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                     entity_id=self.EXP_1_ID,
@@ -2379,12 +2379,12 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     last_nonempty_message_author_id=self.user_2_id
                 )
             )
-            feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.update_timestamps_multi(
                 feedback_thread_models)
         feedback_message_models = []
         for i in range(self.NUMBER_OF_MODELS):
             feedback_message_models.append(
-                feedback_models.GeneralFeedbackMessageModel(
+                feedback_models.GeneralGeneralFeedbackMessageModel1Model(
                     id='message-%s' % i,
                     thread_id='feedback-%s' % i,
                     message_id=i,
@@ -2392,7 +2392,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
                     text='Some text'
                 )
             )
-            feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+            feedback_models.GeneralGeneralFeedbackMessageModel1Model.update_timestamps_multi(
                 feedback_message_models)
         datastore_services.put_multi(feedback_message_models)
         datastore_services.put_multi(feedback_thread_models)
@@ -2407,7 +2407,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         )
 
         pseudonymized_feedback_thread_models = (
-            feedback_models.GeneralFeedbackThreadModel.get_multi(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_multi(
                 [model.id for model in feedback_thread_models]
             )
         )
@@ -2420,7 +2420,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             )
 
         pseudonymized_feedback_message_models = (
-            feedback_models.GeneralFeedbackMessageModel.get_multi(
+            feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_multi(
                 [model.id for model in feedback_message_models]
             )
         )
@@ -2444,7 +2444,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
 
         # Verify first user is pseudonymized.
         feedback_thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.FEEDBACK_1_ID)
         )
         self.assertEqual(
@@ -2487,7 +2487,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        feedback_models.GeneralFeedbackThreadModel(
+        feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id=self.FEEDBACK_1_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,
@@ -2497,7 +2497,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             last_nonempty_message_text='Some text',
             last_nonempty_message_author_id=self.user_1_id
         ).put()
-        feedback_models.GeneralFeedbackMessageModel(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model(
             id=self.MESSAGE_1_ID,
             thread_id=self.FEEDBACK_1_ID,
             message_id=0,
@@ -2532,7 +2532,7 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-        feedback_models.GeneralFeedbackThreadModel(
+        feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id=self.FEEDBACK_1_ID,
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,

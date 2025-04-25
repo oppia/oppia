@@ -48,7 +48,7 @@ EXPECTED_MESSAGE_KEYS: Final = [
     'entity_id', 'text', 'updated_status', 'updated_subject']
 
 
-class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelPermissionsTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = '0'
 
@@ -124,7 +124,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             }, csrf_token=self.csrf_token, expected_status_int=401)
 
 
-class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = '0'
 
@@ -361,7 +361,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'New Message %s' % num)
 
 
-class FeedbackThreadTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelTests(test_utils.GenericTestBase):
 
     OWNER_EMAIL_1: Final = 'owner1@example.com'
     OWNER_USERNAME_1: Final = 'owner1'
@@ -402,7 +402,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         to the given user id.
         """
         feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.get(
+            feedback_models.GeneralGeneralFeedBackThreadModelUserModel.get(
                 user_id, thread_id))
 
         if feedback_thread_user_model:
@@ -667,7 +667,7 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
+class RecentGeneralFeedbackMessageModel1sHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()

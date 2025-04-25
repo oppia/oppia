@@ -63,7 +63,7 @@ _MAX_RETRIES: Final = 10
 _RAND_RANGE: Final = 127 * 127
 
 
-class GeneralFeedbackThreadModel(base_models.BaseModel):
+class GeneralGeneralFeedBackThreadModelModel(base_models.BaseModel):
     """Threads for each entity.
 
     The id of instances of this class has the form
@@ -153,7 +153,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether GeneralFeedbackThreadModel exists for user.
+        """Check whether GeneralGeneralFeedBackThreadModelModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -171,18 +171,18 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             cls,
             user_id: str
     ) -> Dict[str, Dict[str, Union[str, bool, None]]]:
-        """Exports the data from GeneralFeedbackThreadModel
+        """Exports the data from GeneralGeneralFeedBackThreadModelModel
         into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from GeneralFeedbackThreadModel.
+            dict. Dictionary of the data from GeneralGeneralFeedBackThreadModelModel.
         """
 
         user_data = {}
-        feedback_models: Sequence[GeneralFeedbackThreadModel] = (
+        feedback_models: Sequence[GeneralGeneralFeedBackThreadModelModel] = (
             cls.get_all().filter(cls.original_author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
@@ -232,14 +232,14 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, thread_id: str) -> GeneralFeedbackThreadModel:
-        """Creates a new FeedbackThreadModel entry.
+    def create(cls, thread_id: str) -> GeneralGeneralFeedBackThreadModelModel:
+        """Creates a new GeneralFeedBackThreadModelModel entry.
 
         Args:
             thread_id: str. Thread ID of the newly-created thread.
 
         Returns:
-            GeneralFeedbackThreadModel. The newly created FeedbackThreadModel
+            GeneralGeneralFeedBackThreadModelModel. The newly created GeneralFeedBackThreadModelModel
             instance.
 
         Raises:
@@ -255,7 +255,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         entity_type: str,
         entity_id: str,
         limit: int = feconf.DEFAULT_QUERY_LIMIT
-    ) -> Sequence[GeneralFeedbackThreadModel]:
+    ) -> Sequence[GeneralGeneralFeedBackThreadModelModel]:
         """Returns a list of threads associated with the entity, ordered
         by their "last updated" field. The number of entities fetched is
         limited by the `limit` argument to this method, whose default
@@ -268,7 +268,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
                 list.
 
         Returns:
-            list(GeneralFeedbackThreadModel). List of threads associated with
+            list(GeneralGeneralFeedBackThreadModelModel). List of threads associated with
             the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
@@ -276,7 +276,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         ).order(-cls.last_updated).fetch(limit)
 
 
-class GeneralFeedbackMessageModel(base_models.BaseModel):
+class GeneralGeneralFeedbackMessageModel1Model(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
     The id of instances of this class has the form [thread_id].[message_id]
@@ -285,7 +285,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
 
-    # ID corresponding to an entry of FeedbackThreadModel.
+    # ID corresponding to an entry of GeneralFeedBackThreadModelModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
     # thread in chronological order.
@@ -339,7 +339,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether GeneralFeedbackMessageModel exists for user.
+        """Check whether GeneralGeneralFeedbackMessageModel1Model exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -356,18 +356,18 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         cls,
         user_id: str
     ) -> Dict[str, Dict[str, Union[str, int, bool, None]]]:
-        """Exports the data from GeneralFeedbackMessageModel
+        """Exports the data from GeneralGeneralFeedbackMessageModel1Model
         into dict format for Takeout.
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
 
         Returns:
-            dict. Dictionary of the data from GeneralFeedbackMessageModel.
+            dict. Dictionary of the data from GeneralGeneralFeedbackMessageModel1Model.
         """
 
         user_data = {}
-        feedback_models: Sequence[GeneralFeedbackMessageModel] = (
+        feedback_models: Sequence[GeneralGeneralFeedbackMessageModel1Model] = (
             cls.get_all().filter(cls.author_id == user_id).fetch())
 
         for feedback_model in feedback_models:
@@ -417,8 +417,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def create(
         cls, message_identifier: feedback_domain.FullyQualifiedMessageIdentifier
-    ) -> GeneralFeedbackMessageModel:
-        """Creates a new GeneralFeedbackMessageModel entry.
+    ) -> GeneralGeneralFeedbackMessageModel1Model:
+        """Creates a new GeneralGeneralFeedbackMessageModel1Model entry.
 
         Args:
             message_identifier: FullyQualifiedMessageIdentifier. The message
@@ -426,8 +426,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 message_id.
 
         Returns:
-            GeneralFeedbackMessageModel. Instance of the new
-            GeneralFeedbackMessageModel entry.
+            GeneralGeneralFeedbackMessageModel1Model. Instance of the new
+            GeneralGeneralFeedbackMessageModel1Model entry.
 
         Raises:
             Exception. A message with the same ID already exists
@@ -442,8 +442,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         message_identifiers: List[
             feedback_domain.FullyQualifiedMessageIdentifier
         ]
-    ) -> List[GeneralFeedbackMessageModel]:
-        """Creates a new GeneralFeedbackMessageModel entry for each
+    ) -> List[GeneralGeneralFeedbackMessageModel1Model]:
+        """Creates a new GeneralGeneralFeedbackMessageModel1Model entry for each
         (thread_id, message_id) pair.
 
         Args:
@@ -452,8 +452,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 corresponding message_id.
 
         Returns:
-            list(GeneralFeedbackMessageModel). Instances of the new
-            GeneralFeedbackMessageModel entries.
+            list(GeneralGeneralFeedbackMessageModel1Model). Instances of the new
+            GeneralGeneralFeedbackMessageModel1Model entries.
 
         Raises:
             Exception. The number of thread_ids must be equal to the number of
@@ -494,47 +494,47 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get(
         cls, thread_id: str, message_id: int
-    ) -> GeneralFeedbackMessageModel: ...
+    ) -> GeneralGeneralFeedbackMessageModel1Model: ...
 
     @overload
     @classmethod
     def get(
         cls, thread_id: str, message_id: int, *, strict: Literal[True]
-    ) -> GeneralFeedbackMessageModel: ...
+    ) -> GeneralGeneralFeedbackMessageModel1Model: ...
 
     @overload
     @classmethod
     def get(
         cls, thread_id: str, message_id: int, *, strict: Literal[False]
-    ) -> Optional[GeneralFeedbackMessageModel]: ...
+    ) -> Optional[GeneralGeneralFeedbackMessageModel1Model]: ...
 
     @overload
     @classmethod
     def get(
         cls, thread_id: str, message_id: int, *, strict: bool = ...
-    ) -> Optional[GeneralFeedbackMessageModel]: ...
+    ) -> Optional[GeneralGeneralFeedbackMessageModel1Model]: ...
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
         cls, thread_id: str, message_id: int, strict: bool = True
-    ) -> Optional[GeneralFeedbackMessageModel]:
-        """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
+    ) -> Optional[GeneralGeneralFeedbackMessageModel1Model]:
+        """Gets the GeneralGeneralFeedbackMessageModel1Model entry for the given ID. Raises
         an error if no undeleted message with the given ID is found and
         strict == True.
 
         Args:
             thread_id: str. ID of the thread.
             message_id: int. ID of the message.
-            strict: bool. Whether to raise an error if no FeedbackMessageModel
+            strict: bool. Whether to raise an error if no GeneralFeedbackMessageModel1Model
                 entry is found for the given IDs.
 
         Returns:
-            GeneralFeedbackMessageModel or None. If strict == False and no
+            GeneralGeneralFeedbackMessageModel1Model or None. If strict == False and no
             undeleted message with the given message_id exists in the
             datastore, then returns None. Otherwise, returns the
-            GeneralFeedbackMessageModel instance that corresponds to the
+            GeneralGeneralFeedbackMessageModel1Model instance that corresponds to the
             given ID.
 
         Raises:
@@ -544,13 +544,13 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
                 No error will be raised if strict == False.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(GeneralFeedbackMessageModel, cls).get(
+        return super(GeneralGeneralFeedbackMessageModel1Model, cls).get(
             instance_id, strict=strict)
 
     @classmethod
     def get_messages(
         cls, thread_id: str
-    ) -> Sequence[GeneralFeedbackMessageModel]:
+    ) -> Sequence[GeneralGeneralFeedbackMessageModel1Model]:
         """Returns a list of messages in the given thread. The number of
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
@@ -558,7 +558,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            list(GeneralFeedbackMessageModel). A list of messages in the
+            list(GeneralGeneralFeedbackMessageModel1Model). A list of messages in the
             given thread, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
             messages.
         """
@@ -569,16 +569,16 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_most_recent_message(
         cls, thread_id: str
-    ) -> GeneralFeedbackMessageModel:
+    ) -> GeneralGeneralFeedbackMessageModel1Model:
         """Returns the last message in the thread.
 
         Args:
             thread_id: str. ID of the thread.
 
         Returns:
-            GeneralFeedbackMessageModel. Last message in the thread.
+            GeneralGeneralFeedbackMessageModel1Model. Last message in the thread.
         """
-        thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
+        thread = GeneralGeneralFeedBackThreadModelModel.get_by_id(thread_id)
         message = cls.get(thread_id, thread.message_count - 1)
         return message
 
@@ -608,7 +608,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             list(int). List of the message counts for the threads.
         """
-        thread_models = GeneralFeedbackThreadModel.get_multi(thread_ids)
+        thread_models = GeneralGeneralFeedBackThreadModelModel.get_multi(thread_ids)
         assert None not in thread_models
         return [
             thread_model.message_count if thread_model else None
@@ -620,7 +620,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     @classmethod
     def get_all_messages(
         cls, page_size: int, urlsafe_start_cursor: Optional[str]
-    ) -> Tuple[Sequence[GeneralFeedbackMessageModel], Optional[str], bool]:
+    ) -> Tuple[Sequence[GeneralGeneralFeedbackMessageModel1Model], Optional[str], bool]:
         """Fetches a list of all the messages sorted by their last updated
         attribute.
 
@@ -645,7 +645,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
 
-class GeneralFeedbackThreadUserModel(base_models.BaseModel):
+class GeneralGeneralFeedBackThreadModelUserModel(base_models.BaseModel):
     """Model for storing the ids of the messages in the thread that are read by
     the user.
 
@@ -685,7 +685,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
-        """Delete instance of GeneralFeedbackThreadUserModel for the user.
+        """Delete instance of GeneralGeneralFeedBackThreadModelUserModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -695,7 +695,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
-        """Check whether GeneralFeedbackThreadUserModel exists for user.
+        """Check whether GeneralGeneralFeedBackThreadModelUserModel exists for user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -724,8 +724,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def get( # type: ignore[override]
         cls, user_id: str, thread_id: str
-    ) -> Optional[GeneralFeedbackThreadUserModel]:
-        """Gets the FeedbackThreadUserModel corresponding to the given user and
+    ) -> Optional[GeneralGeneralFeedBackThreadModelUserModel]:
+        """Gets the GeneralFeedBackThreadModelUserModel corresponding to the given user and
         the thread.
 
         Args:
@@ -733,25 +733,25 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             thread_id: str. The id of the thread.
 
         Returns:
-            FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
+            GeneralFeedBackThreadModelUserModel. The GeneralFeedBackThreadModelUserModel instance which
             matches with the given user_id, and thread id.
         """
         instance_id = cls.generate_full_id(user_id, thread_id)
-        return super(GeneralFeedbackThreadUserModel, cls).get(
+        return super(GeneralGeneralFeedBackThreadModelUserModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
     def create(
         cls, user_id: str, thread_id: str
-    ) -> GeneralFeedbackThreadUserModel:
-        """Creates a new FeedbackThreadUserModel instance and returns it.
+    ) -> GeneralGeneralFeedBackThreadModelUserModel:
+        """Creates a new GeneralFeedBackThreadModelUserModel instance and returns it.
 
         Args:
             user_id: str. The id of the user.
             thread_id: str. The id of the thread.
 
         Returns:
-            FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
+            GeneralFeedBackThreadModelUserModel. The newly created GeneralFeedBackThreadModelUserModel
             instance.
         """
 
@@ -760,8 +760,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def create_multi(
         cls, user_id: str, thread_ids: List[str]
-    ) -> List[GeneralFeedbackThreadUserModel]:
-        """Creates new FeedbackThreadUserModel instances for user_id for each
+    ) -> List[GeneralGeneralFeedBackThreadModelUserModel]:
+        """Creates new GeneralFeedBackThreadModelUserModel instances for user_id for each
         of the thread_ids.
 
         Args:
@@ -769,8 +769,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             thread_ids: list(str). The ids of the threads.
 
         Returns:
-            list(FeedbackThreadUserModel). The newly created
-            FeedbackThreadUserModel instances.
+            list(GeneralFeedBackThreadModelUserModel). The newly created
+            GeneralFeedBackThreadModelUserModel instances.
         """
         new_instances = []
         for thread_id in thread_ids:
@@ -779,8 +779,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
                 id=instance_id, user_id=user_id, thread_id=thread_id)
             new_instances.append(new_instance)
 
-        GeneralFeedbackThreadUserModel.update_timestamps_multi(new_instances)
-        GeneralFeedbackThreadUserModel.put_multi(new_instances)
+        GeneralGeneralFeedBackThreadModelUserModel.update_timestamps_multi(new_instances)
+        GeneralGeneralFeedBackThreadModelUserModel.put_multi(new_instances)
         return new_instances
 
     # Here we use MyPy ignore because the signature of this method
@@ -788,7 +788,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def get_multi( # type: ignore[override]
         cls, user_id: str, thread_ids: List[str]
-    ) -> List[Optional[GeneralFeedbackThreadUserModel]]:
+    ) -> List[Optional[GeneralGeneralFeedBackThreadModelUserModel]]:
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the thread ids.
 
@@ -797,26 +797,26 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
             thread_ids: list(str). The ids of the threads.
 
         Returns:
-            list(FeedbackThreadUserModel). The FeedbackThreadUserModels
+            list(GeneralFeedBackThreadModelUserModel). The GeneralFeedBackThreadModelUserModels
             corresponding to the given user ans thread ids.
         """
         instance_ids = [
             cls.generate_full_id(user_id, thread_id)
             for thread_id in thread_ids]
 
-        return super(GeneralFeedbackThreadUserModel, cls).get_multi(
+        return super(GeneralGeneralFeedBackThreadModelUserModel, cls).get_multi(
             instance_ids)
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, Dict[str, List[str]]]:
-        """Takeout: Export GeneralFeedbackThreadUserModel user-based properties.
+        """Takeout: Export GeneralGeneralFeedBackThreadModelUserModel user-based properties.
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
             dict. A dict containing the user-relevant properties of
-            GeneralFeedbackThreadUserModel, i.e., which messages have been
+            GeneralGeneralFeedBackThreadModelUserModel, i.e., which messages have been
             read by the user (as a list of ids) in each thread.
         """
         found_models = cls.get_all().filter(cls.user_id == user_id)
@@ -880,7 +880,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     # The list of feedback messages that need to be sent to this user.
     # Each element in this list is a dict with keys 'entity_type', 'entity_id',
     # 'thread_id' and 'message_id'; this information is used to retrieve
-    # corresponding FeedbackMessageModel instance.
+    # corresponding GeneralFeedbackMessageModel1Model instance.
     feedback_message_references = datastore_services.JsonProperty(repeated=True)
     # The number of failed attempts that have been made (so far) to
     # send an email to this user.

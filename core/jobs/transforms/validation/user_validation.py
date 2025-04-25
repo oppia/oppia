@@ -213,7 +213,7 @@ def user_subscriptions_model_relationships(
         List[Type[Union[
             exp_models.ExplorationModel,
             collection_models.CollectionModel,
-            feedback_models.GeneralFeedbackThreadModel,
+            feedback_models.GeneralGeneralFeedBackThreadModelModel,
             user_models.UserSubscribersModel
         ]]]
     ]
@@ -224,7 +224,7 @@ def user_subscriptions_model_relationships(
     yield model.collection_ids, [collection_models.CollectionModel]
     yield (
         model.general_feedback_thread_ids,
-        [feedback_models.GeneralFeedbackThreadModel])
+        [feedback_models.GeneralGeneralFeedBackThreadModelModel])
     yield model.creator_ids, [user_models.UserSubscribersModel]
 
 

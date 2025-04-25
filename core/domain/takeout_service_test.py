@@ -1377,7 +1377,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+        feedback_thread_model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             entity_type=self.THREAD_ENTITY_TYPE,
             entity_id=self.THREAD_ENTITY_ID,
             original_author_id=self.USER_ID_1,
@@ -1442,7 +1442,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+        feedback_thread_model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             entity_type=self.THREAD_ENTITY_TYPE,
             entity_id=self.THREAD_ENTITY_ID,
             original_author_id=self.USER_ID_1,
@@ -1561,7 +1561,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.set_up_non_trivial()
         # We set up the feedback_thread_model here so that we can easily
         # access it when computing the expected data later.
-        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+        feedback_thread_model = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             entity_type=self.THREAD_ENTITY_TYPE,
             entity_id=self.THREAD_ENTITY_ID,
             original_author_id=self.USER_ID_1,
@@ -1697,7 +1697,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'message_count': 2,
                 'last_updated_msec': utils.get_time_in_millisecs(
                     feedback_models.
-                    GeneralFeedbackThreadModel.
+                    GeneralGeneralFeedBackThreadModelModel.
                     get_by_id(thread_id).last_updated)
             }
         }

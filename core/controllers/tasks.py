@@ -50,7 +50,7 @@ class UnsentFeedbackEmailHandler(
 
         feedback_services.update_feedback_email_retries_transactional(user_id)
 
-        messages: Dict[str, email_manager.FeedbackMessagesDict] = {}
+        messages: Dict[str, email_manager.GeneralFeedbackMessageModel1sDict] = {}
         for reference in references:
             message = feedback_services.get_message(
                 reference.thread_id, reference.message_id)
@@ -136,7 +136,7 @@ class ContributorDashboardAchievementEmailHandler(
         self.render_json({})
 
 
-class InstantFeedbackMessageEmailHandler(
+class InstantGeneralFeedbackMessageModel1EmailHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handles task of sending feedback message emails instantly."""
@@ -161,7 +161,7 @@ class InstantFeedbackMessageEmailHandler(
         self.render_json({})
 
 
-class FeedbackThreadStatusChangeEmailHandler(
+class GeneralFeedBackThreadModelStatusChangeEmailHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handles task of sending email instantly when feedback thread status is

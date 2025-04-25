@@ -439,7 +439,7 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
 }
 
 
-class FeedbackMessagesDict(TypedDict):
+class GeneralFeedbackMessageModel1sDict(TypedDict):
     """Dictionary representing the feedback message for email."""
 
     title: str
@@ -1007,7 +1007,7 @@ def send_emails_to_subscribers(
 
 def send_feedback_message_email(
     recipient_id: str,
-    feedback_messages: Dict[str, FeedbackMessagesDict]
+    feedback_messages: Dict[str, GeneralFeedbackMessageModel1sDict]
 ) -> None:
     """Sends an email when creator receives feedback message to an exploration.
 

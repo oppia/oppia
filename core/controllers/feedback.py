@@ -28,8 +28,8 @@ from core.domain import user_services
 from typing import Dict, List, Optional, TypedDict
 
 
-class UpdatedLastMessageAuthorFeedbackThreadDict(TypedDict):
-    """Dict representation of FeedbackThread domain object with
+class UpdatedLastMessageAuthorGeneralFeedBackThreadModelDict(TypedDict):
+    """Dict representation of GeneralFeedBackThreadModel domain object with
     updated author_username and last_nonempty_message_author keys.
     """
 
@@ -45,8 +45,8 @@ class UpdatedLastMessageAuthorFeedbackThreadDict(TypedDict):
     last_nonempty_message_author: Optional[str]
 
 
-class UpdatedAuthorUsernameFeedbackThreadDict(TypedDict):
-    """Dict representation of FeedbackThread domain object with
+class UpdatedAuthorUsernameGeneralFeedBackThreadModelDict(TypedDict):
+    """Dict representation of GeneralFeedBackThreadModel domain object with
     updated author_username key.
     """
 
@@ -62,8 +62,8 @@ class UpdatedAuthorUsernameFeedbackThreadDict(TypedDict):
     last_nonempty_message_author_id: Optional[str]
 
 
-class UpdatedFeedbackMessageDict(TypedDict):
-    """Dict representation of FeedbackMessage object with updated
+class UpdatedGeneralFeedbackMessageModel1Dict(TypedDict):
+    """Dict representation of GeneralFeedbackMessageModel1 object with updated
     author_username key.
     """
 
@@ -78,8 +78,8 @@ class UpdatedFeedbackMessageDict(TypedDict):
 
 
 def update_original_and_last_message_author_id_in_feedback_thread_dicts(
-    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
-) -> List[UpdatedLastMessageAuthorFeedbackThreadDict]:
+    feedback_thread_dicts: List[feedback_domain.GeneralFeedBackThreadModelDict]
+) -> List[UpdatedLastMessageAuthorGeneralFeedBackThreadModelDict]:
     """Replaces original author id and last message author id with there
     corresponding username in the given feedback thread dictionaries.
 
@@ -96,7 +96,7 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
             feedback_thread_dict['last_nonempty_message_author_id']
         )
         updated_feedback_thread_dict: (
-            UpdatedLastMessageAuthorFeedbackThreadDict
+            UpdatedLastMessageAuthorGeneralFeedBackThreadModelDict
         ) = {
             'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
             'original_author_username': (
@@ -125,8 +125,8 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
 
 
 def update_original_author_id_in_feedback_thread_dicts(
-    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
-) -> List[UpdatedAuthorUsernameFeedbackThreadDict]:
+    feedback_thread_dicts: List[feedback_domain.GeneralFeedBackThreadModelDict]
+) -> List[UpdatedAuthorUsernameGeneralFeedBackThreadModelDict]:
     """Replaces original author id with the corresponding username in the
     given feedback thread dictionaries.
 
@@ -140,7 +140,7 @@ def update_original_author_id_in_feedback_thread_dicts(
     updated_feedback_thread_dicts = []
     for feedback_thread_dict in feedback_thread_dicts:
         updated_feedback_thread_dict: (
-            UpdatedAuthorUsernameFeedbackThreadDict
+            UpdatedAuthorUsernameGeneralFeedBackThreadModelDict
         ) = {
             'last_updated_msecs': feedback_thread_dict['last_updated_msecs'],
             'original_author_username': (
@@ -167,8 +167,8 @@ def update_original_author_id_in_feedback_thread_dicts(
 
 
 def update_author_id_in_message_dicts(
-    message_dicts: List[feedback_domain.FeedbackMessageDict]
-) -> List[UpdatedFeedbackMessageDict]:
+    message_dicts: List[feedback_domain.GeneralFeedbackMessageModel1Dict]
+) -> List[UpdatedGeneralFeedbackMessageModel1Dict]:
     """Replaces author id with the corresponding username in the
     given message dictionaries.
 
@@ -181,7 +181,7 @@ def update_author_id_in_message_dicts(
     """
     updated_message_dicts = []
     for message_dict in message_dicts:
-        updated_message_dict: UpdatedFeedbackMessageDict = {
+        updated_message_dict: UpdatedGeneralFeedbackMessageModel1Dict = {
             'author_username': (
                 user_services.get_username(
                     message_dict['author_id']
@@ -418,17 +418,17 @@ class ThreadHandler(
         })
 
 
-class RecentFeedbackMessagesHandlerNormalizedRequestDict(TypedDict):
-    """Dict representation of RecentFeedbackMessagesHandler's
+class RecentGeneralFeedbackMessageModel1sHandlerNormalizedRequestDict(TypedDict):
+    """Dict representation of RecentGeneralFeedbackMessageModel1sHandler's
     normalized_request dictionary.
     """
 
     cursor: Optional[str]
 
 
-class RecentFeedbackMessagesHandler(
+class RecentGeneralFeedbackMessageModel1sHandler(
     base.BaseHandler[
-        Dict[str, str], RecentFeedbackMessagesHandlerNormalizedRequestDict
+        Dict[str, str], RecentGeneralFeedbackMessageModel1sHandlerNormalizedRequestDict
     ]
 ):
     """Returns a list of recently-posted feedback messages.
@@ -506,7 +506,7 @@ class FeedbackStatsHandler(
         self.render_json(self.values)
 
 
-class FeedbackThreadViewEventHandler(
+class GeneralFeedBackThreadModelViewEventHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Records when the given user views a feedback thread, in order to clear

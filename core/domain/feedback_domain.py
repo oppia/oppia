@@ -23,8 +23,8 @@ from core import utils
 from typing import Dict, List, Optional, TypedDict
 
 
-class FeedbackThreadDict(TypedDict):
-    """Dict for FeedbackThread object."""
+class GeneralFeedBackThreadModelDict(TypedDict):
+    """Dict for GeneralFeedBackThreadModel object."""
 
     last_updated_msecs: float
     original_author_id: str
@@ -38,8 +38,8 @@ class FeedbackThreadDict(TypedDict):
     last_nonempty_message_author_id: Optional[str]
 
 
-class FeedbackMessageDict(TypedDict):
-    """Dict for FeedbackMessage object."""
+class GeneralFeedbackMessageModel1Dict(TypedDict):
+    """Dict for GeneralFeedbackMessageModel1 object."""
 
     author_id: str
     created_on_msecs: float
@@ -51,8 +51,8 @@ class FeedbackMessageDict(TypedDict):
     updated_subject: str
 
 
-class FeedbackThreadSummaryDict(TypedDict):
-    """Dict for FeedbackThreadSummary object."""
+class GeneralFeedBackThreadModelSummaryDict(TypedDict):
+    """Dict for GeneralFeedBackThreadModelSummary object."""
 
     status: str
     original_author_id: str
@@ -68,7 +68,7 @@ class FeedbackThreadSummaryDict(TypedDict):
     thread_id: str
 
 
-class FeedbackThread:
+class GeneralFeedBackThreadModel:
     """Domain object for a feedback thread.
 
     Attributes:
@@ -114,7 +114,7 @@ class FeedbackThread:
         last_nonempty_message_text: Optional[str] = None,
         last_nonempty_message_author_id: Optional[str] = None
     ) -> None:
-        """Initializes a FeedbackThread object."""
+        """Initializes a GeneralFeedBackThreadModel object."""
 
         self.id = thread_id
         self.entity_type = entity_type
@@ -132,11 +132,11 @@ class FeedbackThread:
         self.last_nonempty_message_text = last_nonempty_message_text
         self.last_nonempty_message_author_id = last_nonempty_message_author_id
 
-    def to_dict(self) -> FeedbackThreadDict:
-        """Returns a dict representation of this FeedbackThread object.
+    def to_dict(self) -> GeneralFeedBackThreadModelDict:
+        """Returns a dict representation of this GeneralFeedBackThreadModel object.
 
         Returns:
-            dict. A dict representation of the FeedbackThread object.
+            dict. A dict representation of the GeneralFeedBackThreadModel object.
         """
         return {
             'last_updated_msecs': (
@@ -180,7 +180,7 @@ class FeedbackThread:
         ]
 
 
-class FeedbackMessage:
+class GeneralFeedbackMessageModel1:
     """Domain object for a feedback message.
 
     Attributes:
@@ -225,7 +225,7 @@ class FeedbackMessage:
 
     @property
     def entity_id(self) -> str:
-        """Returns the entity ID corresponding to this FeedbackMessage instance.
+        """Returns the entity ID corresponding to this GeneralFeedbackMessageModel1 instance.
 
         Returns:
             str. The entity_id.
@@ -234,7 +234,7 @@ class FeedbackMessage:
 
     @property
     def entity_type(self) -> str:
-        """Returns the entity type corresponding to this FeedbackMessage
+        """Returns the entity type corresponding to this GeneralFeedbackMessageModel1
         instance.
 
         Returns:
@@ -242,11 +242,11 @@ class FeedbackMessage:
         """
         return self.id.split('.')[0]
 
-    def to_dict(self) -> FeedbackMessageDict:
-        """Returns a dict representation of this FeedbackMessage object.
+    def to_dict(self) -> GeneralFeedbackMessageModel1Dict:
+        """Returns a dict representation of this GeneralFeedbackMessageModel1 object.
 
         Returns:
-            dict. Dict representation of the FeedbackMessage object.
+            dict. Dict representation of the GeneralFeedbackMessageModel1 object.
         """
         return {
             'author_id': self.author_id,
@@ -317,8 +317,8 @@ class FeedbackAnalytics:
         }
 
 
-class FeedbackMessageReferenceDict(TypedDict):
-    """Dict for FeedbackMessageReference object."""
+class GeneralFeedbackMessageModel1ReferenceDict(TypedDict):
+    """Dict for GeneralFeedbackMessageModel1Reference object."""
 
     entity_type: str
     entity_id: str
@@ -326,7 +326,7 @@ class FeedbackMessageReferenceDict(TypedDict):
     message_id: int
 
 
-class FeedbackMessageReference:
+class GeneralFeedbackMessageModel1Reference:
     """Domain object for feedback message references.
 
     Attributes:
@@ -343,17 +343,17 @@ class FeedbackMessageReference:
         thread_id: str,
         message_id: int
     ) -> None:
-        """Initializes FeedbackMessageReference object."""
+        """Initializes GeneralFeedbackMessageModel1Reference object."""
         self.entity_type = entity_type
         self.entity_id = entity_id
         self.thread_id = thread_id
         self.message_id = message_id
 
-    def to_dict(self) -> FeedbackMessageReferenceDict:
-        """Returns dict representation of the FeedbackMessageReference object.
+    def to_dict(self) -> GeneralFeedbackMessageModel1ReferenceDict:
+        """Returns dict representation of the GeneralFeedbackMessageModel1Reference object.
 
         Returns:
-            dict. Dict representation of the FeedbackMessageReference object.
+            dict. Dict representation of the GeneralFeedbackMessageModel1Reference object.
         """
         return {
             'entity_type': self.entity_type,
@@ -363,7 +363,7 @@ class FeedbackMessageReference:
         }
 
 
-class FeedbackThreadSummary:
+class GeneralFeedBackThreadModelSummary:
     """Domain object for the summary of a particular thread.
 
     Attributes:
@@ -413,11 +413,11 @@ class FeedbackThreadSummary:
         self.exploration_id = exploration_id
         self.thread_id = thread_id
 
-    def to_dict(self) -> FeedbackThreadSummaryDict:
-        """Returns dict representation of the FeedbackThreadSummary object.
+    def to_dict(self) -> GeneralFeedBackThreadModelSummaryDict:
+        """Returns dict representation of the GeneralFeedBackThreadModelSummary object.
 
         Returns:
-            dict. Dict representation of the FeedbackThreadSummary object.
+            dict. Dict representation of the GeneralFeedBackThreadModelSummary object.
         """
         return {
             'status': self.status,

@@ -149,7 +149,7 @@ class FeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1 = '0'
 

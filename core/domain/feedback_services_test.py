@@ -84,7 +84,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         self.assertTrue(isinstance(message_id, int))
 
         # Retrieve the message instance from the storage layer.
-        datastore_id = feedback_models.GeneralFeedbackMessageModel.get_messages(
+        datastore_id = feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_messages(
             thread_id)[0].id
 
         # The message id should be prefixed with the thread id and a full
@@ -97,7 +97,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         thread_id = 'invalid_thread_id'
 
         expected_exception_regexp = (
-            r'Thread belonging to the GeneralFeedbackThreadModel class '
+            r'Thread belonging to the GeneralGeneralFeedBackThreadModelModel class '
             r'with id:\[%s\] was not found.' % (thread_id)
         )
         with self.assertRaisesRegex(Exception, expected_exception_regexp):
@@ -110,7 +110,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
         thread_ids = ['invalid_thread_id_1', 'invalid_thread_id_2']
 
         expected_exception_regexp = (
-            r'Threads belonging to the GeneralFeedbackThreadModel class '
+            r'Threads belonging to the GeneralGeneralFeedBackThreadModelModel class '
             r'with ids:\[%s\] were not found.' % (' '.join(thread_ids))
         )
         with self.assertRaisesRegex(Exception, expected_exception_regexp):
@@ -157,7 +157,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, [])
 
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(thread_id))
         self.assertIsNone(
             feedback_models.FeedbackAnalyticsModel.get_by_id(self.EXP_1_ID))
 
@@ -222,12 +222,12 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
     def test_delete_feedback_threads_deletes_thread(self) -> None:
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_1_id))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_1_id))
 
     def test_delete_feedback_threads_deletes_suggestion(self) -> None:
@@ -242,12 +242,12 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
     def test_delete_feedback_threads_deletes_message(self) -> None:
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_by_id(
                 '%s.%s' % (self.thread_1_id, 0)))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_by_id(
                 '%s.%s' % (self.thread_1_id, 0)))
 
     def test_delete_feedback_threads_deletes_feedback_analytics(self) -> None:
@@ -267,18 +267,18 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
     def test_delete_feedback_threads_deletes_multiple_feedbacks(self) -> None:
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_1_id))
         self.assertIsNotNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_2_id))
         feedback_services.delete_threads_for_multiple_entities(
             feconf.ENTITY_TYPE_EXPLORATION, [self.EXP_1_ID, self.EXP_2_ID])
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_1_id))
         self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            feedback_models.GeneralGeneralFeedBackThreadModelModel.get_by_id(
                 self.thread_2_id))
 
 
@@ -301,7 +301,7 @@ class ExpectedThreadViewerDict(TypedDict):
 
 
 class ReferenceDict(TypedDict):
-    """Dictionary representing the FeedbackMessageReference dictionary."""
+    """Dictionary representing the GeneralFeedbackMessageModel1Reference dictionary."""
 
     entity_type: str
     entity_id: str
@@ -309,7 +309,7 @@ class ReferenceDict(TypedDict):
     message_id: int
 
 
-class FeedbackThreadUnitTests(test_utils.GenericTestBase):
+class GeneralFeedBackThreadModelUnitTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'eid1'
     EXP_ID_2: Final = 'eid2'
@@ -357,7 +357,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         given thread id read by the user.
         """
         feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.get(
+            feedback_models.GeneralGeneralFeedBackThreadModelUserModel.get(
                 user_id, thread_id))
 
         # TODO(#15621): The explicit declaration of type for ndb properties
@@ -452,7 +452,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             dictionary_list_from_page_message,
         )
         genral_feedback_result = (
-        feedback_models.GeneralFeedbackMessageModel.get_all_messages(
+        feedback_models.GeneralGeneralFeedbackMessageModel1Model.get_all_messages(
             feconf.FEEDBACK_TAB_PAGE_SIZE, None))
         self.assertEqual(method_result[1], genral_feedback_result[1])
         self.assertEqual(method_result[2], genral_feedback_result[2])
@@ -531,7 +531,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # The message count parameter is missing for this thread. The thread
         # summaries function should account for this and function
         # flawlessly.
-        thread_3 = feedback_models.GeneralFeedbackThreadModel(
+        thread_3 = feedback_models.GeneralGeneralFeedBackThreadModelModel(
             id='exploration.%s.%s' % (self.EXP_ID_3, self.THREAD_ID),
             entity_type='exploration', entity_id=self.EXP_ID_3,
             original_author_id=self.user_id, subject='Feedback',
@@ -650,11 +650,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'sample_thread_id_1', 'sample_thread_id_2',
             'sample_thread_id_3'
         ]
-        # The GeneralFeedbackThreadUserModel is created for the
+        # The GeneralGeneralFeedBackThreadModelUserModel is created for the
         # sample_thread_id_1 and sample_thread_id_3 thread ids.
-        feedback_models.GeneralFeedbackThreadUserModel.create(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.create(
             self.user_id, sample_thread_ids[0])
-        feedback_models.GeneralFeedbackThreadUserModel.create(
+        feedback_models.GeneralGeneralFeedBackThreadModelUserModel.create(
             self.user_id, sample_thread_ids[2])
         # Assert that no messages are read for any of the threads yet.
         for sample_thread_id in sample_thread_ids:
@@ -689,9 +689,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(exp_id, 'owner')
 
         event_handler_call_counter_exploration = test_utils.CallCounter(
-            event_services.FeedbackThreadCreatedEventHandler.record)
+            event_services.GeneralFeedBackThreadModelCreatedEventHandler.record)
         with self.swap(
-            event_services.FeedbackThreadCreatedEventHandler, 'record',
+            event_services.GeneralFeedBackThreadModelCreatedEventHandler, 'record',
             event_handler_call_counter_exploration):
             feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id,
@@ -702,9 +702,9 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         event_handler_call_counter_non_exploration = (
             test_utils.CallCounter(
-                event_services.FeedbackThreadCreatedEventHandler.record))
+                event_services.GeneralFeedBackThreadModelCreatedEventHandler.record))
         with self.swap(
-            event_services.FeedbackThreadCreatedEventHandler, 'record',
+            event_services.GeneralFeedBackThreadModelCreatedEventHandler, 'record',
             event_handler_call_counter_non_exploration):
             feedback_services.create_thread(
                 'topic', 'topic_id', 'test_user', 'a subject',
@@ -716,13 +716,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.message_count, 1)
         feedback_services.create_message(
             thread_id, self.user_id,
             feedback_models.STATUS_CHOICES_FIXED, None, 'editor message')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.message_count, 2)
 
     def test_cache_update_after_create_thread_with_user_text(self) -> None:
@@ -730,7 +730,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.user_id, 'subject',
             'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
@@ -738,7 +738,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -746,7 +746,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -754,7 +754,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread_id, self.user_id, feedback_models.STATUS_CHOICES_FIXED, None,
             'anonymous text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'anonymous text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
@@ -763,7 +763,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.user_id, 'subject',
             'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
@@ -771,7 +771,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread_id, None, feedback_models.STATUS_CHOICES_FIXED, None,
             'anonymous text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'anonymous text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -781,7 +781,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id, 'subject', '')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertIsNone(thread.last_nonempty_message_text)
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -791,7 +791,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', '')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertIsNone(thread.last_nonempty_message_text)
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -801,7 +801,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -809,7 +809,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread_id, self.user_id, feedback_models.STATUS_CHOICES_FIXED, None,
             '')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
@@ -820,7 +820,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             'exploration', self.EXP_ID_1, self.user_id, 'subject',
             'initial text')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
@@ -828,7 +828,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread_id, None, feedback_models.STATUS_CHOICES_FIXED,
             None, '')
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        thread = feedback_models.GeneralGeneralFeedBackThreadModelModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
@@ -857,7 +857,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             'thread_id': 'tid',
             'message_id': 5
         }
-        reference = feedback_domain.FeedbackMessageReference(
+        reference = feedback_domain.GeneralFeedbackMessageModel1Reference(
             reference_dict['entity_type'], reference_dict['entity_id'],
             reference_dict['thread_id'], reference_dict['message_id'])
 
@@ -880,7 +880,7 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         self.assertDictEqual(tasks[0].payload['reference_dict'], reference_dict)
 
 
-class FeedbackMessageEmailTests(test_utils.EmailTestBase):
+class GeneralFeedbackMessageModel1EmailTests(test_utils.EmailTestBase):
     """Tests for feedback message emails."""
 
     def setUp(self) -> None:
@@ -1295,7 +1295,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.process_and_flush_pending_tasks()
 
 
-class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
+class GeneralFeedbackMessageModel1BatchEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -1466,7 +1466,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 0)
 
 
-class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
+class GeneralFeedbackMessageModel1InstantEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
         super().setUp()
