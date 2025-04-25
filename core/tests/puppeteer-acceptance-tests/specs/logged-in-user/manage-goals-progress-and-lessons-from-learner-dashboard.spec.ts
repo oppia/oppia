@@ -124,7 +124,7 @@ describe('Logged-in User', function () {
       await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
 
       await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.expectCompletedLessonsToInclude(['Positive Numbers']);
+      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
       await loggedInUser.verifyLessonPresenceInPlayLater(
         'Positive Numbers',
         false
