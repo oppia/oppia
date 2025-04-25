@@ -333,19 +333,19 @@ export class ItemSelectionInputValidationService {
           rule.inputs as unknown as ItemSelectionRuleInputs;
         // Serialize all rule inputs in a general and reversible way,
         // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
-        const inputs = Object.fromEntries(
+        const allInputs = Object.fromEntries(
           Object.entries(itemSelectionInputs).map(([key, value]) => [
             key,
             [...value].sort(),
           ])
         );
-        const input = JSON.stringify(allInputs);
-        const ruleKey = `${rule.type}:${input}`;
+        const stringifiedInputs = JSON.stringify(allInputs);
+        const ruleKey = `${rule.type}:${stringifiedInputs}`;
         if (mapRulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
           const ag = mapRulesToAnswerGroupIndex[ruleKey];
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
-            message: `The Rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
+            message: `Rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
           });
         } else {
           mapRulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;
