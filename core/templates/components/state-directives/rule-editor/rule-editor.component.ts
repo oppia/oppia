@@ -269,8 +269,12 @@ export class RuleEditorComponent
 
   saveThisRule(): void {
     this.populateRuleContentIdsService.populateNullRuleContentIds(this.rule);
-    this.onSaveRule.emit();
-    this.changeDetectorRef.detectChanges();
+  
+    // Wait until the current change-detection cycle finishes.
+    Promise.resolve().then(() => {
+      this.onSaveRule.emit(); // up to date now
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   ngOnInit(): void {
