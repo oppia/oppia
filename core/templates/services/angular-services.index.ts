@@ -456,6 +456,7 @@ import { ExplorationEditorPageAuthGuard } from 'pages/exploration-editor-page/ex
 import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
+import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/guards/normalize-url-case.guard';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -947,5 +948,6 @@ export const angularServices: [string, Type<{}>][] = [
     ContributorDashboardAdminStatsBackendApiService],
   ['InsertScriptService', InsertScriptService],
   ['VoiceoverAdminAuthGuard', VoiceoverAdminAuthGuard],
-  ['SubtopicViewerAuthGuard', SubtopicViewerAuthGuard]
+  ['SubtopicViewerAuthGuard', SubtopicViewerAuthGuard],
+  ['NormalizeUrlCaseGuard', NormalizeUrlCaseGuard]
 ];
