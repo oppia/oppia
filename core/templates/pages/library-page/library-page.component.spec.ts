@@ -91,7 +91,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('Library Page Component', () => {
+describe('Library Page Component', () => {
   let fixture: ComponentFixture<LibraryPageComponent>;
   let componentInstance: LibraryPageComponent;
   let loaderService: LoaderService;
@@ -862,8 +862,7 @@ fdescribe('Library Page Component', () => {
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();
   });
-  fit('should set max-width style on carousel element when it exists', fakeAsync(() => {
-    // Set up AppConstants mock
+  it('should set max-width style on carousel element when it exists', fakeAsync(() => {
     const originalLibraryTileWidth = AppConstants.LIBRARY_TILE_WIDTH_PX;
     AppConstants.LIBRARY_TILE_WIDTH_PX = 200;
 
