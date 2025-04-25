@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {NO_ERRORS_SCHEMA, EventEmitter, Renderer2} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -238,6 +238,10 @@ describe('Library Page Component', () => {
         {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService,
+        },
+        {
+          provide: Renderer2,
+          useValue: {listen: () => () => {}},
         },
         PageTitleService,
         {
@@ -849,4 +853,14 @@ describe('Library Page Component', () => {
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();
   });
+  it('should set max-width style on carousel element when it exists', fakeAsync(() => {
+    let rendererSetStyleSpy = spyOn(
+      componentInstance.renderer,
+      'setStyle'
+    ).and.callThrough();
+
+    componentInstance.initCarousels();
+    tick();
+    expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
+  }));
 });
