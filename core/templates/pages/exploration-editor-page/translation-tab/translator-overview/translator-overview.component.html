@@ -22,9 +22,12 @@
           <strong>Voiceover Language Code: </strong>
         </span>
         <mat-form-field class="language-selector-form">
-          <mat-select (selectionChange)="changeTranslationLanguage()" [(ngModel)]="languageCode">
+          <mat-select (selectionChange)="changeTranslationLanguage()"
+                      class="e2e-test-voiceover-language-selector"
+                      [(ngModel)]="languageCode">
             <mat-option *ngFor="let language of languageCodesAndDescriptions"
-                        [value]="language.id">
+                        [value]="language.id"
+                        class="e2e-test-language-selector-option">
               <span>
                 {{language.description}}
               </span>
@@ -38,9 +41,12 @@
         </span>
         <span *ngIf="selectedLanguageAccentCode === ''"><i>No Accent Selection Available</i></span>
         <mat-form-field class="language-selector-form" *ngIf="selectedLanguageAccentCode !== ''">
-          <mat-select [(value)]="selectedLanguageAccentCode" (selectionChange)="updateLanguageAccentCode($event.value)">
+          <mat-select [(value)]="selectedLanguageAccentCode"
+                      (selectionChange)="updateLanguageAccentCode($event.value)"
+                      class="e2e-test-voiceover-language-accent-selector">
             <mat-option *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue"
-                        [value]="languageAccentCodeToDescription.key">
+                        [value]="languageAccentCodeToDescription.key"
+                        class="e2e-test-language-accent-selector-option">
               <span>
                 {{languageAccentCodeToDescription.value}}
               </span>

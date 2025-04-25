@@ -132,6 +132,14 @@ const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
 const translationLanguageSelector =
   'select.e2e-test-translation-language-selector';
+
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
 const translationModeButton = 'button.e2e-test-translation-mode';
 const editTranslationSelector = 'div.e2e-test-edit-translation';
 const stateTranslationEditorSelector =
@@ -247,6 +255,7 @@ const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -2336,17 +2345,20 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to add a voiceover for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async addVoiceoverToContent(
-    languageCode: string,
+    language: string,
+    languageAccent: string,
     contentType: string,
     voiceoverFilePath: string
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    this.waitForPageToFullyLoad();
+
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -2356,7 +2368,40 @@ export class ExplorationEditor extends BaseUser {
       );
       await this.clickOn(contentType);
     }
-    await this.clickOn(uploadAudioButton);
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    this.page.waitForTimeout(2000);
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();

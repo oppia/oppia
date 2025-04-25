@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseURL = testConstants.URLs.BaseURL;
+const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -45,6 +46,13 @@ const mobileVoiceoverArtistsHeader =
 const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
 
+const languageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+const addNewLanguageAccentButtonSelector =
+  '.e2e-test-add-new-language-accent-button';
+const languageAccentDropdownSelector =
+  '.e2e-test-language-accent-dropdown-selector';
+
 export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to exploration settings tab.
@@ -60,6 +68,15 @@ export class VoiceoverAdmin extends BaseUser {
     }
 
     showMessage('Navigation to settings tab is successful.');
+  }
+
+  /**
+   * Navigate to the voiceover admin page.
+   */
+  async navigateToVoiceoverAdminPage(): Promise<void> {
+    await this.page.bringToFront();
+    await this.waitForNetworkIdle();
+    await this.goto(voiceoverAdminURL);
   }
 
   /**
@@ -245,6 +262,33 @@ export class VoiceoverAdmin extends BaseUser {
       showMessage(
         `Confirmed: Voiceover artist '${artistUsername}' is still not listed.`
       );
+    }
+  }
+
+  async addSupportedLanguageAccentPair(
+    languageAccentCode: string
+  ): Promise<void> {
+    this.navigateToVoiceoverAdminPage();
+    this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
+    await this.clickOn(addNewLanguageAccentButtonSelector);
+
+    await this.page.waitForSelector(languageAccentDropdownSelector);
+    await this.clickOn(languageAccentDropdownSelector);
+
+    await this.page.waitForSelector(languageAccentOptionSelector);
+    const languageOptions = await this.page.$$(languageAccentOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      console.log(textContent);
+      if (textContent === languageAccentCode) {
+        await option.click();
+        break;
+      }
     }
   }
 }
