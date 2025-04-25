@@ -147,6 +147,7 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+    canActivate: [NormalizeUrlCaseGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
