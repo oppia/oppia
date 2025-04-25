@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component, Renderer2} from '@angular/core';
+import {Component, Renderer2, ElementRef} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -118,7 +118,8 @@ export class LibraryPageComponent {
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private el: ElementRef
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -153,9 +154,11 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    var maxWidth =
+    let maxWidth =
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px';
-    var carouselElem = document.querySelector('.oppia-library-carousel');
+    let carouselElem = this.el.nativeElement.querySelector(
+      '.oppia-library-carousel'
+    );
 
     if (carouselElem) {
       this.renderer.setStyle(carouselElem, 'max-width', maxWidth);

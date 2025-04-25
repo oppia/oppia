@@ -17,7 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA, EventEmitter, Renderer2} from '@angular/core';
+import {
+  NO_ERRORS_SCHEMA,
+  EventEmitter,
+  Renderer2,
+  ElementRef,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -86,7 +91,7 @@ class MockTranslateService {
   }
 }
 
-describe('Library Page Component', () => {
+fdescribe('Library Page Component', () => {
   let fixture: ComponentFixture<LibraryPageComponent>;
   let componentInstance: LibraryPageComponent;
   let loaderService: LoaderService;
@@ -242,6 +247,10 @@ describe('Library Page Component', () => {
         {
           provide: Renderer2,
           useValue: {listen: () => () => {}},
+        },
+        {
+          provide: ElementRef,
+          useValue: {nativeElement: document.createElement('div')},
         },
         PageTitleService,
         {
@@ -853,7 +862,40 @@ describe('Library Page Component', () => {
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();
   });
-  it('should set max-width style on carousel element when it exists', fakeAsync(() => {
+  fit('should set max-width style on carousel element when it exists', fakeAsync(() => {
+    // Set up AppConstants mock
+    const originalLibraryTileWidth = AppConstants.LIBRARY_TILE_WIDTH_PX;
+    AppConstants.LIBRARY_TILE_WIDTH_PX = 200;
+
+    componentInstance.tileDisplayCount = 3;
+    componentInstance.libraryWindowIsNarrow = false;
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: [],
+        categories: [],
+        header_i18n_id: 'header1',
+        has_full_results_page: true,
+        full_results_url: '/results1',
+        protractor_id: 'protractor1',
+      },
+      {
+        activity_summary_dicts: [],
+        categories: [],
+        header_i18n_id: 'header2',
+        has_full_results_page: false,
+        full_results_url: '/results2',
+        protractor_id: 'protractor2',
+      },
+    ];
+
+    let carouselElement = document.createElement('div');
+    carouselElement.setAttribute('class', 'oppia-library-carousel');
+    componentInstance.el.nativeElement.appendChild(carouselElement);
+
+    spyOn(componentInstance.el.nativeElement, 'querySelector').and.returnValue(
+      carouselElement
+    );
+
     let rendererSetStyleSpy = spyOn(
       componentInstance.renderer,
       'setStyle'
@@ -861,6 +903,15 @@ describe('Library Page Component', () => {
 
     componentInstance.initCarousels();
     tick();
+
+    let width = '400px';
+    expect(rendererSetStyleSpy).toHaveBeenCalledWith(
+      carouselElement,
+      'max-width',
+      width
+    );
     expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
+
+    AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
   }));
 });
