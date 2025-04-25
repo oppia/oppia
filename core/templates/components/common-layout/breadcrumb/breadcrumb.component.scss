@@ -1,0 +1,65 @@
+@import 'third_party/static/bootstrap-5.1.3/scss/functions';
+@import 'third_party/static/bootstrap-5.1.3/scss/variables';
+
+.oppia-breadcrumb {
+  font-size: 14pt;
+  margin: 1rem 0;
+  padding: 0.5rem 0;
+
+  // Mobile styles
+  .mobile-back-link {
+    align-items: center;
+    color: $primary;
+    display: flex;
+    text-decoration: none;
+
+    i {
+      font-size: 20px;
+      margin-right: 4px;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Desktop styles
+  .breadcrumb-list {
+    align-items: center;
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      align-items: center;
+      display: flex;
+
+      a {
+        color: $primary;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      &.active {
+        color: $gray-700;
+      }
+
+      .separator {
+        color: $gray-500;
+        font-size: 20px;
+        margin: 0 0.5rem;
+      }
+    }
+  }
+}
+
+// Media query for mobile devices
+@media screen and (max-width: 767px) {
+  .oppia-breadcrumb {
+    margin: 0.5rem 0;
+  }
+} 

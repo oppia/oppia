@@ -1,0 +1,26 @@
+<div class="oppia-breadcrumb" *ngIf="items.length > 0">
+  <ng-container *ngIf="isMobile">
+    <!-- Mobile view: "< Back to [Parent]" -->
+    <a [routerLink]="getDisplayItems()[0]?.url" class="mobile-back-link" *ngIf="getDisplayItems().length > 0">
+      <i class="material-icons">chevron_left</i>
+      <span>Back to {{ getDisplayItems()[0]?.label }}</span>
+    </a>
+  </ng-container>
+
+  <ng-container *ngIf="!isMobile">
+    <!-- Desktop view: up to 3 levels -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb-list">
+        <li *ngFor="let item of getDisplayItems(); let last = last" 
+            [class.active]="last"
+            [attr.aria-current]="last ? 'page' : null">
+          <ng-container *ngIf="!last">
+            <a [routerLink]="item.url">{{ item.label }}</a>
+            <i class="material-icons separator">chevron_right</i>
+          </ng-container>
+          <span *ngIf="last">{{ item.label }}</span>
+        </li>
+      </ol>
+    </nav>
+  </ng-container>
+</div> 
