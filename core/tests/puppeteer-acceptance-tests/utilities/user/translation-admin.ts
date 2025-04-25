@@ -137,7 +137,7 @@ export class TranslationAdmin extends BaseUser {
     // Type the username into the contributor username input field for filtering.
     await this.type(viewContributorUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
-    // Wait for the network to settle and verify the user is displayed in the results.
+    // Wait for the network to settle.
     await this.waitForNetworkIdle();
   }
 
@@ -170,7 +170,6 @@ export class TranslationAdmin extends BaseUser {
       showMessage(
         'User list element (.e2e-test-reviewer-roles-result) not found assuming no users have rights.'
       );
-      return;
     }
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
