@@ -23,11 +23,10 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-const INTRODUCTION_CARD_CONTENT: string = 'Test Question';
-const LAST_CARD_CONTENT: string =
-  'Congratulations! You have completed the lesson.';
-const DEFAULT_FEEDBACK: string = 'Wrong.';
-const HINT_TEXT: string = 'Initial coordinate.';
+const INTRODUCTION_CARD_CONTENT = 'Test Question';
+const LAST_CARD_CONTENT = 'Congratulations! You have completed the lesson.';
+const DEFAULT_FEEDBACK = 'Wrong.';
+const HINT_TEXT = 'Initial coordinate.';
 
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
@@ -58,40 +57,41 @@ describe('Exploration Creator', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should draft an exploration with image interaction, add feedback and hints, and publish it successfully',
+    'should draft, discard and publish the changes',
     async function () {
-      // Step 1: Start creating the exploration.
+      // Step 1: Create and setup new exploration.
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
-
-      // Step 2: Add content and interaction to the first card.
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+
+      // Step 2: Add an image interaction with feedback and hint.
       await explorationEditor.addImageInteraction();
       await explorationEditor.editDefaultResponseFeedback(DEFAULT_FEEDBACK);
       await explorationEditor.addHintToState(HINT_TEXT);
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard(CARD_NAME.LAST_CARD);
+
+      // Step 3: Save draft.
       await explorationEditor.saveExplorationDraft();
 
-      // Step 3: Add final card with End Exploration interaction.
+      // Step 4: Create a second card to ensure proper navigation.
+      await explorationEditor.directLearnersToNewCard(CARD_NAME.LAST_CARD);
       await explorationEditor.navigateToCard(CARD_NAME.LAST_CARD);
+
+      // Step 5: Add End Exploration interaction on the new card.
       await explorationEditor.updateCardContent(LAST_CARD_CONTENT);
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+      // Step 6: Save final draft.
       await explorationEditor.saveExplorationDraft();
 
-      // Step 4: Publish the exploration.
+      // Step 7: Publish the exploration.
       explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Publish with an interaction',
         'This is the goal of exploration.',
         'Algebra'
       );
 
-      if (!explorationId) {
-        throw new Error('Exploration failed to publish.');
-      }
-
-      // Step 5: Validate the published exploration is publicly accessible.
+      // Step 8: Verify published exploration is accessible by another user.
       await explorationVisitor.expectExplorationToBeAccessibleByUrl(
         explorationId
       );
