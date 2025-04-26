@@ -118,6 +118,9 @@ describe('Logged-out User', function () {
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
+      const url = await loggedOutUser.page.url();
+      const explorationId = url.split('/explore/')[1];
+
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
