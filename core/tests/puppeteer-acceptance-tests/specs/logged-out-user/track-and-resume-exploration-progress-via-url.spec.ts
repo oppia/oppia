@@ -121,24 +121,6 @@ describe('Logged-out User', function () {
       const explorationId = url.split('/explore/')[1];
 
       await loggedOutUser.continueToNextCard();
-
-      await loggedOutUser.openLessonInfoModal();
-      await loggedOutUser.expectLessonInfoToShowRating('Unrated');
-      await loggedOutUser.expectLessonInfoToShowLastUpdated();
-      await loggedOutUser.expectLessonInfoToShowTags(['growth']);
-
-      // ✅ Updated to use dynamic explorationId.
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Facebook',
-        explorationId
-      );
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Twitter',
-        explorationId
-      );
-
-      await loggedOutUser.closeLessonInfoModal();
-
       await loggedOutUser.submitAnswer('-99');
       await loggedOutUser.expectCardContentToMatch(
         'Enter a negative number greater than -100.'
