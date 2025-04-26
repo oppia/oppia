@@ -331,6 +331,7 @@ describe('Router Service', () => {
       location: {
         hash: '#/gui/Introduction',
       },
+      scrollTo: () => {},
     });
 
     routerService.savePendingChanges();
