@@ -42,6 +42,7 @@ enum CARD_NAME {
 describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutUser: LoggedOutUser;
+  let progressUrl: string;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -117,10 +118,30 @@ describe('Logged-out User', function () {
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
 
+      // ✅ Dynamically fetch the explorationId from URL.
       const url = await loggedOutUser.page.url();
       const explorationId = url.split('/explore/')[1];
 
       await loggedOutUser.continueToNextCard();
+
+      await loggedOutUser.openLessonInfoModal();
+      await loggedOutUser.expectLessonInfoToShowRating('Unrated');
+      await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
+      await loggedOutUser.expectLessonInfoToShowLastUpdated();
+      await loggedOutUser.expectLessonInfoToShowTags(['growth']);
+
+      // ✅ Updated to use dynamic explorationId.
+      await loggedOutUser.shareExplorationFromLessonInfoModal(
+        'Facebook',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationFromLessonInfoModal(
+        'Twitter',
+        explorationId
+      );
+
+      await loggedOutUser.closeLessonInfoModal();
+
       await loggedOutUser.submitAnswer('-99');
       await loggedOutUser.expectCardContentToMatch(
         'Enter a negative number greater than -100.'
@@ -131,12 +152,10 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.reloadPage();
       await loggedOutUser.expectProgressRemainder(false);
-
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-35');
       await loggedOutUser.continueToNextCard();
 
-      // Save progress.
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.saveProgress();
       await loggedOutUser.expectSignInButtonToBePresent();
@@ -144,12 +163,8 @@ describe('Logged-out User', function () {
       await loggedOutUser.checkProgressUrlValidityInfo(
         PROGRESS_URL_VALIDITY_INFO
       );
-      const progressUrl = await loggedOutUser.copyProgressUrl();
+      progressUrl = await loggedOutUser.copyProgressUrl();
 
-      // ✅ Instead of closing modal which is stuck, reload the page.
-      await loggedOutUser.reloadPage();
-
-      // Resume with progress URL.
       await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
       await loggedOutUser.expectProgressRemainder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
@@ -161,24 +176,6 @@ describe('Logged-out User', function () {
       await loggedOutUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
-
-      // ✅ Now safely open Lesson Info Modal to check Views.
-      await loggedOutUser.openLessonInfoModal();
-      await loggedOutUser.expectLessonInfoToShowRating('Unrated');
-      await loggedOutUser.expectLessonInfoToShowNoOfViews(1);
-      await loggedOutUser.expectLessonInfoToShowLastUpdated();
-      await loggedOutUser.expectLessonInfoToShowTags(['growth']);
-
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Facebook',
-        explorationId
-      );
-      await loggedOutUser.shareExplorationFromLessonInfoModal(
-        'Twitter',
-        explorationId
-      );
-
-      await loggedOutUser.closeLessonInfoModal();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
