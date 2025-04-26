@@ -26,7 +26,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {ResponsesService} from '../services/responses.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {TrainingDataService} from './training-data.service';
 import {
   AnswerGroup,

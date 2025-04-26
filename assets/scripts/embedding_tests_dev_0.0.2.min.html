@@ -48,24 +48,27 @@
 </div>
 
 <script type="text/javascript">
-  // To keep track of next exploration id to be replaced.
   var placeholderExplorationId = 'idToBeReplaced';
   var onChangeExpId = function() {
-    var newExplorationId = $(
-      '.e2e-test-exploration-id-input-field').val();
-    $('div > iframe').each(function(index) {
-      var src = $(this).attr('src');
-      src = src.replace(placeholderExplorationId, newExplorationId);
-      $(this).attr('src', src);
+    var inputEl = document.querySelector('.e2e-test-exploration-id-input-field');
+    var newExplorationId = inputEl.value;
+
+    var iframes = document.querySelectorAll('div > iframe');
+    iframes.forEach(function(iframe) {
+      var src = iframe.getAttribute('src');
+      iframe.setAttribute('src', src.replace(placeholderExplorationId, newExplorationId));
     });
+
     placeholderExplorationId = newExplorationId;
 
-    // For first time loading of deferred loading version.
-    $('oppia[oppia-id="idToBeReplaced"]').each(function(index) {
-      $(this).attr('oppia-id', newExplorationId);
+    var oppiaElements = document.querySelectorAll('oppia[oppia-id="idToBeReplaced"]');
+    oppiaElements.forEach(function(el) {
+      el.setAttribute('oppia-id', newExplorationId);
     });
 
-    // Show the contents
-    $('.e2e-test-results').show();
+    var resultsEl = document.querySelector('.e2e-test-results');
+    if (resultsEl) {
+      resultsEl.style.display = 'block';
+    }
   };
 </script>
