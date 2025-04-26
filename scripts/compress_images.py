@@ -75,7 +75,7 @@ class ImageCompressor:
             file_extension: str. The file extension of the image.
 
         Returns:
-            type: str. Compression type (Zip or LZW).
+            str. Compression type (Zip or LZW).
         """
         return (
             'Zip' if file_extension in 
@@ -95,9 +95,8 @@ class ImageCompressor:
             output_file_path: pathlib.Path. The path to the output file.
 
         Returns:
-            image_compressibility_dicts: List(CompressedImageInfo). List of all
-            compressible images over repository with attributes as path, 
-            original_size and new_size.
+            List(CompressedImageInfo). List of all compressible images over 
+            repository with attributes as path, original_size and new_size.
         """
 
         file_extension = file_path.suffix.lower()
@@ -140,7 +139,7 @@ class ImageCompressor:
         """Find images that can be compressed further.
 
         Returns:
-            result_images: List[CompressedImageInfo]. List of all compressible
+            List(CompressedImageInfo). List of all compressible
             images over repository with attributes as path, original_size
             and new_size.
         """

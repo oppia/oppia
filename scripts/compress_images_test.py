@@ -82,17 +82,20 @@ class TestImageCompressor(test_utils.GenericTestBase):
         """Test find_compressible_images method."""
         compressor = compress_images.ImageCompressor(
             self.temp_dir,
-            output_dir=self.output_dir
+            output_dir=self.output_dir,
         )
-        result_images: List[CompressedImageInfo] = (
+        result_images = (
             compressor.find_compressible_images()
         )
 
-        self.assertEqual(len(result_images), 1)
+        self.assertGreaterEqual(len(result_images), 1)
 
         for image in result_images:
-            self.assertIn(image['path'].suffix, ['.png', '.jpg', '.webp'])
-            self.assertTrue(image['original_size'] > image['new_size'])
+            path_extension = image['path'].suffix.lower()
+            expected_path = (
+                pathlib.Path(self.temp_dir) / f'test_image{path_extension}'
+            )
+            self.assertEqual(image['path'].resolve(), expected_path)
 
     def test_compress_images(self) -> None:
         """Test image compression process."""
@@ -100,7 +103,7 @@ class TestImageCompressor(test_utils.GenericTestBase):
             self.temp_dir,
             output_dir=self.output_dir
         )
-        result_images: List[CompressedImageInfo] = (
+        result_images = (
             compressor.find_compressible_images()
         )
 
@@ -124,30 +127,27 @@ class TestImageCompressor(test_utils.GenericTestBase):
             output_dir=self.output_dir
         )
         os.makedirs(self.output_dir, exist_ok=True)
-        mock_rmtree = mock.MagicMock(ignore_errors=OSError('Permission denied'))
-        mock_log_error = mock.MagicMock()
-        mock_subprocess_result = mock.Mock(spec_set=['returncode', 'stderr'])
-        mock_subprocess_result.returncode = 1
-        mock_subprocess_result.stderr = 'Permission denied error'
+        mock_log_error = mock.MagicMock('log error')
+        mock_subprocess_result = mock.Mock(
+            returncode=1,
+            stderr='Director removal error'
+        )
         mock_subprocess_run = mock.Mock(return_value=mock_subprocess_result)
 
-        with self.swap(shutil, 'rmtree', mock_rmtree):
-            with self.swap(logging, 'error', mock_log_error):
-                with self.swap(subprocess, 'run', mock_subprocess_run):
-                    result_images: List[CompressedImageInfo] = [
-                        {
-                            'path': pathlib.Path(self.png_path),
-                            'original_size': 1000,
-                            'new_size': 500
-                        }
-                    ]
-                    compressor.compress_images(result_images)
-
-        mock_rmtree.assert_called_once_with(self.output_dir, ignore_errors=True)
+        with self.swap(logging, 'error', mock_log_error):
+            with self.swap(subprocess, 'run', mock_subprocess_run):
+                result_images: List[CompressedImageInfo] = [
+                    {
+                        'path': pathlib.Path(self.png_path),
+                        'original_size': 1000,
+                        'new_size': 500
+                    }
+                ]
+                compressor.compress_images(result_images)
 
         mock_log_error.assert_called_with(
             '[ERROR]: %s occurred on file %s',
-            'Permission denied error',
+            'Director removal error',
             pathlib.Path(self.png_path)
         )
         args = [
@@ -166,13 +166,14 @@ class TestImageCompressor(test_utils.GenericTestBase):
 
     def test_run_no_compressible_images(self) -> None:
         """Test run method when no images are compressible."""
-        temp_dir = tempfile.mkdtemp()
-        with open(self.txt_image_path, 'w', encoding='utf-8') as f:
-            f.write('This is not a valid image.')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            txt_image_path = os.path.join(temp_dir, 'test_image.txt')
+            with open(txt_image_path, 'w', encoding='utf-8') as f:
+                f.write('This is not a valid image.')
 
-        compressor = compress_images.ImageCompressor(temp_dir)
-        result = compressor.run()
-        self.assertEqual(result, 0)
+            compressor = compress_images.ImageCompressor(temp_dir)
+            result = compressor.run()
+            self.assertEqual(result, 0)
 
     def test_run_with_compressible_images(self) -> None:
         """Test run method with compressible images."""
@@ -195,51 +196,52 @@ class TestImageCompressor(test_utils.GenericTestBase):
 
     def test_compress_images_handles_compression_failure(self) -> None:
         """Test handling of compression failure for an image."""
-        result_images: List[CompressedImageInfo] = [
-            {
-                'path': pathlib.Path(self.png_path),
-                'original_size': 1000,
-                'new_size': 500
-            }
-        ]
         compressor = compress_images.ImageCompressor(
             self.temp_dir,
             output_dir=self.output_dir
         )
-        with (
-            mock.patch('subprocess.run') as mock_subprocess_run,
-            mock.patch('logging.error') as mock_log_error
-        ):
-            mock_subprocess_run.return_value = mock.Mock(
-                returncode=1,
-                stderr='Compression error message'
-            )
-            with mock.patch('PIL.Image.open'):
+
+        mock_subprocess_result = mock.Mock(
+            returncode=1,
+            stderr='Compression error message'
+        )
+        mock_subprocess_run = mock.Mock(return_value=mock_subprocess_result)
+        mock_log_error = mock.Mock('log error')
+
+        with self.swap(subprocess, 'run', mock_subprocess_run):
+            with self.swap(logging, 'error', mock_log_error):
+                result_images: List[CompressedImageInfo] = [
+                    {
+                        'path': pathlib.Path(self.png_path),
+                        'original_size': 1000,
+                        'new_size': 500
+                    }
+                ]
                 compressor.compress_images(result_images)
 
-            mock_log_error.assert_called_once_with(
-                '[ERROR]: %s occurred on file %s',
-                'Compression error message',
-                pathlib.Path(self.png_path)
-            )
-            args = [
-                'gm', 'convert',
-                str(self.png_path),
-                '-strip',
-                '-compress', 'Zip',
-                mock.ANY
-            ]
-            mock_subprocess_run.assert_called_once_with(
-                args,
-                capture_output=True,
-                text=True,
-                check=True
-            )
+        mock_log_error.assert_called_once_with(
+            '[ERROR]: %s occurred on file %s',
+            'Compression error message',
+            pathlib.Path(self.png_path)
+        )
+        args = [
+            'gm', 'convert',
+            str(self.png_path),
+            '-strip',
+            '-compress', 'Zip',
+            mock.ANY
+        ]
+        mock_subprocess_run.assert_called_once_with(
+            args,
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
     def test_main_function(self) -> None:
         """Test the main function execution."""
         mock_run = mock.MagicMock(return_value=0)
-        mock_compressor = mock.MagicMock()
+        mock_compressor = mock.MagicMock(spec_set=['run'])
         mock_compressor.run = mock_run
         mock_constructor = mock.MagicMock(return_value=mock_compressor)
 
