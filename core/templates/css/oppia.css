@@ -1751,6 +1751,15 @@ pre.oppia-pre-wrapped-text {
   margin: 0;
 }
 
+.blog-post-editor-component .blog-post-content-display  p {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+}
+
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
   margin-top: 0;
 }
@@ -4211,5 +4220,107 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 @media(max-width: 620px) {
   .blog-dashboard-card  .mat-card-header-text {
     margin-right: 0;
+  }
+}
+
+/* 
+   The below css is for blog-editor-post-page.
+*/
+.blog-post-editor-component .preview-button .mat-button-wrapper {
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  float: right;
+}
+
+.blog-post-editor-component .mat-spinner circle {
+  stroke: #fff;
+}
+
+.blog-post-editor-component .tag  .mat-button-toggle-label-content {
+  line-height: 19px;
+}
+
+.blog-post-editor-component .tag  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  padding: 4px 5px;
+}
+
+.blog-post-editor-component .blog-post-content-display  h1 {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-bottom: 1rem;
+}
+
+.blog-post-editor-component .blog-post-content-display  ol {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+}
+
+.blog-post-editor-component .blog-post-content-display  strong {
+  font-weight: 600;
+}
+
+.blog-post-editor-component .blog-post-content-display  blockquote {
+  box-shadow: inset 3px 0 0 0 rgb(41 41 41);
+  margin-left: 20px;
+  padding-left: 23px;
+}
+
+@media(max-width: 920px) {
+  .blog-post-editor-component .blog-post-content-display  p {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+  }
+
+  .blog-post-editor-component .blog-post-content-display  ol {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+  }
+
+  .blog-post-editor-component .blog-post-content-display  strong {
+    font-weight: 600;
+  }
+
+  .blog-post-editor-component .blog-post-content-display  h1 {
+    font-size: 18px;
+    line-height: 26px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media(max-width: 700px) {
+    .blog-post-editor-component .blog-post-content-display  p {
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 18px;
+      margin-bottom: 12px;
+    }
+
+    .blog-post-editor-component .blog-post-content-display  ol {
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 18px;
+    }
+
+    .blog-post-editor-component .blog-post-content-display  strong {
+      font-weight: 600;
+    }
+
+    .blog-post-editor-component .blog-post-content-display  h1 {
+      font-size: 13px;
+      line-height: 24px;
+      margin-bottom: 1rem;
+      margin-top: 0.5rem;
+    }
   }
 }
