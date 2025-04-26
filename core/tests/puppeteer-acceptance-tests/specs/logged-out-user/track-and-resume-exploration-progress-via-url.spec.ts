@@ -117,12 +117,28 @@ describe('Logged-out User', function () {
       await loggedOutUser.navigateToCommunityLibraryPage();
       await loggedOutUser.searchForLessonInSearchBar('Positive Numbers');
       await loggedOutUser.playLessonFromSearchResults('Positive Numbers');
+
+      // ✅ Dynamically fetch the explorationId from URL.
+      const url = await loggedOutUser.page.url();
+      const explorationId = url.split('/explore/')[1];
+
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.openLessonInfoModal();
       await loggedOutUser.expectLessonInfoToShowRating('Unrated');
       await loggedOutUser.expectLessonInfoToShowLastUpdated();
       await loggedOutUser.expectLessonInfoToShowTags(['growth']);
+
+      // ✅ Updated to use dynamic explorationId.
+      await loggedOutUser.shareExplorationFromLessonInfoModal(
+        'Facebook',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationFromLessonInfoModal(
+        'Twitter',
+        explorationId
+      );
+
       await loggedOutUser.closeLessonInfoModal();
 
       await loggedOutUser.submitAnswer('-99');
