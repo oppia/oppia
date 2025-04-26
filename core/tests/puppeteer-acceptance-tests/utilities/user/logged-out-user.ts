@@ -3977,27 +3977,17 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} expectedViews - The expected number of views.
    */
   async expectLessonInfoToShowNoOfViews(expectedViews: number): Promise<void> {
-    await this.page.waitForSelector(viewsContainerSelector, {visible: true});
+    await this.page.waitForSelector(viewsContainerSelector);
+    const viewsText = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      const textContent = element ? element.textContent : null;
+      const match = textContent ? textContent.match(/\d+/) : null;
+      return match ? parseInt(match[0], 10) : null;
+    }, viewsContainerSelector);
 
-    const textContent = await this.page.$eval(viewsContainerSelector, el =>
-      (el as HTMLElement).innerText.trim()
-    );
-
-    showMessage(`DEBUG: Views container text = "${textContent}"`);
-
-    // Remove any non-numeric characters.
-    const match = textContent.match(/\d+/);
-    const numberOfViews = match ? parseInt(match[0], 10) : null;
-
-    if (numberOfViews === null) {
+    if (viewsText !== expectedViews) {
       throw new Error(
-        `Views text "${textContent}" does not contain a valid number.`
-      );
-    }
-
-    if (numberOfViews !== expectedViews) {
-      throw new Error(
-        `Expected number of views to be ${expectedViews}, but found ${numberOfViews}.`
+        `Number of views does not match expected number. Found: ${viewsText}, Expected: ${expectedViews}`
       );
     }
   }
