@@ -2160,6 +2160,7 @@ export class ExplorationEditor extends BaseUser {
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
+    await this.page.waitForSelector(translationLanguageSelector);
     await this.select(translationLanguageSelector, languageCode);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
