@@ -35,6 +35,7 @@ export class QuestionDifficultySelectorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillIdToRubricsObject!: Record<string, Rubric>;
   @Input() skillWithDifficulty!: SkillDifficulty;
+  @Input() difficultyCount!: number;
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> =
     new EventEmitter();
 
