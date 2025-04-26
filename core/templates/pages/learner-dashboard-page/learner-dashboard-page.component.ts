@@ -53,6 +53,8 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
 
 import './learner-dashboard-page.component.css';
 
@@ -195,7 +197,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlService: UrlService,
-    private platFeatService: PlatformFeatureService
+    private platFeatService: PlatformFeatureService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -343,10 +346,75 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+    this.windowRef.nativeWindow.onpopstate = () => {
+      this.refreshDashboardData();
+    };
+    
   }
+
+  refreshDashboardData(): void {
+    this.loaderService.showLoadingScreen('Loading');
+  
+    const dashboardTopicAndStoriesDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync()
+        .then(responseData => {
+          this.completedStoriesList = responseData.completedStoriesList;
+          this.learntTopicsList = responseData.learntTopicsList;
+          this.partiallyLearntTopicsList = responseData.partiallyLearntTopicsList;
+          this.topicsToLearn = responseData.topicsToLearnList;
+          this.untrackedTopics = responseData.untrackedTopics;
+          this.allTopics = responseData.allTopicsList;
+          this.learntToPartiallyLearntTopics = responseData.learntToPartiallyLearntTopics;
+        });
+  
+    const dashboardCollectionsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync()
+        .then(responseData => {
+          this.completedCollectionsList = responseData.completedCollectionsList;
+          this.incompleteCollectionsList = responseData.incompleteCollectionsList;
+          this.completedToIncompleteCollections = responseData.completedToIncompleteCollections;
+          this.collectionPlaylist = responseData.collectionPlaylist;
+        });
+  
+    const dashboardExplorationsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync()
+        .then(responseData => {
+          this.completedExplorationsList = responseData.completedExplorationsList;
+          this.incompleteExplorationsList = responseData.incompleteExplorationsList;
+          this.subscriptionsList = responseData.subscriptionList;
+          this.explorationPlaylist = responseData.explorationPlaylist;
+        });
+  
+    Promise.all([
+      dashboardTopicAndStoriesDataPromise,
+      dashboardCollectionsDataPromise,
+      dashboardExplorationsDataPromise
+    ])
+    .then(() => {
+      setTimeout(() => {
+        this.loaderService.hideLoadingScreen();
+        this.communityLessonsDataLoaded = true;
+        this.totalLessonsInPlaylists = [
+          ...this.explorationPlaylist,
+          ...this.collectionPlaylist,
+        ];
+        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+      }, 0);
+    })
+    .catch(errorResponse => {
+      if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+        this.alertsService.addWarning('Failed to refresh learner dashboard data.');
+      }
+      this.loaderService.hideLoadingScreen();
+    });
+  }
+  
+  
+  
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.windowRef.nativeWindow.onpopstate = null;
   }
 
   getauthorPicturePngDataUrl(username: string): string {
