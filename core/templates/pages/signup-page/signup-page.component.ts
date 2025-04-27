@@ -52,7 +52,7 @@ export class SignupPageComponent {
   emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   hasEverRegistered: boolean = false;
   hasAgreedToLatestTerms: boolean = false;
-  showEmailPreferencesForm: boolean = false;
+  showEmailPreferencesForm: boolean = true;
   hasUsername: boolean = false;
   blurredAtLeastOnce = false;
 
@@ -76,7 +76,7 @@ export class SignupPageComponent {
       this.username = data.username;
       this.hasEverRegistered = data.has_ever_registered;
       this.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-      this.showEmailPreferencesForm = data.server_can_send_emails;
+      this.showEmailPreferencesForm = true;
       this.hasUsername = Boolean(this.username);
       this.focusManagerService.setFocus('usernameInputField');
     });
