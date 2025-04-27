@@ -117,6 +117,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
     {
+      "name": "logged-in-user/view-in-progress-and-completed-lessons-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-in-progress-and-completed-lessons-and-skill.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-buttons-on-about-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
     },

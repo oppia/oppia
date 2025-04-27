@@ -175,6 +175,13 @@ const explorationControlsSettingsDropdown =
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const emptyProgressMessage = '.e2e-test-empty-progress-message';
+const exploreLessonButton = '.e2e-test-explore-lesson-button';
+const continueButtonSelector = '.e2e-test-continue-button';
+const startLessonButton = '.e2e-lesson-start-button';
+const lessonPercentProgress = '.e2e-test-lesson-progress-percent';
+const incompleteLessonTitle = '.e2e-test-incomplete-community-lessons-section';
+const completedLessonTitle = '.e2e-test-completed-community-lessons-section';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1803,6 +1810,117 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(anonymousCheckboxSelector);
     }
     await this.clickOn(submitButtonSelector);
+  }
+
+  /*
+   * Verifies that the empty progress message on the page matches the expected text.
+   */
+  async expectEmptyProgressMessage(): Promise<void> {
+    const progressMessageElement = await this.page.$(emptyProgressMessage);
+    const progressMessageText = await this.page.evaluate(
+      el => el.innerText,
+      progressMessageElement
+    );
+    const expectedMessage =
+      "It looks like you don't have any lessons in progress or completed. Head over to Oppia's Classroom to start your first lesson!";
+
+    if (progressMessageText !== expectedMessage) {
+      throw new Error(
+        `Unexpected progress message text: ${progressMessageText}`
+      );
+    }
+  }
+
+  /*
+   * Verifies that the "In Progress" section contains the given lesson name.
+   */
+  async expectIncompleteLesson(lessonName: string): Promise<void> {
+    const lessonTitleElement = await this.page.$(incompleteLessonTitle);
+    const lessonTitleText = await this.page.evaluate(
+      el => el.innerText,
+      lessonTitleElement
+    );
+
+    if (!lessonTitleText.includes(lessonName)) {
+      throw new Error('Progress tab does not contain the in-progress chapter.');
+    }
+  }
+
+  /*
+   * Verifies that the "Completed" section contains the given lesson name.
+   */
+  async expectCompletedLesson(lessonName: string): Promise<void> {
+    const completedLessonTitleElement = await this.page.$(completedLessonTitle);
+    const completedLessonTitleText = await this.page.evaluate(
+      el => el.innerText,
+      completedLessonTitleElement
+    );
+
+    if (!completedLessonTitleText.includes(lessonName)) {
+      throw new Error('Progress tab does not contain the completed chapter.');
+    }
+  }
+
+  /*
+   * Verifies that the lesson's progress percentage matches the expected value.
+   */
+  async expectProgressPercent(percent: string): Promise<void> {
+    const progressPercentElement = await this.page.$(lessonPercentProgress);
+    const progressPercentText = await this.page.evaluate(
+      el => el.innerText,
+      progressPercentElement
+    );
+
+    if (progressPercentText !== percent) {
+      throw new Error(
+        `Unexpected progress percentage text: ${progressPercentText}`
+      );
+    }
+  }
+
+  /*
+   * Verifies that the start lesson button text matches the expected value.
+   */
+  async expectButtonText(buttonText: string): Promise<void> {
+    const startButtonElement = await this.page.$(startLessonButton);
+    const startButtonText = await this.page.evaluate(
+      el => el.innerText,
+      startButtonElement
+    );
+
+    if (startButtonText !== buttonText) {
+      throw new Error(`Unexpected start button text: ${startButtonText}`);
+    }
+  }
+
+  // Clicks the start lesson button in Progress Tab under Learner Dashboard and waits for the page to fully load.
+  async startLessonButtons(): Promise<void> {
+    await this.clickOn(startLessonButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  // Clicks the "Explore Lessons" button in the classroom and waits for the page to fully load.
+  async exploreLessonInclassroom(): Promise<void> {
+    await this.clickOn(exploreLessonButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  // Clicks the continue button to proceed in an exploration.
+  async expectExplorationToNotBeOver(): Promise<void> {
+    await this.clickOn(continueButtonSelector);
+  }
+
+  // Clicks on the Oppia logo and waits for the homepage to fully load.
+  async clickOnLogo(): Promise<void> {
+    await this.clickOn('.e2e-test-oppia-logo');
+    await this.waitForPageToFullyLoad();
+  }
+
+  // Completes the exploration by clicking continue and returning to the homepage.
+  async completeExploration(): Promise<void> {
+    await this.clickOn(continueButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.clickOnLogo();
   }
 }
 
