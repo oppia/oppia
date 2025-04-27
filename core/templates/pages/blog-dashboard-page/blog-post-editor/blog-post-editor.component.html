@@ -1,279 +1,278 @@
-<div class="blog-post-editor-component">
-  <div *ngIf="blogPostData" class="blog-post-editor row">
-    <mat-card class="editor-field-card col-sm-8 ml-auto">
-      <div class="blog-post-thumbnail d-flex e2e-test-photo-clickable"
-           (mouseenter)="showEditImageIcon=true"
-           (mouseleave)="showEditImageIcon=false"
-           (click)="showuploadThumbnailModal()"
-           tabindex="0"
-           *ngIf="!windowIsNarrow">
-        <img mat-card-image
-             class="position-absolute e2e-test-custom-photo"
-             *ngIf="thumbnailDataUrl"
-             [src]="thumbnailDataUrl"
-             [ngClass]="{'hovered-image': showEditImageIcon}"
-             aria-label="Blog Post thumbnail">
-        <div *ngIf="!thumbnailDataUrl" class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
-          <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
-          <span class="mat-card-title">{{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}</span>
-        </div>
-        <div *ngIf="showEditImageIcon && thumbnailDataUrl"
-             class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
-          <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
-          <span class="mat-card-title edit-thumbnail-text">{{ 'I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT' | translate }}</span>
-        </div>
+
+<div *ngIf="blogPostData" class="blog-post-editor row">
+  <mat-card class="editor-field-card col-sm-8 ml-auto">
+    <div class="blog-post-thumbnail d-flex e2e-test-photo-clickable"
+         (mouseenter)="showEditImageIcon=true"
+         (mouseleave)="showEditImageIcon=false"
+         (click)="showuploadThumbnailModal()"
+         tabindex="0"
+         *ngIf="!windowIsNarrow">
+      <img mat-card-image
+           class="position-absolute e2e-test-custom-photo"
+           *ngIf="thumbnailDataUrl"
+           [src]="thumbnailDataUrl"
+           [ngClass]="{'hovered-image': showEditImageIcon}"
+           aria-label="Blog Post thumbnail">
+      <div *ngIf="!thumbnailDataUrl" class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
+        <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
+        <span class="mat-card-title">{{ 'I18N_BLOG_POST_EDITOR_ADD_THUMBNAIL_TEXT' | translate }}</span>
       </div>
-      <div class="row preview-button-div" *ngIf="!windowIsNarrow" >
-        <button mat-icon-button (click)="showPreview()" class="preview-button mr-4 e2e-test-blog-card-preview-button">
-          <i class="fas fa-eye"></i>
-          <h5 class="mt-2">{{ 'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
-        </button>
+      <div *ngIf="showEditImageIcon && thumbnailDataUrl"
+           class="d-flex flex-column flex-grow-1 text-center my-auto position-relative">
+        <i class="fas fa-image blog-post-no-thumbnail-icon"></i>
+        <span class="mat-card-title edit-thumbnail-text">{{ 'I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT' | translate }}</span>
       </div>
-      <div class="blog-post-title d-flex mt-5" [ngClass]="{'flex-column': windowIsNarrow}">
-        <div *ngIf="windowIsNarrow">
-          <mat-card-header [ngClass]="{'flex-column': windowIsNarrow}">
-            <div mat-card-avatar class="author-profile d-flex">
-              <picture>
-                <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
-                <source type="image/png" [srcset]="authorProfilePicPngUrl">
-                <img mat-card-avatar [src]="authorProfilePicPngUrl"
-                     class="profile-image"
-                     alt="Profile image of the author of the blog post">
-              </picture>
-              <span class="author-username text-center general-text-format ml-4 my-auto">
-                {{ authorName }}
-              </span>
-            </div>
-            <div class="mat-card-header-text mx-0 mt-3">
-              <div class="w-100">
-                <mat-card-title class="general-text-format">
-                  {{ blogPostData.title }}
-                </mat-card-title>
-                <mat-card-subtitle class="sub-text general-text-format">
-                  {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
-                </mat-card-subtitle>
-              </div>
-              <button mat-icon-button (click)="showPreview()" class="preview-button">
-                <i class="fas fa-eye"></i>
-                <h6 class="mt-1">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h6>
-              </button>
-            </div>
-          </mat-card-header>
-          <div class="title-heading mr-2 mb-4 text-left">
-            <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
+    </div>
+    <div class="row preview-button-div" *ngIf="!windowIsNarrow" >
+      <button mat-icon-button (click)="showPreview()" class="preview-button mr-4 e2e-test-blog-card-preview-button">
+        <i class="fas fa-eye"></i>
+        <h5 class="mt-2">{{ 'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
+      </button>
+    </div>
+    <div class="blog-post-title d-flex mt-5" [ngClass]="{'flex-column': windowIsNarrow}">
+      <div *ngIf="windowIsNarrow">
+        <mat-card-header [ngClass]="{'flex-column': windowIsNarrow}">
+          <div mat-card-avatar class="author-profile d-flex">
+            <picture>
+              <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
+              <source type="image/png" [srcset]="authorProfilePicPngUrl">
+              <img mat-card-avatar [src]="authorProfilePicPngUrl"
+                   class="profile-image"
+                   alt="Profile image of the author of the blog post">
+            </picture>
+            <span class="author-username text-center general-text-format ml-4 my-auto">
+              {{ authorName }}
+            </span>
           </div>
-          <div *ngIf="!uploadedImage" class="blog-post-thumbnail-image-uploader d-flex flex-column">
-            <img mat-card-image
-                 *ngIf="thumbnailDataUrl"
-                 [src]="thumbnailDataUrl"
-                 aria-label="Blog Post thumbnail">
-            <oppia-upload-blog-post-thumbnail (imageLocallySaved)="saveBlogPostThumbnail($event)"
-                                              (cancelThumbnailUpload)="cancel()">
-            </oppia-upload-blog-post-thumbnail>
-          </div>
-        </div>
-        <div class="title-heading col-sm-2 mr-2" [ngClass]="windowIsNarrow ? 'text-left mb-2' : 'text-center mb-4'">
-          <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
-        </div>
-        <div class="d-block flex-grow-1">
-          <div class="d-flex flex-grow-1">
-            <input #titleInput
-                   class="form-control required general-text-format e2e-test-blog-post-title-field"
-                   [(ngModel)]="title"
-                   [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
-                   maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
-                   minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
-                   aria-label="Title"
-                   (focus)="activateTitleEditor()"
-                   (focusout)="updateLocalTitleValue()"
-                   [pattern]="BLOG_POST_TITLE_PATTERN"
-                   autofocus>
-            <button class="fas fa-pen oppia-editor-edit-icon position-relative"
-                    *ngIf="!titleEditorIsActive"
-                    (click)="activateTitleEditor()">
+          <div class="mat-card-header-text mx-0 mt-3">
+            <div class="w-100">
+              <mat-card-title class="general-text-format">
+                {{ blogPostData.title }}
+              </mat-card-title>
+              <mat-card-subtitle class="sub-text general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
+              </mat-card-subtitle>
+            </div>
+            <button mat-icon-button (click)="showPreview()" class="preview-button">
+              <i class="fas fa-eye"></i>
+              <h6 class="mt-1">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h6>
             </button>
           </div>
-          <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
-            <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
-            </em>
-          </span>
-          <span class="oppia-input-box-subtitle" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
-            <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE }">
-            </em>
-          </span>
-          <span class="oppia-input-box-subtitle" *ngIf="!isTitlePatternValid()">
-            <em>
-              {{ 'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate }}
-            </em>
-          </span>
-          <span class="oppia-input-box-subtitle" *ngIf="blogPostData.titleIsDuplicate">
-            <em>
-              {{ 'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate }}
-            </em>
-          </span>
+        </mat-card-header>
+        <div class="title-heading mr-2 mb-4 text-left">
+          <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
+        </div>
+        <div *ngIf="!uploadedImage" class="blog-post-thumbnail-image-uploader d-flex flex-column">
+          <img mat-card-image
+               *ngIf="thumbnailDataUrl"
+               [src]="thumbnailDataUrl"
+               aria-label="Blog Post thumbnail">
+          <oppia-upload-blog-post-thumbnail (imageLocallySaved)="saveBlogPostThumbnail($event)"
+                                            (cancelThumbnailUpload)="cancel()">
+          </oppia-upload-blog-post-thumbnail>
         </div>
       </div>
-      <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
-        <div class="title-heading mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
-          <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
+      <div class="title-heading col-sm-2 mr-2" [ngClass]="windowIsNarrow ? 'text-left mb-2' : 'text-center mb-4'">
+        <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
+      </div>
+      <div class="d-block flex-grow-1">
+        <div class="d-flex flex-grow-1">
+          <input #titleInput
+                 class="form-control required general-text-format e2e-test-blog-post-title-field"
+                 [(ngModel)]="title"
+                 [ngClass]="{'blog-title-input-field': blogPostData.title.length > 0}"
+                 maxlength="MAX_CHARS_IN_BLOG_POST_TITLE"
+                 minlength="MIN_CHARS_IN_BLOG_POST_TITLE"
+                 aria-label="Title"
+                 (focus)="activateTitleEditor()"
+                 (focusout)="updateLocalTitleValue()"
+                 [pattern]="BLOG_POST_TITLE_PATTERN"
+                 autofocus>
           <button class="fas fa-pen oppia-editor-edit-icon position-relative"
-                  *ngIf="!contentEditorIsActive && windowIsNarrow"
-                  (click)="contentEditorIsActive=true">
+                  *ngIf="!titleEditorIsActive"
+                  (click)="activateTitleEditor()">
           </button>
         </div>
-        <div class="d-block flex-grow-1">
-          <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
-            <div class="oppia-editable-section-mask">
-              <oppia-rte-output-display [rteString]="this.blogPostData.content"
-                                        class="e2e-test-content-display blog-post-content-display">
-              </oppia-rte-output-display>
-            </div>
-          </div>
-          <div *ngIf="contentEditorIsActive"  class="e2e-test-content-editor">
-            <schema-based-editor *ngIf="contentEditorIsActive"
-                                 [schema]="HTML_SCHEMA"
-                                 [localValue]="this.blogPostData.content"
-                                 (localValueChange)="this.updateLocalEditedContent($event)">
-            </schema-based-editor>
-            <div class="mt-2">
-              <button mat-button
-                      class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-blog-post-content"
-                      (click)="updateContentValue()"
-                      aria-label="Button to save entered content.">
-                {{ 'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase }}
-              </button>
-              <button mat-button class="btn cancel-button float-right mx-2" (click)="cancelEdit()">
-                {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase }}
-              </button>
-              <div class="oppia-clear"></div>
-            </div>
-            <div *ngIf="windowIsNarrow">
-              <div class="mt-4 text-left">
-                <span class="tag-heading general-text-format">
-                  {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
-                </span>
-                <span class="sub-text tag-limit-text general-text-format">
-                  {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
-                </span>
-                <span class="sub-text d-block tag-limit-text general-text-format">
-                  {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
-                </span>
-              </div>
-              <div class="text-left">
-                <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                         [value]="blogPostData.tags"
-                                         *ngFor="let tag of defaultTagsList"
-                                         multiple="true"
-                                         class="mx-2 my-2 tag">
-                  <mat-button-toggle class="text-wrap"
-                                     (change)="onTagChange($event.value)"
-                                     [value]="tag"
-                                     [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
-                  {{ tag }}
-                  </mat-button-toggle>
-                </mat-button-toggle-group>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button class="fas fa-pen oppia-editor-edit-icon position-relative mb-auto"
-                *ngIf="!contentEditorIsActive && !windowIsNarrow"
+        <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
+          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
+          </em>
+        </span>
+        <span class="oppia-input-box-subtitle" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
+          <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE }">
+          </em>
+        </span>
+        <span class="oppia-input-box-subtitle" *ngIf="!isTitlePatternValid()">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate }}
+          </em>
+        </span>
+        <span class="oppia-input-box-subtitle" *ngIf="blogPostData.titleIsDuplicate">
+          <em>
+            {{ 'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate }}
+          </em>
+        </span>
+      </div>
+    </div>
+    <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
+      <div class="title-heading mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
+        <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
+        <button class="fas fa-pen oppia-editor-edit-icon position-relative"
+                *ngIf="!contentEditorIsActive && windowIsNarrow"
                 (click)="contentEditorIsActive=true">
         </button>
       </div>
-    </mat-card>
-    <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
-      <mat-card-header *ngIf="!windowIsNarrow" class="d-block">
-        <div mat-card-avatar class="author-profile mx-auto">
-          <img mat-card-avatar
-               class="profile-image e2e-test-profile-user-photo"
-               [src]="authorProfilePicPngUrl"
-               alt="Profile image of the author of the blog post.">
-          <span class="author-username text-center general-text-format e2e-test-username-visible">
-            {{ authorName }}
-          </span>
-        </div>
-        <div class="mat-card-header-text d-block mx-0 mt-3">
-          <mat-card-title class="general-text-format">
-            {{ blogPostData.title }}
-          </mat-card-title>
-          <mat-card-subtitle class="sub-text general-text-format">
-            {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
-          </mat-card-subtitle>
-        </div>
-      </mat-card-header>
-      <mat-card-content class="text-center">
-        <mat-card-actions [ngClass]="{'small-screen-buttons-container': windowIsNarrow}">
-          <span [matTooltip]="(blogPostData.validate()).join('\n')"
-                matTooltipClass="oppia-mat-tooltip-list"
-                [matTooltipDisabled]="false"
-                aria-label="List that shows issues preventing to save blog post as draft"
-                class="w-100">
-            <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
-                    [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade || blogPostData.titleIsDuplicate"
-                    (click)="saveDraft()"
-                    aria-label="Save blog post as draft."
-                    [ngClass]="{'small-screen-button': windowIsNarrow}">
-              <span *ngIf="!saveInProgress">{{ 'I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON' | translate | uppercase }}</span>
-              <mat-spinner *ngIf="saveInProgress" [diameter]="24" class="mx-auto my-auto"></mat-spinner>
-              <mat-icon *ngIf="blogPostData.validate().length > 0" class="save-draft-button-warning">
-                warning
-              </mat-icon>
-            </button>
-          </span>
-          <span [matTooltip]="(blogPostData.prepublishValidate(this.maxAllowedTags)).join('\n')"
-                matTooltipClass="oppia-mat-tooltip-list"
-                [matTooltipDisabled]="false"
-                aria-label="Button that shows a red tooltip"
-                class="w-100">
-            <button mat-button class="w-100 mx-auto my-2 publish-button e2e-test-publish-blog-post-button"
-                    [disabled]="isPublishButtonDisabled()"
-                    (click)="publishBlogPost()"
-                    aria-label="Publish blog post."
-                    [ngClass]="{'small-screen-button': windowIsNarrow}">
-              <span *ngIf="!publishingInProgress">{{ 'I18N_BLOG_POST_EDITOR_PUBLISH_BUTTON' | translate | uppercase }}</span>
-              <mat-spinner *ngIf="publishingInProgress" [diameter]="24" class="mx-auto my-auto"></mat-spinner>
-              <mat-icon *ngIf="(blogPostData.prepublishValidate(this.maxAllowedTags)).length > 0"class="save-draft-button-warning">
-                warning
-              </mat-icon>
-            </button>
-          </span>
-          <div *ngIf="!windowIsNarrow" class="mt-4 text-left">
-            <span class="tag-heading general-text-format">
-              {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
-            </span>
-            <span class="sub-text tag-limit-text general-text-format">
-              {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
-            </span>
-            <span class="sub-text d-block tag-limit-text general-text-format">
-              {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
-            </span>
+      <div class="d-block flex-grow-1">
+        <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
+          <div class="oppia-editable-section-mask">
+            <oppia-rte-output-display [rteString]="this.blogPostData.content"
+                                      class="e2e-test-content-display blog-post-content-display">
+            </oppia-rte-output-display>
           </div>
-          <div *ngIf="!windowIsNarrow" class="text-left">
-            <mat-button-toggle-group aria-label="Tags to classify blog post."
-                                     [value]="blogPostData.tags"
-                                     *ngFor="let tag of defaultTagsList"
-                                     multiple="true"
-                                     class="mx-2 my-2 tag">
-              <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
-                                 (change)="onTagChange($event.value)"
-                                 [value]="tag"
-                                 [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
+        </div>
+        <div *ngIf="contentEditorIsActive"  class="e2e-test-content-editor">
+          <schema-based-editor *ngIf="contentEditorIsActive"
+                               [schema]="HTML_SCHEMA"
+                               [localValue]="this.blogPostData.content"
+                               (localValueChange)="this.updateLocalEditedContent($event)">
+          </schema-based-editor>
+          <div class="mt-2">
+            <button mat-button
+                    class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-blog-post-content"
+                    (click)="updateContentValue()"
+                    aria-label="Button to save entered content.">
+              {{ 'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase }}
+            </button>
+            <button mat-button class="btn cancel-button float-right mx-2" (click)="cancelEdit()">
+              {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase }}
+            </button>
+            <div class="oppia-clear"></div>
+          </div>
+          <div *ngIf="windowIsNarrow">
+            <div class="mt-4 text-left">
+              <span class="tag-heading general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
+              </span>
+              <span class="sub-text tag-limit-text general-text-format">
+                {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
+              </span>
+              <span class="sub-text d-block tag-limit-text general-text-format">
+                {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
+              </span>
+            </div>
+            <div class="text-left">
+              <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                       [value]="blogPostData.tags"
+                                       *ngFor="let tag of defaultTagsList"
+                                       multiple="true"
+                                       class="mx-2 my-2 tag">
+                <mat-button-toggle class="text-wrap"
+                                   (change)="onTagChange($event.value)"
+                                   [value]="tag"
+                                   [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
                 {{ tag }}
-              </mat-button-toggle>
-            </mat-button-toggle-group>
+                </mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
           </div>
-          <button mat-button
-                  class="d-block delete-button w-100 mx-auto mt-2 e2e-test-delete-blog-post-button"
-                  (click)="deleteBlogPost()"
-                  aria-label="Delete blog post."
+        </div>
+      </div>
+      <button class="fas fa-pen oppia-editor-edit-icon position-relative mb-auto"
+              *ngIf="!contentEditorIsActive && !windowIsNarrow"
+              (click)="contentEditorIsActive=true">
+      </button>
+    </div>
+  </mat-card>
+  <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
+    <mat-card-header *ngIf="!windowIsNarrow" class="d-block">
+      <div mat-card-avatar class="author-profile mx-auto">
+        <img mat-card-avatar
+             class="profile-image e2e-test-profile-user-photo"
+             [src]="authorProfilePicPngUrl"
+             alt="Profile image of the author of the blog post.">
+        <span class="author-username text-center general-text-format e2e-test-username-visible">
+          {{ authorName }}
+        </span>
+      </div>
+      <div class="mat-card-header-text d-block mx-0 mt-3">
+        <mat-card-title class="general-text-format">
+          {{ blogPostData.title }}
+        </mat-card-title>
+        <mat-card-subtitle class="sub-text general-text-format">
+          {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
+        </mat-card-subtitle>
+      </div>
+    </mat-card-header>
+    <mat-card-content class="text-center">
+      <mat-card-actions [ngClass]="{'small-screen-buttons-container': windowIsNarrow}">
+        <span [matTooltip]="(blogPostData.validate()).join('\n')"
+              matTooltipClass="oppia-mat-tooltip-list"
+              [matTooltipDisabled]="false"
+              aria-label="List that shows issues preventing to save blog post as draft"
+              class="w-100">
+          <button mat-button class="w-100 mx-auto my-2 e2e-test-save-as-draft-button"
+                  [disabled]="(blogPostData.validate().length > 0) || !newChangesAreMade || blogPostData.titleIsDuplicate"
+                  (click)="saveDraft()"
+                  aria-label="Save blog post as draft."
                   [ngClass]="{'small-screen-button': windowIsNarrow}">
-            {{ 'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate | uppercase }}
+            <span *ngIf="!saveInProgress">{{ 'I18N_BLOG_POST_EDITOR_SAVE_DRAFT_BUTTON' | translate | uppercase }}</span>
+            <mat-spinner *ngIf="saveInProgress" [diameter]="24" class="mx-auto my-auto"></mat-spinner>
+            <mat-icon *ngIf="blogPostData.validate().length > 0" class="save-draft-button-warning">
+              warning
+            </mat-icon>
           </button>
-        </mat-card-actions>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        </span>
+        <span [matTooltip]="(blogPostData.prepublishValidate(this.maxAllowedTags)).join('\n')"
+              matTooltipClass="oppia-mat-tooltip-list"
+              [matTooltipDisabled]="false"
+              aria-label="Button that shows a red tooltip"
+              class="w-100">
+          <button mat-button class="w-100 mx-auto my-2 publish-button e2e-test-publish-blog-post-button"
+                  [disabled]="isPublishButtonDisabled()"
+                  (click)="publishBlogPost()"
+                  aria-label="Publish blog post."
+                  [ngClass]="{'small-screen-button': windowIsNarrow}">
+            <span *ngIf="!publishingInProgress">{{ 'I18N_BLOG_POST_EDITOR_PUBLISH_BUTTON' | translate | uppercase }}</span>
+            <mat-spinner *ngIf="publishingInProgress" [diameter]="24" class="mx-auto my-auto"></mat-spinner>
+            <mat-icon *ngIf="(blogPostData.prepublishValidate(this.maxAllowedTags)).length > 0"class="save-draft-button-warning">
+              warning
+            </mat-icon>
+          </button>
+        </span>
+        <div *ngIf="!windowIsNarrow" class="mt-4 text-left">
+          <span class="tag-heading general-text-format">
+            {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
+          </span>
+          <span class="sub-text tag-limit-text general-text-format">
+            {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
+          </span>
+          <span class="sub-text d-block tag-limit-text general-text-format">
+            {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
+          </span>
+        </div>
+        <div *ngIf="!windowIsNarrow" class="text-left">
+          <mat-button-toggle-group aria-label="Tags to classify blog post."
+                                   [value]="blogPostData.tags"
+                                   *ngFor="let tag of defaultTagsList"
+                                   multiple="true"
+                                   class="mx-2 my-2 tag">
+            <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
+                               (change)="onTagChange($event.value)"
+                               [value]="tag"
+                               [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">
+              {{ tag }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <button mat-button
+                class="d-block delete-button w-100 mx-auto mt-2 e2e-test-delete-blog-post-button"
+                (click)="deleteBlogPost()"
+                aria-label="Delete blog post."
+                [ngClass]="{'small-screen-button': windowIsNarrow}">
+          {{ 'I18N_BLOG_POST_EDITOR_DELETE_BUTTON' | translate | uppercase }}
+        </button>
+      </mat-card-actions>
+    </mat-card-content>
+  </mat-card>
 </div>
 <style>
   .mat-icon.save-draft-button-warning {
@@ -408,14 +407,14 @@
     width: max-content;
   }
 
-  .blog-post-editor-component .preview-button .mat-button-wrapper {
+  .preview-button /deep/ .mat-button-wrapper {
     color: #555;
     display: flex;
     flex-direction: column;
     float: right;
   }
 
-  .blog-post-editor-component .mat-spinner circle {
+  .mat-spinner /deep/ circle {
     stroke: #fff;
   }
 
@@ -443,11 +442,11 @@
   }
 
 
-  .blog-post-editor-component .tag  .mat-button-toggle-label-content {
+  .tag /deep/ .mat-button-toggle-label-content {
     line-height: 19px;
   }
 
-  .blog-post-editor-component .tag  .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  .tag /deep/ .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
     padding: 4px 5px;
   }
 
@@ -476,7 +475,7 @@
     font-size: 40px;
   }
 
-  .blog-post-editor-component .blog-post-content-display  h1 {
+  .blog-post-content-display /deep/ h1 {
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 24px;
@@ -486,7 +485,7 @@
     margin-bottom: 1rem;
   }
 
-  .blog-post-editor-component .blog-post-content-display  p {
+  .blog-post-content-display /deep/ p {
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
@@ -495,7 +494,7 @@
     line-height: 30px;
   }
 
-  .blog-post-editor-component .blog-post-content-display  ol {
+  .blog-post-content-display /deep/ ol {
     color: #333;
     font-family: 'Roboto', Arial, sans-serif;
     font-size: 20px;
@@ -504,11 +503,11 @@
     line-height: 30px;
   }
 
-  .blog-post-editor-component .blog-post-content-display  strong {
+  .blog-post-content-display /deep/ strong {
     font-weight: 600;
   }
 
-  .blog-post-editor-component .blog-post-content-display  blockquote {
+  .blog-post-content-display /deep/ blockquote {
     box-shadow: inset 3px 0 0 0 rgb(41 41 41);
     margin-left: 20px;
     padding-left: 23px;
@@ -524,23 +523,23 @@
       width: 16vw;
     }
 
-    .blog-post-editor-component .blog-post-content-display  p {
+    .blog-post-content-display /deep/ p {
       font-size: 16px;
       font-weight: 300;
       line-height: 20px;
     }
 
-    .blog-post-editor-component .blog-post-content-display  ol {
+    .blog-post-content-display /deep/ ol {
       font-size: 16px;
       font-weight: 300;
       line-height: 20px;
     }
 
-    .blog-post-editor-component .blog-post-content-display  strong {
+    .blog-post-content-display /deep/ strong {
       font-weight: 600;
     }
 
-    .blog-post-editor-component .blog-post-content-display  h1 {
+    .blog-post-content-display /deep/ h1 {
       font-size: 18px;
       line-height: 26px;
       margin-bottom: 1rem;
@@ -622,24 +621,24 @@
         width: 66.667vw;
       }
 
-      .blog-post-editor-component .blog-post-content-display  p {
+      .blog-post-content-display /deep/ p {
         font-size: 12px;
         font-weight: 300;
         line-height: 18px;
         margin-bottom: 12px;
       }
 
-      .blog-post-editor-component .blog-post-content-display  ol {
+      .blog-post-content-display /deep/ ol {
         font-size: 12px;
         font-weight: 300;
         line-height: 18px;
       }
 
-      .blog-post-editor-component .blog-post-content-display  strong {
+      .blog-post-content-display /deep/ strong {
         font-weight: 600;
       }
 
-      .blog-post-editor-component .blog-post-content-display  h1 {
+      .blog-post-content-display /deep/ h1 {
         font-size: 13px;
         line-height: 24px;
         margin-bottom: 1rem;
