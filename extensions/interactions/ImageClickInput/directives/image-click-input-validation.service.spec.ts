@@ -24,10 +24,7 @@ import {
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {ImageClickInputValidationService} from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
@@ -40,7 +37,7 @@ describe('ImageClickInputValidationService', () => {
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
   var customizationArguments: ImageClickInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,12 +45,11 @@ describe('ImageClickInputValidationService', () => {
     });
 
     validatorService = TestBed.inject(ImageClickInputValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -66,7 +62,7 @@ describe('ImageClickInputValidationService', () => {
       missing_prerequisite_skill_id: null,
     });
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
       feedback: {
