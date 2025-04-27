@@ -507,7 +507,7 @@ Registry.create_platform_parameter(
         'platform parameter dashboard.'
     ),
     platform_parameter_domain.DataTypes.BOOL,
-    default=True
+    default=False
 )
 
 Registry.create_platform_parameter(
