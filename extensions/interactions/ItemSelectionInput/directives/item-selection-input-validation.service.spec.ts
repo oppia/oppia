@@ -23,10 +23,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -42,7 +39,7 @@ describe('ItemSelectionInputValidationService', () => {
   let customizationArguments: ItemSelectionInputCustomizationArgs,
     badCustomizationArguments: ItemSelectionInputCustomizationArgs;
   let IsProperSubsetValidOption: AnswerGroup[];
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
   let ThreeInputsAnswerGroups: AnswerGroup[],
     OneInputAnswerGroups: AnswerGroup[],
     NoInputAnswerGroups: AnswerGroup[],
@@ -56,12 +53,11 @@ describe('ItemSelectionInputValidationService', () => {
     validatorService = TestBed.inject(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {

@@ -24,10 +24,7 @@ import {
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {AppConstants} from 'app.constants';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Unit} from 'interactions/answer-defs';
 import {Fraction, FractionDict} from 'domain/objects/fraction.model';
@@ -48,14 +45,12 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoThousandRule: Rule;
   let equivalentToTwoByThreeRule: Rule;
   let equivalentToTwoRule: Rule;
-  let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
   let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
     numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
@@ -88,7 +83,7 @@ describe('NumberWithUnitsValidationService', () => {
     };
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
