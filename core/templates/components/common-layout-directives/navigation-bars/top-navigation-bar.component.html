@@ -186,6 +186,16 @@
               </a>
             </li>
             <li class="nav-item">
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-blog-button"
+                 (click)="navigateToBlogPage()"
+                 (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
+                 rel="noopener">
+                <span class="link">
+                  {{'I18N_TOPNAV_BLOG' | translate}}
+                </span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
                  (click)="navigateToTeachPage()"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"

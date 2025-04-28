@@ -569,6 +569,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.href = '/about';
   }
 
+  navigateToBlogPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.BLOG
+    );
+    this.windowRef.nativeWindow.location.href = '/blog';
+  }
+
   navigateToVolunteerPage(): void {
     this.siteAnalyticsService.registerClickNavbarButtonEvent(
       NavbarAndFooterGATrackingPages.VOLUNTEER

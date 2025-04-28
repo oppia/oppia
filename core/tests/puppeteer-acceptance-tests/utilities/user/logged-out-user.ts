@@ -92,6 +92,7 @@ const navbarLearnTabBasicMathematicsButton =
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
 const navbarAboutTabTeachButton = 'a.e2e-test-navbar-about-menu-teach-button';
+const navbarAboutTabBlogButton = 'a.e2e-test-navbar-about-menu-blog-button';
 const navbarAboutTabImpactReportButton =
   'a.e2e-test-navbar-impact-report-button';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
@@ -804,6 +805,31 @@ export class LoggedOutUser extends BaseUser {
         'Teach button in the About Menu on navbar',
         teachUrl,
         'Teach'
+      );
+    }
+  }
+
+  /**
+   * Function to click the Blog button in the About Menu on navbar
+   * and check if it opens the Blog page.
+   */
+  async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarTeachButton,
+        'Blog button in the About Menu on mobile sidebar',
+        teachUrl,
+        'Blog'
+      );
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        'Blog button in the About Menu on navbar',
+        teachUrl,
+        'Blog'
       );
     }
   }
