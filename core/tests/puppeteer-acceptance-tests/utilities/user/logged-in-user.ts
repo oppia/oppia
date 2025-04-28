@@ -115,6 +115,25 @@ const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
 const topicNameInEditGoalsSelector = '.e2e-test-topic-name-in-edit-goals';
 const completedGoalsSectionSelector = '.e2e-test-completed-goals-section';
 const completedGoalsTopicNameSelector = '.e2e-test-completed-goals-topic-name';
+const addGoalsButtonSelector = '.e2e-test-add-goals-button';
+const addGoalsModalSelector = '.e2e-test-add-goals-modal';
+const goalCheckboxSelector = '.e2e-test-goal-checkbox';
+const saveGoalsButtonSelector = '.e2e-test-save-goals-button';
+const inProgressGoalsSectionSelector = '.e2e-test-in-progress-goals-section';
+const progressBarSelector = '.e2e-test-progress-bar';
+const chapterListSelector = '.e2e-test-chapter-list';
+const startChapterButtonSelector = '.e2e-test-start-chapter-button';
+const completeChapterButtonSelector = '.e2e-test-complete-chapter-button';
+const chapterCompletedToastSelector = '.e2e-test-chapter-completed-toast';
+const cancelGoalsButtonSelector = '.e2e-test-cancel-goals-button';
+const displayMoreButtonSelector = '.e2e-test-display-more-button';
+const chapterProgressSelector = '.e2e-test-chapter-progress';
+const sidebarOptionSelector = '.e2e-test-sidebar-option';
+const addLessonButtonSelector = '.e2e-test-add-lesson-button';
+const topicNameSelector = '.e2e-test-topic-name';
+const lessonNameSelector = '.e2e-test-lesson-name';
+const logoutButtonSelector = '.e2e-test-logout-button';
+const goalsTabDescriptionSelector = '.e2e-test-goals-tab-description';
 const completedStoriesSectionSelector = '.completed-stories';
 const storyNameSelector = '.e2e-test-story-name-in-learner-story-summary-tile';
 const continueFromWhereLeftOffSectionSelector =
@@ -1249,6 +1268,513 @@ export class LoggedInUser extends BaseUser {
         throw new Error(`Goal not found: ${goal}`);
       }
     }
+  }
+
+  /**
+   * Opens the "Add Goals" modal from the learner dashboard.
+   */
+  async openAddGoalsModal(): Promise<void> {
+    showMessage('Opening Add Goals modal.');
+
+    // Wait for the "Add Goals" button to be visible and click it.
+    await this.page.waitForSelector(addGoalsButtonSelector);
+    await this.clickOn(addGoalsButtonSelector);
+
+    // Wait for the modal to appear.
+    await this.page.waitForSelector(addGoalsModalSelector);
+
+    showMessage('Add Goals modal opened successfully.');
+  }
+
+  /**
+   * Verifies that the "Add Goals" modal is visible.
+   */
+  async expectAddGoalsModalToBeVisible(): Promise<void> {
+    showMessage('Verifying Add Goals modal is visible.');
+
+    // Wait for the modal to appear.
+    await this.page.waitForSelector(addGoalsModalSelector);
+
+    showMessage('Add Goals modal is visible.');
+  }
+
+  /**
+   * Checks a random number of goals in the "Add Goals" modal.
+   * @param {number} count - The number of goals to check.
+   */
+  async checkRandomGoals(count: number): Promise<void> {
+    showMessage(`Checking ${count} random goals.`);
+
+    // Wait for the goal checkboxes to load.
+    await this.page.waitForSelector(goalCheckboxSelector);
+    const checkboxes = await this.page.$$(goalCheckboxSelector);
+
+    if (checkboxes.length < count) {
+      throw new Error(
+        `Not enough goals available to check. Found ${checkboxes.length}, but need ${count}.`
+      );
+    }
+
+    // Randomly select and check the specified number of goals.
+    for (let i = 0; i < count; i++) {
+      await checkboxes[i].click();
+    }
+
+    showMessage(`${count} random goals checked.`);
+  }
+
+  /**
+   * Unchecks a random goal in the "Add Goals" modal.
+   */
+  async uncheckRandomGoal(): Promise<void> {
+    showMessage('Unchecking a random goal.');
+
+    // Wait for the goal checkboxes to load.
+    await this.page.waitForSelector(goalCheckboxSelector);
+    const checkboxes = await this.page.$$(goalCheckboxSelector);
+
+    // Find a checked checkbox and uncheck it.
+    for (const checkbox of checkboxes) {
+      const isChecked = await this.page.evaluate(
+        el => (el as HTMLInputElement).checked,
+        checkbox
+      );
+      if (isChecked) {
+        await checkbox.click();
+        showMessage('A random goal was unchecked.');
+        return;
+      }
+    }
+
+    throw new Error('No checked goals found to uncheck.');
+  }
+
+  /**
+   * Unchecks all goals except for the specified goal in the "Add Goals" modal.
+   * @param {string} goalName - The goal to keep checked.
+   */
+  async uncheckAllExceptForGoal(goalName: string): Promise<void> {
+    showMessage(`Unchecking all goals except for "${goalName}".`);
+
+    // Wait for the goal checkboxes to load.
+    await this.page.waitForSelector(goalCheckboxSelector);
+    const checkboxes = await this.page.$$(goalCheckboxSelector);
+
+    for (const checkbox of checkboxes) {
+      const label = await this.page.evaluate(
+        el => el.closest('label')?.textContent?.trim(),
+        checkbox
+      );
+      if (label !== goalName) {
+        const isChecked = await this.page.evaluate(
+          el => (el as HTMLInputElement).checked,
+          checkbox
+        );
+        if (isChecked) {
+          await checkbox.click();
+        }
+      }
+    }
+
+    showMessage(`All goals except for "${goalName}" were unchecked.`);
+  }
+
+  /**
+   * Clicks the "Save" button in the "Add Goals" modal.
+   */
+  async clickSave(): Promise<void> {
+    showMessage('Clicking Save button in Add Goals modal.');
+
+    // Wait for the "Save" button to be visible and click it.
+    await this.page.waitForSelector(saveGoalsButtonSelector);
+    await this.clickOn(saveGoalsButtonSelector);
+
+    // Wait for the modal to disappear.
+    await this.page.waitForSelector(addGoalsModalSelector, {hidden: true});
+
+    showMessage('Save button clicked successfully.');
+  }
+
+  /**
+   * Verifies that a goal is in progress with the correct progress percentage.
+   * @param {string} goalName - The name of the goal.
+   * @param {number} progressPercentage - The expected progress percentage.
+   */
+  async expectGoalToBeInProgress(
+    goalName: string,
+    progressPercentage: number
+  ): Promise<void> {
+    showMessage(
+      `Verifying that goal "${goalName}" is in progress with ${progressPercentage}% progress.`
+    );
+
+    // Wait for the "In Progress" section to load.
+    await this.page.waitForSelector(inProgressGoalsSectionSelector);
+
+    // Find the goal by name and check its progress bar.
+    const progressBarSelectorForGoal = `${inProgressGoalsSectionSelector} .e2e-test-goal:has-text("${goalName}") ${progressBarSelector}`;
+    await this.page.waitForSelector(progressBarSelectorForGoal);
+
+    const progressText = await this.page.$eval(
+      progressBarSelectorForGoal,
+      element => (element as HTMLElement).innerText
+    );
+
+    const actualProgress = parseInt(progressText.replace('%', ''), 10);
+    if (actualProgress !== progressPercentage) {
+      throw new Error(
+        `Expected progress for goal "${goalName}" to be ${progressPercentage}%, but got ${actualProgress}%.`
+      );
+    }
+
+    showMessage(
+      `Goal "${goalName}" is in progress with ${progressPercentage}% progress.`
+    );
+  }
+
+  /**
+   * Starts a chapter for a given goal.
+   * @param {string} chapterName - The name of the chapter to start.
+   */
+  async startChapter(chapterName: string): Promise<void> {
+    showMessage(`Starting chapter: ${chapterName}`);
+
+    // Wait for the chapter list to load.
+    await this.page.waitForSelector(chapterListSelector);
+
+    // Find the chapter by name and click the "Start" button.
+    const chapterSelector = `${chapterListSelector} .e2e-test-chapter:has-text("${chapterName}") ${startChapterButtonSelector}`;
+    await this.page.waitForSelector(chapterSelector);
+    await this.clickOn(chapterSelector);
+
+    showMessage(`Chapter "${chapterName}" started successfully.`);
+  }
+
+  /**
+   * Completes a chapter for a given goal.
+   * @param {string} chapterName - The name of the chapter to complete.
+   */
+  async completeChapter(chapterName: string): Promise<void> {
+    showMessage(`Completing chapter: ${chapterName}`);
+
+    // Wait for the chapter content to load.
+    await this.page.waitForSelector(chapterListSelector);
+
+    // Simulate completing the chapter (e.g., by clicking a "Complete" button).
+    const completeButtonSelector = `${chapterListSelector} .e2e-test-chapter:has-text("${chapterName}") ${completeChapterButtonSelector}`;
+    await this.page.waitForSelector(completeButtonSelector);
+    await this.clickOn(completeButtonSelector);
+
+    // Wait for the completion confirmation.
+    await this.page.waitForSelector(chapterCompletedToastSelector);
+
+    showMessage(`Chapter "${chapterName}" completed successfully.`);
+  }
+
+  /**
+   * Logs in as a creator with the given username.
+   * @param {string} username - The username of the creator.
+   */
+  async loginAsCreator(username: string): Promise<void> {
+    showMessage(`Logging in as creator: ${username}`);
+    await this.login(username);
+  }
+
+  /**
+   * Logs in a user with the given email.
+   * @param {string} email - The email of the user.
+   */
+  async login(email: string): Promise<void> {
+    showMessage(`Logging in with email: ${email}`);
+
+    // Navigate to the login page.
+    await this.goto(testConstants.URLs.Login);
+
+    // Wait for the email input field and type the email.
+    const emailInputSelector = '.e2e-test-login-email-input';
+    await this.page.waitForSelector(emailInputSelector);
+    await this.type(emailInputSelector, email);
+
+    // Click the "Login" button.
+    const loginButtonSelector = '.e2e-test-login-button';
+    await this.page.waitForSelector(loginButtonSelector);
+    await this.clickOn(loginButtonSelector);
+
+    // Wait for the dashboard to load.
+    await this.page.waitForSelector('.e2e-test-learner-dashboard');
+
+    showMessage(`Logged in successfully with email: ${email}`);
+  }
+
+  /**
+   * Creates a classroom with the given name.
+   * @param {string} classroomName - The name of the classroom to create.
+   */
+  async createClassroom(classroomName: string): Promise<void> {
+    showMessage(`Creating classroom: ${classroomName}`);
+    // Add logic to create a classroom.
+    // Example: Navigate to the classroom creation page and fill out the form.
+  }
+
+  /**
+   * Adds a topic to the classroom.
+   * @param {string} topicName - The name of the topic to add.
+   */
+  async addTopic(topicName: string): Promise<void> {
+    showMessage(`Adding topic: ${topicName}`);
+    await this.page.waitForSelector(topicNameSelector);
+    await this.type(topicNameSelector, topicName);
+    await this.clickOn(addGoalsButtonSelector);
+  }
+
+  /**
+   * Adds a lesson to a topic.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} lessonName - The name of the lesson to add.
+   */
+  async addLesson(topicName: string, lessonName: string): Promise<void> {
+    showMessage(`Adding lesson "${lessonName}" to topic "${topicName}"`);
+    await this.page.waitForSelector(topicNameSelector);
+    await this.type(topicNameSelector, topicName);
+    await this.page.waitForSelector(lessonNameSelector);
+    await this.type(lessonNameSelector, lessonName);
+    await this.clickOn(addLessonButtonSelector);
+  }
+
+  /**
+   * Logs out the current user.
+   */
+  async logout(): Promise<void> {
+    showMessage('Logging out the current user.');
+    await this.page.waitForSelector(logoutButtonSelector);
+    await this.clickOn(logoutButtonSelector);
+  }
+
+  /**
+   * Selects a sidebar option in the learner dashboard.
+   * @param {string} optionName - The name of the sidebar option to select.
+   */
+  async selectSidebarOption(optionName: string): Promise<void> {
+    showMessage(`Selecting sidebar option: ${optionName}`);
+    const optionSelector = `${sidebarOptionSelector}:has-text("${optionName}")`;
+    await this.page.waitForSelector(optionSelector);
+    await this.clickOn(optionSelector);
+  }
+
+  /**
+   * Verifies that the Goals tab is displayed with a description.
+   */
+  async expectGoalsTabToBeDisplayed(): Promise<void> {
+    showMessage('Verifying that the Goals tab is displayed.');
+    await this.page.waitForSelector(goalsTabDescriptionSelector);
+    showMessage('Goals tab is displayed successfully.');
+  }
+
+  /**
+   * Verifies that the "Add Goals" button is visible.
+   */
+  async expectAddGoalsButtonToBeVisible(): Promise<void> {
+    showMessage('Verifying that the "Add Goals" button is visible.');
+    await this.page.waitForSelector(addGoalsButtonSelector);
+    showMessage('"Add Goals" button is visible.');
+  }
+
+  /**
+   * Unchecks a specific goal in the "Add Goals" modal.
+   * @param {string} goalName - The name of the goal to uncheck.
+   */
+  async uncheckGoal(goalName: string): Promise<void> {
+    showMessage(`Unchecking goal: ${goalName}`);
+    const goalCheckbox = `${goalCheckboxSelector}:has-text("${goalName}")`;
+    await this.page.waitForSelector(goalCheckbox);
+    const isChecked = await this.page.$eval(
+      goalCheckbox,
+      el => (el as HTMLInputElement).checked
+    );
+    if (isChecked) {
+      await this.clickOn(goalCheckbox);
+    }
+  }
+
+  /**
+   * Clicks the "Cancel" button in the "Add Goals" modal.
+   */
+  async clickCancel(): Promise<void> {
+    showMessage('Clicking the "Cancel" button in the Add Goals modal.');
+    await this.page.waitForSelector(cancelGoalsButtonSelector);
+    await this.clickOn(cancelGoalsButtonSelector);
+  }
+
+  /**
+   * Verifies that the remaining goals are active in the "Add Goals" modal.
+   */
+  async expectRemainingGoalsToBeActive(): Promise<void> {
+    showMessage('Verifying that the remaining goals are active.');
+    const checkboxes = await this.page.$$(goalCheckboxSelector);
+    for (const checkbox of checkboxes) {
+      const isDisabled = await this.page.evaluate(
+        el => (el as HTMLInputElement).disabled,
+        checkbox
+      );
+      if (isDisabled) {
+        throw new Error('Some goals are disabled, but they should be active.');
+      }
+    }
+    showMessage('All remaining goals are active.');
+  }
+
+  /**
+   * Verifies that the remaining goals are disabled in the "Add Goals" modal.
+   */
+  async expectRemainingGoalsToBeDisabled(): Promise<void> {
+    showMessage('Verifying that the remaining goals are disabled.');
+    const checkboxes = await this.page.$$(goalCheckboxSelector);
+    for (const checkbox of checkboxes) {
+      const isDisabled = await this.page.evaluate(
+        el => (el as HTMLInputElement).disabled,
+        checkbox
+      );
+      if (!isDisabled) {
+        throw new Error('Some goals are active, but they should be disabled.');
+      }
+    }
+    showMessage('All remaining goals are disabled.');
+  }
+
+  /**
+   * Opens the chapter list for a specific goal.
+   * @param {string} goalName - The name of the goal.
+   */
+  async openChapterListForGoal(goalName: string): Promise<void> {
+    showMessage(`Opening chapter list for goal: ${goalName}`);
+    const displayMoreButton = `${displayMoreButtonSelector}:has-text("${goalName}")`;
+    await this.page.waitForSelector(displayMoreButton);
+    await this.clickOn(displayMoreButton);
+  }
+
+  /**
+   * Verifies that chapters are displayed for a specific goal.
+   * @param {string} goalName - The name of the goal.
+   */
+  async verifyChaptersDisplayForGoal(goalName: string): Promise<void> {
+    showMessage(`Verifying chapters display for goal: ${goalName}`);
+    const chapterSelector = `${chapterProgressSelector}:has-text("${goalName}")`;
+    await this.page.waitForSelector(chapterSelector);
+    showMessage(`Chapters are displayed for goal: ${goalName}`);
+  }
+
+  /**
+   * Verifies that a goal is not in the "In Progress" section.
+   * @param {string} goalName - The name of the goal.
+   */
+  async expectGoalToNotBeInProgress(goalName: string): Promise<void> {
+    showMessage(`Verifying that goal "${goalName}" is not in progress.`);
+
+    // Wait for the "In Progress" section to load.
+    await this.page.waitForSelector(inProgressGoalsSectionSelector);
+
+    // Check if the goal is listed in the "In Progress" section.
+    const goalSelector = `${inProgressGoalsSectionSelector} .e2e-test-goal:has-text("${goalName}")`;
+    const isGoalInProgress = await this.page.$(goalSelector);
+
+    if (isGoalInProgress) {
+      throw new Error(
+        `Goal "${goalName}" is incorrectly listed in the "In Progress" section.`
+      );
+    }
+
+    showMessage(`Goal "${goalName}" is not in progress.`);
+  }
+
+  /**
+   * Checks a specific goal in the "Add Goals" modal.
+   * @param {string} goalName - The name of the goal to check.
+   */
+  async checkGoal(goalName: string): Promise<void> {
+    showMessage(`Checking goal: ${goalName}`);
+
+    // Wait for the goal checkbox to load.
+    const goalCheckbox = `${goalCheckboxSelector}:has-text("${goalName}")`;
+    await this.page.waitForSelector(goalCheckbox);
+
+    // Check the checkbox if it is not already checked.
+    const isChecked = await this.page.$eval(
+      goalCheckbox,
+      el => (el as HTMLInputElement).checked
+    );
+    if (!isChecked) {
+      await this.clickOn(goalCheckbox);
+    }
+
+    showMessage(`Goal "${goalName}" checked successfully.`);
+  }
+
+  /**
+   * Verifies the progress of a goal.
+   * @param {string} goalName - The name of the goal.
+   * @param {number} progressPercentage - The expected progress percentage.
+   */
+  async verifyGoalProgress(
+    goalName: string,
+    progressPercentage: number
+  ): Promise<void> {
+    showMessage(`Verifying progress for goal: ${goalName}`);
+
+    // Wait for the "In Progress" section to load.
+    await this.page.waitForSelector(inProgressGoalsSectionSelector);
+
+    // Find the goal by name and check its progress bar.
+    const progressBarSelectorForGoal = `${inProgressGoalsSectionSelector} .e2e-test-goal:has-text("${goalName}") ${progressBarSelector}`;
+    await this.page.waitForSelector(progressBarSelectorForGoal);
+
+    const progressText = await this.page.$eval(
+      progressBarSelectorForGoal,
+      element => (element as HTMLElement).innerText
+    );
+
+    const actualProgress = parseInt(progressText.replace('%', ''), 10);
+    if (actualProgress !== progressPercentage) {
+      throw new Error(
+        `Expected progress for goal "${goalName}" to be ${progressPercentage}%, but got ${actualProgress}%.`
+      );
+    }
+
+    showMessage(
+      `Progress for goal "${goalName}" verified as ${progressPercentage}%.`
+    );
+  }
+
+  /**
+   * Verifies that a goal is checked and disabled in the "Add Goals" modal.
+   * @param {string} goalName - The name of the goal.
+   */
+  async expectGoalToBeCheckedAndDisabled(goalName: string): Promise<void> {
+    showMessage(`Verifying that goal "${goalName}" is checked and disabled.`);
+
+    // Wait for the "Add Goals" modal to load.
+    await this.page.waitForSelector(addGoalsModalSelector);
+
+    // Find the goal by name and check its checkbox state.
+    const goalCheckbox = `${goalCheckboxSelector}:has-text("${goalName}")`;
+    await this.page.waitForSelector(goalCheckbox);
+
+    const isChecked = await this.page.$eval(
+      goalCheckbox,
+      el => (el as HTMLInputElement).checked
+    );
+
+    const isDisabled = await this.page.$eval(
+      goalCheckbox,
+      el => (el as HTMLInputElement).disabled
+    );
+
+    if (!isChecked || !isDisabled) {
+      throw new Error(
+        `Goal "${goalName}" is not checked and disabled as expected.`
+      );
+    }
+
+    showMessage(`Goal "${goalName}" is verified as checked and disabled.`);
   }
 
   /**
