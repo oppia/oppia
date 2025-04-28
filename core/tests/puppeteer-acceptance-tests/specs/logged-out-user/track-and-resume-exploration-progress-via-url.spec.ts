@@ -146,9 +146,6 @@ describe('Logged-out User', function () {
       );
       const progressUrl = await loggedOutUser.copyProgressUrl();
 
-      // Instead of closing modal which is stuck, reload the page.
-      await loggedOutUser.reloadPage();
-
       // Resume with progress URL.
       await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
       await loggedOutUser.expectProgressRemainder(true);
