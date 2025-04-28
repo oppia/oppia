@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 from core import feconf
 from core import utils
@@ -138,6 +139,96 @@ def get_azure_voicecode_from_language_accent_code(
     return voice_code
 
 
+def process_factorial_in_text(
+        text: str, math_symbol_pronounciations: Dict[str, str]) -> str:
+    """Process the text to convert factorial expressions into their
+    corresponding words or phrases.
+
+    Args:
+        text: str. The text to be processed for factorial expressions.
+        math_symbol_pronounciations: dict. The dictionary containing the
+            pronunciations of mathematical symbols.
+
+    Returns:
+        str. The processed text with factorial expressions replaced by their
+        corresponding words or phrases.
+    """
+    pronounciation = math_symbol_pronounciations['!'] + ' '
+    return re.sub(r'(\d+)!', pronounciation + r'\1', text)
+
+
+def process_superscript_in_text(
+        text: str, math_symbol_pronounciations: Dict[str, str]) -> str:
+    """Process the text to convert superscript characters into their
+    corresponding words or phrases.
+
+    Args:
+        text: str. The text to be processed for superscript characters.
+        math_symbol_pronounciations: dict. The dictionary containing the
+            pronunciations of mathematical symbols.
+
+    Returns:
+        str. The processed text with superscript characters replaced by their
+        corresponding words or phrases.
+    """
+    superscript_digits = {
+        '⁰': '0',
+        '¹': '1',
+        '²': '2',
+        '³': '3',
+        '⁴': '4',
+        '⁵': '5',
+        '⁶': '6',
+        '⁷': '7',
+        '⁸': '8',
+        '⁹': '9',
+    }
+    is_superscript_present = False
+    for char in superscript_digits:
+        if char in text:
+            is_superscript_present = True
+            break
+    if not is_superscript_present:
+        return text
+
+    result = ''
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char in superscript_digits:
+            number = ''
+            while i < len(text) and text[i] in superscript_digits:
+                number += superscript_digits[text[i]]
+                i += 1
+            if int(number) == 2:
+                result += (' ' + math_symbol_pronounciations['^2'])
+            elif int(number) == 3:
+                result += (' ' + math_symbol_pronounciations['^3'])
+            else:
+                result += (
+                    ' ' + math_symbol_pronounciations['^'] + ' ' + number)
+            continue
+        result += char
+        i += 1
+    return result
+
+
+def process_algebric_fraction(text: str) -> str:
+    """Transforms algebraic fractions in the text into a format with spaces
+    around slashes. For example, 'x/2' becomes 'x / 2'.
+
+    Args:
+        text: str. The input text containing algebraic fractions.
+
+    Returns:
+        str. The text with algebraic fractions reformatted to include spaces
+        around slashes.
+    """
+    text = re.sub(r'(\d+)/', r' \1 / ', text)
+    text = re.sub(r'/(\d+)', r' / \1', text)
+    return text
+
+
 def convert_plaintext_to_ssml_content(
     plaintext: str, language_accent_code: str
 ) -> str:
@@ -187,6 +278,10 @@ def convert_plaintext_to_ssml_content(
                 '×',
                 MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['×'])
 
+        # Update the content of algebraic fractions to contain spaces around
+        # the slashes.
+        content = process_algebric_fraction(content)
+
         # Update the content to pronounce `/` correctly in the given language.
         if ' / ' in content:
             content = content.replace(
@@ -210,6 +305,16 @@ def convert_plaintext_to_ssml_content(
             content = content.replace(
                 ' = ',
                 MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['='])
+
+        # Update the content to pronounce factorials correctly in the given
+        # language.
+        content = process_factorial_in_text(
+            content, math_symbol_pronounciations)
+
+        # Update the content to pronounce superscripts correctly in the given
+        # language.
+        content = process_superscript_in_text(
+            content, math_symbol_pronounciations)
 
         main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
 

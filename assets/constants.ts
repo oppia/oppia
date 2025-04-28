@@ -7756,6 +7756,8 @@ export default {
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
 
+  // Please consult the translation team before adding any entries here.
+  // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
     "en": {
       "+": "plus",
@@ -7763,7 +7765,11 @@ export default {
       "*": "times",
       "×": "times",
       "÷": "divided by",
-      "=": "equals"
+      "=": "equals",
+      "!": "factorial of",
+      "^": "to the power of",
+      "^2": "squared",
+      "^3": "cubed"
     },
     "hi": {
       "+": "जोड़",
@@ -7771,7 +7777,11 @@ export default {
       "*": "गुणा",
       "×": "गुणा",
       "÷": "विभाजित",
-      "=": "बराबर"
+      "=": "बराबर",
+      "!": "फैक्टोरियल",
+      "^": "की घात",
+      "^2": "वर्ग",
+      "^3": "घन"
     },
     "pt": {
       "+": "mais",
@@ -7779,15 +7789,23 @@ export default {
       "*": "vezes",
       "×": "vezes",
       "÷": "dividido por",
-      "=": "igual a"
+      "=": "igual a",
+      "!": "fatorial",
+      "^": "a potência de",
+      "^2": "ao quadrado",
+      "^3": "ao cubo"
     },
     "ar": {
-      "+": "زائد",
-      "-": "ناقص",
-      "*": "ضرب",
-      "×": "ضرب",
-      "÷": "قسمة على",
-      "=": "يساوي"
+      "+": "زَائِدْ",
+      "-": "نَاقِصْ",
+      "*": "ضَرْبْ",
+      "×": "ضَرْبْ",
+      "÷": "تَقْسِيمْ",
+      "=": "يُسَاوِي",
+      "!": "عاملي",
+      "^": "للقوة",
+      "^2": "تربيع",
+      "^3": "تكعيب"
     }
   }
 } as const;
