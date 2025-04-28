@@ -145,10 +145,11 @@ export class Interaction extends BaseTranslatableObject {
     let contentIdToHtml = {};
     let answerGroupsContentIdToHtml = {};
     let outcomeContentIdToHtml = {};
+    let solutionContentIdToHtml = {};
+    let htmlContentToHtml = {};
 
     for (let answerGroup of this.answerGroups) {
       Object.assign(
-        answerGroupsContentIdToHtml,
         answerGroupsContentIdToHtml,
         answerGroup.getContentIdToHtml()
       );
@@ -158,10 +159,20 @@ export class Interaction extends BaseTranslatableObject {
       outcomeContentIdToHtml = this.defaultOutcome.getContentIdToHtml();
     }
 
+    for (let hint of this.hints) {
+      Object.assign(htmlContentToHtml, hint.getContentIdToHtml());
+    }
+
+    if (this.solution) {
+      solutionContentIdToHtml = this.solution.getContentIdToHtml();
+    }
+
     return Object.assign(
       contentIdToHtml,
       answerGroupsContentIdToHtml,
-      outcomeContentIdToHtml
+      outcomeContentIdToHtml,
+      htmlContentToHtml,
+      solutionContentIdToHtml
     );
   }
 

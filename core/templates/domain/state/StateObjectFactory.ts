@@ -97,6 +97,14 @@ export class State extends BaseTranslatableObject {
     return [this.content];
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let contentIdToHtml: {[contentId: string]: string} = {};
+    contentIdToHtml[this.content.contentId as string] = this.content.html;
+    let interactionContentIdToHtml = this.interaction.getContentIdToHtml();
+
+    return Object.assign(contentIdToHtml, interactionContentIdToHtml);
+  }
+
   getTranslatableObjects(): BaseTranslatableObject[] {
     return [this.interaction];
   }
