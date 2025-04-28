@@ -18,16 +18,16 @@
 
 from __future__ import annotations
 
+from typing import Optional, Type
+
 from core.domain import skill_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
-from typing import Optional, Type
-
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
@@ -42,7 +42,8 @@ class ValidateSkillSnapshotMetadataModel(
     """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, unused_input_model: skill_models.SkillSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        unused_input_model: skill_models.SkillSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[skill_domain.SkillChange]:
         """Returns a change domain class.
 

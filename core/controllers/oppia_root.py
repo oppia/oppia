@@ -16,10 +16,9 @@
 
 from __future__ import annotations
 
-from core.controllers import acl_decorators
-from core.controllers import base
-
 from typing import Dict
+
+from core.controllers import acl_decorators, base
 
 
 class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -38,7 +37,8 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         url = self.request.uri
         if 'explore' in url or 'embed' in url:
             self.render_template(
-                'oppia-root.mainpage.html', iframe_restriction=None)
+                'oppia-root.mainpage.html', iframe_restriction=None
+            )
             return
 
         self.render_template('oppia-root.mainpage.html')

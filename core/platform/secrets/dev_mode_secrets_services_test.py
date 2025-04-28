@@ -30,7 +30,8 @@ class DevModeSecretsServicesTests(test_utils.GenericTestBase):
     def test_get_secret_returns_existing_secret(self) -> None:
         with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
             self.assertEqual(
-                dev_mode_secrets_services.get_secret('name'), 'secret')
+                dev_mode_secrets_services.get_secret('name'), 'secret'
+            )
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
         with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):

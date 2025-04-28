@@ -18,26 +18,29 @@
 
 from __future__ import annotations
 
-from core.constants import constants
-
 # To use cloud translate in a local dev environment, use
 # cloud_translate_emulator.
 from google import auth
 from google.cloud import translate_v2 as translate
+
+from core.constants import constants
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
 CLIENT = translate.Client(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 # List of languages with adequate Google Translate accuracy.
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
 def translate_text(
-        text: str, source_language: str, target_language: str
+    text: str, source_language: str, target_language: str
 ) -> str:
     """Translates text into the target language.
 
@@ -66,10 +69,9 @@ def translate_text(
     if source_language == target_language:
         return text
 
-    result = (
-        CLIENT.translate(
-            text, target_language=target_language,
-            source_language=source_language))
+    result = CLIENT.translate(
+        text, target_language=target_language, source_language=source_language
+    )
     # Letting mypy know that result is a dict.
     assert isinstance(result, dict)
     translated_text = result['translatedText']

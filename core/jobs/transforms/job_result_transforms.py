@@ -18,11 +18,12 @@
 
 from __future__ import annotations
 
-from core.jobs.types import job_run_result
+from typing import Any, Optional, Tuple
 
 import apache_beam as beam
 import result
-from typing import Any, Optional, Tuple
+
+from core.jobs.types import job_run_result
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -121,11 +122,11 @@ class ResultsToJobRunResults(beam.PTransform):  # type: ignore[misc]
         """
         return (
             results
-            | 'Transform result to job run result' >> beam.Map(
-                self._transform_result_to_job_run_result)
+            | 'Transform result to job run result'
+            >> beam.Map(self._transform_result_to_job_run_result)
             | 'Count all elements' >> beam.combiners.Count.PerElement()
-            | 'Add count to job run result' >> beam.Map(
-                self._add_count_to_job_run_result)
+            | 'Add count to job run result'
+            >> beam.Map(self._add_count_to_job_run_result)
         )
 
 
@@ -168,10 +169,12 @@ class CountObjectsToJobRunResult(beam.PTransform):  # type: ignore[misc]
         return (
             objects
             | 'Count all new models' >> beam.combiners.Count.Globally()
-            | 'Only create result for non-zero number of objects' >> (
-                beam.Filter(lambda x: x > 0))
-            | 'Add count to job run result' >> beam.Map(
+            | 'Only create result for non-zero number of objects'
+            >> (beam.Filter(lambda x: x > 0))
+            | 'Add count to job run result'
+            >> beam.Map(
                 lambda object_count: job_run_result.JobRunResult.as_stdout(
                     '%sSUCCESS: %s' % (self.prefix, object_count)
-                ))
+                )
+            )
         )

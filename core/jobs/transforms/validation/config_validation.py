@@ -18,12 +18,12 @@
 
 from __future__ import annotations
 
+from typing import Type
+
 from core.domain import platform_parameter_domain as parameter_domain
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
-
-from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,7 +33,8 @@ if MYPY:  # pragma: no cover
 
 
 @validation_decorators.AuditsExisting(
-    config_models.PlatformParameterSnapshotMetadataModel)
+    config_models.PlatformParameterSnapshotMetadataModel
+)
 class ValidatePlatformParameterSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
         config_models.PlatformParameterSnapshotMetadataModel
@@ -44,7 +45,8 @@ class ValidatePlatformParameterSnapshotMetadataModel(
     """
 
     def _get_change_domain_class(
-        self, input_model: config_models.PlatformParameterSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: config_models.PlatformParameterSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[parameter_domain.PlatformParameterChange]:
         """Returns a change domain class.
 

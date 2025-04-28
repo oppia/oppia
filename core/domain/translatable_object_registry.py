@@ -17,10 +17,9 @@
 from __future__ import annotations
 
 import inspect
+from typing import Dict, List, Literal, Type, Union, overload
 
 from extensions.objects.models import objects
-
-from typing import Dict, List, Literal, Type, Union, overload
 
 TranslatableObjectNames = Literal[
     'TranslatableHtml',
@@ -54,12 +53,14 @@ class Registry:
 
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
-                objects, predicate=inspect.isclass):
+            objects, predicate=inspect.isclass
+        ):
             if name.endswith('_test') or name.startswith('Base'):
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
             # Some classes, such as TranslatableHtmlContentId, are not
             # subclasses of BaseTranslatableObject, despite starting with the
             # string 'Translatable'. So we need to do verification based on the
@@ -126,5 +127,6 @@ class Registry:
             cls._refresh_registry()
         if obj_type not in cls._translatable_objects_dict:
             raise TypeError(
-                '\'%s\' is not a valid translatable object class.' % obj_type)
+                '\'%s\' is not a valid translatable object class.' % obj_type
+            )
         return cls._translatable_objects_dict[obj_type]

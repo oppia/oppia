@@ -24,7 +24,6 @@ from __future__ import annotations
 import os
 import sys
 
-
 # This will be read as unicode.
 SOME_STR_TEXT = 'example text'
 

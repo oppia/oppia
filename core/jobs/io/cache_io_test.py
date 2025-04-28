@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+import apache_beam as beam
+
 from core.domain import caching_services
 from core.jobs import job_test_utils
 from core.jobs.io import cache_io
-
-import apache_beam as beam
 
 
 class FlushCacheTests(job_test_utils.PipelinedTestBase):
@@ -43,10 +43,8 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
             caching_services, 'memory_cache_services', MockMemoryCachingServices
         ):
             self.assert_pcoll_equal(
-                self.pipeline
-                | beam.Create(items)
-                | cache_io.FlushCache(),
-                [None]
+                self.pipeline | beam.Create(items) | cache_io.FlushCache(),
+                [None],
             )
 
         self.assertTrue(called_functions['flush_caches'])
