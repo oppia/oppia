@@ -5,6 +5,7 @@ runs:
   steps:
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge
+
     - name: Setup Python 3.9.20
       uses: actions/setup-python@v5
       id: setup_python
@@ -14,14 +15,17 @@ runs:
         cache: 'pip'
         cache-dependency-path: |
           requirements_dev.txt
+
     - name: Show whether a cache hit occurred (for debugging purposes).
       run: |
         echo "${{ steps.setup_python.outputs.cache-hit }}"
       shell: bash
+
     - name: Write the exact Python version to a file for cache-busting.
       run: |
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
+
     - name: Cache Python dev dependencies
       id: restore_python_dev_dependencies_cache
       uses: actions/cache@v4
@@ -31,8 +35,38 @@ runs:
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
         path: |
           /opt/hostedtoolcache/Python/3.9.20/x64
+
+    - name: Validate and fix pip installation
+      id: validate_pip
+      run: >
+        echo "Checking pip installation...";
+        # Try to run pip debug to check if pip is working;
+        if ! python -m pip debug; then;
+          echo "Pip appears to be broken, need to fix before proceeding";
+          # Remove pip completely;
+          python -m pip uninstall -y pip setuptools;
+          
+          # Use get-pip.py to get a basic pip installation working;
+          # In Install third-party Python dev dependencies step,;
+          # correct version of pip will be installed;
+          curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py;
+          python get-pip.py;
+          
+          # Flag that we had to repair pip;
+          echo "pip_repaired=true" >> $GITHUB_OUTPUT;
+        else;
+          echo "Pip appears to be working";
+          echo "pip_repaired=false" >> $GITHUB_OUTPUT;
+        fi;
+
+    - name: Clear pip cache if pip was repaired
+      if: steps.validate_pip.outputs.pip_repaired == 'true'
+      run: |
+        echo "Clearing pip cache due to repair"
+        rm -rf ~/.cache/pip
+
     - name: Install third-party Python dev dependencies
-      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
+      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false || steps.validate_pip.outputs.pip_repaired == 'true'
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
@@ -42,12 +76,14 @@ runs:
         # Note that the effects of this don't seem to be cached by setup-python,
         # resulting in the occasional "No module named PIL" errors in CI.
         command: python -m scripts.install_python_dev_dependencies
+
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
         pip show certifi
         ls -la /opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages
         ls -la /opt/hostedtoolcache/Python/3.9.20/x64/bin
       shell: bash
+
     - name: Check Yarn Cache
       run: |
         # Move outside repository root to ignore the configs in
@@ -64,6 +100,7 @@ runs:
         # Move back to the repository root.
         cd -
       shell: bash
+
     # Production pip dependencies are installed in a custom folder rather than
     # the pip cache (see "Caching Python dependencies" in the README at
     # https://github.com/actions/setup-python?tab=readme-ov-file).
@@ -80,6 +117,7 @@ runs:
       run: |
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
+
     - name: Cache third_party and node_modules
       id: restore_third_party_and_node_modules_cache
       uses: actions/cache@v4
@@ -98,6 +136,7 @@ runs:
           /home/runner/work/oppia/oppia/node_modules
           /home/runner/work/oppia/oppia/third_party/python_libs
           /home/runner/work/oppia/oppia/third_party/static
+
     - name: Install third-party libs on cache miss (retries on error)
       if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
@@ -107,6 +146,7 @@ runs:
         shell: bash
         timeout_minutes: 30
         command: python -m scripts.install_third_party_libs
+
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
       # installed.
