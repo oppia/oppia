@@ -37,7 +37,7 @@ runs:
           /opt/hostedtoolcache/Python/3.9.20/x64
 
     - name: Validate and fix pip installation
-      id: validate_pip          
+      id: validate_pip
       run: |
         echo "Checking pip installation..."
         # Try to run pip debug to check if pip is working
@@ -58,6 +58,7 @@ runs:
           echo "Pip appears to be working"
           echo "pip_repaired=false" >> $GITHUB_OUTPUT
         fi
+      shell: bash
 
     - name: Clear pip cache if pip was repaired
       if: steps.validate_pip.outputs.pip_repaired == 'true'
