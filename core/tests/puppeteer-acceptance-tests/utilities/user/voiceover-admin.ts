@@ -74,8 +74,6 @@ export class VoiceoverAdmin extends BaseUser {
    * Navigate to the voiceover admin page.
    */
   async navigateToVoiceoverAdminPage(): Promise<void> {
-    await this.page.bringToFront();
-    await this.waitForNetworkIdle();
     await this.goto(voiceoverAdminURL);
   }
 
@@ -265,11 +263,15 @@ export class VoiceoverAdmin extends BaseUser {
     }
   }
 
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentCode - The language-accent code to add.
+   */
   async addSupportedLanguageAccentPair(
     languageAccentCode: string
   ): Promise<void> {
-    this.navigateToVoiceoverAdminPage();
-    this.waitForPageToFullyLoad();
+    await this.waitForPageToFullyLoad();
+    await this.navigateToVoiceoverAdminPage();
 
     await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
     await this.clickOn(addNewLanguageAccentButtonSelector);

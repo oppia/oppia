@@ -2357,7 +2357,7 @@ export class ExplorationEditor extends BaseUser {
     contentType: string,
     voiceoverFilePath: string
   ): Promise<void> {
-    this.waitForPageToFullyLoad();
+    await this.waitForPageToFullyLoad();
 
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -2382,8 +2382,6 @@ export class ExplorationEditor extends BaseUser {
         break;
       }
     }
-
-    this.page.waitForTimeout(2000);
 
     await this.clickOn(voiceoverLanguageAccentSelector);
     await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
