@@ -345,14 +345,14 @@ export class ItemSelectionInputValidationService {
         );
         const stringifiedInputs = JSON.stringify(inputs);
         const ruleKey = `${rule.type}:${stringifiedInputs}`;
-        if (mapRulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
-          const ag = mapRulesToAnswerGroupIndex[ruleKey];
+        if (rulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
+          const ag = rulesToAnswerGroupIndex[ruleKey];
           warningsList.push({
             type: AppConstants.WARNING_TYPES.ERROR,
             message: `Rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
           });
         } else {
-          mapRulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;
+          rulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;
         }
       }
     }
