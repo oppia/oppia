@@ -37,7 +37,7 @@ runs:
           /opt/hostedtoolcache/Python/3.9.20/x64
 
     # TODO (#22567): Fix pip not working properly when fetched from cache.
-    - name: Check pip installation and fix if needed
+    - name: Check cached pip installation and fix if needed
       run: |
         set -e
         echo "Checking if pip is properly installed..."
