@@ -4297,11 +4297,11 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   color: #00645c;
 }
 
-.mat-tab-body-content {
+.blog-dashboard-card .mat-tab-body-content {
   overflow: hidden;
 }
 
-mat-card-header .mat-card-header-text {
+.mat-card-header .mat-card-header-text {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -4315,7 +4315,7 @@ mat-card-header .mat-card-header-text {
 }
 
 @media(max-width: 620px) {
-  .mat-card-header-text {
+  .mat-card-header .mat-card-header-text {
     margin-right: 0;
   }
 }
