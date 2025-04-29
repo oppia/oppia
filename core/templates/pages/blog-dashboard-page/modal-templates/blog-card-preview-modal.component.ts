@@ -16,7 +16,7 @@
  * @fileoverview Component for confirming blog post actions.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {BlogDashboardPageService} from '../services/blog-dashboard-page.service';
@@ -27,6 +27,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
   styleUrls: [],
+  encapsulation: ViewEncapsulation.None,
 })
 export class BlogCardPreviewModalComponent
   extends ConfirmOrCancelModal

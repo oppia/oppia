@@ -1,4 +1,3 @@
-
 <div *ngIf="blogPostData" class="blog-post-editor row">
   <mat-card class="editor-field-card col-sm-8 ml-auto">
     <div class="blog-post-thumbnail d-flex e2e-test-photo-clickable"
@@ -407,16 +406,6 @@
     width: max-content;
   }
 
-  .preview-button /deep/ .mat-button-wrapper {
-    color: #555;
-    display: flex;
-    flex-direction: column;
-    float: right;
-  }
-
-  .mat-spinner /deep/ circle {
-    stroke: #fff;
-  }
 
   .sub-text {
     color: #555;
@@ -441,14 +430,6 @@
     color: #555;
   }
 
-
-  .tag /deep/ .mat-button-toggle-label-content {
-    line-height: 19px;
-  }
-
-  .tag /deep/ .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-    padding: 4px 5px;
-  }
 
   .title-heading {
     border-right: 2px solid #999;
@@ -475,44 +456,6 @@
     font-size: 40px;
   }
 
-  .blog-post-content-display /deep/ h1 {
-    color: #333;
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: 0;
-    line-height: 30px;
-    margin-bottom: 1rem;
-  }
-
-  .blog-post-content-display /deep/ p {
-    color: #333;
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 300;
-    letter-spacing: 0;
-    line-height: 30px;
-  }
-
-  .blog-post-content-display /deep/ ol {
-    color: #333;
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 300;
-    letter-spacing: 0;
-    line-height: 30px;
-  }
-
-  .blog-post-content-display /deep/ strong {
-    font-weight: 600;
-  }
-
-  .blog-post-content-display /deep/ blockquote {
-    box-shadow: inset 3px 0 0 0 rgb(41 41 41);
-    margin-left: 20px;
-    padding-left: 23px;
-  }
-
   @media(max-width: 920px) {
     .editor-profile-card.col-sm-2 {
       flex: 0 0 25%;
@@ -521,29 +464,6 @@
 
     .mat-button {
       width: 16vw;
-    }
-
-    .blog-post-content-display /deep/ p {
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 20px;
-    }
-
-    .blog-post-content-display /deep/ ol {
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 20px;
-    }
-
-    .blog-post-content-display /deep/ strong {
-      font-weight: 600;
-    }
-
-    .blog-post-content-display /deep/ h1 {
-      font-size: 18px;
-      line-height: 26px;
-      margin-bottom: 1rem;
-      margin-top: 1rem;
     }
   }
 
@@ -619,30 +539,6 @@
         min-height: 60px;
         min-width: 240px;
         width: 66.667vw;
-      }
-
-      .blog-post-content-display /deep/ p {
-        font-size: 12px;
-        font-weight: 300;
-        line-height: 18px;
-        margin-bottom: 12px;
-      }
-
-      .blog-post-content-display /deep/ ol {
-        font-size: 12px;
-        font-weight: 300;
-        line-height: 18px;
-      }
-
-      .blog-post-content-display /deep/ strong {
-        font-weight: 600;
-      }
-
-      .blog-post-content-display /deep/ h1 {
-        font-size: 13px;
-        line-height: 24px;
-        margin-bottom: 1rem;
-        margin-top: 0.5rem;
       }
     }
   }

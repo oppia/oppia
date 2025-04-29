@@ -4129,7 +4129,7 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 }
 
 /* 
-   the below css is for classroom admin page.
+   The below css is for classroom admin page.
 */
 
 .oppia-create-classroom-spinning-button circle {
@@ -4146,4 +4146,176 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   position: absolute;
   top: 0;
   width: 100%;
+}
+
+/* 
+ The below css is related to thumbnail image uplode area in blog-page.
+*/
+
+.blog-post-thumbnail-image-uploader .image-uploader-drop-area {
+  border: #666 dashed;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 0;
+  width: 300px;
+}
+
+@media(max-width: 768px) {
+  .blog-post-thumbnail-image-uploader .image-uploader-drop-area {
+    height: auto;
+    width: 164px;
+  }
+}
+
+/* 
+  The below css is relate to blog-editor page.
+*/
+
+.preview-button .mat-button-wrapper {
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  float: right;
+}
+
+.blog-post-editor .mat-spinner circle {
+  stroke: #fff;
+}
+
+.blog-post-editor .tag .mat-button-toggle-label-content {
+  line-height: 19px;
+}
+
+.blog-post-editor .tag .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  padding: 4px 5px;
+}
+
+.blog-post-editor .blog-post-content-display h1 {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 30px;
+  margin-bottom: 1rem;
+}
+
+.blog-post-editor .blog-post-content-display p {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+}
+
+.blog-post-editor .blog-post-content-display ol {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+}
+
+.blog-post-editor .blog-post-content-display strong {
+  font-weight: 600;
+}
+
+.blog-post-editor .blog-post-content-display blockquote {
+  box-shadow: inset 3px 0 0 0 rgb(41 41 41);
+  margin-left: 20px;
+  padding-left: 23px;
+}
+
+@media(max-width: 920px) {
+  .blog-post-editor .blog-post-content-display p {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+  }
+
+  .blog-post-editor .blog-post-content-display ol {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 20px;
+  }
+
+  .blog-post-editor .blog-post-content-display strong {
+    font-weight: 600;
+  }
+
+  .blog-post-editor .blog-post-content-display h1 {
+    font-size: 18px;
+    line-height: 26px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+@media(max-width: 700px) {
+  .blog-post-editor .blog-post-content-display p {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18px;
+    margin-bottom: 12px;
+  }
+
+  .blog-post-editor .blog-post-content-display ol {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18px;
+  }
+
+  .blog-post-editor .blog-post-content-display strong {
+    font-weight: 600;
+  }
+
+  .blog-post-editor .blog-post-content-display h1 {
+    font-size: 13px;
+    line-height: 24px;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* 
+  The below css is related to blog-dashboard page.
+*/
+
+.mat-tab-label {
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 1.6rem;
+}
+
+.mat-tab-labels {
+  flex-grow: 1;
+  justify-content: space-evenly;
+}
+
+.mat-tab-label:focus {
+  color: #00645c;
+}
+
+.mat-tab-body-content {
+  overflow: hidden;
+}
+
+mat-card-header .mat-card-header-text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+@media(max-width: 870px) {
+  .mat-tab-label {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.1rem;
+  }
+}
+
+@media(max-width: 620px) {
+  .mat-card-header-text {
+    margin-right: 0;
+  }
 }
