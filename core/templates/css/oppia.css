@@ -1751,6 +1751,15 @@ pre.oppia-pre-wrapped-text {
   margin: 0;
 }
 
+.blog-post-editor .blog-post-content-display p {
+  color: #333;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 30px;
+}
+
 .oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
   margin-top: 0;
 }
@@ -4198,15 +4207,6 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   letter-spacing: 0;
   line-height: 30px;
   margin-bottom: 1rem;
-}
-
-.blog-post-editor .blog-post-content-display p {
-  color: #333;
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 300;
-  letter-spacing: 0;
-  line-height: 30px;
 }
 
 .blog-post-editor .blog-post-content-display ol {
