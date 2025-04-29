@@ -65,6 +65,7 @@ runs:
       run: |
         echo "Clearing pip cache due to repair"
         rm -rf ~/.cache/pip
+      shell: true
 
     - name: Install third-party Python dev dependencies
       if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false || steps.validate_pip.outputs.pip_repaired == 'true'
