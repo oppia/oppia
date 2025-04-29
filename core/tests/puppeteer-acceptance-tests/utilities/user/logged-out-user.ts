@@ -2677,7 +2677,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async continueToNextCard(): Promise<void> {
     try {
-      await this.page.waitForSelector(nextCardButton, {timeout: 10000});
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
