@@ -326,7 +326,7 @@ export class ItemSelectionInputValidationService {
       });
     });
     // Map serialized rule + input to answer group index.
-    const mapRulesToAnswerGroupIndex: {[key: string]: number} = {};
+    const rulesToAnswerGroupIndex: {[key: string]: number} = {};
     for (let [answerGroupIndex, group] of answerGroups.entries()) {
       for (let [ruleIndex, rule] of group.rules.entries()) {
         const itemSelectionInputs =
@@ -335,11 +335,11 @@ export class ItemSelectionInputValidationService {
         // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
         const inputs = Object.fromEntries(
           Object.entries(itemSelectionInputs).map(([key, value]) => {
-            // If array, sort for consistent ordering
+            // If array, sort for consistent ordering.
             if (Array.isArray(value)) {
               return [key, [...value].sort()];
             }
-            // For other types (numbers, strings, booleans, etc.), keep as it is
+            // For other types (numbers, strings, booleans, etc.), keep as it is.
             return [key, value];
           })
         );
