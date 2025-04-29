@@ -82,7 +82,7 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
-      '--window-size=1285,1000',
+      '--window-size=1920,1080',
       '--use-fake-ui-for-media-stream',
     ];
 
@@ -134,7 +134,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1280, height: 720});
+          this.page.setViewport({width: 1920, height: 1080});
         }
 
         // Enable Video Recording.
