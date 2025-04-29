@@ -36,6 +36,7 @@ runs:
         path: |
           /opt/hostedtoolcache/Python/3.9.20/x64
 
+    # TODO (#22567): Fix pip not working properly when fetched from cache.
     - name: Check pip installation and fix if needed
       run: |
         set -e
@@ -45,7 +46,8 @@ runs:
           python -m pip cache purge || true
           echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
           curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-          python get-pip.py
+          python -m pip uninstall pip -y
+          python get-pip.py pip==24.3.1
           python -m scripts.install_python_dev_dependencies
         else
           echo "pip is working correctly."
