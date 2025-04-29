@@ -36,39 +36,22 @@ runs:
         path: |
           /opt/hostedtoolcache/Python/3.9.20/x64
 
-    - name: Validate and fix pip installation
-      id: validate_pip
+    - name: Check pip installation and fix if needed
       run: |
-        echo "Checking pip installation..."
-        # Try to run pip debug to check if pip is working
-        if ! python -m pip debug; then
-          echo "Pip appears to be broken, need to fix before proceeding"
-          # Remove pip completely
-          python -m pip uninstall -y pip setuptools
-
-          # Use get-pip.py to get a basic pip installation working
-          # In Install third-party Python dev dependencies step,
-          # correct version of pip will be installed
-          curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-          python get-pip.py
-
-          # Flag that we had to repair pip
-          echo "pip_repaired=true" >> $GITHUB_OUTPUT
+        set -e
+        echo "Checking if pip is properly installed..."
+        if ! python -m pip debug > /dev/null 2>&1; then
+          echo "pip is broken. Clearing pip cache..."
+          python -m pip cache purge || true
+          echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
+          python -m scripts.install_python_dev_dependencies
         else
-          echo "Pip appears to be working"
-          echo "pip_repaired=false" >> $GITHUB_OUTPUT
+          echo "pip is working correctly."
         fi
       shell: bash
 
-    - name: Clear pip cache if pip was repaired
-      if: steps.validate_pip.outputs.pip_repaired == 'true'
-      run: |
-        echo "Clearing pip cache due to repair"
-        rm -rf ~/.cache/pip
-      shell: bash
-
     - name: Install third-party Python dev dependencies
-      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false || steps.validate_pip.outputs.pip_repaired == 'true'
+      if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
       with:
         max_attempts: 3
