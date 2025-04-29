@@ -44,6 +44,8 @@ runs:
           echo "pip is broken. Clearing pip cache..."
           python -m pip cache purge || true
           echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
+          curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python get-pip.py
           python -m scripts.install_python_dev_dependencies
         else
           echo "pip is working correctly."
