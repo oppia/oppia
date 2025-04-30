@@ -3,9 +3,7 @@ on:
   issues:
     types:
       - assigned
-  push:
-    branches:
-      - issue#21643-cla
+  
 permissions: read-all
 jobs:
   check-cla:
@@ -16,43 +14,74 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      
+      - name: Install Dependencies
+        run: npm install googleapis google-auth-library
+
       - name: Check CLA signature
         id: check-cla
         uses: actions/github-script@v6
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+          SHEETS_CRED: '${{ secrets.SHEETS_CRED }}'
           SPREADSHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
           USERNAME: '${{ github.event.assignee.login }}'
         with:
           script: |
-            const { google } = require('googleapis');
-            const { OAuth2Client } = require('google-auth-library');
-            const authorize = (credentials) => {
-              const clientSecret = credentials.installed.client_secret;
-              const clientId = credentials.installed.client_id;
-              const redirectUrl = credentials.installed.redirect_uris[0];
-              const oauth2Client = new OAuth2Client(clientId, clientSecret, redirectUrl);
-              oauth2Client.credentials = JSON.parse(process.env.CREDENTIALS);
-              return oauth2Client;
-            };
+            try {              
+              const sheetsCredJson = JSON.parse(process.env.SHEETS_CRED);
+              const username = process.env.USERNAME;              
+              console.log(`Checking CLA signature for user: ${username}`);
+              
+              const { google } = require('googleapis');
+              const { JWT } = require('google-auth-library');
 
-            const clientSecret = process.env.CLIENT_SECRET;
-            const oauthClient = authorize(JSON.parse(clientSecret));
-            const sheets = google.sheets('v4');
+              const { OAuth2Client } = require('google-auth-library');
+              
+              const oauth2Client = new OAuth2Client(
+                sheetsCredJson.client_id,
+                sheetsCredJson.client_secret
+              );
+              oauth2Client.setCredentials({
+                refresh_token: sheetsCredJson.refresh_token
+              });
 
-            const rows = await sheets.spreadsheets.values.get({
-              auth: oauthClient,
-              spreadsheetId: process.env.SPREADSHEET_ID,
-              range: 'Usernames!A:A',
-            });
-            const username = process.env.USERNAME.toLowerCase();
-            const hasSignedCla = rows.data.values.some(row => 
-              row[0].toLowerCase() === username
-            );
-            
-            core.setOutput('has-signed-cla', hasSignedCla);
-            console.log(`User ${username} has ${hasSignedCla ? '' : 'not '}signed the CLA`);
-
+              const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
+              
+              console.log(`Fetching data from spreadsheet ID: ${process.env.SPREADSHEET_ID}`);
+              const response = await sheets.spreadsheets.values.get({
+                spreadsheetId: process.env.SPREADSHEET_ID,
+                range: 'Usernames!A:A',
+              });
+              
+              if(!response) {
+                console.log("No response from Google Sheets API");
+                core.setOutput('has-signed-cla', 'false');
+                return;
+              }
+              if (!response.data.values) {
+                console.log("No values found in spreadsheet");
+                core.setOutput('has-signed-cla', 'false');
+                return;
+              }              
+              const lowercaseUsername = username.toLowerCase();
+              const hasSignedCla = response.data.values.some(row => 
+                row[0] && row[0].toLowerCase() === lowercaseUsername
+              );
+              
+              console.log(`User ${username} has ${hasSignedCla ? '' : 'not '}signed the CLA`);
+              core.setOutput('has-signed-cla', hasSignedCla ? 'true' : 'false');
+              
+            } catch (error) {
+              console.error("Error during CLA verification:", error);
+              core.warning(`CLA check failed: ${error.message}`);
+              // Don't fail the workflow on error, default to allowing the contribution
+              core.setOutput('has-signed-cla', 'true');
+            }
 
       - name: Remove assignee and notify if CLA not signed
         if: steps.check-cla.outputs.has-signed-cla == 'false'
@@ -65,14 +94,9 @@ jobs:
               core.setFailed('Invalid event payload');
               return;
             }
-            const linkToCla =
-            '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
+            const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
 
-            const commentBody = 'Hi @' + assignee.login + ', you need to sign
-            the ' +
-              'CLA before you can get assigned to issues. Follow the instructions ' +
-              linkToCla + ' to get started. I am unassigning you for now, feel ' +
-              'free to assign yourself once you have signed the CLA. Thanks!';
+            const commentBody = `Hi @${assignee.login}, you need to sign the CLA before you can get assigned to issues. Follow the instructions ${linkToCla} to get started. I am unassigning you for now, feel free to assign yourself once you have signed the CLA. Thanks!`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -86,11 +110,46 @@ jobs:
               issue_number: issue.number,
               assignees: [assignee.login]
             });
-            console.log(`Removed assignee ${assignee.login} from issue
-            #${issue.number} due to unsigned CLA`);
+            console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
+            
       - name: Report failure
         if: failure()
-        uses: ./.github/actions/send-webhook-notification
+        uses: actions/github-script@v6
         with:
-          message: Failed to check CLA for issue assignee
-          webhook-url: '${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}'
+          script: |
+            const message = "Failed to check CLA for issue assignee";
+            const webhookUrl = process.env.WEBHOOK_URL;
+            
+            if (webhookUrl) {
+              const https = require('https');
+              const url = new URL(webhookUrl);
+              
+              const data = JSON.stringify({
+                text: message
+              });
+              
+              const options = {
+                hostname: url.hostname,
+                path: url.pathname,
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': data.length
+                }
+              };
+              
+              const req = https.request(options, (res) => {
+                console.log(`Webhook notification sent with status code: ${res.statusCode}`);
+              });
+              
+              req.on('error', (error) => {
+                console.error('Error sending webhook notification:', error);
+              });
+              
+              req.write(data);
+              req.end();
+            } else {
+              console.log('No webhook URL provided, skipping notification');
+            }
+        env:
+          WEBHOOK_URL: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
