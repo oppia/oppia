@@ -28,13 +28,6 @@
       "rootDirPrefix": "lamejs-",
       "targetDirPrefix": "lamejs-"
     },
-    "angularTest": {
-      "version": "1.8.2",
-      "downloadFormat": "files",
-      "url": "https://code.angularjs.org/1.8.2",
-      "targetDirPrefix": "angularjs-",
-      "files": ["angular-mocks.js"]
-    },
     "angularTranslate": {
       "version": "2.18.1",
       "downloadFormat": "files",
