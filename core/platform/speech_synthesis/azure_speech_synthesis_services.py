@@ -183,8 +183,11 @@ def process_superscript_in_text(
         '⁸': '8',
         '⁹': '9',
     }
+    superscript_chars = list(superscript_digits.keys())
+    superscript_chars.append('^')
+
     is_superscript_present = False
-    for char in superscript_digits:
+    for char in superscript_chars:
         if char in text:
             is_superscript_present = True
             break
@@ -200,16 +203,32 @@ def process_superscript_in_text(
             while i < len(text) and text[i] in superscript_digits:
                 number += superscript_digits[text[i]]
                 i += 1
-            if int(number) == 2:
-                result += (' ' + math_symbol_pronounciations['^2'])
-            elif int(number) == 3:
-                result += (' ' + math_symbol_pronounciations['^3'])
-            else:
-                result += (
-                    ' ' + math_symbol_pronounciations['^'] + ' ' + number)
+            result += '^' + number
             continue
         result += char
         i += 1
+
+    def get_pronounciation(superscript_chars: str) -> str:
+        """Get the pronunciation for the given superscript characters.
+
+        Args:
+            superscript_chars: str. The superscript characters to be
+                pronounced.
+
+        Returns:
+            str. The pronunciation of the superscript characters.
+        """
+        if superscript_chars == '^2':
+            return ' ' + math_symbol_pronounciations['^2']
+        elif superscript_chars == '^3':
+            return ' ' + math_symbol_pronounciations['^3']
+        return (
+            ' ' + math_symbol_pronounciations['^'] +
+            ' ' + superscript_chars[1:])
+
+    result = re.sub(
+        r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result)
+
     return result
 
 
