@@ -25,7 +25,6 @@ import contextlib
 import shutil
 import sys
 import tempfile
-
 from typing import Dict, Iterator, List, Optional, TextIO
 
 from .. import concurrent_task_utils

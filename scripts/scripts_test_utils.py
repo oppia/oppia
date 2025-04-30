@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import io
 import signal
+from typing import List, Optional, Tuple
 
 import psutil
-from typing import List, Optional, Tuple
 
 
 class PopenStub:
@@ -68,7 +68,7 @@ class PopenStub:
         alive: bool = True,
         unresponsive: bool = False,
         return_code: int = 0,
-        child_procs: Optional[List[PopenStub]] = None
+        child_procs: Optional[List[PopenStub]] = None,
     ) -> None:
         """Initializes a new PopenStub instance.
 
@@ -210,7 +210,9 @@ class PopenStub:
         self.poll_count += 1
         return None if self.alive else self._return_code
 
-    def wait(self, timeout: Optional[int] = None) -> None: # pylint: disable=unused-argument
+    def wait(
+        self, timeout: Optional[int] = None
+    ) -> None:  # pylint: disable=unused-argument
         """Wait for the process completion.
 
         Mocks the process waiting for completion before it continues execution.
@@ -234,7 +236,11 @@ class PopenStub:
         else:
             raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def communicate(self, input: bytes = b'') -> Tuple[bytes, bytes]: # pylint: disable=unused-argument, redefined-builtin
+    def communicate(
+        self, input: bytes = b'' # pylint: disable=unused-argument, redefined-builtin
+    ) -> Tuple[
+        bytes, bytes
+    ]:
         """Mocks an interaction with the process.
 
         Args:

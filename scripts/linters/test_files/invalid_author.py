@@ -20,7 +20,7 @@ python_linter_test. This file use __author__ tag which is not allowed.
 
 from __future__ import annotations
 
-__author__ = 'Author Name' # The __author__ tag is not allowed to use.
+__author__ = 'Author Name'  # The __author__ tag is not allowed to use.
 
 
 class FakeClass:
