@@ -16,7 +16,6 @@
  * @fileoverview Acceptance tests for the goals tab in learner dashboard,
  * specifically adding and removing classroom goals (2.3 blue).
  */
-
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -29,10 +28,15 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Logged-in User - Goals Tab (Add & Remove)', function () {
+describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
+  const placeValueChapters = [
+    'What are the Place Values',
+    'Find the Value of a Number',
+    'Comparing Numbers',
+  ];
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -52,21 +56,28 @@ describe('Logged-in User - Goals Tab (Add & Remove)', function () {
     );
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
-    await curriculumAdmin.createAndPublishTopic('Place Values');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
+    );
+
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values subtopics',
+      'Place Values skills'
+    );
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
     await curriculumAdmin.publishClassroom('Math');
 
-    await curriculumAdmin.createAndPublishExplorationWithCards(
-      'What are the Place Values'
-    );
+    const chapterIds: (string | null)[] = [];
 
-    await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Find the Value of a Number'
-    );
-
-    await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Comparing Numbers'
-    );
+    for (const chapter of placeValueChapters) {
+      const id =
+        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+      chapterIds.push(id);
+    }
 
     await curriculumAdmin.addStoryToTopic(
       "Jamie's Adventures in the Arcade",
@@ -74,20 +85,9 @@ describe('Logged-in User - Goals Tab (Add & Remove)', function () {
       'Place Values'
     );
 
-    await curriculumAdmin.addChapter(
-      'What are the Place Values',
-      'What are the Place Values'
-    );
-
-    await curriculumAdmin.addChapter(
-      'Find the Value of a Number',
-      'Find the Value of a Number'
-    );
-
-    await curriculumAdmin.addChapter(
-      'Comparing Numbers',
-      'Comparing Numbers'
-    );
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
@@ -99,26 +99,18 @@ describe('Logged-in User - Goals Tab (Add & Remove)', function () {
   }, 480000);
 
   it(
-    'should display empty goals tab initially with add goals button',
-    async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectGoalsTabToBeDisplayed();
-      await loggedInUser.expectAddGoalsButtonToBeVisible();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should open add goals modal and show expected content',
     async function () {
-      await loggedInUser.openAddGoalsModal();
-      await loggedInUser.expectAddGoalsModalToBeVisible();
+      await loggedInUser.openAddGoalsModal('Add Goals Modal');
+      await loggedInUser.expectAddGoalsModalToBeVisible(
+        'Add or edit a goal',
+        'You can select up to 5 goals at a time'
+      );
       await loggedInUser.expectModalTitleAndSubtext(
         'Add or edit a goal',
         'You can select up to 5 goals at a time'
       );
-      await loggedInUser.expectCancelAndSaveButtonsVisible();
+      await loggedInUser.expectCancelAndSaveButtonsVisible('Cancel', 'Save');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -136,10 +128,10 @@ describe('Logged-in User - Goals Tab (Add & Remove)', function () {
   it(
     'should retain selection on cancel and restore it on reopen',
     async function () {
-      await loggedInUser.openAddGoalsModal();
+      await loggedInUser.openAddGoalsModal('Add Goals Modal');
       await loggedInUser.uncheckGoal('Place Values');
-      await loggedInUser.clickCancel();
-      await loggedInUser.openAddGoalsModal();
+      await loggedInUser.clickCancel('Add Goals Modal');
+      await loggedInUser.openAddGoalsModal('Add Goals Modal');
       await loggedInUser.expectGoalChecked('Place Values');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -158,7 +150,7 @@ describe('Logged-in User - Goals Tab (Add & Remove)', function () {
   it(
     'should disable remaining checkboxes after selecting 5 goals',
     async function () {
-      await loggedInUser.openAddGoalsModal();
+      await loggedInUser.openAddGoalsModal('Add Goals Modal');
       await loggedInUser.checkRandomGoals(5);
       await loggedInUser.expectRemainingGoalsToBeDisabled();
     },

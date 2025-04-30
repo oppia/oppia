@@ -124,6 +124,17 @@ const addTopicToCurrentGoalsButton =
   '.e2e-test-add-topic-to-current-goals-button';
 const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
+const goalsTabSelector = '.e2e-test-goals-tab';
+const addGoalsButtonSelector = '.e2e-test-add-goals-button';
+const modalTitleSelector = '.e2e-test-modal-title';
+const modalSubtextSelector = '.e2e-test-modal-subtext';
+const cancelButtonSelector = '.e2e-test-cancel-button';
+const saveButtonSelector = '.e2e-test-save-button';
+const goalSelectorTemplate = (goalName: string) => `.e2e-test-goal-checkbox-${goalName}`;
+const goalInProgressSelectorTemplate = (goalName: string, goalIndex: number) =>
+  `.e2e-test-goal-in-progress-${goalName}-${goalIndex}`;
+const goalCheckboxSelectorTemplate = (goalName: string) =>
+  `.e2e-test-goal-checkbox-${goalName}`;
 const homeSectionGreetingElement = '.greeting';
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const matFormTextSelector = '.oppia-form-text';
@@ -349,6 +360,229 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
   }
+
+  /*
+ * Verifies that the Goals tab is displayed in the learner dashboard.
+ * @param {string} tabName - The name of the tab to verify.
+ */
+async expectGoalsTabToBeDisplayed(tabName: string): Promise<void> {
+  const goalsTabElement = await this.page.$(goalsTabSelector);
+  const goalsTabText = await this.page.evaluate(
+    el => el.innerText,
+    goalsTabElement
+  );
+
+  if (!goalsTabText.includes(tabName)) {
+    throw new Error('Goals tab is not displayed');
+  }
+}
+
+/*
+ * Verifies that the "Add Goals" button is visible in the learner dashboard.
+ * @param {string} buttonName - The name of the button to check visibility for.
+ */
+async expectAddGoalsButtonToBeVisible(buttonName: string): Promise<void> {
+  const addGoalsButton = await this.page.$(addGoalsButtonSelector);
+  const buttonText = await this.page.evaluate(
+    el => el.innerText,
+    addGoalsButton
+  );
+
+  if (buttonText !== buttonName) {
+    throw new Error('Add Goals button is not visible');
+  }
+}
+
+/*
+ * Opens the "Add Goals" modal.
+ * @param {string} modalName - The name of the modal to open.
+ */
+async openAddGoalsModal(modalName: string): Promise<void> {
+  await this.clickOn(addGoalsButtonSelector);
+  await this.page.waitForSelector(modalTitleSelector, { visible: true });
+  const modalTitle = await this.page.$eval(modalTitleSelector, el => (el as HTMLElement).innerText);
+  if (modalTitle !== modalName) {
+    throw new Error(`Expected modal with name "${modalName}" to open, but found "${modalTitle}"`);
+  }
+}
+
+/*
+ * Verifies that the "Add or edit a goal" modal is visible and shows the correct title and subtext.
+ * @param {string} expectedTitle - The expected title of the modal.
+ * @param {string} expectedSubtext - The expected subtext in the modal.
+ */
+async expectAddGoalsModalToBeVisible(expectedTitle: string, expectedSubtext: string): Promise<void> {
+  const modalTitleElement = await this.page.$(modalTitleSelector);
+  const modalSubtextElement = await this.page.$(modalSubtextSelector);
+  const modalTitleText = await this.page.evaluate(el => el.innerText, modalTitleElement);
+  const modalSubtextText = await this.page.evaluate(el => el.innerText, modalSubtextElement);
+
+  if (modalTitleText !== expectedTitle || modalSubtextText !== expectedSubtext) {
+    throw new Error('Modal title or subtext does not match the expected values');
+  }
+}
+
+/*
+ * Verifies that the "Cancel" and "Save" buttons are visible in the modal.
+ * @param {string} cancelButtonText - The text of the Cancel button.
+ * @param {string} saveButtonText - The text of the Save button.
+ */
+async expectCancelAndSaveButtonsVisible(expectedCancelButtonText: string, expectedSaveButtonText: string): Promise<void> {
+  const cancelButton = await this.page.$(cancelButtonSelector);
+  const saveButton = await this.page.$(saveButtonSelector);
+
+  const actualCancelButtonText = await this.page.evaluate(el => el.innerText, cancelButton);
+  const actualSaveButtonText = await this.page.evaluate(el => el.innerText, saveButton);
+
+  if (actualCancelButtonText !== expectedCancelButtonText || actualSaveButtonText !== expectedSaveButtonText) {
+    throw new Error('Cancel and/or Save button text does not match expected values');
+  }
+}
+
+/*
+ * Selects a goal in the "Add Goals" modal.
+ * @param {string} goalName - The name of the goal to select.
+ */
+async selectGoal(goalName: string): Promise<void> {
+  const goalSelector = await this.page.$(goalSelectorTemplate(goalName));
+  if (!goalSelector) {
+    throw new Error('Goal selector for ' + goalName + ' not found');
+  }
+  if (goalSelector) {
+    await this.waitForElementToBeClickable(goalSelector);
+    await goalSelector.click();
+  } else {
+    throw new Error('Goal selector not found.');
+  }
+}
+
+/*
+ * Clicks the "Save" button in the modal.
+ */
+async clickSave(): Promise<void> {
+  await this.clickOn(saveButtonSelector);
+}
+
+/*
+ * Verifies that the selected goal is marked as "In Progress".
+ * @param {string} goalName - The name of the goal to check.
+ * @param {number} goalIndex - The index of the goal in the list.
+ */
+async expectGoalToBeInProgress(goalName: string, goalIndex: number): Promise<void> {
+  const goalProgressElement = await this.page.$(goalInProgressSelectorTemplate(goalName, goalIndex));
+  const goalProgressText = await this.page.evaluate(el => el.innerText, goalProgressElement);
+
+  if (!goalProgressText.includes('In Progress')) {
+    throw new Error('Goal ' + goalName + ' is not marked as In Progress');
+  }
+}
+
+/*
+ * Unchecks a goal in the "Add Goals" modal.
+ * @param {string} goalName - The name of the goal to uncheck.
+ */
+async uncheckGoal(goalName: string): Promise<void> {
+  const goalCheckbox = await this.page.$(goalCheckboxSelectorTemplate(goalName));
+  if (goalCheckbox) {
+    await this.waitForElementToBeClickable(goalCheckbox);
+    await goalCheckbox.click();
+  } else {
+    throw new Error('Goal checkbox not found.');
+  }
+}
+
+/*
+ * Verifies that the goal checkbox is checked in the modal.
+ * @param {string} goalName - The name of the goal to verify.
+ */
+async expectGoalChecked(goalName: string): Promise<void> {
+  const goalCheckbox = await this.page.$(goalCheckboxSelectorTemplate(goalName));
+  const checkboxChecked = await this.page.evaluate(el => el.checked, goalCheckbox);
+
+  if (!checkboxChecked) {
+    throw new Error('Goal checkbox is not checked for ' + goalName);
+  }
+}
+
+/**
+ * Clicks the cancel button in the given modal.
+ * @param {string} modalName - The name of the modal where the cancel button is located.
+ */
+async clickCancel(modalName: string): Promise<void> {
+  const cancelButton = await this.page.$(`${modalName} .cancel-button`);
+  if (cancelButton) {
+    await cancelButton.click();
+  } else {
+    throw new Error(`Cancel button not found in ${modalName}`);
+  }
+}
+
+
+/*
+ * Verifies that the goal is not present in the list.
+ * @param {string} goalName - The name of the goal to verify.
+ */
+async expectGoalNotPresent(goalName: string): Promise<void> {
+  const goalSelector = await this.page.$(goalSelectorTemplate(goalName));
+
+  if (goalSelector) {
+    throw new Error('Goal ' + goalName + ' is still present');
+  }
+}
+
+/*
+ * Checks random goals in the modal up to a maximum limit.
+ * @param {number} maxGoalsToCheck - The maximum number of goals to check.
+ */
+async checkRandomGoals(maxGoalsToCheck: number): Promise<void> {
+  const goalCheckboxes = await this.page.$$(goalCheckboxSelectorTemplate(''));
+  for (let i = 0; i < maxGoalsToCheck && i < goalCheckboxes.length; i++) {
+    const goalCheckbox = goalCheckboxes[i];
+    if (goalCheckbox) {
+      await this.waitForElementToBeClickable(goalCheckbox);
+      await goalCheckbox.click();
+    } else {
+      throw new Error('Goal checkbox not found.');
+    }
+  }
+}
+
+/*
+ * Verifies that the remaining goals are disabled after checking the maximum allowed.
+ */
+async expectRemainingGoalsToBeDisabled(): Promise<void> {
+  const disabledGoals = await this.page.$$(`${goalCheckboxSelectorTemplate('')}:disabled`);
+  if (disabledGoals.length === 0) {
+    throw new Error('Remaining goals are not disabled');
+  }
+}
+
+
+/**
+   * Verifies that the modal's title and subtext match the expected values.
+   * @param {string} expectedTitle - The expected title of the modal.
+   * @param {string} expectedSubtext - The expected subtext of the modal.
+   */
+async expectModalTitleAndSubtext(expectedTitle: string, expectedSubtext: string): Promise<void> {
+  const titleElement = await this.page.$('.modal-title');
+  const subtextElement = await this.page.$('.modal-subtext');
+
+  if (!titleElement || !subtextElement) {
+    throw new Error('Modal title or subtext not found');
+  }
+
+  const title = await titleElement.evaluate(el => el.textContent);
+  const subtext = await subtextElement.evaluate(el => el.textContent);
+
+  if (title !== expectedTitle) {
+    throw new Error(`Expected title "${expectedTitle}", but got "${title}"`);
+  }
+
+  if (subtext !== expectedSubtext) {
+    throw new Error(`Expected subtext "${expectedSubtext}", but got "${subtext}"`);
+  }
+}
+
 
   /**
    * Navigates to the feedback updates page.
