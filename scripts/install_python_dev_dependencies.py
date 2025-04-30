@@ -45,24 +45,9 @@ _PARSER.add_argument(
 
 
 def check_python_env_is_suitable() -> None:
-    """Raise an error if we are not in a virtual environment or on CI.
-
-    We want developers to use a virtual environment when developing locally so
-    that our scripts don't change their global Python environments. On CI
-    however, it's okay to change the global environment since the checks are
-    running in an ephemeral virtual machine. Therefore, a "suitable" Python
-    environment is one that either is on CI or is a virtual environment.
-    """
+    """Raise an error if we are not in a virtual environment or on CI."""
     if 'GITHUB_ACTION' in os.environ:
-        # The GITHUB_ACTION environment variable indicates we are running on
-        # GitHub Actions according to
-        # https://docs.github.com/en/actions/learn-github-actions/environment-variables.
         return
-    # There are two signals that a virtual environment is active:
-    # * When sys.prefix != sys.base_prefix
-    # * When sys.real_prefix exists
-    # If either is true, we are in a virtual environment. We also check that
-    # sys.real_prefix is Truthy to make testing easier.
     if (
         sys.prefix == sys.base_prefix
         and not (hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix'))
@@ -73,28 +58,34 @@ def check_python_env_is_suitable() -> None:
 
 def install_installation_tools() -> None:
     """Install the minimal tooling needed to install dependencies."""
+    # Forcefully set pip version first to avoid warnings or auto-upgrades
+    subprocess.run([
+        sys.executable, '-m', 'pip', 'install',
+        f'pip=={INSTALLATION_TOOL_VERSIONS["pip"]}', '--disable-pip-version-check'
+    ], check=True)
+
+    # Show the actual pip version being used
     subprocess.run([sys.executable, '-m', 'pip', '--version'], check=True)
+
+    # Install remaining tools
     for package, version in INSTALLATION_TOOL_VERSIONS.items():
-        # We run pip as a subprocess because importing from the pip
-        # module is not supported:
-        # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program.
+        if package == "pip":
+            continue
         proc_pip_install = subprocess.Popen(
             [sys.executable, '-m', 'pip', 'install', f'{package}=={version}'],
-            stdout=subprocess.PIPE)
-
-        # We suppress the "Requirement already satisfied" warning since it
-        # clutters the output.
+            stdout=subprocess.PIPE
+        )
         proc_filter_output = subprocess.Popen(
             ['grep', '-v', 'Requirement already satisfied'],
             stdin=proc_pip_install.stdout,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         if proc_pip_install.stdout is not None:
             proc_pip_install.stdout.close()
 
         out, err = proc_filter_output.communicate()
         if out:
-            print(out.splitlines())
+            print(out.decode().splitlines())
         if err:
             print('ERRORS: {0}'.format(str(err)))
 
@@ -103,7 +94,7 @@ def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
         ['pip-sync', COMPILED_REQUIREMENTS_DEV_FILE_PATH, '--pip-args',
-        '--require-hashes --no-deps'],
+         '--require-hashes --no-deps'],
         check=True,
         encoding='utf-8',
     )
@@ -121,15 +112,7 @@ def uninstall_dev_dependencies() -> None:
 def compile_pip_requirements(
     requirements_path: str, compiled_path: str
 ) -> bool:
-    """Compile a requirements.txt file.
-
-    Args:
-        requirements_path: str. Path to the requirements.in file.
-        compiled_path: str. Path to the requirements.txt file.
-
-    Returns:
-        bool. Whether the compiled dev requirements file was changed.
-    """
+    """Compile a requirements.txt file."""
     with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = f.read()
     subprocess.run(
@@ -143,7 +126,6 @@ def compile_pip_requirements(
     )
     with open(compiled_path, 'r', encoding='utf-8') as f:
         new_compiled = f.read()
-
     return old_compiled != new_compiled
 
 
@@ -167,7 +149,5 @@ def main(cli_args: Optional[List[str]] = None) -> None:
                 'python -m scripts.install_python_dev_dependencies')
 
 
-# This code cannot be covered by tests since it only runs when this file
-# is executed as a script.
 if __name__ == '__main__':  # pragma: no cover
     main()
