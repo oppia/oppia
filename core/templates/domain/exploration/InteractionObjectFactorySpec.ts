@@ -235,6 +235,9 @@ describe('Interaction object factory', () => {
     expect(contentIdToHtml).toEqual({
       outcome_1: 'Good answer',
       default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
     });
 
     let contentId = testInteraction.getContentIdForMatchingHtml('Good answer');

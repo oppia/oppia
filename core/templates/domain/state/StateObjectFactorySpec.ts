@@ -150,6 +150,16 @@ describe('State Object Factory', () => {
     expect(stateObjectBackend.toBackendDict()).toEqual(stateObject);
   });
 
+  it('should be able to get content ID to HTML', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+
+    const contentIdToHtml = state.getContentIdToHtml();
+    expect(contentIdToHtml).toEqual({
+      content_0: '',
+      default_outcome_1: '',
+    });
+  });
+
   it(
     'should correctly create a state object when param_changes length ' +
       'is greater than 0',

@@ -46,6 +46,8 @@ import {AlertsService} from 'services/alerts.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -87,6 +89,8 @@ describe('Voiceover card component', () => {
   let alertsService: AlertsService;
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
   let platformFeatureService: PlatformFeatureService;
+  let explorationStatesService: ExplorationStatesService;
+  let sof: StateObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -106,6 +110,7 @@ describe('Voiceover card component', () => {
           useClass: MockPlatformFeatureService,
         },
         TranslationLanguageService,
+        ExplorationStatesService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -130,6 +135,8 @@ describe('Voiceover card component', () => {
       VoiceoverLanguageManagementService
     );
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    sof = TestBed.inject(StateObjectFactory);
 
     spyOn(
       translationLanguageService,
@@ -291,6 +298,7 @@ describe('Voiceover card component', () => {
       voiceoverLanguageManagementService,
       'isAutogenerationSupportedGivenLanguageAccent'
     ).and.returnValue(true);
+    spyOn(component, 'updateContentAvailabilityStatusForVoiceovers');
 
     let activeLanguageCodeSpy = spyOn(
       translationLanguageService,
@@ -423,6 +431,7 @@ describe('Voiceover card component', () => {
       voiceoverLanguageManagementService,
       'isAutogenerationSupportedGivenLanguageAccent'
     ).and.returnValue(true);
+    spyOn(component, 'updateContentAvailabilityStatusForVoiceovers');
 
     component.updateLanguageAccentCode('en-IN');
     flush();
@@ -821,6 +830,69 @@ describe('Voiceover card component', () => {
     component.updateContentAvailabilityStatusForVoiceovers();
     expect(component.contentAvailableForVoiceovers).toBeFalse();
   }));
+
+  it('should return correct content availability status', () => {
+    const stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content_0',
+        html: 'Hello world!',
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content_0: {},
+          default_outcome_1: {},
+        },
+      },
+      inapplicable_skill_misconception_ids: [],
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1,
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: '',
+            },
+          },
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome_1',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+      card_is_checkpoint: false,
+    };
+    const state = sof.createFromBackendDict('State name', stateObject);
+    component.activeContentId = 'content_0';
+    component.languageCode = 'en';
+
+    spyOn(explorationStatesService, 'getState').and.returnValue(state);
+
+    expect(component.isContentAvaiableForVoiceover()).toBeTrue();
+    component.activeContentId = 'feedback_1';
+    expect(component.isContentAvaiableForVoiceover()).toBeFalse();
+  });
 
   it('should disable voiceover regeneration feature flag', () => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
