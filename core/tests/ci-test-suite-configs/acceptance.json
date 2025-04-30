@@ -117,7 +117,7 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
     {
-      "name": "logged-in-users/learner-dashboard-goals-add-remove",
+      "name": "logged-in-user/learner-dashboard-goals-add-remove",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/logged-in-user/learner-dashboard-goals-add-remove.spec.ts"
     },
     {
