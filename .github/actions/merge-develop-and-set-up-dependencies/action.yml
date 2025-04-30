@@ -37,11 +37,14 @@ runs:
           /opt/hostedtoolcache/Python/3.9.20/x64
 
     # TODO (#22567): Fix pip not working properly when fetched from cache.
-    - name: Check cached pip installation and fix if needed
+    - name: Check pip installation and fix if needed
       run: |
         set -e
         echo "Checking if pip is properly installed..."
-        if ! python -m pip debug > /dev/null 2>&1; then
+        
+        # This shows pip-related environment and configuration info for debugging:
+        # https://pip.pypa.io/en/stable/cli/pip_debug/
+        if ! python -m pip debug; then
           echo "pip is broken. Clearing pip cache..."
           python -m pip cache purge || true
           echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
