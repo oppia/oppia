@@ -73,6 +73,7 @@ def check_python_env_is_suitable() -> None:
 
 def install_installation_tools() -> None:
     """Install the minimal tooling needed to install dependencies."""
+    subprocess.run([sys.executable, '-m', 'pip', '--version'], check=True)
     for package, version in INSTALLATION_TOOL_VERSIONS.items():
         # We run pip as a subprocess because importing from the pip
         # module is not supported:
