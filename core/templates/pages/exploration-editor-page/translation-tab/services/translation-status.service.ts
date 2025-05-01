@@ -203,7 +203,7 @@ export class TranslationStatusService implements OnInit {
             this.entityTranslationsService
               .languageCodeToLatestEntityTranslations[this.langCode];
 
-            let filteredVoiceoversMapping: { [key: string]: any } = {};
+          let filteredVoiceoversMapping: {[key: string]: any} = {};
 
           for (let contentId in nonEmptyContent.voiceoversMapping) {
             if (entityTranslations) {

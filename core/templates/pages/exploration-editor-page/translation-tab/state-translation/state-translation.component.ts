@@ -535,13 +535,19 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   getTabStatusColorStyle(tabId: string): object {
-    if (!this.isDisabled(tabId) && (tabId === this.TAB_ID_CUSTOMIZATION_ARGS || tabId === this.TAB_ID_RULE_INPUTS)) {
+    if (
+      !this.isDisabled(tabId) &&
+      (tabId === this.TAB_ID_CUSTOMIZATION_ARGS ||
+        tabId === this.TAB_ID_RULE_INPUTS)
+    ) {
       return {
         'border-top-color':
-          this.translationStatusService.getActiveStateComponentStatusColor(tabId),
+          this.translationStatusService.getActiveStateComponentStatusColor(
+            tabId
+          ),
       };
     }
-    
+
     if (this.isDisabled(tabId)) {
       return {};
     }
@@ -561,15 +567,16 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let color =
-      this.translationStatusService.getActiveStateComponentStatusColor(tabId)
-    
+      this.translationStatusService.getActiveStateComponentStatusColor(tabId);
+
     return {'border-top-color': color};
   }
-  
+
   private hasFeedbackContent(): boolean {
-    return this.stateAnswerGroups.some(ag => !ag.outcome.feedback.isEmpty()) ||
-           (this.stateDefaultOutcome &&
-            !this.stateDefaultOutcome.feedback.isEmpty());
+    return (
+      this.stateAnswerGroups.some(ag => !ag.outcome.feedback.isEmpty()) ||
+      (this.stateDefaultOutcome && !this.stateDefaultOutcome.feedback.isEmpty())
+    );
   }
 
   tabNeedUpdatesStatus(tabId: string): boolean {
@@ -587,8 +594,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   }
 
   contentIdStatusColorStyle(content: SubtitledHtml | SubtitledUnicode): object {
-    if ((typeof content.isEmpty === 'function' && content.isEmpty()) ||
-        this.needsTranslation()) {
+    if (
+      (typeof content.isEmpty === 'function' && content.isEmpty()) ||
+      this.needsTranslation()
+    ) {
       return {
         'border-left':
           '3px solid ' +

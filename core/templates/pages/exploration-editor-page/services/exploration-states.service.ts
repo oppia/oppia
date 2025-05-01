@@ -773,7 +773,7 @@ export class ExplorationStatesService {
       'recorded_voiceovers'
     );
 
-    let filteredVoiceoversMapping: { [key: string]: any } = {};
+    let filteredVoiceoversMapping: {[key: string]: any} = {};
 
     for (let contentId in recordedVoiceovers.voiceoversMapping) {
       let content = this.initalContentsMapping[contentId];
