@@ -3,7 +3,6 @@ on:
   issues:
     types:
       - assigned
-  
 permissions: read-all
 jobs:
   check-cla:
@@ -14,15 +13,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      
       - name: Install Dependencies
         run: npm install googleapis google-auth-library
-
       - name: Check CLA signature
         id: check-cla
         uses: actions/github-script@v6
@@ -111,45 +107,10 @@ jobs:
               assignees: [assignee.login]
             });
             console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
-            
-      - name: Report failure
-        if: failure()
-        uses: actions/github-script@v6
+
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: ./.github/actions/send-webhook-notification
         with:
-          script: |
-            const message = "Failed to check CLA for issue assignee";
-            const webhookUrl = process.env.WEBHOOK_URL;
-            
-            if (webhookUrl) {
-              const https = require('https');
-              const url = new URL(webhookUrl);
-              
-              const data = JSON.stringify({
-                text: message
-              });
-              
-              const options = {
-                hostname: url.hostname,
-                path: url.pathname,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': data.length
-                }
-              };
-              
-              const req = https.request(options, (res) => {
-                console.log(`Webhook notification sent with status code: ${res.statusCode}`);
-              });
-              
-              req.on('error', (error) => {
-                console.error('Error sending webhook notification:', error);
-              });
-              
-              req.write(data);
-              req.end();
-            } else {
-              console.log('No webhook URL provided, skipping notification');
-            }
-        env:
-          WEBHOOK_URL: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+          message: "Signed CLA checker failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
