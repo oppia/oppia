@@ -266,7 +266,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        to_date = datetime.datetime.now()
+        to_date = datetime.datetime.now(
+            datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_submitted_within_given_dates(
@@ -291,7 +292,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'exploration.exp1.thread_6',
             'hi',
         )
-        to_date = datetime.datetime.now()
+        to_date = datetime.datetime.now(
+            datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = suggestion_models.GeneralSuggestionModel.get_question_suggestions_submitted_within_given_dates(
