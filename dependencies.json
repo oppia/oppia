@@ -156,13 +156,6 @@
       "rootDirPrefix": "BootstrapCK4-Skin-",
       "targetDirPrefix": "ckeditor-bootstrapck-"
     },
-    "uiCodemirror": {
-      "version": "5d04fa5c991f915e4578be5f1175e22d94696633",
-      "downloadFormat": "zip",
-      "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
-      "rootDirPrefix": "ui-codemirror-",
-      "targetDir": "ui-codemirror-5d04fa"
-    },
     "uiTree": {
       "version": "",
       "downloadFormat": "zip",
