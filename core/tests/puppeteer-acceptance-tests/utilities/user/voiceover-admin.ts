@@ -270,8 +270,8 @@ export class VoiceoverAdmin extends BaseUser {
   async addSupportedLanguageAccentPair(
     languageAccentCode: string
   ): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.navigateToVoiceoverAdminPage();
+    await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
     await this.clickOn(addNewLanguageAccentButtonSelector);
