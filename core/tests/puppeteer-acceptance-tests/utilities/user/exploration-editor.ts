@@ -1246,6 +1246,9 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionSubmitter() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
@@ -1257,10 +1260,6 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    // TODO (#22539): This function has a duplicate in exploration-editor.ts.
-    // To avoid unexpected behavior, ensure that any modifications here are also
-    // made in editDefaultResponseFeedbackInQuestionSubmitter() in question-submitter.ts.
-
     await this.clickOn(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
