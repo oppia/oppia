@@ -186,7 +186,7 @@ class ImageCompressor:
 
             # Create necessary directories.
             os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-            compress_result = self.run_compression_logic( # pylint: disable=unused-variable
+            self.run_compression_logic(
                 file_path,
                 output_file_path,
             )
@@ -211,7 +211,9 @@ class ImageCompressor:
             for image in image_compressibility_dicts:
                 print('    ', image['path'])
 
-            print(f'\nTotal space saved: {space_saved} bytes\n')
+            print(
+                f'\nTotal space that could be saved: {space_saved} bytes\n'
+            )
 
             for _ in range(10):
                 self.compress_images(image_compressibility_dicts)
