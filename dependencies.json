@@ -155,16 +155,6 @@
       "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
       "rootDirPrefix": "BootstrapCK4-Skin-",
       "targetDirPrefix": "ckeditor-bootstrapck-"
-    },
-    "uiTree": {
-      "version": "",
-      "downloadFormat": "zip",
-      "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
-      "rootDirPrefix": "angular-ui-tree-master",
-      "targetDirPrefix": "ui-tree-2.22.6",
-      "bundle": {
-        "css": ["dist/angular-ui-tree.min.css"]
-      }
     }
   }
 }
