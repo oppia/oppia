@@ -16,8 +16,6 @@
  * @fileoverview Module used by karma for frontend tests.
  */
 
-import uiValidate from 'angular-ui-validate';
-
 declare var angular: ng.IAngularStatic;
 
 angular.module('oppia', [
@@ -26,5 +24,4 @@ angular.module('oppia', [
   'ngMaterial',
   'ngSanitize',
   'ngTouch',
-  uiValidate,
 ]);
