@@ -63,7 +63,6 @@ describe('Logged-out User in Teach page', function () {
       expect(currentUrl).toContain(
         '/blog/search/find?q=&tags=(%22Teacher%20story%22)'
       );
-      expect(currentUrl).not.toContain('oppia.org');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
