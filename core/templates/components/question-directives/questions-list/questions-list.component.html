@@ -1,8 +1,14 @@
 <div class="question-editor-container">
-  <div *ngIf="editorIsOpen" class="question-editor-parent">
+  <div *ngIf="editorIsOpen && difficultyCount" class="question-editor-parent">
     <mat-card class="oppia-page-card oppia-question-editor-page-card oppia-mobile-collapsible-card">
       <div class="difficulty-card-header oppia-mobile-collapsible-card-header" (click)="toggleDifficultyCard()">
-        <h3>Difficulty</h3>
+        <h3>Difficulty
+          <img *ngIf="difficultyCount === 1"
+               class="info-icon"
+               src="/assets/images/learner_dashboard/info.svg"
+               matTooltip="The difficulty level of this question cannot be changed because the skill specifies only one difficulty option."
+               aria-label="Locked to one difficulty level: This skill only has one difficulty setting.">
+        </h3>
         <i class="fa fa-caret-down"
            *ngIf="!difficultyCardIsShown"
            aria-hidden="true">
@@ -14,11 +20,14 @@
       </div>
       <div class="oppia-mobile-collapsible-card-content" *ngIf="difficultyCardIsShown">
         <div class="list-group">
-          <h4>Select Difficulty</h4>
-          <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index" class="difficulty-selection-container">
+          <h4 *ngIf="difficultyCount != 1">Select Difficulty</h4>
+          <div *ngFor="let skillWithDifficulty of linkedSkillsWithDifficulty; let index = index"
+               [class.single-option]="difficultyCount === 1"
+               class="difficulty-selection-container">
             <label class="list-group-item-heading">{{skillWithDifficulty.getDescription()}}</label>
             <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
                                                 [skillWithDifficulty]="skillWithDifficulty"
+                                                [difficultyCount]="difficultyCount"
                                                 (skillWithDifficultyChange)="updateSkillWithDifficulty($event, index)">
             </oppia-question-difficulty-selector>
           </div>
@@ -337,6 +346,16 @@
     margin-bottom: 0;
     margin-top: 0;
   }
+  .info-icon {
+    cursor: help;
+    height: 1em;
+    width: 1em;
+  }
+  .single-option {
+    display: block;
+    flex-direction: column;
+  }
+
   @media screen and (max-width: 768px) {
     .question-editor-container {
       margin-top: 30px;

@@ -112,6 +112,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
+  difficultyCount: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -729,6 +730,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.misconceptionIdsForSelectedSkill = responseObject.skill
             .getMisconceptions()
             .map(misconception => misconception.getId());
+          this.difficultyCount = responseObject.skill
+            .getRubrics()
+            .filter(r => r._explanations?.length > 0).length;
         });
     }
 
