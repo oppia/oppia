@@ -130,8 +130,6 @@ const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
 const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
-const translationLanguageSelector =
-  'select.e2e-test-translation-language-selector';
 
 const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
 const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
@@ -2149,19 +2147,32 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to edit a translation for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the translation has to be added.
+   * @param {string} language - Language for which the translation has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
-    languageCode: string,
+    language: string,
     contentType: string,
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.page.waitForSelector(translationLanguageSelector);
-    await this.select(translationLanguageSelector, languageCode);
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(translationModeButton);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()

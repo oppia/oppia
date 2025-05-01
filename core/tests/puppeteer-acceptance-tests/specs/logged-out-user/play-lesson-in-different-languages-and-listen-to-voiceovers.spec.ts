@@ -146,7 +146,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.dismissTranslationTabWelcomeModal();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Content',
       'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
     );
@@ -156,7 +156,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Interaction',
       'जारी रखना'
     );
@@ -166,7 +166,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Content',
       'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
     );
