@@ -333,7 +333,7 @@ export class ItemSelectionInputValidationService {
           rule.inputs as unknown as ItemSelectionRuleInputs;
         // Serialize all rule inputs in a general and reversible way,
         // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
-        const inputs = Object.fromEntries(
+        const allInputs = Object.fromEntries(
           Object.entries(itemSelectionInputs).map(([key, value]) => {
             // If array, sort for consistent ordering.
             if (Array.isArray(value)) {
@@ -343,7 +343,7 @@ export class ItemSelectionInputValidationService {
             return [key, value];
           })
         );
-        const stringifiedInputs = JSON.stringify(inputs);
+        const stringifiedInputs = JSON.stringify(allInputs);
         const ruleKey = `${rule.type}:${stringifiedInputs}`;
         if (rulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
           const ag = rulesToAnswerGroupIndex[ruleKey];
