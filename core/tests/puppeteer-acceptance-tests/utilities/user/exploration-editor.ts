@@ -1259,7 +1259,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     // TODO (#22539): This function has a duplicate in exploration-editor.ts.
     // To avoid unexpected behavior, ensure that any modifications here are also
-    // made in editDefaultResponseFeedback() in question-submitter.ts.
+    // made in editDefaultResponseFeedbackInQuestionSubmitter() in question-submitter.ts.
 
     await this.clickOn(defaultFeedbackTab);
 
