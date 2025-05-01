@@ -296,8 +296,7 @@ describe('NumericInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Learner answer 1 input should be greater than ' +
-          'or equal to zero.',
+          'Learner answer 1 input should be greater than ' + 'or equal to zero',
       },
     ]);
   });
