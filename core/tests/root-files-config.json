@@ -65,7 +65,6 @@
     "extensions/ckeditor_plugins/pre/plugin.js",
     "core/templates/pages/oppia-root/index.ts",
     "core/templates/pages/lightweight-oppia-root/index.ts",
-    "core/templates/third-party-imports/dnd-lists.import.ts",
     "src/main.ts",
     "src/index.html",
     "src/index.prod.html",
