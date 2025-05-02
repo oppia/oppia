@@ -1,5 +1,8 @@
 name: Check Issue Assignee CLA
 on:
+  pull_request:
+    types:
+      - opened
   issues:
     types:
       - assigned
@@ -35,25 +38,23 @@ jobs:
               
               const { google } = require('googleapis');
               const { JWT } = require('google-auth-library');
-
               const { OAuth2Client } = require('google-auth-library');
               
               const oauth2Client = new OAuth2Client(
-                sheetsCredJson.client_id,
-                sheetsCredJson.client_secret
+                sheetsCredJson.installed.client_id,
+                sheetsCredJson.installed.client_secret
               );
               oauth2Client.setCredentials({
                 refresh_token: sheetsCredJson.refresh_token
               });
 
               const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
-              
+
               console.log(`Fetching data from spreadsheet ID: ${process.env.SPREADSHEET_ID}`);
               const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: process.env.SPREADSHEET_ID,
                 range: 'Usernames!A:A',
               });
-              
               if(!response) {
                 console.log("No response from Google Sheets API");
                 core.setOutput('has-signed-cla', 'false');
@@ -63,7 +64,8 @@ jobs:
                 console.log("No values found in spreadsheet");
                 core.setOutput('has-signed-cla', 'false');
                 return;
-              }              
+              }
+
               const lowercaseUsername = username.toLowerCase();
               const hasSignedCla = response.data.values.some(row => 
                 row[0] && row[0].toLowerCase() === lowercaseUsername
@@ -84,29 +86,58 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const issue = context.payload.issue;
+            const isPullRequest = !!context.payload.pull_request;
+            const isIssue = !!context.payload.issue;
             const assignee = context.payload.assignee;
-            if (!issue || !assignee) {
-              core.setFailed('Invalid event payload');
-              return;
+            let targetNumber, assigneeLogin, commentBody;
+            
+            if (isIssue && context.payload.assignee) {
+              const issue = context.payload.issue;
+              const assignee = context.payload.assignee;
+              if (!issue) {
+                core.setFailed('Invalid issue payload');
+                return;
+              }
+
+              const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
+              commentBody = `Hi @${assignee.login}, you need to sign the CLA before you can get assigned to issues. Follow the instructions ${linkToCla} to get started. I am unassigning you for now, feel free to assign yourself once you have signed the CLA. Thanks!`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: commentBody
+              });
+              
+              await github.rest.issues.removeAssignees({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                assignees: [assignee.login]
+              });
+              
+              console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
+
+            } else if (isPullRequest) {
+              const pr = context.payload.pull_request;
+              if (!pr) {
+                core.setFailed('Invalid pull request payload');
+                return;
+              }
+              console.log(`Pull request #${pr.number} opened by @${pr.user.login}`);
+              const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
+              commentBody = `Hi @${pr.user.login}, you need to sign the CLA before we can accept your pull request. Follow the instructions ${linkToCla} to get started. Thanks!`;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: commentBody
+              });
+
+              console.log(`Commented on PR #${pr.number} due to unsigned CLA`);
+            } else {
+              core.setFailed('Unknown event type or missing context');
             }
-            const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
-
-            const commentBody = `Hi @${assignee.login}, you need to sign the CLA before you can get assigned to issues. Follow the instructions ${linkToCla} to get started. I am unassigning you for now, feel free to assign yourself once you have signed the CLA. Thanks!`;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: commentBody
-            });
-            await github.rest.issues.removeAssignees({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              assignees: [assignee.login]
-            });
-            console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
 
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
