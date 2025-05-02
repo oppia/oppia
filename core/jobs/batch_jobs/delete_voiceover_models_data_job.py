@@ -26,11 +26,9 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
