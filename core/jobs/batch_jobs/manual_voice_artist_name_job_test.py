@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
@@ -57,9 +58,9 @@ class VoiceArtistMetadataModelsTestsBaseClass(
     EDITOR_USERNAME_3 = 'editor3'
     EDITOR_USERNAME_4 = 'editor4'
 
-    CURATED_EXPLORATION_ID_1 = 'exploration_id_1'
-    CURATED_EXPLORATION_ID_2 = 'exploration_id_2'
-    NON_CURATED_EXPLORATION_ID_3 = 'exploration_id_3'
+    CURATED_EXPLORATION_ID_1 = 'exp_id_abcde'
+    CURATED_EXPLORATION_ID_2 = 'exp_id_kjsd-'
+    NON_CURATED_EXPLORATION_ID_3 = 'exp_id_abchj'
 
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
@@ -489,6 +490,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -499,20 +503,55 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         )
 
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
-            '\na. editor2\nb. exploration_id_1-2 & exploration_id_1-3\nc. 1, '
-            '[filename2.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
-            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-4 & exp_id_abcde-5\n'
+            'c. 1, [filename3.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n'
+            '-\n'
+            'a. editor2\n'
+            'b. exp_id_abcde-2 & exp_id_abcde-3\n'
+            'c. 1, [filename2.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
-            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
-            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
@@ -568,6 +607,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_skip_voiceover_if_specific_snapshot_model_is_invalid(
         self
     ) -> None:
@@ -579,7 +621,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'exploration %s.'
         )
 
-        snapshot_model_id: str = 'exploration_id_1-4'
+        snapshot_model_id: str = 'exp_id_abcde-4'
         snapshot_model: exp_models.ExplorationSnapshotContentModel = (
             exp_models.ExplorationSnapshotContentModel.get_by_id(
                 snapshot_model_id))
@@ -590,18 +632,54 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         snapshot_model.put()
 
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor2\nb. '
-            'exploration_id_1-2 & exploration_id_1-3\nc. 1, [filename2.mp3]\n-'
-            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
-            '[filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            'Failed to get newly added voiceover between snapshot versions '
+            'exp_id_abcde-4 and exp_id_abcde-5, with error: '
+            '\'voiceovers_mapping\''
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Failed to get newly added voiceover between snapshot versions '
+            'exp_id_abcde-3 and exp_id_abcde-4, with error: '
+            '\'voiceovers_mapping\''
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n-\n'
+            'a. editor2\n'
+            'b. exp_id_abcde-2 & exp_id_abcde-3\n'
+            'c. 1, [filename2.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-0 and exp_id_abcde-1\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]'
-            '\n-\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1,'
-            ' [filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -667,6 +745,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -676,19 +757,53 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'exploration %s.'
         )
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
-            '\na. editor2\nb. exploration_id_1-2 & exploration_id_1-3\nc. 1, '
-            '[filename2.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
-            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-4 & exp_id_abcde-5\n'
+            'c. 1, [filename3.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n'
+            '-\n'
+            'a. editor2\n'
+            'b. exp_id_abcde-2 & exp_id_abcde-3\n'
+            'c. 1, [filename2.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
-            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
-            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -708,6 +823,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
         # No models are being saved in the datastore since this is an audit job.
         self.assertEqual(total_exploration_voice_artist_link_models, 0)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_generate_exp_link_model_if_some_commit_log_models_are_missing(
         self
     ) -> None:
@@ -721,25 +839,57 @@ class AuditVoiceArtistMetadataModelsJobTests(
         )
 
         # Deleting an exploration commit log entry model.
-        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 snapshot_model_id))
         snapshot_model.delete()
 
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
-            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
-            '[filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-4 & exp_id_abcde-5\n'
+            'c. 1, [filename3.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-0 and exp_id_abcde-1\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
-            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
-            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -753,6 +903,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
             job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_generate_exp_link_model_if_some_snapshot_models_are_missing(
         self
     ) -> None:
@@ -766,25 +919,57 @@ class AuditVoiceArtistMetadataModelsJobTests(
         )
 
         # Deleting an exploration commit log entry model.
-        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotContentModel = (
             exp_models.ExplorationSnapshotContentModel.get_by_id(
                 snapshot_model_id))
         snapshot_model.delete()
 
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 4\n-\na. editor1\nb. '
-            'exploration_id_1-4 & exploration_id_1-5\nc. 1, '
-            '[filename3.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
-            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 4\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-4 & exp_id_abcde-5\n'
+            'c. 1, [filename3.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-0 and exp_id_abcde-1\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
-            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
-            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -798,11 +983,14 @@ class AuditVoiceArtistMetadataModelsJobTests(
             job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_shoould_raise_error_for_non_existent_user(self) -> None:
         self._create_curated_explorations()
 
         # Updating committer ID.
-        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 snapshot_model_id))
@@ -816,20 +1004,53 @@ class AuditVoiceArtistMetadataModelsJobTests(
         )
 
         debug_logs_1 = (
-            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
-            '\na. Not Found for user ID: non_existent_user.\nb. '
-            'exploration_id_1-2 & exploration_id_1-3\nc. 1, [filename2.mp3]\n-'
-            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
-            '[filename1.mp3]\n\n'
+            'Exp ID: exp_id_abcde.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 2.\n'
+            'Language code: hi, voiceovers count: 1.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_abcde-4 and exp_id_abcde-5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-4 & exp_id_abcde-5\n'
+            'c. 1, [filename3.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-3 and exp_id_abcde-4\n'
+            'Iteration for snapshots: exp_id_abcde-2 and exp_id_abcde-3\n'
+            '-\n'
+            'a. Not Found for user ID: non_existent_user.\n'
+            'b. exp_id_abcde-2 & exp_id_abcde-3\n'
+            'c. 1, [filename2.mp3]\n'
+            'Iteration for snapshots: exp_id_abcde-1 and exp_id_abcde-2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_abcde-1 & exp_id_abcde-2\n'
+            'c. 1, [filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
-            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
-            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
-            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
-            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
-            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+            'Exp ID: exp_id_kjsd-.\n'
+            'Snapshots: 5\n'
+            'Language code: en, voiceovers count: 3.\n'
+            'Total voiceovers: 3.\n'
+            'Iteration for snapshots: exp_id_kjsd--4 and exp_id_kjsd--5\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--4 & exp_id_kjsd--5\n'
+            'c. 1, [filename7.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--3 and exp_id_kjsd--4\n'
+            '-\n'
+            'a. editor4\n'
+            'b. exp_id_kjsd--3 & exp_id_kjsd--4\n'
+            'c. 1, [filename6.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--2 and exp_id_kjsd--3\n'
+            '-\n'
+            'a. editor3\n'
+            'b. exp_id_kjsd--2 & exp_id_kjsd--3\n'
+            'c. 1, [filename5.mp3]\n'
+            'Iteration for snapshots: exp_id_kjsd--1 and exp_id_kjsd--2\n'
+            '-\n'
+            'a. editor1\n'
+            'b. exp_id_kjsd--1 & exp_id_kjsd--2\n'
+            'c. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -849,6 +1070,9 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 ):
     """Test class to validate helper methods."""
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_create_exploration_link_for_voice_artist(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -948,6 +1172,9 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         )
         self.assertFalse(is_exploration_curated)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_get_empty_filenames_successfully(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -1087,7 +1314,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 
         snapshot_metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get(
-                'exploration_id_1-2'))
+                'exp_id_abcde-2'))
         del snapshot_metadata_model.commit_cmds[0]['cmd']
         snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()

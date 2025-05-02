@@ -270,8 +270,8 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             reteived_cached_model.plaintext, parsed_text_2)
 
     @mock.patch(
-        'core.platform.azure_speech_synthesis.'
-        'dev_mode_azure_speech_synthesis_services.regenerate_speech_from_text',
+        'core.platform.speech_synthesis.'
+        'dev_mode_speech_synthesis_services.regenerate_speech_from_text',
         side_effect=Exception('Mocked exception during voicever regeneration')
     )
     def test_should_raise_exception_if_regeneration_failed(

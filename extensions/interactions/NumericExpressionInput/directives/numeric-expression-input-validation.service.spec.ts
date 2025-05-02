@@ -26,10 +26,7 @@ import {
   NumericExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
@@ -44,7 +41,7 @@ describe('NumericExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: NumericExpressionInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -53,12 +50,11 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.inject(NumericExpressionInputValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {

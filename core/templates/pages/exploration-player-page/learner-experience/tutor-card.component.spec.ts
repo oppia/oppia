@@ -337,7 +337,7 @@ describe('Tutor card component', () => {
     expect(componentInstance.isOnTerminalCard).toHaveBeenCalled();
   }));
 
-  it('should trigger celebratory animation if on the last card of a chapter', fakeAsync(() => {
+  it('should handle multiple calls when ngOnChanges runs before ngAfterViewInit', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
     spyOn(componentInstance, 'triggerCelebratoryAnimation');
@@ -353,9 +353,35 @@ describe('Tutor card component', () => {
     };
 
     componentInstance.ngOnChanges(changes);
-
+    componentInstance.ngAfterViewInit();
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
-    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalled();
+    tick();
+    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalledTimes(
+      1
+    );
+  }));
+
+  it('should trigger celebratory animation once when on last card and ngAfterViewInit runs before ngOnChanges', fakeAsync(() => {
+    spyOn(componentInstance, 'updateDisplayedCard');
+    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+    spyOn(componentInstance, 'triggerCelebratoryAnimation');
+    componentInstance.animationHasPlayedOnce = false;
+    componentInstance.inStoryMode = true;
+    const changes: SimpleChanges = {
+      displayedCard: {
+        previousValue: false,
+        currentValue: true,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+    };
+    componentInstance.ngAfterViewInit();
+    componentInstance.ngOnChanges(changes);
+    expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+    tick();
+    expect(componentInstance.triggerCelebratoryAnimation).toHaveBeenCalledTimes(
+      1
+    );
   }));
 
   it('should not trigger celebratory animation if not in story mode', fakeAsync(() => {
@@ -374,8 +400,8 @@ describe('Tutor card component', () => {
     };
 
     componentInstance.ngOnChanges(changes);
-
     expect(componentInstance.updateDisplayedCard).toHaveBeenCalled();
+    tick();
     expect(
       componentInstance.triggerCelebratoryAnimation
     ).not.toHaveBeenCalled();

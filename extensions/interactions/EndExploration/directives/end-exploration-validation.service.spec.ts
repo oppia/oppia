@@ -24,10 +24,7 @@ import {
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -39,7 +36,7 @@ describe('EndExplorationValidationService', () => {
   let badOutcome: Outcome;
   let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,12 +45,11 @@ describe('EndExplorationValidationService', () => {
 
     validatorService = TestBed.inject(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
       feedback: {
@@ -75,7 +71,7 @@ describe('EndExplorationValidationService', () => {
     goodAnswerGroups = [
       agof.createNew(
         [],
-        oof.createFromBackendDict({
+        Outcome.createFromBackendDict({
           dest: 'Second State',
           dest_if_really_stuck: null,
           feedback: {

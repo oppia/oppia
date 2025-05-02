@@ -31,10 +31,7 @@ import {
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {QuestionValidationService} from './question-validation.service';
 import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 describe('Question Validation Service', () => {
@@ -47,7 +44,6 @@ describe('Question Validation Service', () => {
   let ses: StateEditorService;
   let shouldHideDefaultAnswerGroupSpy: jasmine.Spy;
   let goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory;
   let agof: AnswerGroupObjectFactory;
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
@@ -236,9 +232,8 @@ describe('Question Validation Service', () => {
     originalSpy.and.callThrough();
     const question =
       questionObjectFactory.createFromBackendDict(mockQuestionDict);
-    oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: null,
       dest_if_really_stuck: null,
       feedback: {

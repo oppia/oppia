@@ -45,7 +45,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 import webapp2
 from webapp2_extras import routes
 import webtest
@@ -2435,3 +2435,204 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             self.post_json(
                 '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=200)
+
+
+class LogTypeTests(test_utils.GenericTestBase):
+    """Tests for the LogType Enum."""
+
+    def test_log_type_enum_values(self) -> None:
+        """Test that LogType enum contains the correct values."""
+        self.assertEqual(base.LogType.WARNING, 'warning')
+        self.assertEqual(base.LogType.EXCEPTION, 'exception')
+
+
+class ExceptionsLoggingTests(test_utils.GenericTestBase):
+    """Tests the logging behavior of handle_exception in BaseHandler."""
+
+    def setUp(self) -> None:
+        """Creates a mock request, response, and logging methods for capturing log outputs."""
+        super().setUp()
+        self.mock_request = webapp2.Request.blank('/')
+        self.mock_request.environ['REQUEST_METHOD'] = 'POST'
+        self.mock_response = webapp2.Response()
+
+        self.logged_warnings: List[str] = []
+        self.logged_exceptions: List[str] = []
+
+        def mock_logging_warning(msg: str) -> None:
+            self.logged_warnings.append(msg)
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        self.mock_logging_warning = mock_logging_warning
+        self.mock_logging_exception = mock_logging_exception
+
+        self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(
+            self.mock_request, self.mock_response
+        )
+
+    def test_handle_not_logged_in_exception_logs_warning(self) -> None:
+        """Ensures NotLoggedInException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotLoggedInException('Unauthenticated user'),
+                False
+            )
+        expected_log_message = f"""
+
+NotLoggedInException: Unauthenticated user
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotLoggedInException message not match'
+        )
+
+    def test_not_found_exception_logs_warning(self) -> None:
+        """Ensures NotFoundException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotFoundException('Invalid URL requested'),
+                False
+            )
+        expected_log_message = f"""
+
+NotFoundException: Invalid URL requested
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotFoundException message not match'
+        )
+
+    def test_unauthorized_user_exception_logs_warning(self) -> None:
+        """Ensures UnauthorizedUserException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.UnauthorizedUserException('Unauthorized User'),
+                False
+            )
+        expected_log_message = f"""
+
+UnauthorizedUserException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='UnauthorizedUserException message not match'
+        )
+
+    def test_invalid_input_exception_logs_warning(self) -> None:
+        """Ensures InvalidInputException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InvalidInputException('Invalid Input'),
+                False
+            )
+        expected_log_message = f"""
+
+InvalidInputException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InvalidInputException message not match'
+        )
+
+    def test_internal_error_exception_logs_warning(self) -> None:
+        """Ensures InternalErrorException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InternalErrorException('Internal Error'),
+                False
+            )
+        expected_log_message = f"""
+
+InternalErrorException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InternalErrorException message not match'
+        )
+
+    def test_invalid_log_type_raises_exception(self) -> None:
+        """Tests that _log_exception_message raises an Exception when an
+        invalid log type is passed."""
+        with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):
+            self.handler._log_exception_message('TestException', cast(base.LogType, "invalid"), 'Test error')
+
+    def test_generic_exception_logging_logs_exception(self) -> None:
+        """Tests that a generic exception logs using LogType.EXCEPTION."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            generic_exception = Exception('Generic error')
+            self.handler.handle_exception(generic_exception, False)
+            expected_log_message = f"""
+
+Exception: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+            self.assertIn(expected_log_message, self.logged_exceptions)
+
+    def test_stack_trace_logged_from_existing_handler(self) -> None:
+        """Ensures that calling an actual handler logs a real stack trace."""
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock', BaseHandlerTests.MockHandlerWithInvalidReturnType
+            )
+        ], debug=feconf.DEBUG))
+
+        self.logged_exceptions = []
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_exception):
+            self.testapp.get('/mock', status=500)
+
+        self.assertTrue(
+            any('Traceback (most recent call last)' in log for log in self.logged_exceptions),
+            msg='Expected non-empty stack trace in exception logs.'
+        )

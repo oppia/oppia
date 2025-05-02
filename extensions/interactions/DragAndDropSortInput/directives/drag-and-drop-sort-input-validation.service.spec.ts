@@ -23,10 +23,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -50,7 +47,7 @@ describe('DragAndDropSortInputValidationService', () => {
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs,
     badCustomizationArgs: DragAndDropSortInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -58,13 +55,12 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -77,7 +73,7 @@ describe('DragAndDropSortInputValidationService', () => {
       refresher_exploration_id: null,
     });
 
-    customOutcome = oof.createFromBackendDict({
+    customOutcome = Outcome.createFromBackendDict({
       dest: 'Third State',
       dest_if_really_stuck: null,
       feedback: {

@@ -30,6 +30,7 @@ import {Playthrough} from 'domain/statistics/playthrough.model';
 import {PlaythroughBackendApiService} from 'domain/statistics/playthrough-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
 import {Stopwatch} from 'domain/utilities/stopwatch.model';
+import isEqual from 'lodash/isEqual';
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
@@ -83,7 +84,7 @@ class CyclicStateTransitionsTracker {
       const cycleOfVisitedStates = this.makeCycle(
         this.pathOfVisitedStates.indexOf(destStateName)
       );
-      if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
+      if (isEqual(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
         this.numLoops += 1;
       } else {
         this.cycleOfVisitedStates = cycleOfVisitedStates;

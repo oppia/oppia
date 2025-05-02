@@ -23,10 +23,7 @@ import {
   AnswerGroupObjectFactory,
 } from 'domain/exploration/AnswerGroupObjectFactory';
 import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
@@ -41,7 +38,7 @@ describe('MusicNotesInputValidationService', () => {
   let answerGroups: AnswerGroup[],
     goodAnswerGroups: AnswerGroup[],
     goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -50,11 +47,10 @@ describe('MusicNotesInputValidationService', () => {
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
     agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
