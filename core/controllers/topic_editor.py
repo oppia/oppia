@@ -263,6 +263,12 @@ class TopicEditorStoryHandler(
         story_url_fragment = self.normalized_payload['story_url_fragment']
 
         story_domain.Story.require_valid_title(title)
+
+        # Validation for Title Fragment Length
+        if len(story_url_fragment) < 5:
+            raise self.InvalidInputException(
+                'Story URL fragment must be at least 5 characters long.')
+
         if story_services.does_story_exist_with_url_fragment(
                 story_url_fragment):
             raise self.InvalidInputException(
