@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.clean_up_voiceover_models_job."""
+"""Unit tests for jobs.batch_jobs.delete_voiceover_models_data_job."""
 
 from __future__ import annotations
 
@@ -275,36 +275,6 @@ class DeleteVoiceoverModelsTestsBaseClass(
         exp_services.update_exploration(
             self.editor_id_3, self.NON_CURATED_EXPLORATION_ID_3,
             change_list, 'Translation commits')
-
-    def _create_entity_voiceover_models(self) -> None:
-        """The method creates entity voiceover models for the explorations."""
-        voiceover_models.EntityVoiceoversModel.create_new(
-            feconf.ENTITY_TYPE_EXPLORATION, self.CURATED_EXPLORATION_ID_1, 1,
-            'en-US', {
-                'content_0': {
-                    feconf.VoiceoverType.MANUAL.value: self.voiceover_dict_4,
-                    feconf.VoiceoverType.AUTO.value: self.voiceover_dict_5
-                }
-            }, {}
-        ).put()
-        voiceover_models.EntityVoiceoversModel.create_new(
-            feconf.ENTITY_TYPE_EXPLORATION, self.NON_CURATED_EXPLORATION_ID_2,
-            1, 'en-US', {
-                'content_0': {
-                    feconf.VoiceoverType.MANUAL.value: self.voiceover_dict_4,
-                    feconf.VoiceoverType.AUTO.value: self.voiceover_dict_5
-                }
-            }, {}
-        ).put()
-        voiceover_models.EntityVoiceoversModel.create_new(
-            feconf.ENTITY_TYPE_EXPLORATION, self.NON_CURATED_EXPLORATION_ID_3,
-            1, 'en-US', {
-                'content_0': {
-                    feconf.VoiceoverType.MANUAL.value: self.voiceover_dict_4,
-                    feconf.VoiceoverType.AUTO.value: self.voiceover_dict_5
-                }
-            }, {}
-        ).put()
 
 
 class DeleteExplorationVoiceArtistLinkModelsJobTests(
