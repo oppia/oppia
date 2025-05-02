@@ -263,30 +263,75 @@ export class RouterService {
 
   navigateToMainTab(stateName: string | null): void {
     this._savePendingChanges();
-    const oldState = decodeURI(this._getCurrentStateFromLocationPath());
+    let oldState = decodeURI(this._getCurrentStateFromLocationPath());
 
     if (oldState === '/' + stateName) {
       return;
     }
 
     if (this._activeTabName === this.TABS.MAIN.name) {
-      const container = document.querySelector<HTMLElement>(
+      const container = document.querySelector(
         '.oppia-editor-cards-container'
-      );
-
-      if (container) {
-        container.classList.replace('show', 'hide');
-
-        container.addEventListener(
-          'transitionend',
-          () => {
-            this._actuallyNavigate(this.SLUG_GUI, stateName);
-
-            container.classList.replace('hide', 'show');
-          },
-          {once: true}
-        );
+      ) as HTMLElement;
+      if (!container) {
+        this._actuallyNavigate(this.SLUG_GUI, stateName);
+        return;
       }
+
+      // Fade out animation.
+      const fadeOut = (
+        element: HTMLElement,
+        duration: number
+      ): Promise<void> => {
+        return new Promise(resolve => {
+          const startTime = performance.now();
+          const initialOpacity = parseFloat(getComputedStyle(element).opacity);
+
+          const animate = (currentTime: number) => {
+            const elapsedTime = currentTime - startTime;
+            if (elapsedTime < duration) {
+              const opacity = initialOpacity * (1 - elapsedTime / duration);
+              element.style.opacity = opacity.toString();
+              requestAnimationFrame(animate);
+            } else {
+              element.style.opacity = '0';
+              element.style.display = 'none';
+              resolve();
+            }
+          };
+
+          requestAnimationFrame(animate);
+        });
+      };
+
+      // Fade in animation.
+      const fadeIn = (element: HTMLElement, duration: number): void => {
+        element.style.opacity = '0';
+        element.style.display = '';
+
+        const startTime = performance.now();
+        const animate = (currentTime: number) => {
+          const elapsedTime = currentTime - startTime;
+          if (elapsedTime < duration) {
+            const opacity = elapsedTime / duration;
+            element.style.opacity = opacity.toString();
+            requestAnimationFrame(animate);
+          } else {
+            element.style.opacity = '1';
+          }
+        };
+
+        requestAnimationFrame(animate);
+      };
+
+      // Execute fade out, navigate, then fade in.
+      fadeOut(container, 200).then(() => {
+        this._actuallyNavigate(this.SLUG_GUI, stateName);
+
+        setTimeout(() => {
+          fadeIn(container, 200);
+        }, 150);
+      });
     } else {
       this._actuallyNavigate(this.SLUG_GUI, stateName);
     }

@@ -2249,32 +2249,48 @@ describe('Conversation skin component', () => {
   }));
 
   it('should scroll to bottom', fakeAsync(() => {
-    componentInstance.scrollToBottom();
-    tick(200);
+    const tutorCard = document.createElement('div');
+    tutorCard.className = 'conversation-skin-main-tutor-card';
+    document.body.appendChild(tutorCard);
 
-    spyOn(window, '$').and.returnValue({
-      offset: () => {
-        return {top: 10};
-      },
-      outerHeight: () => 10,
-      scrollTop: () => 0,
-      height: () => 0,
-      animate: () => {},
-    } as unknown as JQLite);
+    spyOn(tutorCard, 'getBoundingClientRect').and.returnValue({
+      top: 1000,
+      height: 200,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      width: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    const smoothScrollSpy = spyOn(
+      componentInstance as unknown as {smoothScrollTo: jasmine.Spy},
+      'smoothScrollTo'
+    );
+
+    spyOnProperty(window, 'scrollY').and.returnValue(0);
+    spyOnProperty(window, 'innerHeight').and.returnValue(600);
 
     componentInstance.scrollToBottom();
-    tick(200);
-    expect(window.$).toHaveBeenCalled();
+
+    tick(100);
+
+    expect(smoothScrollSpy).toHaveBeenCalled();
+
+    document.body.removeChild(tutorCard);
   }));
 
   it('should scroll to top', fakeAsync(() => {
-    let animateSpy = jasmine.createSpy('jquery spy');
-    spyOn(window, '$').and.returnValue({
-      animate: animateSpy,
-    } as unknown as JQLite);
+    const smoothScrollSpy = spyOn(
+      componentInstance as unknown as {smoothScrollTo: jasmine.Spy},
+      'smoothScrollTo'
+    );
     componentInstance.scrollToTop();
-    tick(1000);
-    expect(animateSpy).toHaveBeenCalled();
+    tick(100);
+
+    expect(smoothScrollSpy).toHaveBeenCalledWith(0, 800, 'easeOutQuart');
   }));
 
   it('should show upcoming card', () => {

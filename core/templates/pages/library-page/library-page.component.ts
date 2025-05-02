@@ -177,18 +177,14 @@ export class LibraryPageComponent {
     if (this.isAnyCarouselCurrentlyScrolling) {
       return;
     }
-    let carouselJQuerySelector = '.oppia-library-carousel-tiles:eq(n)'.replace(
-      'n',
-      ind.toString()
+
+    const carouselElements = document.querySelectorAll(
+      '.oppia-library-carousel-tiles'
     );
+    const carouselElement = carouselElements[ind] as HTMLElement;
 
     let direction = isLeftScroll ? -1 : 1;
-    // The number 0 here is just to make sure that the type of width is
-    // number, it is never assigned as the selector will never be undefined.
-    let carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft() || 0;
 
-    // Prevent scrolling if there more carousel pixed widths than
-    // there are tile widths.
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
       this.tileDisplayCount
@@ -196,7 +192,8 @@ export class LibraryPageComponent {
       return;
     }
 
-    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+    let currentScrollPosition = carouselElement?.scrollLeft || 0;
+    currentScrollPosition = Math.max(0, currentScrollPosition);
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -213,15 +210,10 @@ export class LibraryPageComponent {
     }
 
     let newScrollPositionPx =
-      carouselScrollPositionPx +
+      currentScrollPosition +
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
-    const carouselElement = document.querySelector(
-      carouselJQuerySelector
-    ) as HTMLElement;
-
     if (carouselElement) {
-      const currentScrollPosition = carouselElement.scrollLeft;
       const scrollDistance = newScrollPositionPx - currentScrollPosition;
       const duration = 800;
 
@@ -232,8 +224,8 @@ export class LibraryPageComponent {
           startTime = timestamp;
         }
         const timeElapsed = timestamp - startTime;
-
         const progress = Math.min(timeElapsed / duration, 1);
+
         carouselElement.scrollLeft =
           currentScrollPosition + scrollDistance * progress;
 

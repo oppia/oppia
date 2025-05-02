@@ -104,6 +104,34 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService
   ) {}
 
+  private smoothScrollTo(targetY: number, duration: number): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      // Calculate and set the next scroll position.
+      if (elapsedTime < duration) {
+        // Use easeInOutQuad easing function for smooth animation.
+        const progress = elapsedTime / duration;
+        const easeProgress =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        window.scrollTo(0, startY + difference * easeProgress);
+        requestAnimationFrame(step);
+      } else {
+        // Ensure we arrive exactly at target.
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
   startTutorial(): void {
     this.tutorialInProgress = true;
     this.joyride
@@ -129,10 +157,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             .focus();
 
           if (value.number === 2) {
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
+            this.smoothScrollTo(0, 1000);
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -148,12 +173,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            const targetElement = document.getElementById(idToScrollTo);
-            if (targetElement) {
-              window.scrollTo({
-                top: targetElement.offsetTop - 200,
-                behavior: 'smooth',
-              });
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
 
             document.querySelector<HTMLElement>(
@@ -170,12 +192,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            const targetElement = document.getElementById(idToScrollTo);
-            if (targetElement) {
-              window.scrollTo({
-                top: targetElement.offsetTop - 200,
-                behavior: 'smooth',
-              });
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
 
             document.querySelector<HTMLElement>(

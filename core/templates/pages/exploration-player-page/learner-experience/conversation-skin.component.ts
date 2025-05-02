@@ -1529,6 +1529,37 @@ export class ConversationSkinComponent {
     }
     this.currentInteractionService.clearPresubmitHooks();
   }
+  private smoothScrollTo(
+    targetY: number,
+    duration: number,
+    easingName: string = 'easeOutQuad'
+  ): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const easingFunctions = {
+      easeOutQuad: (t: number): number => t * (2 - t),
+      easeOutQuart: (t: number): number => 1 - Math.pow(1 - t, 4),
+    };
+
+    const easingFunction =
+      easingFunctions[easingName] || easingFunctions.easeOutQuad;
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      if (elapsedTime < duration) {
+        const progress = elapsedTime / duration;
+        window.scrollTo(0, startY + difference * easingFunction(progress));
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
 
   showPendingCard(): void {
     this.startCardChangeAnimation = true;
@@ -1638,35 +1669,35 @@ export class ConversationSkinComponent {
 
   scrollToBottom(): void {
     setTimeout(() => {
-      let tutorCard = document.querySelector(
+      const tutorCard = document.querySelector(
         '.conversation-skin-main-tutor-card'
-      ) as HTMLElement;
+      );
 
       if (!tutorCard) {
         return;
       }
 
-      const tutorCardBottom = tutorCard.offsetTop + tutorCard.offsetHeight;
+      const tutorCardRect = tutorCard.getBoundingClientRect();
+      const tutorCardBottom =
+        tutorCardRect.top + window.scrollY + tutorCardRect.height;
       const windowBottom = window.scrollY + window.innerHeight;
 
       if (windowBottom < tutorCardBottom) {
-        window.scrollTo({
-          top: tutorCardBottom - window.innerHeight + 12,
-          behavior: 'smooth',
-        });
+        const targetScrollY = tutorCardBottom - window.innerHeight + 12;
+        this.smoothScrollTo(
+          targetScrollY,
+          this.TIME_SCROLL_MSEC,
+          'easeOutQuad'
+        );
       }
     }, 100);
   }
 
   scrollToTop(): void {
     setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-    }, 0);
+      this.smoothScrollTo(0, 800, 'easeOutQuart');
+    });
   }
-
   onNavigateFromIframe(): void {
     this.siteAnalyticsService.registerVisitOppiaFromIframeEvent(
       this.explorationId
