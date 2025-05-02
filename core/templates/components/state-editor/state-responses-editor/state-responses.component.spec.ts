@@ -24,10 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Interaction,
   InteractionObjectFactory,
@@ -112,7 +109,6 @@ describe('State Responses Component', () => {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let interactionObjectFactory: InteractionObjectFactory;
   let interactionData: Interaction;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let misconceptionObjectFactory: MisconceptionObjectFactory;
   let externalSaveService: ExternalSaveService;
   let stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
@@ -169,7 +165,6 @@ describe('State Responses Component', () => {
         StateSolicitAnswerDetailsService,
         AlertsService,
         InteractionObjectFactory,
-        AnswerGroupObjectFactory,
         MisconceptionObjectFactory,
         {
           provide: NgbModal,
@@ -197,7 +192,6 @@ describe('State Responses Component', () => {
     component = fixture.componentInstance;
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -280,7 +274,7 @@ describe('State Responses Component', () => {
     });
 
     answerGroups = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [
             {
@@ -680,7 +674,7 @@ describe('State Responses Component', () => {
     component.answerGroups = answerGroups;
 
     let newAnswerGroups = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [
             {
@@ -747,7 +741,7 @@ describe('State Responses Component', () => {
     () => {
       // This contains 2 AnswerGroup for a MultipleChoiceInteraction.
       let answerGroups = [
-        answerGroupObjectFactory.createFromBackendDict(
+        AnswerGroup.createFromBackendDict(
           {
             outcome: defaultsOutcomesToSuppressWarnings[0],
             rule_specs: [
@@ -761,7 +755,7 @@ describe('State Responses Component', () => {
           },
           'MultipleChoiceInput'
         ),
-        answerGroupObjectFactory.createFromBackendDict(
+        AnswerGroup.createFromBackendDict(
           {
             outcome: defaultsOutcomesToSuppressWarnings[1],
             rule_specs: [
@@ -804,7 +798,7 @@ describe('State Responses Component', () => {
     () => {
       // This contains 2 AnswerGroup for a ItemSelectionInput.
       let answerGroups = [
-        answerGroupObjectFactory.createFromBackendDict(
+        AnswerGroup.createFromBackendDict(
           {
             outcome: defaultsOutcomesToSuppressWarnings[0],
             rule_specs: [
@@ -818,7 +812,7 @@ describe('State Responses Component', () => {
           },
           'ItemSelectionInput'
         ),
-        answerGroupObjectFactory.createFromBackendDict(
+        AnswerGroup.createFromBackendDict(
           {
             outcome: defaultsOutcomesToSuppressWarnings[1],
             rule_specs: [
@@ -1031,8 +1025,8 @@ describe('State Responses Component', () => {
     component.answerGroups = answerGroups;
     spyOn(externalSaveService.onExternalSave, 'emit').and.stub();
     spyOn(alertsService, 'clearWarnings').and.stub();
-    spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(
-      answerGroupObjectFactory.createFromBackendDict(
+    spyOn(AnswerGroup, 'createNew').and.returnValue(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [
             {
@@ -1440,7 +1434,7 @@ describe('State Responses Component', () => {
   it('should return summary of answer group', () => {
     expect(
       component.summarizeAnswerGroup(
-        answerGroupObjectFactory.createNew(
+        AnswerGroup.createNew(
           [],
           Outcome.createNew('unused', '1', 'Feedback text', []),
           [],
@@ -1454,7 +1448,7 @@ describe('State Responses Component', () => {
 
     expect(
       component.summarizeAnswerGroup(
-        answerGroupObjectFactory.createNew(
+        AnswerGroup.createNew(
           [],
           Outcome.createNew('unused', '1', 'Feedback text', []),
           [],
