@@ -2249,20 +2249,15 @@ describe('Conversation skin component', () => {
   }));
 
   it('should scroll to bottom using smoothScrollTo', fakeAsync(() => {
-    const container = document.createElement('div');
     const tutorCard = document.createElement('div');
-
-    container.className = 'conversation-skin-container';
     tutorCard.className = 'conversation-skin-main-tutor-card';
-
-    container.appendChild(tutorCard);
-    document.body.appendChild(container);
+    document.body.appendChild(tutorCard);
 
     spyOn(tutorCard, 'getBoundingClientRect').and.returnValue({
       top: 1000,
       height: 200,
+      bottom: 1200,
       left: 0,
-      bottom: 0,
       right: 0,
       width: 0,
       x: 0,
@@ -2282,14 +2277,21 @@ describe('Conversation skin component', () => {
         ) => void;
       },
       'smoothScrollTo'
-    ).and.stub();
+    );
+
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      if (selector === '.conversation-skin-main-tutor-card') {
+        return tutorCard;
+      }
+      return null;
+    });
 
     componentInstance.scrollToBottom();
     tick(0);
 
     expect(smoothScrollSpy).toHaveBeenCalledWith(600, 800, 'easeOutQuad');
 
-    document.body.removeChild(container);
+    document.body.removeChild(tutorCard);
     flush();
   }));
 

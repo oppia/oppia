@@ -366,13 +366,16 @@ describe('Router Service', () => {
     container.style.opacity = '1';
     document.body.appendChild(container);
 
-    spyOn(window, 'requestAnimationFrame').and.callFake(cb => cb(0));
+    // Instead of spying on requestAnimationFrame, just let it run naturally.
+    // If needed, stub it without calling the callback.
+    spyOn(window, 'requestAnimationFrame').and.callFake(cb => {
+      setTimeout(() => cb(0), 0);
+      return 0;
+    });
 
     service.navigateToMainTab('newState');
 
-    tick(200);
-    tick(150);
-    tick(200);
+    tick(600);
 
     expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
     expect(container.style.opacity).toBe('1');
