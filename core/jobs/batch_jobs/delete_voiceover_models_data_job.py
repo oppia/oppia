@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs used for deleting instances of EntityVoiceoversModel and
+"""Jobs used for deleting instances of VoiceArtistMetadataModel and
 ExplorationVoiceArtistsLinkModel.
 """
 
