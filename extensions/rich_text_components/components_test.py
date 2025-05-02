@@ -21,12 +21,11 @@ from __future__ import annotations
 import inspect
 import os
 import re
+from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 from core import utils
 from core.tests import test_utils
 from extensions.rich_text_components import components
-
-from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 ValidItemTypes = Union[
     Dict[str, str],

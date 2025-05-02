@@ -20,15 +20,12 @@ from __future__ import annotations
 
 import os
 import re
-
-from core import constants
-from core import feconf
-from core import utils
-from extensions.objects.models import objects
+from typing import Any, Dict, List, Union
 
 import bs4
 
-from typing import Any, Dict, List, Union
+from core import constants, feconf, utils
+from extensions.objects.models import objects
 
 
 class BaseRteComponent:

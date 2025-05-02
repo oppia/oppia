@@ -19,11 +19,10 @@
 from __future__ import annotations
 
 import copy
+from typing import Dict, List, Optional
 
 from core import utils
 from core.domain import value_generators_domain
-
-from typing import Dict, List, Optional
 
 
 class Copier(value_generators_domain.BaseValueGenerator):

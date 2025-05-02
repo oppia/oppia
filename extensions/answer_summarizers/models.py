@@ -42,13 +42,10 @@ from __future__ import annotations
 import collections
 import itertools
 import operator
-
-from core import feconf
-from core import utils
-from core.domain import exp_domain
-from core.domain import stats_domain
-
 from typing import Dict, FrozenSet, Iterable, List, Optional, TypedDict
+
+from core import feconf, utils
+from core.domain import exp_domain, stats_domain
 
 MYPY = False
 if MYPY:  # pragma: no cover

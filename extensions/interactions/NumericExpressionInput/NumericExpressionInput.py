@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.interactions import base
-
 from typing import List
+
+from extensions.interactions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
