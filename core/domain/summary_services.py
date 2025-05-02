@@ -725,15 +725,11 @@ def check_activity_id_validity(
             collection_ids),
     }]
 
-    # Initialize lists for each type of invalid ID:
-    # dne_exp = list of nonexistent Explorations,
-    # dne_col = list of nonexistent Collections,
-    # priv_exp = list of private Explorations, &
-    # priv_col = list of private Collections.
-    dne_exp = []
-    dne_col = []
-    priv_exp = []
-    priv_col = []
+    # Initialize lists for each type of invalid ID.
+    non_existent_explorations = []
+    non_existent_collections = []
+    private_explorations = []
+    private_collections = []
 
     for activities_info in activity_summaries_by_type:
 
@@ -742,28 +738,41 @@ def check_activity_id_validity(
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Exploration ID,
                 # it means it doesn't exist. ID string is added to
-                # dne_exp list.
+                # non_existent_explorations list.
                 if summary is None:
-                    dne_exp.append(activities_info['ids'][index])
+                    non_existent_explorations.append(
+                        activities_info['ids'][index]
+                    )
                 # If the Exploration is set to private. ID string is added to
-                # priv_exp list.
+                # private_explorations list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-                    priv_exp.append(activities_info['ids'][index])
+                    private_explorations.append(
+                        activities_info['ids'][index]
+                    )
         # If the activity isn't an Exploration, it's a Collection.
         else:
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Collection ID,
                 # it means it doesn't exist. ID string is added to
-                # dne_col list.
+                # non_existent_collections list.
                 if summary is None:
-                    dne_col.append(activities_info['ids'][index])
+                    non_existent_collections.append(
+                        activities_info['ids'][index]
+                    )
                 # If the Collection is set to private. ID string is added to
-                # priv_col list.
+                # private_collections list.
                 elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-                    priv_col.append(activities_info['ids'][index])
+                    private_collections.append(
+                        activities_info['ids'][index]
+                    )
 
     # Return Tuple of lists containing any invalid IDs.
-    return dne_exp, dne_col, priv_exp, priv_col
+    return (
+                non_existent_explorations,
+                non_existent_collections,
+                private_explorations,
+                private_collections
+            )
 
 
 def get_featured_activity_summary_dicts(
