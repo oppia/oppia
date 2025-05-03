@@ -591,6 +591,34 @@ class TopicEditorTests(
 
         self.logout()
 
+    def test_editable_topic_handler_put_fails_with_short_page_title_fragment(
+        self
+    ) -> None:
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Testing page title fragment length validation',
+            'topic_and_subtopic_page_change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'page_title_fragment_for_web',
+                'old_value': '',
+                'new_value': 'abc'  # too short
+            }]
+        }
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertIn(
+            'Expected page_title_fragment_for_web to be at least 5 characters',
+            json_response['error']
+        )
+        self.logout()
+
     def test_editable_topic_handler_put_fails_with_long_commit_message(
         self
     ) -> None:
