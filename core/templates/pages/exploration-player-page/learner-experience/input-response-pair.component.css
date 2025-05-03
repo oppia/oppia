@@ -6,8 +6,8 @@
 
 .conversation-skin-learner-answer-container,
 .conversation-skin-oppia-feedback-container {
-  display: flex;
   align-items: center;
+  display: flex;
   padding: 0 20px;
 }
 
@@ -82,9 +82,9 @@ oppia-input-response-pair .oppia-popover {
 }
 
 .conversation-skin-oppia-avatar {
-  width: 40px;
-  height: 40px;
   border-radius: 50%;
+  height: 40px;
   margin-right: 10px; 
   object-fit: cover; 
+  width: 40px;
 }
