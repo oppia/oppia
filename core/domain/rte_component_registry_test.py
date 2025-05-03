@@ -27,6 +27,8 @@ import re
 import string
 import struct
 
+from unittest import mock
+
 from core import feconf
 from core import schema_utils
 from core import schema_utils_test
@@ -310,6 +312,18 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(obtained_component_class_names),
             set(actual_component_class_names))
+
+    @mock.patch('pkgutil.iter_modules')
+    def test_get_non_component_types_to_component_classes(
+        self, mock_iter_modules: mock.Mock
+    ) -> None:
+        mock_loader = mock.MagicMock()
+        mock_iter_modules.return_value = [(mock_loader, 'non_component', None)]
+
+        component_types = (
+            rte_component_registry.Registry.
+            get_component_types_to_component_classes())
+        self.assertEqual(component_types, {})
 
     def test_get_component_tag_names(self) -> None:
         """Test get_component_tag_names method."""

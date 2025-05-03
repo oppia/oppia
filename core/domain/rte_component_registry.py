@@ -137,6 +137,8 @@ class Registry:
                 loader_with_exec = cast(importlib.abc.Loader, spec.loader)
                 loader_with_exec.exec_module(module)
                 break
+        else:
+            return {}
 
         component_types_to_component_classes = {}
         component_names = list(cls.get_all_rte_components().keys())
