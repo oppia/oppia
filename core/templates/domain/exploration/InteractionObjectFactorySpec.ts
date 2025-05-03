@@ -19,9 +19,9 @@
 import {TestBed} from '@angular/core/testing';
 
 import {
-  AnswerGroupObjectFactory,
+  AnswerGroup,
   AnswerGroupBackendDict,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {
@@ -44,7 +44,6 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
@@ -57,7 +56,6 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
@@ -618,7 +616,7 @@ describe('Interaction object factory', () => {
       tagged_skill_misconception_id: 'skill_id-1',
     };
     expect(testInteraction.answerGroups).toEqual([
-      agof.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -639,7 +637,7 @@ describe('Interaction object factory', () => {
         'TextInput'
       ),
     ]);
-    const newAnswerGroup = agof.createFromBackendDict(
+    const newAnswerGroup = AnswerGroup.createFromBackendDict(
       newAnswerGroupBackendDict,
       'TextInput'
     );
