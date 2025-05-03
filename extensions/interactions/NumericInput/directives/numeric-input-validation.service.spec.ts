@@ -20,10 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {NumericInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -53,7 +50,6 @@ describe('NumericInputValidationService', () => {
     zeroWithinToleranceOfOneRule: Rule,
     zeroWithinToleranceOfOneRuleLessThanZero: Rule,
     nonPositiveToleranceRule: Rule;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -63,7 +59,6 @@ describe('NumericInputValidationService', () => {
     validatorService = TestBed.inject(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     customizationArgs = {
       requireNonnegativeInput: {
@@ -216,7 +211,7 @@ describe('NumericInputValidationService', () => {
       'NumericInput'
     );
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsZeroRule, betweenNegativeOneAndOneRule],
         goodDefaultOutcome,
         [],

@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {unit} from 'mathjs';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {
   Warning,
