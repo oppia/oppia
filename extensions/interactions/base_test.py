@@ -24,18 +24,21 @@ import os
 import re
 import string
 import struct
-from typing import Any, Dict, Final, List, Literal, Set, Tuple, Type
 
-from core import constants, feconf, schema_utils, schema_utils_test, utils
-from core.domain import (
-    exp_fetchers,
-    exp_services,
-    interaction_registry,
-    object_registry,
-)
+from core import constants
+from core import feconf
+from core import schema_utils
+from core import schema_utils_test
+from core import utils
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import interaction_registry
+from core.domain import object_registry
 from core.tests import test_utils
 from extensions import domain
 from extensions.interactions import base
+
+from typing import Any, Dict, Final, List, Literal, Set, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.

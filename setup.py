@@ -22,10 +22,10 @@ from __future__ import annotations
 
 import re
 
+from core import feconf
+
 import pkg_resources
 import setuptools
-
-from core import feconf
 
 
 def main() -> None:

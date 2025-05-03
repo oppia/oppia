@@ -21,11 +21,12 @@ from __future__ import annotations
 import inspect
 import json
 import re
-from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 from core import schema_utils_test
 from core.tests import test_utils
 from extensions.objects.models import objects
+
+from typing import Any, Dict, List, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

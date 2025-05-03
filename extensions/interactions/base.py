@@ -38,13 +38,16 @@ from __future__ import annotations
 
 import copy
 import json
-from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
 
-from core import constants, feconf
-from core.domain import object_registry, visualization_registry
+from core import constants
+from core import feconf
+from core.domain import object_registry
+from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 from extensions.visualizations import models
+
+from typing import Dict, Final, List, Optional, Tuple, Type, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover

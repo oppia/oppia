@@ -20,16 +20,16 @@ from __future__ import annotations
 
 import copy
 import json
-from typing import Any, Dict, List, Optional, Union
 
 from core import schema_utils
 from core.constants import constants
 
+from typing import Any, Dict, List, Optional, Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
-    from typing import TypedDict
-
     from extensions import domain
+    from typing import TypedDict
 
     class CheckedProofDict(TypedDict):
         """Dictionary representing the CheckedProof object."""

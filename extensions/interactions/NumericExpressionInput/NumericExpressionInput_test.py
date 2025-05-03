@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
 from extensions.interactions.NumericExpressionInput import NumericExpressionInput # pylint: disable=unused-import, line-too-long # isort: skip
 
 

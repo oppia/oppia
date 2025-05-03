@@ -18,10 +18,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, TypedDict, Union
-
-from core import schema_utils, utils
+from core import schema_utils
+from core import utils
 from core.domain import calculation_registry
+
+from typing import Any, Dict, List, Mapping, TypedDict, Union
 
 OptionsDictType = Mapping[str, Union[str, List[str], bool]]
 

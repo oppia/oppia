@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from typing import Dict, List
-
 from extensions import domain
+
+from typing import Dict, List
 
 
 class BaseExplorationIssueSpec:
