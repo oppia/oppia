@@ -5,6 +5,7 @@ runs:
   steps:
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge
+
     - name: Setup Python 3.9.20
       uses: actions/setup-python@v5
       id: setup_python
@@ -14,14 +15,17 @@ runs:
         cache: 'pip'
         cache-dependency-path: |
           requirements_dev.txt
+
     - name: Show whether a cache hit occurred (for debugging purposes).
       run: |
         echo "${{ steps.setup_python.outputs.cache-hit }}"
       shell: bash
+
     - name: Write the exact Python version to a file for cache-busting.
       run: |
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
+
     - name: Cache Python dev dependencies
       id: restore_python_dev_dependencies_cache
       uses: actions/cache@v4
@@ -31,6 +35,28 @@ runs:
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
         path: |
           /opt/hostedtoolcache/Python/3.9.20/x64
+
+    # TODO (#22567): Fix pip not working properly when fetched from cache.
+    - name: Check pip installation and fix if needed
+      run: |
+        set -e
+        echo "Checking if pip is properly installed..."
+        
+        # This shows pip-related environment and configuration info for debugging:
+        # https://pip.pypa.io/en/stable/cli/pip_debug/
+        if ! python -m pip debug; then
+          echo "pip is broken. Clearing pip cache..."
+          python -m pip cache purge || true
+          echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
+          curl -sS https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
+          python -m pip uninstall pip -y
+          python /tmp/get-pip.py pip==24.3.1
+          python -m scripts.install_python_dev_dependencies
+        else
+          echo "pip is working correctly."
+        fi
+      shell: bash
+
     - name: Install third-party Python dev dependencies
       if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
@@ -42,12 +68,14 @@ runs:
         # Note that the effects of this don't seem to be cached by setup-python,
         # resulting in the occasional "No module named PIL" errors in CI.
         command: python -m scripts.install_python_dev_dependencies
+
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
         pip show certifi
         ls -la /opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages
         ls -la /opt/hostedtoolcache/Python/3.9.20/x64/bin
       shell: bash
+
     - name: Check Yarn Cache
       run: |
         # Move outside repository root to ignore the configs in
@@ -64,6 +92,7 @@ runs:
         # Move back to the repository root.
         cd -
       shell: bash
+
     # Production pip dependencies are installed in a custom folder rather than
     # the pip cache (see "Caching Python dependencies" in the README at
     # https://github.com/actions/setup-python?tab=readme-ov-file).
@@ -80,6 +109,7 @@ runs:
       run: |
         echo "${{ steps.setup_python.outputs.python-version }}" > /home/runner/work/.pyversion
       shell: bash
+
     - name: Cache third_party and node_modules
       id: restore_third_party_and_node_modules_cache
       uses: actions/cache@v4
@@ -98,6 +128,7 @@ runs:
           /home/runner/work/oppia/oppia/node_modules
           /home/runner/work/oppia/oppia/third_party/python_libs
           /home/runner/work/oppia/oppia/third_party/static
+
     - name: Install third-party libs on cache miss (retries on error)
       if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
@@ -107,6 +138,7 @@ runs:
         shell: bash
         timeout_minutes: 30
         command: python -m scripts.install_third_party_libs
+
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
       # installed.

@@ -25,7 +25,7 @@ import {
   ComponentFixture,
   waitForAsync,
 } from '@angular/core/testing';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -82,7 +82,6 @@ import {AlertsService} from 'services/alerts.service';
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
@@ -212,7 +211,6 @@ describe('Exploration editor tab component', () => {
     fixture = TestBed.createComponent(ExplorationEditorTabComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
@@ -776,7 +774,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           training_data: null,
@@ -799,7 +797,7 @@ describe('Exploration editor tab component', () => {
     ]);
 
     let displayedValue = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
