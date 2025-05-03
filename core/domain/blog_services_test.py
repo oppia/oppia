@@ -419,7 +419,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
-            'Blog Post URL fragment should be a string. Recieved:\[123\]',
+            'Blog Post URL fragment should be a string. Recieved:123',
         ):
             blog_services.does_blog_post_with_url_fragment_exist([123])  # type: ignore[arg-type]
 
