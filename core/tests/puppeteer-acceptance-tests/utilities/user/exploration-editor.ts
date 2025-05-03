@@ -1094,49 +1094,12 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to which learners will be directed.
    */
   async directLearnersToNewCard(cardName: string): Promise<void> {
-    try {
-      // Wait for the "Open Outcome Destination Editor" button to be visible and click it.
-      await this.page.waitForSelector(openOutcomeDestButton, {visible: true});
-      await this.page.$eval(openOutcomeDestButton, element => {
-        element.scrollIntoView();
-      });
-
-      let retries = 3;
-      while (retries > 0) {
-        try {
-          await this.clickOn(openOutcomeDestButton);
-          break;
-        } catch (error) {
-          retries--;
-          if (retries === 0) {
-            throw new Error(
-              `Failed to click on the "Open Outcome Destination Editor" button after multiple attempts: ${error.message}`
-            );
-          }
-          await this.page.waitForTimeout(1000);
-        }
-      }
-
-      // Wait for the destination card dropdown to be clickable.
-      await this.waitForElementToBeClickable(destinationCardSelector);
-
-      // Select the "Add New Card" option.
-      await this.select(destinationCardSelector, '/');
-
-      // Enter the name of the new card.
-      await this.page.waitForSelector(addStateInput, {visible: true});
-      await this.type(addStateInput, cardName);
-
-      // Save the outcome destination.
-      await this.page.waitForSelector(saveOutcomeDestButton, {visible: true});
-      await this.clickOn(saveOutcomeDestButton);
-
-      showMessage(`Learners directed to a new card: ${cardName}`);
-    } catch (error) {
-      throw new Error(
-        `Failed to direct learners to new card "${cardName}": ${error.message}`
-      );
-    }
+    await this.clickOn(openOutcomeDestButton);
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, cardName);
+    await this.clickOn(saveOutcomeDestButton);
   }
 
   async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
