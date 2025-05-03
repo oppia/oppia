@@ -30,7 +30,7 @@ import {RouterService} from '../services/router.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {InteractionData} from 'interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';

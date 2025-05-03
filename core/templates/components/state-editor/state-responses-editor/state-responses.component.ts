@@ -47,10 +47,7 @@ import {AppConstants} from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {AlertsService} from 'services/alerts.service';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {Rule} from 'domain/exploration/rule.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
@@ -115,7 +112,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
     private generateContentIdService: GenerateContentIdService,
-    private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
@@ -275,7 +271,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
         // Create a new answer group.
         this.answerGroups.push(
-          this.answerGroupObjectFactory.createNew(
+          AnswerGroup.createNew(
             [result.tmpRule],
             result.tmpOutcome,
             [],
