@@ -427,7 +427,7 @@ class IssueManager:
 
             if issue.number in issues_with_prs:
                 logging.info(
-                    'Skipping issue #%d: has open PR #%d',
+                    'Skipping issue #%d: has open PR #%s',
                     issue.number, issues_with_prs[issue.number]
                 )
                 continue
