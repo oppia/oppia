@@ -39,7 +39,7 @@ calculation may look like this:
 
 from __future__ import annotations
 
-import collections.abc
+import collections
 import itertools
 import operator
 
