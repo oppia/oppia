@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -45,13 +42,11 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoThousandRule: Rule;
   let equivalentToTwoByThreeRule: Rule;
   let equivalentToTwoRule: Rule;
-  let agof: AnswerGroupObjectFactory;
   let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
     numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -187,7 +182,7 @@ describe('NumberWithUnitsValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsTwoRule, equalsTwoByThreeRule],
         goodDefaultOutcome,
         [],

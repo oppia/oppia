@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import nerdamer from 'nerdamer';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
   BaseInteractionValidationService,
