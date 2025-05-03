@@ -29,7 +29,7 @@ import {
   NumberWithUnits,
   NumberWithUnitsObjectFactory,
 } from 'domain/objects/NumberWithUnitsObjectFactory';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -345,12 +345,11 @@ describe('NumberWithUnitsValidationService', () => {
         return null;
       },
       toDict: () => {
-        let uof = new UnitsObjectFactory();
         let tmp = new NumberWithUnits(
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / s^2')
+          Units.fromRawInputString('m / s^2')
         );
 
         return tmp.toDict();

@@ -42,7 +42,6 @@
     "core/templates/domain/feedback_thread/FeedbackThreadObjectFactorySpec.ts",
     "core/templates/pages/about-page/about-page.constants.ts",
     "core/templates/domain/objects/NumberWithUnitsObjectFactorySpec.ts",
-    "core/templates/domain/objects/UnitsObjectFactorySpec.ts",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/new-lesson-player/lesson-player-page.constants.ts",
     "core/templates/pages/topic-editor-page/topic-editor-page.constants.ts",
