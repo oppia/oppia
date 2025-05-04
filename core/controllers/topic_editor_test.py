@@ -601,7 +601,7 @@ class TopicEditorTests(
                 'cmd': 'update_topic_property',
                 'property_name': 'page_title_fragment_for_web',
                 'old_value': '',
-                'new_value': 'abc'  # too short
+                'new_value': 'abc'
             }]
         }
 
