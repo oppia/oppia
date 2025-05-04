@@ -478,6 +478,18 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  isExplorationLinkedToStory(): boolean {
+    return this.contextService.isExplorationLinkedToStory();
+  }
+
+  shouldShowAutoVoiceoverRegenerationSection(): boolean {
+    return (
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.isExplorationLinkedToStory()
+    );
+  }
+
   deleteManualVoiceover(): void {
     const modalRef = this.ngbModal.open(VoiceoverRemovalConfirmModalComponent, {
       backdrop: 'static',
