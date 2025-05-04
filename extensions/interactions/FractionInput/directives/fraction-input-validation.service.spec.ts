@@ -18,15 +18,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {AppConstants} from 'app.constants';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {TestBed} from '@angular/core/testing';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -65,13 +59,9 @@ describe('FractionInputValidationService', () => {
     numerator: number,
     denominator: number
   ) => FractionDict;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     validatorService = TestBed.inject(FractionInputValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     createFractionDict = (
@@ -104,7 +94,7 @@ describe('FractionInputValidationService', () => {
     };
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -308,7 +298,7 @@ describe('FractionInputValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsOneRule, lessThanTwoRule],
         goodDefaultOutcome,
         [],

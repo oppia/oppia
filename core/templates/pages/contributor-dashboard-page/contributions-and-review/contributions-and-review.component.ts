@@ -16,7 +16,13 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -642,6 +648,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.loadContributions(/* Param shouldResetOffset= */ false);
   }
 
+  @HostListener('document:click', ['$event'])
   closeDropdownWhenClickedOutside(clickEvent: {target: Node}): void {
     const dropdown = document.querySelector(
       '.oppia-contributions-dropdown-container'
@@ -833,8 +840,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         },
       },
     };
-
-    $(document).on('click', this.closeDropdownWhenClickedOutside);
   }
 
   openSnackbarWithAction(
@@ -875,6 +880,5 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    $(document).off('click', this.closeDropdownWhenClickedOutside);
   }
 }
