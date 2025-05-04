@@ -206,15 +206,23 @@ export class TranslationAdmin extends BaseUser {
    * Function to check that there are no translators for the selected language.
    */
   async expectUserToNotBeDisplayed(username: string): Promise<void> {
-    const elementHandle = await this.page.$(viewLanguageRoleUserResult);
-    if (!elementHandle) {
-      showMessage('No users displayed  assuming user is not present.');
+    try {
+      // Wait for the selector to appear within 5 seconds.
+      await this.page.waitForSelector(viewLanguageRoleUserResult, {
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Element didn't appear – assume no users are displayed.
+      showMessage('No users displayed — assuming user is not present.');
       return;
     }
+
+    // If the element appeared, check if the username is among the displayed users.
     const displayedUsers = await this.page.$eval(
       viewLanguageRoleUserResult,
       element => (element as HTMLElement).innerText
     );
+
     if (displayedUsers.includes(username)) {
       throw new Error(
         `${username} has translation rights for selected language!`
@@ -222,6 +230,5 @@ export class TranslationAdmin extends BaseUser {
     }
   }
 }
-
 export let TranslationAdminFactory = (): TranslationAdmin =>
   new TranslationAdmin();
