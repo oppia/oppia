@@ -2265,19 +2265,8 @@ describe('Conversation skin component', () => {
       toJSON: () => {},
     });
 
-    spyOnProperty(window, 'scrollY').and.returnValue(0);
-    spyOnProperty(window, 'innerHeight').and.returnValue(600);
-
-    const smoothScrollSpy = spyOn(
-      componentInstance as unknown as {
-        smoothScrollTo: (
-          targetY: number,
-          duration: number,
-          easing?: string
-        ) => void;
-      },
-      'smoothScrollTo'
-    );
+    spyOnProperty(window, 'scrollY', 'get').and.returnValue(0);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(600);
 
     spyOn(document, 'querySelector').and.callFake((selector: string) => {
       if (selector === '.conversation-skin-main-tutor-card') {
@@ -2286,10 +2275,27 @@ describe('Conversation skin component', () => {
       return null;
     });
 
-    componentInstance.scrollToBottom();
-    tick(0);
+    const smoothScrollSpy = spyOn(
+      componentInstance as unknown as {
+      smoothScrollTo: (
+        targetY: number,
+        duration: number,
+        easing?: string
+      ) => void;
+      },
+      'smoothScrollTo'
+    );
 
-    expect(smoothScrollSpy).toHaveBeenCalledWith(600, 800, 'easeOutQuad');
+    componentInstance.scrollToBottom();
+
+    tick(100);
+
+    const expectedScrollY = 1000 + 200 - 600 + 12;
+    expect(smoothScrollSpy).toHaveBeenCalledWith(
+      expectedScrollY,
+      componentInstance.TIME_SCROLL_MSEC,
+      'easeOutQuad'
+    );
 
     document.body.removeChild(tutorCard);
     flush();
