@@ -86,7 +86,7 @@
 
   <div *ngIf="redesignFeatureFlag">
      <!--TODO(#18384): Hides recommendations if no classroom topics in-progress (isNonemptyObject(untrackedTopics) not sure what this does)-->
-    <div class="oppia-learner-dash-section" *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0">
+    <div class="e2e-test-learner-dash-continue-section oppia-learner-dash-section" *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
         {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
@@ -114,7 +114,7 @@
         </oppia-card-display>
       </div>
     </div>
-    <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+    <div class="e2e-test-learner-dash-learn-new-section oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <!--TODO(#18384): Add search bar -->
       <!--TODO(#18384): Only untracked topics. Will need to change headings when there are multiple classrooms-->

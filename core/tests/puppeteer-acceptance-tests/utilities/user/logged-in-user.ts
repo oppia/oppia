@@ -176,6 +176,16 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
+const homeTabSections = {
+  continueWhereYouLeftOff: {
+    title: 'Continue where you left off',
+    selector: '.e2e-test-learner-dash-continue-section',
+  },
+  topicsAvailableInClassrrom: {
+    title: 'Topics available in classroom',
+    selector: '.e2e-test-learner-dash-learn-new-section',
+  },
+};
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1834,6 +1844,40 @@ export class LoggedInUser extends BaseUser {
     }
 
     expect(tabTitleText).toBe(expectedTabTitleText);
+  }
+
+  /**
+   * Verifies section's existence.
+   * @param {string} section - Section type.
+   * @param {string} shouldExist - Section should appear.
+   */
+  async expectSectionExistence(
+    section: string,
+    shouldExist: boolean
+  ): Promise<void> {
+    const currentSection = homeTabSections[section];
+
+    const sectionElement = this.page.$(currentSection.selector);
+    if (shouldExist) {
+      expect(sectionElement).not.toBeNull();
+    } else {
+      expect(sectionElement).toBeNull();
+    }
+  }
+
+  /**
+   * Verifies section title.
+   * @param {string} section - Section type.
+   */
+
+  async expectSectionTitleToMatch(section: string): Promise<void> {
+    const currentSection = homeTabSections[section];
+
+    await this.page.waitForSelector(currentSection.selector);
+    const sectionTitle = await this.page.$(
+      `${currentSection.selector} .oppia-learner-dash-section-heading`
+    );
+    expect(sectionTitle).toBe(currentSection.title);
   }
 }
 
