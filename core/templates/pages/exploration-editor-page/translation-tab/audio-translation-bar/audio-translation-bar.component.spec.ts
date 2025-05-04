@@ -233,20 +233,18 @@ describe('Audio translation bar Component', () => {
     spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
     spyOn(zone, 'run').and.callFake((fn: Function) => fn());
 
+    translationTabDivMock = document.createElement('div');
+    translationTabDivMock.classList.add('oppia-translation-tab');
+
+    mainBodyDivMock = document.createElement('div');
+    mainBodyDivMock.classList.add('oppia-main-body');
+
     dropAreaMessageDivMock = document.createElement('div');
     dropAreaMessageDivMock.classList.add('oppia-drop-area-message');
 
-    translationTabDivMock = $(document.createElement('div'));
-    mainBodyDivMock = $(document.createElement('div'));
-
-    var jQuerySpy = spyOn(window, '$');
-
-    jQuerySpy
-      .withArgs('.oppia-translation-tab')
-      .and.returnValue(translationTabDivMock)
-      .withArgs('.oppia-main-body')
-      .and.returnValue(mainBodyDivMock);
-    jQuerySpy.and.callThrough();
+    fixture.nativeElement.appendChild(translationTabDivMock);
+    fixture.nativeElement.appendChild(mainBodyDivMock);
+    fixture.nativeElement.appendChild(dropAreaMessageDivMock);
 
     fixture.detectChanges();
     component.showRecorderWarning = true;
@@ -263,7 +261,15 @@ describe('Audio translation bar Component', () => {
     component.ngOnInit();
     tick();
 
-    translationTabDivMock.triggerHandler('dragover');
+    const dragOverEvent = new DragEvent('dragover', {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const translationTabEl = fixture.nativeElement.querySelector(
+      '.oppia-translation-tab'
+    );
+    translationTabEl.dispatchEvent(dragOverEvent);
     tick();
 
     component.waveSurferOnFinishCb();
@@ -313,37 +319,56 @@ describe('Audio translation bar Component', () => {
     expect(audioPlayerService.play).not.toHaveBeenCalled();
   });
 
-  it('should trigger dragleave event in main body element', fakeAsync(() => {
+  it('should trigger dragleave event in main body element and handle drop', fakeAsync(() => {
     spyOn(component, 'openAddAudioTranslationModal').and.stub();
 
     component.ngOnInit();
     tick();
 
-    mainBodyDivMock.triggerHandler({
-      pageX: 0,
-      pageY: 0,
-      preventDefault: () => {},
-      type: 'dragleave',
+    // Simulate dragleave.
+    const dragLeaveEvent = new DragEvent('dragleave', {
+      bubbles: true,
+      cancelable: true,
     });
+    Object.defineProperty(dragLeaveEvent, 'pageX', {value: 0});
+    Object.defineProperty(dragLeaveEvent, 'pageY', {value: 0});
+
+    const mainBodyEl = fixture.nativeElement.querySelector('.oppia-main-body');
+    mainBodyEl.dispatchEvent(dragLeaveEvent);
     tick();
 
-    translationTabDivMock.triggerHandler('dragover');
-    translationTabDivMock.triggerHandler({
-      originalEvent: {
-        dataTransfer: {
-          files: [],
-        },
-      },
-      preventDefault: () => {},
-      stopPropagation: () => {},
-      target: dropAreaMessageDivMock,
-      type: 'drop',
+    // Simulate dragover.
+    const dragOverEvent = new DragEvent('dragover', {
+      bubbles: true,
+      cancelable: true,
     });
+
+    const translationTabEl = fixture.nativeElement.querySelector(
+      '.oppia-translation-tab'
+    );
+    translationTabEl.dispatchEvent(dragOverEvent);
+    tick();
+
+    // Simulate drop.
+    const dropAreaMessageDiv = fixture.nativeElement.querySelector(
+      '.oppia-drop-area-message'
+    );
+
+    const dropEvent = new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: new DataTransfer(),
+    });
+
+    Object.defineProperty(dropEvent, 'target', {value: dropAreaMessageDiv});
+
+    translationTabEl.dispatchEvent(dropEvent);
     tick();
 
     expect(component.dropAreaIsAccessible).toBe(false);
     expect(component.openAddAudioTranslationModal).toHaveBeenCalled();
   }));
+
   it('should evaluate component properties after audio bar initialization', () => {
     expect(component.languageCode).toBe('en');
     expect(component.contentId).toBe('content');
