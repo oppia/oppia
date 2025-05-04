@@ -22,30 +22,30 @@ import {
   NumberWithUnitsObjectFactory,
 } from 'domain/objects/NumberWithUnitsObjectFactory';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
-import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {Units} from 'domain/objects/units.model';
 
 describe('NumberWithUnitsObjectFactory', () => {
   describe('number with units object factory', () => {
     let nwuof: NumberWithUnitsObjectFactory;
-    let uof: UnitsObjectFactory;
     let errors: typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
 
     beforeEach(() => {
-      nwuof = new NumberWithUnitsObjectFactory(new UnitsObjectFactory());
-      uof = new UnitsObjectFactory();
+      nwuof = new NumberWithUnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
 
     it('should convert units to list format', () => {
-      expect(uof.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual([
-        {exponent: -1, unit: 'kg'},
-        {exponent: 2, unit: 'K'},
-        {exponent: 1, unit: 'mol'},
-        {exponent: -1, unit: 'N'},
-        {exponent: -1, unit: 'm'},
-        {exponent: -1, unit: 's'},
-      ]);
-      expect(uof.fromStringToList('mol/(kg / (N m / s^2)')).toEqual([
+      expect(Units.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
+        [
+          {exponent: -1, unit: 'kg'},
+          {exponent: 2, unit: 'K'},
+          {exponent: 1, unit: 'mol'},
+          {exponent: -1, unit: 'N'},
+          {exponent: -1, unit: 'm'},
+          {exponent: -1, unit: 's'},
+        ]
+      );
+      expect(Units.fromStringToList('mol/(kg / (N m / s^2)')).toEqual([
         {exponent: 1, unit: 'mol'},
         {exponent: -1, unit: 'kg'},
         {exponent: 1, unit: 'N'},
@@ -53,7 +53,7 @@ describe('NumberWithUnitsObjectFactory', () => {
         {exponent: -2, unit: 's'},
       ]);
       expect(
-        uof.fromStringToList('kg per kg^2 K mol per (N m s^2) K s')
+        Units.fromStringToList('kg per kg^2 K mol per (N m s^2) K s')
       ).toEqual([
         {exponent: -1, unit: 'kg'},
         {exponent: 2, unit: 'K'},
@@ -87,7 +87,9 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should convert units from string to lexical format', () => {
-      expect(uof.stringToLexical('kg per kg^2 K mol / (N m s^2) K s')).toEqual([
+      expect(
+        Units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s')
+      ).toEqual([
         'kg',
         '/',
         'kg^2',
@@ -107,7 +109,9 @@ describe('NumberWithUnitsObjectFactory', () => {
         '*',
         's',
       ]);
-      expect(uof.stringToLexical('kg (K mol) m/s^2 r t / (l/ n) / o')).toEqual([
+      expect(
+        Units.stringToLexical('kg (K mol) m/s^2 r t / (l/ n) / o')
+      ).toEqual([
         'kg',
         '(',
         'K',
@@ -130,23 +134,25 @@ describe('NumberWithUnitsObjectFactory', () => {
         '/',
         'o',
       ]);
-      expect(uof.stringToLexical('mol per (kg per (N m per s^2)*K)')).toEqual([
-        'mol',
-        '/',
-        '(',
-        'kg',
-        '/',
-        '(',
-        'N',
-        '*',
-        'm',
-        '/',
-        's^2',
-        ')',
-        '*',
-        'K',
-        ')',
-      ]);
+      expect(Units.stringToLexical('mol per (kg per (N m per s^2)*K)')).toEqual(
+        [
+          'mol',
+          '/',
+          '(',
+          'kg',
+          '/',
+          '(',
+          'N',
+          '*',
+          'm',
+          '/',
+          's^2',
+          ')',
+          '*',
+          'K',
+          ')',
+        ]
+      );
     });
 
     it('should convert number with units object to a string', () => {
@@ -155,7 +161,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / s^2')
+          Units.fromRawInputString('m / s^2')
         ).toString()
       ).toBe('2.02 m s^-2');
       expect(
@@ -163,7 +169,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('Rs')
+          Units.fromRawInputString('Rs')
         ).toString()
       ).toBe('Rs 2.02');
       expect(
@@ -171,7 +177,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('₹')
+          Units.fromRawInputString('₹')
         ).toString()
       ).toBe('₹ 2.02');
       expect(
@@ -179,7 +185,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('')
+          Units.fromRawInputString('')
         ).toString()
       ).toBe('2');
       expect(
@@ -187,7 +193,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(true, 0, 4, 3),
-          uof.fromRawInputString('m / s^2')
+          Units.fromRawInputString('m / s^2')
         ).toString()
       ).toBe('-4/3 m s^-2');
       expect(
@@ -195,7 +201,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(false, 0, 4, 3),
-          uof.fromRawInputString('$ per hour')
+          Units.fromRawInputString('$ per hour')
         ).toString()
       ).toBe('$ 4/3 hour^-1');
       expect(
@@ -203,7 +209,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           40,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('Rs per hour')
+          Units.fromRawInputString('Rs per hour')
         ).toString()
       ).toBe('Rs 40 hour^-1');
       expect(
@@ -211,17 +217,17 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           40,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('₹ per hour')
+          Units.fromRawInputString('₹ per hour')
         ).toString()
       ).toBe('₹ 40 hour^-1');
     });
 
     it('should parse valid units strings', () => {
-      expect(uof.fromRawInputString('kg per (K mol^-2)')).toEqual(
-        new Units(uof.fromStringToList('kg / (K mol^-2)'))
+      expect(Units.fromRawInputString('kg per (K mol^-2)')).toEqual(
+        new Units(Units.fromStringToList('kg / (K mol^-2)'))
       );
-      expect(uof.fromRawInputString('kg / (K mol^-2) N / m^2')).toEqual(
-        new Units(uof.fromStringToList('kg / (K mol^-2) N / m^2'))
+      expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2')).toEqual(
+        new Units(Units.fromStringToList('kg / (K mol^-2) N / m^2'))
       );
     });
 
@@ -231,7 +237,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('kg / m^3')
+          Units.fromRawInputString('kg / m^3')
         )
       );
       expect(nwuof.fromRawInputString('2 / 3 kg / m^3')).toEqual(
@@ -239,7 +245,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(false, 0, 2, 3),
-          uof.fromRawInputString('kg / m^3')
+          Units.fromRawInputString('kg / m^3')
         )
       );
       expect(nwuof.fromRawInputString('2')).toEqual(
@@ -247,7 +253,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('')
+          Units.fromRawInputString('')
         )
       );
       expect(nwuof.fromRawInputString('2 / 3')).toEqual(
@@ -255,7 +261,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(false, 0, 2, 3),
-          uof.fromRawInputString('')
+          Units.fromRawInputString('')
         )
       );
       expect(nwuof.fromRawInputString('$ 2.02')).toEqual(
@@ -263,7 +269,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('$')
+          Units.fromRawInputString('$')
         )
       );
       expect(nwuof.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
@@ -271,7 +277,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(false, 0, 2, 3),
-          uof.fromRawInputString('Rs / hour')
+          Units.fromRawInputString('Rs / hour')
         )
       );
       expect(nwuof.fromRawInputString('₹ 2 / 3 per hour')).toEqual(
@@ -279,7 +285,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'fraction',
           0,
           new Fraction(false, 0, 2, 3),
-          uof.fromRawInputString('₹ / hour')
+          Units.fromRawInputString('₹ / hour')
         )
       );
     });
@@ -596,7 +602,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('celsius / meter')
+          Units.fromRawInputString('celsius / meter')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
@@ -610,7 +616,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           24,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('dollar / megatonne')
+          Units.fromRawInputString('dollar / megatonne')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
@@ -624,7 +630,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / in')
+          Units.fromRawInputString('m / in')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
@@ -638,7 +644,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / Rupee')
+          Units.fromRawInputString('m / Rupee')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
