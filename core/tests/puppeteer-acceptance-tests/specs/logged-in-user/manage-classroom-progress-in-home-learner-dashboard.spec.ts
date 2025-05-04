@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for learner dashboard functionalities, specfically
+ * @fileoverview Acceptance tests for home tab of learner dashboard, specfically
  * interactions with components that use classroom data across all tabs.
  */
 
@@ -100,23 +100,19 @@ describe('Logged-in User', function () {
     );
   }, 480000);
 
-  /**
-   * TODO(#22070): Add tests for home tab. Interactions involving recommended
-   * lessons, in-progress lessons, topics available, and saved lessons sections.
-   */
-
-  /**
-   * TODO(#22070): Add tests for goals tab, all interactions.
-   */
-
-  /**
-   * TODO(#22070): Add tests for progress tab. Interactions involving in-progress
-   * and completed classroom lessons & skills sections.
-   */
   it(
     'should navigate to the new learner dashboard',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should have the correct home tab title with the username',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.checkTabTitle('loggedInUser1', 'home');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
