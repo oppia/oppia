@@ -2277,11 +2277,11 @@ describe('Conversation skin component', () => {
 
     const smoothScrollSpy = spyOn(
       componentInstance as unknown as {
-      smoothScrollTo: (
-        targetY: number,
-        duration: number,
-        easing?: string
-      ) => void;
+        smoothScrollTo: (
+          targetY: number,
+          duration: number,
+          easing?: string
+        ) => void;
       },
       'smoothScrollTo'
     );
