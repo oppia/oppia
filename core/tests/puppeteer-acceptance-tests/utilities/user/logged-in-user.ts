@@ -175,6 +175,7 @@ const explorationControlsSettingsDropdown =
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const tabTitle = '.e2e-test-learner-dash-tab-title';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1803,6 +1804,36 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(anonymousCheckboxSelector);
     }
     await this.clickOn(submitButtonSelector);
+  }
+
+  /**
+   * Verifies tab title.
+   * @param {string} username - Username of logged in user.
+   * @param {string} tab - Tab type.
+   */
+  async checkTabTitle(username: string, tab: string): Promise<void> {
+    await this.page.waitForSelector(tabTitle);
+    const tabTitleElement = await this.page.$(tabTitle);
+    const tabTitleText = await this.page.evaluate(
+      el => el.innerText,
+      tabTitleElement
+    );
+    let expectedTabTitleText = '';
+    switch (tab) {
+      case 'home':
+        expectedTabTitleText = `Welcome, ${username}!`;
+        break;
+      case 'goals':
+        expectedTabTitleText = `${username}'s Goals`;
+        break;
+      case 'progress':
+        expectedTabTitleText = `${username}'s Progress`;
+        break;
+      default:
+        throw new Error(`Unknown tab: ${tab}`);
+    }
+
+    expect(tabTitleText).toBe(expectedTabTitleText);
   }
 }
 

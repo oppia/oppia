@@ -121,6 +121,15 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should have the correct home tab title with the username',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.checkTabTitle('loggedInUser1', 'home');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
