@@ -1811,7 +1811,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} username - Username of logged in user.
    * @param {string} tab - Tab type.
    */
-  async checkTabTitle(username: string, tab: string): Promise<void> {
+  async expectTabTitleToMatch(username: string, tab: string): Promise<void> {
     await this.page.waitForSelector(tabTitle);
     const tabTitleElement = await this.page.$(tabTitle);
     const tabTitleText = await this.page.evaluate(

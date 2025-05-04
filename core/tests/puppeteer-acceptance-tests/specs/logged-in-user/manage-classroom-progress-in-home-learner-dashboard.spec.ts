@@ -98,21 +98,13 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
+    await loggedInUser.navigateToLearnerDashboard();
   }, 480000);
-
-  it(
-    'should navigate to the new learner dashboard',
-    async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
   it(
     'should have the correct home tab title with the username',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.checkTabTitle('loggedInUser1', 'home');
+      await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
