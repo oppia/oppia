@@ -109,6 +109,21 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should only display available classroom lessons when no lessons in progress',
+    async function () {
+      await loggedInUser.expectSectionExistence(
+        'continueWhereYouLeftOff',
+        false
+      );
+      await loggedInUser.expectSectionExistence(
+        'topicsAvailableInClassroom',
+        true
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

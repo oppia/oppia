@@ -181,7 +181,7 @@ const homeTabSections = {
     title: 'Continue where you left off',
     selector: '.e2e-test-learner-dash-continue-section',
   },
-  topicsAvailableInClassrrom: {
+  topicsAvailableInClassroom: {
     title: 'Topics available in classroom',
     selector: '.e2e-test-learner-dash-learn-new-section',
   },
@@ -1856,28 +1856,27 @@ export class LoggedInUser extends BaseUser {
     shouldExist: boolean
   ): Promise<void> {
     const currentSection = homeTabSections[section];
+    const sectionElement = await this.page.waitForSelector(
+      currentSection.selector,
+      {
+        timeout: 5000,
+      }
+    );
 
-    const sectionElement = this.page.$(currentSection.selector);
     if (shouldExist) {
       expect(sectionElement).not.toBeNull();
+      const sectionTitleElement = await this.page.$(
+        `${currentSection.selector} .oppia-learner-dash-section-heading`
+      );
+      const sectionTitleText = await this.page.evaluate(
+        el => el.innerText,
+        sectionTitleElement
+      );
+      expect(sectionTitleText).toBe(currentSection.title);
     } else {
-      expect(sectionElement).toBeNull();
+      const nullElement = this.page.$(currentSection.selector);
+      expect(nullElement).toBeNull();
     }
-  }
-
-  /**
-   * Verifies section title.
-   * @param {string} section - Section type.
-   */
-
-  async expectSectionTitleToMatch(section: string): Promise<void> {
-    const currentSection = homeTabSections[section];
-
-    await this.page.waitForSelector(currentSection.selector);
-    const sectionTitle = await this.page.$(
-      `${currentSection.selector} .oppia-learner-dash-section-heading`
-    );
-    expect(sectionTitle).toBe(currentSection.title);
   }
 }
 
