@@ -1848,14 +1848,18 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Verifies section's existence.
+   * @param {string} tab - Tab type.
    * @param {string} section - Section type.
    * @param {string} shouldExist - Section should appear.
    */
   async expectSectionExistence(
+    tab: string,
     section: string,
     shouldExist: boolean
   ): Promise<void> {
-    const currentSection = homeTabSections[section];
+    const currentSection =
+      tab === 'home' ? homeTabSections[section] : homeTabSections[section];
+
     const sectionElement = await this.page.waitForSelector(
       currentSection.selector,
       {

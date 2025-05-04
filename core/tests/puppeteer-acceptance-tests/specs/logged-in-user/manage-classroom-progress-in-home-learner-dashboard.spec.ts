@@ -102,28 +102,22 @@ describe('Logged-in User', function () {
   }, 480000);
 
   it(
-    'should have the correct home tab title with the username',
+    'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should only display available classroom lessons when no lessons in progress',
-    async function () {
       await loggedInUser.expectSectionExistence(
+        'home',
         'continueWhereYouLeftOff',
         false
       );
       await loggedInUser.expectSectionExistence(
+        'home',
         'topicsAvailableInClassroom',
         true
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
