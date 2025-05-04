@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -36,7 +33,6 @@ describe('EndExplorationValidationService', () => {
   let badOutcome: Outcome;
   let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +41,6 @@ describe('EndExplorationValidationService', () => {
 
     validatorService = TestBed.inject(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -69,7 +64,7 @@ describe('EndExplorationValidationService', () => {
     };
 
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [],
         Outcome.createFromBackendDict({
           dest: 'Second State',

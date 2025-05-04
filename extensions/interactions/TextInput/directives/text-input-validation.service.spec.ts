@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -45,13 +42,11 @@ describe('TextInputValidationService', () => {
   let customizationArguments: TextInputCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.inject(TextInputValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     let customizationArgSpecs =
       INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -86,9 +81,11 @@ describe('TextInputValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   it('should be able to perform basic validation', () => {

@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   AlgebraicExpressionInputValidationService,
   // eslint-disable-next-line max-len
@@ -40,7 +37,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: AlgebraicExpressionInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -49,7 +45,6 @@ describe('AlgebraicExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(AlgebraicExpressionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -93,7 +88,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       'AlgebraicExpressionInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {

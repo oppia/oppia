@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {ImageClickInputValidationService} from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -37,7 +34,6 @@ describe('ImageClickInputValidationService', () => {
   let badOutcome: Outcome, goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
   var customizationArguments: ImageClickInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +41,6 @@ describe('ImageClickInputValidationService', () => {
     });
 
     validatorService = TestBed.inject(ImageClickInputValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -101,7 +96,7 @@ describe('ImageClickInputValidationService', () => {
     };
 
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
