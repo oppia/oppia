@@ -28,7 +28,6 @@ import {
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Rule} from 'domain/exploration/rule.model';
@@ -58,7 +57,7 @@ import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
@@ -119,7 +118,6 @@ class MockConvertToPlainTextPipe {
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
@@ -313,7 +311,6 @@ describe('State translation component', () => {
     fixture = TestBed.createComponent(StateTranslationComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
@@ -741,8 +738,9 @@ describe('State translation component', () => {
       it('should get summary answer group', () => {
         expect(
           component.summarizeAnswerGroup(
-            answerGroupObjectFactory.createNew(
+            AnswerGroup.createNew(
               [],
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'

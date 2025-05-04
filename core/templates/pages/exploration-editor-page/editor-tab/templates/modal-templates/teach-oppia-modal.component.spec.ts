@@ -48,7 +48,7 @@ import {AnswerClassificationService} from 'pages/exploration-player-page/service
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Teach Oppia Modal Component', () => {
