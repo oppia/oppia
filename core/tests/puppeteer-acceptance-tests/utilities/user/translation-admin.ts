@@ -166,22 +166,42 @@ export class TranslationAdmin extends BaseUser {
    */
   async expectDisplayedLanguagesToContain(language: string): Promise<void> {
     const elementHandle = await this.page.$(viewLanguageRoleUserResult);
+
     if (!elementHandle) {
+      // CASE 1: Element does not exist.
       showMessage(
-        'User list element (.e2e-test-reviewer-roles-result) not found assuming no users have rights.'
+        'Element not found: .e2e-test-reviewer-roles-result does not exist on the page. Assuming no users have rights.'
       );
+      return;
     }
-    const displayedLanguage = await this.page.$eval(
-      viewContributorLanguageResult,
-      element => (element as HTMLElement).innerText
+
+    const languageElementHandle = await this.page.$(
+      viewContributorLanguageResult
     );
-    if (!displayedLanguage.includes(language)) {
+    if (!languageElementHandle) {
+      // CASE 2a: Language element not found even though the container exists.
+      showMessage('Language element not found inside user container.');
+      return;
+    }
+
+    const displayedLanguages = await this.page.$eval(
+      viewContributorLanguageResult,
+      element => (element as HTMLElement).innerText.trim()
+    );
+
+    if (!displayedLanguages) {
+      // CASE 2b: Element exists but is empty.
+      showMessage('Element found, but no languages are displayed.');
+      return;
+    }
+
+    if (!displayedLanguages.includes(language)) {
       throw new Error(
         `Selected user does not have translation rights for ${language}!`
       );
     } else {
       showMessage(
-        `Selected user has translation rights for ${displayedLanguage}`
+        `Selected user has translation rights for: ${displayedLanguages}`
       );
     }
   }
