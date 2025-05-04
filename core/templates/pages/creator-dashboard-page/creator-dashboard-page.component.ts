@@ -270,6 +270,7 @@ export class CreatorDashboardPageComponent {
       );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
+
     this.renderer.listen('window', 'resize', () => {
       this.updatesGivenScreenWidth();
     });
@@ -283,7 +284,7 @@ export class CreatorDashboardPageComponent {
     // This function is used as a custom function to
     // sort heading in the list view. Directly assigning
     // keyvalue : 0 gives error "TypeError: The comparison function
-    // must be either a function or undefined" .
+    // must be either a function or undefined".
     return 0;
   }
 }

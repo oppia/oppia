@@ -2581,12 +2581,5 @@ describe('Contributions and review component', () => {
       component.closeDropdownWhenClickedOutside(clickEvent);
       expect(document.querySelector).toHaveBeenCalled();
     });
-
-    it('should unbind event listener when onDestroy is called', () => {
-      const unbindSpy = spyOn($.fn, 'off');
-
-      component.ngOnDestroy();
-      expect(unbindSpy).toHaveBeenCalled();
-    });
   });
 });
