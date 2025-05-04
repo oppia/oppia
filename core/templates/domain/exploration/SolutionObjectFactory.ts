@@ -27,7 +27,6 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,
   FractionAnswer,
@@ -112,7 +111,7 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer
       ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = new NumberWithUnitsObjectFactory(new UnitsObjectFactory())
+      correctAnswer = new NumberWithUnitsObjectFactory()
         .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
         .toString();
     } else if (interactionId === 'DragAndDropSortInput') {
