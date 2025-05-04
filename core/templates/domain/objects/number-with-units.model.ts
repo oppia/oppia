@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of NumberWithUnits
+ * @fileoverview Model class for creating instances of NumberWithUnits
  * domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
@@ -162,20 +160,13 @@ export class NumberWithUnits {
 
     return updatedUnits;
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class NumberWithUnitsObjectFactory {
-  constructor() {}
-  createCurrencyUnits(): void {
+  static createCurrencyUnits(): void {
     try {
       Units.createCurrencyUnits();
     } catch (parsingError) {}
   }
 
-  fromRawInputString(rawInput: string): NumberWithUnits {
+  static fromRawInputString(rawInput: string): NumberWithUnits {
     rawInput = rawInput.trim();
     let type = '';
     let real = 0.0;
@@ -332,7 +323,7 @@ export class NumberWithUnitsObjectFactory {
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
-  fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
+  static fromDict(numberWithUnitsDict: NumberWithUnitsAnswer): NumberWithUnits {
     return new NumberWithUnits(
       numberWithUnitsDict.type,
       numberWithUnitsDict.real,

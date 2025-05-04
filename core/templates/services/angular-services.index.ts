@@ -93,7 +93,6 @@ import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboa
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
@@ -720,7 +719,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
   ['NumberAttemptsService', NumberAttemptsService],
-  ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
   ['NumberWithUnitsValidationService', NumberWithUnitsValidationService],
   ['NumericExpressionInputRulesService', NumericExpressionInputRulesService],
