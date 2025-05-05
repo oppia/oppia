@@ -106,8 +106,12 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
       await loggedInUser.expectSectionExistence(
-        ['Topics available in classroom'],
+        ['Learn Something New'],
         'tabSection'
+      );
+      await loggedInUser.expectSectionExistence(
+        ["Topics available in Oppia's Classroom"],
+        'cardDisplay'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -134,6 +138,10 @@ describe('Logged-in User', function () {
         'What are the Place Values'
       );
       await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectSectionExistence(
+        ['Continue where you left off', 'Learn Something New'],
+        'tabSection'
+      );
       await loggedInUser.expectSectionExistence(
         ['Lessons in progress', 'Recommended for you'],
         'displayHeading'

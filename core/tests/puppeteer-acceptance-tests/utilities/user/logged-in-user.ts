@@ -1845,7 +1845,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies section's existence.
+   * Verifies sections' existence.
    * @param {string[]} sections - Available section headings.
    * @param {string} heading - Heading type.
    */
@@ -1859,7 +1859,7 @@ export class LoggedInUser extends BaseUser {
       case 'tabSection':
         selectedHeading = tabSectionHeading;
         break;
-      case 'displayHeading':
+      case 'cardDisplay':
         selectedHeading = cardDisplayHeading;
         break;
     }
@@ -1904,15 +1904,15 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToTopicPage(topic: string): Promise<void> {
     await this.page.waitForFunction(() => {
-      return Array.from(document.querySelectorAll(tabSectionHeading))
+      return Array.from(document.querySelectorAll(cardDisplayHeading))
         .map(h => h.textContent?.trim())
         .includes('Topics available in classroom');
     });
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
-      tabSection,
-      tabSectionHeading,
-      'Topics available in classroom'
+      cardDisplay,
+      cardDisplayHeading,
+      "Topics available in Oppia's Classroom"
     );
     const topicCardElement = await this.findElement(
       topicsAvailableInClassroomElement,
