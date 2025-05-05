@@ -185,6 +185,8 @@ const cardDisplayHeading = 'e2e-test-card-display-heading';
 const topicCard = '.e2e-test-learner-topic-summary-tile';
 const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
 const lessonCard = '.e2e-test-lesson-card';
+const lessonCardButton = '.e2e-test-lesson-card-button';
+const lessonCardTitle = '.e2e-test-lesson-card-title';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1967,6 +1969,52 @@ export class LoggedInUser extends BaseUser {
         'lessonCard',
         subsectionElement
       );
+    }
+  }
+
+  /**
+   * Verifies lesson card navigates to correct lesson.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {string} section - Overarching section.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} lessonTitle - Lesson card titles expected.
+   * @param {string} lessonId - Lesson card id expected.
+   */
+
+  async navigateToLessonFromLessonCard(
+    section: string,
+    criteria: string,
+    lessonTitle: string,
+    lessonId: string
+  ): Promise<void> {
+    if (section !== 'In Progress' && section !== 'Completed') {
+      const subsectionElement = await this.findElement(
+        this.page,
+        cardDisplay,
+        cardDisplayHeading,
+        criteria
+      );
+      const lessonCardElement = await this.findElement(
+        subsectionElement,
+        lessonCard,
+        lessonCardTitle,
+        lessonTitle
+      );
+
+      if (lessonCardElement) {
+        const lessonCardButtonElement =
+          await lessonCardElement.$(lessonCardButton);
+        if (lessonCardButtonElement) {
+          await lessonCardButtonElement.click();
+          this.expectToBeOnPage('explore');
+          const url = await this.page.url();
+          expect(url).toContain(lessonId);
+        }
+      } else {
+        throw new Error(
+          `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+        );
+      }
     }
   }
 }

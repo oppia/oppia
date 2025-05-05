@@ -13,14 +13,14 @@
   <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
     <div class="d-flex flex-column flex-grow">
       <div class="lesson-card-title-container mt-1">
-        <p class="lesson-card-title mb-0"> {{ title }} </p>
+        <p class="e2e-test-lesson-card-title lesson-card-title mb-0"> {{ title }} </p>
       </div>
       <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
       <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
-      <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
+      <a class="e2e-test-lesson-card-button align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
     </div>
