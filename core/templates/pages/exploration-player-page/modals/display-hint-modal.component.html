@@ -10,10 +10,14 @@
   </span>
 </div>
 
-<button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button ml-auto"
-        (click)="closeModal()">
-  <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
-</button>
+<!-- ✅ New container for proper alignment -->
+<div class="got-it-button-container">
+  <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
+          (click)="closeModal()">
+    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+  </button>
+</div>
+
 <span class="clearfix"></span>
 
 <style>
@@ -30,12 +34,31 @@
     word-wrap: break-word;
   }
 
-  .oppia-learner-got-it-button {
-    float: right;
-  }
-
   .modal-body {
     max-height: calc(85vh - 125px);
     overflow-y: auto;
+    padding: 0 20px;
+  }
+
+  /* ✅ Flex container for button */
+  .got-it-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px;
+  }
+
+  .oppia-learner-got-it-button {
+    background-color: #009688;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: none;
+    font-weight: 500;
+    text-transform: none;
+    cursor: pointer;
+  }
+
+  .oppia-learner-got-it-button:hover {
+    background-color: #038a7d;
   }
 </style>

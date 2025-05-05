@@ -9,9 +9,10 @@
                                [htmlData]="shortAnswerHtml.answer">
     </oppia-interaction-display>
   </span>
-  <br>
-  <br>
-  <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
+  <br><br>
+  <label>
+    <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span>
+  </label>
   <span>
     <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
                               [rteString]="solutionExplanationHtml">
@@ -19,10 +20,14 @@
   </span>
 </div>
 
-<button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button ml-auto"
-        (click)="closeModal()">
-  <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
-</button>
+<!-- ✅ Wrap button in a flex container -->
+<div class="got-it-button-container">
+  <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
+          (click)="closeModal()">
+    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+  </button>
+</div>
+
 <span class="clearfix"></span>
 
 <style>
@@ -38,7 +43,26 @@
   .oppia-learner-hint-and-solution-modal-body {
     word-wrap: break-word;
   }
+
+  /* ✅ Flex container for aligning the button */
+  .got-it-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px;
+  }
+
   .oppia-learner-got-it-button {
-    float: right;
+    background-color: #009688;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 4px;
+    border: none;
+    font-weight: 500;
+    text-transform: none;
+    cursor: pointer;
+  }
+
+  .oppia-learner-got-it-button:hover {
+    background-color: #038a7d;
   }
 </style>
