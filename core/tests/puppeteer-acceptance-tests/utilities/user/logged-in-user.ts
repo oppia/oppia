@@ -1847,11 +1847,26 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies section's existence.
    * @param {string[]} sections - Available section headings.
+   * @param {string} heading - Heading type.
    */
-  async expectSectionExistence(sections: string[]): Promise<void> {
+  async expectSectionExistence(
+    sections: string[],
+    heading: string
+  ): Promise<void> {
+    let selectedHeading = '';
+
+    switch (heading) {
+      case 'tabSection':
+        selectedHeading = tabSectionHeading;
+        break;
+      case 'displayHeading':
+        selectedHeading = cardDisplayHeading;
+        break;
+    }
+
     await this.page.waitForFunction(() => {
       return (
-        document.querySelectorAll(tabSectionHeading).length === sections.length
+        document.querySelectorAll(selectedHeading).length === sections.length
       );
     });
 

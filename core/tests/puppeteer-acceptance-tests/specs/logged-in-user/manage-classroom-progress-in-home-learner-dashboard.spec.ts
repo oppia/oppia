@@ -105,9 +105,10 @@ describe('Logged-in User', function () {
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-      await loggedInUser.expectSectionExistence([
-        'Topics available in classroom',
-      ]);
+      await loggedInUser.expectSectionExistence(
+        ['Topics available in classroom'],
+        'tabSection'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -131,6 +132,11 @@ describe('Logged-in User', function () {
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'What are the Place Values'
+      );
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectSectionExistence(
+        ['Lessons in progress', 'Recommended for you'],
+        'displayHeading'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
