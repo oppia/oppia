@@ -1884,7 +1884,33 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigate to math classroom using button in topics available in classroom.
+   * Navigate directly to topic in math classroom using topic card.
+   * @param {string} topic - Classroom topic.
+   */
+  async navigateToTopicPage(topic: string): Promise<void> {
+    const topicsAvailableInClassroomElement = await this.page.waitForSelector(
+      `${homeTabSections.topicsAvailableInClassroom.selector}`
+    );
+    const topicCardElement = await topicsAvailableInClassroomElement?.$$eval(
+      '.oppia-class-card',
+      ele =>
+        ele.find(card => {
+          const cardTitle = card
+            .querySelector('.e2e-test-learner-topic-summary-tile-title')
+            ?.textContent?.trim();
+          return cardTitle && cardTitle === topic;
+        })
+    );
+
+    if (topicCardElement) {
+      await topicCardElement.click();
+    } else {
+      throw new Error(`${topic} is not a valid topic`);
+    }
+  }
+
+  /**
+   * Navigate to math classroom using button in topics available in classroom section.
    */
   async navigateToMathClassroomPage(): Promise<void> {
     await this.page.waitForSelector('.oppia-learner-dash-button--blue');

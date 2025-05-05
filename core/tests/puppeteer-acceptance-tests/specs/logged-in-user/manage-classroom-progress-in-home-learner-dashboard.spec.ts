@@ -122,7 +122,7 @@ describe('Logged-in User', function () {
   it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
-      await loggedInUser.navigateToMathClassroomPage();
+      await loggedInUser.navigateToTopicPage('Place Values');
       await loggedInUser.expectToBeOnPage('learn/math/place-values/story');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
