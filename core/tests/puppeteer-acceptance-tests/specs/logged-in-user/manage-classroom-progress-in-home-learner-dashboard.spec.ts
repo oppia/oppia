@@ -33,7 +33,7 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
-  const chapterIds: (string | null)[] = [];
+  const chapterIds: string[] = [];
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -77,7 +77,7 @@ describe('Logged-in User', function () {
     for (const chapter of placeValueChapters) {
       const id =
         await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
-      chapterIds.push(id);
+      chapterIds.push(id ?? '');
     }
 
     await curriculumAdmin.addStoryToTopic(
@@ -155,10 +155,24 @@ describe('Logged-in User', function () {
         'Lessons in progress',
         ['Chapter 1: What are the Place Values']
       );
+
+      await loggedInUser.navigateToLessonFromLessonCard(
+        'Continue where you left off',
+        'Lessons in progress',
+        'Chapter 1: What are the Place Values',
+        chapterIds[0]
+      );
+      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectLessonCardsToBePresent(
         'Continue where you left off',
         'Recommended for you',
         ['Chapter 2: Find the Value of a Number']
+      );
+      await loggedInUser.navigateToLessonFromLessonCard(
+        'Continue where you left off',
+        'Lessons in progress',
+        'Chapter 2: Find the Value of a Number',
+        chapterIds[1]
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
