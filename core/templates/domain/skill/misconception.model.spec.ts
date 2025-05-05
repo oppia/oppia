@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for MisconceptionObjectFacfory.
+ * @fileoverview Unit tests for Misconception.
  */
 
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionBackendDict,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 
-describe('Misconception object factory', () => {
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
+describe('Misconception', () => {
   let misconceptionDict: MisconceptionBackendDict;
 
   beforeEach(() => {
-    misconceptionObjectFactory = new MisconceptionObjectFactory();
     misconceptionDict = {
       id: 1,
       name: 'test name',
@@ -38,7 +36,7 @@ describe('Misconception object factory', () => {
 
   it('should create a new misconception from dict', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.getId()).toEqual(1);
     expect(misconception.getName()).toEqual('test name');
     expect(misconception.getNotes()).toEqual('test notes');
@@ -48,12 +46,12 @@ describe('Misconception object factory', () => {
 
   it('should convert to a backend dictionary', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.toBackendDict()).toEqual(misconceptionDict);
   });
 
   it('should create a new misconception', () => {
-    const misconception = misconceptionObjectFactory.create(
+    const misconception = Misconception.create(
       1,
       'test name',
       'test notes',
@@ -69,7 +67,7 @@ describe('Misconception object factory', () => {
 
   it('should change the name from misconception object', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.getName()).toEqual('test name');
 
     misconception.setName('new name');
@@ -79,7 +77,7 @@ describe('Misconception object factory', () => {
 
   it('should change the notes from misconception object', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.getNotes()).toEqual('test notes');
 
     misconception.setNotes('new notes');
@@ -89,7 +87,7 @@ describe('Misconception object factory', () => {
 
   it('should change if a misconception object must be addressed', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.isMandatory()).toEqual(true);
 
     misconception.setMustBeAddressed(false);
@@ -99,7 +97,7 @@ describe('Misconception object factory', () => {
 
   it('should change the feedback from misconception object', () => {
     const misconception =
-      misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
+      Misconception.createFromBackendDict(misconceptionDict);
     expect(misconception.getFeedback()).toEqual('test feedback');
 
     misconception.setFeedback('new feedback');
