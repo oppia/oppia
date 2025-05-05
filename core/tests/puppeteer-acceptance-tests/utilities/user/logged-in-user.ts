@@ -178,15 +178,18 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
 const homeTabSections = {
   continueWhereYouLeftOff: {
-    title: 'Continue where you left off',
+    heading: 'Continue where you left off',
     selector: '.e2e-test-learner-dash-continue-section',
   },
   topicsAvailableInClassroom: {
-    title: 'Topics available in classroom',
+    heading: 'Topics available in classroom',
     selector: '.e2e-test-learner-dash-learn-new-section',
   },
 };
+const tabSectionHeading = '.e2e-test-learner-dash-section-heading';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
+const topicCard = '.e2e-test-learner-topic-summary-tile';
+const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1871,13 +1874,13 @@ export class LoggedInUser extends BaseUser {
     if (shouldExist) {
       expect(sectionElement).not.toBeNull();
       const sectionTitleElement = await this.page.$(
-        `${currentSection.selector} .oppia-learner-dash-section-heading`
+        `${currentSection.selector} ${tabSectionHeading}`
       );
       const sectionTitleText = await this.page.evaluate(
         el => el.innerText,
         sectionTitleElement
       );
-      expect(sectionTitleText).toBe(currentSection.title);
+      expect(sectionTitleText).toBe(currentSection.heading);
     } else {
       const nullElement = this.page.$(currentSection.selector);
       expect(nullElement).toBeNull();
@@ -1893,11 +1896,11 @@ export class LoggedInUser extends BaseUser {
       `${homeTabSections.topicsAvailableInClassroom.selector}`
     );
     const topicCardElement = await topicsAvailableInClassroomElement?.$$eval(
-      '.oppia-class-card',
+      topicCard,
       ele =>
         ele.find(card => {
           const cardTitle = card
-            .querySelector('.e2e-test-learner-topic-summary-tile-title')
+            .querySelector(topicCardTitle)
             ?.textContent?.trim();
           return cardTitle && cardTitle === topic;
         })
