@@ -118,6 +118,30 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  it(
+    'should navigate directly to the Place Values topic in the math classroom',
+    async function () {
+      await loggedInUser.navigateToMathClassroomPage();
+      await loggedInUser.expectToBeOnPage('learn/math/place-values/story');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should navigate to math classroom and start first lesson in Place Values',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToMathClassroomPage();
+      await loggedInUser.expectToBeOnPage('learn/math');
+      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.selectChapterWithinStoryToLearn(
+        "Jamie's Adventures in the Arcade",
+        'What are the Place Values'
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

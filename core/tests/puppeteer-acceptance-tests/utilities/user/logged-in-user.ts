@@ -1882,6 +1882,14 @@ export class LoggedInUser extends BaseUser {
       expect(nullElement).toBeNull();
     }
   }
+
+  /**
+   * Navigate to math classroom using button in topics available in classroom.
+   */
+  async navigateToMathClassroomPage(): Promise<void> {
+    await this.page.waitForSelector('.oppia-learner-dash-button--blue');
+    await this.clickAndWaitForNavigation('.oppia-learner-dash-button--blue');
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
