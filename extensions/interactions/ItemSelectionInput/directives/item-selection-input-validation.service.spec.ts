@@ -793,7 +793,7 @@ describe('ItemSelectionInputValidationService', () => {
   );
 
   it('should warn about duplicated rules in the same answer group', () => {
-    const answerGroups = [
+    const answerGroup = [
       AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
@@ -823,7 +823,7 @@ describe('ItemSelectionInputValidationService', () => {
     const warnings = validatorService.getAllWarnings(
       currentState,
       customizationArguments,
-      answerGroups,
+      answerGroup,
       goodDefaultOutcome
     );
     expect(warnings).toEqual([
@@ -837,7 +837,7 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should warn about duplicated rules in the different answer group', () => {
     const answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -853,7 +853,7 @@ describe('ItemSelectionInputValidationService', () => {
         [],
         null
       ),
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
