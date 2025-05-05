@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating frontend instances of
+ * @fileoverview Model class for creating frontend instances of
  * misconceptions.
  */
 
@@ -32,8 +32,6 @@ export interface TaggedMisconception {
   skillId: string;
   misconceptionId: number;
 }
-
-import {Injectable} from '@angular/core';
 
 export class Misconception {
   _id: number;
@@ -101,13 +99,8 @@ export class Misconception {
   setFeedback(newFeedback: string): void {
     this._feedback = newFeedback;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class MisconceptionObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
     misconceptionBackendDict: MisconceptionBackendDict
   ): Misconception {
     return new Misconception(
@@ -119,7 +112,7 @@ export class MisconceptionObjectFactory {
     );
   }
 
-  create(
+  static create(
     id: number,
     name: string,
     notes: string,

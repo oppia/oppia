@@ -25,6 +25,7 @@ import {
   Input,
   Output,
   EventEmitter,
+  SimpleChanges,
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
@@ -35,6 +36,7 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import {UserService} from 'services/user.service';
+import {TranslationValidationService} from 'services/translation-validation.service';
 import {ValidatorsService} from 'services/validators.service';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {AppConstants} from 'app.constants';
@@ -62,7 +64,7 @@ interface ActiveContributionDetailsDict {
   topic_name: string;
 }
 
-interface SuggestionChangeDict {
+export interface SuggestionChangeDict {
   cmd: string;
   content_html: string | string[];
   content_id: string;
@@ -72,7 +74,7 @@ interface SuggestionChangeDict {
   translation_html: string;
 }
 
-interface ActiveSuggestionDict {
+export interface ActiveSuggestionDict {
   author_name: string;
   change_cmd: SuggestionChangeDict;
   exploration_content_html: string | string[] | null;
@@ -163,6 +165,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   hasQueuedSuggestion: boolean = false;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   isUndoFeatureEnabled: boolean = false;
+  incompleteTranslationErrorIsShown: boolean = false;
+
   @Input() altTextIsDisplayed: boolean = false;
   @Output() queuedSuggestionSummaryEmit =
     new EventEmitter<PendingSuggestionDict>();
@@ -209,7 +213,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     private userService: UserService,
     private validatorsService: ValidatorsService,
     private snackBar: MatSnackBar,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private translationValidationService: TranslationValidationService
   ) {}
 
   ngOnInit(): void {
@@ -248,8 +253,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] = this.activeContribution;
-
     this.refreshActiveContributionState();
+    const translationError =
+      this.translationValidationService.validateTranslationFromHtmlStrings(
+        this.activeSuggestion.change_cmd.content_html as string,
+        this.translationHtml
+      );
+    this.incompleteTranslationErrorIsShown =
+      translationError.hasUntranslatedElements;
+
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
     // the translation is not received from the editor when the translation
@@ -370,9 +382,45 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
+  areComponentsMismatched(): boolean {
+    const translationError =
+      this.translationValidationService.validateTranslationFromHtmlStrings(
+        this.activeSuggestion.change_cmd.content_html as string,
+        this.editedContent.html
+      );
+
+    this.incompleteTranslationErrorIsShown =
+      translationError.hasUntranslatedElements;
+    return translationError.hasUntranslatedElements;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.editedContent && this.editedContent) {
+      const componentsAreMismatched = this.areComponentsMismatched();
+
+      if (!componentsAreMismatched) {
+        this.errorMessage = '';
+        this.errorFound = false;
+      }
+    }
+  }
+
+  get updateIsDisabled(): boolean {
+    return this.startedEditing && this.areComponentsMismatched();
+  }
+
   updateSuggestion(): void {
     const updatedTranslation = this.editedContent.html;
     const suggestionId = this.activeSuggestion.suggestion_id;
+
+    if (this.areComponentsMismatched()) {
+      this.errorMessage =
+        'Please ensure all components (images, math formulas, concept cards, videos) ' +
+        'in your translation match the original content.';
+      this.errorFound = true;
+      return;
+    }
+
     this.preEditTranslationHtml = this.translationHtml;
     this.translationHtml = updatedTranslation;
     this.contributionAndReviewService.updateTranslationSuggestionAsync(
@@ -637,7 +685,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         )
       );
     }
-    if (angular.isString(first) && angular.isString(second)) {
+    if (typeof first === 'string' && typeof second === 'string') {
       return this.stripWhitespace(first) === this.stripWhitespace(second);
     }
     return false;

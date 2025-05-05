@@ -16,14 +16,20 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {
   Question,
   QuestionBackendDict,
@@ -752,6 +758,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     return this.loadContributions(/* Param shouldResetOffset= */ false);
   }
 
+  @HostListener('document:click', ['$event'])
   closeDropdownWhenClickedOutside(clickEvent: {target: Node}): void {
     const dropdown = document.querySelector(
       '.oppia-contributions-dropdown-container'
@@ -943,8 +950,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         },
       },
     };
-
-    $(document).on('click', this.closeDropdownWhenClickedOutside);
   }
 
   openSnackbarWithAction(
@@ -985,6 +990,5 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    $(document).off('click', this.closeDropdownWhenClickedOutside);
   }
 }

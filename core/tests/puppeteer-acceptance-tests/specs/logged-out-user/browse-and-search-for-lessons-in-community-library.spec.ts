@@ -45,7 +45,8 @@ describe('Logged-out User', function () {
     explorationId2 =
       await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
         'Algebra II',
-        'Algorithms'
+        'Algorithms',
+        false
       );
 
     await explorationEditor.playExploration(explorationId1);
