@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   RatioExpressionInputValidationService,
   // eslint-disable-next-line max-len
@@ -42,7 +39,6 @@ describe('RatioExpressionInputValidationService', () => {
   let equals: Rule, isEquivalent: Rule;
   let hasNumberOfTermsEqualTo: Rule, hasSpecificTermEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -51,7 +47,6 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(RatioExpressionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -118,7 +113,7 @@ describe('RatioExpressionInputValidationService', () => {
       'RatioExpressionInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {

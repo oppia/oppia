@@ -65,7 +65,6 @@ import { SearchExplorationsBackendApiService } from 'domain/collection/search-ex
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
@@ -94,8 +93,6 @@ import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboa
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
@@ -471,7 +468,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MailingListBackendApiService', MailingListBackendApiService],
   ['AngularNameService', AngularNameService],
   ['AnswerClassificationService', AnswerClassificationService],
-  ['AnswerGroupObjectFactory', AnswerGroupObjectFactory],
   ['AssetsBackendApiService', AssetsBackendApiService],
   ['AttributionService', AttributionService],
   ['AudioBarStatusService', AudioBarStatusService],
@@ -723,7 +719,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
   ['NumberAttemptsService', NumberAttemptsService],
-  ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
   ['NumberWithUnitsValidationService', NumberWithUnitsValidationService],
   ['NumericExpressionInputRulesService', NumericExpressionInputRulesService],
@@ -893,7 +888,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['TrainingDataEditorPanelService', TrainingDataEditorPanelService],
   ['SortByPipe', SortByPipe],
   ['UndoRedoService', UndoRedoService],
-  ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],
   ['UserBackendApiService', UserBackendApiService],
