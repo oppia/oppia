@@ -102,7 +102,6 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
@@ -702,7 +701,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MathInteractionsService', MathInteractionsService],
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
-  ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['MobileMenuService', MobileMenuService],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['ModeratorAuthGuard', ModeratorAuthGuard],
