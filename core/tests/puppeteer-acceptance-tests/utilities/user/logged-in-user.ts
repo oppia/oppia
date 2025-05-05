@@ -1849,12 +1849,12 @@ export class LoggedInUser extends BaseUser {
    * Verifies elements' existence.
    * @param {string[]} expectedTexts - Text content expected in elements.
    * @param {string} selector - Selector type.
-   * @param {ParentNode} root - Document or element we're verifying.
+   * @param {ParentNode} root - Page or element type we're verifying.
    */
   async expectElementsToBePresent(
     expectedTexts: string[],
     selector: string,
-    root: ParentNode = document
+    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
   ): Promise<void> {
     let selectorClass = '';
 
@@ -1869,17 +1869,11 @@ export class LoggedInUser extends BaseUser {
         selectorClass = lessonCard;
         break;
     }
-
-    await this.page.waitForFunction(() => {
-      return (
-        root.querySelectorAll(selectorClass).length === expectedTexts.length
-      );
-    });
-
-    const sectionHeadingTexts = Array.from(
-      root.querySelectorAll(selectorClass)
-    ).map(el => el.textContent);
-
+    await this.page.waitForSelector(selectorClass);
+    const allElements = await root?.$$(selectorClass);
+    const sectionHeadingTexts = await Promise.all(
+      allElements.map(card => card.evaluate(el => el.textContent?.trim()))
+    );
     expect(sectionHeadingTexts).toEqual(expectedTexts);
   }
 
@@ -1949,9 +1943,16 @@ export class LoggedInUser extends BaseUser {
     await this.clickAndWaitForNavigation(classroomButton);
   }
 
+  /**
+   * Verifies lesson cards are in correct section.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {string} section - Overarching section.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   */
   async expectLessonCardsToBePresent(
     section: string,
-    subsection: string,
+    criteria: string,
     expectedTitles: string[]
   ): Promise<void> {
     if (section !== 'In Progress' && section !== 'Completed') {
@@ -1959,19 +1960,13 @@ export class LoggedInUser extends BaseUser {
         this.page,
         cardDisplay,
         cardDisplayHeading,
-        subsection
+        criteria
       );
-      const parentSubsectionNode =
-        await subsectionElement?.getProperty('parentNode');
-      const parentSubsection: HTMLElement | null | undefined =
-        await parentSubsectionNode?.jsonValue();
-      if (parentSubsection) {
-        this.expectElementsToBePresent(
-          expectedTitles,
-          'lessonCard',
-          parentSubsection
-        );
-      }
+      this.expectElementsToBePresent(
+        expectedTitles,
+        'lessonCard',
+        subsectionElement
+      );
     }
   }
 }
