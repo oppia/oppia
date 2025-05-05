@@ -36,6 +36,11 @@ var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
+let a = 0;
+function logger() {
+  console.log(a++);
+}
+
 describe('Contributor dashboard page', function () {
   const TOPIC_NAMES = ['Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
@@ -200,9 +205,11 @@ describe('Contributor dashboard page', function () {
       dummyExplorationId,
       Constants.TEST_SVG_PATH
     );
+    logger();
     await storyEditorPage.updateMetaTagContent('story meta tag');
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
+    logger();
 
     // Testing the copy tool.
     let opportunityActionButtonCss = $(
@@ -213,22 +220,34 @@ describe('Contributor dashboard page', function () {
     let cancelButton = $('.e2e-test-cancel-rich-text-editor');
 
     await contributorDashboardPage.get();
+    logger();
     await waitFor.pageToFullyLoad();
+    logger();
     await contributorDashboardPage.navigateToTranslateTextTab();
+    logger();
     await contributorDashboardTranslateTextTab.changeLanguage(GERMAN_LANGUAGE);
+    logger();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
+    logger();
     await action.click('Opportunity button', opportunityActionButtonCss);
+    logger();
     let image = $('.e2e-test-image');
+    logger();
     await waitFor.visibilityOf(image, 'Test image taking too long to appear.');
+    logger();
     let images = await $$('.e2e-test-image');
+    logger();
     expect(images.length).toEqual(1);
+    logger();
 
     // Copy tool should copy image on pressing 'Done'.
     await waitFor.visibilityOf(
       copyButton,
       'Copy button taking too long to appear'
     );
+    logger();
     await action.click('Copy button', copyButton);
+    logger();
     await action.click('Image', images[0]);
     await action.click('Done', doneButton);
     images = await $$('.e2e-test-image');
