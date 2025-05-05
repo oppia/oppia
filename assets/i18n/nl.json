@@ -313,7 +313,7 @@
 	"I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION": "Begin je leerreis met onze basislessen",
 	"I18N_CLASSROOM_NAVIGATION_LINKS_INTRO": "Begin met Oppia-klaslokalen",
 	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_HEADING": "Ken je al een beetje <[classroomName]>?",
-	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT": "Beantwoord 10 - 15 vragen om te zien waar je moet beginnen.",
+	"I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT": "Doe een korte quiz zodat u iets nieuws kan leren.",
 	"I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON": "Wij raden aan om te beginnen met de les <[firstTopic]>.",
 	"I18N_CLASSROOM_PAGE_COMING_SOON": "Binnenkort",
 	"I18N_CLASSROOM_PAGE_COURSE_DETAILS": "Cursusdetails",
