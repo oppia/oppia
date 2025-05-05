@@ -76,7 +76,7 @@ import {
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 
 describe('Exploration editor tab component', () => {
@@ -105,7 +105,6 @@ describe('Exploration editor tab component', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let alertsService: AlertsService;
 
   class MockJoyrideService {
@@ -241,7 +240,6 @@ describe('Exploration editor tab component', () => {
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
@@ -732,7 +730,7 @@ describe('Exploration editor tab component', () => {
 
     expect(component.misconceptionsBySkill).toEqual({
       skill_id1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',
@@ -743,7 +741,7 @@ describe('Exploration editor tab component', () => {
     });
     expect(stateEditorService.setMisconceptionsBySkill).toHaveBeenCalledWith({
       skill_id1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',
