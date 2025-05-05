@@ -1911,12 +1911,6 @@ export class LoggedInUser extends BaseUser {
         .map(h => h.textContent?.trim())
         .includes("Topics available in Oppia's Classroom");
     });
-    /*const learnSomethingNewElement = await this.findElement(
-      this.page,
-      tabSection,
-      tabSectionHeading,
-      'Learn Something New'
-    );*/
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
       cardDisplay,
@@ -1957,19 +1951,19 @@ export class LoggedInUser extends BaseUser {
     expectedTitles: string[],
     section: string = 'N/A'
   ): Promise<void> {
-    let currentElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
       this.page;
 
     if (section === 'In Progress' || section === 'Completed') {
-      currentElement = await this.findElement(
-        currentElement,
-        cardDisplay,
-        cardDisplayHeading,
-        criteria
+      sectionElement = await this.findElement(
+        this.page,
+        tabSection,
+        tabSectionHeading,
+        section
       );
     }
     const subsectionElement = await this.findElement(
-      currentElement,
+      sectionElement,
       cardDisplay,
       cardDisplayHeading,
       criteria
@@ -1994,20 +1988,20 @@ export class LoggedInUser extends BaseUser {
     lessonId: string,
     section: string = 'N/A'
   ): Promise<void> {
-    let currentElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
       this.page;
 
     if (section === 'In Progress' || section === 'Completed') {
-      currentElement = await this.findElement(
-        currentElement,
-        cardDisplay,
-        cardDisplayHeading,
-        criteria
+      sectionElement = await this.findElement(
+        this.page,
+        tabSection,
+        tabSectionHeading,
+        section
       );
     }
 
     const subsectionElement = await this.findElement(
-      currentElement,
+      sectionElement,
       cardDisplay,
       cardDisplayHeading,
       criteria
