@@ -143,7 +143,11 @@ describe('Logged-in User', function () {
         'tabSection'
       );
       await loggedInUser.expectElementsToBePresent(
-        ['Lessons in progress', 'Recommended for you'],
+        [
+          'Lessons in progress',
+          'Recommended for you',
+          "Topics available in Oppia's Classroom",
+        ],
         'displayHeading'
       );
     },

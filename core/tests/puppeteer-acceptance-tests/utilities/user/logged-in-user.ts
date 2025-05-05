@@ -184,6 +184,7 @@ const cardDisplayContent = 'e2e-test-card-display-content';
 const cardDisplayHeading = 'e2e-test-card-display-heading';
 const topicCard = '.e2e-test-learner-topic-summary-tile';
 const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
+const lessonCard = '.e2e-test-lesson-card';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1864,6 +1865,9 @@ export class LoggedInUser extends BaseUser {
       case 'cardDisplay':
         selectorClass = cardDisplayHeading;
         break;
+      case 'lessonCard':
+        selectorClass = lessonCard;
+        break;
     }
 
     await this.page.waitForFunction(() => {
@@ -1872,10 +1876,11 @@ export class LoggedInUser extends BaseUser {
       );
     });
 
-    const sectionHeadingElements = this.page.$$eval(tabSectionHeading, el =>
-      el.map(t => t.textContent?.trim())
-    );
-    expect(sectionHeadingElements).toEqual(expectedTexts);
+    const sectionHeadingTexts = Array.from(
+      root.querySelectorAll(selectorClass)
+    ).map(el => el.textContent);
+
+    expect(sectionHeadingTexts).toEqual(expectedTexts);
   }
 
   /**
@@ -1908,8 +1913,14 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForFunction(() => {
       return Array.from(document.querySelectorAll(cardDisplayHeading))
         .map(h => h.textContent?.trim())
-        .includes('Topics available in classroom');
+        .includes("Topics available in Oppia's Classroom");
     });
+    /*const learnSomethingNewElement = await this.findElement(
+      this.page,
+      tabSection,
+      tabSectionHeading,
+      'Learn Something New'
+    );*/
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
       cardDisplay,
@@ -1936,6 +1947,32 @@ export class LoggedInUser extends BaseUser {
   async navigateToMathClassroomPage(): Promise<void> {
     await this.page.waitForSelector(classroomButton);
     await this.clickAndWaitForNavigation(classroomButton);
+  }
+
+  async expectLessonCardsToBePresent(
+    section: string,
+    subsection: string,
+    expectedTitles: string[]
+  ): Promise<void> {
+    if (section !== 'In Progress' && section !== 'Completed') {
+      const subsectionElement = await this.findElement(
+        this.page,
+        cardDisplay,
+        cardDisplayHeading,
+        subsection
+      );
+      const parentSubsectionNode =
+        await subsectionElement?.getProperty('parentNode');
+      const parentSubsection: HTMLElement | null | undefined =
+        await parentSubsectionNode?.jsonValue();
+      if (parentSubsection) {
+        this.expectElementsToBePresent(
+          expectedTitles,
+          'lessonCard',
+          parentSubsection
+        );
+      }
+    }
   }
 }
 
