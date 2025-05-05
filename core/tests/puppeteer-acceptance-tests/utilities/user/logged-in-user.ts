@@ -179,6 +179,9 @@ const tabTitle = '.e2e-test-learner-dash-tab-title';
 const tabSection = '.e2e-test-learner-dash-section';
 const tabSectionHeading = '.e2e-test-learner-dash-section-heading';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
+const cardDisplay = 'e2e-test-card-display';
+const cardDisplayContent = 'e2e-test-card-display-content';
+const cardDisplayHeading = 'e2e-test-card-display-heading';
 const topicCard = '.e2e-test-learner-topic-summary-tile';
 const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
 
