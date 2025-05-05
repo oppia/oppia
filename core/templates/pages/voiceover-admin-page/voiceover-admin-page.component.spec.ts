@@ -171,6 +171,10 @@ describe('Voiceover Admin Page component ', () => {
       'en-US': 'en',
       'hi-IN': 'hi',
     };
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': false,
+      'hi-IN': true,
+    };
     component.languageCodesMapping = {};
     component.supportedLanguageAccentCodesToDescriptions = {};
     spyOn(

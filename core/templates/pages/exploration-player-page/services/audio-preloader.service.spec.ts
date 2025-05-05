@@ -444,6 +444,9 @@ describe('Audio preloader service', () => {
       audioPreloaderService,
       'isVoiceoverContributionWithAccentEnabled'
     ).and.returnValue(true);
+    audioPreloaderService.contentIdsToVoiceovers = {
+      content: [manualVoiceover],
+    };
 
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
