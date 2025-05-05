@@ -2759,7 +2759,7 @@ describe('Contributions and review component', () => {
     });
 
     it(
-      'should commit the queued suggestion when' + ' the snackbar is dismissed',
+      'should commit the queued suggestion when the snackbar is dismissed',
       () => {
         const commitQueuedSuggestionSpy = spyOn(
           component,
