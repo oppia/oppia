@@ -1980,7 +1980,6 @@ export class LoggedInUser extends BaseUser {
    * @param {string} lessonTitle - Lesson card titles expected.
    * @param {string} lessonId - Lesson card id expected.
    */
-
   async navigateToLessonFromLessonCard(
     section: string,
     criteria: string,

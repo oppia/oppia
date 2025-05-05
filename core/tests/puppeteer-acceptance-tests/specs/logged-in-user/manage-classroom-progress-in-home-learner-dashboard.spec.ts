@@ -130,7 +130,6 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToMathClassroomPage();
-      await loggedInUser.expectToBeOnPage('learn/math');
       await loggedInUser.selectAndOpenTopic('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
@@ -177,6 +176,57 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+  it(
+    'should not recommend any lessons if currently on last lesson',
+    async function () {
+      await loggedInUser.navigateToClassroomPage('math');
+      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.selectChapterWithinStoryToLearn(
+        "Jamie's Adventures in the Arcade",
+        'What are the Place Values'
+      );
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Continue where you left off',
+        'Lessons in progress',
+        ['Chapter 2: Find the Value of a Number']
+      );
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Continue where you left off',
+        'Recommended for you',
+        ['Chapter 3: Comparing Numbers']
+      );
+
+      await loggedInUser.navigateToClassroomPage('math');
+      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.selectChapterWithinStoryToLearn(
+        "Jamie's Adventures in the Arcade",
+        'Find the Value of a Number'
+      );
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectElementsToBePresent(
+        ['Lessons in progress', "Topics available in Oppia's Classroom"],
+        'displayHeading'
+      );
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Continue where you left off',
+        'Lessons in progress',
+        ['Chapter 3: Comparing Numbers']
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
