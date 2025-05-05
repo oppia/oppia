@@ -92,8 +92,6 @@ export class TranslationAdmin extends BaseUser {
 
     await this.waitForNetworkIdle();
 
-    // Verify that the user has the translation rights.
-    await this.viewContributionRightsForUser(username);
     await this.expectDisplayedLanguagesToContain(languageCode);
   }
 
@@ -232,9 +230,8 @@ export class TranslationAdmin extends BaseUser {
         timeout: 5000,
       });
     } catch (error) {
-      // Element didn't appear – assume no users are displayed.
-      showMessage('No users displayed — assuming user is not present.');
-      return;
+      // Element didn't appear – throw error instead of just logging a message.
+    throw new Error('No users displayed — user should not have translation rights.');
     }
 
     // If the element appeared, check if the username is among the displayed users.
