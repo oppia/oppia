@@ -33,6 +33,7 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
+  const chapterIds: (string | null)[] = [];
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -72,8 +73,6 @@ describe('Logged-in User', function () {
       'Find the Value of a Number',
       'Comparing Numbers',
     ];
-
-    const chapterIds: (string | null)[] = [];
 
     for (const chapter of placeValueChapters) {
       const id =
@@ -149,6 +148,17 @@ describe('Logged-in User', function () {
           "Topics available in Oppia's Classroom",
         ],
         'displayHeading'
+      );
+
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Continue where you left off',
+        'Lessons in progress',
+        ['Chapter 1: What are the Place Values']
+      );
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Continue where you left off',
+        'Recommended for you',
+        ['Chapter 2: Find the Value of a Number']
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
