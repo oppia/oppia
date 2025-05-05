@@ -176,16 +176,7 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
-const homeTabSections = {
-  continueWhereYouLeftOff: {
-    heading: 'Continue where you left off',
-    selector: '.e2e-test-learner-dash-continue-section',
-  },
-  topicsAvailableInClassroom: {
-    heading: 'Topics available in classroom',
-    selector: '.e2e-test-learner-dash-learn-new-section',
-  },
-};
+const tabSection = '.e2e-test-learner-dash-section';
 const tabSectionHeading = '.e2e-test-learner-dash-section-heading';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
 const topicCard = '.e2e-test-learner-topic-summary-tile';
@@ -1852,39 +1843,41 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Verifies section's existence.
-   * @param {string} tab - Tab type.
-   * @param {string} section - Section type.
-   * @param {string} shouldExist - Section should appear.
+   * @param {string[]} sections - Available section headings.
    */
-  async expectSectionExistence(
-    tab: string,
-    section: string,
-    shouldExist: boolean
-  ): Promise<void> {
-    const currentSection =
-      tab === 'home' ? homeTabSections[section] : homeTabSections[section];
+  async expectSectionExistence(sections: string[]): Promise<void> {
+    await this.page.waitForFunction(() => {
+      return (
+        document.querySelectorAll(tabSectionHeading).length === sections.length
+      );
+    });
 
-    const sectionElement = await this.page.waitForSelector(
-      currentSection.selector,
-      {
-        timeout: 5000,
-      }
+    const sectionHeadingElements = this.page.$$eval(tabSectionHeading, el =>
+      el.map(t => t.textContent?.trim())
     );
+    expect(sectionHeadingElements).toEqual(sections);
+  }
 
-    if (shouldExist) {
-      expect(sectionElement).not.toBeNull();
-      const sectionTitleElement = await this.page.$(
-        `${currentSection.selector} ${tabSectionHeading}`
-      );
-      const sectionTitleText = await this.page.evaluate(
-        el => el.innerText,
-        sectionTitleElement
-      );
-      expect(sectionTitleText).toBe(currentSection.heading);
-    } else {
-      const nullElement = this.page.$(currentSection.selector);
-      expect(nullElement).toBeNull();
-    }
+  /**
+   * Finds child element in parent by matching text values.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {string} item - Child element selector.
+   * @param {string} itemTitle - Child element title selector.
+   * @param {string} criteria - Title value to match.
+   */
+  async findElement(
+    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
+    item: string,
+    itemTitle: string,
+    criteria: string
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    const childElement = await parentElement?.$$eval(item, ele =>
+      ele.find(e => {
+        const eTitle = e.querySelector(itemTitle)?.textContent?.trim();
+        return eTitle && eTitle === criteria;
+      })
+    );
+    return childElement;
   }
 
   /**
@@ -1892,18 +1885,22 @@ export class LoggedInUser extends BaseUser {
    * @param {string} topic - Classroom topic.
    */
   async navigateToTopicPage(topic: string): Promise<void> {
-    const topicsAvailableInClassroomElement = await this.page.waitForSelector(
-      `${homeTabSections.topicsAvailableInClassroom.selector}`
+    await this.page.waitForFunction(() => {
+      return Array.from(document.querySelectorAll(tabSectionHeading))
+        .map(h => h.textContent?.trim())
+        .includes('Topics available in classroom');
+    });
+    const topicsAvailableInClassroomElement = await this.findElement(
+      this.page,
+      tabSection,
+      tabSectionHeading,
+      'Topics available in classroom'
     );
-    const topicCardElement = await topicsAvailableInClassroomElement?.$$eval(
+    const topicCardElement = await this.findElement(
+      topicsAvailableInClassroomElement,
       topicCard,
-      ele =>
-        ele.find(card => {
-          const cardTitle = card
-            .querySelector(topicCardTitle)
-            ?.textContent?.trim();
-          return cardTitle && cardTitle === topic;
-        })
+      topicCardTitle,
+      topic
     );
 
     if (topicCardElement) {

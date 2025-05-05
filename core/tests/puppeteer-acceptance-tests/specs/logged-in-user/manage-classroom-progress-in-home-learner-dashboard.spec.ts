@@ -105,16 +105,9 @@ describe('Logged-in User', function () {
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-      await loggedInUser.expectSectionExistence(
-        'home',
-        'continueWhereYouLeftOff',
-        false
-      );
-      await loggedInUser.expectSectionExistence(
-        'home',
-        'topicsAvailableInClassroom',
-        true
-      );
+      await loggedInUser.expectSectionExistence([
+        'Topics available in classroom',
+      ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
