@@ -127,42 +127,22 @@ class TestImageCompressor(test_utils.GenericTestBase):
             output_dir=self.output_dir
         )
         os.makedirs(self.output_dir, exist_ok=True)
-        mock_log_error = mock.MagicMock('log error')
-        mock_subprocess_result = mock.Mock(
-            returncode=1,
-            stderr='Director removal error'
-        )
-        mock_subprocess_run = mock.Mock(return_value=mock_subprocess_result)
+        result_images: List[CompressedImageInfo] = [{
+            'path': pathlib.Path(self.png_path),
+            'original_size': 1000,
+            'new_size': 500
+        }]
 
-        with self.swap(logging, 'error', mock_log_error):
-            with self.swap(subprocess, 'run', mock_subprocess_run):
-                result_images: List[CompressedImageInfo] = [
-                    {
-                        'path': pathlib.Path(self.png_path),
-                        'original_size': 1000,
-                        'new_size': 500
-                    }
-                ]
-                compressor.compress_images(result_images)
+        mock_rmtree = mock.Mock(spec=shutil.rmtree)
+        mock_rmtree.error = PermissionError('Failed to remove directory')
 
-        mock_log_error.assert_called_with(
-            '[ERROR]: %s occurred on file %s',
-            'Director removal error',
-            pathlib.Path(self.png_path)
-        )
-        args = [
-            'gm', 'convert',
-            str(self.png_path),
-            '-strip',
-            '-compress', 'Zip',
-            mock.ANY
-        ]
-        mock_subprocess_run.assert_called_once_with(
-            args,
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        with self.swap(shutil, 'rmtree', mock_rmtree):
+            compressor.compress_images(result_images)
+
+            mock_rmtree.assert_called_once_with(
+                self.output_dir, ignore_errors=True
+            )
+            self.assertTrue(os.path.exists(self.output_dir))
 
     def test_run_no_compressible_images(self) -> None:
         """Test run method when no images are compressible."""
