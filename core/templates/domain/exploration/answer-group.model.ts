@@ -13,18 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of AnswerGroup
+ * @fileoverview Moedel class for creating new frontend instances of AnswerGroup
  * domain objects.
  */
 
-import {Injectable} from '@angular/core';
-
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {
-  Outcome,
-  OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {Rule, RuleBackendDict} from 'domain/exploration/rule.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
@@ -73,15 +67,8 @@ export class AnswerGroup extends BaseTranslatableObject {
       tagged_skill_misconception_id: this.taggedSkillMisconceptionId,
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AnswerGroupObjectFactory {
-  constructor(private outcomeObjectFactory: OutcomeObjectFactory) {}
-
-  generateRulesFromBackendDict(
+  static generateRulesFromBackendDict(
     ruleBackendDicts: RuleBackendDict[],
     interactionId: string
   ): Rule[] {
@@ -90,7 +77,7 @@ export class AnswerGroupObjectFactory {
     );
   }
 
-  createNew(
+  static createNew(
     rules: Rule[],
     outcome: Outcome,
     trainingData: readonly InteractionAnswer[],
@@ -104,7 +91,7 @@ export class AnswerGroupObjectFactory {
     );
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
     answerGroupBackendDict: AnswerGroupBackendDict,
     interactionId: string
   ): AnswerGroup {
@@ -113,9 +100,7 @@ export class AnswerGroupObjectFactory {
         answerGroupBackendDict.rule_specs,
         interactionId
       ),
-      this.outcomeObjectFactory.createFromBackendDict(
-        answerGroupBackendDict.outcome
-      ),
+      Outcome.createFromBackendDict(answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,
       answerGroupBackendDict.tagged_skill_misconception_id
     );
