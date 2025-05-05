@@ -149,26 +149,20 @@ describe('Logged-in User', function () {
         'displayHeading'
       );
 
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Continue where you left off',
-        'Lessons in progress',
-        ['Chapter 1: What are the Place Values']
-      );
+      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
+        'Chapter 1: What are the Place Values',
+      ]);
 
       await loggedInUser.navigateToLessonFromLessonCard(
-        'Continue where you left off',
         'Lessons in progress',
         'Chapter 1: What are the Place Values',
         chapterIds[0]
       );
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Continue where you left off',
-        'Recommended for you',
-        ['Chapter 2: Find the Value of a Number']
-      );
+      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
+        'Chapter 2: Find the Value of a Number',
+      ]);
       await loggedInUser.navigateToLessonFromLessonCard(
-        'Continue where you left off',
         'Lessons in progress',
         'Chapter 2: Find the Value of a Number',
         chapterIds[1]
@@ -191,16 +185,12 @@ describe('Logged-in User', function () {
       );
 
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Continue where you left off',
-        'Lessons in progress',
-        ['Chapter 2: Find the Value of a Number']
-      );
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Continue where you left off',
-        'Recommended for you',
-        ['Chapter 3: Comparing Numbers']
-      );
+      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
+        'Chapter 2: Find the Value of a Number',
+      ]);
+      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
+        'Chapter 3: Comparing Numbers',
+      ]);
 
       await loggedInUser.navigateToClassroomPage('math');
       await loggedInUser.selectAndOpenTopic('Place Values');
@@ -218,11 +208,9 @@ describe('Logged-in User', function () {
         ['Lessons in progress', "Topics available in Oppia's Classroom"],
         'displayHeading'
       );
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Continue where you left off',
-        'Lessons in progress',
-        ['Chapter 3: Comparing Numbers']
-      );
+      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
+        'Chapter 3: Comparing Numbers',
+      ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

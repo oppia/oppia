@@ -1948,72 +1948,90 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies lesson cards are in correct section.
    * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {string} section - Overarching section.
    * @param {string} criteria - Subsection title value to match.
    * @param {string[]} expectedTitles - Lesson card titles expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
   async expectLessonCardsToBePresent(
-    section: string,
     criteria: string,
-    expectedTitles: string[]
+    expectedTitles: string[],
+    section: string = 'N/A'
   ): Promise<void> {
-    if (section !== 'In Progress' && section !== 'Completed') {
-      const subsectionElement = await this.findElement(
-        this.page,
+    let currentElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+
+    if (section === 'In Progress' || section === 'Completed') {
+      currentElement = await this.findElement(
+        currentElement,
         cardDisplay,
         cardDisplayHeading,
         criteria
       );
-      this.expectElementsToBePresent(
-        expectedTitles,
-        'lessonCard',
-        subsectionElement
-      );
     }
+    const subsectionElement = await this.findElement(
+      currentElement,
+      cardDisplay,
+      cardDisplayHeading,
+      criteria
+    );
+    this.expectElementsToBePresent(
+      expectedTitles,
+      'lessonCard',
+      subsectionElement
+    );
   }
 
   /**
    * Verifies lesson card navigates to correct lesson.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {string} section - Overarching section.
    * @param {string} criteria - Subsection title value to match.
    * @param {string} lessonTitle - Lesson card titles expected.
    * @param {string} lessonId - Lesson card id expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
   async navigateToLessonFromLessonCard(
-    section: string,
     criteria: string,
     lessonTitle: string,
-    lessonId: string
+    lessonId: string,
+    section: string = 'N/A'
   ): Promise<void> {
-    if (section !== 'In Progress' && section !== 'Completed') {
-      const subsectionElement = await this.findElement(
-        this.page,
+    let currentElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+
+    if (section === 'In Progress' || section === 'Completed') {
+      currentElement = await this.findElement(
+        currentElement,
         cardDisplay,
         cardDisplayHeading,
         criteria
       );
-      const lessonCardElement = await this.findElement(
-        subsectionElement,
-        lessonCard,
-        lessonCardTitle,
-        lessonTitle
-      );
+    }
 
-      if (lessonCardElement) {
-        const lessonCardButtonElement =
-          await lessonCardElement.$(lessonCardButton);
-        if (lessonCardButtonElement) {
-          await lessonCardButtonElement.click();
-          this.expectToBeOnPage('explore');
-          const url = await this.page.url();
-          expect(url).toContain(lessonId);
-        }
-      } else {
-        throw new Error(
-          `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
-        );
+    const subsectionElement = await this.findElement(
+      currentElement,
+      cardDisplay,
+      cardDisplayHeading,
+      criteria
+    );
+    const lessonCardElement = await this.findElement(
+      subsectionElement,
+      lessonCard,
+      lessonCardTitle,
+      lessonTitle
+    );
+
+    if (lessonCardElement) {
+      const lessonCardButtonElement =
+        await lessonCardElement.$(lessonCardButton);
+      if (lessonCardButtonElement) {
+        await lessonCardButtonElement.click();
+        this.expectToBeOnPage('explore');
+        const url = await this.page.url();
+        expect(url).toContain(lessonId);
       }
+    } else {
+      throw new Error(
+        `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
     }
   }
 }
