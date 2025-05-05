@@ -86,14 +86,6 @@
         "fontsPath": "webfonts"
       }
     },
-    "angularUiLeaflet": {
-      "version": "1.0.3",
-      "downloadFormat": "files",
-      "url": "https://raw.githubusercontent.com/angular-ui/ui-leaflet/v1.0.3/dist",
-      "rootDirPrefix": "angular-ui-leaflet-",
-      "targetDirPrefix": "angular-ui-leaflet-",
-      "files": ["ui-leaflet.min.no-header.js"]
-    },
     "angular-simple-logger": {
       "version": "0.1.7",
       "downloadFormat": "files",
