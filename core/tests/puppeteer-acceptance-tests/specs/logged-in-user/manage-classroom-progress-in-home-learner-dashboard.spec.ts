@@ -105,11 +105,11 @@ describe('Logged-in User', function () {
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-      await loggedInUser.expectSectionExistence(
+      await loggedInUser.expectElementsToBePresent(
         ['Learn Something New'],
         'tabSection'
       );
-      await loggedInUser.expectSectionExistence(
+      await loggedInUser.expectElementsToBePresent(
         ["Topics available in Oppia's Classroom"],
         'cardDisplay'
       );
@@ -138,11 +138,11 @@ describe('Logged-in User', function () {
         'What are the Place Values'
       );
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectSectionExistence(
+      await loggedInUser.expectElementsToBePresent(
         ['Continue where you left off', 'Learn Something New'],
         'tabSection'
       );
-      await loggedInUser.expectSectionExistence(
+      await loggedInUser.expectElementsToBePresent(
         ['Lessons in progress', 'Recommended for you'],
         'displayHeading'
       );

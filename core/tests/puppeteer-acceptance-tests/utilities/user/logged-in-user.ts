@@ -1845,35 +1845,37 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies sections' existence.
-   * @param {string[]} sections - Available section headings.
-   * @param {string} heading - Heading type.
+   * Verifies elements' existence.
+   * @param {string[]} expectedTexts - Text content expected in elements.
+   * @param {string} selector - Selector type.
+   * @param {ParentNode} root - Document or element we're verifying.
    */
-  async expectSectionExistence(
-    sections: string[],
-    heading: string
+  async expectElementsToBePresent(
+    expectedTexts: string[],
+    selector: string,
+    root: ParentNode = document
   ): Promise<void> {
-    let selectedHeading = '';
+    let selectorClass = '';
 
-    switch (heading) {
+    switch (selector) {
       case 'tabSection':
-        selectedHeading = tabSectionHeading;
+        selectorClass = tabSectionHeading;
         break;
       case 'cardDisplay':
-        selectedHeading = cardDisplayHeading;
+        selectorClass = cardDisplayHeading;
         break;
     }
 
     await this.page.waitForFunction(() => {
       return (
-        document.querySelectorAll(selectedHeading).length === sections.length
+        root.querySelectorAll(selectorClass).length === expectedTexts.length
       );
     });
 
     const sectionHeadingElements = this.page.$$eval(tabSectionHeading, el =>
       el.map(t => t.textContent?.trim())
     );
-    expect(sectionHeadingElements).toEqual(sections);
+    expect(sectionHeadingElements).toEqual(expectedTexts);
   }
 
   /**
