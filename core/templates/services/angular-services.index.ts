@@ -92,7 +92,6 @@ import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboa
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
@@ -102,7 +101,6 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { ConceptCardBackendApiService } from 'domain/skill/concept-card-backend-api.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
@@ -699,7 +697,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MathInteractionsService', MathInteractionsService],
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
-  ['MisconceptionObjectFactory', MisconceptionObjectFactory],
   ['MobileMenuService', MobileMenuService],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['ModeratorAuthGuard', ModeratorAuthGuard],
@@ -716,7 +713,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
   ['NumberAttemptsService', NumberAttemptsService],
-  ['NumberWithUnitsObjectFactory', NumberWithUnitsObjectFactory],
   ['NumberWithUnitsRulesService', NumberWithUnitsRulesService],
   ['NumberWithUnitsValidationService', NumberWithUnitsValidationService],
   ['NumericExpressionInputRulesService', NumericExpressionInputRulesService],

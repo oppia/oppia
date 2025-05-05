@@ -26,7 +26,7 @@ import {
   Warning,
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {NumberWithUnitsCustomizationArgs} from 'interactions/customization-args-defs';
 import {Rule} from 'domain/exploration/rule.model';
@@ -36,10 +36,7 @@ import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
   providedIn: 'root',
 })
 export class NumberWithUnitsValidationService {
-  constructor(
-    private unitObjectFactory: NumberWithUnitsObjectFactory,
-    private baseInteraction: BaseInteractionValidationService
-  ) {}
+  constructor(private baseInteraction: BaseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
     customizationArgs: NumberWithUnitsCustomizationArgs
@@ -60,26 +57,24 @@ export class NumberWithUnitsValidationService {
     );
 
     try {
-      this.unitObjectFactory.createCurrencyUnits();
+      NumberWithUnits.createCurrencyUnits();
     } catch (parsingError) {}
 
     var checkEquality = (earlierRule: Rule, laterRule: Rule) => {
-      var answer = this.unitObjectFactory.fromDict(
+      var answer = NumberWithUnits.fromDict(
         earlierRule.inputs.f as NumberWithUnitsAnswer
       );
-      var inputs = this.unitObjectFactory.fromDict(
+      var inputs = NumberWithUnits.fromDict(
         laterRule.inputs.f as NumberWithUnitsAnswer
       );
 
       var answerString = answer.toMathjsCompatibleString();
       var inputsString = inputs.toMathjsCompatibleString();
 
-      var answerList = this.unitObjectFactory
-        .fromRawInputString(answerString)
-        .toDict();
-      var inputsList = this.unitObjectFactory
-        .fromRawInputString(inputsString)
-        .toDict();
+      var answerList =
+        NumberWithUnits.fromRawInputString(answerString).toDict();
+      var inputsList =
+        NumberWithUnits.fromRawInputString(inputsString).toDict();
       return (
         JSON.stringify(answerList).toLowerCase() ===
         JSON.stringify(inputsList).toLowerCase()
@@ -87,10 +82,10 @@ export class NumberWithUnitsValidationService {
     };
 
     var checkEquivalency = (earlierRule: Rule, laterRule: Rule) => {
-      var earlierInput = this.unitObjectFactory.fromDict(
+      var earlierInput = NumberWithUnits.fromDict(
         earlierRule.inputs.f as NumberWithUnitsAnswer
       );
-      var laterInput = this.unitObjectFactory.fromDict(
+      var laterInput = NumberWithUnits.fromDict(
         laterRule.inputs.f as NumberWithUnitsAnswer
       );
       if (earlierInput.type === 'fraction') {

@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component} from '@angular/core';
+import {Component, Renderer2, ElementRef} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -117,7 +117,9 @@ export class LibraryPageComponent {
     private classroomBackendApiService: ClassroomBackendApiService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private renderer: Renderer2,
+    private el: ElementRef
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -152,10 +154,15 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    $('.oppia-library-carousel').css({
-      'max-width':
-        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px',
-    });
+    let maxWidth =
+      this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px';
+    let carouselElem = this.el.nativeElement.querySelector(
+      '.oppia-library-carousel'
+    );
+
+    if (carouselElem) {
+      this.renderer.setStyle(carouselElem, 'max-width', maxWidth);
+    }
 
     // The following determines whether to enable left scroll after
     // resize.
