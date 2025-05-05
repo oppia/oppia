@@ -186,6 +186,7 @@ const homeTabSections = {
     selector: '.e2e-test-learner-dash-learn-new-section',
   },
 };
+const classroomButton = '.e2e-test-learner-dash-classroom-button';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1913,8 +1914,8 @@ export class LoggedInUser extends BaseUser {
    * Navigate to math classroom using button in topics available in classroom section.
    */
   async navigateToMathClassroomPage(): Promise<void> {
-    await this.page.waitForSelector('.oppia-learner-dash-button--blue');
-    await this.clickAndWaitForNavigation('.oppia-learner-dash-button--blue');
+    await this.page.waitForSelector(classroomButton);
+    await this.clickAndWaitForNavigation(classroomButton);
   }
 }
 
