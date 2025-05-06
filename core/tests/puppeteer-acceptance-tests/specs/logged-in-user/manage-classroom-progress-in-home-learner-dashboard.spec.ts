@@ -106,10 +106,10 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-      /*await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresent(
         ['Learn Something New'],
         'tabSection'
-      );*/
+      );
       await loggedInUser.expectElementsToBePresent(
         ["Topics available in Oppia's Classroom"],
         'cardDisplay'
@@ -118,12 +118,11 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  /*it(
+  it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTopicPage('Place Values');
-      await loggedInUser.expectToBeOnPage('learn/math/place-values/story');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -216,7 +215,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );*/
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

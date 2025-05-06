@@ -176,8 +176,6 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
-const tabSection = '.e2e-test-learner-dash-section';
-const tabSectionHeading = '.e2e-test-learner-dash-section-heading';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
 
 const learnerDashSelectors = {
@@ -199,14 +197,6 @@ const learnerDashSelectors = {
     button: '.e2e-test-lesson-card-button',
   },
 };
-const cardDisplay = '.e2e-test-card-display';
-const cardDisplayContent = '.e2e-test-card-display-content';
-const cardDisplayHeading = '.e2e-test-card-display-heading';
-const topicCard = '.e2e-test-learner-topic-summary-tile';
-const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
-const lessonCard = '.e2e-test-lesson-card';
-const lessonCardButton = '.e2e-test-lesson-card-button';
-const lessonCardTitle = '.e2e-test-lesson-card-title';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1865,7 +1855,6 @@ export class LoggedInUser extends BaseUser {
     }
 
     expect(tabTitleText).toBe(expectedTabTitleText);
-    showMessage('Landing UI is correct.');
   }
 
   /**
@@ -1885,7 +1874,6 @@ export class LoggedInUser extends BaseUser {
       allElements.map(card => card.evaluate(el => el.textContent?.trim()))
     );
     expect(sectionHeadingTexts).toEqual(expectedTexts);
-    showMessage('Lessons are present');
   }
 
   /**
@@ -1920,7 +1908,7 @@ export class LoggedInUser extends BaseUser {
           .includes("Topics available in Oppia's Classroom");
       },
       {},
-      cardDisplayHeading
+      learnerDashSelectors.cardDisplay.heading
     );
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
@@ -1935,6 +1923,10 @@ export class LoggedInUser extends BaseUser {
 
     if (topicCardElement) {
       await topicCardElement.click();
+      this.expectToBeOnPage(
+        `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}/story`
+      );
+      showMessage(`Navigated to ${topic} from learner dashboard`);
     } else {
       throw new Error(`${topic} is not a valid topic`);
     }
@@ -2019,8 +2011,9 @@ export class LoggedInUser extends BaseUser {
     );
 
     if (lessonCardElement) {
-      const lessonCardButtonElement =
-        await lessonCardElement.$(lessonCardButton);
+      const lessonCardButtonElement = await lessonCardElement.$(
+        learnerDashSelectors.lessonCard.button
+      );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
         this.expectToBeOnPage('explore');
