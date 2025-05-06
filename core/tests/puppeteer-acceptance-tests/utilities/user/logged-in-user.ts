@@ -1906,7 +1906,7 @@ export class LoggedInUser extends BaseUser {
    * Navigate directly to topic in math classroom using topic card.
    * @param {string} topic - Classroom topic.
    */
-  async navigateToTopicPageByCards(topic: string): Promise<void> {
+  async navigateToTopicPageByCard(topic: string): Promise<void> {
     await this.page.waitForFunction(
       c => {
         return Array.from(document.querySelectorAll(c))

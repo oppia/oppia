@@ -133,7 +133,7 @@ describe('Logged-in User', function () {
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToTopicPageByCards('Place Values');
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );*/
