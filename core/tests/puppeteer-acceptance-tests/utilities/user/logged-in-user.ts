@@ -177,7 +177,8 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
-
+const cardDisplay = '.e2e-test-card-display';
+const cardDisplayHeading = '.e2e-test-card-display-heading';
 const learnerDashSelectors = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -1887,13 +1888,15 @@ export class LoggedInUser extends BaseUser {
     selectors: {[key: string]: string},
     criteria: string
   ): Promise<puppeteer.ElementHandle | undefined> {
-    const childElement = await parentElement?.$$eval(selectors.content, ele =>
-      ele.find(e => {
-        const eTitle = e.querySelector(selectors.heading)?.textContent?.trim();
-        return eTitle && eTitle === criteria;
-      })
-    );
-    return childElement;
+    const allElements = await parentElement?.$$(selectors.content);
+    const targetElement = await allElements?.find(async h => {
+      const targetHeadingElement = await h.$(selectors.heading);
+      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
+        ele.textContent?.trim()
+      );
+      return targetHeadingText === criteria;
+    });
+    return targetElement;
   }
 
   /**
@@ -1910,11 +1913,13 @@ export class LoggedInUser extends BaseUser {
       {},
       learnerDashSelectors.cardDisplay.heading
     );
+
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
       learnerDashSelectors.cardDisplay,
       "Topics available in Oppia's Classroom"
     );
+
     const topicCardElement = await this.findElement(
       topicsAvailableInClassroomElement,
       learnerDashSelectors.topicCard,
@@ -1923,10 +1928,10 @@ export class LoggedInUser extends BaseUser {
 
     if (topicCardElement) {
       await topicCardElement.click();
-      this.expectToBeOnPage(
+      await this.expectToBeOnPage(
         `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}/story`
       );
-      showMessage(`Navigated to ${topic} from learner dashboard`);
+      showMessage(`Navigated to ${topic} from learner dashboard.`);
     } else {
       throw new Error(`${topic} is not a valid topic`);
     }
@@ -1938,6 +1943,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToMathClassroomPage(): Promise<void> {
     await this.page.waitForSelector(classroomButton);
     await this.clickAndWaitForNavigation(classroomButton);
+    await this.expectToBeOnPage('learn/math/');
+    showMessage('Navigated to math classroom from learner dashboard.');
   }
 
   /**
@@ -2019,6 +2026,7 @@ export class LoggedInUser extends BaseUser {
         this.expectToBeOnPage('explore');
         const url = await this.page.url();
         expect(url).toContain(lessonId);
+        showMessage(`Navigated to ${lessonTitle} from learner dashboard.`);
       }
     } else {
       throw new Error(

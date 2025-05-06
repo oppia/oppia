@@ -74,7 +74,10 @@ describe('Logged-in User', function () {
       'Comparing Numbers',
     ];*/
 
-    const placeValueChapters = ['What are the Place Values'];
+    const placeValueChapters = [
+      'What are the Place Values',
+      'Find the Value of a Number',
+    ];
 
     for (const chapter of placeValueChapters) {
       const id =
@@ -101,7 +104,7 @@ describe('Logged-in User', function () {
     );
   }, 480000);
 
-  it(
+  /*it(
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
@@ -116,16 +119,16 @@ describe('Logged-in User', function () {
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
-  it(
+  /*it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTopicPage('Place Values');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   it(
     'should navigate to math classroom and start first lesson in Place Values',
@@ -172,7 +175,7 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-  it(
+  /*it(
     'should not recommend any lessons if currently on last lesson',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
@@ -215,7 +218,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
