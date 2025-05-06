@@ -25,7 +25,7 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {Fraction} from 'domain/objects/fraction.model';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
   DragAndDropAnswer,
@@ -111,9 +111,9 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer
       ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = new NumberWithUnitsObjectFactory()
-        .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
-        .toString();
+      correctAnswer = NumberWithUnits.fromDict(
+        this.correctAnswer as NumberWithUnitsAnswer
+      ).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
       const subtitledHtmlChoices = (
