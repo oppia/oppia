@@ -1949,16 +1949,22 @@ export class LoggedInUser extends BaseUser {
     classroom: string
   ): Promise<void> {
     await this.page.waitForSelector(classroomButton);
+    let targetHref = '';
     const allClassroomButtonElements = await this.page.$$(classroomButton);
     for (const buttonElement of allClassroomButtonElements) {
       const buttonHref = await buttonElement.evaluate(ele =>
         ele.getAttribute('href')
       );
       if (buttonHref?.includes(classroom)) {
+        targetHref = buttonHref;
         await buttonElement.click();
         await this.expectToBeOnPage(`learn/${classroom}/`);
         showMessage('Navigated to math classroom from learner dashboard.');
+        break;
       }
+    }
+    if (!targetHref) {
+      throw new Error(`${classroom} is not a valid classroom`);
     }
   }
 
