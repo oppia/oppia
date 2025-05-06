@@ -24,7 +24,7 @@ import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-t
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 
 @Component({
