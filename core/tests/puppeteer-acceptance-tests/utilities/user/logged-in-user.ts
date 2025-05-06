@@ -1873,7 +1873,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(learnerDashSelectors[selector].heading);
     const allElements = await root?.$$(learnerDashSelectors[selector].heading);
     const sectionHeadingTexts = await Promise.all(
-      allElements.map(card => card.evaluate(el => el.textContent?.trim()))
+      allElements.map(
+        async card => await card.evaluate(el => el.textContent?.trim())
+      )
     );
     expect(sectionHeadingTexts).toEqual(expectedTexts);
   }
@@ -1943,7 +1945,9 @@ export class LoggedInUser extends BaseUser {
    * Currently there is only math.
    * @param {string} classroom - Classroom.
    */
-  async navigateToMathClassroomPage(classroom: string): Promise<void> {
+  async navigateToClassroomFromLearnerDashboard(
+    classroom: string
+  ): Promise<void> {
     await this.page.waitForSelector(classroomButton);
     const allClassroomButtonElements = await this.page.$$(classroomButton);
     for (const buttonElement of allClassroomButtonElements) {
