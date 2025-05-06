@@ -203,7 +203,7 @@ def process_superscript_in_text(
             while i < len(text) and text[i] in superscript_digits:
                 number += superscript_digits[text[i]]
                 i += 1
-            result += '^' + number
+            result += '^%s' % str(number)
             continue
         result += char
         i += 1
