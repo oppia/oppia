@@ -121,6 +121,14 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );*/
 
+  it(
+    'should navigate directly to math classroom',
+    async function () {
+      await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   /*it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
@@ -131,7 +139,7 @@ describe('Logged-in User', function () {
   );*/
 
   it(
-    'should navigate to math classroom and start first lesson in Place Values',
+    'should display in-progress and recommended lessons after starting a lesson',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToMathClassroomPage();

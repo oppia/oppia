@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
+import {all} from 'q';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -1938,13 +1939,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigate to math classroom using button in topics available in classroom section.
+   * Navigate to any classroom using button in topics available in classroom section.
+   * Currently there is only math.
+   * @param {string} classroom - Classroom.
    */
-  async navigateToMathClassroomPage(): Promise<void> {
+  async navigateToMathClassroomPage(classroom: string): Promise<void> {
     await this.page.waitForSelector(classroomButton);
-    await this.clickAndWaitForNavigation(classroomButton);
-    await this.expectToBeOnPage('learn/math/');
-    showMessage('Navigated to math classroom from learner dashboard.');
+    const allClassroomButtonElements = await this.page.$$(classroomButton);
+    for (const buttonElement of allClassroomButtonElements) {
+      const buttonHref = await buttonElement.evaluate(ele =>
+        ele.getAttribute('href')
+      );
+      if (buttonHref?.includes(classroom)) {
+        await buttonElement.click();
+        await this.expectToBeOnPage(`learn/${classroom}/`);
+        showMessage('Navigated to math classroom from learner dashboard.');
+      }
+    }
   }
 
   /**
