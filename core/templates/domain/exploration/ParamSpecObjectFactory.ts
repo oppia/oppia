@@ -20,9 +20,8 @@
 import {Injectable} from '@angular/core';
 
 import {
-  ParamType,
-  ParamTypeObjectFactory,
-} from 'domain/exploration/ParamTypeObjectFactory';
+  ParamType
+} from 'domain/exploration/param-type-object.model';
 
 export interface ParamSpecBackendDict {
   obj_type: string;
@@ -56,7 +55,7 @@ export class ParamSpec {
   providedIn: 'root',
 })
 export class ParamSpecObjectFactory {
-  constructor(private paramTypeObjectFactory: ParamTypeObjectFactory) {}
+  constructor(private pt: ParamType) {}
   /**
    * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
    *    backend.
@@ -64,7 +63,7 @@ export class ParamSpecObjectFactory {
    */
   createFromBackendDict(paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
     return new ParamSpec(
-      this.paramTypeObjectFactory.getTypeFromBackendName(
+      this.pt.getTypeFromBackendName(
         paramSpecBackendDict.obj_type
       )
     );
@@ -72,6 +71,6 @@ export class ParamSpecObjectFactory {
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
   createDefault(): ParamSpec {
-    return new ParamSpec(this.paramTypeObjectFactory.getDefaultType());
+    return new ParamSpec(this.pt.getDefaultType());
   }
 }

@@ -16,16 +16,13 @@
  * @fileoverview Description of this file.
  */
 
-import {
-  ParamTypeObjectFactory,
-  ParamType,
-} from 'domain/exploration/ParamTypeObjectFactory';
+import { ParamType } from 'domain/exploration/param-type-object.model';
 
 describe('ParamType objects', () => {
-  let paramType: ParamTypeObjectFactory;
+  let paramType: ParamType;
 
   beforeEach(() => {
-    paramType = new ParamTypeObjectFactory();
+    paramType = new ParamType();
   });
 
   it('should have its registry frozen', () => {

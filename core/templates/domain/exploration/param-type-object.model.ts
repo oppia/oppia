@@ -13,13 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamType
- * domain objects.
+ * @fileoverview Model class for creating new frontend instances of ParamType.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-
-import {Injectable} from '@angular/core';
 
 interface TypeDefinitionObject {
   validate: (arg0: Object) => boolean;
@@ -67,38 +64,7 @@ export class ParamType {
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
-  /** @returns {Object} - A valid default value for this particular type. */
-  createDefaultValue(): Object {
-    return cloneDeep(this.defaultValue);
-  }
-
-  /** @returns {String} - The display-name of this type. */
-  getName(): string {
-    return this._name;
-  }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamTypeObjectFactory {
-  constructor() {
-    // To finalize type registration, we encode the name of each type into their
-    // definition, then freeze them from modifications.
-    Object.keys(this.registry).forEach((paramTypeName: string) => {
-      // The bracket notation is needed since 'paramTypeName' is a dynamic
-      // property and is not defined on 'registry'.
-      /* eslint-disable-next-line dot-notation */
-      var paramType = this.registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    // Finally, we freeze the registry itself.
-    Object.freeze(this.registry);
-  }
   // Type registration.
-
   /** @type {Object.<String, ParamType>} */
   registry: RegistryType = {
     UnicodeString: new ParamType({
@@ -108,6 +74,16 @@ export class ParamTypeObjectFactory {
       default_value: '',
     }),
   };
+
+  /** @returns {Object} - A valid default value for this particular type. */
+  createDefaultValue(): Object {
+    return cloneDeep(this.defaultValue);
+  }
+
+  /** @returns {String} - The display-name of this type. */
+  getName(): string {
+    return this._name;
+  }
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
   getDefaultType(): ParamType {

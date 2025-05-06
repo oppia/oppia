@@ -19,21 +19,14 @@
 import {TestBed} from '@angular/core/testing';
 
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
-import {
-  ParamTypeObjectFactory,
-  ParamType,
-} from 'domain/exploration/ParamTypeObjectFactory';
+import {ParamType} from 'domain/exploration/param-type-object.model';
 
 describe('Param Spec Object Factory', () => {
   let psof: ParamSpecObjectFactory;
-  let ptof: ParamTypeObjectFactory;
   let paramType: ParamType;
 
   beforeEach(() => {
     psof = TestBed.inject(ParamSpecObjectFactory);
-    ptof = TestBed.inject(ParamTypeObjectFactory);
-
-    paramType = ptof.getDefaultType();
   });
 
   it('should create a param spec object from backend dict', () => {
@@ -48,7 +41,7 @@ describe('Param Spec Object Factory', () => {
   });
 
   it('should create a param spec objec from a non default type', () => {
-    const paramType = ptof.getTypeFromBackendName('UnicodeString');
+    const paramType = ParamType.getTypeFromBackendName('UnicodeString');
     const paramSpecObject = psof.createFromBackendDict({
       obj_type: 'UnicodeString',
     });
