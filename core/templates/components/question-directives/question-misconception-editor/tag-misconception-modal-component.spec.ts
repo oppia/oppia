@@ -22,9 +22,9 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 
 class MockActiveModal {
@@ -43,7 +43,6 @@ describe('Tag Misconception Modal Component', () => {
   let ngbActiveModal: NgbActiveModal;
   let stateEditorService: StateEditorService;
 
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
 
   beforeEach(waitForAsync(() => {
@@ -66,27 +65,10 @@ describe('Tag Misconception Modal Component', () => {
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     stateEditorService = TestBed.inject(StateEditorService);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     mockMisconceptionObject = {
-      abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-      ],
-      def: [
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          true
-        ),
-      ],
+      abc: [Misconception.create(1, 'misc1', 'notes1', 'feedback1', true)],
+      def: [Misconception.create(2, 'misc2', 'notes2', 'feedback1', true)],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
       return mockMisconceptionObject;

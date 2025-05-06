@@ -41,7 +41,6 @@ import {
 } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AudioBarStatusService} from 'services/audio-bar-status.service';
 import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -169,7 +168,6 @@ import {
 } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
 import {MessengerService} from 'services/messenger.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
 import {
   MultipleChoiceInputRulesService,
   // eslint-disable-next-line max-len
@@ -195,7 +193,6 @@ import {
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {NumericInputRulesService} from 'interactions/NumericInput/directives/numeric-input-rules.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {NumberWithUnitsRulesService} from 'interactions/NumberWithUnits/directives/number-with-units-rules.service';
 import {
   NumberWithUnitsValidationService,
@@ -209,7 +206,6 @@ import {
   NumericExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
 import {PageTitleService} from 'services/page-title.service';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
@@ -335,7 +331,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserBackendApiService} from 'services/user-backend-api.service';
@@ -445,8 +440,6 @@ export class UpgradedServices {
         upgradedServices['AlgebraicExpressionInputRulesService']
       );
     upgradedServices['Meta'] = new Meta({});
-    upgradedServices['MisconceptionObjectFactory'] =
-      new MisconceptionObjectFactory();
     upgradedServices['MultipleChoiceInputRulesService'] =
       new MultipleChoiceInputRulesService();
     upgradedServices['MusicPhrasePlayerService'] =
@@ -487,7 +480,6 @@ export class UpgradedServices {
       new TopicsAndSkillsDashboardPageService(
         upgradedServices['PlatformFeatureService']
       );
-    upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
@@ -600,18 +592,12 @@ export class UpgradedServices {
       new NumericInputValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['NumberWithUnitsObjectFactory'] =
-      new NumberWithUnitsObjectFactory(upgradedServices['UnitsObjectFactory']);
     upgradedServices['NumericExpressionInputValidationService'] =
       new NumericExpressionInputValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
     upgradedServices['NumberWithUnitsRulesService'] =
-      new NumberWithUnitsRulesService(
-        upgradedServices['UnitsObjectFactory'],
-        upgradedServices['UtilsService']
-      );
-    upgradedServices['OutcomeObjectFactory'] = new OutcomeObjectFactory();
+      new NumberWithUnitsRulesService(upgradedServices['UtilsService']);
     upgradedServices['PageTitleService'] = new PageTitleService(
       upgradedServices['Meta'],
       upgradedServices['Title']
@@ -633,7 +619,6 @@ export class UpgradedServices {
     upgradedServices['ResponsesService'] = new ResponsesService(
       upgradedServices['AlertsService'],
       upgradedServices['LoggerService'],
-      upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SolutionValidityService'],
       upgradedServices['SolutionVerificationService'],
       upgradedServices['StateCustomizationArgsService'],
@@ -697,9 +682,6 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService(
       upgradedServices['HttpXhrBackend']
     );
-    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory']
-    );
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(upgradedServices['HtmlEscaperService']);
     upgradedServices['AutogeneratedAudioPlayerService'] =
@@ -749,7 +731,6 @@ export class UpgradedServices {
     );
     upgradedServices['NumberWithUnitsValidationService'] =
       new NumberWithUnitsValidationService(
-        upgradedServices['NumberWithUnitsObjectFactory'],
         upgradedServices['BaseInteractionValidationService']
       );
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
@@ -1000,7 +981,6 @@ export class UpgradedServices {
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['SkillObjectFactory'] = new SkillObjectFactory(
-      upgradedServices['MisconceptionObjectFactory'],
       upgradedServices['ValidatorsService']
     );
     upgradedServices['SkillRightsBackendApiService'] =
@@ -1158,9 +1138,7 @@ export class UpgradedServices {
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['AnswerGroupObjectFactory'],
       upgradedServices['SolutionObjectFactory'],
-      upgradedServices['OutcomeObjectFactory'],
       upgradedServices['SubtitledUnicodeObjectFactory']
     );
 
