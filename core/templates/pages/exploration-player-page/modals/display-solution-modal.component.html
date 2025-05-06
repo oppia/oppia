@@ -9,10 +9,9 @@
                                [htmlData]="shortAnswerHtml.answer">
     </oppia-interaction-display>
   </span>
-  <br><br>
-  <label>
-    <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span>
-  </label>
+  <br>
+  <br>
+  <label><span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span></label>
   <span>
     <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
                               [rteString]="solutionExplanationHtml">
@@ -20,20 +19,18 @@
   </span>
 </div>
 
-<!-- ✅ Wrap button in a flex container -->
-<div class="got-it-button-container">
+<div class="oppia-learner-solution-container">
   <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
           (click)="closeModal()">
     <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
   </button>
 </div>
-
 <span class="clearfix"></span>
 
 <style>
   .oppia-learner-hint-and-solution-modal-title {
     color: #00786d;
-    font-family: 'Capriola', Roboto, arial, sans-serif;
+    font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
     font-size: 1.75em;
     font-weight: bold;
     padding-top: 20px;
@@ -44,25 +41,43 @@
     word-wrap: break-word;
   }
 
-  /* ✅ Flex container for aligning the button */
-  .got-it-button-container {
+  .modal-body {
+    padding: 0 20px;
+  }
+
+  .oppia-learner-solution-container {
     display: flex;
     justify-content: flex-end;
     padding: 16px 20px;
   }
 
-  .oppia-learner-got-it-button {
-    background-color: #009688;
+  .mat-button.oppia-learner-got-it-button {
+    background-color: #00786d;
     color: white;
-    padding: 8px 20px;
-    border-radius: 4px;
-    border: none;
+    height: 35px;
+    padding: 6px 12px;
+    border-radius: 1px !important;
+    border: none !important;
     font-weight: 500;
     text-transform: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    outline: none !important;
+    box-shadow: none !important;
   }
 
-  .oppia-learner-got-it-button:hover {
-    background-color: #038a7d;
+  .mat-button.oppia-learner-got-it-button:hover {
+    background-color: #00655a;
+  }
+
+  .mat-button.oppia-learner-got-it-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .clearfix {
+    clear: both;
   }
 </style>

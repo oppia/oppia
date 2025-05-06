@@ -19,57 +19,69 @@
 </div>
 <span class="clearfix"></span>
 
-
 <style>
   .oppia-learner-solution-interstitial-modal-title {
-  color: #00786d;
-  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
-  font-size: 1.75em;
-  font-weight: bold;
-  padding-top: 20px;
-  text-align: center;
-}
+    color: #00786d;
+    font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+    font-size: 1.75em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
 
-.oppia-learner-solution-interstitial-modal-body {
-  word-wrap: break-word;
-}
+  .oppia-learner-solution-interstitial-modal-body {
+    word-wrap: break-word;
+  }
 
-.oppia-learner-solution-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 15px; /* Ensures space between the buttons */
-}
+  .oppia-learner-solution-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 16px 20px;
+  }
 
-.mat-button.oppia-modal-cancel-button {
-  background: #9a9a9a;
-  color: #fff;
-  height: 35px;
-  padding: 6px 12px;
-  display: inline-flex; /* Ensures that the button text stays centered */
-  align-items: center; /* Vertically centers text */
-}
+  .mat-button.oppia-modal-cancel-button {
+    background: #9a9a9a;
+    color: #fff;
+    height: 35px;
+    padding: 6px 12px;
+    border-radius: 1px !important;
+    border: none !important;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    outline: none !important;
+    box-shadow: none !important;
+  }
 
-.mat-button.oppia-modal-cancel-button:focus,
-.mat-button.oppia-modal-cancel-button:hover {
-  background: #7a7a7a;
-}
+  .mat-button.oppia-modal-cancel-button:focus,
+  .mat-button.oppia-modal-cancel-button:hover {
+    background: #7a7a7a;
+  }
 
-.mat-button.oppia-learner-got-it-button {
-  background: #00786d;
-  color: #fff;
-  height: 35px;
-  padding: 6px 12px;
-  display: inline-flex;
-  align-items: center; /* Vertically centers text */
-}
+  .mat-button.oppia-learner-got-it-button {
+    background: #00786d;
+    color: #fff;
+    height: 35px;
+    padding: 6px 12px;
+    border-radius: 1px !important;
+    border: none !important;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    outline: none !important;
+    box-shadow: none !important;
+  }
 
-.mat-button.oppia-learner-got-it-button:focus,
-.mat-button.oppia-learner-got-it-button:hover {
-  background: #00655a;
-}
+  .mat-button.oppia-learner-got-it-button:focus,
+  .mat-button.oppia-learner-got-it-button:hover {
+    background: #00655a;
+  }
 
-.clearfix {
-  clear: both;
-}
+  .clearfix {
+    clear: both;
+  }
 </style>
