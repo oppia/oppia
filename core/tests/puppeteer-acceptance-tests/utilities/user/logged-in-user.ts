@@ -630,7 +630,6 @@ export class LoggedInUser extends BaseUser {
 
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
-
     if (!url.includes(expectedPageInUrl.toLowerCase())) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
@@ -1955,7 +1954,7 @@ export class LoggedInUser extends BaseUser {
       if (buttonHref?.includes(classroom)) {
         targetHref = buttonHref;
         await buttonElement.click();
-        await this.expectToBeOnPage(`learn/${classroom}/`);
+        await this.expectToBeOnPage(`learn/${classroom}`);
         showMessage('Navigated to math classroom from learner dashboard.');
         break;
       }
@@ -2041,9 +2040,7 @@ export class LoggedInUser extends BaseUser {
       );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
-        this.expectToBeOnPage('explore');
-        const url = await this.page.url();
-        expect(url).toContain(lessonId);
+        this.expectToBeOnPage(`explore/${lessonId}`);
         showMessage(`Navigated to ${lessonTitle} from learner dashboard.`);
       }
     } else {

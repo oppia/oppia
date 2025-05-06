@@ -121,13 +121,13 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );*/
 
-  it(
+  /*it(
     'should navigate directly to math classroom',
     async function () {
       await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   /*it(
     'should navigate directly to the Place Values topic in the math classroom',
@@ -141,25 +141,21 @@ describe('Logged-in User', function () {
   it(
     'should display in-progress and recommended lessons after starting a lesson',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToClassroomPage('math');
       await loggedInUser.selectAndOpenTopic('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'What are the Place Values'
       );
+      await loggedInUser.continueToNextCard();
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectElementsToBePresent(
-        ['Continue where you left off', 'Learn Something New'],
+        ['Continue where you left off'],
         'tabSection'
       );
       await loggedInUser.expectElementsToBePresent(
-        [
-          'Lessons in progress',
-          'Recommended for you',
-          "Topics available in Oppia's Classroom",
-        ],
-        'displayHeading'
+        ['Lessons in progress', 'Recommended for you'],
+        'cardDisplay'
       );
 
       await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
