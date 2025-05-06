@@ -18,25 +18,26 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.domain import caching_domain
+from typing import Dict, List, Optional
 
 import redis
-from typing import Dict, List, Optional
+
+from core import feconf
+from core.domain import caching_domain
 
 # Redis client for our own implementation of caching.
 OPPIA_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
-    decode_responses=True
+    decode_responses=True,
 )
 
 # Redis client for the Cloud NDB cache.
 CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
 )
 
 
@@ -54,7 +55,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
-        redis_full_profile['keys.count']
+        redis_full_profile['keys.count'],
     )
 
     return memory_stats

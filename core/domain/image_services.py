@@ -19,9 +19,9 @@
 from __future__ import annotations
 
 import io
+from typing import Tuple
 
 from PIL import Image
-from typing import Tuple
 
 
 def _get_pil_image_dimensions(pil_image: Image.Image) -> Tuple[int, int]:
@@ -67,7 +67,8 @@ def compress_image(image_content: bytes, scaling_factor: float) -> bytes:
     if scaling_factor > 1 or scaling_factor <= 0:
         raise ValueError(
             'Scaling factor should be in the interval (0, 1], received %f.'
-            % scaling_factor)
+            % scaling_factor
+        )
     image = Image.open(io.BytesIO(image_content))
 
     image_format = image.format

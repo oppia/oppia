@@ -20,15 +20,14 @@ from __future__ import annotations
 
 import importlib
 import os
+from typing import Dict, List
 
 from core import feconf
 from core.platform import models
 from extensions.issues import base
 
-from typing import Dict, List
-
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])

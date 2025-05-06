@@ -20,14 +20,13 @@ from __future__ import annotations
 
 import os
 import textwrap
+from typing import Dict, Tuple, Union
 from unittest import mock
 
 from core import feconf
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
-
-from typing import Dict, Tuple, Union
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -41,14 +40,15 @@ class EmailTests(test_utils.GenericTestBase):
         super().setUp()
         self.swapped_request = lambda *args: args
         self.swap_api_key_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None)
+            secrets_services, 'get_secret', None
+        )
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
             lambda _: 'key',
             expected_args=[
                 ('MAILGUN_API_KEY',),
-            ]
+            ],
         )
 
     @mock.patch('requests.post')
@@ -76,7 +76,7 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_emails,
                 subject,
                 plaintext_body,
-                html_body
+                html_body,
             )
 
         expected_data = {
@@ -85,7 +85,7 @@ class EmailTests(test_utils.GenericTestBase):
             'text': plaintext_body,
             'html': html_body,
             'to': recipient_emails[0],
-            'recipient_variables': {}
+            'recipient_variables': {},
         }
 
         mock_post.assert_called_once_with(
@@ -93,13 +93,14 @@ class EmailTests(test_utils.GenericTestBase):
             auth=('api', 'key'),
             data=expected_data,
             files=attachments,
-            timeout=mailgun_email_services.TIMEOUT_SECS
+            timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertTrue(resp)
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_file_attachments(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 200
         mock_post.return_value = mock_response
@@ -124,7 +125,7 @@ class EmailTests(test_utils.GenericTestBase):
                 subject,
                 plaintext_body,
                 html_body,
-                attachments=attachments
+                attachments=attachments,
             )
 
         mock_post.assert_called_once()
@@ -143,7 +144,8 @@ class EmailTests(test_utils.GenericTestBase):
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipient(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         # Test sending email with single bcc and single recipient email.
         mock_response = mock.Mock()
         mock_response.status_code = 200
@@ -155,7 +157,8 @@ class EmailTests(test_utils.GenericTestBase):
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@b.com': {'first': 'Bob', 'id': 1}}
+            'b@b.com': {'first': 'Bob', 'id': 1}
+        }
         bcc = ['c@example.com']
         reply_to = 'abc'
         attachments = None
@@ -171,7 +174,8 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body,
                 bcc,
                 reply_to,
-                recipient_variables)
+                recipient_variables,
+            )
 
         expected_data = {
             'from': sender_email,
@@ -189,13 +193,14 @@ class EmailTests(test_utils.GenericTestBase):
             auth=('api', 'key'),
             data=expected_data,
             files=attachments,
-            timeout=mailgun_email_services.TIMEOUT_SECS
+            timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertTrue(resp)
 
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipients(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         # Test sending email with single bcc, and multiple recipient emails
         # differentiated by recipient_variables ids.
         mock_response = mock.Mock()
@@ -208,7 +213,8 @@ class EmailTests(test_utils.GenericTestBase):
         plaintext_body = 'plaintext_body 😂'
         html_body = 'Hi abc,<br> 😂'
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
-            'b@example.com': {'first': 'Bob', 'id': 1}}
+            'b@example.com': {'first': 'Bob', 'id': 1}
+        }
         bcc = ['c@example.com', 'd@example.com']
         reply_to = 'abc'
         attachments = None
@@ -224,7 +230,7 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body,
                 bcc,
                 reply_to,
-                recipient_variables
+                recipient_variables,
             )
 
         expected_data = {
@@ -243,7 +249,7 @@ class EmailTests(test_utils.GenericTestBase):
             auth=('api', 'key'),
             data=expected_data,
             files=attachments,
-            timeout=mailgun_email_services.TIMEOUT_SECS
+            timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertTrue(resp)
 
@@ -269,7 +275,7 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_emails,
                 subject,
                 plaintext_body,
-                html_body
+                html_body,
             )
 
         expected_data = {
@@ -278,7 +284,7 @@ class EmailTests(test_utils.GenericTestBase):
             'text': plaintext_body,
             'html': html_body,
             'to': recipient_emails,
-            'recipient_variables': {}
+            'recipient_variables': {},
         }
 
         mock_post.assert_called_once_with(
@@ -286,7 +292,7 @@ class EmailTests(test_utils.GenericTestBase):
             auth=('api', 'key'),
             data=expected_data,
             files=attachments,
-            timeout=mailgun_email_services.TIMEOUT_SECS
+            timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertTrue(resp)
 
@@ -312,11 +318,14 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """)
+            """
+        )
         mailgun_exception = self.assertRaisesRegex(
-            Exception, (
+            Exception,
+            (
                 'Mailgun API key is not available. Here is the email that '
-                'failed sending: %s' % msg_body)
+                'failed sending: %s' % msg_body
+            ),
         )
         with self.swap_api_key_secrets_return_none, mailgun_exception:
             with self.capture_logging() as logs:
@@ -325,10 +334,11 @@ class EmailTests(test_utils.GenericTestBase):
                     ['b@b.com', 'c@c.com', 'd@d.com'],
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
-                    'Hi abc,<br> 😂')
+                    'Hi abc,<br> 😂',
+                )
                 self.assertIn(
                     'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
-                    logs
+                    logs,
                 )
 
     def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
@@ -350,11 +360,14 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """)
+            """
+        )
         mailgun_exception = self.assertRaisesRegex(
-            Exception, (
+            Exception,
+            (
                 'Mailgun domain name is not set. Here is the email that '
-                'failed sending: %s' % msg_body)
+                'failed sending: %s' % msg_body
+            ),
         )
         with self.swap_api_key_secrets_return_secret, mailgun_exception:
             with self.capture_logging() as logs:
@@ -363,15 +376,17 @@ class EmailTests(test_utils.GenericTestBase):
                     ['b@b.com', 'c@c.com', 'd@d.com'],
                     'Hola 😂 - invitation to collaborate',
                     'plaintext_body 😂',
-                    'Hi abc,<br> 😂')
+                    'Hi abc,<br> 😂',
+                )
                 self.assertIn(
                     'Cloud Secret Manager is not able to get MAILGUN_API_KEY.',
-                    logs
+                    logs,
                 )
 
     @mock.patch('requests.post')
     def test_invalid_status_code_returns_false(
-            self, mock_post: mock.Mock) -> None:
+        self, mock_post: mock.Mock
+    ) -> None:
         mock_response = mock.Mock()
         mock_response.status_code = 500
         mock_post.return_value = mock_response
@@ -391,7 +406,7 @@ class EmailTests(test_utils.GenericTestBase):
                 recipient_emails,
                 subject,
                 plaintext_body,
-                html_body
+                html_body,
             )
 
         expected_data = {
@@ -400,7 +415,7 @@ class EmailTests(test_utils.GenericTestBase):
             'text': plaintext_body,
             'html': html_body,
             'to': recipient_emails,
-            'recipient_variables': {}
+            'recipient_variables': {},
         }
 
         mock_post.assert_called_once_with(
@@ -408,6 +423,6 @@ class EmailTests(test_utils.GenericTestBase):
             auth=('api', 'key'),
             data=expected_data,
             files=attachments,
-            timeout=mailgun_email_services.TIMEOUT_SECS
+            timeout=mailgun_email_services.TIMEOUT_SECS,
         )
         self.assertFalse(resp)

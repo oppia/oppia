@@ -18,35 +18,37 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core import feconf
+from typing import Dict, List, Sequence, Type
+
+from core import feature_flag_list, feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    state_domain,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import manual_voice_artist_name_job
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Sequence, Type
-
 MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import voiceover_models
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models, voiceover_models
 
-(voiceover_models, exp_models) = models.Registry.import_models([
-    models.Names.VOICEOVER, models.Names.EXPLORATION])
+(voiceover_models, exp_models) = models.Registry.import_models(
+    [models.Names.VOICEOVER, models.Names.EXPLORATION]
+)
 
 
 class VoiceArtistMetadataModelsTestsBaseClass(
-    job_test_utils.JobTestBase, test_utils.GenericTestBase):
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
 
     EDITOR_EMAIL_1 = 'editor1@example.com'
     EDITOR_EMAIL_2 = 'editor2@example.com'
@@ -76,12 +78,15 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.set_curriculum_admins([
-            self.EDITOR_USERNAME_1,
-            self.EDITOR_USERNAME_2,
-            self.EDITOR_USERNAME_3,
-            self.EDITOR_USERNAME_4,
-            self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins(
+            [
+                self.EDITOR_USERNAME_1,
+                self.EDITOR_USERNAME_2,
+                self.EDITOR_USERNAME_3,
+                self.EDITOR_USERNAME_4,
+                self.CURRICULUM_ADMIN_USERNAME,
+            ]
+        )
 
         self.editor_id_1 = self.get_user_id_from_email(self.EDITOR_EMAIL_1)
         self.editor_id_2 = self.get_user_id_from_email(self.EDITOR_EMAIL_2)
@@ -94,43 +99,43 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
-            'duration_secs': 42.43
+            'duration_secs': 42.43,
         }
         self.voiceover_dict_2: state_domain.VoiceoverDict = {
             'filename': 'filename2.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
-            'duration_secs': 40
+            'duration_secs': 40,
         }
         self.voiceover_dict_3: state_domain.VoiceoverDict = {
             'filename': 'filename3.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
-            'duration_secs': 20
+            'duration_secs': 20,
         }
         self.voiceover_dict_4: state_domain.VoiceoverDict = {
             'filename': 'filename4.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
-            'duration_secs': 20
+            'duration_secs': 20,
         }
         self.voiceover_dict_5: state_domain.VoiceoverDict = {
             'filename': 'filename5.mp3',
             'file_size_bytes': 5000,
             'needs_update': False,
-            'duration_secs': 42.43
+            'duration_secs': 42.43,
         }
         self.voiceover_dict_6: state_domain.VoiceoverDict = {
             'filename': 'filename6.mp3',
             'file_size_bytes': 1000,
             'needs_update': False,
-            'duration_secs': 25
+            'duration_secs': 25,
         }
         self.voiceover_dict_7: state_domain.VoiceoverDict = {
             'filename': 'filename7.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
-            'duration_secs': 42.43
+            'duration_secs': 42.43,
         }
 
     def _create_curated_explorations(self) -> None:
@@ -148,118 +153,151 @@ class VoiceArtistMetadataModelsTestsBaseClass(
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_1
-                },
+                'content_0': {'en': self.voiceover_dict_1},
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
+        old_voiceover_dict: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
+            }
+        }
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
                 }
-            }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Translation commits',
+        )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {
                     'en': self.voiceover_dict_1,
-                    'hi': self.voiceover_dict_2
+                    'hi': self.voiceover_dict_2,
                 },
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_1
-                },
+                'content_0': {'en': self.voiceover_dict_1},
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_2, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits2')
+            self.editor_id_2,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Translation commits2',
+        )
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                }
+            )
+        ]
 
         exp_services.update_exploration(
-            self.owner_id, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Added new interaction')
+            self.owner_id,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Added new interaction',
+        )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {
                     'en': self.voiceover_dict_1,
-                    'hi': self.voiceover_dict_2
+                    'hi': self.voiceover_dict_2,
                 },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_3
-                },
-                'default_outcome_1': {}
+                'ca_placeholder_2': {'en': self.voiceover_dict_3},
+                'default_outcome_1': {},
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
                 'content_0': {
                     'en': self.voiceover_dict_1,
-                    'hi': self.voiceover_dict_2
+                    'hi': self.voiceover_dict_2,
                 },
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits3')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Translation commits3',
+        )
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm')
+            self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm'
+        )
         topic_1.thumbnail_filename = 'thumbnail.svg'
         topic_1.thumbnail_bg_color = '#C6DCDA'
         topic_1.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-url')]
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url',
+            )
+        ]
         topic_1.next_subtopic_id = 2
         topic_1.skill_ids_for_diagnostic_test = ['skill_id_1']
 
@@ -267,27 +305,44 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         story_1 = story_domain.Story.create_default_story(
-            self.STORY_ID_1, 'A story', 'Description', self.TOPIC_ID_1,
-            'story-two')
+            self.STORY_ID_1,
+            'A story',
+            'Description',
+            self.TOPIC_ID_1,
+            'story-two',
+        )
         story_services.save_new_story(self.owner_id, story_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
 
         story_services.update_story(
-            self.owner_id, self.STORY_ID_1, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': self.CURATED_EXPLORATION_ID_1
-            })], 'Changes.')
+            self.owner_id,
+            self.STORY_ID_1,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_1',
+                        'title': 'Node1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': self.CURATED_EXPLORATION_ID_1,
+                    }
+                ),
+            ],
+            'Changes.',
+        )
 
         exploration_2 = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_2,
@@ -301,108 +356,116 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {},
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
                 'content_0': {},
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_2,
-            change_list, 'Translation commits')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_2,
+            change_list,
+            'Translation commits',
+        )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_5
-                },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'content_0': {'en': self.voiceover_dict_5},
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
                 'content_0': {},
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_3, self.CURATED_EXPLORATION_ID_2,
-            change_list, 'Translation commits')
+            self.editor_id_3,
+            self.CURATED_EXPLORATION_ID_2,
+            change_list,
+            'Translation commits',
+        )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {
                     'en': self.voiceover_dict_6,
                 },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
         old_voiceover_dict = {
             'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_6
-                },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'content_0': {'en': self.voiceover_dict_6},
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_4, self.CURATED_EXPLORATION_ID_2,
-            change_list, 'Translation commits2')
+            self.editor_id_4,
+            self.CURATED_EXPLORATION_ID_2,
+            change_list,
+            'Translation commits2',
+        )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {
                     'en': self.voiceover_dict_6,
                 },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
                 'default_outcome_1': {
                     'en': self.voiceover_dict_7,
-                }
+                },
             }
         }
         old_voiceover_dict = {
@@ -410,33 +473,46 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'content_0': {
                     'en': self.voiceover_dict_6,
                 },
-                'ca_placeholder_2': {
-                    'en': self.voiceover_dict_4
-                },
-                'default_outcome_1': {}
+                'ca_placeholder_2': {'en': self.voiceover_dict_4},
+                'default_outcome_1': {},
             }
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_2,
-            change_list, 'Translation commits2')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_2,
+            change_list,
+            'Translation commits2',
+        )
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_2, 'topic2', 'abbrev-top', 'description', 'fragmem')
+            self.TOPIC_ID_2, 'topic2', 'abbrev-top', 'description', 'fragmem'
+        )
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_2.subtopics = [
             topic_domain.Subtopic(
-                1, 'Title subtopic', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-url-sub')]
+                1,
+                'Title subtopic',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url-sub',
+            )
+        ]
         topic_2.next_subtopic_id = 2
         topic_2.skill_ids_for_diagnostic_test = ['skill_id_1']
 
@@ -444,27 +520,44 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
 
         story_2 = story_domain.Story.create_default_story(
-            self.STORY_ID_2, 'The second story', 'Description second',
-            self.TOPIC_ID_2, 'story-three')
+            self.STORY_ID_2,
+            'The second story',
+            'Description second',
+            self.TOPIC_ID_2,
+            'story-three',
+        )
         story_services.save_new_story(self.owner_id, story_2)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
+            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
+            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id
+        )
 
         story_services.update_story(
-            self.owner_id, self.STORY_ID_2, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
-                'node_id': 'node_1',
-                'title': 'Node1',
-            }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
-                'node_id': 'node_1',
-                'old_value': None,
-                'new_value': self.CURATED_EXPLORATION_ID_2
-            })], 'Changes.')
+            self.owner_id,
+            self.STORY_ID_2,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_1',
+                        'title': 'Node1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': self.CURATED_EXPLORATION_ID_2,
+                    }
+                ),
+            ],
+            'Changes.',
+        )
 
     def _create_non_curated_exploration(self) -> None:
         """The method generates a non curated exploration."""
@@ -479,20 +572,21 @@ class VoiceArtistMetadataModelsTestsBaseClass(
 
 
 class CreateExplorationVoiceArtistLinkModelsJobTests(
-    VoiceArtistMetadataModelsTestsBaseClass):
+    VoiceArtistMetadataModelsTestsBaseClass
+):
 
     JOB_CLASS: Type[
         manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob
-    ] = (
-        manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob
-    )
+    ] = manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -552,26 +646,30 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
             self.CURATED_EXPLORATION_ID_1: {
                 'content_0': {
                     'en': [self.editor_id_1, self.voiceover_dict_1],
-                    'hi': [self.editor_id_2, self.voiceover_dict_2]
+                    'hi': [self.editor_id_2, self.voiceover_dict_2],
                 },
                 'ca_placeholder_2': {
                     'en': [self.editor_id_1, self.voiceover_dict_3]
-                }
+                },
             },
             self.CURATED_EXPLORATION_ID_2: {
                 'content_0': {
@@ -582,36 +680,38 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 },
                 'default_outcome_1': {
                     'en': [self.editor_id_1, self.voiceover_dict_7],
-                }
-            }
+                },
+            },
         }
 
         exploration_voice_artist_link_models: Sequence[
-            voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-                voiceover_models.ExplorationVoiceArtistsLinkModel.
-                get_all().fetch()
-            )
+            voiceover_models.ExplorationVoiceArtistsLinkModel
+        ] = voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
 
         for exp_link_model in exploration_voice_artist_link_models:
             exp_id = exp_link_model.id
             content_id_to_voiceovers_mapping = (
-                exp_link_model.content_id_to_voiceovers_mapping)
+                exp_link_model.content_id_to_voiceovers_mapping
+            )
 
             expected_content_id_voiceovers_mapping = (
-                expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id])
+                expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id]
+            )
 
             self.assertDictEqual(
                 content_id_to_voiceovers_mapping,
-                expected_content_id_voiceovers_mapping
+                expected_content_id_voiceovers_mapping,
             )
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_should_skip_voiceover_if_specific_snapshot_model_is_invalid(
-        self
+        self,
     ) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -624,10 +724,13 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         snapshot_model_id: str = 'exp_id_abcde-4'
         snapshot_model: exp_models.ExplorationSnapshotContentModel = (
             exp_models.ExplorationSnapshotContentModel.get_by_id(
-                snapshot_model_id))
+                snapshot_model_id
+            )
+        )
         # Deleting recorded voiceovers field to make this snapshot invalid.
-        del snapshot_model.content['states'][
-            'Introduction']['recorded_voiceovers']['voiceovers_mapping']
+        del snapshot_model.content['states']['Introduction'][
+            'recorded_voiceovers'
+        ]['voiceovers_mapping']
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
@@ -682,22 +785,26 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
             self.CURATED_EXPLORATION_ID_1: {
                 'content_0': {
                     'en': [self.editor_id_1, self.voiceover_dict_1],
-                    'hi': [self.editor_id_2, self.voiceover_dict_2]
+                    'hi': [self.editor_id_2, self.voiceover_dict_2],
                 }
             },
             self.CURATED_EXPLORATION_ID_2: {
@@ -709,45 +816,46 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 },
                 'default_outcome_1': {
                     'en': [self.editor_id_1, self.voiceover_dict_7],
-                }
-            }
+                },
+            },
         }
 
         exploration_voice_artist_link_models: Sequence[
-            voiceover_models.ExplorationVoiceArtistsLinkModel] = (
-                voiceover_models.ExplorationVoiceArtistsLinkModel.
-                get_all().fetch()
-            )
+            voiceover_models.ExplorationVoiceArtistsLinkModel
+        ] = voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
 
         for exp_link_model in exploration_voice_artist_link_models:
             exp_id = exp_link_model.id
             content_id_to_voiceovers_mapping = (
-                exp_link_model.content_id_to_voiceovers_mapping)
+                exp_link_model.content_id_to_voiceovers_mapping
+            )
 
             expected_content_id_voiceovers_mapping = (
-                expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id])
+                expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id]
+            )
 
             self.assertDictEqual(
                 content_id_to_voiceovers_mapping,
-                expected_content_id_voiceovers_mapping
+                expected_content_id_voiceovers_mapping,
             )
 
 
 class AuditVoiceArtistMetadataModelsJobTests(
-    VoiceArtistMetadataModelsTestsBaseClass):
+    VoiceArtistMetadataModelsTestsBaseClass
+):
 
     JOB_CLASS: Type[
         manual_voice_artist_name_job.AuditExplorationVoiceArtistLinkModelsJob
-    ] = (
-        manual_voice_artist_name_job.AuditExplorationVoiceArtistLinkModelsJob
-    )
+    ] = manual_voice_artist_name_job.AuditExplorationVoiceArtistLinkModelsJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_non_curated_exploration()
@@ -806,28 +914,35 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
         total_exploration_voice_artist_link_models = len(
-            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
+        )
 
         # No models are being saved in the datastore since this is an audit job.
         self.assertEqual(total_exploration_voice_artist_link_models, 0)
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_generate_exp_link_model_if_some_commit_log_models_are_missing(
-        self
+        self,
     ) -> None:
 
         self._create_curated_explorations()
@@ -842,7 +957,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
         snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                snapshot_model_id))
+                snapshot_model_id
+            )
+        )
         snapshot_model.delete()
 
         debug_logs_1 = (
@@ -892,22 +1009,28 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_generate_exp_link_model_if_some_snapshot_models_are_missing(
-        self
+        self,
     ) -> None:
 
         self._create_curated_explorations()
@@ -922,7 +1045,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
         snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotContentModel = (
             exp_models.ExplorationSnapshotContentModel.get_by_id(
-                snapshot_model_id))
+                snapshot_model_id
+            )
+        )
         snapshot_model.delete()
 
         debug_logs_1 = (
@@ -972,20 +1097,26 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_shoould_raise_error_for_non_existent_user(self) -> None:
         self._create_curated_explorations()
 
@@ -993,7 +1124,9 @@ class AuditVoiceArtistMetadataModelsJobTests(
         snapshot_model_id: str = 'exp_id_abcde-3'
         snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                snapshot_model_id))
+                snapshot_model_id
+            )
+        )
         snapshot_model.committer_id = 'non_existent_user'
         snapshot_model.update_timestamps()
         snapshot_model.put()
@@ -1053,16 +1186,20 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'c. 1, [filename4.mp3]\n\n'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
-                stderr=''),
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(
+                    stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                    stderr='',
+                ),
+                job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+                job_run_result.JobRunResult(stdout=debug_logs_2, stderr=''),
+            ]
+        )
 
 
 class HelperMethodsForExplorationVoiceArtistLinkJobTest(
@@ -1070,9 +1207,11 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 ):
     """Test class to validate helper methods."""
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_should_create_exploration_link_for_voice_artist(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -1084,97 +1223,106 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         self.publish_exploration(self.owner_id, exploration.id)
 
         exp_services.update_exploration(
-            self.owner_id, self.CURATED_EXPLORATION_ID_1,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Introduction',
-                'new_value': {
-                    'content_id': 'content_0',
-                    'html': '<p>A content to translate.</p>'
-                }
-            })],
-            'Changes content.'
+            self.owner_id,
+            self.CURATED_EXPLORATION_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>A content to translate.</p>',
+                        },
+                    }
+                )
+            ],
+            'Changes content.',
         )
 
         new_voiceovers_dict = {
             'voiceovers_mapping': {
-                'content_0': {
-                    'en': self.voiceover_dict_1
-                },
+                'content_0': {'en': self.voiceover_dict_1},
                 'ca_placeholder_2': {},
-                'default_outcome_1': {}
+                'default_outcome_1': {},
             }
         }
-        old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
+        old_voiceover_dict: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
             }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict,
-            'old_value': old_voiceover_dict
-        })]
+        }
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict,
+                    'old_value': old_voiceover_dict,
+                }
+            )
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Translation commits',
+        )
 
         exploration_models: List[exp_models.ExplorationModel] = list(
-            exp_models.ExplorationModel.get_all().fetch())
-        snapshot_models: List[
-            exp_models.ExplorationSnapshotContentModel] = list(
-                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
-        metadata_models: List[
-            exp_models.ExplorationSnapshotMetadataModel] = list(
-                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+            exp_models.ExplorationModel.get_all().fetch()
+        )
+        snapshot_models: List[exp_models.ExplorationSnapshotContentModel] = (
+            list(exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        )
+        metadata_models: List[exp_models.ExplorationSnapshotMetadataModel] = (
+            list(exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+        )
 
         expected_content_id_to_voiceovers_mapping = {
-            'content_0': {
-                'en': (self.editor_id_1, self.voiceover_dict_1)
-            }
+            'content_0': {'en': (self.editor_id_1, self.voiceover_dict_1)}
         }
 
         exp_link_model, _ = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(
-                exploration_models[0], snapshot_models, metadata_models))
+            manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob.get_exploration_voice_artists_link_model(
+                exploration_models[0], snapshot_models, metadata_models
+            )
+        )
         assert exp_link_model is not None
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
             exp_link_model.content_id_to_voiceovers_mapping,
-            expected_content_id_to_voiceovers_mapping
+            expected_content_id_to_voiceovers_mapping,
         )
 
     def test_check_is_exploration_curated_for_invalid_id(self) -> None:
-        is_exploration_curated = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            is_exploration_curated(exploration_id='')
+        is_exploration_curated = manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob.is_exploration_curated(
+            exploration_id=''
         )
         self.assertFalse(is_exploration_curated)
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        is_exploration_curated = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            is_exploration_curated(exploration_id=None) # type: ignore[arg-type]
-        )
+        is_exploration_curated = manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob.is_exploration_curated(
+            exploration_id=None
+        )  # type: ignore[arg-type]
         self.assertFalse(is_exploration_curated)
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+        ]
+    )
     def test_should_get_empty_filenames_successfully(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -1186,98 +1334,115 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         self.publish_exploration(self.owner_id, exploration.id)
 
         exp_services.update_exploration(
-            self.owner_id, self.CURATED_EXPLORATION_ID_1,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Introduction',
-                'new_value': {
-                    'content_id': 'content_0',
-                    'html': '<p>A content to translate.</p>'
-                }
-            })],
-            'Changes content.'
+            self.owner_id,
+            self.CURATED_EXPLORATION_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>A content to translate.</p>',
+                        },
+                    }
+                )
+            ],
+            'Changes content.',
         )
 
-        new_voiceovers_dict_1: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {
-                        'en': self.voiceover_dict_1
-                    },
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
+        new_voiceovers_dict_1: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {'en': self.voiceover_dict_1},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
             }
-        old_voiceover_dict_1: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
+        }
+        old_voiceover_dict_1: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
             }
+        }
 
-        new_voiceovers_dict_2: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
+        new_voiceovers_dict_2: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
             }
-        old_voiceover_dict_2: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {
-                        'en': self.voiceover_dict_1
-                    },
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
+        }
+        old_voiceover_dict_2: Dict[
+            str, Dict[str, Dict[str, state_domain.VoiceoverDict]]
+        ] = {
+            'voiceovers_mapping': {
+                'content_0': {'en': self.voiceover_dict_1},
+                'ca_placeholder_2': {},
+                'default_outcome_1': {},
             }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict_1,
-            'old_value': old_voiceover_dict_1
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict_2,
-            'old_value': old_voiceover_dict_2
-        })]
+        }
+        change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict_1,
+                    'old_value': old_voiceover_dict_1,
+                }
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
+                    ),
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': new_voiceovers_dict_2,
+                    'old_value': old_voiceover_dict_2,
+                }
+            ),
+        ]
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
+            self.editor_id_1,
+            self.CURATED_EXPLORATION_ID_1,
+            change_list,
+            'Translation commits',
+        )
 
         exploration_models: List[exp_models.ExplorationModel] = list(
-            exp_models.ExplorationModel.get_all().fetch())
+            exp_models.ExplorationModel.get_all().fetch()
+        )
 
-        snapshot_models: List[
-            exp_models.ExplorationSnapshotContentModel] = list(
-                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        snapshot_models: List[exp_models.ExplorationSnapshotContentModel] = (
+            list(exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        )
 
-        metadata_models: List[
-            exp_models.ExplorationSnapshotMetadataModel] = list(
-                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+        metadata_models: List[exp_models.ExplorationSnapshotMetadataModel] = (
+            list(exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+        )
 
         exp_link_model, _ = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(
+            manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob.get_exploration_voice_artists_link_model(
                 exploration_models[0], snapshot_models, metadata_models
-            ))
+            )
+        )
         assert exp_link_model is not None
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
 
     def test_should_create_empty_exploration_voice_artist_link_model(
-        self
+        self,
     ) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -1289,44 +1454,50 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         self.publish_exploration(self.owner_id, exploration.id)
 
         exp_services.update_exploration(
-            self.owner_id, self.CURATED_EXPLORATION_ID_1,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Introduction',
-                'new_value': {
-                    'content_id': 'content_0',
-                    'html': '<p>A content to translate.</p>'
-                }
-            })],
-            'Changes content.'
+            self.owner_id,
+            self.CURATED_EXPLORATION_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>A content to translate.</p>',
+                        },
+                    }
+                )
+            ],
+            'Changes content.',
         )
 
         exploration_models: List[exp_models.ExplorationModel] = list(
-            exp_models.ExplorationModel.get_all().fetch())
+            exp_models.ExplorationModel.get_all().fetch()
+        )
 
-        snapshot_models: List[
-            exp_models.ExplorationSnapshotContentModel] = list(
-                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
-        metadata_models: List[
-            exp_models.ExplorationSnapshotMetadataModel] = list(
-                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+        snapshot_models: List[exp_models.ExplorationSnapshotContentModel] = (
+            list(exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        )
+        metadata_models: List[exp_models.ExplorationSnapshotMetadataModel] = (
+            list(exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+        )
 
         snapshot_metadata_model = (
-            exp_models.ExplorationSnapshotMetadataModel.get(
-                'exp_id_abcde-2'))
+            exp_models.ExplorationSnapshotMetadataModel.get('exp_id_abcde-2')
+        )
         del snapshot_metadata_model.commit_cmds[0]['cmd']
         snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
         exp_link_model, _ = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(
+            manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkModelsJob.get_exploration_voice_artists_link_model(
                 exploration_models[0], snapshot_models, metadata_models
-            ))
+            )
+        )
         assert exp_link_model is not None
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
-            exp_link_model.content_id_to_voiceovers_mapping, {})
+            exp_link_model.content_id_to_voiceovers_mapping, {}
+        )

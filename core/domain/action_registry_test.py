@@ -32,7 +32,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
     def test_action_registry_with_compliant_and_non_compliant_actions(
         self, mock_import_module: mock.MagicMock
     ) -> None:
-        """Test that only subclasses of BaseLearnerActionSpec 
+        """Test that only subclasses of BaseLearnerActionSpec
         are added to the registry.
         """
 
@@ -68,7 +68,8 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertTrue(isinstance(actions[0], CompliantAction))
 
     def test_cannot_get_action_with_empty_registry_by_invalid_type(
-        self) -> None:
+        self,
+    ) -> None:
         """Test with an invalid action type. Should raise a KeyError."""
         with self.assertRaisesRegex(KeyError, 'fakeAction'):
             action_registry.Registry.get_action_by_type('fakeAction')
@@ -78,7 +79,8 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
 
         actions = action_registry.Registry.get_all_actions()
         action_type = actions[0].__class__.__name__
-        retrieved_action = (
-            action_registry.Registry.get_action_by_type(action_type))
+        retrieved_action = action_registry.Registry.get_action_by_type(
+            action_type
+        )
         self.assertIsNotNone(retrieved_action)
         self.assertEqual(retrieved_action.__class__.__name__, action_type)

@@ -19,20 +19,23 @@
 from __future__ import annotations
 
 import functools
-
-from core import feconf
-from core.constants import constants
+from typing import Optional
 
 from google import auth
 from google.cloud import secretmanager
-from typing import Optional
+
+from core import feconf
+from core.constants import constants
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
 CLIENT = secretmanager.SecretManagerServiceClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 @functools.lru_cache(maxsize=64)
@@ -46,7 +49,8 @@ def get_secret(name: str) -> Optional[str]:
         str. The value of the secret.
     """
     secret_name = (
-        f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
+        f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest'
+    )
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
     except Exception:

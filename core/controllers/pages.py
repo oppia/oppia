@@ -16,11 +16,10 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-
 from typing import Dict
+
+from core import feconf
+from core.controllers import acl_decorators, base
 
 
 class ForumRedirectPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):

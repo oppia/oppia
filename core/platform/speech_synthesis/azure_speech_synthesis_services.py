@@ -23,16 +23,15 @@ from __future__ import annotations
 
 import json
 import os
-
-from core import feconf
-from core import utils
-from core.platform import models
-
-import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 
+import azure.cognitiveservices.speech as speechsdk
+
+from core import feconf, utils
+from core.platform import models
+
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -65,8 +64,7 @@ NON_MATH_TEMPLATE_SSML_BLOCK = """
 
 # Standard arithmetic operators used to separate text with math expressions in
 # an SSML string.
-COMMONLY_USED_ARITHMETIC_EXPRESSIONS = [
-    '+', ' - ', '*', ' / ', '×', '÷']
+COMMONLY_USED_ARITHMETIC_EXPRESSIONS = ['+', ' - ', '*', ' / ', '×', '÷']
 
 
 class WordBoundaryCollection:
@@ -87,7 +85,7 @@ class WordBoundaryCollection:
         """
         audio_offset_record: Dict[str, Union[str, float]] = {
             'token': '',
-            'audio_offset_msecs': 0.0
+            'audio_offset_msecs': 0.0,
         }
 
         audio_offset_record['token'] = event.text
@@ -115,7 +113,7 @@ def is_mathematical_text(text: str) -> bool:
 
 
 def get_azure_voicecode_from_language_accent_code(
-        language_accent_code: str
+    language_accent_code: str,
 ) -> str:
     """The method retrieves the voice code associated with the given language
     accent code from the `autogeneratable_language_accent_list.json` file.
@@ -129,20 +127,19 @@ def get_azure_voicecode_from_language_accent_code(
         code.
     """
     file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR,
-        'autogeneratable_language_accent_list.json'
+        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
     )
     with utils.open_file(file_path, 'r') as f:
-        autogeneratable_language_accent_list = json.loads(
-            f.read())
+        autogeneratable_language_accent_list = json.loads(f.read())
 
     voice_code: str = autogeneratable_language_accent_list[
-        language_accent_code]['voice_code']
+        language_accent_code
+    ]['voice_code']
     return voice_code
 
 
 def convert_plaintext_to_ssml_content(
-        plaintext: str, language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
@@ -166,20 +163,19 @@ def convert_plaintext_to_ssml_content(
 
     for content in content_list:
         if is_mathematical_text(content):
-            main_ssml_content += (MATH_TEMPLATE_SSML_BLOCK % content)
+            main_ssml_content += MATH_TEMPLATE_SSML_BLOCK % content
         else:
-            main_ssml_content += (NON_MATH_TEMPLATE_SSML_BLOCK % content)
+            main_ssml_content += NON_MATH_TEMPLATE_SSML_BLOCK % content
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,
         get_azure_voicecode_from_language_accent_code(language_accent_code),
-        main_ssml_content
+        main_ssml_content,
     )
 
 
 def regenerate_speech_from_text(
-    plaintext: str,
-    language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """Regenerates speech (Oppia's voiceovers) from the provided text.
 
@@ -217,26 +213,32 @@ def regenerate_speech_from_text(
 
     # Speech Configuration for Azure TTS.
     speech_config = speechsdk.SpeechConfig(
-        subscription=azure_tts_api_key,
-        region=azure_tts_region)
+        subscription=azure_tts_api_key, region=azure_tts_region
+    )
 
     # Configuring audio format to MP3.
     speech_config.set_speech_synthesis_output_format(
-        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
+        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+    )
 
     speech_synthesizer = speechsdk.SpeechSynthesizer(
-        speech_config=speech_config, audio_config=None)
+        speech_config=speech_config, audio_config=None
+    )
 
     word_boundary_collection_instance: WordBoundaryCollection = (
-        WordBoundaryCollection())
+        WordBoundaryCollection()
+    )
     speech_synthesizer.synthesis_word_boundary.connect(
-        word_boundary_collection_instance.word_boundary_event)
+        word_boundary_collection_instance.word_boundary_event
+    )
 
     ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(
-        plaintext, language_accent_code)
+        plaintext, language_accent_code
+    )
 
     speech_synthesis_result = speech_synthesizer.speak_ssml_async(
-        ssml_text_for_speech_synthesis).get()
+        ssml_text_for_speech_synthesis
+    ).get()
 
     binary_audio_data = speech_synthesis_result.audio_data
 
@@ -250,5 +252,5 @@ def regenerate_speech_from_text(
     return (
         binary_audio_data,
         word_boundary_collection_instance.audio_offset_list,
-        error_details
+        error_details,
     )

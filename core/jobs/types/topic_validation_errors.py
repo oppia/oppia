@@ -22,7 +22,7 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
@@ -34,5 +34,6 @@ class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
     def __init__(self, model: topic_models.TopicModel) -> None:
         message = (
             'Entity name %s in lowercase does not match '
-            'canonical name %s' % (model.name, model.canonical_name))
+            'canonical name %s' % (model.name, model.canonical_name)
+        )
         super().__init__(message, model)
