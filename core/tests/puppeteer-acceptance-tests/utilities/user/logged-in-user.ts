@@ -179,9 +179,29 @@ const tabTitle = '.e2e-test-learner-dash-tab-title';
 const tabSection = '.e2e-test-learner-dash-section';
 const tabSectionHeading = '.e2e-test-learner-dash-section-heading';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
-const cardDisplay = 'e2e-test-card-display';
-const cardDisplayContent = 'e2e-test-card-display-content';
-const cardDisplayHeading = 'e2e-test-card-display-heading';
+
+const learnerDashSelectors = {
+  tabSection: {
+    content: '.e2e-test-learner-dash-section',
+    heading: '.e2e-test-learner-dash-section-heading',
+  },
+  cardDisplay: {
+    content: '.e2e-test-card-display',
+    heading: '.e2e-test-card-display-heading',
+  },
+  topicCard: {
+    content: '.e2e-test-learner-topic-summary-tile',
+    heading: '.e2e-test-learner-topic-summary-tile-title',
+  },
+  lessonCard: {
+    content: '.e2e-test-lesson-card',
+    heading: '.e2e-test-lesson-card-title',
+    button: '.e2e-test-lesson-card-button',
+  },
+};
+const cardDisplay = '.e2e-test-card-display';
+const cardDisplayContent = '.e2e-test-card-display-content';
+const cardDisplayHeading = '.e2e-test-card-display-heading';
 const topicCard = '.e2e-test-learner-topic-summary-tile';
 const topicCardTitle = '.e2e-test-learner-topic-summary-tile-title';
 const lessonCard = '.e2e-test-lesson-card';
@@ -1845,6 +1865,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     expect(tabTitleText).toBe(expectedTabTitleText);
+    showMessage('Landing UI is correct.');
   }
 
   /**
@@ -1858,43 +1879,29 @@ export class LoggedInUser extends BaseUser {
     selector: string,
     root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
   ): Promise<void> {
-    let selectorClass = '';
-
-    switch (selector) {
-      case 'tabSection':
-        selectorClass = tabSectionHeading;
-        break;
-      case 'cardDisplay':
-        selectorClass = cardDisplayHeading;
-        break;
-      case 'lessonCard':
-        selectorClass = lessonCard;
-        break;
-    }
-    await this.page.waitForSelector(selectorClass);
-    const allElements = await root?.$$(selectorClass);
+    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+    const allElements = await root?.$$(learnerDashSelectors[selector].heading);
     const sectionHeadingTexts = await Promise.all(
       allElements.map(card => card.evaluate(el => el.textContent?.trim()))
     );
     expect(sectionHeadingTexts).toEqual(expectedTexts);
+    showMessage('Lessons are present');
   }
 
   /**
    * Finds child element in parent by matching text values.
    * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {string} item - Child element selector.
-   * @param {string} itemTitle - Child element title selector.
+   * @param {[key: string]: string} selectors - Relevant selectors.
    * @param {string} criteria - Title value to match.
    */
   async findElement(
     parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
-    item: string,
-    itemTitle: string,
+    selectors: {[key: string]: string},
     criteria: string
   ): Promise<puppeteer.ElementHandle | undefined> {
-    const childElement = await parentElement?.$$eval(item, ele =>
+    const childElement = await parentElement?.$$eval(selectors.content, ele =>
       ele.find(e => {
-        const eTitle = e.querySelector(itemTitle)?.textContent?.trim();
+        const eTitle = e.querySelector(selectors.heading)?.textContent?.trim();
         return eTitle && eTitle === criteria;
       })
     );
@@ -1906,21 +1913,23 @@ export class LoggedInUser extends BaseUser {
    * @param {string} topic - Classroom topic.
    */
   async navigateToTopicPage(topic: string): Promise<void> {
-    await this.page.waitForFunction(() => {
-      return Array.from(document.querySelectorAll(cardDisplayHeading))
-        .map(h => h.textContent?.trim())
-        .includes("Topics available in Oppia's Classroom");
-    });
+    await this.page.waitForFunction(
+      c => {
+        return Array.from(document.querySelectorAll(c))
+          .map(h => h.textContent?.trim())
+          .includes("Topics available in Oppia's Classroom");
+      },
+      {},
+      cardDisplayHeading
+    );
     const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
-      cardDisplay,
-      cardDisplayHeading,
+      learnerDashSelectors.cardDisplay,
       "Topics available in Oppia's Classroom"
     );
     const topicCardElement = await this.findElement(
       topicsAvailableInClassroomElement,
-      topicCard,
-      topicCardTitle,
+      learnerDashSelectors.topicCard,
       topic
     );
 
@@ -1957,17 +1966,16 @@ export class LoggedInUser extends BaseUser {
     if (section === 'In Progress' || section === 'Completed') {
       sectionElement = await this.findElement(
         this.page,
-        tabSection,
-        tabSectionHeading,
+        learnerDashSelectors.tabSection,
         section
       );
     }
     const subsectionElement = await this.findElement(
       sectionElement,
-      cardDisplay,
-      cardDisplayHeading,
+      learnerDashSelectors.cardDisplay,
       criteria
     );
+
     this.expectElementsToBePresent(
       expectedTitles,
       'lessonCard',
@@ -1994,22 +2002,19 @@ export class LoggedInUser extends BaseUser {
     if (section === 'In Progress' || section === 'Completed') {
       sectionElement = await this.findElement(
         this.page,
-        tabSection,
-        tabSectionHeading,
+        learnerDashSelectors.tabSection,
         section
       );
     }
 
     const subsectionElement = await this.findElement(
       sectionElement,
-      cardDisplay,
-      cardDisplayHeading,
+      learnerDashSelectors.cardDisplay,
       criteria
     );
     const lessonCardElement = await this.findElement(
       subsectionElement,
-      lessonCard,
-      lessonCardTitle,
+      learnerDashSelectors.lessonCard,
       lessonTitle
     );
 
