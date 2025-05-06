@@ -22,7 +22,7 @@
 <div class="oppia-learner-solution-container">
   <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
           (click)="closeModal()">
-    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+    <span [innerHTML]="'I18N_GOT_IT' | translate" style="text-transform: uppercase;"></span>
   </button>
 </div>
 <span class="clearfix"></span>
@@ -56,10 +56,10 @@
     color: white;
     height: 35px;
     padding: 6px 12px;
-    border-radius: 1px !important;
+    border-radius: 4px !important;
     border: none !important;
     font-weight: 500;
-    text-transform: none;
+    text-transform: uppercase;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
