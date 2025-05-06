@@ -133,7 +133,7 @@ describe('Logged-in User', function () {
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToTopicPage('Place Values');
+      await loggedInUser.navigateToTopicPageByCards('Place Values');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );*/
@@ -142,7 +142,7 @@ describe('Logged-in User', function () {
     'should display in-progress and recommended lessons after starting a lesson',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToMathClassroomPage();
+      await loggedInUser.navigateToClassroomPage('math');
       await loggedInUser.selectAndOpenTopic('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
