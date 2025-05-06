@@ -20,7 +20,6 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import puppeteer from 'puppeteer';
-import {all} from 'q';
 
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
@@ -178,8 +177,6 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
-const cardDisplay = '.e2e-test-card-display';
-const cardDisplayHeading = '.e2e-test-card-display-heading';
 const learnerDashSelectors = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
