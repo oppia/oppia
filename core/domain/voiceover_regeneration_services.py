@@ -119,28 +119,6 @@ def parse_html(html_content: str) -> str:
     return text_content
 
 
-def preprocess_text_for_voiceover_regeneration(text: str) -> str:
-    """Preprocesses the input text for voiceover regeneration by applying
-    custom rules to handle special cases.
-    This ensures the text is modified appropriately for accurate voiceovers.
-
-    Args:
-        text: str. The text that will be preprocessed.
-
-    Returns:
-        str. The text after applying preprocessing rules.
-    """
-    # Replace multiple underscores with string `dash`.
-    updated_text = re.sub(r'_{2,}', 'dash', text)
-
-    # Replaces the division operator `/` surrounded by numerals and spaces
-    # with the Unicode character `÷`.
-    pattern = r'(\d+)\s*/\s*(\d+)'
-    updated_text = re.sub(pattern, r'\1 ÷ \2', updated_text)
-
-    return updated_text
-
-
 def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
@@ -177,12 +155,10 @@ def synthesize_voiceover_for_html_string(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
 
     parsed_text = parse_html(content_html)
-    processed_text_for_voiceover_regeneration = (
-        preprocess_text_for_voiceover_regeneration(parsed_text))
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.
-        generate_hash_from_text(processed_text_for_voiceover_regeneration)
+        generate_hash_from_text(parsed_text)
     )
     cached_model: Optional[voiceover_models.CachedAutomaticVoiceoversModel] = (
         voiceover_models.CachedAutomaticVoiceoversModel.
@@ -195,33 +171,28 @@ def synthesize_voiceover_for_html_string(
 
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
-    is_voiceover_from_cache = False
+    is_cached_model_used_for_voiceovers = False
+
     if cached_model is not None:
         error_details = None
         try:
-            # If the content is available in the cache, use the cached
-            # voiceovers.
-            if (
-                cached_model.plaintext ==
-                processed_text_for_voiceover_regeneration
-            ):
+            if cached_model.plaintext == parsed_text:
                 audio_offset_list = (
                     cached_model.audio_offset_list)
                 filename = cached_model.voiceover_filename
                 binary_audio_data = fs.get('%s/%s' % ('audio', filename))
-                is_voiceover_from_cache = True
+                is_cached_model_used_for_voiceovers = True
         except Exception as e:
             cached_model = None
-            logging.error('Failed to retrieve voiceover from cache: %s' % e)
+            logging.warning('Failed to retrieve voiceover from cache: %s' % e)
 
-    # Generate automatic voiceover only if the content is not available in the
-    # cache; otherwise, use the cached voiceovers.
-    if not is_voiceover_from_cache:
+    # Generate automatic voiceover only if retrieving the voiceover from the
+    # cache fails; otherwise, utilize the cached voiceovers.
+    if not is_cached_model_used_for_voiceovers:
         try:
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    processed_text_for_voiceover_regeneration,
-                    language_accent_code)
+                    parsed_text, language_accent_code)
             )
         except Exception as e:
             error_details = str(e)
@@ -247,17 +218,13 @@ def synthesize_voiceover_for_html_string(
     # In case the content is not available in the cache, store the generated
     # voiceovers in the cache.
     if cached_model is not None:
-        if cached_model.plaintext != processed_text_for_voiceover_regeneration:
-            if (
-                len(processed_text_for_voiceover_regeneration) <
-                len(cached_model.plaintext)
-            ):
+        if cached_model.plaintext != parsed_text:
+            if len(parsed_text) < len(cached_model.plaintext):
                 # Since the current text is shorter than the one in the cached
                 # model, there is a higher likelihood of repetition in
                 # other content. Thus, updating the cached model to store the
                 # current data.
-                cached_model.plaintext = (
-                    processed_text_for_voiceover_regeneration)
+                cached_model.plaintext = parsed_text
                 cached_model.voiceover_filename = voiceover_filename
                 cached_model.audio_offset_list = audio_offset_list
                 cached_model.update_timestamps()
@@ -266,7 +233,7 @@ def synthesize_voiceover_for_html_string(
         new_cached_model = (
             voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
                 language_accent_code,
-                processed_text_for_voiceover_regeneration,
+                parsed_text,
                 voiceover_filename,
                 audio_offset_list))
         new_cached_model.update_timestamps()

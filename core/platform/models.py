@@ -286,7 +286,7 @@ class _Gae(Platform):
         # based on the environment. Refer to the issue for implementation
         # details.
         from core.platform.speech_synthesis import (
-                dev_mode_speech_synthesis_services)
+            dev_mode_speech_synthesis_services)
         return dev_mode_speech_synthesis_services
 
     @classmethod
