@@ -207,7 +207,7 @@ jobs:
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=0
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
@@ -228,7 +228,7 @@ jobs:
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
@@ -255,7 +255,7 @@ jobs:
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
           --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
@@ -274,11 +274,11 @@ jobs:
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
-        # Numbers in 1285x1000x24 represents screen width, height and color depth respectively.
+        # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1285x1000x24"
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
