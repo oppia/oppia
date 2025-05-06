@@ -166,7 +166,7 @@ describe('Logged-in User', function () {
         'Chapter 1: What are the Place Values',
       ]);
 
-      await loggedInUser.navigateToLessonFromLessonCard(
+      await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
         'Chapter 1: What are the Place Values',
         chapterIds[0]
@@ -175,7 +175,7 @@ describe('Logged-in User', function () {
       await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
         'Chapter 2: Find the Value of a Number',
       ]);
-      await loggedInUser.navigateToLessonFromLessonCard(
+      await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
         'Chapter 2: Find the Value of a Number',
         chapterIds[1]

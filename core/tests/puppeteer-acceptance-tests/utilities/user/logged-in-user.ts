@@ -2010,7 +2010,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} lessonId - Lesson card id expected.
    * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
-  async navigateToLessonFromLessonCard(
+  async navigateToLessonByCard(
     criteria: string,
     lessonTitle: string,
     lessonId: string,
