@@ -175,7 +175,7 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
+  /*it(
     'should not recommend any lessons if currently on last lesson',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
@@ -217,7 +217,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

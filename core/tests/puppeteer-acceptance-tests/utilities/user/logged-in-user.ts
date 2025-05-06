@@ -1927,8 +1927,9 @@ export class LoggedInUser extends BaseUser {
 
     if (topicCardElement) {
       await topicCardElement.click();
+      this.waitForPageToFullyLoad();
       await this.expectToBeOnPage(
-        `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}/story`
+        `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}`
       );
       showMessage(`Navigated to ${topic} from learner dashboard.`);
     } else {
@@ -1954,6 +1955,7 @@ export class LoggedInUser extends BaseUser {
       if (buttonHref?.includes(classroom)) {
         targetHref = buttonHref;
         await buttonElement.click();
+        this.waitForPageToFullyLoad();
         await this.expectToBeOnPage(`learn/${classroom}`);
         showMessage('Navigated to math classroom from learner dashboard.');
         break;
@@ -2040,6 +2042,7 @@ export class LoggedInUser extends BaseUser {
       );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
+        this.waitForPageToFullyLoad();
         this.expectToBeOnPage(`explore/${lessonId}`);
         showMessage(`Navigated to ${lessonTitle} from learner dashboard.`);
       }
