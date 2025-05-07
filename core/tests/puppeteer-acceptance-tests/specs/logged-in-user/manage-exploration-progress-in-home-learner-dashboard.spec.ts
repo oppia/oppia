@@ -86,6 +86,7 @@ describe('Logged-in User', function () {
         await loggedInUser.navigateToCommunityLibraryPage();
         await loggedInUser.searchForLessonInSearchBar(title);
         await loggedInUser.playLessonFromSearchResults(title);
+        await loggedInUser.continueToNextCard();
       }
 
       await loggedInUser.navigateToLearnerDashboard();
