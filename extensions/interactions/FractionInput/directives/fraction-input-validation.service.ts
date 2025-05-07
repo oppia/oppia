@@ -24,7 +24,7 @@ import {BaseInteractionValidationService} from 'interactions/base-interaction-va
 import {AppConstants} from 'app.constants';
 import {Warning} from 'services/alerts.service';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
