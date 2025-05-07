@@ -186,7 +186,7 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
     container: 'e2e-test-card-display-container',
-    addButton: 'e2e-test-card-display-plus-button',
+    plusButton: 'e2e-test-card-display-plus-button',
     minusButton: 'e2e-test-card-display-minus-button',
   },
   topicCard: {
@@ -2092,17 +2092,53 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.lessonCard.content
     );
 
+    const minusButtonElement = await subsectionElement?.$(
+      learnerDashSelectors.cardDisplay.minusButton
+    );
+    const plusButtonElement = await subsectionElement?.$(
+      learnerDashSelectors.cardDisplay.plusButton
+    );
+
     if (allCardElements && allCardElements.length > 1) {
       const firstCardBox = await allCardElements[0].boundingBox();
       const lastCardBox =
         await allCardElements[allCardElements.length - 1].boundingBox();
+      if (minusButtonElement === null && plusButtonElement === null) {
+        expect(
+          this.isBoxWithinRange(containerBox, firstCardBox) &&
+            this.isBoxWithinRange(containerBox, lastCardBox)
+        ).toBe(true);
+      } else {
+        while (!this.isBoxWithinRange(containerBox, lastCardBox)) {
+          await plusButtonElement?.click();
+          showMessage('Shifted cards to view more');
+        }
+        expect(this.isBoxWithinRange(containerBox, lastCardBox)).toBe(true);
+        await minusButtonElement?.click();
+        showMessage('Shifted cards to view less');
+        expect(this.isBoxWithinRange(containerBox, lastCardBox)).toBe(false);
+      }
+    } else {
+      throw new Error(
+        `Unexpected error retrieving card display controls from ${criteria} section in ${section}`
+      );
     }
   }
 
-  isElementWithinRange(
-    parentElement: puppeteer.ElementHandle | null = null,
-    childElement: puppeteer.ElementHandle = null
-  ): boolean {}
+  isBoxWithinRange(
+    parentBox: puppeteer.BoundingBox | null = null,
+    childBox: puppeteer.BoundingBox | null = null
+  ): boolean {
+    if (parentBox === null || childBox === null) {
+      return false;
+    }
+    return (
+      parentBox &&
+      childBox &&
+      childBox.x >= parentBox.x &&
+      childBox.x + childBox.width <= parentBox.x + parentBox.width
+    );
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
