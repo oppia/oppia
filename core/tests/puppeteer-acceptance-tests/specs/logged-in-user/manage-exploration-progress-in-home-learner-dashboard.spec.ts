@@ -20,6 +20,7 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
@@ -28,7 +29,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
-  let loggedInUser: LoggedInUser;
+  let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
 
@@ -64,21 +65,10 @@ describe('Logged-in User', function () {
       'logged_in_user1@example.com'
     );
   }, 480000);
-
-  /**
-   * TODO(#22493): Add tests for home tab. Interactions involving in-progress lessons
-   * and saved lessons sections.
-   */
-
-  /**
-   * TODO(#22493): Add tests for progress tab. Interactions involving in-progress
-   * and completed explorations.
-   */
-
   it(
-    'should navigate to the new learner dashboard',
+    'should display in-progress lessons only after starting explorations',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToCommunityLibraryPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
