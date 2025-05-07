@@ -1887,14 +1887,23 @@ export class LoggedInUser extends BaseUser {
     selectors: {[key: string]: string},
     criteria: string
   ): Promise<puppeteer.ElementHandle | undefined> {
+    let targetElement;
     const allElements = await parentElement?.$$(selectors.content);
-    const targetElement = await allElements?.find(async h => {
+    for (const h of allElements || []) {
       const targetHeadingElement = await h.$(selectors.heading);
       const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
         ele.textContent?.trim()
       );
-      return targetHeadingText === criteria;
-    });
+      if (targetHeadingText === criteria) {
+        targetElement = h;
+        break;
+      }
+    }
+    if (!targetElement) {
+      throw new Error(
+        `Element with selectors: ${selectors.toString()} and criteria: ${criteria} is not found`
+      );
+    }
     return targetElement;
   }
 
@@ -1927,7 +1936,7 @@ export class LoggedInUser extends BaseUser {
 
     if (topicCardElement) {
       await topicCardElement.click();
-      this.waitForPageToFullyLoad();
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
       await this.expectToBeOnPage(
         `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}`
       );
@@ -1955,7 +1964,7 @@ export class LoggedInUser extends BaseUser {
       if (buttonHref?.includes(classroom)) {
         targetHref = buttonHref;
         await buttonElement.click();
-        this.waitForPageToFullyLoad();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
         await this.expectToBeOnPage(`learn/${classroom}`);
         showMessage('Navigated to math classroom from learner dashboard.');
         break;
@@ -1980,7 +1989,6 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
       this.page;
-
     if (section === 'In Progress' || section === 'Completed') {
       sectionElement = await this.findElement(
         this.page,
@@ -1994,7 +2002,7 @@ export class LoggedInUser extends BaseUser {
       criteria
     );
 
-    this.expectElementsToBePresent(
+    await this.expectElementsToBePresent(
       expectedTitles,
       'lessonCard',
       subsectionElement
@@ -2016,7 +2024,6 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
       this.page;
-
     if (section === 'In Progress' || section === 'Completed') {
       sectionElement = await this.findElement(
         this.page,
@@ -2042,8 +2049,10 @@ export class LoggedInUser extends BaseUser {
       );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
-        this.waitForPageToFullyLoad();
-        this.expectToBeOnPage(`explore/${lessonId}`);
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+        expect(`/explore/${lessonId}`.toLowerCase()).toBe(
+          new URL(this.page.url()).pathname.toLowerCase()
+        );
         showMessage(`Navigated to ${lessonTitle} from learner dashboard.`);
       }
     } else {

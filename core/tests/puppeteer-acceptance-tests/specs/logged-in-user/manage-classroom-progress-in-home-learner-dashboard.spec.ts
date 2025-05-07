@@ -167,7 +167,7 @@ describe('Logged-in User', function () {
         'Chapter 2: Find the Value of a Number',
       ]);
       await loggedInUser.navigateToLessonByCard(
-        'Lessons in progress',
+        'Recommended for you',
         'Chapter 2: Find the Value of a Number',
         chapterIds[1]
       );
@@ -175,7 +175,7 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  /*it(
+  it(
     'should not recommend any lessons if currently on last lesson',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
@@ -217,7 +217,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );*/
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
