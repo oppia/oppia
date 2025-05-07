@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance tests for home tab of learner dashboard, specfically
- * interactions with components that use classroom data across all tabs.
+ * interactions with components that use classroom data.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
