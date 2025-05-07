@@ -52,23 +52,16 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   ) {}
 
   setPageTitle(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
-    );
-
     const translatedTitle = this.translateService.instant(
       'I18N_PRACTICE_SESSION_PAGE_TITLE',
-      {
-        topicName: this.topicName,
-      }
+      {topicName: this.topicName}
     );
-
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   subscribeToOnLanguageCodeChange(): void {
     this.directiveSubscriptions.add(
-      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+      this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
       })
     );
