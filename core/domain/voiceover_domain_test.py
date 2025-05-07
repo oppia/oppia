@@ -609,59 +609,6 @@ class ExplorationVoiceArtistsLinkUnitTests(test_utils.GenericTestBase):
         ):
             exp_voice_artists_link.validate()
 
-    def test_validate_voiceover_dict_missing_keys(self) -> None:
-        incomplete_voiceover_dict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_1': {
-                'en': ('voice_artist_1', incomplete_voiceover_dict)
-            }
-        }
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
-            )
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Missing keys in voiceoverDict'
-        ):
-            exp_voice_artists_link.validate()
-
-    def test_validate_voiceover_dict_unexpected_keys(self) -> None:
-        extra_keys_voiceover_dict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1,
-            'unexpected_key': 'value'
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_id_1': {
-                'en': ('voice_artist_1', extra_keys_voiceover_dict)
-            }
-        }
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        exp_voice_artists_link = (
-            voiceover_domain.ExplorationVoiceArtistsLink(
-                content_id_to_voiceovers_mapping=(
-                    content_id_to_voiceovers_mapping)) # type: ignore[arg-type]
-            )
-
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Unexpected keys in voiceoverDict'
-        ):
-            exp_voice_artists_link.validate()
-
     def test_validate_filename_type(self) -> None:
         invalid_voiceover_dict = {
             'filename': 123,

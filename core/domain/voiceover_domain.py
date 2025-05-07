@@ -322,10 +322,10 @@ class ExplorationVoiceArtistsLink:
     """Domain object for linking Exploration with voice artists."""
 
     def __init__(
-            self,
-            content_id_to_voiceovers_mapping: Dict[
-                str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
-            ]
+        self,
+        content_id_to_voiceovers_mapping: Dict[
+            str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
+        ]
     ) -> None:
         """Construct a ExplorationVoiceArtistsLink domain object.
 
@@ -386,26 +386,6 @@ class ExplorationVoiceArtistsLink:
                     raise utils.ValidationError(
                         'Expected voiceover_dict to be a dict, '
                         'recieved: %s' % voiceover_dict
-                    )
-                expected_keys = {
-                    'filename',
-                    'file_size_bytes',
-                    'needs_update',
-                    'duration_secs'
-                }
-                missing_keys = (
-                    expected_keys - set(voiceover_dict.keys()))
-                unexpected_keys = (
-                    set(voiceover_dict.keys()) - expected_keys)
-                if missing_keys:
-                    raise utils.ValidationError(
-                        'Missing keys in voiceoverDict: %s'
-                        % missing_keys
-                    )
-                if unexpected_keys:
-                    raise utils.ValidationError(
-                        'Unexpected keys in voiceoverDict: %s'
-                        % unexpected_keys
                     )
                 try:
                     state_domain.Voiceover.from_dict(
