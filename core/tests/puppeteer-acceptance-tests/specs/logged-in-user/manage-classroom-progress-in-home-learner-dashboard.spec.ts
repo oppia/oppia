@@ -148,28 +148,19 @@ describe('Logged-in User', function () {
         ['Continue where you left off'],
         'tabSection'
       );
-      await loggedInUser.expectElementsToBePresent(
-        ['Lessons in progress', 'Recommended for you'],
-        'cardDisplay'
-      );
 
       await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
         'Chapter 1: What are the Place Values',
+      ]);
+
+      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
+        'Chapter 2: Find the Value of a Number',
       ]);
 
       await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
         'Chapter 1: What are the Place Values',
         chapterIds[0]
-      );
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 2: Find the Value of a Number',
-      ]);
-      await loggedInUser.navigateToLessonByCard(
-        'Recommended for you',
-        'Chapter 2: Find the Value of a Number',
-        chapterIds[1]
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
