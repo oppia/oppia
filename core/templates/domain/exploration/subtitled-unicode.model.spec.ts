@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SubtitledUnicode object factory.
+ * @fileoverview Unit tests for the SubtitledUnicode model.
  */
 
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
