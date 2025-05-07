@@ -1908,6 +1908,35 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Gets subsection element based on title. We need to differentiate parent elements
+   * in progress tab because the subsections are titled the same.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async findSubsectionElement(
+    criteria: string,
+    section: string = 'N/A'
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+    if (section === 'In Progress' || section === 'Completed') {
+      sectionElement = await this.findElement(
+        this.page,
+        learnerDashSelectors.tabSection,
+        section
+      );
+    }
+
+    const subsectionElement = await this.findElement(
+      sectionElement,
+      learnerDashSelectors.cardDisplay,
+      criteria
+    );
+
+    return subsectionElement;
+  }
+
+  /**
    * Navigate directly to topic in math classroom using topic card.
    * @param {string} topic - Classroom topic.
    */
@@ -1987,19 +2016,9 @@ export class LoggedInUser extends BaseUser {
     expectedTitles: string[],
     section: string = 'N/A'
   ): Promise<void> {
-    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
-      this.page;
-    if (section === 'In Progress' || section === 'Completed') {
-      sectionElement = await this.findElement(
-        this.page,
-        learnerDashSelectors.tabSection,
-        section
-      );
-    }
-    const subsectionElement = await this.findElement(
-      sectionElement,
-      learnerDashSelectors.cardDisplay,
-      criteria
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
     );
 
     await this.expectElementsToBePresent(
@@ -2022,21 +2041,11 @@ export class LoggedInUser extends BaseUser {
     lessonId: string,
     section: string = 'N/A'
   ): Promise<void> {
-    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
-      this.page;
-    if (section === 'In Progress' || section === 'Completed') {
-      sectionElement = await this.findElement(
-        this.page,
-        learnerDashSelectors.tabSection,
-        section
-      );
-    }
-
-    const subsectionElement = await this.findElement(
-      sectionElement,
-      learnerDashSelectors.cardDisplay,
-      criteria
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
     );
+
     const lessonCardElement = await this.findElement(
       subsectionElement,
       learnerDashSelectors.lessonCard,
@@ -2060,35 +2069,6 @@ export class LoggedInUser extends BaseUser {
         `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
       );
     }
-  }
-
-  /**
-   * Gets subsection element based on title. We need to differentiate parent elements
-   * in progress tab because the subsections are titled the same.
-   * @param {string} criteria - Subsection title value to match.
-   * @param {string} section - Overarching section.
-   */
-  async findSubsectionElement(
-    criteria: string,
-    section: string = 'N/A'
-  ): Promise<puppeteer.ElementHandle | undefined> {
-    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
-      this.page;
-    if (section === 'In Progress' || section === 'Completed') {
-      sectionElement = await this.findElement(
-        this.page,
-        learnerDashSelectors.tabSection,
-        section
-      );
-    }
-
-    const subsectionElement = await this.findElement(
-      sectionElement,
-      learnerDashSelectors.cardDisplay,
-      criteria
-    );
-
-    return subsectionElement;
   }
 }
 
