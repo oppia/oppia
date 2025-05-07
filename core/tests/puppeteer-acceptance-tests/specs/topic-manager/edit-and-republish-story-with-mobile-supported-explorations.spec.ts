@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,17 +22,9 @@ import testConstants from '../../utilities/common/test-constants';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-
-// TODO(#20829): Console error "Cannot read properties of undefined (reading 'getStory')" on navigation or reload in Story Editor. Since this error is getting triggered on navigation only, it is causing "Execution context destroyed error". So, creating and switching to a new tab to avoid this error. Please remove the statement below that creates and switches to new tab and this errorToIgnore below.
-const errorsToIgnore = [
-  /Cannot read properties of undefined \(reading 'storyEditorStalenessDetectionService'\)/,
-];
-
-ConsoleReporter.setConsoleErrorsToIgnore(errorsToIgnore);
 
 describe('Topic Manager', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -48,6 +40,7 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    // Create two simple explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Exploring Quadratic Equations'
@@ -55,20 +48,19 @@ describe('Topic Manager', function () {
 
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Understanding Polynomial Functions',
-        'Algebra',
-        false
+        'Understanding Polynomial Functions'
       );
 
-    explorationId3 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Exploring Advance Equations',
-        'Algebra',
-        false
-      );
+    // Create an exploration with Code Editor.
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToExplorationEditorPage();
+    await curriculumAdmin.dismissWelcomeModal();
 
+    // Create an exlporation unsupported by mobile.
+    explorationId3 = await curriculumAdmin.createSimpleProgrammingExploration();
+
+    // Create Topics and add skills.
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
-
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
       'Algebra II'
@@ -78,6 +70,7 @@ describe('Topic Manager', function () {
       'Algebra II'
     );
 
+    // Add story to topic.
     await curriculumAdmin.addStoryToTopic(
       'Journey into Quadratic Equations',
       'journey-into-quadratic-equations',
@@ -87,12 +80,10 @@ describe('Topic Manager', function () {
       'Quadratic Equations Basics',
       explorationId1 as string
     );
-    await curriculumAdmin.addChapter(
-      'Introduction to Polynomial Functions',
-      explorationId2 as string
-    );
+
     await curriculumAdmin.saveStoryDraft();
 
+    // Create topic Manager.
     topicManager = await UserFactory.createNewUser(
       'topicManager',
       'topicManager1@example.com',
@@ -100,11 +91,12 @@ describe('Topic Manager', function () {
       'Algebra II'
     );
     // Setup is taking longer than the Default timeout of 300000 ms.
-  }, 360000);
+  }, 380000);
 
   it(
     'should be able to modify chapter details, preview the chapter card, add skills, and save the changes.',
     async function () {
+      // Navigate to topics page.
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.openChapterEditor(
         'Quadratic Equations Basics',
@@ -112,34 +104,34 @@ describe('Topic Manager', function () {
         'Algebra II'
       );
 
+      // Update story with mobile supported exploration.
       await topicManager.editChapterDetails(
         'Intro to Quadratic Equations',
         'Introductory chapter on Quadratic Equations',
-        explorationId3 as string,
+        explorationId2 as string,
         testConstants.data.curriculumAdminThumbnailImage
       );
-
-      await topicManager.addAcquiredSkill('Quadratic Equations');
-
       await topicManager.saveStoryDraft();
 
+      // Check preview card and expect updated values.
       await topicManager.previewChapterCard();
       await topicManager.expectChapterPreviewToHave(
         'Intro to Quadratic Equations',
         'Introductory chapter on Quadratic Equations'
       );
 
-      // Opening second chapter in chapter editor to add prerequisite skill as it only can be added if the skill is acquired in previous chapters, which is acquired in the chapter above.
+      // Add exploration with interaction unsupported on mobile and expect topic can't be updated.
       await topicManager.createAndSwitchToNewTab();
-      await topicManager.openChapterEditor(
-        'Introduction to Polynomial Functions',
+      await topicManager.addChapterWithoutSaving(
+        'Introduction to Python Programmin',
+        explorationId3 as string,
         'Journey into Quadratic Equations',
         'Algebra II'
       );
-      await topicManager.addAcquiredSkill('Polynomial Functions');
-      await topicManager.addPrerequisiteSkill('Quadratic Equations');
-
-      await topicManager.saveStoryDraft();
+      await topicManager.clickOnSaveNewChapterButton();
+      await topicManager.expectNewChapterErrorSpan(
+        'The states [Introduction] contain restricted interaction types.'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

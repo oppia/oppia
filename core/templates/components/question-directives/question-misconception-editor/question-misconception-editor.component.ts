@@ -24,7 +24,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
   TaggedMisconception,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {ExternalSaveService} from 'services/external-save.service';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
