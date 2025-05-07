@@ -28,13 +28,6 @@
       "rootDirPrefix": "lamejs-",
       "targetDirPrefix": "lamejs-"
     },
-    "angularTest": {
-      "version": "1.8.2",
-      "downloadFormat": "files",
-      "url": "https://code.angularjs.org/1.8.2",
-      "targetDirPrefix": "angularjs-",
-      "files": ["angular-mocks.js"]
-    },
     "messageFormat": {
       "version": "2.0.5",
       "downloadFormat": "zip",
@@ -169,16 +162,6 @@
       "url": "https://github.com/oppia/ui-codemirror/archive/5d04fa5c991f915e4578be5f1175e22d94696633.zip",
       "rootDirPrefix": "ui-codemirror-",
       "targetDir": "ui-codemirror-5d04fa"
-    },
-    "uiTree": {
-      "version": "",
-      "downloadFormat": "zip",
-      "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
-      "rootDirPrefix": "angular-ui-tree-master",
-      "targetDirPrefix": "ui-tree-2.22.6",
-      "bundle": {
-        "css": ["dist/angular-ui-tree.min.css"]
-      }
     }
   }
 }

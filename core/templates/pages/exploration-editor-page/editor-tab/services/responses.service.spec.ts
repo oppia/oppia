@@ -20,10 +20,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {fakeAsync, TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {
@@ -45,7 +42,6 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let interactionData: Interaction;
   let interactionDataWithRules: Interaction;
@@ -61,7 +57,6 @@ describe('Responses Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     alertsService = TestBed.get(AlertsService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService
@@ -853,7 +848,7 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
         Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
@@ -896,7 +891,7 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
         Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
