@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -39,7 +36,6 @@ describe('MultipleChoiceInputValidationService', () => {
     goodDefaultOutcome: Outcome;
   let validatorService: MultipleChoiceInputValidationService,
     customizationArguments: MultipleChoiceInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,7 +44,6 @@ describe('MultipleChoiceInputValidationService', () => {
 
     validatorService = TestBed.get(MultipleChoiceInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
 
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -92,7 +87,7 @@ describe('MultipleChoiceInputValidationService', () => {
     };
 
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           {
             rule_type: 'Equals',

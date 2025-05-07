@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 
@@ -33,7 +30,6 @@ describe('CodeReplValidationService', () => {
   let validatorService: CodeReplValidationService;
   let currentState: string, customizationArguments: CodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +38,6 @@ describe('CodeReplValidationService', () => {
 
     validatorService = TestBed.get(CodeReplValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
@@ -73,7 +68,9 @@ describe('CodeReplValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
   });
 
   it('should be able to perform basic validation', () => {
