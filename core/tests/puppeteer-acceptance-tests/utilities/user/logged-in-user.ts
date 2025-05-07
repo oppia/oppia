@@ -189,7 +189,7 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
     container: 'e2e-test-card-display-container',
-    addButton: 'e2e-test-card-display-add-button',
+    addButton: 'e2e-test-card-display-plus-button',
     minusButton: 'e2e-test-card-display-minus-button',
   },
   topicCard: {
@@ -3371,7 +3371,36 @@ export class LoggedInUser extends BaseUser {
 
     return foundElement.length > 0 ? foundElement[0] : null;
   }
-  async expectCardDisplayControls(): Promise<void> {}
+
+  async expectCardDisplayControls(
+    criteria: string,
+    section: string
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    const containerElement = await subsectionElement?.$(
+      learnerDashSelectors.cardDisplay.container
+    );
+    const containerBox = await containerElement?.boundingBox();
+
+    const allCardElements = await containerElement?.$$(
+      learnerDashSelectors.lessonCard.content
+    );
+
+    if (allCardElements && allCardElements.length > 1) {
+      const firstCardBox = await allCardElements[0].boundingBox();
+      const lastCardBox =
+        await allCardElements[allCardElements.length - 1].boundingBox();
+    }
+  }
+
+  isElementWithinRange(
+    parentElement: puppeteer.ElementHandle | null = null,
+    childElement: puppeteer.ElementHandle = null
+  ): boolean {}
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
