@@ -923,10 +923,10 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     def test_checking_activity_id_validity_on_nonexistent_activities(
         self
     ) -> None:
-        dne_exp_id = 'non-existent exploration'
-        dne_col_id = 'non-existent collection'
+        non_existent_exploration_id = 'non-existent exploration'
+        non_existent_collection_id = 'non-existent collection'
 
-        dne_activities = [
+        non_existent_activity_ids = [
             activity_domain.ActivityReference(
                 constants.ACTIVITY_TYPE_EXPLORATION, dne_exp_id),
             activity_domain.ActivityReference(
@@ -934,15 +934,20 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         ]
 
         (
-            dne_exp, dne_col, priv_exp, priv_col
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
         ) = summary_services.check_activity_id_validity(
-            dne_activities
+            non_existent_activity_ids
         )
 
-        self.assertIn(dne_exp_id, dne_exp)
-        self.assertIn(dne_col_id, dne_col)
-        self.assertEqual(priv_exp, [])
-        self.assertEqual(priv_col, [])
+        self.assertIn(non_existent_exploration_id,
+            non_existent_exploration_ids)
+        self.assertIn(non_existent_collection_id,
+            non_existent_collection_ids)
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
 
     def test_checking_activity_id_validity_on_private_activities(
         self
@@ -952,7 +957,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        priv_activities = [
+        private_activity_ids = [
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
                 activity_domain.ActivityReference(
@@ -960,15 +965,18 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         ]
 
         (
-            dne_exp, dne_col, priv_exp, priv_col
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
         ) = summary_services.check_activity_id_validity(
-            priv_activities
+            private_activity_ids
         )
 
-        self.assertEqual(dne_exp, [])
-        self.assertEqual(dne_col, [])
-        self.assertIn(self.EXP_ID_0, priv_exp)
-        self.assertIn(self.COL_ID_2, priv_col)
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertIn(self.EXP_ID_0, private_exploration_ids)
+        self.assertIn(self.COL_ID_2, private_collection_ids)
 
     def test_checking_activity_id_validity_on_valid_activities(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -978,7 +986,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
-        valid_activities = [
+        valid_activity_ids = [
             activity_domain.ActivityReference(
                 constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
@@ -986,15 +994,18 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         ]
 
         (
-            dne_exp, dne_col, priv_exp, priv_col
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
         ) = summary_services.check_activity_id_validity(
-          valid_activities
+            valid_activity_ids
         )
 
-        self.assertEqual(dne_exp, [])
-        self.assertEqual(dne_col, [])
-        self.assertEqual(priv_exp, [])
-        self.assertEqual(priv_col, [])
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
 
 
 class CollectionNodeMetadataDictsTest(

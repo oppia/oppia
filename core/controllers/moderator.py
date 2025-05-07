@@ -80,10 +80,10 @@ class FeaturedActivitiesHandler(
         try:
             # Retrieve the list for each type of inavlid ID.
             (
-                non_existent_explorations,
-                non_existent_collections,
-                private_explorations,
-                private_collections
+                non_existent_exploration_ids,
+                non_existent_collection_ids,
+                private_exploration_ids,
+                private_collection_ids
             ) = (
                 summary_services.check_activity_id_validity(
                 featured_activity_references)
@@ -92,11 +92,11 @@ class FeaturedActivitiesHandler(
             # If all of the lists are empty, there are no invalid IDs.
             # Since there are no invalid IDs, the Featured Activity
             # References are allowed to be updated.
-            if ((not non_existent_explorations) &
-                (not non_existent_collections) &
-                (not private_explorations) &
-                (not private_collections)
-                ):
+            if ((not non_existent_exploration_ids) &
+            (not non_existent_collection_ids) &
+            (not private_exploration_ids) &
+            (not private_collection_ids)
+            ):
                 activity_services.update_featured_activity_references(
                 featured_activity_references)
                 self.render_json({})
@@ -108,10 +108,10 @@ class FeaturedActivitiesHandler(
 
                 # If there are IDs for non-existent Explorations,
                 # create new error message by joining all of the
-                # strings in the non_existent_explorations list
+                # strings in the non_existent_exploration_ids list
                 # with the beginning component of the message.
-                if non_existent_explorations:
-                    ids = ', '.join(str(id) for id in non_existent_explorations)
+                if non_existent_exploration_ids:
+                    ids = ', '.join(str(id) for id in non_existent_exploration_ids)
                     error = (
                         f'These Exploration IDs do not exist: '
                         f'{ids}. '
@@ -122,10 +122,10 @@ class FeaturedActivitiesHandler(
 
                 # If there are IDs for non-existent Collections,
                 # create new error message by joining all of the
-                # strings in the non_existent_collections
+                # strings in the non_existent_collection_ids
                 # list with the beginning component of the message.
-                if non_existent_collections:
-                    ids = ', '.join(str(id) for id in non_existent_collections)
+                if non_existent_collection_ids:
+                    ids = ', '.join(str(id) for id in non_existent_collection_ids)
                     error = (
                         f'These Collection IDs do not exist: '
                         f'{ids}. '
@@ -136,12 +136,12 @@ class FeaturedActivitiesHandler(
 
                 # If there are IDs for private Explorations,
                 # create new error message by joining all of the
-                # strings in the private_explorations list with
+                # strings in the private_exploration_ids list with
                 # the beginning component of the message.
-                if private_explorations:
+                if private_exploration_ids:
                     error = (
                         f'These Exploration IDs are private: '
-                        f'{", ".join(str(id) for id in private_explorations)}. '
+                        f'{", ".join(str(id) for id in private_exploration_ids)}. '
                     )
                     # Join specific error with general error
                     # message.
@@ -149,12 +149,12 @@ class FeaturedActivitiesHandler(
 
                 # If there are IDs for private Collections,
                 # create new error message by joining all of the
-                # strings in the private_collections list with
+                # strings in the private_collection_ids list with
                 # the beginning component of the message.
-                if private_collections:
+                if private_collection_ids:
                     error = (
                         f'These Collection IDs are private: '
-                        f'{", ".join(str(id) for id in private_collections)}. '
+                        f'{", ".join(str(id) for id in private_collection_ids)}. '
                     )
                     # Join specific error with general error
                     # message.

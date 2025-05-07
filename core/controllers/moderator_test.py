@@ -55,7 +55,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1)
 
-    def test_nonexistent_exploration_id(
+    def test_nonexistent_exploration_id_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -73,7 +73,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_nonexistent_collection_id(
+    def test_nonexistent_collection_id_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -91,7 +91,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_and_nonexistent_exploration_ids(
+    def test_public_and_nonexistent_exploration_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -112,7 +112,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_and_nonexistent_collection_ids(
+    def test_public_and_nonexistent_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -133,7 +133,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_nonexistent_exploration_and_collection_ids(
+    def test_nonexistent_exploration_and_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -154,7 +154,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_exploration_and_nonexistent_collection_ids(
+    def test_public_exploration_and_nonexistent_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -175,7 +175,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_collection_and_nonexistent_exploration_ids(
+    def test_public_collection_and_nonexistent_exploration_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -196,7 +196,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_private_exploration_id(
+    def test_private_exploration_id_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -214,7 +214,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_private_collection_id(
+    def test_private_collection_id_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -232,7 +232,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_and_private_exploration_ids(
+    def test_public_and_private_exploration_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -253,7 +253,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_and_private_collection_ids(
+    def test_public_and_private_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -274,7 +274,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_private_exploration_and_private_collection_ids(
+    def test_private_exploration_and_private_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -295,7 +295,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_exploration_and_private_collection_ids(
+    def test_public_exploration_and_private_collection_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -316,7 +316,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_public_collection_and_private_exploration_ids(
+    def test_public_collection_and_private_exploration_ids_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
@@ -337,7 +337,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
-    def test_scenarios_for_public_activity_ids(
+    def test_public_exploration_and_public_collection_ids_should_succeed(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
