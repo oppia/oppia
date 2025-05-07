@@ -185,6 +185,9 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
   cardDisplay: {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
+    container: 'e2e-test-card-display-container',
+    addButton: 'e2e-test-card-display-add-button',
+    minusButton: 'e2e-test-card-display-minus-button',
   },
   topicCard: {
     content: '.e2e-test-learner-topic-summary-tile',
@@ -2070,6 +2073,8 @@ export class LoggedInUser extends BaseUser {
       );
     }
   }
+
+  async expectCardDisplayControls(): Promise<void> {}
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

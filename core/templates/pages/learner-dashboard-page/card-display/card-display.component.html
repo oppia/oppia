@@ -2,16 +2,16 @@
   <div class="d-flex justify-content-between">
     <p class="e2e-test-card-display-heading card-display-heading"> {{ headingI18n | translate }} </p>
     <div class="card-display-arrow-button-container" *ngIf="arrowButtonVisibility">
-      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'right' : 'left')" [disabled]="currentShift === 0" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift - 1)">
+      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'right' : 'left')" [disabled]="currentShift === 0" class="e2e-test-card-display-minus-button px-0 card-display-arrow-button" (click)="moveCard(currentShift - 1)">
         <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
       </button>
-      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'left' : 'right')" [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
+      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'left' : 'right')" [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="e2e-test-card-display-add-button px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
         <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
       </button>
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <div class="e2e-test-card-display-content d-flex card-display-content-container pb-1 mb-n1" [ngClass]="getVisibility()" #cards>
+  <div class="e2e-test-card-display-container d-flex card-display-content-container pb-1 mb-n1" [ngClass]="getVisibility()" #cards>
     <ng-content></ng-content>
   </div>
   <!--TODO(#18384): Delete I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON key-->
