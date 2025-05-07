@@ -238,6 +238,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/manage-classroom-progress-in-learner-dashboard',
     'logged-in-user/manage-classroom-progress-in-home-learner-dashboard',
     'logged-in-user/manage-exploration-progress-in-learner-dashboard',
+    'logged-in-user/manage-exploration-progress-in-home-learner-dashboard',
     'logged-in-user/deny-access-to-pages-without-additional-roles',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
