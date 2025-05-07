@@ -20,10 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
@@ -38,7 +35,6 @@ describe('GraphInputValidationService', () => {
   let currentState: string;
   let customizationArguments: GraphInputCustomizationArgs;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -47,7 +43,6 @@ describe('GraphInputValidationService', () => {
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     validatorService = TestBed.get(GraphInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
@@ -95,7 +90,7 @@ describe('GraphInputValidationService', () => {
       },
     };
 
-    var answerGroup = agof.createNew(
+    var answerGroup = AnswerGroup.createNew(
       [
         Rule.createFromBackendDict(
           {
@@ -258,7 +253,7 @@ describe('GraphInputValidationService', () => {
   it(
     "should not verify vertex graph that has 'HasGraphProperty'" + ' rule type',
     () => {
-      var answerGroup = agof.createNew(
+      var answerGroup = AnswerGroup.createNew(
         [
           Rule.createNew(
             'HasGraphProperty',
@@ -286,7 +281,7 @@ describe('GraphInputValidationService', () => {
   );
 
   it('should validate the maximum number of vertices in the graph', () => {
-    var answerGroup = agof.createNew(
+    var answerGroup = AnswerGroup.createNew(
       [
         Rule.createNew(
           'rule',
@@ -326,7 +321,7 @@ describe('GraphInputValidationService', () => {
   });
 
   it('should throw error when rule is invalid', () => {
-    var answerGroup = agof.createNew(
+    var answerGroup = AnswerGroup.createNew(
       [new Rule(new Error('Error') as unknown as string, {}, {})],
       goodDefaultOutcome,
       [],
