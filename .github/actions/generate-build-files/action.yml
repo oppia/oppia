@@ -3,17 +3,29 @@ description: 'Generate build files'
 runs:
   using: composite
   steps:
+    - name: Check if build files already exist
+      id: precheck
+      run: |
+        if [ -f "/home/runner/work/oppia/build_files.zip" ]; then
+          echo "Build files already exist. Skipping download and regeneration."
+          echo "files_exist=true" >> $GITHUB_ENV
+        else
+          echo "Build files not found. Proceeding with download or regeneration."
+          echo "files_exist=false" >> $GITHUB_ENV
+        fi
+      shell: bash
     - name: Attempt to download build files
       id: download_artifact
+      if: env.files_exist == 'false'
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
         name: cached_build_files
         path: /home/runner/work/oppia
     - name: Unzip build files
-      if: steps.download_artifact.outcome != 'failure'
+      if: steps.download_artifact.outcome != 'failure' || env.files_exist == 'true'
       run: |
-        echo "Successfully downloaded build files"
+        echo "Successfully downloaded build files or pre-checked build files"
         pwd
         ls -la
         unzip build_files.zip
@@ -31,7 +43,7 @@ runs:
       working-directory: /home/runner/work/oppia
       shell: bash
     - name: Build Webpack
-      if: steps.download_artifact.outcome == 'failure'
+      if: steps.download_artifact.outcome == 'failure' && env.files_exist == 'false'
       run: |
         echo "Failed to download build files. Regenerating."
         python -m scripts.build --prod_env
@@ -39,12 +51,23 @@ runs:
     - name: Zip build files
       # We avoid using ../ or absolute paths because unzip treats these as
       # security issues and will refuse to follow them.
+      if: steps.download_artifact.outcome == 'failure' && env.files_exist == 'false'
       run: |
         zip -rqy build_files.zip oppia/build oppia/webpack_bundles oppia/app.yaml oppia/assets/hashes.json oppia/backend_prod_files oppia/dist oppia/third_party/generated
       working-directory: /home/runner/work/oppia
       shell: bash
+    - name: Check if build_files.zip exists before upload
+      if: always()
+      run: |
+        if [ -f "build_files.zip" ]; then
+          echo "build_files.zip exists and will be uploaded."
+        else
+          echo "build_files.zip does not exist. Skipping upload."
+        fi
+      working-directory: /home/runner/work/oppia
+      shell: bash
     - name: Upload build files artifact
-      if: steps.download_artifact.outcome == 'failure'
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: cached_build_files
