@@ -77,7 +77,6 @@ jobs:
             } catch (error) {
               console.error("Error during CLA verification:", error);
               core.warning(`CLA check failed: ${error.message}`);
-              // Don't fail the workflow on error, default to allowing the contribution
               core.setOutput('has-signed-cla', 'true');
             }
 
