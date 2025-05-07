@@ -111,7 +111,7 @@ class FeaturedActivitiesHandler(
                 # strings in the non_existent_exploration_ids list
                 # with the beginning component of the message.
                 if non_existent_exploration_ids:
-                    ids = ', '.join(str(id) for id in non_existent_exploration_ids)
+                    ids = ', '.join(map(str, non_existent_exploration_ids))
                     error = (
                         f'These Exploration IDs do not exist: '
                         f'{ids}. '
@@ -125,7 +125,7 @@ class FeaturedActivitiesHandler(
                 # strings in the non_existent_collection_ids
                 # list with the beginning component of the message.
                 if non_existent_collection_ids:
-                    ids = ', '.join(str(id) for id in non_existent_collection_ids)
+                    ids = ', '.join(map(str, non_existent_collection_ids))
                     error = (
                         f'These Collection IDs do not exist: '
                         f'{ids}. '
@@ -139,9 +139,10 @@ class FeaturedActivitiesHandler(
                 # strings in the private_exploration_ids list with
                 # the beginning component of the message.
                 if private_exploration_ids:
+                    ids = ', '.join(map(str, private_exploration_ids))
                     error = (
                         f'These Exploration IDs are private: '
-                        f'{", ".join(str(id) for id in private_exploration_ids)}. '
+                        f'{ids}. '
                     )
                     # Join specific error with general error
                     # message.
@@ -152,9 +153,10 @@ class FeaturedActivitiesHandler(
                 # strings in the private_collection_ids list with
                 # the beginning component of the message.
                 if private_collection_ids:
+                    ids = ', '.join(map(str, private_collection_ids))
                     error = (
                         f'These Collection IDs are private: '
-                        f'{", ".join(str(id) for id in private_collection_ids)}. '
+                        f'{ids}. '
                     )
                     # Join specific error with general error
                     # message.

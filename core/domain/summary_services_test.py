@@ -928,9 +928,13 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
         non_existent_activity_ids = [
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_EXPLORATION, dne_exp_id),
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                non_existent_exploration_id
+            ),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, dne_col_id)
+                constants.ACTIVITY_TYPE_COLLECTION,
+                non_existent_collection_id
+            )
         ]
 
         (
@@ -942,10 +946,14 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
             non_existent_activity_ids
         )
 
-        self.assertIn(non_existent_exploration_id,
-            non_existent_exploration_ids)
-        self.assertIn(non_existent_collection_id,
-            non_existent_collection_ids)
+        self.assertIn(
+            non_existent_exploration_id,
+            non_existent_exploration_ids
+        )
+        self.assertIn(
+            non_existent_collection_id,
+            non_existent_collection_ids
+        )
         self.assertEqual(private_exploration_ids, [])
         self.assertEqual(private_collection_ids, [])
 
