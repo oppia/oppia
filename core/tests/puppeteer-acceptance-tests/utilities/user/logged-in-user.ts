@@ -2061,6 +2061,35 @@ export class LoggedInUser extends BaseUser {
       );
     }
   }
+
+  /**
+   * Gets subsection element based on title. We need to differentiate parent elements
+   * in progress tab because the subsections are titled the same.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async findSubsectionElement(
+    criteria: string,
+    section: string = 'N/A'
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+    if (section === 'In Progress' || section === 'Completed') {
+      sectionElement = await this.findElement(
+        this.page,
+        learnerDashSelectors.tabSection,
+        section
+      );
+    }
+
+    const subsectionElement = await this.findElement(
+      sectionElement,
+      learnerDashSelectors.cardDisplay,
+      criteria
+    );
+
+    return subsectionElement;
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
