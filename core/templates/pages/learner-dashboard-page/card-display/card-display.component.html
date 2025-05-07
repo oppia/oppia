@@ -5,7 +5,7 @@
       <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'right' : 'left')" [disabled]="currentShift === 0" class="e2e-test-card-display-minus-button px-0 card-display-arrow-button" (click)="moveCard(currentShift - 1)">
         <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'right' : 'left')"></span>
       </button>
-      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'left' : 'right')" [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="e2e-test-card-display-add-button px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
+      <button [attr.aria-label]="'Shift cards to the ' + (isLanguageRTL ? 'left' : 'right')" [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="e2e-test-card-display-plus-button px-0 card-display-arrow-button" (click)="moveCard(currentShift + 1)">
         <span aria-hidden="true" [ngClass]="'fas fa-chevron-' + (isLanguageRTL ? 'left' : 'right')"></span>
       </button>
     </div>
