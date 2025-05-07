@@ -87,6 +87,16 @@ describe('Logged-in User', function () {
         await loggedInUser.searchForLessonInSearchBar(title);
         await loggedInUser.playLessonFromSearchResults(title);
       }
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectElementsToBePresent(
+        ['Continue where you left off'],
+        'tabSection'
+      );
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Lessons in progress',
+        explorationTitles
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
