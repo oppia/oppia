@@ -61,7 +61,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
 
   subscribeToOnLanguageCodeChange(): void {
     this.directiveSubscriptions.add(
-      this.translateService.onLangChange.subscribe(() => {
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
         this.setPageTitle();
       })
     );
