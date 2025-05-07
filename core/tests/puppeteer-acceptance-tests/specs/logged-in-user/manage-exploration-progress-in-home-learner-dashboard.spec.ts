@@ -32,6 +32,7 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
+  const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -50,12 +51,6 @@ describe('Logged-in User', function () {
       'show_redesigned_learner_dashboard'
     );
 
-    const explorationTitles = [
-      'Exploration 1',
-      'Exploration 2',
-      'Exploration 3',
-    ];
-
     for (const title of explorationTitles) {
       await curriculumAdmin.createAndPublishExplorationWithCards(title);
     }
@@ -66,9 +61,32 @@ describe('Logged-in User', function () {
     );
   }, 480000);
   it(
-    'should display in-progress lessons only after starting explorations',
+    'should display saved community lessons after adding to playlist',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
+      await loggedInUser.addLessonToPlayLater('Exploration 1');
+      await loggedInUser.expectToolTipMessage(
+        "Successfully added to your 'Play Later' list."
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Lessons you saved for later',
+        ['Exploration 1']
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display in-progress section after starting explorations (no in progress classroom lessons)',
+    async function () {
+      for (const title of explorationTitles) {
+        await loggedInUser.navigateToCommunityLibraryPage();
+        await loggedInUser.searchForLessonInSearchBar(title);
+        await loggedInUser.playLessonFromSearchResults(title);
+      }
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
