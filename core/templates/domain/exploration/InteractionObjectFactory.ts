@@ -141,26 +141,26 @@ export class Interaction extends BaseTranslatableObject {
   }
 
   getContentIdToContents(): {[contentId: string]: string} {
-    let contentIdToHtml = {};
-    let answerGroupsContentIdToHtml = {};
-    let outcomeContentIdToHtml = {};
-    let solutionContentIdToHtml = {};
-    let htmlContentToHtml = {};
-    let customizationArgsContentIdToContents = {};
+    let contentIdToHtml: {[contentId: string]: string} = {};
+    let answerGroupsContentIdToHtml: {[contentId: string]: string} = {};
+    let outcomeContentIdToHtml: {[contentId: string]: string} = {};
+    let solutionContentIdToHtml: {[contentId: string]: string} = {};
+    let htmlContentToHtml: {[contentId: string]: string} = {};
+    let customizationArgsContentIdToContents: {[contentId: string]: string} =
+      {};
 
     const subtitledContents = Interaction.getCustomizationArgContents(
       this.customizationArgs
     );
 
     for (let subtitledContent of subtitledContents) {
+      const contentId = subtitledContent.contentId || '';
+
       if (subtitledContent instanceof SubtitledHtml) {
-        customizationArgsContentIdToContents[
-          subtitledContent.contentId as string
-        ] = subtitledContent.html;
+        customizationArgsContentIdToContents[contentId] = subtitledContent.html;
       } else if (subtitledContent instanceof SubtitledUnicode) {
-        customizationArgsContentIdToContents[
-          subtitledContent.contentId as string
-        ] = subtitledContent.unicode;
+        customizationArgsContentIdToContents[contentId] =
+          subtitledContent.unicode;
       }
     }
 

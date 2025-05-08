@@ -24,7 +24,6 @@ import html
 import io
 import json
 import logging
-import re
 import uuid
 
 from core import feconf

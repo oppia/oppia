@@ -151,15 +151,13 @@ describe('State Object Factory', () => {
   });
 
   it('should be able to get content ID to HTML', () => {
-    stateObject.interaction.customization_args.placeholder.value.content_id =
-      'ca_placeholder_0';
     const state = sof.createFromBackendDict('State name', stateObject);
 
     const contentIdToHtml = state.getContentIdToContents();
     expect(contentIdToHtml).toEqual({
       content_0: '',
       default_outcome_1: '',
-      ca_placeholder_0: 'Type your answer here.',
+      '': 'Type your answer here.',
     });
   });
 
