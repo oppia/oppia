@@ -33,6 +33,7 @@ describe('Logged-in User', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
+  const explorationIds: string[] = [];
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -52,7 +53,9 @@ describe('Logged-in User', function () {
     );
 
     for (const title of explorationTitles) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(title);
+      const id =
+        await curriculumAdmin.createAndPublishExplorationWithCards(title);
+      explorationIds.push(id ?? '');
     }
 
     loggedInUser = await UserFactory.createNewUser(
@@ -82,13 +85,10 @@ describe('Logged-in User', function () {
   it(
     'should display in-progress section after starting explorations (no in progress classroom lessons)',
     async function () {
-      for (const title of explorationTitles) {
-        await loggedInUser.navigateToCommunityLibraryPage();
-        await loggedInUser.searchForLessonInSearchBar(title);
-        await loggedInUser.playLessonFromSearchResults(title);
+      for (const id of explorationIds) {
+        await loggedInUser.playExploration(id);
         await loggedInUser.continueToNextCard();
       }
-
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectElementsToBePresent(
         ['Continue where you left off'],
