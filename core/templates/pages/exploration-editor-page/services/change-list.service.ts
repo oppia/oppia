@@ -47,7 +47,7 @@ import {
 import {
   AnswerGroup,
   AnswerGroupBackendDict,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
 import {

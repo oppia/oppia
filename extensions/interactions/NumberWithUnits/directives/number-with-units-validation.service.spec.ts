@@ -18,21 +18,15 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Unit} from 'interactions/answer-defs';
 import {Fraction, FractionDict} from 'domain/objects/fraction.model';
-import {
-  NumberWithUnits,
-  NumberWithUnitsObjectFactory,
-} from 'domain/objects/NumberWithUnitsObjectFactory';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
+import {Units} from 'domain/objects/units.model';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -45,13 +39,9 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoThousandRule: Rule;
   let equivalentToTwoByThreeRule: Rule;
   let equivalentToTwoRule: Rule;
-  let agof: AnswerGroupObjectFactory;
-  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
-    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -187,7 +177,7 @@ describe('NumberWithUnitsValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsTwoRule, equalsTwoByThreeRule],
         goodDefaultOutcome,
         [],
@@ -328,7 +318,7 @@ describe('NumberWithUnitsValidationService', () => {
   );
 
   it('should throw error when rule equivalency check fails', () => {
-    spyOn(numberWithUnitsObjectFactory, 'fromDict').and.returnValue({
+    spyOn(NumberWithUnits, 'fromDict').and.returnValue({
       type: 'real',
       real: 0.0,
       // This throws "Type '{ toFloat: () => number; }' is missing the
@@ -350,12 +340,11 @@ describe('NumberWithUnitsValidationService', () => {
         return null;
       },
       toDict: () => {
-        let uof = new UnitsObjectFactory();
         let tmp = new NumberWithUnits(
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / s^2')
+          Units.fromRawInputString('m / s^2')
         );
 
         return tmp.toDict();
