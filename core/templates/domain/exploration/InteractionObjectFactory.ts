@@ -140,12 +140,29 @@ export class Interaction extends BaseTranslatableObject {
     return translatableObjects;
   }
 
-  getContentIdToHtml(): {[contentId: string]: string} {
+  getContentIdToContents(): {[contentId: string]: string} {
     let contentIdToHtml = {};
     let answerGroupsContentIdToHtml = {};
     let outcomeContentIdToHtml = {};
     let solutionContentIdToHtml = {};
     let htmlContentToHtml = {};
+    let customizationArgsContentIdToContents = {};
+
+    const subtitledContents = Interaction.getCustomizationArgContents(
+      this.customizationArgs
+    );
+
+    for (let subtitledContent of subtitledContents) {
+      if (subtitledContent instanceof SubtitledHtml) {
+        customizationArgsContentIdToContents[
+          subtitledContent.contentId as string
+        ] = subtitledContent.html;
+      } else if (subtitledContent instanceof SubtitledUnicode) {
+        customizationArgsContentIdToContents[
+          subtitledContent.contentId as string
+        ] = subtitledContent.unicode;
+      }
+    }
 
     for (let answerGroup of this.answerGroups) {
       Object.assign(
@@ -168,6 +185,7 @@ export class Interaction extends BaseTranslatableObject {
 
     return Object.assign(
       contentIdToHtml,
+      customizationArgsContentIdToContents,
       answerGroupsContentIdToHtml,
       outcomeContentIdToHtml,
       htmlContentToHtml,
@@ -176,7 +194,7 @@ export class Interaction extends BaseTranslatableObject {
   }
 
   getContentIdForMatchingHtml(contentHtml: string): string | undefined {
-    let contentIdToHtml = this.getContentIdToHtml();
+    let contentIdToHtml = this.getContentIdToContents();
     for (let contentId in contentIdToHtml) {
       let retrievedHtml = contentIdToHtml[contentId];
 
