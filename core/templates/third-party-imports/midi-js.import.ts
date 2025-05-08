@@ -28,18 +28,18 @@ if (AppConstants.DEV_MODE) {
   soundfontPath = '/dist/oppia-angular-prod/midi/examples/soundfont/';
 }
 
-function ready(fn: () => void): void {
+const ready = (fn: () => void): void => {
   if (document.readyState !== 'loading') {
     fn();
   } else {
     document.addEventListener('DOMContentLoaded', fn);
   }
-}
+};
 
-ready(function () {
+ready(() => {
   MIDI.loadPlugin({
     soundfontUrl: soundfontPath,
     instrument: 'acoustic_grand_piano',
-    callback: function () {},
+    callback: () => {},
   });
 });
