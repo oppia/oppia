@@ -40,9 +40,9 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {
   Question,
   QuestionObjectFactory,
@@ -122,7 +122,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
     private loggerService: LoggerService,
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
     private questionsListService: QuestionsListService,
@@ -261,9 +260,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             response.associated_skill_dicts.forEach(skillDict => {
               this.misconceptionsBySkill[skillDict.id] =
                 skillDict.misconceptions.map(misconception => {
-                  return this.misconceptionObjectFactory.createFromBackendDict(
-                    misconception
-                  );
+                  return Misconception.createFromBackendDict(misconception);
                 });
               this.associatedSkillSummaries.push(
                 ShortSkillSummary.create(skillDict.id, skillDict.description)

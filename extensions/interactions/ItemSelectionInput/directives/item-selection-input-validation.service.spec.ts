@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
@@ -39,7 +36,6 @@ describe('ItemSelectionInputValidationService', () => {
   let customizationArguments: ItemSelectionInputCustomizationArgs,
     badCustomizationArguments: ItemSelectionInputCustomizationArgs;
   let IsProperSubsetValidOption: AnswerGroup[];
-  let agof: AnswerGroupObjectFactory;
   let ThreeInputsAnswerGroups: AnswerGroup[],
     OneInputAnswerGroups: AnswerGroup[],
     NoInputAnswerGroups: AnswerGroup[],
@@ -52,8 +48,6 @@ describe('ItemSelectionInputValidationService', () => {
 
     validatorService = TestBed.inject(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-
-    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
@@ -100,7 +94,7 @@ describe('ItemSelectionInputValidationService', () => {
       },
     };
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -118,7 +112,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     ThreeInputsAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -136,7 +130,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     OneInputAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -154,7 +148,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     NoInputAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -172,7 +166,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     NoInputAnswerGroupsWithEqualsRule = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -190,7 +184,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     IsProperSubsetValidOption = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -491,7 +485,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -539,7 +533,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -575,7 +569,7 @@ describe('ItemSelectionInputValidationService', () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       goodDefaultOutcome.feedback.html = '';
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -622,7 +616,7 @@ describe('ItemSelectionInputValidationService', () => {
     () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -662,7 +656,7 @@ describe('ItemSelectionInputValidationService', () => {
         new SubtitledHtml('Selection 3', 'ca_2'),
       ];
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -721,7 +715,7 @@ describe('ItemSelectionInputValidationService', () => {
     () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -758,7 +752,7 @@ describe('ItemSelectionInputValidationService', () => {
       goodDefaultOutcome.feedback.html = '';
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -800,7 +794,7 @@ describe('ItemSelectionInputValidationService', () => {
 
   it('should warn about duplicated rules', () => {
     const answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
