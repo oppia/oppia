@@ -24,7 +24,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {AppConstants} from 'app.constants';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
 
 /* Null in ID denotes a new question whose ID is yet
