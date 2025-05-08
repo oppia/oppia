@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
+from core.constants import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
@@ -404,3 +405,62 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(
             ssml_content,
             self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = '15 ÷ 5 is ______.'
+        expected_main_content = (
+            '15 <say-as interpret-as="math">divided by</say-as> 5 is  dash .')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+    def test_should_transform_algebric_fraction(self) -> None:
+        content = 'Calculate x: x/4 = 2.'
+        expected_transformed_content = 'Calculate x: x / 4 = 2.'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_algebric_fraction(content),
+            expected_transformed_content)
+
+        content = 'Calculate x: 4/x = 2.'
+        expected_transformed_content = 'Calculate x: 4 / x = 2.'
+        self.assertEqual(
+            azure_speech_synthesis_services.process_algebric_fraction(content),
+            expected_transformed_content)
+
+    def test_should_pronounce_correctly_for_superscripts(self) -> None:
+        math_symbol_pronounciations = (
+            constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            'en', {}))
+
+        content = 'x^2 + y^2 = z^3'
+        expected_content_to_be_pronounced = 'x squared + y squared = z cubed'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )
+
+        content = 'x² + 5 = z⁴'
+        expected_content_to_be_pronounced = (
+            'x squared + 5 = z to the power of 4')
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )
+
+        # Should not update if the text doesn't contain any superscript.
+        content = 'x + 5  = 10'
+        expected_content_to_be_pronounced = 'x + 5  = 10'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )

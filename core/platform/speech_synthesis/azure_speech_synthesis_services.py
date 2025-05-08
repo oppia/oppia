@@ -243,7 +243,7 @@ def process_algebric_fraction(text: str) -> str:
         str. The text with algebraic fractions reformatted to include spaces
         around slashes.
     """
-    text = re.sub(r'(\d+)/', r' \1 / ', text)
+    text = re.sub(r'(\d+)/', r'\1 / ', text)
     text = re.sub(r'/(\d+)', r' / \1', text)
     return text
 
@@ -334,6 +334,10 @@ def convert_plaintext_to_ssml_content(
         # language.
         content = process_superscript_in_text(
             content, math_symbol_pronounciations)
+
+        # Update the content to pronounce 'dash' for two or more underscores in
+        # the content.
+        content = re.sub(r'_{2,}', ' dash ', content)
 
         main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
 
