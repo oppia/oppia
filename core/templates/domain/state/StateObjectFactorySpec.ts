@@ -153,10 +153,11 @@ describe('State Object Factory', () => {
   it('should be able to get content ID to HTML', () => {
     const state = sof.createFromBackendDict('State name', stateObject);
 
-    const contentIdToHtml = state.getContentIdToHtml();
+    const contentIdToHtml = state.getContentIdToContents();
     expect(contentIdToHtml).toEqual({
       content_0: '',
       default_outcome_1: '',
+      '': 'Type your answer here.',
     });
   });
 

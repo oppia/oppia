@@ -473,6 +473,7 @@ describe('Translation status service', () => {
         },
         content_8: {
           manual: voiceover2,
+          auto: undefined,
         },
       }
     );

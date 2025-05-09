@@ -636,7 +636,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       let state = this.explorationStatesService.getState(
         activeStateName as string
       );
-      let contentIdToHtml = state.getContentIdToHtml();
+      let contentIdToHtml = state.getContentIdToContents();
 
       if (contentIdToHtml[this.activeContentId]) {
         return true;
