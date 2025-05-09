@@ -884,4 +884,142 @@ describe('ItemSelectionInputValidationService', () => {
       },
     ]);
   });
+
+  it('should not warn if rules have different inputs', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it('should not warn if rules have same inputs but different rule types', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'ContainsAtLeastOneOf',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it('should warn if rules have same inputs in different order', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0', 'ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1', 'ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
 });
