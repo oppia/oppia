@@ -1635,7 +1635,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(previewTabButton);
     }
-    await this.waitForNetworkIdle();
   }
 
   /**
