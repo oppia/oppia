@@ -2749,30 +2749,27 @@ describe('Contributions and review component', () => {
       );
     });
 
-    it(
-      'should commit the queued suggestion when the snackbar is dismissed',
-      () => {
-        const commitQueuedSuggestionSpy = spyOn(
-          component,
-          'commitQueuedSuggestion'
-        ).and.callThrough();
+    it('should commit the queued suggestion when the snackbar is dismissed', () => {
+      const commitQueuedSuggestionSpy = spyOn(
+        component,
+        'commitQueuedSuggestion'
+      ).and.callThrough();
 
-        let afterDismissedObservable = new Subject<void>();
-        let snackBarRefMock = {
-          instance: {message: ''},
-          afterDismissed: () => afterDismissedObservable.asObservable(),
-          onAction: () => of(null),
-        };
+      let afterDismissedObservable = new Subject<void>();
+      let snackBarRefMock = {
+        instance: {message: ''},
+        afterDismissed: () => afterDismissedObservable.asObservable(),
+        onAction: () => of(null),
+      };
 
-        snackBarSpy.and.returnValue(snackBarRefMock);
+      snackBarSpy.and.returnValue(snackBarRefMock);
 
-        component.showUndoSnackbar();
+      component.showUndoSnackbar();
 
-        afterDismissedObservable.next();
-        afterDismissedObservable.complete();
+      afterDismissedObservable.next();
+      afterDismissedObservable.complete();
 
-        expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
-      }
-    );
+      expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
+    });
   });
 });
