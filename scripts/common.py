@@ -235,6 +235,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
     'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/manage-classroom-progress-in-learner-dashboard',
+    'logged-in-user/manage-exploration-progress-in-learner-dashboard',
     'logged-in-user/deny-access-to-pages-without-additional-roles',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
@@ -291,6 +293,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
     'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-and-republish-story-with-mobile-supported-explorations',
     'topic-manager/edit-preview-and-save-a-chapter',
     'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]

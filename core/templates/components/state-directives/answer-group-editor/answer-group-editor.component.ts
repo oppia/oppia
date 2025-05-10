@@ -39,7 +39,7 @@ import {AlertsService} from 'services/alerts.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {ExternalSaveService} from 'services/external-save.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 

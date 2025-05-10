@@ -28,7 +28,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Subscription} from 'rxjs';
 import {ExternalSaveService} from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';

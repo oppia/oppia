@@ -515,6 +515,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
