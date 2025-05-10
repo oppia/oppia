@@ -502,14 +502,14 @@ export class QuestionSubmitter extends BaseUser {
 
   // TODO (#22539): This function has a duplicate in exploration-editor.ts.
   // To avoid unexpected behavior, ensure that any modifications here are also
-  // made in editDefaultResponseFeedback() in exploration-editor.ts.
+  // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedbackInQuestionSubmitter(
+  async editDefaultResponseFeedbackInQuestionEditorPage(
     defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
