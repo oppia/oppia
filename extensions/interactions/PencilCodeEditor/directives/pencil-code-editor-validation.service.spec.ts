@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
@@ -29,11 +26,9 @@ import {TestBed} from '@angular/core/testing';
 describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService;
   let inputBackend: RuleInputs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     pcevs = TestBed.inject(PencilCodeEditorValidationService);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
   });
 
   describe('on calling getCustomizationArgsWarnings', () => {
@@ -93,7 +88,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome2,
+        [],
+        null
+      );
 
       // It also returns the error when feedback is not provided.
       expect(
@@ -125,7 +125,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome,
+        [],
+        null
+      );
       const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',
@@ -194,7 +199,12 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
         x: 'CodeString',
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      let answergroup2 = AnswerGroup.createNew(
+        [rulesDict],
+        testOutcome,
+        [],
+        null
+      );
       const testOutcome2 = Outcome.createNew(
         'Introduction',
         'default_outcome',

@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
@@ -47,7 +44,6 @@ describe('DragAndDropSortInputValidationService', () => {
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs,
     badCustomizationArgs: DragAndDropSortInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -55,7 +51,6 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -196,13 +191,13 @@ describe('DragAndDropSortInputValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
         [],
         null
       ),
-      agof.createNew([goodRule1, goodRule2], customOutcome, [], null),
+      AnswerGroup.createNew([goodRule1, goodRule2], customOutcome, [], null),
     ];
   });
 
@@ -233,8 +228,8 @@ describe('DragAndDropSortInputValidationService', () => {
       ),
     ];
     answerGroups = [
-      agof.createNew(rules, customOutcome, [], null),
-      agof.createNew(rules, customOutcome, [], null),
+      AnswerGroup.createNew(rules, customOutcome, [], null),
+      AnswerGroup.createNew(rules, customOutcome, [], null),
     ];
     var warnings = validatorService.getAllWarnings(
       currentState,
