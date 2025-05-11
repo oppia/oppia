@@ -17,20 +17,15 @@
  */
 
 import {Fraction} from 'domain/objects/fraction.model';
-import {
-  NumberWithUnits,
-  NumberWithUnitsObjectFactory,
-} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {Units} from 'domain/objects/units.model';
 
-describe('NumberWithUnitsObjectFactory', () => {
+describe('NumberWithUnits', () => {
   describe('number with units object factory', () => {
-    let nwuof: NumberWithUnitsObjectFactory;
     let errors: typeof ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
 
     beforeEach(() => {
-      nwuof = new NumberWithUnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS;
     });
 
@@ -232,7 +227,7 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should parse valid number with units strings', () => {
-      expect(nwuof.fromRawInputString('2.02 kg / m^3')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('2.02 kg / m^3')).toEqual(
         new NumberWithUnits(
           'real',
           2.02,
@@ -240,7 +235,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('kg / m^3')
         )
       );
-      expect(nwuof.fromRawInputString('2 / 3 kg / m^3')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('2 / 3 kg / m^3')).toEqual(
         new NumberWithUnits(
           'fraction',
           0,
@@ -248,7 +243,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('kg / m^3')
         )
       );
-      expect(nwuof.fromRawInputString('2')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('2')).toEqual(
         new NumberWithUnits(
           'real',
           2,
@@ -256,7 +251,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('')
         )
       );
-      expect(nwuof.fromRawInputString('2 / 3')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('2 / 3')).toEqual(
         new NumberWithUnits(
           'fraction',
           0,
@@ -264,7 +259,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('')
         )
       );
-      expect(nwuof.fromRawInputString('$ 2.02')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('$ 2.02')).toEqual(
         new NumberWithUnits(
           'real',
           2.02,
@@ -272,7 +267,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('$')
         )
       );
-      expect(nwuof.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits(
           'fraction',
           0,
@@ -280,7 +275,7 @@ describe('NumberWithUnitsObjectFactory', () => {
           Units.fromRawInputString('Rs / hour')
         )
       );
-      expect(nwuof.fromRawInputString('₹ 2 / 3 per hour')).toEqual(
+      expect(NumberWithUnits.fromRawInputString('₹ 2 / 3 per hour')).toEqual(
         new NumberWithUnits(
           'fraction',
           0,
@@ -292,49 +287,49 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     it('should throw errors for invalid number with units', () => {
       expect(() => {
-        nwuof.fromRawInputString('3* kg');
+        NumberWithUnits.fromRawInputString('3* kg');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
-        nwuof.fromRawInputString('$ 3*');
+        NumberWithUnits.fromRawInputString('$ 3*');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
-        nwuof.fromRawInputString('Rs 3^');
+        NumberWithUnits.fromRawInputString('Rs 3^');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
-        nwuof.fromRawInputString('₹ 3^');
+        NumberWithUnits.fromRawInputString('₹ 3^');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
-        nwuof.fromRawInputString('₹ - $25');
+        NumberWithUnits.fromRawInputString('₹ - $25');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
-        nwuof.fromRawInputString('3# m/s');
+        NumberWithUnits.fromRawInputString('3# m/s');
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
-        nwuof.fromRawInputString('3 $');
+        NumberWithUnits.fromRawInputString('3 $');
       }).toThrowError(errors.INVALID_CURRENCY_FORMAT);
       expect(() => {
-        nwuof.fromRawInputString('Rs5');
+        NumberWithUnits.fromRawInputString('Rs5');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
-        nwuof.fromRawInputString('$');
+        NumberWithUnits.fromRawInputString('$');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
-        nwuof.fromRawInputString('kg 2 s^2');
+        NumberWithUnits.fromRawInputString('kg 2 s^2');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
-        nwuof.fromRawInputString('2 m/s#');
+        NumberWithUnits.fromRawInputString('2 m/s#');
       }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
-        nwuof.fromRawInputString('@ 2');
+        NumberWithUnits.fromRawInputString('@ 2');
       }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
-        nwuof.fromRawInputString('2 / 3 kg&^-2');
+        NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
       }).toThrowError(errors.INVALID_UNIT_CHARS);
       expect(() => {
-        nwuof.fromRawInputString('2 m**2');
+        NumberWithUnits.fromRawInputString('2 m**2');
       }).toThrowError('Unexpected "*" in "m**2" at index 2');
       expect(() => {
-        nwuof.fromRawInputString('2 kg / m^(2)');
+        NumberWithUnits.fromRawInputString('2 kg / m^(2)');
       }).toThrowError(
         'In "kg / m^(2)", "^" must be followed by a floating-point number'
       );
@@ -344,7 +339,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Simple duplicate units like "m m".
 
       expect(() => {
-        nwuof.fromRawInputString('2 m m');
+        NumberWithUnits.fromRawInputString('2 m m');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
       );
@@ -352,7 +347,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Check complex expressions like "((m)/(s^2))(m/kg)".
 
       expect(() => {
-        nwuof.fromRawInputString('2 ((m)/(s^2))(m/kg)');
+        NumberWithUnits.fromRawInputString('2 ((m)/(s^2))(m/kg)');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2/(s^2 kg)".'
       );
@@ -360,7 +355,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Mixed normalized and unnormalized units like "m/meter".
 
       expect(() => {
-        nwuof.fromRawInputString('2 ((m/meter)/s meter)/kg');
+        NumberWithUnits.fromRawInputString('2 ((m/meter)/s meter)/kg');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m/(s kg)".'
       );
@@ -368,7 +363,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Both are normalized as "yard".
 
       expect(() => {
-        nwuof.fromRawInputString('2 yard yards');
+        NumberWithUnits.fromRawInputString('2 yard yards');
       }).toThrowError(
         'Your answer has a repeated unit: "yard". Try rewriting it as "yard^2".'
       );
@@ -376,13 +371,13 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Units mapped to the same normalized value, such as "meter" and "m".
 
       expect(() => {
-        nwuof.fromRawInputString('3 m meter');
+        NumberWithUnits.fromRawInputString('3 m meter');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
       );
 
       expect(() => {
-        nwuof.fromRawInputString('3 m^2 sec^-3 m');
+        NumberWithUnits.fromRawInputString('3 m^2 sec^-3 m');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^3/sec^3".'
       );
@@ -390,7 +385,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Multiple duplicates within a single expression.
 
       expect(() => {
-        nwuof.fromRawInputString('6 ((m m)/(kg kg))');
+        NumberWithUnits.fromRawInputString('6 ((m m)/(kg kg))');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2/kg^2".'
       );
@@ -398,7 +393,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Units with mismatched exponents in division.
 
       expect(() => {
-        nwuof.fromRawInputString('2 s^4/s^3');
+        NumberWithUnits.fromRawInputString('2 s^4/s^3');
       }).toThrowError(
         'Your answer has a repeated unit: "s". Try rewriting it as "s".'
       );
@@ -406,7 +401,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Units with mismatched exponents in multiplication.
 
       expect(() => {
-        nwuof.fromRawInputString('2 s^4 s^3');
+        NumberWithUnits.fromRawInputString('2 s^4 s^3');
       }).toThrowError(
         'Your answer has a repeated unit: "s". Try rewriting it as "s^7".'
       );
@@ -414,7 +409,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Mismatched exponents in multiplication and division.
 
       expect(() => {
-        nwuof.fromRawInputString('2 m^3/m m^2');
+        NumberWithUnits.fromRawInputString('2 m^3/m m^2');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^4".'
       );
@@ -422,7 +417,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Repetition in ratios like "(m/m) m".
 
       expect(() => {
-        nwuof.fromRawInputString('1 (m/m) m');
+        NumberWithUnits.fromRawInputString('1 (m/m) m');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m".'
       );
@@ -430,7 +425,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Invalid nested parentheses with duplicated units and space variation.
 
       expect(() => {
-        nwuof.fromRawInputString('2 ((m)/(s^2))/(m  kg)');
+        NumberWithUnits.fromRawInputString('2 ((m)/(s^2))/(m kg)');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "1/(s^2 kg)".'
       );
@@ -438,7 +433,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Excessive duplicate units in the denominator.
 
       expect(() => {
-        nwuof.fromRawInputString('2 km / (s s s sec)');
+        NumberWithUnits.fromRawInputString('2 km / (s s s sec)');
       }).toThrowError(
         'Your answer has a repeated unit: "s". Try rewriting it as "km/s^4".'
       );
@@ -446,7 +441,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Mixed normalized and unnormalized units.
 
       expect(() => {
-        nwuof.fromRawInputString('4 (meter^3)/(m^3 kg)');
+        NumberWithUnits.fromRawInputString('4 (meter^3)/(m^3 kg)');
       }).toThrowError(
         'Your answer has a repeated unit: "meter". Try rewriting it as "1/kg".'
       );
@@ -454,7 +449,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Negative exponent usage.
 
       expect(() => {
-        nwuof.fromRawInputString('4 m/(m^-2 m)');
+        NumberWithUnits.fromRawInputString('4 m/(m^-2 m)');
       }).toThrowError(
         'Your answer has a repeated unit: "m". Try rewriting it as "m^2".'
       );
@@ -464,7 +459,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Multiple slashes in an expression.
 
       expect(() => {
-        nwuof.fromRawInputString('2 km/s/m/kg');
+        NumberWithUnits.fromRawInputString('2 km/s/m/kg');
       }).toThrowError(
         'Your answer contains more than one slash ("/"). Try rewriting it as "km/(s m kg)".'
       );
@@ -472,14 +467,17 @@ describe('NumberWithUnitsObjectFactory', () => {
       // Excessive slashes in a complex expression.
 
       expect(() => {
-        nwuof.fromRawInputString('2 km/s^2/m/kg/in/mol');
+        NumberWithUnits.fromRawInputString('2 km/s^2/m/kg/in/mol');
       }).toThrowError(
         'Your answer contains more than one slash ("/"). Try rewriting it as "km/(s^2 m kg in mol)".'
       );
     });
     it('should create currency units', () => {
-      const createCurrencyUnitsSpy = spyOn(nwuof, 'createCurrencyUnits');
-      nwuof.createCurrencyUnits();
+      const createCurrencyUnitsSpy = spyOn(
+        NumberWithUnits,
+        'createCurrencyUnits'
+      );
+      NumberWithUnits.createCurrencyUnits();
       expect(createCurrencyUnitsSpy).toHaveBeenCalled();
     });
 
@@ -501,7 +499,9 @@ describe('NumberWithUnitsObjectFactory', () => {
         ],
       };
 
-      let createdNumberWithUnits = nwuof.fromDict(numberWithUnitsObject);
+      let createdNumberWithUnits = NumberWithUnits.fromDict(
+        numberWithUnitsObject
+      );
       expect(createdNumberWithUnits.toDict()).toEqual(numberWithUnitsObject);
     });
 
@@ -543,12 +543,12 @@ describe('NumberWithUnitsObjectFactory', () => {
           ],
         };
 
-        expect(() => nwuof.fromDict(realNumberWithFractionPart)).toThrowError(
-          'Number with type real cannot have a fraction part.'
-        );
-        expect(() => nwuof.fromDict(fractionNumberWithRealPart)).toThrowError(
-          'Number with type fraction cannot have a real part.'
-        );
+        expect(() =>
+          NumberWithUnits.fromDict(realNumberWithFractionPart)
+        ).toThrowError('Number with type real cannot have a fraction part.');
+        expect(() =>
+          NumberWithUnits.fromDict(fractionNumberWithRealPart)
+        ).toThrowError('Number with type fraction cannot have a real part.');
       }
     );
 

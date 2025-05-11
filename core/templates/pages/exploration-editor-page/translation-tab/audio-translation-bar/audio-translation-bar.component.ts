@@ -23,6 +23,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  Renderer2,
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import WaveSurfer from 'wavesurfer.js';
@@ -110,6 +111,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
+    private renderer: Renderer2,
     public voiceoverRecorder: VoiceoverRecordingService
   ) {}
 
@@ -576,6 +578,12 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     );
 
     let userIsLoggedIn;
+    const translationTab = document.querySelectorAll('.oppia-translation-tab');
+    const mainBody = document.querySelector('.oppia-main-body');
+
+    const translationTabElements =
+      translationTab.length > 0 ? translationTab : [];
+    const mainBodyElement = mainBody;
 
     this.userService
       .getUserInfoAsync()
@@ -584,40 +592,49 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
         return this.userExplorationPermissionsService.getPermissionsAsync();
       })
       .then(permissions => {
-        $('.oppia-translation-tab').on('dragover', evt => {
+        if (translationTabElements.length > 0) {
+          translationTabElements.forEach(tab => {
+            this.renderer.listen(tab, 'dragover', (evt: DragEvent) => {
+              evt.preventDefault();
+              this.dropAreaIsAccessible = permissions.canVoiceover;
+              this.userIsGuest = !userIsLoggedIn;
+              return false;
+            });
+          });
+        }
+      });
+
+    if (mainBodyElement) {
+      this.renderer.listen(mainBodyElement, 'dragleave', (evt: DragEvent) => {
+        evt.preventDefault();
+        if (evt.pageX === 0 || evt.pageY === 0) {
+          this.dropAreaIsAccessible = false;
+          this.userIsGuest = false;
+        }
+        return false;
+      });
+    }
+
+    if (translationTabElements.length > 0) {
+      translationTabElements.forEach(tab => {
+        this.renderer.listen(tab, 'drop', (evt: DragEvent) => {
           evt.preventDefault();
-          this.dropAreaIsAccessible = permissions.canVoiceover;
-          this.userIsGuest = !userIsLoggedIn;
+
+          const target = evt.target as HTMLElement;
+          if (
+            target.classList.contains('oppia-drop-area-message') &&
+            this.dropAreaIsAccessible
+          ) {
+            const files = evt.dataTransfer?.files;
+            if (files) {
+              this.openAddAudioTranslationModal(files);
+            }
+          }
+          this.dropAreaIsAccessible = false;
           return false;
         });
       });
-
-    $('.oppia-main-body').on('dragleave', evt => {
-      evt.preventDefault();
-      if (evt.pageX === 0 || evt.pageY === 0) {
-        this.dropAreaIsAccessible = false;
-        this.userIsGuest = false;
-      }
-      return false;
-    });
-
-    $('.oppia-translation-tab').on('drop', evt => {
-      evt.preventDefault();
-      if (
-        // TODO(#13015): Remove use of unknown as a type.
-        // The way to remove this unknown is migrating jQuery.
-        // So probably #12882 also.
-        (evt.target as unknown as Element).classList.contains(
-          'oppia-drop-area-message'
-        ) &&
-        this.dropAreaIsAccessible
-      ) {
-        let files = (evt.originalEvent as DragEvent).dataTransfer.files;
-        this.openAddAudioTranslationModal(files);
-      }
-      this.dropAreaIsAccessible = false;
-      return false;
-    });
+    }
 
     // // This is needed in order for the scope to be retrievable during Karma
     // // unit testing. See http://stackoverflow.com/a/29833832 for more
@@ -633,11 +650,6 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
 
     document.body.onkeyup = null;
-    // TODO(#12146): Remove jQuery usage below.
-    // Remove jQuery event listeners.
-    $('.oppia-translation-tab').off('dragover');
-    $('.oppia-main-body').off('dragleave');
-    $('.oppia-translation-tab').off('drop');
     // Remove wavesurefer finish event listener.
     this.waveSurfer?.un('finish', this.waveSurferOnFinishCb.bind(this));
   }

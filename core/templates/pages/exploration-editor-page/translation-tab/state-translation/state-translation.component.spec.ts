@@ -36,7 +36,6 @@ import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -297,7 +296,6 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
         StateCustomizationArgsService,
         StateInteractionIdService,
@@ -989,7 +987,6 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
         StateCustomizationArgsService,
         StateInteractionIdService,
@@ -1510,7 +1507,6 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
         StateCustomizationArgsService,
         StateInteractionIdService,
@@ -2194,7 +2190,6 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
         StateCustomizationArgsService,
         StateInteractionIdService,
