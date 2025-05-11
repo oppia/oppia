@@ -22,7 +22,6 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationStatusService} from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
@@ -76,7 +75,6 @@ describe('Translation status service', () => {
         TranslationStatusService,
         TranslationLanguageService,
         StateRecordedVoiceoversService,
-        StateWrittenTranslationsService,
         TranslationTabActiveModeService,
         ExplorationStatesService,
         GenerateContentIdService,

@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Outcome
+ * @fileoverview Model class for creating new frontend instances of Outcome
  * domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {
   SubtitledHtmlBackendDict,
@@ -107,15 +105,7 @@ export class Outcome extends BaseTranslatableObject {
       this.refresherExplorationId === null
     );
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class OutcomeObjectFactory {
-  constructor() {}
-
-  createNew(
+  static createNew(
     dest: string,
     feedbackTextId: string,
     feedbackText: string,
@@ -132,7 +122,7 @@ export class OutcomeObjectFactory {
     );
   }
 
-  createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
+  static createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
       outcomeDict.dest_if_really_stuck,
