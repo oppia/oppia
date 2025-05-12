@@ -127,7 +127,7 @@
         </oppia-card-display>
         <oppia-classroom-button [classroom]="item.key" [variant]="'blue'"></oppia-classroom-button>
       </ng-container>
-      <oppia-card-display *ngIf="totalLessonsInPlaylists.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists?.length ?? 0">
+      <oppia-card-display *ngIf="totalLessonsInPlaylists.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists?.length || 0">
         <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
           <lesson-card [story]="lesson"></lesson-card>
         </ng-container>
