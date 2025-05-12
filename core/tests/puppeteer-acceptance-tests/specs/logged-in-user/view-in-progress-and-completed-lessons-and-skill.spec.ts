@@ -153,4 +153,8 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });
