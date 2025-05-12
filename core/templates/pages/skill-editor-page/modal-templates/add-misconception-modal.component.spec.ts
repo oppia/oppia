@@ -21,7 +21,7 @@ import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {AddMisconceptionModalComponent} from './add-misconception-modal.component';
@@ -40,7 +40,6 @@ describe('Add Misconception Modal Component', function () {
   let component: AddMisconceptionModalComponent;
   let fixture: ComponentFixture<AddMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let skillEditorStateService: SkillEditorStateService;
   let skillObjectFactory: SkillObjectFactory;
   let skillObject: Skill;
@@ -64,7 +63,6 @@ describe('Add Misconception Modal Component', function () {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddMisconceptionModalComponent);
     component = fixture.componentInstance;
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
@@ -134,7 +132,7 @@ describe('Add Misconception Modal Component', function () {
     component.saveMisconception();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      misconception: misconceptionObjectFactory.create(3, '', '', '', true),
+      misconception: Misconception.create(3, '', '', '', true),
     });
   });
 
