@@ -461,6 +461,7 @@ describe('TopNavigationBarComponent', () => {
             // type 'Element'.". We need to suppress this error because if i18n
             // has not run, then the tabs will not have text content and so
             // their innerText.length value will be 0.
+            // @ts-expect-error
             innerText: '',
           },
         ],
@@ -534,6 +535,7 @@ describe('TopNavigationBarComponent', () => {
       // typescript expects around 120 more properties than just one
       // (clientWidth). We need only one 'clientWidth' for
       // testing purposes.
+      // @ts-expect-error
       .and.returnValue({
         clientHeight: 61,
       });
