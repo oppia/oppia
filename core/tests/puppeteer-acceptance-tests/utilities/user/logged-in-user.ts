@@ -1942,7 +1942,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToTopicPageByCard(topic: string): Promise<void> {
     await this.page.waitForFunction(
-      c => {
+      (c: string) => {
         return Array.from(document.querySelectorAll(c))
           .map(h => h.textContent?.trim())
           .includes("Topics available in Oppia's Classroom");
