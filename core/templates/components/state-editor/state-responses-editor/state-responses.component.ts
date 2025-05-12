@@ -33,7 +33,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
   TaggedMisconception,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {Subscription} from 'rxjs';
 import {
   AnswerChoice,
