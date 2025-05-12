@@ -1635,6 +1635,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(previewTabButton);
     }
+    // dummy comment.
   }
 
   /**
