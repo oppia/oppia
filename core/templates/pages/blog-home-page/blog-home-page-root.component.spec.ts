@@ -37,6 +37,8 @@ import {PageHeadService} from 'services/page-head.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BlogHomePageRootComponent} from './blog-home-page-root.component';
 import {UserService} from 'services/user.service';
+import {Router} from '@angular/router';
+import {By} from '@angular/platform-browser';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -53,6 +55,7 @@ describe('Blog Home Page Root', () => {
   let loaderService: LoaderService;
   let userService: UserService;
   let translateService: TranslateService;
+  let router: Router;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -81,6 +84,7 @@ describe('Blog Home Page Root', () => {
     );
     userService = TestBed.inject(UserService);
     translateService = TestBed.inject(TranslateService);
+    router = TestBed.inject(Router);
   });
 
   it('should successfully instantiate the component', () => {
@@ -182,5 +186,21 @@ describe('Blog Home Page Root', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should navigate to "/blog" when navigateToBlogHome is called', () => {
+    spyOn(router, 'navigate');
+    component.navigateToBlogHome();
+    expect(router.navigate).toHaveBeenCalledWith(['/blog']);
+  });
+
+  it('should call navigateToBlogHome when breadcrumb span is clicked', () => {
+    spyOn(component, 'navigateToBlogHome');
+    fixture.detectChanges();
+    const breadcrumb = fixture.debugElement.query(
+      By.css('.mobile-navbar-blog-homepage')
+    );
+    breadcrumb.triggerEventHandler('click', null);
+    expect(component.navigateToBlogHome).toHaveBeenCalled();
   });
 });
