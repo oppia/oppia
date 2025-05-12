@@ -1922,6 +1922,18 @@ export class LoggedInUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     await this.clickOnLogo();
   }
+
+  // This function is to open progress bar in new learner page.
+  async navigateToProgressSectionNewLearner(): Promise<void> {
+    await this.page.waitForSelector(progressSectionSelector);
+    const progressSection = await this.page.$(progressSectionSelector);
+    if (!progressSection) {
+      throw new Error('Progress section not found.');
+    }
+    await progressSection.click();
+
+    await this.waitForPageToFullyLoad();
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();

@@ -103,9 +103,8 @@ describe('Logged-in User', function () {
     'should display empty progress message when no lessons are in progress',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectEmptyProgressMessage();
-      // Screenshot will be added.
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -121,7 +120,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.expectExplorationToNotBeOver();
       await loggedInUser.clickOnLogo();
-      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectIncompleteLesson('What are the Place Values');
       await loggedInUser.expectProgressPercent('0%');
     },
@@ -133,7 +132,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.startLessonButtons();
       await loggedInUser.completeExploration();
-      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectCompletedLesson('What are the Place Values');
       await loggedInUser.expectProgressPercent('33%');
     },
@@ -146,7 +145,7 @@ describe('Logged-in User', function () {
       for (let i = 1; i < placeValueChapters.length; i++) {
         await loggedInUser.startLessonButtons();
         await loggedInUser.completeExploration();
-        await loggedInUser.navigateToProgressSection();
+        await loggedInUser.navigateToProgressSectionNewLearner();
         await loggedInUser.expectCompletedLesson(placeValueChapters[i]);
       }
       await loggedInUser.expectProgressPercent('100%');
@@ -154,8 +153,4 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-
-  afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
-  });
 });
