@@ -47,7 +47,7 @@ import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';

@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptCardBackendDict} from 'domain/skill/concept-card.model';
-import {MisconceptionBackendDict} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RubricBackendDict} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';

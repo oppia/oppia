@@ -29,7 +29,7 @@ import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {Skill} from 'domain/skill/SkillObjectFactory';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 
 interface MisconceptionFormSchema {
   type: 'html';
