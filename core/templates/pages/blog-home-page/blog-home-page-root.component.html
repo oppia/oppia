@@ -3,9 +3,8 @@
     <navbar-breadcrumb class="blog-homepage">
       <div class="nav navbar-nav oppia-navbar-breadcrumb main-blog-homepage-mobile-breadcrumb">
         <span class="mx-3 oppia-navbar-breadcrumb-separator"></span>
-        <span class="pt-3 mobile-navbar-blog-homepage">
+        <span class="pt-3 mobile-navbar-blog-homepage" (click)="navigateToBlogHome()" style="cursor: pointer;">
           {{ 'I18N_BLOG_HOME_PAGE_BREADCRUMB' | translate }}
-        </span>
       </div>
     </navbar-breadcrumb>
     <content>
