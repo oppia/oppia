@@ -177,7 +177,7 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
-const learnerDashSelectors = {
+const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
     heading: '.e2e-test-learner-dash-section-heading',
@@ -1879,12 +1879,12 @@ export class LoggedInUser extends BaseUser {
   /**
    * Finds child element in parent by matching text values.
    * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {[key: string]: string} selectors - Relevant selectors.
+   * @param {Record<string, string>} selectors - Relevant selectors.
    * @param {string} criteria - Title value to match.
    */
   async findElement(
     parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
-    selectors: {[key: string]: string},
+    selectors: Record<string, string>,
     criteria: string
   ): Promise<puppeteer.ElementHandle | undefined> {
     let targetElement;
