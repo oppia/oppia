@@ -56,7 +56,7 @@ describe('Blog Home Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, RouterTestingModule],
       declarations: [BlogHomePageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
