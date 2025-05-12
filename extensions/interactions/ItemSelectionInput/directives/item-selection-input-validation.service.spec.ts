@@ -1022,4 +1022,56 @@ describe('ItemSelectionInputValidationService', () => {
       },
     ]);
   });
+
+  it('should warn if rules have multiple identical keys/values in different order', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                y: 'extra',
+                x: ['ca_0', 'ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1', 'ca_0'],
+                y: 'extra',
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
 });

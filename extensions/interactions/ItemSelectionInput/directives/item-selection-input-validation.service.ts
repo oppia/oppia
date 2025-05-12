@@ -334,14 +334,16 @@ export class ItemSelectionInputValidationService {
         // Serialize all rule inputs in a general and reversible way,
         // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
         const allInputs = Object.fromEntries(
-          Object.entries(itemSelectionInputs).map(([key, value]) => {
-            // If array, sort for consistent ordering.
-            if (Array.isArray(value)) {
-              return [key, [...value].sort()];
-            }
-            // For other types (numbers, strings, booleans, etc.), keep as it is.
-            return [key, value];
-          })
+          Object.entries(itemSelectionInputs)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([key, value]) => {
+              // If array, sort for consistent ordering.
+              if (Array.isArray(value)) {
+                return [key, [...value].sort()];
+              }
+              // For other types (numbers, strings, booleans, etc.), keep as it is.
+              return [key, value];
+            })
         );
         const stringifiedInputs = JSON.stringify(allInputs);
         const ruleKey = `${rule.type}:${stringifiedInputs}`;
