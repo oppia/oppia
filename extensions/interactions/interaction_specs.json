@@ -625,7 +625,7 @@
     }
   },
   "MultipleChoiceInput": {
-    "can_have_solution": true,
+    "can_have_solution": false,
     "show_generic_submit_button": true,
     "instructions": null,
     "is_trainable": false,
