@@ -34,7 +34,6 @@
     "core/templates/domain/exploration/ParamSpecObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamSpecsObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamTypeObjectFactorySpec.ts",
-    "core/templates/domain/exploration/SubtitledUnicodeObjectFactorySpec.ts",
     "core/templates/domain/statistics/learner-answer-details.model.ts",
     "core/templates/domain/exploration/TranslatedContentObjectFactorySpec.ts",
     "core/templates/domain/exploration/WrittenTranslationObjectFactorySpec.ts",

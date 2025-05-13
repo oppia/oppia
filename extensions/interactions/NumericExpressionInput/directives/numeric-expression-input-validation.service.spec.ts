@@ -26,7 +26,7 @@ import {
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 import {AppConstants} from 'app.constants';
 
