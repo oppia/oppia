@@ -13,21 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the SubtitledUnicode object factory.
+ * @fileoverview Unit tests for the SubtitledUnicode model.
  */
 
-import {
-  SubtitledUnicodeObjectFactory,
-  SubtitledUnicode,
-} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('SubtitledUnicode object factory', () => {
-  let suof: SubtitledUnicodeObjectFactory, subtitledUnicode: SubtitledUnicode;
+  let subtitledUnicode: SubtitledUnicode;
 
   beforeEach(() => {
-    suof = new SubtitledUnicodeObjectFactory();
-
-    subtitledUnicode = suof.createFromBackendDict({
+    subtitledUnicode = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_id',
       unicode_str: 'some string',
     });
@@ -63,7 +58,7 @@ describe('SubtitledUnicode object factory', () => {
   });
 
   it('should create default object', () => {
-    const defaultSubtitledUnicode = suof.createDefault(
+    const defaultSubtitledUnicode = SubtitledUnicode.createDefault(
       'test string',
       'content_id'
     );
