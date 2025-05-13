@@ -451,6 +451,36 @@ describe('TopNavigationBarComponent', () => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 
+  it('should register Blog header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToBlogPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.BLOG);
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/blog');
+  });
+
+  it('should call navigateToBlogPage when the menu link is clicked', () => {
+    spyOn(component, 'navigateToBlogPage');
+
+    component.userIsLoggedIn = true;
+    component.standardNavIsShown = true;
+    component.activeMenuName = 'aboutMenu';
+    fixture.detectChanges();
+
+    const blogLinkDE = fixture.debugElement.query(
+      By.css('.e2e-test-navbar-about-menu-blog-button')
+    );
+    expect(blogLinkDE).toBeTruthy();
+
+    blogLinkDE.triggerEventHandler('click', /* $event */ null);
+
+    expect(component.navigateToBlogPage).toHaveBeenCalled();
+  });
+
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')
       .withArgs('.oppia-navbar-tab-content')
