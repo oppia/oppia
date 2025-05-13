@@ -67,7 +67,7 @@ runs:
       working-directory: /home/runner/work/oppia
       shell: bash
     - name: Upload build files artifact
-      if: always()
+      if: steps.download_artifact.outcome == 'failure' && env.files_exist == 'false'
       uses: actions/upload-artifact@v4
       with:
         name: cached_build_files
