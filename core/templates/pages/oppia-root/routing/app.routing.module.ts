@@ -418,6 +418,14 @@ const routes: Route[] = [
       import('pages/teach-page/teach-page.module').then(m => m.TeachPageModule),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/blog-home-page/blog-home-page.module').then(
+        m => m.BlogHomePageModule
+      ),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE,
     loadChildren: () =>
       import('pages/terms-page/terms-page.module').then(m => m.TermsPageModule),

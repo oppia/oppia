@@ -306,6 +306,17 @@
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
+          <a
+            tabindex="-1"
+            (click)="navigateToBlogPage()"
+            [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE"
+            class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-blog-button">
+            <span class="oppia-sidebar-submenu-title">
+              {{ 'I18N_SIDEBAR_BLOG' | translate }}
+            </span>
+          </a>
+        </div>
+        <div class="oppia-sidebar-submenu-upperborder">
           <a tabindex="-1" (click)="navigateToTeachPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_TEACH' | translate }}</span>
           </a>

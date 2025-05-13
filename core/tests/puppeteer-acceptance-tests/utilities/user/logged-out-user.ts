@@ -140,6 +140,8 @@ const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarTeachButton = 'a.e2e-mobile-test-sidebar-teach-button';
+const mobileSidebarAboutMenuBlogButton =
+  'a.e2e-mobile-test-sidebar-blog-button';
 const mobileSidebarImpactReportButton =
   'a.e2e-mobile-test-sidebar-impact-report-button';
 const mobileSidebarExpandAboutMenuButton =
@@ -818,9 +820,9 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
-        mobileSidebarTeachButton,
+        mobileSidebarAboutMenuBlogButton,
         'Blog button in the About Menu on mobile sidebar',
-        teachUrl,
+        blogUrl,
         'Blog'
       );
     } else {
@@ -828,7 +830,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabBlogButton,
         'Blog button in the About Menu on navbar',
-        teachUrl,
+        blogUrl,
         'Blog'
       );
     }
