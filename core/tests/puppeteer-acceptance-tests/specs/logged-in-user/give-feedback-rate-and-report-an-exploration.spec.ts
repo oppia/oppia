@@ -89,7 +89,9 @@ describe('Logged-out User', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
 
     await explorationEditor.saveExplorationDraft();
 
