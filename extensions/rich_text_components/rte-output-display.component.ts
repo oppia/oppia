@@ -87,6 +87,24 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
 
+  customOppiaTags = [
+    'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
+    'OPPIA-NONINTERACTIVE-IMAGE',
+    'OPPIA-NONINTERACTIVE-LINK',
+    'OPPIA-NONINTERACTIVE-MATH',
+    'OPPIA-NONINTERACTIVE-VIDEO',
+    'OPPIA-NONINTERACTIVE-SKILLREVIEW',
+    'OPPIA-NONINTERACTIVE-TABS',
+  ];
+
+  // The index is used to assign a unique ID to each sentence of the lesson content.
+  index = 1;
+
+  // Parent tags eligible for voiceover highlighting. Text within these tags
+  // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
+  // do not require special handling.
+  acceptedTagsForVoiceoverHighlighting = ['P', 'LI'];
+
   constructor(
     private _viewContainerRef: ViewContainerRef,
     private cdRef: ChangeDetectorRef,
@@ -102,276 +120,38 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     private platformFeatureService: PlatformFeatureService
   ) {}
 
-  /**
-   * This function wraps each sentence in a span tag to highlight the
-   * sentence during voiceover playback.
-   */
-  wrapSentencesInSpansForHighlighting(htmlString: string): string {
-    // This prevents wrapping the sentences in spans multiple times.
-    if (this.wrapped) {
-      return htmlString;
-    }
-    this.wrapped = true;
-
-    let languageCode =
-      this.localStorageService.getLastSelectedTranslationLanguageCode();
-
-    // Sentences in the lesson content are separated using punctuation marks specific to the language.
-    // The following line retrieves the punctuation marks for the current language.
-    const punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        languageCode
-      ];
-
-    // The regex below is used to split sentences from the lesson content.
-    const sentenceRegex = new RegExp(
-      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Za-z”])`,
-      'g'
-    );
-
-    // Create a temporary DOM element.
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;
-    console.log(tempDiv);
-
-    let customOppiaTags = [
-      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
-      'OPPIA-NONINTERACTIVE-IMAGE',
-      'OPPIA-NONINTERACTIVE-LINK',
-      'OPPIA-NONINTERACTIVE-MATH',
-      'OPPIA-NONINTERACTIVE-VIDEO',
-      'OPPIA-NONINTERACTIVE-SKILLREVIEW',
-      'OPPIA-NONINTERACTIVE-TABS',
-    ];
-
-    // The index is used to assign a unique ID to each sentence of the lesson content.
-    let index = 1;
-
-    // Dictionary storing the mapping between the highlight ID and the sentence text.
-    let highlighIdToSentenceText = {};
-
-    // Parent tags eligible for voiceover highlighting. Text within these tags
-    // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
-    // do not require special handling.
-    const acceptedTagsForVoiceoverHighlighting = ['P', 'LI'];
-
-    function getTextFromNode(node): string {
-      let sentence = '';
-      for (let tempChildNode of node.childNodes) {
-        if (tempChildNode.nodeType === Node.TEXT_NODE) {
-          sentence += tempChildNode.textContent;
-        } else if (
-          tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW'
-        ) {
-          const encoded = tempChildNode.getAttribute('text-with-value');
-          if (encoded !== null) {
-            const decoded = this.decodeHtmlEntities(encoded); // → "\"concept card\""
-            const cleanText = JSON.parse(decoded); // → concept card
-            sentence += cleanText;
-          }
-        } else if (tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-IMAGE') {
-        }
-      }
-      return sentence;
-    }
-
-    const traverse = function (node: Node) {
-      let currentNodeName = node.nodeName;
-
-      if (node.nodeType === Node.TEXT_NODE) {
-        const textContent = node.textContent || '';
-        const sentences = textContent.split(sentenceRegex);
-        let textNodesForSentences: Text[] = [];
-
-        for (let sentence of sentences) {
-          textNodesForSentences.push(document.createTextNode(sentence));
-        }
-        return textNodesForSentences;
-      } else {
-        let updatedChildNodes: Node[] = [];
-
-        node.childNodes.forEach(childNode => {
-          updatedChildNodes = updatedChildNodes.concat(traverse(childNode));
-        });
-
-        if (node.nodeName === 'DIV') {
-          let temp = document.createElement('div');
-          updatedChildNodes.forEach(child => {
-            temp.appendChild(child);
-          });
-          return temp;
-        }
-
-        // Handles tags that are not parent tags by creating replicas.
-        // For example: "Hello <strong> world. I am <strong> a contributor in Oppia."
-        // This text contains two sentences, and after wrapping, it becomes:
-        // "<span id=highlightBlock1> Hello <strong> world.</strong></span>"
-        // "<span id=highlightBlock2><strong>I am </strong> a contributor in Oppia.</span>".
-
-        if (!acceptedTagsForVoiceoverHighlighting.includes(currentNodeName)) {
-          let currentElementReplicaNodes = [];
-
-          if (customOppiaTags.includes(currentNodeName)) {
-            return [node];
-          }
-
-          updatedChildNodes.forEach(child => {
-            let tempElementNode = document.createElement(currentNodeName);
-            tempElementNode.appendChild(child);
-            currentElementReplicaNodes.push(tempElementNode);
-          });
-          return currentElementReplicaNodes;
-        } else {
-          // Earliest parent tag.
-          let textContent = '';
-
-          let sentence;
-          for (let tempChildNode of updatedChildNodes) {
-            if (tempChildNode.nodeType === Node.TEXT_NODE) {
-              sentence = tempChildNode.textContent;
-              sentence = sentence.trim();
-              textContent += sentence;
-            } else if (
-              tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' &&
-              tempChildNode instanceof Element
-            ) {
-              const encoded = tempChildNode.getAttribute('text-with-value');
-              if (encoded !== null) {
-                const decoded = this.decodeHtmlEntities(encoded);
-                const cleanText = JSON.parse(decoded);
-                textContent += cleanText;
-              }
-            } else if (
-              tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-IMAGE'
-            ) {
-            }
-          }
-
-          const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
-
-          let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
-          // Removing spaces to avoid ambiguity during string matching.
-          let x = currentSentenceToMatch?.split(' ');
-          let y = x.join('');
-          currentSentenceToMatch = y.trim();
-
-          let spanNodeList = [];
-          let nextSentenceOffset = '';
-          let tempSpanNode = document.createElement('span');
-
-          sentence = '';
-          for (let tempChildNode of updatedChildNodes) {
-            if (tempChildNode.nodeType === Node.TEXT_NODE) {
-              sentence = tempChildNode.textContent.trim();
-            } else if (
-              tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' &&
-              tempChildNode instanceof Element
-            ) {
-              const rawTextAttr = tempChildNode.getAttribute('text-with-value');
-              const encoded = tempChildNode.getAttribute('text-with-value');
-              if (encoded !== null) {
-                const decoded = this.decodeHtmlEntities(encoded);
-                const cleanText = JSON.parse(decoded);
-                sentence = cleanText;
-              }
-            } else if (
-              tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-IMAGE'
-            ) {
-            }
-
-            let temp = nextSentenceOffset + sentence;
-            temp = temp.split(' ').join('').trim();
-
-            tempSpanNode.appendChild(tempChildNode);
-
-            if (temp === currentSentenceToMatch) {
-              spanNodeList.push(tempSpanNode);
-
-              nextSentenceOffset = '';
-              currentSentenceToMatch = sentencesInEarliestParentTag.shift();
-              currentSentenceToMatch = currentSentenceToMatch
-                ?.split(' ')
-                ?.join('')
-                ?.trim();
-
-              tempSpanNode = document.createElement('span');
-            } else {
-              nextSentenceOffset += sentence;
-            }
-          }
-
-          let nodeTemp = node.cloneNode();
-
-          spanNodeList.forEach(spanNode => {
-            let elementId = `highlightBlock${index}`;
-            spanNode.id = elementId;
-            index++;
-            getTextFromNode(spanNode);
-
-            let text = '';
-
-            for (let tempChildNode of spanNode.childNodes) {
-              if (tempChildNode.nodeType === Node.TEXT_NODE) {
-                text += tempChildNode.textContent.trim();
-              } else if (
-                tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' &&
-                tempChildNode instanceof Element
-              ) {
-                const rawTextAttr =
-                  tempChildNode.getAttribute('text-with-value');
-                const encoded = tempChildNode.getAttribute('text-with-value');
-                if (encoded !== null) {
-                  const decoded = this.decodeHtmlEntities(encoded);
-                  const cleanText = JSON.parse(decoded);
-                  text += cleanText;
-                }
-              } else if (
-                tempChildNode.nodeName === 'OPPIA-NONINTERACTIVE-IMAGE'
-              ) {
-              }
-            }
-            highlighIdToSentenceText[elementId] = text;
-            nodeTemp.appendChild(spanNode);
-          });
-
-          return nodeTemp;
-        }
-      }
-    };
-
-    tempDiv = traverse(tempDiv) as HTMLDivElement;
-    this.highlighIdToSentenceText = highlighIdToSentenceText;
-
-    return tempDiv.innerHTML;
-  }
-
-  // This method converts HTML escape characters into their corresponding string representations.
-  // For instance, &nbsp; is transformed into a space character.
-  decodeHtmlEntities = (str: string): string => {
+  // The function decodes the HTML escape characters in the string.
+  decodeHtmlEntities(str: string): string {
     const textarea = document.createElement('textarea');
+    // eslint-disable-next-line oppia/no-inner-html
     textarea.innerHTML = str;
     return textarea.value;
-  };
+  }
 
+  /*
+  The method below converts LaTeX expressions to a more readable format.
+  It replaces LaTeX commands with their corresponding symbols or
+  representations. For example, it converts \frac{a}{b} to a/b.
+  */
   parseAndConvertLatex(latexExpr: string): string {
     try {
       const readable = latexExpr
-        .replace(/\\frac{(.+?)}{(.+?)}/g, '($1)/($2)')
+        .replace(/\\frac{(.+?)}{(.+?)}/g, '$1/$2')
         .replace(/\\times/g, '×')
         .replace(/\\div/g, '÷')
         .replace(/\\cdot/g, '·')
         .replace(/\\sqrt{(.+?)}/g, '√($1)')
         .replace(/\\left|\\right/g, '')
-        .replace(/\\[a-zA-Z]+/g, '') // removes other unknown commands
-        .replace(/{|}/g, ''); // remove LaTeX grouping braces
+        .replace(/\\[a-zA-Z]+/g, '')
+        .replace(/{|}/g, '');
       return readable;
     } catch (error) {
-      console.error('Invalid math content:', error);
       return '';
     }
   }
 
-  getReadableTextFromNode = (node: Node): string => {
+  // The method returns the readable text from the node.
+  getReadableTextFromNode(node: Node): string {
     if (node.nodeType === Node.TEXT_NODE) {
       return node.textContent || '';
     } else if (
@@ -389,124 +169,157 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
-  };
+  }
 
-  traverse = (
+  // The method recursively traverses the node and wraps span tags around
+  // the sentences.
+  traverseNodeAndWrapSpanTags(
     node: Node,
-    sentenceRegex,
-    acceptedTags,
-    customOppiaTags,
-    index
-  ): any => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const sentences = (node.textContent || '').split(sentenceRegex);
-      return sentences.map(sentence => document.createTextNode(sentence));
-    }
-
+    sentenceRegex: RegExp
+  ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
-    let updatedChildren: Node[] = [];
 
-    node.childNodes.forEach(child => {
-      updatedChildren = updatedChildren.concat(
-        this.traverse(
-          child,
-          sentenceRegex,
-          acceptedTags,
-          customOppiaTags,
-          index
-        )
-      );
-    });
+    if (node.nodeType === Node.TEXT_NODE) {
+      const textContent = node.textContent || '';
+      const sentences = textContent.split(sentenceRegex);
+      let textNodesForSentences: Text[] = [];
 
-    if (!acceptedTags.includes(currentNodeName)) {
-      if (customOppiaTags.includes(currentNodeName)) {
-        return [node];
+      for (let sentence of sentences) {
+        textNodesForSentences.push(document.createTextNode(sentence));
       }
+      return textNodesForSentences;
+    } else {
+      let updatedChildNodes: Node[] = [];
 
-      return updatedChildren.map(child => {
-        const wrapper = document.createElement(currentNodeName);
-        wrapper.appendChild(child);
-        return wrapper;
+      node.childNodes.forEach(childNode => {
+        updatedChildNodes = updatedChildNodes.concat(
+          this.traverseNodeAndWrapSpanTags(childNode, sentenceRegex)
+        );
       });
-    }
 
-    // Parent tag handling
-    const combinedText = this.getReadableTextFromNode(node);
-    const sentences = combinedText.split(sentenceRegex);
-    let currentSentence = sentences.shift()?.replace(/\s/g, '')?.trim() ?? '';
-
-    const spanList: HTMLElement[] = [];
-    let buffer = '';
-    let tempSpan = document.createElement('span');
-
-    updatedChildren.forEach(child => {
-      const childText = this.getReadableTextFromNode(child)
-        .replace(/\s/g, '')
-        .trim();
-      buffer += childText;
-      tempSpan.appendChild(child);
-
-      if (buffer === currentSentence) {
-        const spanId = `highlightBlock${index++}`;
-        tempSpan.id = spanId;
-        this.highlighIdToSentenceText[spanId] =
-          this.getReadableTextFromNode(tempSpan);
-        spanList.push(tempSpan);
-
-        currentSentence = sentences.shift()?.replace(/\s/g, '')?.trim() ?? '';
-        buffer = '';
-        tempSpan = document.createElement('span');
+      if (node.nodeName === 'DIV') {
+        let wrapper = document.createElement('div');
+        updatedChildNodes.forEach(child => {
+          wrapper.appendChild(child);
+        });
+        return wrapper;
       }
-    });
 
-    const parentClone = node.cloneNode() as HTMLElement;
-    spanList.forEach(span => parentClone.appendChild(span));
-    return parentClone;
-  };
+      if (
+        !this.acceptedTagsForVoiceoverHighlighting.includes(currentNodeName)
+      ) {
+        // No changes are required for custom Oppia tags.
+        if (this.customOppiaTags.includes(currentNodeName)) {
+          return [node];
+        }
 
-  wrapSentencesInSpansForHighlighting1(htmlString: string): string {
+        let currentElementReplicaNodes = [];
+        updatedChildNodes.forEach(child => {
+          let tempElementNode = document.createElement(currentNodeName);
+          tempElementNode.appendChild(child);
+          currentElementReplicaNodes.push(tempElementNode);
+        });
+        return currentElementReplicaNodes;
+      } else {
+        // The earliest parent tag that contains texts that should be voiceovered.
+        let textContent = '';
+
+        for (let tempChildNode of updatedChildNodes) {
+          textContent += this.getReadableTextFromNode(tempChildNode);
+        }
+
+        const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
+
+        let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
+
+        let spanNodeList = [];
+        let spanTagElement = document.createElement('span');
+        let nextSentenceOffset = '';
+
+        for (let childNode of updatedChildNodes) {
+          let currentText = this.getReadableTextFromNode(childNode);
+
+          let sentence = nextSentenceOffset + currentText;
+
+          // Removing spaces to avoid ambiguity in sentence matching.
+          sentence = sentence.split(' ').join('').trim();
+          currentSentenceToMatch = currentSentenceToMatch
+            ?.split(' ')
+            ?.join('')
+            ?.trim();
+
+          spanTagElement.appendChild(childNode);
+
+          if (sentence === currentSentenceToMatch) {
+            spanNodeList.push(spanTagElement);
+            spanTagElement = document.createElement('span');
+            nextSentenceOffset = '';
+            currentSentenceToMatch = sentencesInEarliestParentTag.shift();
+          } else {
+            nextSentenceOffset += currentText;
+          }
+        }
+
+        let nodeTemp = node.cloneNode();
+
+        spanNodeList.forEach(spanNode => {
+          let elementId = `highlightBlock${this.index}`;
+          spanNode.id = elementId;
+          this.index++;
+
+          let textInsideSpanTag = '';
+
+          for (let tempChildNode of spanNode.childNodes) {
+            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
+          }
+          this.highlighIdToSentenceText[elementId] = textInsideSpanTag;
+          nodeTemp.appendChild(spanNode);
+        });
+
+        return nodeTemp;
+      }
+    }
+  }
+
+  /**
+   * This function wraps each sentence in a span tag to highlight the
+   * sentence during voiceover playback.
+   */
+  wrapSentencesInSpansForHighlighting(htmlString: string): string {
+    // This prevents wrapping the sentences in spans multiple times.
     if (this.wrapped) {
       return htmlString;
     }
     this.wrapped = true;
 
-    const languageCode =
+    let languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode();
+
+    // Sentences in the lesson content are separated using punctuation marks
+    // specific to the language.
+    // The following line retrieves the punctuation marks for the current language.
     const punctuationsForCurrentLanguage =
       AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
         languageCode
       ];
+
+    // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
       `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Za-z”])`,
       'g'
     );
 
-    let index = 1;
-    const customOppiaTags = [
-      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
-      'OPPIA-NONINTERACTIVE-IMAGE',
-      'OPPIA-NONINTERACTIVE-LINK',
-      'OPPIA-NONINTERACTIVE-MATH',
-      'OPPIA-NONINTERACTIVE-VIDEO',
-      'OPPIA-NONINTERACTIVE-SKILLREVIEW',
-      'OPPIA-NONINTERACTIVE-TABS',
-    ];
-    const acceptedTags = ['P', 'LI'];
+    // Create a temporary DOM element.
+    const temporaryDivElement = document.createElement('div');
+    // eslint-disable-next-line oppia/no-inner-html
+    temporaryDivElement.innerHTML = htmlString;
 
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;
-
-    console.log(tempDiv);
-
-    const finalDom = this.traverse(
-      tempDiv,
-      sentenceRegex,
-      acceptedTags,
-      customOppiaTags,
-      index
-    );
-    console.log(finalDom);
-    return (finalDom as HTMLElement).innerHTML;
+    const finalDivElement = this.traverseNodeAndWrapSpanTags(
+      temporaryDivElement,
+      sentenceRegex
+    ) as HTMLDivElement;
+    // eslint-disable-next-line oppia/no-inner-html
+    return finalDivElement.innerHTML;
   }
 
   private _updateNode(): void {
@@ -531,7 +344,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
-    this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+    if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
+      this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+    }
 
     let domparser = new DOMParser();
     let dom = domparser.parseFromString(this.rteString, 'text/html').body;
