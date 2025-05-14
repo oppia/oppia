@@ -43,10 +43,8 @@ class FlushCacheTests(job_test_utils.PipelinedTestBase):
             caching_services, 'memory_cache_services', MockMemoryCachingServices
         ):
             self.assert_pcoll_equal(
-                self.pipeline
-                | beam.Create(items)
-                | cache_io.FlushCache(),
-                [None]
+                self.pipeline | beam.Create(items) | cache_io.FlushCache(),
+                [None],
             )
 
         self.assertTrue(called_functions['flush_caches'])

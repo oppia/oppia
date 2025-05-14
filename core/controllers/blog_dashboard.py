@@ -45,7 +45,7 @@ class BlogCardSummaryDict(TypedDict):
 
 
 def _get_blog_card_summary_dicts_for_dashboard(
-    summaries: List[blog_domain.BlogPostSummary]
+    summaries: List[blog_domain.BlogPostSummary],
 ) -> List[BlogCardSummaryDict]:
     """Creates summary dicts for use in blog dashboard.
 
@@ -59,16 +59,18 @@ def _get_blog_card_summary_dicts_for_dashboard(
     summary_dicts: List[BlogCardSummaryDict] = []
     for summary in summaries:
         summary_dict = summary.to_dict()
-        summary_dicts.append({
-            'id': summary_dict['id'],
-            'title': summary_dict['title'],
-            'summary': summary_dict['summary'],
-            'url_fragment': summary_dict['url_fragment'],
-            'tags': summary_dict['tags'],
-            'thumbnail_filename': summary_dict['thumbnail_filename'],
-            'last_updated': summary_dict['last_updated'],
-            'published_on': summary_dict['published_on'],
-        })
+        summary_dicts.append(
+            {
+                'id': summary_dict['id'],
+                'title': summary_dict['title'],
+                'summary': summary_dict['summary'],
+                'url_fragment': summary_dict['url_fragment'],
+                'tags': summary_dict['tags'],
+                'thumbnail_filename': summary_dict['thumbnail_filename'],
+                'last_updated': summary_dict['last_updated'],
+                'published_on': summary_dict['published_on'],
+            }
+        )
     return summary_dicts
 
 
@@ -90,9 +92,9 @@ class BlogDashboardDataHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_AUTHOR_NAME_LENGTH
+                        'max_value': constants.MAX_AUTHOR_NAME_LENGTH,
                     }
-                ]
+                ],
             },
             'author_bio': {
                 'schema': {
@@ -101,9 +103,9 @@ class BlogDashboardDataHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO
+                        'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO,
                     }
-                ]
+                ],
             },
         },
     }
@@ -112,36 +114,47 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        author_details = (
-            blog_services.get_blog_author_details(self.user_id).to_dict())
+        author_details = blog_services.get_blog_author_details(
+            self.user_id
+        ).to_dict()
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0
         draft_blog_post_summary_dicts = []
         published_post_summaries = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
-                self.user_id, True))
+                self.user_id, True
+            )
+        )
         if published_post_summaries:
             no_of_published_blog_posts = len(published_post_summaries)
             published_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_dashboard(
-                    published_post_summaries))
+                    published_post_summaries
+                )
+            )
 
         draft_blog_post_summaries = (
             blog_services.get_blog_post_summary_models_list_by_user_id(
-                self.user_id, False))
+                self.user_id, False
+            )
+        )
         if draft_blog_post_summaries:
             no_of_draft_blog_posts = len(draft_blog_post_summaries)
             draft_blog_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_dashboard(
-                    draft_blog_post_summaries))
-        self.values.update({
-            'author_details': author_details,
-            'no_of_published_blog_posts': no_of_published_blog_posts,
-            'no_of_draft_blog_posts': no_of_draft_blog_posts,
-            'published_blog_post_summary_dicts': published_post_summary_dicts,
-            'draft_blog_post_summary_dicts': draft_blog_post_summary_dicts
-        })
+                    draft_blog_post_summaries
+                )
+            )
+        self.values.update(
+            {
+                'author_details': author_details,
+                'no_of_published_blog_posts': no_of_published_blog_posts,
+                'no_of_draft_blog_posts': no_of_draft_blog_posts,
+                'published_blog_post_summary_dicts': published_post_summary_dicts,
+                'draft_blog_post_summary_dicts': draft_blog_post_summary_dicts,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -157,18 +170,20 @@ class BlogDashboardDataHandler(
         """Updates author details of the user."""
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        displayed_author_name = self.normalized_payload[
-            'displayed_author_name']
+        displayed_author_name = self.normalized_payload['displayed_author_name']
         author_bio = self.normalized_payload['author_bio']
         blog_services.update_blog_author_details(
             self.user_id, displayed_author_name, author_bio
         )
-        author_details = (
-            blog_services.get_blog_author_details(self.user_id).to_dict())
+        author_details = blog_services.get_blog_author_details(
+            self.user_id
+        ).to_dict()
 
-        self.values.update({
-            'author_details': author_details,
-        })
+        self.values.update(
+            {
+                'author_details': author_details,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -193,7 +208,7 @@ class BlogPostHandlerNormalizedRequestDict(TypedDict):
 class BlogPostHandler(
     base.BaseHandler[
         BlogPostHandlerNormalizedPayloadDict,
-        BlogPostHandlerNormalizedRequestDict
+        BlogPostHandlerNormalizedRequestDict,
     ]
 ):
     """Handler for blog dashboard editor"""
@@ -206,13 +221,13 @@ class BlogPostHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.BLOG_POST_ID_LENGTH
+                        'max_value': constants.BLOG_POST_ID_LENGTH,
                     },
                     {
                         'id': 'has_length_at_least',
-                        'min_value': constants.BLOG_POST_ID_LENGTH
-                    }
-                ]
+                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                    },
+                ],
             },
         }
     }
@@ -234,18 +249,10 @@ class BlogPostHandler(
             },
         },
         'POST': {
-            'thumbnail_filename': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'image': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'thumbnail_filename': {'schema': {'type': 'basestring'}},
+            'image': {'schema': {'type': 'basestring'}},
         },
-        'DELETE': {}
+        'DELETE': {},
     }
 
     @acl_decorators.can_access_blog_dashboard
@@ -259,19 +266,19 @@ class BlogPostHandler(
             NotFoundException. The blog post with the given id
                 or url doesn't exist.
         """
-        blog_post = (
-            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        blog_post = blog_services.get_blog_post_by_id(
+            blog_post_id, strict=False
+        )
         if blog_post is None:
             raise self.NotFoundException(
-                'The blog post with the given id or url doesn\'t exist.')
+                'The blog post with the given id or url doesn\'t exist.'
+            )
 
         author_details = blog_services.get_blog_author_details(
-            blog_post.author_id)
-        max_no_of_tags = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
-            )
+            blog_post.author_id
+        )
+        max_no_of_tags = platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
@@ -287,12 +294,14 @@ class BlogPostHandler(
             'last_updated': blog_post_dict['last_updated'],
             'published_on': blog_post_dict['published_on'],
         }
-        self.values.update({
-            'blog_post_dict': blog_post_dict_for_dashboard,
-            'displayed_author_name': author_details.displayed_author_name,
-            'max_no_of_tags': max_no_of_tags,
-            'list_of_default_tags': list_of_default_tags
-        })
+        self.values.update(
+            {
+                'blog_post_dict': blog_post_dict_for_dashboard,
+                'displayed_author_name': author_details.displayed_author_name,
+                'max_no_of_tags': max_no_of_tags,
+                'list_of_default_tags': list_of_default_tags,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -304,8 +313,9 @@ class BlogPostHandler(
             blog_post_id: str. The ID of the blog post.
         """
         assert self.normalized_payload is not None
-        blog_post_rights = (
-            blog_services.get_blog_post_rights(blog_post_id, strict=True))
+        blog_post_rights = blog_services.get_blog_post_rights(
+            blog_post_id, strict=True
+        )
         blog_post_currently_published = blog_post_rights.blog_post_is_published
         change_dict = self.normalized_payload['change_dict']
         blog_services.update_blog_post(blog_post_id, change_dict)
@@ -315,12 +325,11 @@ class BlogPostHandler(
         elif blog_post_currently_published:
             blog_services.unpublish_blog_post(blog_post_id)
 
-        blog_post_dict = (
-            blog_services.get_blog_post_by_id(blog_post_id).to_dict())
+        blog_post_dict = blog_services.get_blog_post_by_id(
+            blog_post_id
+        ).to_dict()
 
-        self.values.update({
-            'blog_post': blog_post_dict
-        })
+        self.values.update({'blog_post': blog_post_dict})
         self.render_json(self.values)
 
     @acl_decorators.can_edit_blog_post
@@ -339,8 +348,12 @@ class BlogPostHandler(
         thumbnail_filename = self.normalized_payload['thumbnail_filename']
         try:
             fs_services.validate_and_save_image(
-              raw_image, thumbnail_filename, 'thumbnail',
-              feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
+                raw_image,
+                thumbnail_filename,
+                'thumbnail',
+                feconf.ENTITY_TYPE_BLOG_POST,
+                blog_post_id,
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
@@ -367,8 +380,7 @@ class BlogPostTitleHandlerNormalizedDict(TypedDict):
 
 class BlogPostTitleHandler(
     base.BaseHandler[
-        BlogPostTitleHandlerNormalizedDict,
-        BlogPostTitleHandlerNormalizedDict
+        BlogPostTitleHandlerNormalizedDict, BlogPostTitleHandlerNormalizedDict
     ]
 ):
     """A data handler for checking if a blog post with given title exists."""
@@ -381,13 +393,13 @@ class BlogPostTitleHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.BLOG_POST_ID_LENGTH
+                        'max_value': constants.BLOG_POST_ID_LENGTH,
                     },
                     {
                         'id': 'has_length_at_least',
                         'min_value': constants.BLOG_POST_ID_LENGTH,
-                    }
-                ]
+                    },
+                ],
             }
         }
     }
@@ -399,9 +411,9 @@ class BlogPostTitleHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE
+                            'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE,
                         }
-                    ]
+                    ],
                 }
             }
         },
@@ -417,10 +429,12 @@ class BlogPostTitleHandler(
         """
         assert self.normalized_request is not None
         title = self.normalized_request['title']
-        self.render_json({
-            'blog_post_exists': (
-                blog_services.does_blog_post_with_title_exist(
-                    title, blog_post_id
+        self.render_json(
+            {
+                'blog_post_exists': (
+                    blog_services.does_blog_post_with_title_exist(
+                        title, blog_post_id
+                    )
                 )
-            )
-        })
+            }
+        )

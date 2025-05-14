@@ -34,15 +34,13 @@ from pylatexenc import latex2text
 from typing import Dict, List, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import speech_synthesis_services
     from mypy_imports import voiceover_models
 
-(voiceover_models,) = models.Registry.import_models([
-    models.Names.VOICEOVER])
+(voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
-speech_synthesis_services = (
-    models.Registry.import_speech_synthesis_services())
+speech_synthesis_services = models.Registry.import_speech_synthesis_services()
 
 
 ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
@@ -52,7 +50,7 @@ ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
     'oppia-noninteractive-math',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-tabs'
+    'oppia-noninteractive-tabs',
 ]
 
 
@@ -72,7 +70,7 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
 
     if element.name in [
         'oppia-noninteractive-link',
-        'oppia-noninteractive-skillreview'
+        'oppia-noninteractive-skillreview',
     ]:
         escaped_text = element.get('text-with-value')
         text = html.unescape(escaped_text)
@@ -105,7 +103,8 @@ def parse_html(html_content: str) -> str:
             convert_custom_oppia_tags_to_generic_tags(element)
 
     text_content: str = soup.get_text(
-        separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True)
+        separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True
+    )
 
     return text_content
 
@@ -114,7 +113,7 @@ def synthesize_voiceover_for_html_string(
     exploration_id: str,
     content_html: str,
     language_accent_code: str,
-    voiceover_filename: str
+    voiceover_filename: str,
 ) -> List[Dict[str, Union[str, float]]]:
     """The method generates automated voiceovers for the given HTML content
     using cloud service helper functions.
@@ -143,22 +142,21 @@ def synthesize_voiceover_for_html_string(
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
     fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+    )
 
     parsed_text = parse_html(content_html)
 
     content_hash_code = (
-        voiceover_models.CachedAutomaticVoiceoversModel.
-        generate_hash_from_text(parsed_text)
+        voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
+            parsed_text
+        )
     )
 
-    cached_model = (
-        voiceover_models.CachedAutomaticVoiceoversModel.
-        get_cached_automatic_voiceover_model(
-            content_hash_code,
-            language_accent_code,
-            feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
-        )
+    cached_model = voiceover_models.CachedAutomaticVoiceoversModel.get_cached_automatic_voiceover_model(
+        content_hash_code,
+        language_accent_code,
+        feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER,
     )
 
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
@@ -168,8 +166,7 @@ def synthesize_voiceover_for_html_string(
     if cached_model is not None:
         error_details = None
         if cached_model.plaintext == parsed_text:
-            audio_offset_list = (
-                cached_model.audio_offset_list)
+            audio_offset_list = cached_model.audio_offset_list
             filename = cached_model.voiceover_filename
             binary_audio_data = fs.get('%s/%s' % ('audio', filename))
             is_cached_model_used_for_voiceovers = True
@@ -178,7 +175,9 @@ def synthesize_voiceover_for_html_string(
         try:
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    parsed_text, language_accent_code))
+                    parsed_text, language_accent_code
+                )
+            )
         except Exception as e:
             error_details = str(e)
 
@@ -198,7 +197,9 @@ def synthesize_voiceover_for_html_string(
     del audio
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
-        binary_audio_data, mimetype=mimetype)
+        binary_audio_data,
+        mimetype=mimetype,
+    )
 
     # Case of Collison.
     if cached_model is not None:
@@ -219,7 +220,9 @@ def synthesize_voiceover_for_html_string(
                 language_accent_code,
                 parsed_text,
                 voiceover_filename,
-                audio_offset_list))
+                audio_offset_list,
+            )
+        )
         new_cached_model.update_timestamps()
         new_cached_model.put()
 

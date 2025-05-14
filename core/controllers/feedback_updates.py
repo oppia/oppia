@@ -61,8 +61,7 @@ class FeedbackUpdatesHandlerNormalizedPayloadDict(TypedDict):
 
 class FeedbackUpdatesHandler(
     base.BaseHandler[
-        FeedbackUpdatesHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        FeedbackUpdatesHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Provides data for the user's feedback updates page."""
@@ -76,12 +75,10 @@ class FeedbackUpdatesHandler(
                     'type': 'list',
                     'items': {
                         'type': 'list',
-                        'items': {
-                            'type': 'basestring'
-                        },
+                        'items': {'type': 'basestring'},
                     },
                 },
-                'default_value': []
+                'default_value': [],
             }
         }
     }
@@ -98,8 +95,9 @@ class FeedbackUpdatesHandler(
                 )
             )
             paginated_threads_list = [
-                full_thread_ids[index: index + 100]
-                for index in range(0, len(full_thread_ids), 100)]
+                full_thread_ids[index : index + 100]
+                for index in range(0, len(full_thread_ids), 100)
+            ]
         else:
             paginated_threads_list = self.normalized_payload[
                 'paginated_threads_list'
@@ -107,21 +105,23 @@ class FeedbackUpdatesHandler(
         if paginated_threads_list and paginated_threads_list[0]:
             thread_summaries, number_of_unread_threads = (
                 feedback_services.get_exp_thread_summaries(
-                    self.user_id, paginated_threads_list[0]))
+                    self.user_id, paginated_threads_list[0]
+                )
+            )
         else:
             thread_summaries, number_of_unread_threads = [], 0
 
-        self.values.update({
-            'thread_summaries': [s.to_dict() for s in thread_summaries],
-            'number_of_unread_threads': number_of_unread_threads,
-            'paginated_threads_list': paginated_threads_list[1:]
-        })
+        self.values.update(
+            {
+                'thread_summaries': [s.to_dict() for s in thread_summaries],
+                'number_of_unread_threads': number_of_unread_threads,
+                'paginated_threads_list': paginated_threads_list[1:],
+            }
+        )
         self.render_json(self.values)
 
 
-class FeedbackThreadHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Gets all the messages in a thread."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -129,10 +129,12 @@ class FeedbackThreadHandler(
         'thread_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -148,7 +150,8 @@ class FeedbackThreadHandler(
 
         message_ids = [m.message_id for m in messages]
         feedback_services.update_messages_read_by_the_user(
-            self.user_id, thread_id, message_ids)
+            self.user_id, thread_id, message_ids
+        )
 
         message_summary_list: List[
             Union[MessageSummaryDict, SuggestionSummaryDict]
@@ -164,26 +167,24 @@ class FeedbackThreadHandler(
                 author_ids[0], strict=True
             )
             if not isinstance(
-                suggestion,
-                suggestion_registry.SuggestionEditStateContent
+                suggestion, suggestion_registry.SuggestionEditStateContent
             ):
                 raise Exception(
                     'No edit state content suggestion found for the given '
                     'thread_id: %s' % thread_id
                 )
             exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-            current_content_html = (
-                exploration.states[
-                    suggestion.change_cmd.state_name
-                ].content.html
-            )
+            current_content_html = exploration.states[
+                suggestion.change_cmd.state_name
+            ].content.html
             suggestion_summary: SuggestionSummaryDict = {
                 'suggestion_html': suggestion.change_cmd.new_value['html'],
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
                 'created_on_msecs': utils.get_time_in_millisecs(
-                    messages[0].created_on)
+                    messages[0].created_on
+                ),
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
@@ -201,10 +202,8 @@ class FeedbackThreadHandler(
                 'text': m.text,
                 'updated_status': m.updated_status,
                 'author_username': author_username,
-                'created_on_msecs': utils.get_time_in_millisecs(m.created_on)
+                'created_on_msecs': utils.get_time_in_millisecs(m.created_on),
             }
             message_summary_list.append(message_summary)
 
-        self.render_json({
-            'message_summary_list': message_summary_list
-        })
+        self.render_json({'message_summary_list': message_summary_list})

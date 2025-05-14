@@ -36,15 +36,16 @@ import apache_beam as beam
 from typing import Dict, List, Optional, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
-(voiceover_models, exp_models) = models.Registry.import_models([
-    models.Names.VOICEOVER, models.Names.EXPLORATION])
+(voiceover_models, exp_models) = models.Registry.import_models(
+    [models.Names.VOICEOVER, models.Names.EXPLORATION]
+)
 
 
 class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
@@ -67,21 +68,21 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         """
         try:
             with datastore_services.get_ndb_context():
-                return (
-                    opportunity_services.
-                    is_exploration_available_for_contribution(exploration_id)
+                return opportunity_services.is_exploration_available_for_contribution(
+                    exploration_id
                 )
         except Exception:
             logging.exception(
                 'Not able to check whether exploration is curated or not'
-                ' for exploration ID %s.' % exploration_id)
+                ' for exploration ID %s.' % exploration_id
+            )
             return False
 
     @classmethod
     def extract_added_voiceovers_between_successive_snapshots(
         cls,
         new_snapshot_model: exp_models.ExplorationSnapshotContentModel,
-        old_snapshot_model: exp_models.ExplorationSnapshotContentModel
+        old_snapshot_model: exp_models.ExplorationSnapshotContentModel,
     ) -> List[str]:
         """Compares two successive versions of snapshot models and
         extracts voiceovers that have been added in the later version of the
@@ -113,15 +114,17 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         filenames_in_this_version: List[str] = []
 
         for state in new_snapshot_model.content['states'].values():
-            voiceovers_mapping = (
-                state['recorded_voiceovers']['voiceovers_mapping'])
+            voiceovers_mapping = state['recorded_voiceovers'][
+                'voiceovers_mapping'
+            ]
             for lang_code_to_voiceover_dict in voiceovers_mapping.values():
                 for voiceover_dict in lang_code_to_voiceover_dict.values():
                     new_filenames.append(voiceover_dict['filename'])
 
         for state in old_snapshot_model.content['states'].values():
-            voiceovers_mapping = (
-                state['recorded_voiceovers']['voiceovers_mapping'])
+            voiceovers_mapping = state['recorded_voiceovers'][
+                'voiceovers_mapping'
+            ]
             for lang_code_to_voiceover_dict in voiceovers_mapping.values():
                 for voiceover_dict in lang_code_to_voiceover_dict.values():
                     old_filenames.append(voiceover_dict['filename'])
@@ -137,9 +140,10 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         exploration_model: exp_models.ExplorationModel,
         snapshot_models: List[exp_models.ExplorationSnapshotContentModel],
-        metadata_models: List[exp_models.ExplorationSnapshotMetadataModel]
+        metadata_models: List[exp_models.ExplorationSnapshotMetadataModel],
     ) -> Tuple[
-        Optional[voiceover_models.ExplorationVoiceArtistsLinkModel], str]:
+        Optional[voiceover_models.ExplorationVoiceArtistsLinkModel], str
+    ]:
         """Creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
 
@@ -161,7 +165,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         """
 
         metadata_models_dict: Dict[
-            str, exp_models.ExplorationSnapshotMetadataModel] = {}
+            str, exp_models.ExplorationSnapshotMetadataModel
+        ] = {}
         for metadata_model in metadata_models:
             metadata_models_dict[metadata_model.id] = metadata_model
 
@@ -177,51 +182,60 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         # A dictionary mapping all the content IDs and voiceovers of the latest
         # exploration.
-        latest_content_id_to_voiceover_mapping: Dict[str, Dict[
-            str, state_domain.VoiceoverDict]] = collections.defaultdict(dict)
+        latest_content_id_to_voiceover_mapping: Dict[
+            str, Dict[str, state_domain.VoiceoverDict]
+        ] = collections.defaultdict(dict)
 
         # Collects all the debug logs.
-        debug_logs: str = (
-            'Exp ID: %s.\n' % exploration_model.id)
+        debug_logs: str = 'Exp ID: %s.\n' % exploration_model.id
         logging.info('Exp ID: %s.\n' % exploration_model.id)
 
-        debug_logs += ('Snapshots: %s\n' % len(snapshot_models))
+        debug_logs += 'Snapshots: %s\n' % len(snapshot_models)
 
         # The dictionary contains information about voice artists and their
         # provided voiceovers in the given exploration. This dict is built
         # iteratively using exploration snapshot models.
         voiceover_artist_and_voiceover_mapping: (
-            voiceover_domain.ContentIdToVoiceoverMappingType) = (
-                collections.defaultdict(dict)
-            )
+            voiceover_domain.ContentIdToVoiceoverMappingType
+        ) = collections.defaultdict(dict)
 
         language_code_to_voiceovers_count: Dict[str, int] = {}
 
         for state in exploration_model.states.values():
-            voiceovers_mapping = (
-                state['recorded_voiceovers']['voiceovers_mapping'])
-            for content_id, lang_code_to_voiceovers in (
-                    voiceovers_mapping.items()):
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceovers.items()):
+            voiceovers_mapping = state['recorded_voiceovers'][
+                'voiceovers_mapping'
+            ]
+            for (
+                content_id,
+                lang_code_to_voiceovers,
+            ) in voiceovers_mapping.items():
+                for (
+                    lang_code,
+                    voiceover_dict,
+                ) in lang_code_to_voiceovers.items():
 
                     if lang_code in language_code_to_voiceovers_count:
                         language_code_to_voiceovers_count[lang_code] += 1
                     else:
                         language_code_to_voiceovers_count[lang_code] = 1
 
-                    latest_content_id_to_voiceover_mapping[
-                        content_id][lang_code] = voiceover_dict
+                    latest_content_id_to_voiceover_mapping[content_id][
+                        lang_code
+                    ] = voiceover_dict
                     total_number_of_voiceovers_to_identify += 1
 
-        for language_code, voiceovers_count in (
-                language_code_to_voiceovers_count.items()):
-            debug_logs += (
-                'Language code: %s, voiceovers count: %s.\n' % (
-                    language_code, voiceovers_count))
+        for (
+            language_code,
+            voiceovers_count,
+        ) in language_code_to_voiceovers_count.items():
+            debug_logs += 'Language code: %s, voiceovers count: %s.\n' % (
+                language_code,
+                voiceovers_count,
+            )
 
         debug_logs += (
-            'Total voiceovers: %s.\n' % total_number_of_voiceovers_to_identify)
+            'Total voiceovers: %s.\n' % total_number_of_voiceovers_to_identify
+        )
 
         current_version = exploration_model.version
 
@@ -237,23 +251,29 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             new_snapshot_id = exploration_model.id + '-' + str(version)
             old_snapshot_id = exploration_model.id + '-' + str(version - 1)
 
-            debug_logs += (
-                'Iteration for snapshots: %s and %s\n' % (
-                    old_snapshot_id, new_snapshot_id))
-            logging.info('Iteration for snapshots: %s and %s\n' % (
-                old_snapshot_id, new_snapshot_id))
+            debug_logs += 'Iteration for snapshots: %s and %s\n' % (
+                old_snapshot_id,
+                new_snapshot_id,
+            )
+            logging.info(
+                'Iteration for snapshots: %s and %s\n'
+                % (old_snapshot_id, new_snapshot_id)
+            )
 
             if old_snapshot_id not in snapshot_models_dict:
                 logging.info(
-                    '%s not present in snapshot model dict.' % old_snapshot_id)
+                    '%s not present in snapshot model dict.' % old_snapshot_id
+                )
                 continue
             if new_snapshot_id not in snapshot_models_dict:
                 logging.info(
-                    '%s not present in snapshot model dict.' % new_snapshot_id)
+                    '%s not present in snapshot model dict.' % new_snapshot_id
+                )
                 continue
             if new_snapshot_id not in metadata_models_dict:
                 logging.info(
-                    '%s not present in metadata model dict.' % new_snapshot_id)
+                    '%s not present in metadata model dict.' % new_snapshot_id
+                )
                 continue
 
             new_snapshot_model = snapshot_models_dict[new_snapshot_id]
@@ -264,17 +284,19 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             try:
                 filenames_in_this_version = (
                     cls.extract_added_voiceovers_between_successive_snapshots(
-                        new_snapshot_model, old_snapshot_model))
+                        new_snapshot_model, old_snapshot_model
+                    )
+                )
             except Exception as e:
                 debug_logs += (
                     'Failed to get newly added voiceover between snapshot '
-                    'versions %s and %s, with error: %s' % (
-                        old_snapshot_model.id, new_snapshot_model.id, e)
+                    'versions %s and %s, with error: %s'
+                    % (old_snapshot_model.id, new_snapshot_model.id, e)
                 )
                 logging.info(
                     'Failed to get newly added voiceover between snapshot '
-                    'versions %s and %s, with error: %s' % (
-                        old_snapshot_model.id, new_snapshot_model.id, e)
+                    'versions %s and %s, with error: %s'
+                    % (old_snapshot_model.id, new_snapshot_model.id, e)
                 )
                 # If the method does not successfully retrieve newly added
                 # voiceovers in these versions of snapshot models, we should
@@ -288,44 +310,56 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 logging.info('No files added in this version.')
                 continue
 
-            voice_artist_id = (
-                metadata_models_dict[new_snapshot_model.id].committer_id
-            )
+            voice_artist_id = metadata_models_dict[
+                new_snapshot_model.id
+            ].committer_id
             logging.info('Got the voice artist ID: %s.' % voice_artist_id)
 
             try:
                 with datastore_services.get_ndb_context():
-                    voice_artist_username = (
-                        user_services.get_username(voice_artist_id))
+                    voice_artist_username = user_services.get_username(
+                        voice_artist_id
+                    )
             except Exception as e:
                 logging.info(e)
                 logging.info('\n')
                 voice_artist_username = (
-                    'Not Found for user ID: %s.' % voice_artist_id)
+                    'Not Found for user ID: %s.' % voice_artist_id
+                )
 
-            debug_logs += ('-\n')
-            debug_logs += ('a. %s\n' % voice_artist_username)
-            debug_logs += ('b. %s & %s\n' % (
-                old_snapshot_model.id, new_snapshot_model.id))
-            debug_logs += ('c. %s, [%s]\n' % (
+            debug_logs += '-\n'
+            debug_logs += 'a. %s\n' % voice_artist_username
+            debug_logs += 'b. %s & %s\n' % (
+                old_snapshot_model.id,
+                new_snapshot_model.id,
+            )
+            debug_logs += 'c. %s, [%s]\n' % (
                 len(filenames_in_this_version),
-                ', '.join(filenames_in_this_version)
-            ))
+                ', '.join(filenames_in_this_version),
+            )
 
             logging.info('-\n')
             logging.info('a. %s\n' % voice_artist_username)
-            logging.info('b. %s & %s\n' % (
-                old_snapshot_model.id, new_snapshot_model.id))
-            logging.info('c. %s, [%s]\n' % (
-                len(filenames_in_this_version),
-                ', '.join(filenames_in_this_version)
-            ))
+            logging.info(
+                'b. %s & %s\n' % (old_snapshot_model.id, new_snapshot_model.id)
+            )
+            logging.info(
+                'c. %s, [%s]\n'
+                % (
+                    len(filenames_in_this_version),
+                    ', '.join(filenames_in_this_version),
+                )
+            )
 
-            for content_id, lang_code_to_voiceovers in (
-                    latest_content_id_to_voiceover_mapping.items()):
+            for (
+                content_id,
+                lang_code_to_voiceovers,
+            ) in latest_content_id_to_voiceover_mapping.items():
 
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceovers.items()):
+                for (
+                    lang_code,
+                    voiceover_dict,
+                ) in lang_code_to_voiceovers.items():
 
                     referred_filename = voiceover_dict['filename']
 
@@ -341,7 +375,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     # never share the same filename.
                     if referred_filename in filenames_in_this_version:
                         voiceover_artist_and_voiceover_mapping[content_id][
-                            lang_code] = (voice_artist_id, voiceover_dict)
+                            lang_code
+                        ] = (voice_artist_id, voiceover_dict)
 
                         total_number_of_voiceovers_identified += 1
 
@@ -349,27 +384,22 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             # identified, further iteration over the remaining unexplored
             # snapshot models can be avoided.
             if (
-                total_number_of_voiceovers_to_identify ==
-                total_number_of_voiceovers_identified
+                total_number_of_voiceovers_to_identify
+                == total_number_of_voiceovers_identified
             ):
                 break
 
-        debug_logs += ('\n')
+        debug_logs += '\n'
 
         with datastore_services.get_ndb_context():
-            exploration_voice_artists_link_model = (
-                voiceover_services.
-                create_exploration_voice_artists_link_model_instance(
-                    exploration_model.id,
-                    voiceover_artist_and_voiceover_mapping
-                )
+            exploration_voice_artists_link_model = voiceover_services.create_exploration_voice_artists_link_model_instance(
+                exploration_model.id, voiceover_artist_and_voiceover_mapping
             )
 
         return exploration_voice_artists_link_model, debug_logs
 
     def extract_exploration_id_from_snapshot_id(
-        self,
-        snapshot_model_id: str
+        self, snapshot_model_id: str
     ) -> str:
         """Retrieves the substring of the snapshot model ID that
         matches the exploration ID. The snapshot model ID follows the pattern
@@ -395,38 +425,43 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         """
         exploration_models = (
             self.pipeline
-            | 'Get exploration models' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all())
+            | 'Get exploration models'
+            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
         )
 
         exploration_snapshot_models = (
             self.pipeline
-            | 'Get exploration snapshot models' >> ndb_io.GetModels(
-                exp_models.ExplorationSnapshotContentModel.get_all())
+            | 'Get exploration snapshot models'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationSnapshotContentModel.get_all()
+            )
         )
 
         exploration_snapshot_metadata_models = (
             self.pipeline
-            | 'Get exploration snapshot metadata models' >> ndb_io.GetModels(
-                exp_models.ExplorationSnapshotMetadataModel.get_all())
+            | 'Get exploration snapshot metadata models'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationSnapshotMetadataModel.get_all()
+            )
         )
 
         # Pair each exploration model with its exploration ID and create
         # key-value pairs.
         paired_exploration_models = (
             exploration_models
-            | 'Pair Exploration ID to model' >> beam.Map(
-                lambda model: (model.id, model))
+            | 'Pair Exploration ID to model'
+            >> beam.Map(lambda model: (model.id, model))
         )
 
         # Pair each exploration snapshot model with its exploration ID and
         # create key-value pairs.
         paired_snapshot_models = (
             exploration_snapshot_models
-            | 'Pair Exploration snapshot ID to model' >> beam.Map(
+            | 'Pair Exploration snapshot ID to model'
+            >> beam.Map(
                 lambda model: (
                     self.extract_exploration_id_from_snapshot_id(model.id),
-                    model
+                    model,
                 )
             )
         )
@@ -435,10 +470,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # ID and create key-value pairs.
         paired_snapshot_metadata_models = (
             exploration_snapshot_metadata_models
-            | 'Pair Exploration snapshot metadata ID to model' >> beam.Map(
+            | 'Pair Exploration snapshot metadata ID to model'
+            >> beam.Map(
                 lambda model: (
                     self.extract_exploration_id_from_snapshot_id(model.id),
-                    model
+                    model,
                 )
             )
         )
@@ -448,33 +484,33 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         grouped_models = {
             'exploration_models': paired_exploration_models,
             'snapshot_models': paired_snapshot_models,
-            'metadata_models': paired_snapshot_metadata_models
+            'metadata_models': paired_snapshot_metadata_models,
         } | 'Group by Exploration ID' >> beam.CoGroupByKey()
 
         voice_artist_link_models_and_logs = (
             grouped_models
-            | 'Get curated and valid exploration models' >> beam.Filter(
+            | 'Get curated and valid exploration models'
+            >> beam.Filter(
                 lambda element: (
-                    element[0] != '' and
-                    self.is_exploration_curated(exploration_id=element[0]) and
-                    len(element[1]['exploration_models']) > 0 and
-                    len(element[1]['snapshot_models']) > 0 and
-                    len(element[1]['metadata_models']) > 0
+                    element[0] != ''
+                    and self.is_exploration_curated(exploration_id=element[0])
+                    and len(element[1]['exploration_models']) > 0
+                    and len(element[1]['snapshot_models']) > 0
+                    and len(element[1]['metadata_models']) > 0
                 )
             )
-            | 'Get exploration voice artist link models' >> beam.Map(
+            | 'Get exploration voice artist link models'
+            >> beam.Map(
                 lambda element: (
-                    CreateExplorationVoiceArtistLinkModelsJob.
-                    get_exploration_voice_artists_link_model(
+                    CreateExplorationVoiceArtistLinkModelsJob.get_exploration_voice_artists_link_model(
                         exploration_model=element[1]['exploration_models'][0],
                         snapshot_models=element[1]['snapshot_models'],
-                        metadata_models=element[1]['metadata_models']
+                        metadata_models=element[1]['metadata_models'],
                     )
                 )
             )
-            | 'Filter None objects' >> beam.Filter(
-                lambda model: model[0] is not None
-            )
+            | 'Filter None objects'
+            >> beam.Filter(lambda model: model[0] is not None)
         )
 
         voice_artist_link_models = (
@@ -484,7 +520,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         debug_logs = (
             voice_artist_link_models_and_logs
-            | 'Unpack and get debug logs result' >> beam.Map(
+            | 'Unpack and get debug logs result'
+            >> beam.Map(
                 lambda element: (
                     job_run_result.JobRunResult.as_stdout(element[1])
                 )
@@ -493,7 +530,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         exploration_voice_artist_link_result = (
             voice_artist_link_models
-            | 'Get the exploration IDs for generated models' >> beam.Map(
+            | 'Get the exploration IDs for generated models'
+            >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
                     'Generated exploration voice artist link model for '
                     'exploration %s.' % model.id
@@ -507,11 +545,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
         return (
-            (
-                exploration_voice_artist_link_result,
-                debug_logs
-            ) | 'Flatten job run results' >> beam.Flatten()
-        )
+            exploration_voice_artist_link_result,
+            debug_logs,
+        ) | 'Flatten job run results' >> beam.Flatten()
 
 
 class AuditExplorationVoiceArtistLinkModelsJob(

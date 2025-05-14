@@ -30,45 +30,58 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_isfile_checks_if_file_exists(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'image/png')
+            'bucket', '/file/path.png', b'data', 'image/png'
+        )
         self.assertTrue(
-            dev_mode_storage_services.isfile('bucket', '/file/path.png'))
+            dev_mode_storage_services.isfile('bucket', '/file/path.png')
+        )
         self.assertFalse(
-            dev_mode_storage_services.isfile('bucket', '/file/path2.png'))
+            dev_mode_storage_services.isfile('bucket', '/file/path2.png')
+        )
 
     def test_commit_and_get_with_bytes(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'image/png')
+            'bucket', '/file/path.png', b'data', 'image/png'
+        )
         self.assertEqual(
-            dev_mode_storage_services.get('bucket', '/file/path.png'), b'data')
+            dev_mode_storage_services.get('bucket', '/file/path.png'), b'data'
+        )
 
     def test_commit_and_get_with_str(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', 'data', 'image/png')
+            'bucket', '/file/path.png', 'data', 'image/png'
+        )
         self.assertEqual(
-            dev_mode_storage_services.get('bucket', '/file/path.png'), b'data')
+            dev_mode_storage_services.get('bucket', '/file/path.png'), b'data'
+        )
 
     def test_delete_correctly_deletes_file(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'image/png')
+            'bucket', '/file/path.png', b'data', 'image/png'
+        )
         self.assertTrue(
-            dev_mode_storage_services.isfile('bucket', '/file/path.png'))
+            dev_mode_storage_services.isfile('bucket', '/file/path.png')
+        )
 
         dev_mode_storage_services.delete('bucket', '/file/path.png')
         self.assertFalse(
-            dev_mode_storage_services.isfile('bucket', '/file/path.png'))
+            dev_mode_storage_services.isfile('bucket', '/file/path.png')
+        )
 
     def test_copy_with_existing_source_blob_is_successful(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path.png', b'data', 'image/png')
+            'bucket', '/file/path.png', b'data', 'image/png'
+        )
         dev_mode_storage_services.copy(
-            'bucket', '/file/path.png', '/copy/path.png')
+            'bucket', '/file/path.png', '/copy/path.png'
+        )
 
         self.assertTrue(
-            dev_mode_storage_services.isfile('bucket', '/copy/path.png'))
+            dev_mode_storage_services.isfile('bucket', '/copy/path.png')
+        )
         self.assertEqual(
             dev_mode_storage_services.get('bucket', '/file/path.png'),
-            dev_mode_storage_services.get('bucket', '/copy/path.png')
+            dev_mode_storage_services.get('bucket', '/copy/path.png'),
         )
 
     def test_copy_with_non_existing_source_blob_fails(self) -> None:
@@ -76,32 +89,39 @@ class DevModeStorageServicesTests(test_utils.TestBase):
             ValueError, 'Source asset does not exist at /file/path.png'
         ):
             dev_mode_storage_services.copy(
-                'bucket', '/file/path.png', '/copy/path.png')
+                'bucket', '/file/path.png', '/copy/path.png'
+            )
 
     def test_listdir_with_slash_returns_all_blobs(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path1.png', b'data1', 'image/png')
+            'bucket', '/file/path1.png', b'data1', 'image/png'
+        )
         dev_mode_storage_services.commit(
-            'bucket', '/file/path2.png', b'data2', 'image/png')
+            'bucket', '/file/path2.png', b'data2', 'image/png'
+        )
         dev_mode_storage_services.commit(
-            'bucket', '/different/path1.png', b'data3', 'image/png')
+            'bucket', '/different/path1.png', b'data3', 'image/png'
+        )
 
         blob_data = [
-            blob.download_as_bytes() for blob in
-            dev_mode_storage_services.listdir('bucket', '/')
+            blob.download_as_bytes()
+            for blob in dev_mode_storage_services.listdir('bucket', '/')
         ]
         self.assertItemsEqual(blob_data, [b'data1', b'data2', b'data3'])
 
     def test_listdir_with_specific_folder_returns_some_blobs(self) -> None:
         dev_mode_storage_services.commit(
-            'bucket', '/file/path1.png', b'data1', 'image/png')
+            'bucket', '/file/path1.png', b'data1', 'image/png'
+        )
         dev_mode_storage_services.commit(
-            'bucket', '/file/path2.png', b'data2', 'image/png')
+            'bucket', '/file/path2.png', b'data2', 'image/png'
+        )
         dev_mode_storage_services.commit(
-            'bucket', '/different/path1.png', b'data3', 'image/png')
+            'bucket', '/different/path1.png', b'data3', 'image/png'
+        )
 
         blob_data = [
-            blob.download_as_bytes() for blob in
-            dev_mode_storage_services.listdir('bucket', '/file')
+            blob.download_as_bytes()
+            for blob in dev_mode_storage_services.listdir('bucket', '/file')
         ]
         self.assertItemsEqual(blob_data, [b'data1', b'data2'])

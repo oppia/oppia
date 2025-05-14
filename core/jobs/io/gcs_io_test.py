@@ -49,9 +49,13 @@ class ReadFileTest(job_test_utils.PipelinedTestBase):
             | 'Create pcoll of filepaths' >> beam.Create(filepaths)
             | 'Read file from GCS' >> gcs_io.ReadFile()
         )
-        self.assert_pcoll_equal(filepath_p_collec, [
-            result.Ok(('dummy_file', b'testing')),
-            result.Err(('new_dummy_file', 'The file does not exists.'))])
+        self.assert_pcoll_equal(
+            filepath_p_collec,
+            [
+                result.Ok(('dummy_file', b'testing')),
+                result.Err(('new_dummy_file', 'The file does not exists.')),
+            ],
+        )
 
 
 class WriteFileTest(job_test_utils.PipelinedTestBase):
@@ -62,12 +66,12 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
         filepaths = [
             {
                 'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',
-                'data': string
+                'data': string,
             },
             {
                 'filepath': 'dummy_folder/dummy_subfolder/dummy_file_2',
-                'data': string
-            }
+                'data': string,
+            },
         ]
         filepath_p_collec = (
             self.pipeline
@@ -78,11 +82,12 @@ class WriteFileTest(job_test_utils.PipelinedTestBase):
 
     def test_write_binary_files_to_gcs(self) -> None:
         binary_data = utils.convert_data_url_to_binary(
-            user_services.DEFAULT_IDENTICON_DATA_URL, 'png')
+            user_services.DEFAULT_IDENTICON_DATA_URL, 'png'
+        )
         filepaths = [
             {
                 'filepath': 'dummy_folder/dummy_subfolder/dummy_file_1',
-                'data': binary_data
+                'data': binary_data,
             }
         ]
         filepath_p_collec = (
@@ -115,10 +120,8 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         file_paths = [file_path]
 
         with self.swap(
-            gcs_io.DeleteFile,
-            '_delete_file',
-            lambda self, file_path: file_path
-        ): # pylint: disable=unused-argument
+            gcs_io.DeleteFile, '_delete_file', lambda self, file_path: file_path
+        ):  # pylint: disable=unused-argument
             filepath_p_collec = (
                 self.pipeline
                 | 'Create pcoll of filepaths' >> beam.Create(file_paths)
@@ -136,9 +139,11 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
         filepath_2 = 'dummy_folder/dummy_subfolder/dummy_file_2'
         string = b'testing'
         storage_services.commit(
-            bucket, filepath_1, string, 'application/octet-stream')
+            bucket, filepath_1, string, 'application/octet-stream'
+        )
         storage_services.commit(
-            bucket, filepath_2, string, 'application/octet-stream')
+            bucket, filepath_2, string, 'application/octet-stream'
+        )
         prefixes = ['dummy_folder/dummy_subfolder']
         filepath_p_collec = (
             self.pipeline
@@ -147,12 +152,14 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
             | 'Sort the values' >> beam.Map(sorted)
         )
         self.assert_pcoll_equal(
-            filepath_p_collec, [
+            filepath_p_collec,
+            [
                 [
                     'dummy_folder/dummy_subfolder/dummy_file_1',
-                    'dummy_folder/dummy_subfolder/dummy_file_2'
+                    'dummy_folder/dummy_subfolder/dummy_file_2',
                 ]
-            ])
+            ],
+        )
 
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
@@ -160,13 +167,13 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
         with self.swap(
             gcs_io.GetFiles,
             '_get_file_with_prefix',
-            lambda self, file_path: file_path
-        ): # pylint: disable=unused-argument
+            lambda self, file_path: file_path,
+        ):  # pylint: disable=unused-argument
             filepath_p_collec = (
                 self.pipeline
                 | 'Create pcoll of filepaths' >> beam.Create(file_paths)
                 | 'Get files with prefixes from GCS' >> gcs_io.GetFiles()
             )
             self.assert_pcoll_equal(
-                filepath_p_collec,
-                ['dummy_folder/dummy_subfolder'])
+                filepath_p_collec, ['dummy_folder/dummy_subfolder']
+            )

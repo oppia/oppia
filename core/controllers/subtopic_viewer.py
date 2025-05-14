@@ -26,9 +26,7 @@ from core.domain import topic_fetchers
 from typing import Dict
 
 
-class SubtopicPageDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class SubtopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Manages the data that needs to be displayed to a learner on the
     subtopic page.
     """
@@ -40,15 +38,18 @@ class SubtopicPageDataHandler(
         'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
-                }, {
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX,
+                    },
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+                    },
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -80,15 +81,19 @@ class SubtopicPageDataHandler(
                 break
         subtopic_page_contents = (
             subtopic_page_services.get_subtopic_page_contents_by_id(
-                topic.id, subtopic_id))
+                topic.id, subtopic_id
+            )
+        )
         subtopic_page_contents_dict = subtopic_page_contents.to_dict()
 
-        self.values.update({
-            'topic_id': topic.id,
-            'topic_name': topic.name,
-            'page_contents': subtopic_page_contents_dict,
-            'subtopic_title': subtopic_title,
-            'next_subtopic_dict': next_subtopic_dict,
-            'prev_subtopic_dict': prev_subtopic_dict,
-        })
+        self.values.update(
+            {
+                'topic_id': topic.id,
+                'topic_name': topic.name,
+                'page_contents': subtopic_page_contents_dict,
+                'subtopic_title': subtopic_title,
+                'next_subtopic_dict': next_subtopic_dict,
+                'prev_subtopic_dict': prev_subtopic_dict,
+            }
+        )
         self.render_json(self.values)

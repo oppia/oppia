@@ -32,18 +32,18 @@ import apache_beam as beam
 from typing import Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
-(voiceover_models,) = models.Registry.import_models([
-    models.Names.VOICEOVER])
+(voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 
 class DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob(
-    base_jobs.JobBase):
+    base_jobs.JobBase
+):
     """Jobs deletes the instances of ExplorationVoiceArtistsLinkModel's which
     corresponds to non-curated explorations.
     """
@@ -63,14 +63,14 @@ class DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob(
         """
         try:
             with datastore_services.get_ndb_context():
-                return (
-                    opportunity_services.
-                    is_exploration_available_for_contribution(exploration_id)
+                return opportunity_services.is_exploration_available_for_contribution(
+                    exploration_id
                 )
         except Exception:
             logging.exception(
                 'Not able to check whether exploration is curated or not'
-                ' for exploration ID %s.' % exploration_id)
+                ' for exploration ID %s.' % exploration_id
+            )
             return False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -83,19 +83,23 @@ class DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob(
         """
         models_to_be_deleted = (
             self.pipeline
-            | 'Get all exploration voice artist link models' >>
-                ndb_io.GetModels(
-                    voiceover_models.ExplorationVoiceArtistsLinkModel.get_all()
-                )
-            | 'Filter non-curated model instances' >> beam.Filter(
-                lambda model: not self.is_exploration_curated(model.id))
+            | 'Get all exploration voice artist link models'
+            >> ndb_io.GetModels(
+                voiceover_models.ExplorationVoiceArtistsLinkModel.get_all()
+            )
+            | 'Filter non-curated model instances'
+            >> beam.Filter(
+                lambda model: not self.is_exploration_curated(model.id)
+            )
         )
 
         deleted_models_report_pcollection = (
             models_to_be_deleted
-            | 'Report deleted model IDs' >> beam.Map(
+            | 'Report deleted model IDs'
+            >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Deleted ExplorationVoiceArtistsLinkModel: %s' % model.id)
+                    'Deleted ExplorationVoiceArtistsLinkModel: %s' % model.id
+                )
             )
         )
 
@@ -110,16 +114,16 @@ class DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob(
 
 
 class AuditExplorationVoiceArtistsLinkModelJob(
-    DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob):
-    """ Jobs used for auditing the instances of ExplorationVoiceArtistsLinkModel
+    DeleteNonCuratedInstanceofExplorationVoiceArtistsLinkModelJob
+):
+    """Jobs used for auditing the instances of ExplorationVoiceArtistsLinkModel
     which corresponds to non-curated explorations.
     """
 
     DATASTORE_UPDATES_ALLOWED = False
 
 
-class DeleteNonCuratedInstanceofEntityVoiceoversModelJob(
-    base_jobs.JobBase):
+class DeleteNonCuratedInstanceofEntityVoiceoversModelJob(base_jobs.JobBase):
     """Jobs deletes the instances of EntityVoiceoversModel's which
     corresponds to non-curated explorations.
     """
@@ -139,14 +143,14 @@ class DeleteNonCuratedInstanceofEntityVoiceoversModelJob(
         """
         try:
             with datastore_services.get_ndb_context():
-                return (
-                    opportunity_services.
-                    is_exploration_available_for_contribution(exploration_id)
+                return opportunity_services.is_exploration_available_for_contribution(
+                    exploration_id
                 )
         except Exception:
             logging.exception(
                 'Not able to check whether exploration is curated or not'
-                ' for exploration ID %s.' % exploration_id)
+                ' for exploration ID %s.' % exploration_id
+            )
             return False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -159,19 +163,23 @@ class DeleteNonCuratedInstanceofEntityVoiceoversModelJob(
         """
         models_to_be_deleted = (
             self.pipeline
-            | 'Get all entity voiceover models' >>
-                ndb_io.GetModels(
-                    voiceover_models.EntityVoiceoversModel.get_all()
-                )
-            | 'Filter non-curated model instances' >> beam.Filter(
-                lambda model: not self.is_exploration_curated(model.entity_id))
+            | 'Get all entity voiceover models'
+            >> ndb_io.GetModels(
+                voiceover_models.EntityVoiceoversModel.get_all()
+            )
+            | 'Filter non-curated model instances'
+            >> beam.Filter(
+                lambda model: not self.is_exploration_curated(model.entity_id)
+            )
         )
 
         deleted_models_report_pcollection = (
             models_to_be_deleted
-            | 'Report deleted model IDs' >> beam.Map(
+            | 'Report deleted model IDs'
+            >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Deleted EntityVoiceoversModel: %s' % model.id)
+                    'Deleted EntityVoiceoversModel: %s' % model.id
+                )
             )
         )
 
@@ -186,8 +194,9 @@ class DeleteNonCuratedInstanceofEntityVoiceoversModelJob(
 
 
 class AuditEntityVoiceoversModelJob(
-    DeleteNonCuratedInstanceofEntityVoiceoversModelJob):
-    """ Jobs used for auditing the instances of EntityVoiceoversModel
+    DeleteNonCuratedInstanceofEntityVoiceoversModelJob
+):
+    """Jobs used for auditing the instances of EntityVoiceoversModel
     which corresponds to non-curated explorations.
     """
 

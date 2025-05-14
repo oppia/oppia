@@ -52,11 +52,13 @@ _TOKEN_CATEGORY_OPERATOR: Final = 'operator'
 _OPENING_CATEGORIES: Final = (
     _TOKEN_CATEGORY_IDENTIFIER,
     _TOKEN_CATEGORY_FUNCTION,
-    _TOKEN_CATEGORY_NUMBER)
+    _TOKEN_CATEGORY_NUMBER,
+)
 
 _CLOSING_CATEGORIES: Final = (
     _TOKEN_CATEGORY_IDENTIFIER,
-    _TOKEN_CATEGORY_NUMBER)
+    _TOKEN_CATEGORY_NUMBER,
+)
 
 
 def contains_balanced_brackets(expression: str) -> bool:
@@ -101,7 +103,8 @@ def contains_at_least_one_variable(expression: str) -> bool:
     token_list = tokenize(expression)
 
     return any(
-        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list)
+        token.category == _TOKEN_CATEGORY_IDENTIFIER for token in token_list
+    )
 
 
 def tokenize(expression: str) -> List[Token]:
@@ -125,11 +128,16 @@ def tokenize(expression: str) -> List[Token]:
     # For eg. 'x + epsilon' should be tokenized as ['x','+','epsilon'] and not
     # ['x','+','e','*','psi','*','l','*','o','*','n']. a^2.
     re_string = r'(%s|[a-zA-Z]|[0-9]+\.[0-9]+|[0-9]+|[%s])' % (
-        '|'.join(sorted(
-            list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys()) +
-            constants.MATH_FUNCTION_NAMES,
-            reverse=True, key=len)),
-        '\\'.join(_VALID_OPERATORS))
+        '|'.join(
+            sorted(
+                list(constants.GREEK_LETTER_NAMES_TO_SYMBOLS.keys())
+                + constants.MATH_FUNCTION_NAMES,
+                reverse=True,
+                key=len,
+            )
+        ),
+        '\\'.join(_VALID_OPERATORS),
+    )
 
     token_texts = re.findall(re_string, expression)
 
@@ -142,8 +150,10 @@ def tokenize(expression: str) -> List[Token]:
     tokenized_exp_frequency = collections.Counter(''.join(token_texts))
 
     for character in original_exp_frequency:
-        if original_exp_frequency[
-                character] != tokenized_exp_frequency[character]:
+        if (
+            original_exp_frequency[character]
+            != tokenized_exp_frequency[character]
+        ):
             raise Exception('Invalid token: %s.' % character)
 
     token_list = []
@@ -168,14 +178,11 @@ def tokenize(expression: str) -> List[Token]:
             # to explicitly denote the operation. For eg. 'ab+x' would be
             # transformed into 'a*b+x'.
             if (
-                    (
-                        token.category in _CLOSING_CATEGORIES or
-                        token.text in _CLOSING_PARENS
-                    ) and
-                    (
-                        token_list[i + 1].category in _OPENING_CATEGORIES or
-                        token_list[i + 1].text in _OPENING_PARENS
-                    )
+                token.category in _CLOSING_CATEGORIES
+                or token.text in _CLOSING_PARENS
+            ) and (
+                token_list[i + 1].category in _OPENING_CATEGORIES
+                or token_list[i + 1].text in _OPENING_PARENS
             ):
                 final_token_list.append(Token('*'))
 
@@ -200,7 +207,9 @@ def get_variables(expression: str) -> List[str]:
     variables = set()
     for token in token_list:
         if token.category == _TOKEN_CATEGORY_IDENTIFIER or token.text in [
-                'pi', 'e']:
+            'pi',
+            'e',
+        ]:
             variables.add(token.text)
     return list(variables)
 
@@ -444,7 +453,8 @@ class Parser:
         # Expression should not contain any invalid characters.
         for character in expression:
             if not bool(re.match(r'(\s|\d|\w|\.)', character)) and (
-                    character not in _VALID_OPERATORS):
+                character not in _VALID_OPERATORS
+            ):
                 raise Exception('Invalid character: %s.' % character)
 
         if not contains_balanced_brackets(expression):
@@ -470,8 +480,7 @@ class Parser:
             Node. Root node of the generated parse tree.
         """
         parsed_expr = self._parse_mul_expr(token_list)
-        operator_token = self._get_next_token_if_text_in(
-            ['+', '-'], token_list)
+        operator_token = self._get_next_token_if_text_in(['+', '-'], token_list)
         while operator_token:
             parsed_right = self._parse_mul_expr(token_list)
             if operator_token.text == '+':
@@ -479,7 +488,8 @@ class Parser:
             else:
                 parsed_expr = SubtractionOperatorNode(parsed_expr, parsed_right)
             operator_token = self._get_next_token_if_text_in(
-                ['+', '-'], token_list)
+                ['+', '-'], token_list
+            )
         return parsed_expr
 
     def _parse_mul_expr(self, token_list: List[Token]) -> Node:
@@ -494,17 +504,18 @@ class Parser:
             Node. Root node of the generated parse tree.
         """
         parsed_expr = self._parse_pow_expr(token_list)
-        operator_token = self._get_next_token_if_text_in(
-            ['*', '/'], token_list)
+        operator_token = self._get_next_token_if_text_in(['*', '/'], token_list)
         while operator_token:
             parsed_right = self._parse_pow_expr(token_list)
             if operator_token.text == '*':
                 parsed_expr = MultiplicationOperatorNode(
-                    parsed_expr, parsed_right)
+                    parsed_expr, parsed_right
+                )
             else:
                 parsed_expr = DivisionOperatorNode(parsed_expr, parsed_right)
             operator_token = self._get_next_token_if_text_in(
-                ['*', '/'], token_list)
+                ['*', '/'], token_list
+            )
         return parsed_expr
 
     def _parse_pow_expr(self, token_list: List[Token]) -> Node:

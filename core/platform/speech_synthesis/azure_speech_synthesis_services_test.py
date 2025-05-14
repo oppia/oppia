@@ -36,45 +36,50 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swap_api_key_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None)
+            secrets_services, 'get_secret', None
+        )
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
             lambda _: 'azure_key',
             expected_args=[
                 ('AZURE_TTS_API_KEY',),
-            ]
+            ],
         )
 
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
         'core.platform.speech_synthesis.'
-        'azure_speech_synthesis_services.WordBoundaryCollection')
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
     def test_regenerate_speech_from_text_success(
         self,
         mock_word_boundary_collection: mock.Mock,
         mock_speech_config: mock.Mock,
-        mock_speech_synthesizer: mock.Mock
+        mock_speech_synthesizer: mock.Mock,
     ) -> None:
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
         ssml_text = (
             azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
-                plaintext, language_accent_code))
+                plaintext, language_accent_code
+            )
+        )
 
         mock_audio_data = b'mock_audio_data'
         mock_speech_config_instance = mock_speech_config.return_value
         mock_speech_config_instance.set_speech_synthesis_output_format = (
-            mock.MagicMock())
+            mock.MagicMock()
+        )
         mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
         mock_speech_synthesis_result = mock.MagicMock()
         mock_speech_synthesis_result.audio_data = mock_audio_data
         mock_speech_synthesis_result.reason = (
-            speechsdk.ResultReason.SynthesizingAudioCompleted)
+            speechsdk.ResultReason.SynthesizingAudioCompleted
+        )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            return_value.get.return_value
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
         ) = mock_speech_synthesis_result
         mock_word_boundary_instance = mock.MagicMock()
         mock_word_boundaries = [
@@ -84,24 +89,25 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             {'token': 'test', 'audio_offset_msecs': 300.0},
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
-        mock_word_boundary_instance.audio_offset_list = (
-            mock_word_boundaries)
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
         with self.swap_api_key_secrets_return_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
-                    plaintext, language_accent_code))
+                    plaintext, language_accent_code
+                )
+            )
 
         (
-            mock_speech_config_instance.set_speech_synthesis_output_format.
-            assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat
-                .Audio24Khz160KBitRateMonoMp3)
+            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            )
         )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            assert_called_once_with(ssml_text)
+            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                ssml_text
+            )
         )
 
         self.assertEqual(result_binary_data, mock_audio_data)
@@ -110,44 +116,50 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
     def test_raise_exception_when_azure_api_key_is_not_set(self) -> None:
         azure_exception = self.assertRaisesRegex(
-            Exception, 'Azure TTS API key is not available.')
+            Exception, 'Azure TTS API key is not available.'
+        )
 
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
 
         with self.swap_api_key_secrets_return_none, azure_exception:
             azure_speech_synthesis_services.regenerate_speech_from_text(
-                plaintext, language_accent_code)
+                plaintext, language_accent_code
+            )
 
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
         'core.platform.speech_synthesis.'
-        'azure_speech_synthesis_services.WordBoundaryCollection')
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
     def test_regenerate_speech_from_math_text_success(
         self,
         mock_word_boundary_collection: mock.Mock,
         mock_speech_config: mock.Mock,
-        mock_speech_synthesizer: mock.Mock
+        mock_speech_synthesizer: mock.Mock,
     ) -> None:
         plaintext = 'Evaluate 2 + 3 '
         language_accent_code = 'en-US'
         ssml_text = (
             azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
-                plaintext, language_accent_code))
+                plaintext, language_accent_code
+            )
+        )
 
         mock_audio_data = b'mock_audio_data'
         mock_speech_config_instance = mock_speech_config.return_value
         mock_speech_config_instance.set_speech_synthesis_output_format = (
-            mock.MagicMock())
+            mock.MagicMock()
+        )
         mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
         mock_speech_synthesis_result = mock.MagicMock()
         mock_speech_synthesis_result.audio_data = mock_audio_data
         mock_speech_synthesis_result.reason = (
-            speechsdk.ResultReason.SynthesizingAudioCompleted)
+            speechsdk.ResultReason.SynthesizingAudioCompleted
+        )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            return_value.get.return_value
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
         ) = mock_speech_synthesis_result
         mock_word_boundary_instance = mock.MagicMock()
         mock_word_boundaries = [
@@ -156,24 +168,25 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             {'token': '+', 'audio_offset_msecs': 200.0},
             {'token': '3', 'audio_offset_msecs': 300.0},
         ]
-        mock_word_boundary_instance.audio_offset_list = (
-            mock_word_boundaries)
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
         with self.swap_api_key_secrets_return_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
-                    plaintext, language_accent_code))
+                    plaintext, language_accent_code
+                )
+            )
 
         (
-            mock_speech_config_instance.set_speech_synthesis_output_format.
-            assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat
-                .Audio24Khz160KBitRateMonoMp3)
+            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            )
         )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            assert_called_once_with(ssml_text)
+            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                ssml_text
+            )
         )
 
         self.assertEqual(result_binary_data, mock_audio_data)
@@ -181,7 +194,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertIsNone(result_error)
 
     def test_regenerate_speech_from_text_failed_for_invalid_credentials(
-        self
+        self,
     ) -> None:
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
@@ -197,7 +210,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         with self.swap_api_key_secrets_return_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
-                    plaintext, language_accent_code))
+                    plaintext, language_accent_code
+                )
+            )
 
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
@@ -207,61 +222,66 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     @mock.patch('azure.cognitiveservices.speech.SpeechConfig')
     @mock.patch(
         'core.platform.speech_synthesis.'
-        'azure_speech_synthesis_services.WordBoundaryCollection')
+        'azure_speech_synthesis_services.WordBoundaryCollection'
+    )
     def test_regenerate_speech_from_text_failed(
         self,
         mock_word_boundary_collection: mock.Mock,
         mock_speech_config: mock.Mock,
-        mock_speech_synthesizer: mock.Mock
+        mock_speech_synthesizer: mock.Mock,
     ) -> None:
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
         ssml_text = (
             azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
-                plaintext, language_accent_code))
+                plaintext, language_accent_code
+            )
+        )
         mock_audio_data = b''
 
         mock_speech_config_instance = mock_speech_config.return_value
         mock_speech_config_instance.set_speech_synthesis_output_format = (
-            mock.MagicMock())
+            mock.MagicMock()
+        )
         mock_speech_synthesizer_instance = mock_speech_synthesizer.return_value
         mock_speech_synthesis_result = mock.MagicMock()
         mock_speech_synthesis_result.audio_data = mock_audio_data
         mock_cancellation_details = mock.MagicMock()
 
         error_details = (
-            'Azure speech synthesis failed becuase of `custom message`.')
+            'Azure speech synthesis failed becuase of `custom message`.'
+        )
         mock_cancellation_details.reason = speechsdk.CancellationReason.Error
         mock_cancellation_details.error_details = error_details
 
-        mock_speech_synthesis_result.reason = (
-            speechsdk.ResultReason.Canceled)
+        mock_speech_synthesis_result.reason = speechsdk.ResultReason.Canceled
         mock_speech_synthesis_result.cancellation_details = (
-            mock_cancellation_details)
+            mock_cancellation_details
+        )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            return_value.get.return_value
+            mock_speech_synthesizer_instance.speak_ssml_async.return_value.get.return_value
         ) = mock_speech_synthesis_result
         mock_word_boundary_instance = mock.MagicMock()
         mock_word_boundaries: List[Dict[str, Union[str, float]]] = []
-        mock_word_boundary_instance.audio_offset_list = (
-            mock_word_boundaries)
+        mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
         with self.swap_api_key_secrets_return_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
-                    plaintext, language_accent_code))
+                    plaintext, language_accent_code
+                )
+            )
 
         (
-            mock_speech_config_instance.set_speech_synthesis_output_format.
-            assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat
-                .Audio24Khz160KBitRateMonoMp3)
+            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            )
         )
         (
-            mock_speech_synthesizer_instance.speak_ssml_async.
-            assert_called_once_with(ssml_text)
+            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                ssml_text
+            )
         )
 
         self.assertEqual(result_binary_data, mock_audio_data)
@@ -270,7 +290,8 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
     def test_should_return_word_boundary_collection_correctly(self) -> None:
         word_boundary_collection = (
-            azure_speech_synthesis_services.WordBoundaryCollection())
+            azure_speech_synthesis_services.WordBoundaryCollection()
+        )
 
         mock_word_boundary_event = mock.MagicMock()
         mock_word_boundary_event.text = 'Hello'
@@ -283,9 +304,10 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         expected_word_boundary_collection = [
             {'token': 'Hello', 'audio_offset_msecs': 1.0},
-            {'token': 'world', 'audio_offset_msecs': 2.0}
+            {'token': 'world', 'audio_offset_msecs': 2.0},
         ]
 
         self.assertEqual(
             word_boundary_collection.audio_offset_list,
-            expected_word_boundary_collection)
+            expected_word_boundary_collection,
+        )

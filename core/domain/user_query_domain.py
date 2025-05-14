@@ -36,9 +36,9 @@ UserQueryParams = collections.namedtuple(
         'created_fewer_than_n_exps',
         'edited_at_least_n_exps',
         'edited_fewer_than_n_exps',
-        'created_collection'
+        'created_collection',
     ],
-    defaults=(None, None, None, None, None, None, None)
+    defaults=(None, None, None, None, None, None, None),
 )
 
 
@@ -54,7 +54,7 @@ class UserQuery:
         user_ids: List[str],
         sent_email_model_id: Optional[str] = None,
         created_on: Optional[datetime.datetime] = None,
-        deleted: bool = False
+        deleted: bool = False,
     ) -> None:
         """Create user query domain object.
 
@@ -89,8 +89,9 @@ class UserQuery:
         """
         if not utils.is_user_id_valid(self.submitter_id):
             raise utils.ValidationError(
-                'Expected submitter ID to be a valid user ID, received %s' %
-                self.submitter_id)
+                'Expected submitter ID to be a valid user ID, received %s'
+                % self.submitter_id
+            )
 
         if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
             raise utils.ValidationError('Invalid status: %s' % self.status)
@@ -99,14 +100,12 @@ class UserQuery:
             if not utils.is_user_id_valid(user_id):
                 raise utils.ValidationError(
                     'Expected user ID in user_ids to be a valid user ID, '
-                    'received %s' % user_id)
+                    'received %s' % user_id
+                )
 
     @classmethod
     def create_default(
-        cls,
-        query_id: str,
-        query_params: UserQueryParams,
-        submitter_id: str
+        cls, query_id: str, query_params: UserQueryParams, submitter_id: str
     ) -> UserQuery:
         """Create default user query.
 
@@ -119,8 +118,11 @@ class UserQuery:
             UserQuery. The default user query.
         """
         return cls(
-            query_id, query_params, submitter_id,
-            feconf.USER_QUERY_STATUS_PROCESSING, []
+            query_id,
+            query_params,
+            submitter_id,
+            feconf.USER_QUERY_STATUS_PROCESSING,
+            [],
         )
 
     def archive(self, sent_email_model_id: Optional[str] = None) -> None:

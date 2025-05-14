@@ -82,13 +82,13 @@ class BeamJobRun:
     """
 
     def __init__(
-            self,
-            job_id: str,
-            job_name: str,
-            job_state: str,
-            job_started_on: datetime.datetime,
-            job_updated_on: datetime.datetime,
-            job_is_synchronous: bool
+        self,
+        job_id: str,
+        job_name: str,
+        job_state: str,
+        job_started_on: datetime.datetime,
+        job_updated_on: datetime.datetime,
+        job_is_synchronous: bool,
     ) -> None:
         """Initializes a new BeamJobRun instance.
 
@@ -133,9 +133,11 @@ class BeamJobRun:
             'job_name': self.job_name,
             'job_state': self.job_state,
             'job_started_on_msecs': (
-                utils.get_time_in_millisecs(self.job_started_on)),
+                utils.get_time_in_millisecs(self.job_started_on)
+            ),
             'job_updated_on_msecs': (
-                utils.get_time_in_millisecs(self.job_updated_on)),
+                utils.get_time_in_millisecs(self.job_updated_on)
+            ),
             'job_is_synchronous': self.job_is_synchronous,
         }
 

@@ -37,9 +37,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[skill_inspection_jobs.CountHangingPrerequisiteSkillsJob] = (
         skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
-    ] = skill_inspection_jobs.CountHangingPrerequisiteSkillsJob
+    )
 
     SKILL_1_ID: Final = 'skill_id_1'
     SKILL_1_DESC: Final = 'skill_description_1'
@@ -63,25 +63,20 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
-                        'default_outcome': {}
+                        'default_outcome': {},
                     }
-                }
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=[]
+            prerequisite_skill_ids=[],
         )
         skill.update_timestamps()
         self.put_multi([skill])
@@ -102,25 +97,20 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
-                        'default_outcome': {}
+                        'default_outcome': {},
                     }
-                }
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=[]
+            prerequisite_skill_ids=[],
         )
         skill = self.create_model(
             skill_models.SkillModel,
@@ -135,25 +125,20 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
-                        'default_outcome': {}
+                        'default_outcome': {},
                     }
-                }
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=[self.SKILL_1_ID]
+            prerequisite_skill_ids=[self.SKILL_1_ID],
         )
         prerequisite_skill.update_timestamps()
         skill.update_timestamps()
@@ -175,25 +160,20 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
-                        'default_outcome': {}
+                        'default_outcome': {},
                     }
-                }
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            superseding_skill_id='superseding-skill'
+            superseding_skill_id='superseding-skill',
         )
         skill = self.create_model(
             skill_models.SkillModel,
@@ -208,35 +188,32 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
                     'content_id': 'explanation',
                 },
                 'worked_examples': [],
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {}
-                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
-                        'default_outcome': {}
+                        'default_outcome': {},
                     }
-                }
+                },
             },
             next_misconception_id=0,
-            misconceptions_schema_version=feconf
-                .CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            rubric_schema_version=feconf
-                .CURRENT_RUBRIC_SCHEMA_VERSION,
-            skill_contents_schema_version=feconf
-                .CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+            misconceptions_schema_version=feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            rubric_schema_version=feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+            skill_contents_schema_version=feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             all_questions_merged=False,
-            prerequisite_skill_ids=['nonexistent_skill', self.SKILL_2_ID]
+            prerequisite_skill_ids=['nonexistent_skill', self.SKILL_2_ID],
         )
         superseded_skill.update_timestamps()
         skill.update_timestamps()
         self.put_multi([superseded_skill, skill])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist' # pylint: disable = line-too-long
-            ),
-            job_run_result.JobRunResult(
-                stdout='Skill with ID: skill_id_2 (Description: skill_description_2) is referenced as a prerequisite but is superseded by skill with ID: superseding-skill' # pylint: disable = line-too-long
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Skill with ID: nonexistent_skill is referenced as a prerequisite but does not exist'  # pylint: disable = line-too-long
+                ),
+                job_run_result.JobRunResult(
+                    stdout='Skill with ID: skill_id_2 (Description: skill_description_2) is referenced as a prerequisite but is superseded by skill with ID: superseding-skill'  # pylint: disable = line-too-long
+                ),
+            ]
+        )

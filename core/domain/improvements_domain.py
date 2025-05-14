@@ -76,7 +76,7 @@ class TaskEntry:
         issue_description: Optional[str],
         status: str,
         resolver_id: Optional[str] = None,
-        resolved_on: Optional[datetime.datetime] = None
+        resolved_on: Optional[datetime.datetime] = None,
     ) -> None:
         """Initializes a new TaskEntry domain object from the given values.
 
@@ -125,8 +125,13 @@ class TaskEntry:
             str. The ID of this task.
         """
         return feconf.TASK_ENTRY_ID_TEMPLATE % (
-            self.entity_type, self.entity_id, self.entity_version,
-            self.task_type, self.target_type, self.target_id)
+            self.entity_type,
+            self.entity_id,
+            self.entity_version,
+            self.task_type,
+            self.target_type,
+            self.target_id,
+        )
 
     @property
     def composite_entity_id(self) -> str:
@@ -139,7 +144,10 @@ class TaskEntry:
             str. The value of the utility field.
         """
         return feconf.COMPOSITE_ENTITY_ID_TEMPLATE % (
-            self.entity_type, self.entity_id, self.entity_version)
+            self.entity_type,
+            self.entity_id,
+            self.entity_version,
+        )
 
     def to_dict(self) -> TaskEntryDict:
         """Returns a dict-representation of the task.
@@ -178,6 +186,8 @@ class TaskEntry:
             'status': self.status,
             'resolver_username': None,
             'resolved_on_msecs': (
-                None if not self.resolved_on
-                else utils.get_time_in_millisecs(self.resolved_on)),
+                None
+                if not self.resolved_on
+                else utils.get_time_in_millisecs(self.resolved_on)
+            ),
         }
