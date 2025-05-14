@@ -25,7 +25,7 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
@@ -41,7 +41,6 @@ describe('Content translation manager service', () => {
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
-  let suof: SubtitledUnicodeObjectFactory;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
   let imagePreloaderService: ImagePreloaderService;
@@ -54,7 +53,6 @@ describe('Content translation manager service', () => {
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
-    suof = TestBed.inject(SubtitledUnicodeObjectFactory);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
 
@@ -216,7 +214,7 @@ describe('Content translation manager service', () => {
     const interaction = card.getInteraction();
     const translatedCustomizationArgs = {
       placeholder: {
-        value: suof.createFromBackendDict({
+        value: SubtitledUnicode.createFromBackendDict({
           unicode_str: 'fr placeholder',
           content_id: 'ca_placeholder_0',
         }),
@@ -250,7 +248,7 @@ describe('Content translation manager service', () => {
     const interaction = card.getInteraction();
     const translatedCustomizationArgs = {
       placeholder: {
-        value: suof.createFromBackendDict({
+        value: SubtitledUnicode.createFromBackendDict({
           unicode_str: 'fr placeholder',
           content_id: 'ca_placeholder_0',
         }),
@@ -295,7 +293,7 @@ describe('Content translation manager service', () => {
     const interaction = card.getInteraction();
     const originalCustomizationArgs = {
       placeholder: {
-        value: suof.createFromBackendDict({
+        value: SubtitledUnicode.createFromBackendDict({
           unicode_str: 'en placeholder',
           content_id: 'ca_placeholder_0',
         }),
@@ -482,14 +480,14 @@ describe('Content translation manager service', () => {
         dummyCustArg: {
           value: [
             {
-              content: suof.createFromBackendDict({
+              content: SubtitledUnicode.createFromBackendDict({
                 unicode_str: 'first',
                 content_id: 'ca_0',
               }),
               show: true,
             },
             {
-              content: suof.createFromBackendDict({
+              content: SubtitledUnicode.createFromBackendDict({
                 unicode_str: 'first',
                 content_id: 'ca_1',
               }),
@@ -507,14 +505,14 @@ describe('Content translation manager service', () => {
         dummyCustArg: {
           value: [
             {
-              content: suof.createFromBackendDict({
+              content: SubtitledUnicode.createFromBackendDict({
                 unicode_str: 'fr 1',
                 content_id: 'ca_0',
               }),
               show: true,
             },
             {
-              content: suof.createFromBackendDict({
+              content: SubtitledUnicode.createFromBackendDict({
                 unicode_str: 'fr 2',
                 content_id: 'ca_1',
               }),

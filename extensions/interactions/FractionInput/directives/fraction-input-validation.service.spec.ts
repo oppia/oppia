@@ -25,7 +25,7 @@ import {Rule} from 'domain/exploration/rule.model';
 import {TestBed} from '@angular/core/testing';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {FractionDict} from 'domain/objects/fraction.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('FractionInputValidationService', () => {
   let validatorService: FractionInputValidationService;

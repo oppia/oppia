@@ -34,7 +34,7 @@ import {
   SolutionBackendDict,
   SolutionObjectFactory,
 } from 'domain/exploration/SolutionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {

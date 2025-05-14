@@ -109,7 +109,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.TEXT_QUESTION,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addHintToState(
       'It is closer to zero but not a positive number.'
     );
@@ -128,7 +130,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addSolutionToState(
       'minus',
       'Minus is the opposite of plus.',
@@ -359,7 +363,9 @@ describe('Exploration Editor', function () {
         1
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.editDefaultResponseFeedback('Feedback content.');
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Feedback content.'
+      );
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
         'de',
