@@ -63,6 +63,7 @@ export class AutomaticVoiceoverHighlightService {
   ): void {
     this.automatedVoiceoversAudioOffsetsMsecs =
       automatedVoiceoversAudioOffsetsMsecs;
+    console.log(automatedVoiceoversAudioOffsetsMsecs);
   }
 
   setHighlightIdToSenetnceMap(highlightIdToSentenceMap: {
@@ -82,6 +83,7 @@ export class AutomaticVoiceoverHighlightService {
         .join('')
         .trim();
     }
+    console.log(this.highlightIdToSentenceWithoutSpacesMap);
   }
 
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
