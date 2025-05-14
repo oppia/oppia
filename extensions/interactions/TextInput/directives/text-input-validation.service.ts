@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
@@ -26,7 +26,7 @@ import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {TextInputRulesService} from './text-input-rules.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {TranslatableSetOfNormalizedString} from 'interactions/rule-input-defs';
 import {UtilsService} from 'services/utils.service';
 
