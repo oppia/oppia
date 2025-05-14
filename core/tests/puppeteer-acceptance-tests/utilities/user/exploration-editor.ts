@@ -1246,13 +1246,16 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(
+  async editDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
@@ -1967,7 +1970,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addNewResponseButton);
     await this.clickOn(correctAnswerInTheGroupSelector);
 
-    await this.editDefaultResponseFeedback('Wrong Answer. Please try again');
+    await this.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
     await this.navigateToCard(lastInteraction);
     await this.createMinimalExploration(
       'This is last card',
