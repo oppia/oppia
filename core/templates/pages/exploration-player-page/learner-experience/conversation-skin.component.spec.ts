@@ -81,6 +81,7 @@ import {CurrentInteractionService} from '../services/current-interaction.service
 import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
 import {ExplorationRecommendationsService} from '../services/exploration-recommendations.service';
+import {ExplorationHtmlFormatterService} from '../services/exploration-html-formatter.service';
 import {FatigueDetectionService} from '../services/fatigue-detection.service';
 import {HintsAndSolutionManagerService} from '../services/hints-and-solution-manager.service';
 import {ImagePreloaderService} from '../services/image-preloader.service';
@@ -98,7 +99,7 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {ConversationFlowService} from '../services/conversation-flow.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 
@@ -167,7 +168,7 @@ describe('Conversation skin component', () => {
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let conceptCardManagerService: ConceptCardManagerService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
   let displayedCard = new StateCard(
@@ -482,7 +483,7 @@ describe('Conversation skin component', () => {
       imports: [HttpClientTestingModule],
       declarations: [ConversationSkinComponent, MockTranslatePipe],
       providers: [
-        SolutionObjectFactory,
+        ehfs,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -558,7 +559,7 @@ describe('Conversation skin component', () => {
     );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -1242,11 +1243,12 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      componentInstance.solutionForState = solutionObjectFactory.createNew(
+      componentInstance.solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
-        'XyzID'
+        'XyzID',
+        ehfs
       );
       componentInstance.numberOfIncorrectSubmissions = 3;
       componentInstance.triggerIfLearnerStuckAction();
@@ -1309,11 +1311,12 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      componentInstance.solutionForState = solutionObjectFactory.createNew(
+      componentInstance.solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
-        'XyzID'
+        'XyzID',
+        ehfs
       );
       componentInstance.numberOfIncorrectSubmissions = 3;
       componentInstance.triggerIfLearnerStuckActionDirectly();

@@ -25,12 +25,13 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {EditabilityService} from 'services/editability.service';
 import {StateHintsService} from '../state-editor-properties-services/state-hints.service';
 import {ExternalSaveService} from 'services/external-save.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {AlertsService} from 'services/alerts.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
 
 class MockStateHintsService {
@@ -101,7 +102,7 @@ describe('StateHintsEditorComponent', () => {
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
   let alertsService: AlertsService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let ngbModalSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -119,7 +120,7 @@ describe('StateHintsEditorComponent', () => {
         StateInteractionIdService,
         StateSolutionService,
         AlertsService,
-        SolutionObjectFactory,
+        ExplorationHtmlFormatterService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -136,13 +137,14 @@ describe('StateHintsEditorComponent', () => {
     stateSolutionService = TestBed.inject(StateSolutionService);
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
 
-    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+    stateSolutionService.savedMemento = Solution.createNew(
       true,
       'correct_answer',
       '<p> Hint Index 0 </p>',
-      '0'
+      '0',
+      ehfs
     );
 
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);

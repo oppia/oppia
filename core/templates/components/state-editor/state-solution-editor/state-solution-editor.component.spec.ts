@@ -27,10 +27,8 @@ import {
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -65,7 +63,7 @@ describe('State Solution Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
 
   let solution: Solution;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -106,21 +104,24 @@ describe('State Solution Editor Component', () => {
     solutionValidityService = TestBed.inject(SolutionValidityService);
     alertsService = TestBed.inject(AlertsService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
       () => 0,
       () => {}
     );
 
-    solution = solutionObjectFactory.createFromBackendDict({
-      answer_is_exclusive: false,
-      correct_answer: 'This is a correct answer!',
-      explanation: {
-        content_id: 'solution',
-        html: 'This is the explanation to the answer',
+    solution = Solution.createFromBackendDict(
+      {
+        answer_is_exclusive: false,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer',
+        },
       },
-    });
+      ehfs
+    );
 
     spyOn(
       explorationHtmlFormatterService,

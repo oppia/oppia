@@ -30,10 +30,8 @@ import {
   InteractionBackendDict,
 } from 'domain/exploration/InteractionObjectFactory';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
-import {
-  SolutionBackendDict,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -44,7 +42,7 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let sof: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
   let solutionDict: SolutionBackendDict;
@@ -56,7 +54,7 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    sof = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     defaultOutcomeDict = {
       dest: 'dest_default',
       dest_if_really_stuck: null,
@@ -714,16 +712,19 @@ describe('Interaction object factory', () => {
         html: 'This is the new explanation to the answer',
       },
     };
-    const newSolution = sof.createFromBackendDict(newSolutionDict);
+    const newSolution = Solution.createFromBackendDict(newSolutionDict, ehfs);
     expect(testInteraction.solution).toEqual(
-      sof.createFromBackendDict({
-        answer_is_exclusive: false,
-        correct_answer: 'This is a correct answer!',
-        explanation: {
-          content_id: 'solution',
-          html: 'This is the explanation to the answer',
+      Solution.createFromBackendDict(
+        {
+          answer_is_exclusive: false,
+          correct_answer: 'This is a correct answer!',
+          explanation: {
+            content_id: 'solution',
+            html: 'This is the explanation to the answer',
+          },
         },
-      })
+        ehfs
+      )
     );
     testInteraction.setSolution(newSolution);
     expect(testInteraction.solution).toEqual(newSolution);

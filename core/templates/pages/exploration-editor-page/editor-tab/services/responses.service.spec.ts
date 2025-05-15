@@ -38,7 +38,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;

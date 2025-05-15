@@ -80,7 +80,7 @@ import {ConversationFlowService} from '../services/conversation-flow.service';
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 

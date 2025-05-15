@@ -52,7 +52,7 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';

@@ -26,7 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';

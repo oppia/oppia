@@ -22,18 +22,19 @@ import {StateCustomizationArgsService} from 'components/state-editor/state-edito
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 describe('Solution Verification Service', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateCustomizationArgsService: StateCustomizationArgsService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let solutionVerificationService: SolutionVerificationService;
   let stateEditorService: StateEditorService;
   let mockInteractionState: Record<string, unknown>;
@@ -49,7 +50,7 @@ describe('Solution Verification Service', () => {
       providers: [
         StateInteractionIdService,
         StateCustomizationArgsService,
-        SolutionObjectFactory,
+        ehfs,
         StateEditorService,
         SolutionVerificationService,
         ExplorationStatesService,
@@ -72,7 +73,7 @@ describe('Solution Verification Service', () => {
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     stateEditorService = TestBed.inject(StateEditorService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
 
@@ -153,7 +154,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+      Solution.createNew(false, 'abc', 'nothing', ehfs)
     );
 
     expect(
@@ -184,7 +185,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'xyz', 'nothing')
+      Solution.createNew(false, 'xyz', 'nothing', ehfs)
     );
 
     expect(
@@ -237,7 +238,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+      Solution.createNew(false, 'abc', 'nothing', ehfs)
     );
 
     expect(

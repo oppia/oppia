@@ -73,7 +73,6 @@ import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObject
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
@@ -802,7 +801,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SkillUpdateService', SkillUpdateService],
-  ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],

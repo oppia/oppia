@@ -13,13 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Solution
+ * @fileoverview Model class for creating new frontend instances of Solution
  * domain objects.
  */
 
 import {} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
-
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {Fraction} from 'domain/objects/fraction.model';
@@ -177,34 +175,31 @@ export class Solution extends BaseTranslatableObject {
   getOppiaSolutionExplanationResponseHtml(): string {
     return this.explanation.html;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class SolutionObjectFactory {
-  constructor(private ehfs: ExplorationHtmlFormatterService) {}
-
-  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
-    return new Solution(
-      this.ehfs,
-      solutionBackendDict.answer_is_exclusive,
-      solutionBackendDict.correct_answer,
-      SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)
-    );
-  }
-
-  createNew(
+  static createNew(
     answerIsExclusive: boolean,
     correctAnswer: InteractionAnswer,
     explanationHtml: string,
-    explanationId: string
+    explanationId: string,
+    ehfs: ExplorationHtmlFormatterService
   ): Solution {
     return new Solution(
-      this.ehfs,
+      ehfs,
       answerIsExclusive,
       correctAnswer,
       SubtitledHtml.createDefault(explanationHtml, explanationId)
+    );
+  }
+
+  static createFromBackendDict(
+    solutionBackendDict: SolutionBackendDict,
+    ehfs: ExplorationHtmlFormatterService
+  ): Solution {
+    return new Solution(
+      ehfs,
+      solutionBackendDict.answer_is_exclusive,
+      solutionBackendDict.correct_answer,
+      SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)
     );
   }
 }

@@ -30,12 +30,13 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
@@ -46,7 +47,7 @@ describe('State card object factory', () => {
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService
     );
@@ -320,14 +321,17 @@ describe('State card object factory', () => {
   });
 
   it('should get interaction solution', () => {
-    let expectedResult = solutionObjectFactory.createFromBackendDict({
-      answer_is_exclusive: true,
-      correct_answer: 'correct answer',
-      explanation: {
-        content_id: 'pqr',
-        html: 'solution explanation',
+    let expectedResult = Solution.createFromBackendDict(
+      {
+        answer_is_exclusive: true,
+        correct_answer: 'correct answer',
+        explanation: {
+          content_id: 'pqr',
+          html: 'solution explanation',
+        },
       },
-    });
+      ehfs
+    );
 
     expect(_sampleCard1.getSolution()).toEqual(expectedResult);
   });

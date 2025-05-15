@@ -28,7 +28,7 @@ import {
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';

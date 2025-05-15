@@ -32,7 +32,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -42,6 +42,7 @@ import {EditabilityService} from 'services/editability.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ExplorationWarningsService} from '../services/exploration-warnings.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {RouterService} from '../services/router.service';
 import {StateEditorRefreshService} from '../services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
@@ -90,7 +91,7 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let solutionObjectFactory: SolutionObjectFactory;
+  let ehfs: ExplorationHtmlFormatterService;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
@@ -212,7 +213,7 @@ describe('Exploration editor tab component', () => {
 
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -868,24 +869,30 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
-        correct_answer: 'This is the correct answer',
-        answer_is_exclusive: false,
-        explanation: {
-          html: 'Solution explanation',
-          content_id: 'content_4',
+      Solution.createFromBackendDict(
+        {
+          correct_answer: 'This is the correct answer',
+          answer_is_exclusive: false,
+          explanation: {
+            html: 'Solution explanation',
+            content_id: 'content_4',
+          },
         },
-      })
+        ehfs
+      )
     );
 
-    let displayedValue = solutionObjectFactory.createFromBackendDict({
-      correct_answer: 'This is the second correct answer',
-      answer_is_exclusive: true,
-      explanation: {
-        html: 'Solution complete explanation',
-        content_id: 'content_4',
+    let displayedValue = Solution.createFromBackendDict(
+      {
+        correct_answer: 'This is the second correct answer',
+        answer_is_exclusive: true,
+        explanation: {
+          html: 'Solution complete explanation',
+          content_id: 'content_4',
+        },
       },
-    });
+      ehfs
+    );
     component.saveSolution(displayedValue);
 
     expect(stateEditorService.interaction.solution).toEqual(displayedValue);
