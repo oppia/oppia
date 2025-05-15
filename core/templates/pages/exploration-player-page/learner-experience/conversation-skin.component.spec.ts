@@ -81,7 +81,7 @@ import {CurrentInteractionService} from '../services/current-interaction.service
 import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
 import {ExplorationRecommendationsService} from '../services/exploration-recommendations.service';
-import {ExplorationHtmlFormatterService} from '../services/exploration-html-formatter.service';
+import {ExplorationHtmlFormatterService} from '../../../services/exploration-html-formatter.service';
 import {FatigueDetectionService} from '../services/fatigue-detection.service';
 import {HintsAndSolutionManagerService} from '../services/hints-and-solution-manager.service';
 import {ImagePreloaderService} from '../services/image-preloader.service';
