@@ -254,8 +254,9 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'content': 'hi'
         }
         with self.assertRaisesRegex(
-            Exception, 'Invalid tags provided. Tags not in default'
-            ' tags list.'):
+            Exception,
+            'Invalid tags provided. Tags not in default tags list.'
+        ):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
 
