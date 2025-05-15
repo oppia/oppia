@@ -50,10 +50,11 @@ describe('Solution Verification Service', () => {
       providers: [
         StateInteractionIdService,
         StateCustomizationArgsService,
-        ehfs,
+        ExplorationHtmlFormatterService,
         StateEditorService,
         SolutionVerificationService,
         ExplorationStatesService,
+
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState,

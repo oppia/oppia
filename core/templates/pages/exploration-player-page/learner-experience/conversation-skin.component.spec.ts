@@ -483,7 +483,7 @@ describe('Conversation skin component', () => {
       imports: [HttpClientTestingModule],
       declarations: [ConversationSkinComponent, MockTranslatePipe],
       providers: [
-        ehfs,
+        ExplorationHtmlFormatterService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
