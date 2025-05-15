@@ -22,7 +22,6 @@
     "core/templates/domain/state/StateObjectFactorySpec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/templates/domain/exploration/InteractionObjectFactorySpec.ts",
-    "core/templates/domain/exploration/SolutionObjectFactorySpec.ts",
     "core/README.md",
     "core/templates/karma.module.ts",
     "core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.ts",
