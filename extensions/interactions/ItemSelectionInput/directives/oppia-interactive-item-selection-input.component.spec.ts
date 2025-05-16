@@ -529,6 +529,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     component.handleEnterKey(event);
 
     expect(component.submitAnswer).toHaveBeenCalled();
-    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 });
