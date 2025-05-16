@@ -58,7 +58,9 @@ describe('Exploration Creator', function () {
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
       await explorationEditor.addImageInteraction();
-      await explorationEditor.editDefaultResponseFeedback('Wrong.');
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Wrong.'
+      );
       await explorationEditor.addHintToState('Initial coordinate');
       await explorationEditor.saveExplorationDraft();
 
