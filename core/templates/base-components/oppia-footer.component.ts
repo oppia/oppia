@@ -49,6 +49,8 @@ export class OppiaFooterComponent {
 
   versionInformationIsShown: boolean = this.router.url === '/about';
 
+  subscriptionProcessing: boolean = false;
+
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
@@ -68,9 +70,17 @@ export class OppiaFooterComponent {
     return regex.test(String(this.emailAddress));
   }
 
+  disableNewsletterSubscription(): boolean {
+    if (!this.subscriptionProcessing) {
+      return !this.validateEmailAddress();
+    }
+    return this.subscriptionProcessing;
+  }
+
   subscribeToMailingList(): void {
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
+    this.subscriptionProcessing = true;
     this.mailingListBackendApiService
       .subscribeUserToMailingList(
         String(this.emailAddress),
@@ -78,24 +88,30 @@ export class OppiaFooterComponent {
         AppConstants.MAILING_LIST_WEB_TAG
       )
       .then(status => {
-        if (status) {
-          this.alertsService.addInfoMessage('Done!', 1000);
-          this.ngbModal.open(ThanksForSubscribingModalComponent, {
-            backdrop: 'static',
-            size: 'xl',
-          });
-        } else {
+        setTimeout(() => {
+          if (status) {
+            this.alertsService.addInfoMessage('Done!', 1000);
+            this.ngbModal.open(ThanksForSubscribingModalComponent, {
+              backdrop: 'static',
+              size: 'xl',
+            });
+          } else {
+            this.alertsService.addInfoMessage(
+              AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+              10000
+            );
+          }
+          this.subscriptionProcessing = false;
+        }, 500);
+      })
+      .catch(errorResponse => {
+        setTimeout(() => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        }
-      })
-      .catch(errorResponse => {
-        this.alertsService.addInfoMessage(
-          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-          10000
-        );
+          this.subscriptionProcessing = false;
+        }, 500);
       });
   }
 

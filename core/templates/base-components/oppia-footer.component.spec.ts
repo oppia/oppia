@@ -36,6 +36,8 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -51,6 +53,10 @@ class MockRouter {
   url = '/about';
 }
 
+class MockNgbModal {
+  open = jasmine.createSpy('open').and.returnValue({componentInstance: {}});
+}
+
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
@@ -58,6 +64,7 @@ describe('OppiaFooterComponent', () => {
   let alertsService: AlertsService;
   let siteAnalyticsService: SiteAnalyticsService;
   let mockWindowRef: MockWindowRef;
+  let ngbModal: MockNgbModal;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -73,6 +80,10 @@ describe('OppiaFooterComponent', () => {
           provide: WindowRef,
           useValue: mockWindowRef,
         },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -84,6 +95,7 @@ describe('OppiaFooterComponent', () => {
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -110,6 +122,24 @@ describe('OppiaFooterComponent', () => {
     expect(component.validateEmailAddress()).toBeTrue();
   });
 
+  it('should return true if not processing subscription and email address is invalid', () => {
+    component.subscriptionProcessing = false;
+    component.emailAddress = 'invalidEmail';
+    expect(component.disableNewsletterSubscription()).toBeTrue();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.disableNewsletterSubscription()).toBeFalse();
+  });
+
+  it('should return true if processing subscription regardless of email address validity', () => {
+    component.subscriptionProcessing = true;
+    component.emailAddress = 'invalidEmail';
+    expect(component.disableNewsletterSubscription()).toBeTrue();
+
+    component.emailAddress = 'validEmail@example.com';
+    expect(component.disableNewsletterSubscription()).toBeTrue();
+  });
+
   it('should add user to mailing list and return status', fakeAsync(() => {
     spyOn(alertsService, 'addInfoMessage');
     tick();
@@ -120,11 +150,22 @@ describe('OppiaFooterComponent', () => {
       'subscribeUserToMailingList'
     ).and.returnValue(Promise.resolve(true));
 
+    expect(component.subscriptionProcessing).toBeFalse();
+
     component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeTrue();
 
     flushMicrotasks();
 
+    tick(500);
+
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith('Done!', 1000);
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ThanksForSubscribingModalComponent,
+      {backdrop: 'static', size: 'xl'}
+    );
+    expect(component.subscriptionProcessing).toBeFalse();
   }));
 
   it('should fail to add user to mailing list and return status', fakeAsync(() => {
@@ -137,14 +178,21 @@ describe('OppiaFooterComponent', () => {
       'subscribeUserToMailingList'
     ).and.returnValue(Promise.resolve(false));
 
+    expect(component.subscriptionProcessing).toBeFalse();
+
     component.subscribeToMailingList();
 
+    expect(component.subscriptionProcessing).toBeTrue();
+
     flushMicrotasks();
+
+    tick(500);
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
       10000
     );
+    expect(component.subscriptionProcessing).toBeFalse();
   }));
 
   it('should reject request to the mailing list correctly', fakeAsync(() => {
@@ -157,14 +205,21 @@ describe('OppiaFooterComponent', () => {
       'subscribeUserToMailingList'
     ).and.returnValue(Promise.reject(false));
 
+    expect(component.subscriptionProcessing).toBeFalse();
+
     component.subscribeToMailingList();
 
+    expect(component.subscriptionProcessing).toBeTrue();
+
     flushMicrotasks();
+
+    tick(500);
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
       10000
     );
+    expect(component.subscriptionProcessing).toBeFalse();
   }));
 
   it('should register About footer link click event', () => {

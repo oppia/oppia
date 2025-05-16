@@ -17,7 +17,7 @@
                  required="true"
                  aria-labelledby="email">
           <button class="oppia-footer-newsletter-button e2e-test-newsletter-subscribe-btn"
-                  [disabled]="!validateEmailAddress()"
+                  [disabled]="disableNewsletterSubscription()"
                   (click)="subscribeToMailingList()">
             <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
           </button>
