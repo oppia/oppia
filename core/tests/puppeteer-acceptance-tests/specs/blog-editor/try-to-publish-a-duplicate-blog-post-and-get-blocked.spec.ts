@@ -63,6 +63,7 @@ describe('Blog Editor', function () {
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+      await blogPostEditor.hoverOverWarningToast();
       await blogPostEditor.expectScreenshotToMatch(
         'blogEditorPageWithErrorMessageForDuplicateBlogPostTitle',
         __dirname
