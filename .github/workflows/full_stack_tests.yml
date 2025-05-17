@@ -223,6 +223,7 @@ jobs:
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
       - name: Uploading diff screenshots as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
