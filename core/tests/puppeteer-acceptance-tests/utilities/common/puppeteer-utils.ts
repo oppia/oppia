@@ -888,7 +888,7 @@ export class BaseUser {
     await this.page.evaluate(async () => {
       await new Promise<void>(resolve => {
         let totalHeight = 0;
-        const distance = 100; // pixels per scroll step
+        const distance = 100;
         const timer = setInterval(() => {
           const scrollHeight = document.body.scrollHeight;
           window.scrollBy(0, distance);
