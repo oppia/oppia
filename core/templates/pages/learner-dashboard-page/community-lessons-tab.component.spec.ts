@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for for ProgressTabComponent.
+ * @fileoverview Unit tests for for CommunityLessonsTabComponent.
  */
 
 import {
@@ -21,6 +21,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick,
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -30,11 +31,12 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
-import {ProgressTabComponent} from './progress-tab.component';
+import {CommunityLessonsTabComponent} from './community-lessons-tab.component';
 import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {UserService} from 'services/user.service';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
@@ -77,15 +79,16 @@ const sampleExploration = {
   title: 'Test Title',
 };
 
-describe('Progress Tab Component', () => {
-  let component: ProgressTabComponent;
-  let fixture: ComponentFixture<ProgressTabComponent>;
+describe('Community lessons tab Component', () => {
+  let component: CommunityLessonsTabComponent;
+  let fixture: ComponentFixture<CommunityLessonsTabComponent>;
   let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
   let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
   let userService: UserService;
   let explorationSummary: LearnerExplorationSummary;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
 
   let subtopic = {
     skill_ids: ['skill_id_2'],
@@ -127,9 +130,9 @@ describe('Progress Tab Component', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
   const learntTopicSummaryDict = {
@@ -196,9 +199,9 @@ describe('Progress Tab Component', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
 
@@ -293,7 +296,11 @@ describe('Progress Tab Component', () => {
         FormsModule,
         HttpClientTestingModule,
       ],
-      declarations: [ProgressTabComponent, MockTranslatePipe, MockTruncatePipe],
+      declarations: [
+        CommunityLessonsTabComponent,
+        MockTranslatePipe,
+        MockTruncatePipe,
+      ],
       providers: [
         LearnerDashboardActivityBackendApiService,
         {
@@ -309,7 +316,7 @@ describe('Progress Tab Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProgressTabComponent);
+    fixture = TestBed.createComponent(CommunityLessonsTabComponent);
     component = fixture.componentInstance;
     learnerDashboardActivityBackendApiService = TestBed.inject(
       LearnerDashboardActivityBackendApiService
@@ -317,6 +324,9 @@ describe('Progress Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     userService = TestBed.inject(UserService);
+    learnerDashboardBackendApiService = TestBed.inject(
+      LearnerDashboardBackendApiService
+    );
     component.incompleteExplorationsList = [];
     component.incompleteCollectionsList = [];
     component.completedExplorationsList = [];
@@ -338,11 +348,6 @@ describe('Progress Tab Component', () => {
     component.learntTopicsList = [
       LearnerTopicSummary.createFromBackendDict(learntTopicSummaryDict),
     ];
-
-    component.subtopicMasteries = {
-      new_sample_topic_id: {},
-      sample_topic_id: {1: 1},
-    };
 
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',
@@ -1065,8 +1070,15 @@ describe('Progress Tab Component', () => {
     expect(component.isLearnerStateEmpty()).toBeFalse();
   });
 
-  it("should correctly set a topic and its subtopics' masteries on ngOnInit", () => {
-    fixture.detectChanges();
+  it('should correctly get subtopic masteries', fakeAsync(() => {
+    spyOn(learnerDashboardBackendApiService, 'fetchSubtopicMastery')
+      .withArgs(['new_sample_topic_id', 'sample_topic_id'])
+      .and.returnValue(
+        Promise.resolve({new_sample_topic_id: {}, sample_topic_id: {1: 1}})
+      );
+
+    component.getSubtopicMasteryData();
+    tick();
 
     expect(component.partialTopicMastery).toEqual([
       {topic: component.partiallyLearntTopicsList[0], progress: [0]},
@@ -1074,7 +1086,7 @@ describe('Progress Tab Component', () => {
     expect(component.learntTopicMastery).toEqual([
       {topic: component.learntTopicsList[0], progress: [100]},
     ]);
-  });
+  }));
 
   it('should correctly get total number of skills', () => {
     const multipleTopics = LearnerTopicSummary.createFromBackendDict(
