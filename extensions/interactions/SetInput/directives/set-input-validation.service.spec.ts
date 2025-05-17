@@ -22,7 +22,7 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 import {AppConstants} from 'app.constants';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';

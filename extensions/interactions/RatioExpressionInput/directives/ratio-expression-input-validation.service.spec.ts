@@ -25,7 +25,7 @@ import {
 } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 
 import {AppConstants} from 'app.constants';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of SubtitledUnicode
+ * @fileoverview Model class for creating new frontend instances of SubtitledUnicode
  * domain objects.
  */
 
@@ -21,8 +21,6 @@ export interface SubtitledUnicodeBackendDict {
   content_id: string | null;
   unicode_str: string;
 }
-
-import {Injectable} from '@angular/core';
 
 export class SubtitledUnicode {
   // A null 'content_id' indicates that the 'SubtitledHtml' has been created
@@ -38,6 +36,22 @@ export class SubtitledUnicode {
       unicode_str: this._unicode,
       content_id: this._contentId,
     };
+  }
+
+  static createFromBackendDict(
+    subtitledUnicodeBackendDict: SubtitledUnicodeBackendDict
+  ): SubtitledUnicode {
+    return new SubtitledUnicode(
+      subtitledUnicodeBackendDict.unicode_str,
+      subtitledUnicodeBackendDict.content_id
+    );
+  }
+
+  static createDefault(
+    unicode: string,
+    contentId: string | null
+  ): SubtitledUnicode {
+    return new SubtitledUnicode(unicode, contentId);
   }
 
   isEmpty(): boolean {
@@ -58,23 +72,5 @@ export class SubtitledUnicode {
 
   set unicode(unicode: string) {
     this._unicode = unicode;
-  }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class SubtitledUnicodeObjectFactory {
-  createFromBackendDict(
-    subtitledUnicodeBackendDict: SubtitledUnicodeBackendDict
-  ): SubtitledUnicode {
-    return new SubtitledUnicode(
-      subtitledUnicodeBackendDict.unicode_str,
-      subtitledUnicodeBackendDict.content_id
-    );
-  }
-
-  createDefault(unicode: string, contentId: string | null): SubtitledUnicode {
-    return new SubtitledUnicode(unicode, contentId);
   }
 }

@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 import {AppConstants} from 'app.constants';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
