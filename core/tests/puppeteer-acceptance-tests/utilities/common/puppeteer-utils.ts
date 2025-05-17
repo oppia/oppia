@@ -885,22 +885,10 @@ export class BaseUser {
    * Scrolls to the bottom of the page.
    */
   async scrollToBottomOfPage(): Promise<void> {
-    await this.page.evaluate(async () => {
-      await new Promise<void>(resolve => {
-        let totalHeight = 0;
-        const distance = 100;
-        const timer = setInterval(() => {
-          const scrollHeight = document.body.scrollHeight;
-          window.scrollBy(0, distance);
-          totalHeight += distance;
-
-          if (totalHeight >= scrollHeight) {
-            clearInterval(timer);
-            resolve();
-          }
-        }, 100);
-      });
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
     });
+    await this.waitForPageToFullyLoad();
   }
 }
 
