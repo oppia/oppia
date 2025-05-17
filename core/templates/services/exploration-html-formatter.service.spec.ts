@@ -22,7 +22,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('Exploration Html Formatter Service', () => {
   let ehfs: ExplorationHtmlFormatterService;
