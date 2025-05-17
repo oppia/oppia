@@ -61,7 +61,8 @@
     <div *ngIf="activeTab === 'practice'">
       <practice-tab [subtopicsList]="subtopics"
                     [topicName]="topicName"
-                    [previewMode]="true">
+                    [topicUrlFragment]="topicUrlFragment"
+                    [classroomUrlFragment]="classroomUrlFragment">
       </practice-tab>
     </div>
   </div>
