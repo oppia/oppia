@@ -270,13 +270,6 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function hovers over the warning toast message.
-   */
-  async hoverOverWarningToast(): Promise<void> {
-    await this.page.hover(toastMessage);
-  }
-
-  /**
    * This function checks that the user is unable to publish a blog post.
    */
   async expectUserUnableToPublishBlogPost(
