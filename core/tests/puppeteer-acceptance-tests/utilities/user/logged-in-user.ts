@@ -178,11 +178,12 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const emptyProgressMessage = '.e2e-test-empty-progress-message';
 const exploreLessonButton = '.e2e-test-explore-lesson-button';
 const continueButtonSelector = '.e2e-test-continue-button';
-const startLessonButton = '.e2e-lesson-start-button';
+const startLessonButton = '.e2e-test-lesson-resume-redo-button';
 const lessonPercentProgress = '.e2e-test-lesson-progress-percent';
 const incompleteLessonTitle = '.e2e-test-incomplete-community-lessons-section';
 const completedLessonTitle = '.e2e-test-completed-community-lessons-section';
 const skillProgressPercent = '.e2e-test-skill-progress-circle';
+const oppiaLogoButton = '.e2e-test-oppia-logo';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1897,7 +1898,7 @@ export class LoggedInUser extends BaseUser {
   /*
    * Verifies that the start lesson button text matches the expected value.
    */
-  async expectButtonText(buttonText: string): Promise<void> {
+  async expectStartLessonButtonTextToBe(buttonText: string): Promise<void> {
     const startButtonElement = await this.page.$(startLessonButton);
     const startButtonText = await this.page.evaluate(
       el => el.innerText,
@@ -1922,13 +1923,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   // Clicks the continue button to proceed in an exploration.
-  async expectExplorationToNotBeOver(): Promise<void> {
+  async clickOnLessonContinueButton(): Promise<void> {
     await this.clickOn(continueButtonSelector);
   }
 
   // Clicks on the Oppia logo and waits for the homepage to fully load.
   async clickOnLogo(): Promise<void> {
-    await this.clickOn('.e2e-test-oppia-logo');
+    await this.clickOn(oppiaLogoButton);
     await this.waitForPageToFullyLoad();
   }
 

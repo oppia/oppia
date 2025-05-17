@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for learner dashboard functionalities, specfically
- * interactions with components that use classroom data across all tabs.
+ * @fileoverview Acceptance tests for learner dashboard functionalities, specfically to
+ * verify the visibility and correctness of Progress section, Progress percentage, Completed lessons, Skills and skill progress percentages.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -118,7 +118,7 @@ describe('Logged-in User', function () {
         "Jamie's Adventures in the Arcade",
         'What are the Place Values'
       );
-      await loggedInUser.expectExplorationToNotBeOver();
+      await loggedInUser.clickOnLessonContinueButton();
       await loggedInUser.clickOnLogo();
       await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectIncompleteLesson('What are the Place Values');
@@ -152,7 +152,7 @@ describe('Logged-in User', function () {
       }
       await loggedInUser.expectProgressPercent('100%');
       await loggedInUser.expectSkillProgressPercent('0%');
-      await loggedInUser.expectButtonText('Redo');
+      await loggedInUser.expectStartLessonButtonTextToBe('Redo');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
