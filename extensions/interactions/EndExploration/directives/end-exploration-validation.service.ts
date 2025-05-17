@@ -51,21 +51,21 @@ export class EndExplorationValidationService {
     if (!Array.isArray(recommendedExplorationIds)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.',
+        message: 'Set of recommended exploration IDs must be list',
       });
     }
     for (var i = 0; i < recommendedExplorationIds.length; i++) {
       if (!(typeof recommendedExplorationIds[i] === 'string')) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Recommended exploration ID must be a string.',
+          message: 'Recommended exploration ID must be a string',
         });
         break;
       }
       if (recommendedExplorationIds[i].trim().length === 0) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Recommended exploration ID must be non-empty.',
+          message: 'Recommended exploration ID must be non-empty',
         });
         break;
       }
@@ -91,7 +91,7 @@ export class EndExplorationValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.',
+          'have any Oppia responses',
       });
     }
     if (defaultOutcome) {
@@ -99,7 +99,7 @@ export class EndExplorationValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have a default outcome.',
+          'have a default outcome',
       });
     }
 
