@@ -210,8 +210,7 @@ jobs:
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
-          | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.
-
+          | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
