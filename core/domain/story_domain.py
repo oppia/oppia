@@ -877,19 +877,19 @@ class StoryNode:
                     'Chapter status cannot be %s ' % self.status)
 
         if self.planned_publication_date_msecs and (
-            not isinstance(self.planned_publication_date_msecs, int)):
+            not isinstance(self.planned_publication_date_msecs, float)):
             raise utils.ValidationError(
                 'Expected planned publication date to be milliseconds, '
                 'received %s' % self.planned_publication_date_msecs)
 
         if self.last_modified_msecs and (
-            not isinstance(self.last_modified_msecs, int)):
+            not isinstance(self.last_modified_msecs, float)):
             raise utils.ValidationError(
                 'Expected last modified to be milliseconds, '
                 'received %s' % self.last_modified_msecs)
 
         if self.first_publication_date_msecs and (
-            not isinstance(self.first_publication_date_msecs, int)):
+            not isinstance(self.first_publication_date_msecs, float)):
             raise utils.ValidationError(
                 'Expected first publication date to be milliseconds, '
                 'received %s' % self.first_publication_date_msecs)
