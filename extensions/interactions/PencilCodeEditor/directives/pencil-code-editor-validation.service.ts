@@ -49,7 +49,7 @@ export class PencilCodeEditorValidationService {
     if (!(typeof initialCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.',
+        message: 'The initialCode must be a string',
       });
     }
     return warningsList;
