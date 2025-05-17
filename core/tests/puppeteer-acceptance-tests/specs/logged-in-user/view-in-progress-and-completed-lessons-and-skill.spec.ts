@@ -123,6 +123,7 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectIncompleteLesson('What are the Place Values');
       await loggedInUser.expectProgressPercent('0%');
+      await loggedInUser.expectSkillProgressPercent('0%');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -135,6 +136,7 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectCompletedLesson('What are the Place Values');
       await loggedInUser.expectProgressPercent('33%');
+      await loggedInUser.expectSkillProgressPercent('0%');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -149,6 +151,7 @@ describe('Logged-in User', function () {
         await loggedInUser.expectCompletedLesson(placeValueChapters[i]);
       }
       await loggedInUser.expectProgressPercent('100%');
+      await loggedInUser.expectSkillProgressPercent('0%');
       await loggedInUser.expectButtonText('Redo');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

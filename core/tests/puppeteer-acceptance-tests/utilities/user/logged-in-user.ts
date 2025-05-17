@@ -182,6 +182,7 @@ const startLessonButton = '.e2e-lesson-start-button';
 const lessonPercentProgress = '.e2e-test-lesson-progress-percent';
 const incompleteLessonTitle = '.e2e-test-incomplete-community-lessons-section';
 const completedLessonTitle = '.e2e-test-completed-community-lessons-section';
+const skillProgressPercent = '.e2e-test-skill-progress-circle';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1866,6 +1867,21 @@ export class LoggedInUser extends BaseUser {
    */
   async expectProgressPercent(percent: string): Promise<void> {
     const progressPercentElement = await this.page.$(lessonPercentProgress);
+    const progressPercentText = await this.page.evaluate(
+      el => el.innerText,
+      progressPercentElement
+    );
+
+    if (progressPercentText !== percent) {
+      throw new Error(
+        `Unexpected progress percentage text: ${progressPercentText}`
+      );
+    }
+  }
+
+  // This verify the progress percent of skill card under progress tab in new learner dashboard.
+  async expectSkillProgressPercent(percent: string): Promise<void> {
+    const progressPercentElement = await this.page.$(skillProgressPercent);
     const progressPercentText = await this.page.evaluate(
       el => el.innerText,
       progressPercentElement
