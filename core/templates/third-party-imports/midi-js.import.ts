@@ -16,31 +16,30 @@
  * @fileoverview This file imports the MIDI.js library.
  */
 
-import {Injectable, OnInit} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import 'midi/build/MIDI.js';
 window.Base64Binary = require('midi/inc/shim/Base64binary.js');
 
-@Injectable({
-  providedIn: 'root',
-})
-export class MidiService implements OnInit {
-  private soundfontPath: string;
-  constructor() {
-    if (AppConstants.DEV_MODE) {
-      this.soundfontPath = '/dist/oppia-angular/midi/examples/soundfont/';
-    } else {
-      this.soundfontPath = '/dist/oppia-angular-prod/midi/examples/soundfont/';
-    }
-  }
-  ngOnInit(): void {
-    this.initializeMidi();
-  }
-  initializeMidi(): void {
-    MIDI.loadPlugin({
-      soundfontUrl: this.soundfontPath,
-      instrument: 'acoustic_grand_piano',
-      callback: function () {},
-    });
-  }
+var soundfontPath: string;
+
+if (AppConstants.DEV_MODE) {
+  soundfontPath = '/dist/oppia-angular/midi/examples/soundfont/';
+} else {
+  soundfontPath = '/dist/oppia-angular-prod/midi/examples/soundfont/';
 }
+
+const ready = (fn: () => void): void => {
+  if (document.readyState !== 'loading') {
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+};
+
+ready(() => {
+  MIDI.loadPlugin({
+    soundfontUrl: soundfontPath,
+    instrument: 'acoustic_grand_piano',
+    callback: () => {},
+  });
+});

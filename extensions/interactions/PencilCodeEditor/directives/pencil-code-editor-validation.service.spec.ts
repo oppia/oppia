@@ -214,7 +214,7 @@ describe('Pencil Code Editor Validation Service', () => {
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.',
+        message: 'The initialCode must be a string',
       });
       expect(
         pcevs.getAllWarnings(
