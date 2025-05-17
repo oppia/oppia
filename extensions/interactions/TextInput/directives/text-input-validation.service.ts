@@ -18,15 +18,15 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {TextInputRulesService} from './text-input-rules.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {TranslatableSetOfNormalizedString} from 'interactions/rule-input-defs';
 import {UtilsService} from 'services/utils.service';
 
@@ -56,7 +56,7 @@ interface Warning {
   providedIn: 'root',
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
     customizationArgs: TextInputCustomizationArgs
@@ -71,7 +71,7 @@ export class TextInputValidationService {
 
     if (
       !(placeholder instanceof SubtitledUnicode) ||
-      !angular.isString(placeholder.unicode)
+      typeof placeholder.unicode !== 'string'
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,

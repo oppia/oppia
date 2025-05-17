@@ -20,13 +20,14 @@ import {Injectable} from '@angular/core';
 
 import {FractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {AppConstants} from 'app.constants';
 import {Warning} from 'services/alerts.service';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
+import isEqual from 'lodash/isEqual';
 
 interface FractionWarning {
   type: string;
@@ -46,7 +47,7 @@ interface Range {
   providedIn: 'root',
 })
 export class FractionInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
@@ -168,7 +169,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -223,7 +224,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -242,7 +243,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -263,7 +264,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -284,7 +285,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:

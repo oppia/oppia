@@ -4,8 +4,6 @@
   </div>
 
   <div class="modal-body">
-    <!-- Provide a sink to move the focus into while the modal loads. -->
-    <input *ngIf="modalIsLoading" type="text" [oppiaFocusOn]="tmpFocusPoint">
     <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
       <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
            class="oppia-customization-arg-editor">
@@ -61,6 +59,6 @@
     z-index: 1;
   }
   input.oppia-save-btn, input.oppia-cancel-btn {
-    max-width: 100px
+    max-width: 100px;
   }
 </style>

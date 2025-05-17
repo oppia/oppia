@@ -18,14 +18,14 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {TranslatableSetOfUnicodeString} from 'interactions/rule-input-defs';
 
@@ -40,7 +40,7 @@ interface PreviousRule {
 })
 export class SetInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   /**
@@ -95,7 +95,7 @@ export class SetInputValidationService {
 
     let buttonText =
       customizationArgs.buttonText && customizationArgs.buttonText.value;
-    if (!buttonText || !angular.isString(buttonText.unicode)) {
+    if (!buttonText || typeof buttonText.unicode !== 'string') {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Button text must be a string.',

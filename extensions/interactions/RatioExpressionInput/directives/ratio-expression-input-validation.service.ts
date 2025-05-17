@@ -18,15 +18,15 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Ratio} from 'domain/objects/ratio.model';
 import {RatioExpressionInputRulesService} from './ratio-expression-input-rules.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {RatioInputAnswer} from 'interactions/answer-defs';
 
@@ -35,7 +35,7 @@ import {RatioInputAnswer} from 'interactions/answer-defs';
 })
 export class RatioExpressionInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(

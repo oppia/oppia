@@ -407,12 +407,12 @@ DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
-IMAGE_FORMAT_JPEG = 'jpeg'
+IMAGE_FORMAT_JPEG = 'jpg'
 IMAGE_FORMAT_PNG = 'png'
 IMAGE_FORMAT_GIF = 'gif'
 IMAGE_FORMAT_SVG = 'svg'
 
-# An array containing the accepted image formats (as determined by the imghdr
+# An array containing the accepted image formats (as determined by the filetype
 # module) and the corresponding allowed extensions in the filenames of uploaded
 # images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
@@ -522,7 +522,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.4'
+OPPIA_VERSION = '3.4.6'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer

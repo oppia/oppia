@@ -20,15 +20,15 @@ import {Injectable} from '@angular/core';
 
 import nerdamer from 'nerdamer';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {AlgebraicExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
@@ -39,7 +39,7 @@ export class AlgebraicExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(

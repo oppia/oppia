@@ -29,16 +29,13 @@ import {
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -61,7 +58,7 @@ import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
@@ -122,14 +119,11 @@ class MockConvertToPlainTextPipe {
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -301,15 +295,12 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -340,16 +331,11 @@ describe('State translation component', () => {
     fixture = TestBed.createComponent(StateTranslationComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -729,11 +715,10 @@ describe('State translation component', () => {
       });
 
       it('should get subtitled Unicode data translation', () => {
-        let subtitledObject =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObject = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getRequiredUnicode(subtitledObject)).toBe(
           'This is the unicode'
         );
@@ -756,7 +741,7 @@ describe('State translation component', () => {
       it('should get summary default outcome when outcome is linear', () => {
         expect(
           component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+            Outcome.createNew('unused', '1', 'Feedback Text', []),
             'Continue',
             0,
             'true'
@@ -770,12 +755,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               1,
               'true'
@@ -790,12 +770,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               0,
               'true'
@@ -813,14 +788,10 @@ describe('State translation component', () => {
       it('should get summary answer group', () => {
         expect(
           component.summarizeAnswerGroup(
-            answerGroupObjectFactory.createNew(
+            AnswerGroup.createNew(
               [],
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
             ),
@@ -842,7 +813,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -1011,15 +981,12 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1055,9 +1022,6 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -1267,11 +1231,10 @@ describe('State translation component', () => {
           'This is the html'
         );
 
-        let subtitledObjectBack =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObjectBack = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getSubtitledContentSummary(subtitledObjectBack)).toBe(
           'This is the unicode'
         );
@@ -1298,7 +1261,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -1534,15 +1496,12 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1578,9 +1537,6 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -1737,7 +1693,7 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isTranslationModeActive'
     ).and.returnValue(true);
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1763,7 +1719,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1789,7 +1745,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -2015,7 +1971,6 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationState1 = {
     Introduction: {
@@ -2220,15 +2175,12 @@ describe('State translation component', () => {
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
         StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -2280,9 +2232,6 @@ describe('State translation component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
@@ -2332,7 +2281,7 @@ describe('State translation component', () => {
     ).and.returnValue({
       testCa: {
         value: {
-          unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
+          unicode: SubtitledUnicode.createDefault('', 'ca_0'),
           html: [SubtitledHtml.createDefault('', 'ca_1')],
         },
       },
