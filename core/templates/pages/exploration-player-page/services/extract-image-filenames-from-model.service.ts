@@ -16,7 +16,6 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
@@ -235,10 +234,3 @@ export class ExtractImageFilenamesFromModelService {
   getImageFilenamesInSkill = this._getImageFilenamesInSkill;
   getImageFilenamesInState = this._getImageFilenamesInState;
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExtractImageFilenamesFromModelService',
-    downgradeInjectable(ExtractImageFilenamesFromModelService)
-  );

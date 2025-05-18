@@ -19,7 +19,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
@@ -146,10 +145,3 @@ export class VersionHistoryBackendApiService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VersionHistoryBackendApiService',
-    downgradeInjectable(VersionHistoryBackendApiService)
-  );

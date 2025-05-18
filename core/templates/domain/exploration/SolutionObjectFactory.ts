@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -25,9 +25,8 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {Fraction} from 'domain/objects/fraction.model';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,
   FractionAnswer,
@@ -112,9 +111,9 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer
       ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = new NumberWithUnitsObjectFactory(new UnitsObjectFactory())
-        .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
-        .toString();
+      correctAnswer = NumberWithUnits.fromDict(
+        this.correctAnswer as NumberWithUnitsAnswer
+      ).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
       const subtitledHtmlChoices = (
@@ -209,7 +208,3 @@ export class SolutionObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SolutionObjectFactory', downgradeInjectable(SolutionObjectFactory));

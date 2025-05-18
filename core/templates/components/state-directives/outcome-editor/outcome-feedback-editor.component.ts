@@ -24,8 +24,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ContextService} from 'services/context.service';
 
 @Component({
@@ -62,9 +61,3 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     }
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'oppiaOutcomeFeedbackEditor',
-    downgradeComponent({component: OutcomeFeedbackEditorComponent})
-  );

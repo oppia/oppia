@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   FeatureStatusSummary,
@@ -116,10 +115,3 @@ export class FeatureFlagBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FeatureFlagBackendApiService',
-    downgradeInjectable(FeatureFlagBackendApiService)
-  );

@@ -16,7 +16,6 @@
  * @fileoverview Service that manages blog admin data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -45,7 +44,3 @@ export class BlogAdminDataService {
     return this._getDataAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BlogAdminDataService', downgradeInjectable(BlogAdminDataService));

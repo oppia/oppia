@@ -32,7 +32,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence, cast
+from typing import Dict, List, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -64,7 +64,9 @@ def _get_entity_voiceovers_from_model(
         'entity_type': entity_voiceovers_model.entity_type,
         'entity_version': entity_voiceovers_model.entity_version,
         'language_accent_code': entity_voiceovers_model.language_accent_code,
-        'voiceovers_mapping': entity_voiceovers_model.voiceovers_mapping
+        'voiceovers_mapping': entity_voiceovers_model.voiceovers_mapping,
+        'automated_voiceovers_audio_offsets_msecs': (
+            entity_voiceovers_model.automated_voiceovers_audio_offsets_msecs)
     })
     return entity_voiceovers
 
@@ -271,7 +273,9 @@ def compute_voiceover_related_change(
                 entity_voiceovers_dict['entity_id'],
                 entity_voiceovers_dict['entity_version'] + 1,
                 entity_voiceovers_dict['language_accent_code'],
-                entity_voiceovers_dict['voiceovers_mapping']
+                entity_voiceovers_dict['voiceovers_mapping'],
+                entity_voiceovers_dict[
+                    'automated_voiceovers_audio_offsets_msecs']
             )
         )
 
@@ -379,11 +383,14 @@ def create_entity_voiceovers_model(
 
     entity_voiceovers_dict = entity_voiceovers.to_dict()
     voiceovers_mapping = entity_voiceovers_dict['voiceovers_mapping']
+    automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
+        'automated_voiceovers_audio_offsets_msecs']
 
     entity_voiceovers_model = (
         voiceover_models.EntityVoiceoversModel.create_new(
             entity_type, entity_id, entity_version,
-            language_accent_code, voiceovers_mapping
+            language_accent_code, voiceovers_mapping,
+            automated_voiceovers_audio_offsets_msecs_dict
         )
     )
     entity_voiceovers_model.update_timestamps()
@@ -438,6 +445,32 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
             f.read())
         return language_accent_master_list
+
+
+def get_language_code_from_language_accent_code(
+    language_accent_code: str
+) -> Optional[str]:
+    """The method returns the language code corresponding to the provided
+    language accent code.
+
+    Args:
+        language_accent_code: str. Language accent code.
+
+    Returns:
+        str. The language code corresponds to the provided language accent code.
+    """
+    language_accent_master_dict = (
+        get_language_accent_master_list())
+    language_code_for_given_accent = None
+
+    for language_code, language_accent_code_to_description in (
+            language_accent_master_dict.items()):
+        if language_accent_code in list(
+                language_accent_code_to_description.keys()):
+            language_code_for_given_accent = language_code
+            break
+
+    return language_code_for_given_accent
 
 
 def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:

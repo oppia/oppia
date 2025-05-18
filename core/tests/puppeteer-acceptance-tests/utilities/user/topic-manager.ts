@@ -22,6 +22,8 @@ import {ElementHandle} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
+const curriculumAdminThumbnailImage =
+  testConstants.data.curriculumAdminThumbnailImage;
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -69,8 +71,9 @@ const chapterExplorationIdField = '.e2e-test-exploration-id-input';
 
 const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const subtopicTitleField = '.e2e-test-subtopic-title-field';
-('input.e2e-test-new-subtopic-url-fragment-field');
-const subtopicUrlFragmentField = '.e2e-test-subtopic-url-fragment-field';
+('input.e2e-test-url-fragment-field');
+const subtopicUrlFragmentField =
+  '.e2e-test-subtopic-url-fragment-field .e2e-test-url-fragment-field';
 const richTextAreaField = 'div.e2e-test-rte';
 const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
@@ -102,6 +105,14 @@ const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileSkillQuestionTab = '.e2e-test-mobile-questions-tab';
 
+const newChapterTitleField = 'input.e2e-test-new-chapter-title-field';
+const newChapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
+const newChapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
+const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const newChapterErrorMessageSelector =
+  '.acceptance-restricted-interaction-error';
+
 const topicStatusDropdownSelector = '.e2e-test-select-topic-status-dropdown';
 const classroomDropdownSelector = '.e2e-test-select-classroom-dropdown';
 const keywordDropdownSelector = '.e2e-test-select-keyword-dropdown';
@@ -119,7 +130,8 @@ const desktopSkillSelector = '.e2e-test-skill-description';
 const itemsPerPageDropdown = '.e2e-test-select-items-per-page-dropdown';
 const filterOptionSelector = '.mat-option-text';
 const topicNameField = '.e2e-test-topic-name-field';
-const updateTopicUrlFragmentField = '.e2e-test-topic-url-fragment-field';
+const topicEditorUrlFragmentField =
+  '.e2e-test-topic-url-fragment-field .e2e-test-url-fragment-field';
 const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 const createNewTopicButton = '.e2e-test-create-topic-button';
@@ -401,8 +413,11 @@ export class TopicManager extends BaseUser {
       await this.type(topicNameField, topicName);
     }
     if (urlFragment) {
-      await this.clearAllTextFrom(updateTopicUrlFragmentField);
-      await this.type(updateTopicUrlFragmentField, urlFragment);
+      await this.page.waitForSelector(topicEditorUrlFragmentField, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(topicEditorUrlFragmentField);
+      await this.page.type(topicEditorUrlFragmentField, urlFragment);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
@@ -2207,8 +2222,13 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     await this.clearAllTextFrom(subtopicTitleField);
     await this.type(subtopicTitleField, title);
-    await this.clearAllTextFrom(subtopicUrlFragmentField);
-    await this.type(subtopicUrlFragmentField, urlFragment);
+    if (urlFragment) {
+      await this.page.waitForSelector(subtopicUrlFragmentField, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(subtopicUrlFragmentField);
+      await this.page.type(subtopicUrlFragmentField, urlFragment);
+    }
 
     await this.clickOn(editSubtopicExplanationSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -2435,7 +2455,7 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Save a story as a curriculum admin.
+   * Save a story as a topic manager.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -2451,7 +2471,7 @@ export class TopicManager extends BaseUser {
     }
     await this.type(
       saveChangesMessageInput,
-      'Test saving story as curriculum admin.'
+      'Test saving story as topic manager.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
@@ -2613,6 +2633,67 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Create a chapter for a certain story.
+   */
+  async addChapterWithoutSaving(
+    chapterName: string,
+    explorationId: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForStaticAssetsToLoad();
+      const addChapterButtonElement = await this.page.$(addChapterButton);
+      if (!addChapterButtonElement) {
+        await this.clickOn(mobileChapterCollapsibleCard);
+      }
+    }
+    await this.clickOn(addChapterButton);
+    await this.type(newChapterTitleField, chapterName);
+    await this.type(newChapterExplorationIdField, explorationId);
+
+    await this.clickOn(newChapterPhotoBoxButton);
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+  }
+
+  /**
+   * Click on save new chapter button.
+   */
+  async clickOnSaveNewChapterButton(): Promise<void> {
+    await this.clickOn(createChapterButton);
+  }
+
+  /**
+   * Expect create new chapter to have error
+   */
+  async expectNewChapterErrorSpan(errorSpan: string): Promise<void> {
+    await this.page.waitForSelector(newChapterErrorMessageSelector);
+
+    const errorSpanElement = await this.page.$(newChapterErrorMessageSelector);
+
+    const errorMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      errorSpanElement
+    );
+
+    if (!errorMessage.startsWith(errorSpan)) {
+      showMessage(errorMessage);
+      showMessage(errorSpan);
+      throw new Error(
+        `Expected error message to be ${errorSpan} but found ${errorMessage}`
+      );
+    }
+
+    showMessage(`Found expected error message: ${errorMessage}`);
   }
 
   /**

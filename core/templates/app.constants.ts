@@ -65,27 +65,26 @@ export const AppConstants = {
   },
 
   STATE_ERROR_MESSAGES: {
-    ADD_INTERACTION: 'Please add an interaction to this card.',
-    STATE_UNREACHABLE: 'This card is unreachable.',
+    ADD_INTERACTION: 'Please add an interaction to this card',
+    STATE_UNREACHABLE: 'This card is unreachable',
     UNABLE_TO_END_EXPLORATION:
-      "There's no way to complete the exploration starting from this card. " +
-      'To fix this, make sure that the last card in the chain starting from' +
-      " this one has an 'End Exploration' question type.",
-    INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
+      "There's no way to complete the exploration starting from this card -- " +
+      'ensure that the last card in the chain starting from' +
+      " this one has an 'End Exploration' question type",
+    INCORRECT_SOLUTION: 'The current solution does not lead to another card',
     UNRESOLVED_ANSWER:
-      'There is an answer among the top 10 which has no explicit feedback.',
+      'There is an answer among the top 10 which has no explicit feedback',
     INVALID_REDIRECTION:
       'Learner should not be directed back by more than' +
-      ' 3 cards in the lesson.',
+      ' 3 cards in the lesson',
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
-    INIT_CARD: 'The first card of the lesson must be a checkpoint.',
-    TERMINAL_CARD:
-      'Checkpoints are not allowed on the last card of the lesson.',
+    INIT_CARD: 'The first card of the lesson must be a checkpoint',
+    TERMINAL_CARD: 'Checkpoints are not allowed on the last card of the lesson',
     CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
     BYPASSABLE_CARD:
-      'Checkpoints must not be assigned to cards that can be bypassed.',
+      'Checkpoints must not be assigned to cards that can be bypassed',
   },
 
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
@@ -326,8 +325,10 @@ export const AppConstants = {
   },
   VOLUNTEER_FORM_LINK:
     'https://docs.google.com/forms/d/e/1FAIpQLSc5_rwUjugT_Jt_EB49_zAKWVY68I3fTXF5w9b5faIk7rL6yg/viewform',
-  IMPACT_REPORT_LINK:
+  IMPACT_REPORT_LINK_2022:
     'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+  IMPACT_REPORT_LINK_2023:
+    'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:
@@ -425,4 +426,5 @@ export enum NavbarAndFooterGATrackingPages {
   ABOUT = 'About',
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
+  DONATE = 'Donate',
 }

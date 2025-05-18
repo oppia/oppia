@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +37,3 @@ export class AuthBackendApiService {
     await this.httpClient.get('/session_end').toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AuthBackendApiService', downgradeInjectable(AuthBackendApiService));

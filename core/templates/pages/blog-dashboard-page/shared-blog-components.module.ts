@@ -20,7 +20,6 @@ import {NgModule} from '@angular/core';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {HttpClientModule} from '@angular/common/http';
 import {SharedComponentsModule} from 'components/shared-component.module';
 
 import {BlogPostActionConfirmationModalComponent} from 'pages/blog-dashboard-page/blog-post-action-confirmation/blog-post-action-confirmation.component';
@@ -37,7 +36,6 @@ import {CommonModule} from '@angular/common';
 @NgModule({
   imports: [
     CommonModule,
-    HttpClientModule,
     SharedComponentsModule,
     MatTabsModule,
     MatMenuModule,

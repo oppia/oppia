@@ -36,6 +36,7 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   skill!: Skill;
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToRubricsObject: Record<string, Rubric[]> = {};
+  difficultyCount!: number;
 
   constructor(private skillEditorStateService: SkillEditorStateService) {}
 

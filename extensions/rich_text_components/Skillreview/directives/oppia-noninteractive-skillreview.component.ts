@@ -40,7 +40,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ContextService} from 'services/context.service';
@@ -157,10 +156,3 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveSkillreview',
-  downgradeComponent({
-    component: NoninteractiveSkillreview,
-  }) as angular.IDirectiveFactory
-);

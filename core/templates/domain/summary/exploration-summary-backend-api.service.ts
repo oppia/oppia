@@ -19,7 +19,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -118,10 +117,3 @@ export class ExplorationSummaryBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationSummaryBackendApiService',
-    downgradeInjectable(ExplorationSummaryBackendApiService)
-  );

@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface KeyFunc {
   shiftKeyIsPressed: boolean;
@@ -124,7 +123,3 @@ export class NavigationService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory('NavigationService', downgradeInjectable(NavigationService));

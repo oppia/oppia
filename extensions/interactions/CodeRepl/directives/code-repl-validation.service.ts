@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {CodeReplCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -34,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class CodeReplValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -50,7 +49,7 @@ export class CodeReplValidationService {
     if (!(typeof language === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Programming language name must be a string.',
+        message: 'Programming language name must be a string',
       });
     }
 
@@ -58,7 +57,7 @@ export class CodeReplValidationService {
     if (!(typeof placeholder === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       });
     }
 
@@ -66,7 +65,7 @@ export class CodeReplValidationService {
     if (!(typeof preCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The pre-code text must be a string.',
+        message: 'The pre-code text must be a string',
       });
     }
 
@@ -74,7 +73,7 @@ export class CodeReplValidationService {
     if (!(typeof postCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The post-code text must be a string.',
+        message: 'The post-code text must be a string',
       });
     }
     return warningsList;
@@ -95,10 +94,3 @@ export class CodeReplValidationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CodeReplValidationService',
-    downgradeInjectable(CodeReplValidationService)
-  );

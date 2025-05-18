@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core import utils
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
@@ -132,28 +131,3 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         with swap_create_http_task:
             taskqueue_services.enqueue_task(
                 correct_url, correct_payload, 0)
-
-    def test_that_queue_names_are_in_sync_with_queue_yaml_file(self) -> None:
-        """Checks that all of the queues that are instantiated in the queue.yaml
-        file has a corresponding QUEUE_NAME_* constant instantiated in
-        taskqueue_services.
-        """
-        queue_name_dict = {}
-        # Parse the queue.yaml file for the correct queue names.
-        with utils.open_file('queue.yaml', 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                if 'name' in line:
-                    queue_name = line.split(':')[1]
-                    queue_name_dict[queue_name.strip()] = False
-
-        # Get all attributes of taskqueue_services using the dir function.
-        attributes = dir(taskqueue_services)
-        # Check if the queue names in the queue.yaml file exist as a queue
-        # name in taskqueue_services.
-        for attribute in attributes:
-            if attribute.startswith('QUEUE_NAME_'):
-                queue_name_dict[getattr(taskqueue_services, attribute)] = True
-
-        for queue_name, in_taskqueue_services in queue_name_dict.items():
-            self.assertTrue(in_taskqueue_services)

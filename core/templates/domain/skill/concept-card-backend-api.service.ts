@@ -17,7 +17,6 @@
  * about the concept card of a skill from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
@@ -139,10 +138,3 @@ export class ConceptCardBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ConceptCardBackendApiService',
-    downgradeInjectable(ConceptCardBackendApiService)
-  );

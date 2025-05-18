@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -43,10 +42,3 @@ export class OppiaResponseContinueComponent implements OnInit {
     ) as string;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseContinue',
-  downgradeComponent({
-    component: OppiaResponseContinueComponent,
-  }) as angular.IDirectiveFactory
-);

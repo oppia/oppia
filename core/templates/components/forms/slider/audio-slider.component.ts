@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-audio-slider',
@@ -57,10 +56,3 @@ export class AudioSliderComponent {
     this.valueChange.emit(event);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAudioSlider',
-  downgradeComponent({
-    component: AudioSliderComponent,
-  }) as angular.IDirectiveFactory
-);

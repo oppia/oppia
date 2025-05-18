@@ -115,6 +115,8 @@ def download_and_install_package(url_to_retrieve: str, filename: str) -> None:
     """
     common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
+    # TODO(#21906): Add parameter filter = 'data'
+    # after updating to Python 3.12.
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
     rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
@@ -204,6 +206,8 @@ def install_gcloud_sdk() -> None:
 
         print('Download complete. Installing Google Cloud SDK...')
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
+        # TODO(#21906): Add parameter filter = 'data'
+        # after updating to Python 3.12.
         tar.extractall(path=os.path.join(
             common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'))
         tar.close()
@@ -288,6 +292,8 @@ def download_and_untar_files(
         common.url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
+            # TODO(#21906): Add parameter filter = 'data'
+            # after updating to Python 3.12.
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 

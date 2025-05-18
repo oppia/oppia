@@ -17,7 +17,6 @@
  * of a user for a particular exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 
@@ -62,10 +61,3 @@ export class UserExplorationPermissionsService {
     return this.userExplorationPermissionsFetched;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'UserExplorationPermissionsService',
-    downgradeInjectable(UserExplorationPermissionsService)
-  );

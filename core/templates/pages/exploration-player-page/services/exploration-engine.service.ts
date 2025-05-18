@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -33,7 +32,7 @@ import {
   BindableVoiceovers,
   RecordedVoiceovers,
 } from 'domain/exploration/recorded-voiceovers.model';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -62,6 +61,7 @@ import {
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import isEqual from 'lodash/isEqual';
 
 @Injectable({
   providedIn: 'root',
@@ -174,7 +174,7 @@ export class ExplorationEngineService {
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
       oldInteractionArgs.catchMisspellings &&
-      angular.equals(outcome, defaultOutcome);
+      isEqual(outcome, defaultOutcome);
 
     if (shouldCheckForMisspelling) {
       const answerIsOnlyMisspelled =
@@ -197,10 +197,9 @@ export class ExplorationEngineService {
   }
 
   private _getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a $scope variable
-    // happens,
-    // AngularJS compares the new value of the variable to its previous
-    // value. If they are the same, then the variable is not updated.
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
@@ -841,10 +840,3 @@ export class ExplorationEngineService {
     return shortestPathToStateInReverse.reverse();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationEngineService',
-    downgradeInjectable(ExplorationEngineService)
-  );

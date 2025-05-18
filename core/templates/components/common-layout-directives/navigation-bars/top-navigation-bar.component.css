@@ -428,7 +428,7 @@
   display: block;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
-  opacity: 0.9;
+  opacity: 1;
 }
 .oppia-top-navigation-bar .oppia-navbar-menu:focus {
   outline: 1px dotted #212121;
@@ -514,6 +514,13 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
+}
+.oppia-navbar-impactreport-tab-content {
+  list-style-type: none;
+}
+.oppia-navbar-impactreport-submenu-tab-content {
+  margin-left: -15px;
+  width: 150px;
 }
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {

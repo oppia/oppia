@@ -18,24 +18,15 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Unit} from 'interactions/answer-defs';
 import {Fraction, FractionDict} from 'domain/objects/fraction.model';
-import {
-  NumberWithUnits,
-  NumberWithUnitsObjectFactory,
-} from 'domain/objects/NumberWithUnitsObjectFactory';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
+import {Units} from 'domain/objects/units.model';
 
 describe('NumberWithUnitsValidationService', () => {
   let validatorService: NumberWithUnitsValidationService;
@@ -48,15 +39,9 @@ describe('NumberWithUnitsValidationService', () => {
   let equivalentToTwoThousandRule: Rule;
   let equivalentToTwoByThreeRule: Rule;
   let equivalentToTwoRule: Rule;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
-  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
 
   beforeEach(() => {
-    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     validatorService = TestBed.inject(NumberWithUnitsValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (
@@ -88,7 +73,7 @@ describe('NumberWithUnitsValidationService', () => {
     };
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -192,7 +177,7 @@ describe('NumberWithUnitsValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsTwoRule, equalsTwoByThreeRule],
         goodDefaultOutcome,
         [],
@@ -224,7 +209,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be matched' +
-          ' because it is made redundant by answer 1 from response 1.',
+          ' because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -273,7 +258,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -309,7 +294,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -333,7 +318,7 @@ describe('NumberWithUnitsValidationService', () => {
   );
 
   it('should throw error when rule equivalency check fails', () => {
-    spyOn(numberWithUnitsObjectFactory, 'fromDict').and.returnValue({
+    spyOn(NumberWithUnits, 'fromDict').and.returnValue({
       type: 'real',
       real: 0.0,
       // This throws "Type '{ toFloat: () => number; }' is missing the
@@ -355,12 +340,11 @@ describe('NumberWithUnitsValidationService', () => {
         return null;
       },
       toDict: () => {
-        let uof = new UnitsObjectFactory();
         let tmp = new NumberWithUnits(
           'real',
           2.02,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('m / s^2')
+          Units.fromRawInputString('m / s^2')
         );
 
         return tmp.toDict();

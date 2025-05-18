@@ -18,7 +18,6 @@
 
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {MatRadioChange} from '@angular/material/radio';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
@@ -36,6 +35,7 @@ export class QuestionDifficultySelectorComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillIdToRubricsObject!: Record<string, Rubric>;
   @Input() skillWithDifficulty!: SkillDifficulty;
+  @Input() difficultyCount!: number;
   @Output() skillWithDifficultyChange: EventEmitter<SkillDifficulty> =
     new EventEmitter();
 
@@ -56,10 +56,3 @@ export class QuestionDifficultySelectorComponent {
     this.skillWithDifficultyChange.emit(this.skillWithDifficulty);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionDifficultySelector',
-  downgradeComponent({
-    component: QuestionDifficultySelectorComponent,
-  }) as angular.IDirectiveFactory
-);

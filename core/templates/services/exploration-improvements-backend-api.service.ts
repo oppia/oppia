@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching improvement tasks from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -162,10 +161,3 @@ export class ExplorationImprovementsBackendApiService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationImprovementsBackendApiService',
-    downgradeInjectable(ExplorationImprovementsBackendApiService)
-  );

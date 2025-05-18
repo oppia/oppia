@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
@@ -223,9 +222,3 @@ export class TopicRightsBackendApiService {
     });
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'TopicRightsBackendApiService',
-    downgradeInjectable(TopicRightsBackendApiService)
-  );

@@ -26,7 +26,6 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 
 interface CodeMirrorMergeViewOptions {
@@ -88,10 +87,3 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaCodemirror',
-  downgradeComponent({
-    component: CodeMirrorComponent,
-  }) as angular.IDirectiveFactory
-);

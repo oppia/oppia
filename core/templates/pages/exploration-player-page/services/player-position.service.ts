@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -140,7 +139,3 @@ export class PlayerPositionService {
     return this._currentQuestionChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('PlayerPositionService', downgradeInjectable(PlayerPositionService));
