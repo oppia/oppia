@@ -224,7 +224,7 @@ export class QuestionSubmitter extends BaseUser {
    * Function to add a hint to the current state card.
    * @param {string} hint - The hint to be added to the current state card.
    */
-  async addHintToState(hint: string): Promise<void> {
+  async addHintToStateInQuestionEditorPage(hint: string): Promise<void> {
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
@@ -236,7 +236,7 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} answerExplanation - The explanation for this state card's solution.
    * @param {boolean} isSolutionNumericInput - Whether the solution is for a numeric input interaction.
    */
-  async addSolutionToState(
+  async addSolutionToStateInQuestionEditorPage(
     answer: string,
     answerExplanation: string,
     isSolutionNumericInput: boolean
@@ -367,7 +367,9 @@ export class QuestionSubmitter extends BaseUser {
    * using the options array.
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
-  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+  async addMultipleChoiceInteractionInQuestionEditorPage(
+    options: string[]
+  ): Promise<void> {
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
@@ -402,7 +404,9 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Add a text input interaction to the card.
    */
-  async addTextInputInteraction(answer: string): Promise<void> {
+  async addTextInputInteractionInQuestionEditorPage(
+    answer: string
+  ): Promise<void> {
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
@@ -431,7 +435,9 @@ export class QuestionSubmitter extends BaseUser {
    * Adds a math interaction to the current exploration.
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
-  async addMathInteraction(interactionToAdd: string): Promise<void> {
+  async addMathInteractionInQuestionEditorPage(
+    interactionToAdd: string
+  ): Promise<void> {
     await this.clickOn(addInteractionButton);
     await this.clickOn(mathInteractionsTab);
     await this.clickOn(` ${interactionToAdd} `);
@@ -445,7 +451,7 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Adds an Image interaction to the current exploration.
    */
-  async addImageInteraction(): Promise<void> {
+  async addImageInteractionInQuestionEditorPage(): Promise<void> {
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');
     await this.clickOn(uploadImageButton);

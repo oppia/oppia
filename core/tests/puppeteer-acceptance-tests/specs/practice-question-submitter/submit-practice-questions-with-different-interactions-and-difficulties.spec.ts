@@ -93,9 +93,9 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addImageInteraction();
+      await questionSubmitter.addImageInteractionInQuestionEditorPage();
 
-      await questionSubmitter.addHintToState('Test Hint 1');
+      await questionSubmitter.addHintToStateInQuestionEditorPage('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
@@ -122,7 +122,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteraction([
+      await questionSubmitter.addMultipleChoiceInteractionInQuestionEditorPage([
         'Option 1',
         'Option 2',
         'Option 3',
@@ -132,7 +132,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
-      await questionSubmitter.addHintToState('Test Hint 2');
+      await questionSubmitter.addHintToStateInQuestionEditorPage('Test Hint 2');
       await questionSubmitter.submitQuestionSuggestion();
 
       await questionSubmitter.expectQuestionSuggestionInContributorDashboard(
@@ -156,13 +156,15 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addTextInputInteraction('Answer');
+      await questionSubmitter.addTextInputInteractionInQuestionEditorPage(
+        'Answer'
+      );
 
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'
       );
-      await questionSubmitter.addHintToState('Test Hint 3');
-      await questionSubmitter.addSolutionToState(
+      await questionSubmitter.addHintToStateInQuestionEditorPage('Test Hint 3');
+      await questionSubmitter.addSolutionToStateInQuestionEditorPage(
         'Answer',
         'Test Solution 1',
         false
