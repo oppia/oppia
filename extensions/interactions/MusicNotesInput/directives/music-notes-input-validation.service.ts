@@ -65,7 +65,7 @@ export class MusicNotesInputValidationService {
             partialWarningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message:
-                `The rule in response group ${groupId} is invalid. ` +
+                `The rule in response group ${groupId} is invalid -- ` +
                 `${rule.inputs.a} is more than ${rule.inputs.b}`,
             });
           }
