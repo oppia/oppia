@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {Voiceover} from './voiceover.model';
 
 describe('States Object Factory', () => {

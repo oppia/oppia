@@ -226,7 +226,7 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
-            planned_publication_date_msecs: 168960000000.0,
+            planned_publication_date_msecs: 168960000000,
           },
           {
             id: 'node_2',

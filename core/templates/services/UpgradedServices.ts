@@ -311,7 +311,6 @@ import {StatsReportingBackendApiService} from 'domain/exploration/stats-reportin
 import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
 import {SuggestionsService} from 'services/suggestions.service';
@@ -469,8 +468,6 @@ export class UpgradedServices {
       new StateEditorRefreshService();
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
-    upgradedServices['SubtitledUnicodeObjectFactory'] =
-      new SubtitledUnicodeObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionsService'] = new SuggestionsService();
     upgradedServices['ThreadStatusDisplayService'] =
@@ -650,10 +647,7 @@ export class UpgradedServices {
     upgradedServices['SpeechSynthesisChunkerService'] =
       new SpeechSynthesisChunkerService(upgradedServices['HtmlEscaperService']);
     upgradedServices['SchemaDefaultValueService'] =
-      new SchemaDefaultValueService(
-        upgradedServices['LoggerService'],
-        upgradedServices['SubtitledUnicodeObjectFactory']
-      );
+      new SchemaDefaultValueService(upgradedServices['LoggerService']);
     upgradedServices['SiteAnalyticsService'] = new SiteAnalyticsService(
       upgradedServices['WindowRef'],
       upgradedServices['LocalStorageService']
@@ -1138,8 +1132,7 @@ export class UpgradedServices {
 
     // Topological level: 7.
     upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['SolutionObjectFactory'],
-      upgradedServices['SubtitledUnicodeObjectFactory']
+      upgradedServices['SolutionObjectFactory']
     );
 
     // Topological level: 8.
