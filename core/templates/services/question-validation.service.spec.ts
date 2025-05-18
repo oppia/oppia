@@ -25,17 +25,16 @@ import {
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {QuestionValidationService} from './question-validation.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 describe('Question Validation Service', () => {
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
   let mockQuestionDict: QuestionBackendDict;
   let questionObjectFactory: QuestionObjectFactory;
@@ -44,7 +43,6 @@ describe('Question Validation Service', () => {
   let ses: StateEditorService;
   let shouldHideDefaultAnswerGroupSpy: jasmine.Spy;
   let goodDefaultOutcome: Outcome;
-  let agof: AnswerGroupObjectFactory;
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(waitForAsync(() => {
@@ -56,7 +54,6 @@ describe('Question Validation Service', () => {
   }));
 
   beforeEach(() => {
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     qvs = TestBed.inject(QuestionValidationService);
     rs = TestBed.inject(ResponsesService);
     ses = TestBed.inject(StateEditorService);
@@ -66,7 +63,7 @@ describe('Question Validation Service', () => {
     shouldHideDefaultAnswerGroupSpy = spyOn(rs, 'shouldHideDefaultAnswerGroup');
     shouldHideDefaultAnswerGroupSpy.and.returnValue(false);
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   beforeEach(() => {
@@ -177,20 +174,8 @@ describe('Question Validation Service', () => {
     } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          false
-        ),
+        Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create(2, 'misc2', 'notes2', 'feedback1', false),
       ],
     };
   });
@@ -232,7 +217,6 @@ describe('Question Validation Service', () => {
     originalSpy.and.callThrough();
     const question =
       questionObjectFactory.createFromBackendDict(mockQuestionDict);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: null,
       dest_if_really_stuck: null,
@@ -282,7 +266,7 @@ describe('Question Validation Service', () => {
     expect(errorMessage).toBe(
       'Learner answer 1 from Oppia response 2 will never be matched' +
         " because it is preceded by a 'Equals' answer" +
-        ' with a matching input.'
+        ' with a matching input'
     );
 
     originalSpy.and.returnValue(null);

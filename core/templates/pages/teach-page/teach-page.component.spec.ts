@@ -106,7 +106,6 @@ describe('Teach Page', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
-  beforeEach(angular.mock.module('oppia'));
 
   beforeEach(() => {
     TestBed.configureTestingModule({

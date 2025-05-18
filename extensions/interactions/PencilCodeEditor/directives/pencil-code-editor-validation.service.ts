@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   BaseInteractionValidationService,
   Warning,
@@ -49,7 +49,7 @@ export class PencilCodeEditorValidationService {
     if (!(typeof initialCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.',
+        message: 'The initialCode must be a string',
       });
     }
     return warningsList;
