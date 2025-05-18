@@ -23,6 +23,8 @@ import {
   ViewChild,
   ElementRef,
   Input,
+  Output,
+  EventEmitter,
   SimpleChanges,
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -105,8 +107,6 @@ enum ExpansionTabType {
   TRANSLATION,
 }
 
-const COMMIT_TIMEOUT_DURATION = 30000; // 30 seconds in milliseconds.
-
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
@@ -168,6 +168,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   incompleteTranslationErrorIsShown: boolean = false;
 
   @Input() altTextIsDisplayed: boolean = false;
+  @Output() queuedSuggestionSummaryEmit =
+    new EventEmitter<PendingSuggestionDict>();
+  @Output() queuedSuggestionEmit = new EventEmitter<PendingSuggestionDict>();
 
   @ViewChild('contentPanel')
   contentPanel!: RteOutputDisplayComponent;
@@ -507,9 +510,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           this.allContributions[this.queuedSuggestion?.suggestion_id];
         delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
+        this.queuedSuggestionEmit.emit(this.queuedSuggestion);
+
         // If the reviewed item was the last item, close the modal.
         if (this.lastSuggestionToReview || this.isLastItem) {
-          this.commitQueuedSuggestion();
           this.activeModal.close(this.resolvedSuggestionIds);
           return;
         }
@@ -550,10 +554,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         reviewer_message: reviewMessageForSubmitter,
         commit_message: this.finalCommitMessage,
       };
-      this.hasQueuedSuggestion = true;
+      this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
+
       this.resolveSuggestionAndUpdateModal();
-      this.startCommitTimeout();
-      this.showSnackbar();
     } else {
       this.finalCommitMessage = this.generateCommitMessage();
       const reviewMessageForSubmitter =
@@ -604,10 +607,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           action_status: AppConstants.ACTION_REJECT_SUGGESTION,
           reviewer_message: reviewMessage || this.reviewMessage,
         };
-        this.hasQueuedSuggestion = true;
+        this.queuedSuggestionSummaryEmit.emit(this.queuedSuggestion);
         this.resolveSuggestionAndUpdateModal();
-        this.startCommitTimeout();
-        this.showSnackbar();
       }
     } else {
       if (
@@ -661,93 +662,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  startCommitTimeout(): void {
-    clearTimeout(this.commitTimeout); // Clear existing timeout.
-
-    // Start a new timeout for commit after timeframe.
-    this.commitTimeout = setTimeout(() => {
-      this.commitQueuedSuggestion();
-    }, COMMIT_TIMEOUT_DURATION);
-  }
-
-  commitQueuedSuggestion(): void {
-    if (!this.queuedSuggestion) {
-      return;
-    }
-    this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.queuedSuggestion.target_id,
-      this.queuedSuggestion.suggestion_id,
-      this.queuedSuggestion.action_status,
-      this.queuedSuggestion.reviewer_message,
-      this.queuedSuggestion.action_status === 'accept' &&
-        this.queuedSuggestion.commit_message
-        ? this.queuedSuggestion.commit_message
-        : null,
-      // Only include commit_message for accepted suggestions.
-      () => {
-        this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage(
-          `Suggestion ${
-            this.queuedSuggestion?.action_status === 'accept'
-              ? 'accepted'
-              : 'rejected'
-          }.`
-        );
-        this.clearQueuedSuggestion();
-      },
-      errorMessage => {
-        this.alertsService.clearWarnings();
-        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-        this.revertSuggestionResolution();
-      }
-    );
-  }
-
-  clearQueuedSuggestion(): void {
-    this.queuedSuggestion = undefined;
-    this.hasQueuedSuggestion = false;
-  }
-
-  undoReviewAction(): void {
-    clearTimeout(this.commitTimeout); // Clear the commit timeout.
-    if (this.queuedSuggestion) {
-      const indexToRemove = this.resolvedSuggestionIds.indexOf(
-        this.queuedSuggestion.suggestion_id
-      );
-      if (indexToRemove !== -1) {
-        this.resolvedSuggestionIds.splice(indexToRemove, 1);
-        if (this.removedSuggestion) {
-          this.allContributions[this.queuedSuggestion.suggestion_id] =
-            this.removedSuggestion;
-        }
-      }
-    }
-    this.clearQueuedSuggestion();
-  }
-
-  showSnackbar(): void {
-    this.currentSnackbarRef =
-      this.snackBar.openFromComponent<UndoSnackbarComponent>(
-        UndoSnackbarComponent,
-        {
-          duration: COMMIT_TIMEOUT_DURATION,
-          verticalPosition: 'bottom',
-          horizontalPosition: 'right',
-        }
-      );
-    this.currentSnackbarRef.instance.message = 'Suggestion queued';
-
-    this.currentSnackbarRef.onAction().subscribe(() => {
-      this.undoReviewAction();
-    });
-
-    this.currentSnackbarRef.afterDismissed().subscribe(() => {
-      if (this.hasQueuedSuggestion) {
-        this.commitQueuedSuggestion();
-      }
-    });
-  }
-
   // Returns whether the active suggestion's exploration_content_html
   // differs from the content_html of the suggestion's change object.
   hasExplorationContentChanged(): boolean {
@@ -795,7 +709,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   cancel(): void {
-    this.commitQueuedSuggestion();
     this.activeModal.close(this.resolvedSuggestionIds);
   }
 

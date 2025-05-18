@@ -58,6 +58,7 @@ export class TopicPreviewTabComponent {
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment() ?? '';
     this.topicName = this.topic.getName();
+    this.topicUrlFragment = this.topic.getUrlFragment();
     this.subtopics = this.topic.getSubtopics();
     this.canonicalStorySummaries =
       this.topicEditorStateService.getCanonicalStorySummaries();

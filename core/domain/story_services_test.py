@@ -307,7 +307,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE),
                 'old_value': None,
-                'new_value': 1672617600000.0
+                'new_value': 1672617600000
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -315,7 +315,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_LAST_MODIFIED),
                 'old_value': None,
-                'new_value': 1672531200000.0
+                'new_value': 1672531200000
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -323,7 +323,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE),
                 'old_value': None,
-                'new_value': 1672531200000.0
+                'new_value': 1672531200000
             })
         ]
 
@@ -363,29 +363,19 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[1].status,
             constants.STORY_NODE_STATUS_PUBLISHED)
         self.assertEqual(
-            story.story_contents.nodes[1].
-            planned_publication_date_msecs, (
-                datetime.datetime(
-                    2023, 1, 2, 0, 0,
-                    tzinfo=datetime.timezone.utc).timestamp() * 1000
-            ),
-            msg='Incorrect planned publication date in milliseconds received.')
+            story.story_contents.nodes[1].planned_publication_date,
+            datetime.datetime(2023, 1, 2, 0, 0, tzinfo=datetime.timezone.utc),
+            msg='Incorrect planned publication date received.')
+        self.assertEqual(
+            story.story_contents.nodes[1].first_publication_date,
+            datetime.datetime(2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
+            msg='Incorrect first publication date received.')
         self.assertEqual(
             story.story_contents.nodes[1].
-            first_publication_date_msecs, (
-                datetime.datetime(
-                    2023, 1, 1, 0, 0,
-                    tzinfo=datetime.timezone.utc).timestamp() * 1000
-            ),
-            msg='Incorrect first publication date in milliseconds received.')
-        self.assertEqual(
-            story.story_contents.nodes[1].
-            last_modified_msecs, (
-                datetime.datetime(
-                    2023, 1, 1, 0, 0,
-                    tzinfo=datetime.timezone.utc).timestamp() * 1000
-            ),
-            msg='Incorrect last modified date in milliseconds received.')
+            last_modified, datetime.datetime(
+                2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
+            msg='Incorrect last modified date received.')
+
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_titles, ['Title 1', 'Title 2'])
 
@@ -460,8 +450,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -480,8 +470,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -500,8 +490,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -537,8 +527,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -557,8 +547,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -577,8 +567,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': None,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -2130,9 +2120,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
-            'planned_publication_date_msecs': 1672770600000.0,
-            'first_publication_date_msecs': 1672684200000.0,
-            'last_modified_msecs': 1672684200000.0,
+            'planned_publication_date_msecs': 1672770600000,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -2150,9 +2140,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1672770600000.0,
+            'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -2170,9 +2160,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690655400000.0,
+            'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
@@ -2299,8 +2289,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': 'exp_1',
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -2319,8 +2309,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': 'exp_2',
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -2339,8 +2329,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': 'exp_3',
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -2359,8 +2349,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             'outline_is_finalized': False,
             'exploration_id': 'exp_4',
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
