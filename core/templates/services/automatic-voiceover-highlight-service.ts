@@ -63,7 +63,6 @@ export class AutomaticVoiceoverHighlightService {
   ): void {
     this.automatedVoiceoversAudioOffsetsMsecs =
       automatedVoiceoversAudioOffsetsMsecs;
-    console.log(automatedVoiceoversAudioOffsetsMsecs);
   }
 
   setHighlightIdToSenetnceMap(highlightIdToSentenceMap: {
@@ -79,11 +78,10 @@ export class AutomaticVoiceoverHighlightService {
       sentence =
         this.transformMathSentenceContainingAudioSpecficWords(sentence);
       this.highlightIdToSentenceWithoutSpacesMap[highlightSentenceId] = sentence
-        .split(' ')
+        .split(/\s+/)
         .join('')
         .trim();
     }
-    console.log(this.highlightIdToSentenceWithoutSpacesMap);
   }
 
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
@@ -123,6 +121,8 @@ export class AutomaticVoiceoverHighlightService {
       sentence = sentence.replace(/ = /g, mathSymbolPronounciations['=']);
     }
 
+    sentence = sentence.replace(/_{2,}/g, ' dash ');
+
     return sentence;
   }
 
@@ -135,39 +135,76 @@ export class AutomaticVoiceoverHighlightService {
     let maxOffsetMsecs = 0;
     this.sentenceHighlightIntervalList = [];
 
+    let hightlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
+
+    let currentHighlightId = hightlightIds.shift();
+    let currentSentence =
+      this.highlightIdToSentenceWithoutSpacesMap[currentHighlightId as string];
+
+    let start, end;
+    start = 0.0;
+
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       const token = tokenToAudioOffsetMsecs.token;
       const audioOffsetMsecs = tokenToAudioOffsetMsecs.audioOffsetMsecs;
+      if (start === 0.0) {
+        start = audioOffsetMsecs;
+      }
 
       sentence += token;
       minOffsetMsecs = Math.min(minOffsetMsecs, audioOffsetMsecs);
       maxOffsetMsecs = Math.max(maxOffsetMsecs, audioOffsetMsecs);
 
-      // If the current token is a punctuation in given language, then it marks
-      // as an end of sentence.
-      if (this.punctuationsForCurrentLanguage.includes(token)) {
-        const highlightId = Object.keys(
-          this.highlightIdToSentenceWithoutSpacesMap
-        ).find(
-          highlightSentenceId =>
-            sentence.trim() ===
-            this.highlightIdToSentenceWithoutSpacesMap[highlightSentenceId]
-        );
+      currentSentence = currentSentence.startsWith(token)
+        ? currentSentence.slice(token.length)
+        : currentSentence;
+
+      if (currentSentence.length === 0) {
+        end = audioOffsetMsecs;
 
         this.sentenceHighlightIntervalList.push({
-          highlightSentenceId: highlightId,
-          startTimeInSecs:
-            minOffsetMsecs === Number.MAX_VALUE
-              ? 0
-              : Math.round(minOffsetMsecs / 1000),
-          endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
+          highlightSentenceId: currentHighlightId,
+          startTimeInSecs: Math.round(start / 1000),
+          endTimeInSecs: Math.round(end / 1000),
         });
 
-        // Resetting variables for the next sentence.
-        sentence = '';
-        minOffsetMsecs = Number.MAX_VALUE;
-        maxOffsetMsecs = 0;
+        currentHighlightId = hightlightIds.shift();
+
+        if (currentHighlightId === undefined) {
+          return;
+        }
+        currentSentence =
+          this.highlightIdToSentenceWithoutSpacesMap[
+            currentHighlightId as string
+          ];
+        start = 0.0;
       }
+
+      // If the current token is a punctuation in given language, then it marks
+      // as an end of sentence.
+      // if (this.punctuationsForCurrentLanguage.includes(token)) {
+      //   const highlightId = Object.keys(
+      //     this.highlightIdToSentenceWithoutSpacesMap
+      //   ).find(
+      //     highlightSentenceId =>
+      //       sentence.trim() ===
+      //       this.highlightIdToSentenceWithoutSpacesMap[highlightSentenceId]
+      //   );
+
+      //   this.sentenceHighlightIntervalList.push({
+      //     highlightSentenceId: highlightId,
+      //     startTimeInSecs:
+      //       minOffsetMsecs === Number.MAX_VALUE
+      //         ? 0
+      //         : Math.round(minOffsetMsecs / 1000),
+      //     endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
+      //   });
+
+      //   // Resetting variables for the next sentence.
+      //   sentence = '';
+      //   minOffsetMsecs = Number.MAX_VALUE;
+      //   maxOffsetMsecs = 0;
+      // }
     });
   }
 
