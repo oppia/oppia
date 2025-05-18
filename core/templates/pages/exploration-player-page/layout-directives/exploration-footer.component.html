@@ -43,7 +43,7 @@
           </div>
         </div>
         <button *ngIf="isConceptCardButtonVisible()"
-                class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+                mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
                 (click)="showConceptCard()">
           <mat-icon>description</mat-icon>
         </button>
@@ -56,7 +56,7 @@
   .oppia-navbar-breadcrumb-icon .oppia-footer-info-icon .fa-info-circle {
     padding: 6%;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button {
     border-radius: 50%;
     height: 32px;
     line-height: 32px;
@@ -67,27 +67,27 @@
     padding: inherit;
     width: 32px;
   }
-  .md-button.oppia-learner-hint-solution-button {
+  .mat-button.oppia-learner-hint-solution-button {
     background: #6c58b6;
     color: #fff;
     padding: 6px 12px;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
-  .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button:focus,
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button:hover {
     background-color: #7968b8;
     text-decoration: none;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed {
     background: #009688;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed:hover,
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed:focus {
     background: #038a7d;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button .material-icons {
     font-size: 22px;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+  .mdatbutton.mat-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
     color: #f5da57;
     font-size: 23px;
   }

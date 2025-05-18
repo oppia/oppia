@@ -108,11 +108,11 @@ describe('MusicNotesInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The rule in response group 1 is invalid. 5 is more than 0',
+        message: 'The rule in response group 1 is invalid -- 5 is more than 0',
       },
       {
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The rule in response group 2 is invalid. 5 is more than 0',
+        message: 'The rule in response group 2 is invalid -- 5 is more than 0',
       },
     ]);
   });

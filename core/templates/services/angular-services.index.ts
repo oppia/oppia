@@ -75,7 +75,6 @@ import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFact
 import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
@@ -846,7 +845,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StoryUpdateService', StoryUpdateService],
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
-  ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
   ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
