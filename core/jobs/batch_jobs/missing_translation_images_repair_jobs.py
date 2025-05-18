@@ -203,9 +203,10 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
                 translation_html_lst = translation_html
             try:
                 for translation_html_str in translation_html_lst:
-                    if not isinstance(translation_html_str, str):  # pragma: no cover
+                    if not isinstance(
+                            translation_html_str, str):  # pragma: no cover
                         logging.error(
-                            'Expected translation_html entry to be type str, not %s. obj: %s',
+                            'Unexpected translation_html_str type: %s. obj: %s',
                             type(translation_html_str), translation_html_str)
                     translation_tree = bs4.BeautifulSoup(
                         translation_html_str, 'html.parser')
