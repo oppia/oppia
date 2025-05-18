@@ -209,7 +209,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be matched' +
-          ' because it is made redundant by answer 1 from response 1.',
+          ' because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -258,7 +258,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -294,7 +294,7 @@ describe('NumberWithUnitsValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });

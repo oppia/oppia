@@ -87,7 +87,7 @@ describe('ContinueValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.',
+        message: 'The button text should not be empty',
       },
     ]);
 
@@ -130,7 +130,7 @@ describe('ContinueValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should be at most 20 characters.',
+        message: 'The button text should be at most 20 characters',
       },
     ]);
 
@@ -162,7 +162,7 @@ describe('ContinueValidationService', () => {
       {
         type: WARNING_TYPES.CRITICAL,
         message:
-          'Only the default outcome is necessary for a continue interaction.',
+          'Only the default outcome is necessary for a continue interaction',
       },
     ]);
   });
@@ -183,7 +183,7 @@ describe('ContinueValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Please specify what Oppia should do after the button is clicked.',
+          'Please specify what Oppia should do after the button is clicked',
       },
     ]);
   });

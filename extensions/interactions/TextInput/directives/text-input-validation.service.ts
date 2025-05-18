@@ -75,7 +75,7 @@ export class TextInputValidationService {
     ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       });
     }
 
@@ -95,17 +95,13 @@ export class TextInputValidationService {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
-            'Number of rows must be between ' +
-            minRows +
-            ' and ' +
-            maxRows +
-            '.',
+            'Number of rows must be between ' + minRows + ' and ' + maxRows,
         });
       }
     } else {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Number of rows must be integral.',
+        message: 'Number of rows must be integral',
       });
     }
     return warningsList;
@@ -141,7 +137,7 @@ export class TextInputValidationService {
             message:
               `Oppia response ${answerGroupIndex + 1} has multiple learner ` +
               `answers with the same type \'${rule.type}\' within the same ` +
-              'response.',
+              'response',
           });
         }
         seenRuleTypes.add(rule.type);
@@ -164,7 +160,7 @@ export class TextInputValidationService {
               message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                "is preceded by a 'Contains' answer with a matching input.",
+                "is preceded by a 'Contains' answer with a matching input",
             });
           }
 
@@ -186,7 +182,7 @@ export class TextInputValidationService {
               message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                "is preceded by a 'StartsWith' answer with a matching prefix.",
+                "is preceded by a 'StartsWith' answer with a matching prefix",
             });
           }
           seenStringsStartsWith.push(...currentStrings);
@@ -207,7 +203,7 @@ export class TextInputValidationService {
               message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                "is preceded by a 'Equals' answer with a matching input.",
+                "is preceded by a 'Equals' answer with a matching input",
             });
           } else if (
             seenStringsFuzzyEquals.some(seenString =>
@@ -225,7 +221,7 @@ export class TextInputValidationService {
               message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                "is preceded by a 'FuzzyEquals' answer with a matching input.",
+                "is preceded by a 'FuzzyEquals' answer with a matching input",
             });
           }
           seenStringsEquals.push(...currentStrings);
@@ -246,7 +242,7 @@ export class TextInputValidationService {
               message:
                 `Learner answer ${ruleIndex + 1} from Oppia response ` +
                 `${answerGroupIndex + 1} will never be matched because it ` +
-                "is preceded by a 'FuzzyEquals' answer with a matching input.",
+                "is preceded by a 'FuzzyEquals' answer with a matching input",
             });
           }
           seenStringsFuzzyEquals.push(...currentStrings);

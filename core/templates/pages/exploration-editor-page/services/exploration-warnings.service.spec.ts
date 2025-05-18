@@ -186,7 +186,13 @@ describe('Exploration Warnings Service', () => {
       },
       {
         type: 'error',
-        message: 'The following card has errors: Hola.',
+        message:
+          'Errors in Hola interaction: \n' +
+          'Placeholder text must be a string; Number of rows must be integral; ' +
+          "There's no way to complete the exploration starting from" +
+          ' this card -- ensure that the last card in' +
+          " the chain starting from this one has an 'End Exploration'" +
+          ' question type.',
       },
       {
         type: 'error',
@@ -199,11 +205,11 @@ describe('Exploration Warnings Service', () => {
     expect(explorationWarningsService.countWarnings()).toBe(4);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Placeholder text must be a string.',
-        'Number of rows must be integral.',
+        'Placeholder text must be a string',
+        'Number of rows must be integral',
         "There's no way to complete the exploration starting from this" +
-          ' card. To fix this, make sure that the last card in the chain' +
-          " starting from this one has an 'End Exploration' question type.",
+          ' card -- ensure that the last card in the chain' +
+          " starting from this one has an 'End Exploration' question type",
       ],
     });
   });
@@ -310,7 +316,13 @@ describe('Exploration Warnings Service', () => {
       },
       {
         type: 'error',
-        message: 'The following card has errors: Hola.',
+        message:
+          'Errors in Hola interaction: \n' +
+          'The button text should not be empty; Only the default outcome is necessary for a continue interaction; ' +
+          "There's no way to complete the exploration starting from" +
+          ' this card -- ensure that the last card in' +
+          " the chain starting from this one has an 'End Exploration'" +
+          ' question type.',
       },
       {
         type: 'error',
@@ -323,11 +335,11 @@ describe('Exploration Warnings Service', () => {
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'The button text should not be empty.',
-        'Only the default outcome is necessary for a continue interaction.',
+        'The button text should not be empty',
+        'Only the default outcome is necessary for a continue interaction',
         "There's no way to complete the exploration starting from this" +
-          ' card. To fix this, make sure that the last card in the chain' +
-          " starting from this one has an 'End Exploration' question type.",
+          ' card -- ensure that the last card in the chain' +
+          " starting from this one has an 'End Exploration' question type",
       ],
     });
   });
@@ -386,17 +398,23 @@ describe('Exploration Warnings Service', () => {
       },
       {
         type: 'error',
-        message: 'The following card has errors: Hola.',
+        message:
+          'Errors in Hola interaction: \n' +
+          'Please add an interaction to this card; ' +
+          "There's no way to complete the exploration starting from" +
+          ' this card -- ensure that the last card in' +
+          " the chain starting from this one has an 'End Exploration'" +
+          ' question type.',
       },
     ]);
     expect(explorationWarningsService.countWarnings()).toBe(3);
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Please add an interaction to this card.',
+        'Please add an interaction to this card',
         "There's no way to complete the exploration starting from this" +
-          ' card. To fix this, make sure that the last card in the chain' +
-          " starting from this one has an 'End Exploration' question type.",
+          ' card -- ensure that the last card in the chain' +
+          " starting from this one has an 'End Exploration' question type",
       ],
     });
   });
@@ -492,7 +510,13 @@ describe('Exploration Warnings Service', () => {
       },
       {
         type: 'error',
-        message: 'The following card has errors: Hola.',
+        message:
+          'Errors in Hola interaction: \n' +
+          'Placeholder text must be a string; Number of rows must be integral; The current solution does not lead to another card; ' +
+          "There's no way to complete the exploration starting from" +
+          ' this card -- ensure that the last card in' +
+          " the chain starting from this one has an 'End Exploration'" +
+          ' question type.',
       },
       {
         type: 'error',
@@ -505,13 +529,13 @@ describe('Exploration Warnings Service', () => {
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Placeholder text must be a string.',
-        'Number of rows must be integral.',
-        'The current solution does not lead to another card.',
+        'Placeholder text must be a string',
+        'Number of rows must be integral',
+        'The current solution does not lead to another card',
         "There's no way to complete the exploration starting from" +
-          ' this card. To fix this, make sure that the last card in' +
+          ' this card -- ensure that the last card in' +
           " the chain starting from this one has an 'End Exploration'" +
-          ' question type.',
+          ' question type',
       ],
     });
   }));
@@ -622,7 +646,13 @@ describe('Exploration Warnings Service', () => {
       },
       {
         type: 'error',
-        message: 'The following card has errors: Hola.',
+        message:
+          'Errors in Hola interaction: \n' +
+          'Placeholder text must be a string; Number of rows must be integral; There is an answer among the top 10 which has no explicit feedback; The current solution does not lead to another card; ' +
+          "There's no way to complete the exploration starting from" +
+          ' this card -- ensure that the last card in' +
+          " the chain starting from this one has an 'End Exploration'" +
+          ' question type.',
       },
       {
         type: 'error',
@@ -635,15 +665,15 @@ describe('Exploration Warnings Service', () => {
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Placeholder text must be a string.',
-        'Number of rows must be integral.',
+        'Placeholder text must be a string',
+        'Number of rows must be integral',
         'There is an answer among the top 10 which has no explicit' +
-          ' feedback.',
-        'The current solution does not lead to another card.',
+          ' feedback',
+        'The current solution does not lead to another card',
         "There's no way to complete the exploration starting from" +
-          ' this card. To fix this, make sure that the last card in' +
+          ' this card -- ensure that the last card in' +
           " the chain starting from this one has an 'End Exploration'" +
-          ' question type.',
+          ' question type',
       ],
     });
   }));
@@ -740,7 +770,13 @@ describe('Exploration Warnings Service', () => {
         },
         {
           type: 'error',
-          message: 'The following card has errors: Hola.',
+          message:
+            'Errors in Hola interaction: \n' +
+            'Placeholder text must be a string; Number of rows must be integral; ' +
+            "There's no way to complete the exploration starting from" +
+            ' this card -- ensure that the last card in' +
+            " the chain starting from this one has an 'End Exploration'" +
+            ' question type.',
         },
         {
           type: 'error',
@@ -753,11 +789,11 @@ describe('Exploration Warnings Service', () => {
       expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
           "There's no way to complete the exploration starting from this" +
-            ' card. To fix this, make sure that the last card in the chain' +
-            " starting from this one has an 'End Exploration' question type.",
+            ' card -- ensure that the last card in the chain' +
+            " starting from this one has an 'End Exploration' question type",
         ],
       });
     }
@@ -921,7 +957,15 @@ describe('Exploration Warnings Service', () => {
         },
         {
           type: 'error',
-          message: 'The following cards have errors: Hola, State.',
+          message:
+            'Errors in Hola interaction: \n' +
+            'Placeholder text must be a string; Number of rows must be integral; The current solution does not lead to another card.',
+        },
+        {
+          type: 'error',
+          message:
+            'Errors in State interaction: \n' +
+            'Placeholder text must be a string; Number of rows must be integral; The current solution does not lead to another card; This card is unreachable.',
         },
         {
           type: 'error',
@@ -936,19 +980,19 @@ describe('Exploration Warnings Service', () => {
             ' with no training data: 0',
         },
       ]);
-      expect(explorationWarningsService.countWarnings()).toBe(5);
+      expect(explorationWarningsService.countWarnings()).toBe(6);
       expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'The current solution does not lead to another card.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'The current solution does not lead to another card',
         ],
         State: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'The current solution does not lead to another card.',
-          'This card is unreachable.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'The current solution does not lead to another card',
+          'This card is unreachable',
         ],
       });
     }
@@ -1025,12 +1069,12 @@ describe('Exploration Warnings Service', () => {
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Placeholder text must be a string.',
-        'Number of rows must be integral.',
+        'Placeholder text must be a string',
+        'Number of rows must be integral',
         "There's no way to complete the exploration starting from this" +
-          ' card. To fix this, make sure that the last card in the chain' +
-          " starting from this one has an 'End Exploration' question type.",
-        'The first card of the lesson must be a checkpoint.',
+          ' card -- ensure that the last card in the chain' +
+          " starting from this one has an 'End Exploration' question type",
+        'The first card of the lesson must be a checkpoint',
       ],
     });
   });
@@ -1144,18 +1188,18 @@ describe('Exploration Warnings Service', () => {
     );
 
     explorationWarningsService.updateWarnings();
-    expect(explorationWarningsService.countWarnings()).toBe(5);
+    expect(explorationWarningsService.countWarnings()).toBe(6);
     expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
     expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
       Hola: [
-        'Placeholder text must be a string.',
-        'Number of rows must be integral.',
+        'Placeholder text must be a string',
+        'Number of rows must be integral',
       ],
       End: [
         'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.',
-        'Checkpoints are not allowed on the last card of the lesson.',
-        'Checkpoints must not be assigned to cards that can be bypassed.',
+          'have any Oppia responses',
+        'Checkpoints are not allowed on the last card of the lesson',
+        'Checkpoints must not be assigned to cards that can be bypassed',
       ],
     });
   });
@@ -1631,52 +1675,52 @@ describe('Exploration Warnings Service', () => {
       );
 
       explorationWarningsService.updateWarnings();
-      expect(explorationWarningsService.countWarnings()).toBe(13);
+      expect(explorationWarningsService.countWarnings()).toBe(21);
       expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(explorationWarningsService.getCheckpointCountWarning()).toEqual(
         'Only a maximum of 8 checkpoints are allowed per lesson.'
       );
       expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         State1: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State2: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State3: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State4: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         State5: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         State6: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         State7: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-            'have any Oppia responses.',
-          'Checkpoints are not allowed on the last card of the lesson.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+            'have any Oppia responses',
+          'Checkpoints are not allowed on the last card of the lesson',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
       });
     }
@@ -2164,54 +2208,54 @@ describe('Exploration Warnings Service', () => {
       );
 
       explorationWarningsService.updateWarnings();
-      expect(explorationWarningsService.countWarnings()).toBe(12);
+      expect(explorationWarningsService.countWarnings()).toBe(20);
       expect(explorationWarningsService.hasCriticalWarnings()).toBe(true);
       expect(explorationWarningsService.getAllStateRelatedWarnings()).toEqual({
         Hola: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
         ],
         State1: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State2: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State3: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State4: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State5: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State6: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
           'Learner should not be directed back by more than' +
-            ' 3 cards in the lesson.',
-          'Checkpoints must not be assigned to cards that can be bypassed.',
+            ' 3 cards in the lesson',
+          'Checkpoints must not be assigned to cards that can be bypassed',
         ],
         State7: [
-          'Placeholder text must be a string.',
-          'Number of rows must be integral.',
+          'Placeholder text must be a string',
+          'Number of rows must be integral',
           'Learner should not be directed back by more than' +
-            ' 3 cards in the lesson.',
+            ' 3 cards in the lesson',
         ],
         End: [
           'Please make sure end exploration interactions do not ' +
-            'have any Oppia responses.',
+            'have any Oppia responses',
         ],
       });
     }
