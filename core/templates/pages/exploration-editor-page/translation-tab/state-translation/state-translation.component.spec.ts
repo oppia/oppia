@@ -35,7 +35,7 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -121,7 +121,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -334,9 +333,6 @@ describe('State translation component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
     );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -696,11 +692,10 @@ describe('State translation component', () => {
       });
 
       it('should get subtitled Unicode data translation', () => {
-        let subtitledObject =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObject = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getRequiredUnicode(subtitledObject)).toBe(
           'This is the unicode'
         );
@@ -795,7 +790,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -1006,9 +1000,6 @@ describe('State translation component', () => {
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
     );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -1217,11 +1208,10 @@ describe('State translation component', () => {
           'This is the html'
         );
 
-        let subtitledObjectBack =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObjectBack = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getSubtitledContentSummary(subtitledObjectBack)).toBe(
           'This is the unicode'
         );
@@ -1248,7 +1238,6 @@ describe('State translation component', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -1526,9 +1515,6 @@ describe('State translation component', () => {
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService
     );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -1684,7 +1670,7 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isTranslationModeActive'
     ).and.returnValue(true);
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1710,7 +1696,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1736,7 +1722,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1962,7 +1948,6 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationState1 = {
     Introduction: {
@@ -2224,9 +2209,6 @@ describe('State translation component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
@@ -2276,7 +2258,7 @@ describe('State translation component', () => {
     ).and.returnValue({
       testCa: {
         value: {
-          unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
+          unicode: SubtitledUnicode.createDefault('', 'ca_0'),
           html: [SubtitledHtml.createDefault('', 'ca_1')],
         },
       },

@@ -26,7 +26,7 @@ import {
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 import {AppConstants} from 'app.constants';
 
@@ -121,7 +121,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -159,7 +159,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -197,7 +197,7 @@ describe('NumericExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'MatchesExactlyWith' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
   });
