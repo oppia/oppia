@@ -235,6 +235,8 @@ const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
 const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const languageDropdownValueSelector =
+  'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
 const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
@@ -784,37 +786,31 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(languageUpdateDropdown);
     await this.clickOn(language);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
    *  Verifies that the selected language matches the expected language.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    await this.page.waitForSelector(languageUpdateDropdown);
-    const languageDropdown = await this.page.$(languageUpdateDropdown);
-    if (!languageDropdown) {
-      throw new Error('Category dropdown not found.');
-    }
-    await languageDropdown.click();
-
-    const selectedLanguage = await this.page.evaluate(() => {
-      const matOption = document.querySelector(
-        '.mat-option.mat-selected'
-      ) as HTMLElement;
-      if (!matOption) {
-        throw new Error('Selected language option not found.');
-      }
-      return matOption.innerText.trim();
+    await this.page.waitForSelector(languageDropdownValueSelector, {
+      visible: true,
     });
+
+    const selectedLanguage = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector) as HTMLElement;
+      return element?.innerText.trim() ?? '';
+    }, languageDropdownValueSelector);
 
     if (selectedLanguage.includes(expectedLanguage)) {
       showMessage(
         `The language ${selectedLanguage} contains the expected language.`
       );
     } else {
-      throw new Error('Language is not correct.');
+      throw new Error(
+        `Expected language: ${expectedLanguage}, but found: "${selectedLanguage}".`
+      );
     }
-    await this.page.keyboard.press('Enter');
   }
 
   async addTags(tagNames: string[]): Promise<void> {
@@ -1246,13 +1242,16 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(
+  async editDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
@@ -1967,7 +1966,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addNewResponseButton);
     await this.clickOn(correctAnswerInTheGroupSelector);
 
-    await this.editDefaultResponseFeedback('Wrong Answer. Please try again');
+    await this.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
     await this.navigateToCard(lastInteraction);
     await this.createMinimalExploration(
       'This is last card',
