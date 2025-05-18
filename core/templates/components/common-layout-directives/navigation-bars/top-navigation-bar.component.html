@@ -103,8 +103,8 @@
               [ngStyle]="{'left.px': learnDropdownOffset}"
               [ngClass]="{
                 'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
-                'two-classrooms': classroomSummariesLength == 2,
-                'three-classrooms': classroomSummariesLength >= 3
+                'two-columns': classroomSummariesLength == 2,
+                'three-columns': classroomSummariesLength >= 3
               }"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
@@ -113,7 +113,7 @@
               <div class="nav-item-main d-flex">
                 <div
                 [ngClass]="{
-                  'nav-item-left d-flex flex-column justify-content-between' : true,
+                  'nav-item-left d-flex flex-column justify-content-between': true,
                   'two-columns': classroomSummariesLength == 2,
                   'three-columns': classroomSummariesLength >= 3
                 }"

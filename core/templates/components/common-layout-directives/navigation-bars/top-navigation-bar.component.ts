@@ -420,9 +420,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   setClassroomSummariesLength(): void {
-    const classrooomGrid = document.querySelector('.classroom-grid');
-    if (classrooomGrid) {
-      const countAttr = classrooomGrid.getAttribute('data-classroom-count');
+    const classroomGrid = document.querySelector('.classroom-grid');
+    if (classroomGrid) {
+      const countAttr = classroomGrid.getAttribute('data-classroom-count');
       const parsed = parseInt(countAttr ?? '0', 10);
       this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
     }

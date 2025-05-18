@@ -161,10 +161,10 @@
 .oppia-top-navigation-bar .classroom-disabled {
   min-width: 300px;
 }
-.oppia-top-navigation-bar .two-classrooms {
+.oppia-top-navigation-bar .two-columns {
   min-width: 855px;
 }
-.oppia-top-navigation-bar .three-classrooms {
+.oppia-top-navigation-bar .three-columns {
   min-width: 1200px;
 }
 .oppia-top-navigation-bar .language-dropdown {
