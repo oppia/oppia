@@ -81,6 +81,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     reject_invalid_suggestion_and_delete_invalid_translation_jobs)
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import delete_voiceover_models_data_job    # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
