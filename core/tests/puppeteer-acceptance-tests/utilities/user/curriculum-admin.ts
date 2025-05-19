@@ -228,6 +228,10 @@ const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -672,11 +676,23 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} updateMessage - The update message.
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(saveOrPublishSkillSelector, {
-      visible: true,
-    });
-    await this.clickOn(saveOrPublishSkillSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(mobileSkillNavToggle);
+      await elems[1].click();
+      await this.page.waitForSelector(mobileSaveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(saveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(saveOrPublishSkillSelector);
+    }
 
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
