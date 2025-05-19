@@ -114,7 +114,7 @@
         </oppia-card-display>
       </div>
     </div>
-    <div class="e2e-test-learner-dash-section oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+    <div class="e2e-test-learner-dash-section oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached() || totalLessonsInPlaylists?.length > 0">
       <p class="e2e-test-learner-dash-section-heading oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <!--TODO(#18384): Add search bar -->
       <!--TODO(#18384): Only untracked topics. Will need to change headings when there are multiple classrooms-->
@@ -134,7 +134,7 @@
       </oppia-card-display>
     </div>
     <div class="oppia-learner-dash-section px-3 py-4 w-100"
-        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0 && totalLessonsInPlaylists.length === 0 && (incompleteCollectionsList?.length || 0) === 0  && (incompleteCollectionsList?.length || 0) === 0">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="empty-suggested-for-you-section">
         <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
