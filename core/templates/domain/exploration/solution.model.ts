@@ -17,7 +17,6 @@
  * domain objects.
  */
 
-import {} from '@angular/upgrade/static';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {Fraction} from 'domain/objects/fraction.model';
