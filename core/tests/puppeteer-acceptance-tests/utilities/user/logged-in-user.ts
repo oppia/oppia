@@ -3399,29 +3399,39 @@ export class LoggedInUser extends BaseUser {
     if (allCardElements && allCardElements.length > 1) {
       const firstCardBox = allCardElements[0];
       const lastCardBox = allCardElements[allCardElements.length - 1];
+      let isFirstCardInView = await this.isBoxWithinRange(
+        containerElement,
+        firstCardBox
+      );
+      let isLastCardInView = await this.isBoxWithinRange(
+        containerElement,
+        lastCardBox
+      );
       if (minusButtonElement === null && plusButtonElement === null) {
-        expect(
-          this.isBoxWithinRange(containerElement, firstCardBox) &&
-            this.isBoxWithinRange(containerElement, lastCardBox)
-        ).toBe(true);
+        expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
         let counter = 0;
-        console.log(containerElement);
-        while (
-          !this.isBoxWithinRange(containerElement, lastCardBox) &&
-          counter < 5
-        ) {
-          console.log(lastCardBox);
+        isLastCardInView = await this.isBoxWithinRange(
+          containerElement,
+          lastCardBox
+        );
+        while (!isLastCardInView && counter < 5) {
           await plusButtonElement?.click();
           counter++;
           showMessage('Shifted cards to view more');
         }
-        expect(this.isBoxWithinRange(containerElement, lastCardBox)).toBe(true);
+        isLastCardInView = await this.isBoxWithinRange(
+          containerElement,
+          lastCardBox
+        );
+        expect(isLastCardInView).toBe(true);
         await minusButtonElement?.click();
         showMessage('Shifted cards to view less');
-        expect(this.isBoxWithinRange(containerElement, lastCardBox)).toBe(
-          false
+        isLastCardInView = await this.isBoxWithinRange(
+          containerElement,
+          lastCardBox
         );
+        expect(isLastCardInView).toBe(false);
       }
     } else {
       throw new Error(
@@ -3431,9 +3441,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   async isBoxWithinRange(
-    parentElement: puppeteer.ElementHandle,
-    childElement: puppeteer.ElementHandle
+    parentElement: puppeteer.ElementHandle | null = null,
+    childElement: puppeteer.ElementHandle | null = null
   ): Promise<boolean> {
+    if (parentElement === null || childElement === null) {
+      return false;
+    }
     const {parentLeft, parentRight} = await parentElement.evaluate(el => {
       const dimensions = el.getBoundingClientRect();
       return {
