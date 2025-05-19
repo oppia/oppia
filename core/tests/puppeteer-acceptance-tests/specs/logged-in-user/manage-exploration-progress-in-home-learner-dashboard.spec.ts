@@ -102,6 +102,20 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should display carousel arrows and shift to see all cards',
+    async function () {
+      for (const id of explorationIds) {
+        await loggedInUser.playExploration(id);
+        await loggedInUser.continueToNextCard();
+      }
+      await loggedInUser.navigateToLearnerDashboard();
+
+      await loggedInUser.expectCardDisplayControls('Lessons in progress');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
