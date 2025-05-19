@@ -4653,6 +4653,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function for creating an exploration with cards.
+   */
+  async createAndPublishExplorationWithMultipleCards(
+    explorationTitle: string,
+    category: string = 'Mathematics'
+  ): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+
+    await this.updateCardContent('Content 0');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 1');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 1');
+    await this.updateCardContent('Content 1');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 2');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 2');
+    await this.updateCardContent('Content 2');
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.navigateToCard('Introduction');
+    await this.saveExplorationDraft();
+
+    return await this.publishExplorationWithMetadata(
+      explorationTitle,
+      `This is ${explorationTitle}\`s goals.`,
+      category
+    );
+  }
+
+  /**
    * This function checks the number of subscribers in the Subscribers tab of the creator dashboard.
    */
   async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
