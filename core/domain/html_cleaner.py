@@ -400,8 +400,7 @@ def validate_rte_tags(
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
-                'Video tag does not have \'autoplay-with-value\' '
-                'attribute.'
+                'Video tag does not have \'autoplay-with-value\' attribute.'
             )
 
         if tag['autoplay-with-value'].strip() not in (
@@ -422,8 +421,7 @@ def validate_rte_tags(
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
             raise utils.ValidationError(
-                'Link tag does not have \'text-with-value\' '
-                'attribute.'
+                'Link tag does not have \'text-with-value\' attribute.'
             )
 
         _raise_validation_errors_for_unescaped_html_tag(
@@ -456,8 +454,7 @@ def validate_rte_tags(
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
-                'Math tag does not have \'raw_latex-with-value\' '
-                'attribute.'
+                'Math tag does not have \'raw_latex-with-value\' attribute.'
             )
 
         if is_html_empty(math_content_list['raw_latex']):

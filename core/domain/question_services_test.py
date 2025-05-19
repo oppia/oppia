@@ -128,8 +128,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertIsNone(question_with_none)
 
         with self.assertRaisesRegex(
-            Exception, 'Entity for class QuestionModel with id question_id '
-            'not found'):
+            Exception,
+            'Entity for class QuestionModel with id question_id not found'
+        ):
             question_services.get_question_by_id('question_id')
 
     def test_get_questions_by_skill_ids_with_fetch_by_difficulty(self) -> None:
