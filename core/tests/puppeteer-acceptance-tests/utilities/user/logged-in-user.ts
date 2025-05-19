@@ -185,9 +185,9 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
   cardDisplay: {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
-    container: 'e2e-test-card-display-container',
-    plusButton: 'e2e-test-card-display-plus-button',
-    minusButton: 'e2e-test-card-display-minus-button',
+    container: '.e2e-test-card-display-container',
+    plusButton: '.e2e-test-card-display-plus-button',
+    minusButton: '.e2e-test-card-display-minus-button',
   },
   topicCard: {
     content: '.e2e-test-learner-topic-summary-tile',
@@ -2076,7 +2076,7 @@ export class LoggedInUser extends BaseUser {
 
   async expectCardDisplayControls(
     criteria: string,
-    section: string
+    section: string = 'N/A'
   ): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
       criteria,
@@ -2086,7 +2086,6 @@ export class LoggedInUser extends BaseUser {
     const containerElement = await subsectionElement?.$(
       learnerDashSelectors.cardDisplay.container
     );
-    const containerBox = await containerElement?.boundingBox();
 
     const allCardElements = await containerElement?.$$(
       learnerDashSelectors.lessonCard.content
@@ -2100,23 +2099,31 @@ export class LoggedInUser extends BaseUser {
     );
 
     if (allCardElements && allCardElements.length > 1) {
-      const firstCardBox = await allCardElements[0].boundingBox();
-      const lastCardBox =
-        await allCardElements[allCardElements.length - 1].boundingBox();
+      const firstCardBox = allCardElements[0];
+      const lastCardBox = allCardElements[allCardElements.length - 1];
       if (minusButtonElement === null && plusButtonElement === null) {
         expect(
-          this.isBoxWithinRange(containerBox, firstCardBox) &&
-            this.isBoxWithinRange(containerBox, lastCardBox)
+          this.isBoxWithinRange(containerElement, firstCardBox) &&
+            this.isBoxWithinRange(containerElement, lastCardBox)
         ).toBe(true);
       } else {
-        while (!this.isBoxWithinRange(containerBox, lastCardBox)) {
+        let counter = 0;
+        console.log(containerElement);
+        while (
+          !this.isBoxWithinRange(containerElement, lastCardBox) &&
+          counter < 5
+        ) {
+          console.log(lastCardBox);
           await plusButtonElement?.click();
+          counter++;
           showMessage('Shifted cards to view more');
         }
-        expect(this.isBoxWithinRange(containerBox, lastCardBox)).toBe(true);
+        expect(this.isBoxWithinRange(containerElement, lastCardBox)).toBe(true);
         await minusButtonElement?.click();
         showMessage('Shifted cards to view less');
-        expect(this.isBoxWithinRange(containerBox, lastCardBox)).toBe(false);
+        expect(this.isBoxWithinRange(containerElement, lastCardBox)).toBe(
+          false
+        );
       }
     } else {
       throw new Error(
@@ -2125,19 +2132,27 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  isBoxWithinRange(
-    parentBox: puppeteer.BoundingBox | null = null,
-    childBox: puppeteer.BoundingBox | null = null
-  ): boolean {
-    if (parentBox === null || childBox === null) {
-      return false;
-    }
-    return (
-      parentBox &&
-      childBox &&
-      childBox.x >= parentBox.x &&
-      childBox.x + childBox.width <= parentBox.x + parentBox.width
-    );
+  async isBoxWithinRange(
+    parentElement: puppeteer.ElementHandle,
+    childElement: puppeteer.ElementHandle
+  ): Promise<boolean> {
+    const {parentLeft, parentRight} = await parentElement.evaluate(el => {
+      const dimensions = el.getBoundingClientRect();
+      return {
+        parentLeft: dimensions.left,
+        parentRight: dimensions.right,
+      };
+    });
+
+    const {childLeft, childRight} = await childElement.evaluate(el => {
+      const dimensions = el.getBoundingClientRect();
+      return {
+        childLeft: dimensions.left,
+        childRight: dimensions.right,
+      };
+    });
+
+    return childLeft >= parentLeft && childRight <= parentRight;
   }
 }
 
