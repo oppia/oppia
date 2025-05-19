@@ -3396,9 +3396,15 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.cardDisplay.plusButton
     );
 
+    const isRTL = await this.isPageRTL();
+
     if (allCardElements && allCardElements.length > 1) {
-      const firstCardBox = allCardElements[0];
-      const lastCardBox = allCardElements[allCardElements.length - 1];
+      const firstCardBox = isRTL
+        ? allCardElements[allCardElements.length - 1]
+        : allCardElements[0];
+      const lastCardBox = isRTL
+        ? allCardElements[0]
+        : allCardElements[allCardElements.length - 1];
       let isFirstCardInView = await this.isBoxWithinRange(
         containerElement,
         firstCardBox
@@ -3464,6 +3470,24 @@ export class LoggedInUser extends BaseUser {
     });
 
     return childLeft >= parentLeft && childRight <= parentRight;
+  }
+
+  async isPageRTL(): Promise<boolean> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+    return pageDirection === 'rtl';
   }
 }
 
