@@ -2019,6 +2019,13 @@ export class ExplorationEditor extends BaseUser {
 
     await this.navigateToCard('Card 1');
     await this.updateCardContent('Content 1');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 2');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 2');
+    await this.updateCardContent('Content 2');
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await this.navigateToCard('Introduction');
     await this.saveExplorationDraft();
