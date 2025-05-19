@@ -23,7 +23,7 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {MisconceptionBackendDict} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
 import {StateBackendDict} from 'domain/state/StateObjectFactory';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';

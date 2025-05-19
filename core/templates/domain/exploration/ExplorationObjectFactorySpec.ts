@@ -31,7 +31,7 @@ import {
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {LoggerService} from 'services/contextual/logger.service';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 

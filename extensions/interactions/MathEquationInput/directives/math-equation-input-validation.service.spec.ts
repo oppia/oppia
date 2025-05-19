@@ -18,10 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   MathEquationInputValidationService,
   // eslint-disable-next-line max-len
@@ -40,7 +37,6 @@ describe('MathEquationInputValidationService', () => {
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let matchesExactlyWith: Rule, isEquivalentTo: Rule;
   let customizationArgs: MathEquationInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -49,7 +45,6 @@ describe('MathEquationInputValidationService', () => {
     });
 
     validatorService = TestBed.get(MathEquationInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -94,7 +89,7 @@ describe('MathEquationInputValidationService', () => {
       'MathEquationInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -123,7 +118,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -161,7 +156,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -201,7 +196,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'MatchesExactlyWith' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
   });
@@ -310,7 +305,7 @@ describe('MathEquationInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The number of custom letters cannot be more than 10.',
+        message: 'The number of custom letters cannot be more than 10',
       },
     ]);
   });

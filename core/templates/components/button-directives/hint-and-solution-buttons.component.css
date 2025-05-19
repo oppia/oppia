@@ -166,7 +166,11 @@ oppia-hint-and-solution-buttons .hint-box::before {
   float: left;
 }
 
-.md-button.md-default-theme.oppia-learner-hint-solution-button {
+.oppia-hint-and-solution-buttons .uib-position-measure {
+  visibility: visible !important;
+}
+
+.oppia-learner-hint-solution-button.mat-button {
   border-radius: 50%;
   height: 32px;
   line-height: 32px;
@@ -177,20 +181,20 @@ oppia-hint-and-solution-buttons .hint-box::before {
   width: 32px;
 }
 
-.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+.oppia-learner-hint-solution-button.viewed.mat-button.viewed {
   background: #009688;
 }
 
-.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
-.md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+.oppia-learner-hint-solution-button.viewed:hover,
+.oppia-learner-hint-solution-button.mat-button.viewed:focus {
   background: #038a7d;
 }
 
-.md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+.oppia-learner-hint-solution-button.mat-button .material-icons {
   font-size: 22px;
 }
 
-.md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+.oppia-learner-hint-solution-button.mat-button .material-icons.oppia-lightbulb-yellow {
   color: #f5da57;
   font-size: 23px;
 }

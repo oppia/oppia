@@ -18,17 +18,14 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   RatioExpressionInputValidationService,
   // eslint-disable-next-line max-len
 } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 
 import {AppConstants} from 'app.constants';
@@ -42,7 +39,6 @@ describe('RatioExpressionInputValidationService', () => {
   let equals: Rule, isEquivalent: Rule;
   let hasNumberOfTermsEqualTo: Rule, hasSpecificTermEqualTo: Rule;
   let customizationArgs: RatioExpressionInputCustomizationArgs;
-  let agof: AnswerGroupObjectFactory;
   let warnings;
 
   beforeEach(() => {
@@ -51,7 +47,6 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     validatorService = TestBed.get(RatioExpressionInputValidationService);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
@@ -118,7 +113,7 @@ describe('RatioExpressionInputValidationService', () => {
       'RatioExpressionInput'
     );
 
-    answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    answerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
@@ -160,7 +155,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'Equals' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -189,7 +184,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'IsEquivalent' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -218,13 +213,13 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasNumberOfTermsEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 3 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
     ]);
 
@@ -243,7 +238,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasNumberOfTermsEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -283,13 +278,13 @@ describe('RatioExpressionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 3 from Oppia response 1 will never be matched' +
-          ' because it has differing number of terms than required.',
+          ' because it has differing number of terms than required',
       },
     ]);
 
@@ -308,7 +303,7 @@ describe('RatioExpressionInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'HasSpecificTermEqualTo' " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -334,7 +329,7 @@ describe('RatioExpressionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be matched' +
-          ' because it expects more terms than the answer allows.',
+          ' because it expects more terms than the answer allows',
       },
     ]);
   });
@@ -351,7 +346,7 @@ describe('RatioExpressionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The number of terms should be a non-negative integer other than 1.',
+          'The number of terms should be a non-negative integer other than 1',
       },
     ]);
   });
@@ -368,7 +363,7 @@ describe('RatioExpressionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The number of terms should be a non-negative integer other than 1.',
+          'The number of terms should be a non-negative integer other than 1',
       },
     ]);
   });
@@ -384,7 +379,7 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The number of terms in a ratio should be greater than 1.',
+        message: 'The number of terms in a ratio should be greater than 1',
       },
     ]);
   });
@@ -400,8 +395,7 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message:
-          'The number of terms in a ratio should not be greater than 10.',
+        message: 'The number of terms in a ratio should not be greater than 10',
       },
     ]);
   });
