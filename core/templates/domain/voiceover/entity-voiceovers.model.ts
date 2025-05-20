@@ -154,4 +154,17 @@ export class EntityVoiceovers {
   getAutomaticVoiceover(contentId: string): Voiceover | undefined {
     return this.voiceoversMapping[contentId]?.auto;
   }
+
+  removeVoiceover(contentId: string): void {
+    if (this.voiceoversMapping[contentId]) {
+      delete this.voiceoversMapping[contentId];
+    }
+  }
+
+  toggleManualVoiceoverNeedsUpdate(contentId: string): void {
+    let voiceover = this.getManualVoiceover(contentId);
+    if (voiceover) {
+      voiceover.needsUpdate = !voiceover.needsUpdate;
+    }
+  }
 }

@@ -112,14 +112,6 @@ describe('ExplorationStatesService', () => {
       {
         Hola: {
           content: {content_id: 'content', html: ''},
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              rule_input: {},
-            },
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],
