@@ -2172,16 +2172,32 @@ export class LoggedInUser extends BaseUser {
     return childLeft >= parentLeft && childRight <= parentRight;
   }
 
-  private getCardsInView(
-    allCardElements: puppeteer.ElementHandle[],
-    isRTL: boolean
-  ): void {
-    const firstCardBox = isRTL
-      ? allCardElements[allCardElements.length - 1]
-      : allCardElements[0];
-    const lastCardBox = isRTL
-      ? allCardElements[0]
-      : allCardElements[allCardElements.length - 1];
+  private async createCardViewChecker(
+    containerElement: puppeteer.ElementHandle
+  ): Promise<
+    (a: puppeteer.ElementHandle[]) => Promise<Record<string, boolean>>
+  > {
+    const isRTL = await this.isPageRTL();
+    const getCardsInView = async (
+      allCardElements: puppeteer.ElementHandle[]
+    ): Promise<Record<string, boolean>> => {
+      const firstCardBox = isRTL
+        ? allCardElements[allCardElements.length - 1]
+        : allCardElements[0];
+      const lastCardBox = isRTL
+        ? allCardElements[0]
+        : allCardElements[allCardElements.length - 1];
+      const isFirstCardInView = await this.isBoxWithinRange(
+        containerElement,
+        firstCardBox
+      );
+      const isLastCardInView = await this.isBoxWithinRange(
+        containerElement,
+        lastCardBox
+      );
+      return {isFirstCardInView, isLastCardInView};
+    };
+    return getCardsInView;
   }
 
   private async isPageRTL(): Promise<boolean> {
