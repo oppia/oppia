@@ -63,7 +63,6 @@ import {ExplorationEditorTabComponent} from './editor-tab/exploration-editor-tab
 import {ExplorationSaveAndPublishButtonsComponent} from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import {ExplorationSavePromptModalComponent} from './modal-templates/exploration-save-prompt-modal.component';
 import {AddAudioTranslationModalComponent} from './translation-tab/modal-templates/add-audio-translation-modal.component';
-import {AudioTranslationBarComponent} from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import {VoiceoverCardComponent} from './translation-tab/voiceover-card/voiceover-card.component';
 import {StateTranslationEditorComponent} from './translation-tab/state-translation-editor/state-translation-editor.component';
 import {StateTranslationComponent} from './translation-tab/state-translation/state-translation.component';
@@ -246,7 +245,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
@@ -301,7 +299,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,

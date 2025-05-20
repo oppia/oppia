@@ -68,12 +68,6 @@ describe('Image preloader service', () => {
           html: '',
           content_id: 'content',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         interaction: {
           id: 'Continue',
           default_outcome: {
@@ -112,11 +106,6 @@ describe('Image preloader service', () => {
           content_id: 'content',
           html: 'Congratulations, you have finished!',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-          },
-        },
         interaction: {
           id: 'EndExploration',
           default_outcome: null,
@@ -141,14 +130,6 @@ describe('Image preloader service', () => {
         content: {
           content_id: 'content',
           html: 'Multiple Choice',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-          },
         },
         interaction: {
           id: 'MultipleChoiceInput',
@@ -250,15 +231,6 @@ describe('Image preloader service', () => {
         content: {
           content_id: 'content',
           html: '<p>Text Input Content</p>',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-            hint_1: {},
-          },
         },
         interaction: {
           id: 'TextInput',

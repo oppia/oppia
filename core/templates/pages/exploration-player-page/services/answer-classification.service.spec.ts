@@ -67,14 +67,6 @@ describe('Answer Classification Service', () => {
           content_id: 'content',
           html: 'content',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-          },
-        },
         interaction: {
           id: 'TextInput',
           customization_args: {
@@ -535,14 +527,6 @@ describe('Answer Classification Service', () => {
         content: {
           content_id: 'content',
           html: 'content',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            feedback_2: {},
-          },
         },
         interaction: {
           id: 'TextInput',

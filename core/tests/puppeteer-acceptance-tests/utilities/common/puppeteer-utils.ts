@@ -881,6 +881,16 @@ export class BaseUser {
     this.page = newPage;
     return newPage;
   }
+
+  /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

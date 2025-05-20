@@ -17,7 +17,7 @@
  */
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {

@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 import {AppConstants} from 'app.constants';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
@@ -87,7 +87,7 @@ describe('ContinueValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.',
+        message: 'The button text should not be empty',
       },
     ]);
 
@@ -130,7 +130,7 @@ describe('ContinueValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should be at most 20 characters.',
+        message: 'The button text should be at most 20 characters',
       },
     ]);
 
@@ -162,7 +162,7 @@ describe('ContinueValidationService', () => {
       {
         type: WARNING_TYPES.CRITICAL,
         message:
-          'Only the default outcome is necessary for a continue interaction.',
+          'Only the default outcome is necessary for a continue interaction',
       },
     ]);
   });
@@ -183,7 +183,7 @@ describe('ContinueValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Please specify what Oppia should do after the button is clicked.',
+          'Please specify what Oppia should do after the button is clicked',
       },
     ]);
   });
