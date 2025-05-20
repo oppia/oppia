@@ -2118,20 +2118,14 @@ export class LoggedInUser extends BaseUser {
       if (minusButtonElement === null && plusButtonElement === null) {
         expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
-        let counter = 0;
-        isLastCardInView = await this.isBoxWithinRange(
-          containerElement,
-          lastCardBox
-        );
-        while (!isLastCardInView && counter < 5) {
+        while (!isLastCardInView) {
           await plusButtonElement?.click();
-          counter++;
+          isLastCardInView = await this.isBoxWithinRange(
+            containerElement,
+            lastCardBox
+          );
           showMessage('Shifted cards to view more');
         }
-        isLastCardInView = await this.isBoxWithinRange(
-          containerElement,
-          lastCardBox
-        );
         expect(isLastCardInView).toBe(true);
         await minusButtonElement?.click();
         showMessage('Shifted cards to view less');
@@ -2148,7 +2142,7 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  async isBoxWithinRange(
+  private async isBoxWithinRange(
     parentElement: puppeteer.ElementHandle | null = null,
     childElement: puppeteer.ElementHandle | null = null
   ): Promise<boolean> {
@@ -2171,10 +2165,26 @@ export class LoggedInUser extends BaseUser {
       };
     });
 
+    console.log(
+      `parent left: ${parentLeft}, parent right: ${parentRight}, child left: ${childLeft}, child right: ${childRight}`
+    );
+
     return childLeft >= parentLeft && childRight <= parentRight;
   }
 
-  async isPageRTL(): Promise<boolean> {
+  private getCardsInView(
+    allCardElements: puppeteer.ElementHandle[],
+    isRTL: boolean
+  ): void {
+    const firstCardBox = isRTL
+      ? allCardElements[allCardElements.length - 1]
+      : allCardElements[0];
+    const lastCardBox = isRTL
+      ? allCardElements[0]
+      : allCardElements[allCardElements.length - 1];
+  }
+
+  private async isPageRTL(): Promise<boolean> {
     await this.page.waitForSelector(angularRootElementSelector);
     const pageDirection = await this.page.evaluate(selector => {
       const oppiaRoot = document.querySelector(selector);
