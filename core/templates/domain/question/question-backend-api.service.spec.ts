@@ -55,9 +55,6 @@ describe('Question backend Api service', () => {
           content: {
             html: 'Question 1',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
@@ -553,15 +550,6 @@ describe('Question backend Api service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 2,
         language_code: '',
@@ -650,15 +638,6 @@ describe('Question backend Api service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 2,
         language_code: '',
