@@ -514,3 +514,41 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read()))
         return autogeneratable_language_accent_list
+
+
+def compute_voiceover_related_changes_upon_revert(
+    reverted_exploration: exp_domain.Exploration,
+    revert_to_version: int
+) -> List[voiceover_models.EntityVoiceoversModel]:
+    """Creates new EntityVoiceovers models corresponding to voiceover related
+    changes upon reverting an exploration.
+
+    Args:
+        reverted_exploration: Exploration. The reverted exploration object.
+        revert_to_version: int. The version to which the exploration is being
+            reverted.
+
+    Returns:
+        list(EntityVoiceoversModel). A list of EntityVoiceoversModel's with
+        respect to reverted exploration version.
+    """
+    entity_voiceovers_domain_objects = (
+        get_entity_voiceovers_for_given_exploration(
+            reverted_exploration.id, 'exploration', revert_to_version
+        ))
+    new_entity_voiceovers_models = []
+
+    for entity_voiceovers in entity_voiceovers_domain_objects:
+        entity_voiceovers_dict = entity_voiceovers.to_dict()
+        new_entity_voiceovers_models.append(
+            voiceover_models.EntityVoiceoversModel.create_new(
+                entity_voiceovers_dict['entity_type'],
+                entity_voiceovers_dict['entity_id'],
+                reverted_exploration.version,
+                entity_voiceovers_dict['language_accent_code'],
+                entity_voiceovers_dict['voiceovers_mapping'],
+                entity_voiceovers_dict[
+                    'automated_voiceovers_audio_offsets_msecs']
+            )
+        )
+    return new_entity_voiceovers_models
