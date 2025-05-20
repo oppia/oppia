@@ -2074,6 +2074,11 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Helper function - verifies if the child element is fully visible in parent element.
+   * @param {string} parentElement - Parent element to search though.
+   * @param {string} childElement- Element to search for.
+   */
   private async isBoxWithinRange(
     parentElement: puppeteer.ElementHandle | null = null,
     childElement: puppeteer.ElementHandle | null = null
@@ -2100,6 +2105,9 @@ export class LoggedInUser extends BaseUser {
     return childLeft >= parentLeft && childRight <= parentRight;
   }
 
+  /**
+   * Helper function - returns whether the page is RTL. Logic is retrieved from verifyPageIsRTL().
+   */
   private async isPageRTL(): Promise<boolean> {
     await this.page.waitForSelector(angularRootElementSelector);
     const pageDirection = await this.page.evaluate(selector => {
@@ -2118,6 +2126,11 @@ export class LoggedInUser extends BaseUser {
     return pageDirection === 'rtl';
   }
 
+  /**
+   * Helper function - Returns callback that retrieves dimensions of first and last element of a list
+   * based on RTL.
+   * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
+   */
   private async createCardViewChecker(
     containerElement: puppeteer.ElementHandle | null | undefined
   ): Promise<
@@ -2146,13 +2159,18 @@ export class LoggedInUser extends BaseUser {
     return getCardsInView;
   }
 
+  /**
+   * Helper function - Shifts the card display to display the rest of the hidden cards.
+   * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
+   * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
+   * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
+   */
   private async shiftCardDisplay(
     shift: string,
-    currentCardView: boolean,
     shiftButton: puppeteer.ElementHandle | null | undefined,
     cardsInView: () => Promise<Record<string, boolean>>
   ): Promise<void> {
-    let isCardInView = currentCardView;
+    let isCardInView = false;
     let maxShifts = 0;
 
     while (!isCardInView && maxShifts < 10) {
@@ -2177,6 +2195,14 @@ export class LoggedInUser extends BaseUser {
       `Shifted cards to view ${shift} to the ${shift === 'more' ? 'last' : 'first'} card`
     );
   }
+
+  /**
+   * Verifies the proper controls display based on card display container. If the screen is too small,
+   * control buttons should appear and shift correctly to the last and first cards.
+   * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
+   * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
+   * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
+   */
 
   async expectCardDisplayControls(
     criteria: string,
@@ -2208,13 +2234,11 @@ export class LoggedInUser extends BaseUser {
         const getCardsInViewArg = () => getCardsInView(allCardElements);
         await this.shiftCardDisplay(
           'more',
-          isLastCardInView,
           plusButtonElement,
           getCardsInViewArg
         );
         await this.shiftCardDisplay(
           'less',
-          isFirstCardInView,
           minusButtonElement,
           getCardsInViewArg
         );

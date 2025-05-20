@@ -89,34 +89,46 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should display in-progress section after starting explorations (no in progress classroom lessons)',
-    async function () {
+  describe('In-progress lessons', function () {
+    beforeAll(async function () {
       for (const id of explorationIds.slice(0, -1)) {
         await loggedInUser.playExploration(id);
         await loggedInUser.continueToNextCard();
       }
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Lessons in progress',
-        explorationTitles.slice(0, -1)
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    it(
+      'should display in-progress section after starting explorations (no in progress classroom lessons)',
+      async function () {
+        await loggedInUser.navigateToLearnerDashboard();
+        await loggedInUser.expectLessonCardsToBePresent(
+          'Lessons in progress',
+          explorationTitles.slice(0, -1)
+        );
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
+    );
 
-  it(
-    'should display carousel arrows when cards do not fit screen, shifting all to the end and back',
-    async function () {
-      for (const id of explorationIds.slice(0, -1)) {
-        await loggedInUser.playExploration(id);
-        await loggedInUser.continueToNextCard();
-      }
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectCardDisplayControls('Lessons in progress');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    it(
+      'should display carousel arrows when cards do not fit screen (currently mobile) for LTR languages, shifting all to the end and back',
+      async function () {
+        await loggedInUser.navigateToLearnerDashboard();
+        await loggedInUser.expectCardDisplayControls('Lessons in progress');
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
+    );
+    // TODO(#18384) - Text was corrected (missing a s) for English key, this might fail if translations are updated.
+    it(
+      'should display carousel arrows when cards do not fit screen (currently mobile) for RTL languages, shifting all to the end and back',
+      async function () {
+        await loggedInUser.changeSiteLanguage('ar');
+        await loggedInUser.navigateToLearnerDashboard();
+        await loggedInUser.expectCardDisplayControls(
+          'دروس أحرزت فيها بعض التقدم'
+        );
+      },
+      DEFAULT_SPEC_TIMEOUT_MSECS
+    );
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
