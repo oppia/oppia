@@ -40,6 +40,30 @@ datastore_services = models.Registry.import_datastore_services()
 
 ERROR_TRUNCATION_LIMIT = 10
 
+"""Validation Jobs for base models
+
+# How to write validation jobs:
+
+For every group of data models defined within 'core/storage/<X>/gae_models.py',
+there should be a corresponding validation job file named 'X_jobs.py' located
+within the `datastore_audit` directory. This file should contain a validation
+job for each of the models defined in the corresponding `gae_models.py`.
+
+The naming convention for the validation job classes within 'x_jobs.py'
+should be `<StorageModelName>ValidationJob`.
+
+This class must implement the following methods:
+
+- `get_validation_fns(self):
+  This method should return a list of functions. Each function takes a model
+  instance as input and yields `JobRunResult` objects for any validation
+  errors found.
+
+- `get_validate_domain_object_fn(self):
+  This method should return a function that takes a model instance and
+  validates its corresponding domain object. It should yield
+  `JobRunResult` objects for any validation errors found in the domain object.
+"""
 
 class BaseValidationJob(base_jobs.JobBase):
     """Base class for all validation jobs."""
