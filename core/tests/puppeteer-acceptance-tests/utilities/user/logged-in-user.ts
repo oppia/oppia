@@ -2130,13 +2130,14 @@ export class LoggedInUser extends BaseUser {
    * Helper function - Returns callback that retrieves dimensions of first and last element of a list
    * based on RTL.
    * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
+   * @param {boolean} isRTL - Current language is RTL.
    */
   private async createCardViewChecker(
-    containerElement: puppeteer.ElementHandle | null | undefined
+    containerElement: puppeteer.ElementHandle | null | undefined,
+    isRTL: boolean
   ): Promise<
     (a: puppeteer.ElementHandle[]) => Promise<Record<string, boolean>>
   > {
-    const isRTL = await this.isPageRTL();
     const getCardsInView = async (
       allCardElements: puppeteer.ElementHandle[]
     ): Promise<Record<string, boolean>> => {
@@ -2163,14 +2164,16 @@ export class LoggedInUser extends BaseUser {
    * Helper function - Shifts the card display to display the rest of the hidden cards.
    * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
    * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
+   * @param {puppeteer.ElementHandle | null | undefined} currentCardView - Starting value for isCardInView.
    * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
    */
   private async shiftCardDisplay(
     shift: string,
     shiftButton: puppeteer.ElementHandle | null | undefined,
+    currentCardView: boolean,
     cardsInView: () => Promise<Record<string, boolean>>
   ): Promise<void> {
-    let isCardInView = false;
+    let isCardInView = currentCardView;
     let maxShifts = 0;
 
     while (!isCardInView && maxShifts < 10) {
@@ -2203,7 +2206,6 @@ export class LoggedInUser extends BaseUser {
    * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
    * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
    */
-
   async expectCardDisplayControls(
     criteria: string,
     section: string = 'N/A'
@@ -2224,8 +2226,12 @@ export class LoggedInUser extends BaseUser {
         subsectionElement?.$(learnerDashSelectors.cardDisplay.plusButton),
       ]);
 
+    const isRTL = await this.isPageRTL();
     if (allCardElements && allCardElements.length > 1) {
-      const getCardsInView = await this.createCardViewChecker(containerElement);
+      const getCardsInView = await this.createCardViewChecker(
+        containerElement,
+        isRTL
+      );
       let {isFirstCardInView, isLastCardInView} =
         await getCardsInView(allCardElements);
       if (minusButtonElement === null && plusButtonElement === null) {
@@ -2234,12 +2240,14 @@ export class LoggedInUser extends BaseUser {
         const getCardsInViewArg = () => getCardsInView(allCardElements);
         await this.shiftCardDisplay(
           'more',
-          plusButtonElement,
+          isRTL ? minusButtonElement : plusButtonElement,
+          isLastCardInView,
           getCardsInViewArg
         );
         await this.shiftCardDisplay(
           'less',
-          minusButtonElement,
+          isRTL ? plusButtonElement : minusButtonElement,
+          isFirstCardInView,
           getCardsInViewArg
         );
       }
