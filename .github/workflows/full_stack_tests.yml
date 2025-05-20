@@ -181,7 +181,7 @@ jobs:
         id: check_skip
         # TODO(#22448): Remove once all suites are fixed.
         run: |
-          broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "logged-out-user/play-through-lesson-while-getting-feedback-and-hints" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
+          broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
           for suite in "${broken_suites[@]}"; do
             if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
               echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
@@ -223,6 +223,15 @@ jobs:
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
+      - name: Uploading diff screenshots as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ failure() }}
         run: >
