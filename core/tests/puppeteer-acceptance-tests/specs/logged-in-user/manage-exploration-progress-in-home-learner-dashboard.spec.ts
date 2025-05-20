@@ -91,7 +91,7 @@ describe('Logged-in User', function () {
   );
 
   it(
-    'should display carousel arrows and shift to see all cards',
+    'should display carousel arrows when cards do not fit screen, shifting all to the end and back',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
 
