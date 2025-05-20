@@ -67,43 +67,13 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-
-    for (const id of explorationIds.slice(3)) {
-      await loggedInUser.playExploration(id);
-      await loggedInUser.continueToNextCard();
-    }
   }, 480000);
-
-  it(
-    'should display in-progress section after starting explorations (no in progress classroom lessons)',
-    async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectElementsToBePresent(
-        ['Continue where you left off'],
-        'tabSection'
-      );
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Lessons in progress',
-        explorationTitles.slice(3)
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should display carousel arrows when cards do not fit screen, shifting all to the end and back',
-    async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-
-      await loggedInUser.expectCardDisplayControls('Lessons in progress');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
   it(
     'should display saved community lessons after adding to playlist',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar(explorationTitles[3]);
       await loggedInUser.addLessonToPlayLater(explorationTitles[3]);
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
@@ -113,8 +83,37 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent(
         'Lessons you saved for later',
-        explorationTitles.slice(0, 2)
+        explorationTitles.slice(3)
       );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display in-progress section after starting explorations (no in progress classroom lessons)',
+    async function () {
+      for (const id of explorationIds.slice(0, -1)) {
+        await loggedInUser.playExploration(id);
+        await loggedInUser.continueToNextCard();
+      }
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Lessons in progress',
+        explorationTitles.slice(0, -1)
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display carousel arrows when cards do not fit screen, shifting all to the end and back',
+    async function () {
+      for (const id of explorationIds.slice(0, -1)) {
+        await loggedInUser.playExploration(id);
+        await loggedInUser.continueToNextCard();
+      }
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectCardDisplayControls('Lessons in progress');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

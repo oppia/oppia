@@ -3395,10 +3395,6 @@ export class LoggedInUser extends BaseUser {
       };
     });
 
-    console.log(
-      `parent left: ${parentLeft}, parent right: ${parentRight}, child left: ${childLeft}, child right: ${childRight}`
-    );
-
     return childLeft >= parentLeft && childRight <= parentRight;
   }
 
@@ -3508,13 +3504,13 @@ export class LoggedInUser extends BaseUser {
         expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
         const getCardsInViewArg = () => getCardsInView(allCardElements);
-        this.shiftCardDisplay(
+        await this.shiftCardDisplay(
           'more',
           isLastCardInView,
           plusButtonElement,
           getCardsInViewArg
         );
-        this.shiftCardDisplay(
+        await this.shiftCardDisplay(
           'less',
           isFirstCardInView,
           minusButtonElement,
