@@ -2150,6 +2150,38 @@ export class LoggedInUser extends BaseUser {
     return getCardsInView;
   }
 
+  private async shiftCardDisplay(
+    shift: string,
+    currentCardView: boolean,
+    shiftButton: puppeteer.ElementHandle | null | undefined,
+    cardsInView: () => Promise<Record<string, boolean>>
+  ): Promise<void> {
+    let isCardInView = currentCardView;
+    let maxShifts = 0;
+
+    while (!isCardInView && maxShifts < 10) {
+      await shiftButton?.click();
+      if (shift === 'more') {
+        isCardInView = (await cardsInView()).isLastCardInView;
+      } else {
+        isCardInView = (await cardsInView()).isFirstCardInView;
+      }
+      showMessage(`Shifted cards to view ${shift}`);
+      maxShifts++;
+    }
+
+    if (maxShifts === 10) {
+      throw new Error(
+        `Max shifts of 10 reached but ${shift === 'more' ? 'last' : 'first'} card is not displayed `
+      );
+    }
+
+    expect(isCardInView).toBe(true);
+    showMessage(
+      `Shifted cards to view ${shift} to the ${shift === 'more' ? 'last' : 'first'} card`
+    );
+  }
+
   async expectCardDisplayControls(
     criteria: string,
     section: string = 'N/A'
@@ -2163,16 +2195,12 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.cardDisplay.container
     );
 
-    const allCardElements = await containerElement?.$$(
-      learnerDashSelectors.lessonCard.content
-    );
-
-    const minusButtonElement = await subsectionElement?.$(
-      learnerDashSelectors.cardDisplay.minusButton
-    );
-    const plusButtonElement = await subsectionElement?.$(
-      learnerDashSelectors.cardDisplay.plusButton
-    );
+    const [allCardElements, minusButtonElement, plusButtonElement] =
+      await Promise.all([
+        containerElement?.$$(learnerDashSelectors.lessonCard.content),
+        subsectionElement?.$(learnerDashSelectors.cardDisplay.minusButton),
+        subsectionElement?.$(learnerDashSelectors.cardDisplay.plusButton),
+      ]);
 
     if (allCardElements && allCardElements.length > 1) {
       const getCardsInView = await this.createCardViewChecker(containerElement);
@@ -2181,18 +2209,19 @@ export class LoggedInUser extends BaseUser {
       if (minusButtonElement === null && plusButtonElement === null) {
         expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
-        while (!isLastCardInView) {
-          await plusButtonElement?.click();
-          isLastCardInView = (await getCardsInView(allCardElements))
-            .isLastCardInView;
-          showMessage('Shifted cards to view more');
-        }
-        expect(isLastCardInView).toBe(true);
-        await minusButtonElement?.click();
-        showMessage('Shifted cards to view less');
-        isLastCardInView = (await getCardsInView(allCardElements))
-          .isLastCardInView;
-        expect(isLastCardInView).toBe(false);
+        const getCardsInViewArg = () => getCardsInView(allCardElements);
+        this.shiftCardDisplay(
+          'more',
+          isLastCardInView,
+          plusButtonElement,
+          getCardsInViewArg
+        );
+        this.shiftCardDisplay(
+          'less',
+          isFirstCardInView,
+          minusButtonElement,
+          getCardsInViewArg
+        );
       }
     } else {
       throw new Error(
