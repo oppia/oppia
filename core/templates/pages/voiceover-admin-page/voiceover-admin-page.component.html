@@ -37,9 +37,11 @@
       <div *ngIf="languageAccentDropdownIsShown" class="oppia-language-accent-dropdown">
         <mat-form-field class="oppia-language-accent-dropdown-selector">
           <mat-label>Language Accent pair</mat-label>
-          <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
+          <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)"
+                      class="e2e-test-language-accent-dropdown-selector">
             <mat-option *ngFor="let languageAccentDescriptionToCode of availableLanguageAccentDescriptionsToCodes | keyvalue"
-                        [value]="languageAccentDescriptionToCode.value">
+                        [value]="languageAccentDescriptionToCode.value"
+                        class="e2e-test-language-accent-selector-option">
               <span>
                 {{languageAccentDescriptionToCode.key}}
               </span>
@@ -57,7 +59,7 @@
       <div class="oppia-first-card-bottom-buttons">
         <button (click)="showLanguageAccentDropdown()"
                 *ngIf="!languageAccentDropdownIsShown"
-                class="btn btn-secondary">
+                class="e2e-test-add-new-language-accent-button btn btn-secondary">
           <mat-icon>add</mat-icon>
           <span> Add new language accent support</span>
         </button>

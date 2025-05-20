@@ -110,7 +110,6 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
 ]
@@ -128,6 +127,7 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -194,13 +194,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag is to enable the exploration player redesign.',
             feature_flag_domain.ServerMode.DEV
-        )
-    ),
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
-        (
-            'The flag allows voice artists to add voiceovers in a specific '
-            'accent for the given language.',
-            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (

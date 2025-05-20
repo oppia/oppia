@@ -22,10 +22,10 @@ from core import feature_flag_list
 from core import feconf
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 from typing import Final
 
 MYPY = False
@@ -61,20 +61,21 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     """Test the handling of saving translation work."""
 
     EXP_ID: Final = 'exp1'
-    RECORDED_VOICEOVERS: Final = {
-        'voiceovers_mapping': {
-            'ca_placeholder_2': {},
-            'content_0': {
-                'en': {
-                    'filename': 'testFile.mp3',
-                    'file_size_bytes': 12200,
-                    'needs_update': False,
-                    'duration_secs': 4.5
-                }
-            },
-            'default_outcome_1': {}
-        }
+    manual_voiceover_1: state_domain.VoiceoverDict = {
+        'filename': 'testFile.mp3',
+        'file_size_bytes': 12200,
+        'needs_update': False,
+        'duration_secs': 4.5
     }
+
+    VALID_DRAFT_CHANGELIST: Final = [{
+        'cmd': 'update_voiceovers',
+        'language_accent_code': 'en-US',
+        'content_id': 'content_0',
+        'voiceovers': {
+            'manual': manual_voiceover_1
+        }
+    }]
 
     def setUp(self) -> None:
         super().setUp()
@@ -100,12 +101,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
             Exception, 'Missing key in handler args: version.'):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
-                    'change_list': [{
-                        'cmd': 'edit_state_property',
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'property_name': 'recorded_voiceovers',
-                        'new_value': self.RECORDED_VOICEOVERS
-                    }],
+                    'change_list': self.VALID_DRAFT_CHANGELIST,
                     'commit_message': 'Translated first state content'
                 }, csrf_token=self.csrf_token)
 
@@ -118,36 +114,10 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
 
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, self.EXP_ID), {
-                    'change_list': [{
-                        'cmd': 'edit_state_property',
-                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                        'property_name': 'recorded_voiceovers',
-                        'new_value': self.RECORDED_VOICEOVERS
-                    }],
+                    'change_list': self.VALID_DRAFT_CHANGELIST,
                     'commit_message': 'Translated first state content',
                     'version': 3
                 }, csrf_token=self.csrf_token)
-
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
-    def test_voice_artist_can_save_valid_change_list(self) -> None:
-        response = self.put_json(
-            '/createhandler/data/%s' % self.EXP_ID, {
-                'change_list': [{
-                    'cmd': 'edit_state_property',
-                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-                    'property_name': 'recorded_voiceovers',
-                    'new_value': self.RECORDED_VOICEOVERS
-                }],
-                'commit_message': 'Translated first state content',
-                'version': 1
-            }, csrf_token=self.csrf_token)
-        # Checking the response to have audio translations.
-        self.assertEqual(
-            response['states'][feconf.DEFAULT_INIT_STATE_NAME]
-            ['recorded_voiceovers'],
-            self.RECORDED_VOICEOVERS)
 
     def test_voice_artist_cannot_save_invalid_change_list(self) -> None:
         # Trying to change exploration objective.
@@ -179,26 +149,21 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
     NEWER_DATETIME: Final = datetime.datetime.utcnow() + datetime.timedelta(30)
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
-    RECORDED_VOICEOVERS: Final = {
-        'voiceovers_mapping': {
-            'ca_placeholder_2': {},
-            'content_0': {
-                'en': {
-                    'filename': 'testFile.mp3',
-                    'file_size_bytes': 12200,
-                    'needs_update': False,
-                    'duration_secs': 4.5
-                }
-            },
-            'default_outcome_1': {}
-        }
+    manual_voiceover_1: state_domain.VoiceoverDict = {
+        'filename': 'testFile.mp3',
+        'file_size_bytes': 12200,
+        'needs_update': False,
+        'duration_secs': 4.5
     }
+
     VALID_DRAFT_CHANGELIST: Final = [{
-        'cmd': 'edit_state_property',
-        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-        'property_name': 'recorded_voiceovers',
-        'old_value': None,
-        'new_value': RECORDED_VOICEOVERS}]
+        'cmd': 'update_voiceovers',
+        'language_accent_code': 'en-US',
+        'content_id': 'content_0',
+        'voiceovers': {
+            'manual': manual_voiceover_1
+        }
+    }]
     INVALID_DRAFT_CHANGELIST: Final = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',

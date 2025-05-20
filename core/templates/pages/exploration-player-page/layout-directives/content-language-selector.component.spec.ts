@@ -42,11 +42,9 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
@@ -89,23 +87,12 @@ class MockWindowRef {
   };
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
-
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
   let entityVoiceoversService: EntityVoiceoversService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -135,10 +122,6 @@ describe('Content language selector component', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
     })
       .overrideModule(BrowserDynamicTestingModule, {
@@ -152,9 +135,6 @@ describe('Content language selector component', () => {
     );
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    audioTranslationLanguageService = TestBed.get(
-      AudioTranslationLanguageService
-    );
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
@@ -181,10 +161,6 @@ describe('Content language selector component', () => {
   );
 
   it('should correcly initialize newLanguageCode', fakeAsync(() => {
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
     entityVoiceoversService.entityType = 'exploration';
     entityVoiceoversService.entityId = 'exploration_id_1';
     entityVoiceoversService.entityVersion = 1;
@@ -211,7 +187,6 @@ describe('Content language selector component', () => {
     ).and.returnValue(Promise.resolve(response));
     spyOn(audioPreloaderService, 'kickOffAudioPreloader');
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
-    spyOn(audioTranslationLanguageService, 'setCurrentAudioLanguageCode');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('Hola');
 
     const explorationDict = {
@@ -269,10 +244,6 @@ describe('Content language selector component', () => {
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode'
     );
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
       Promise.resolve()
     );
@@ -337,8 +308,7 @@ describe('Content language selector component', () => {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
@@ -415,8 +385,7 @@ describe('Content language selector component', () => {
           },
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
       card.addInputResponsePair({
         learnerInput: '',

@@ -36,6 +36,7 @@ import {
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface HTMLSchema {
   type: string;
@@ -95,37 +96,26 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
-    private contextService: ContextService
+    private contextService: ContextService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
     contentId: string,
     languageCode: string
   ): void {
-    let stateName = this.stateEditorService.getActiveStateName() as string;
-    let state = this.explorationStatesService.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let availableAudioLanguages =
-      recordedVoiceovers.getLanguageCodes(contentId);
-    if (availableAudioLanguages.indexOf(languageCode) !== -1) {
-      let voiceover = recordedVoiceovers.getVoiceover(contentId, languageCode);
-      if (voiceover.needsUpdate) {
-        return;
-      }
-
+    let canShowModal =
+      this.entityVoiceoversService.languageCode === languageCode &&
+      this.entityVoiceoversService.getAllVoiceovers().length > 0;
+    if (canShowModal) {
       this.ngbModal
         .open(MarkAudioAsNeedingUpdateModalComponent, {
           backdrop: 'static',
         })
         .result.then(
           () => {
-            recordedVoiceovers.toggleNeedsUpdateAttribute(
-              contentId,
-              languageCode
-            );
-            this.explorationStatesService.saveRecordedVoiceovers(
-              stateName,
-              recordedVoiceovers
+            this.entityVoiceoversService.markManualVoiceoverAsNeedingUpdate(
+              contentId
             );
           },
           () => {

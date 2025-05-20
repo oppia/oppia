@@ -34,6 +34,8 @@ export type ExplorationChange =
   | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
   | ExplorationChangeEditVoiceovers
+  | ExplorationChangeMarkVoiceoversAsNeedsUpdate
+  | ExplorationChangeRemoveVoiceovers
   | ExplorationChangeRemoveTranslations
   | ExplorationChangeRenameState
   | ExplorationChangeDeleteState
@@ -152,6 +154,18 @@ export interface ExplorationChangeEditVoiceovers {
   content_id: string;
   language_accent_code: string;
   voiceovers: VoiceoverTypeToVoiceoversBackendDict;
+}
+
+export interface ExplorationChangeMarkVoiceoversAsNeedsUpdate {
+  cmd: 'mark_voiceovers_needs_update';
+  content_id: string;
+  language_code: string;
+}
+
+export interface ExplorationChangeRemoveVoiceovers {
+  cmd: 'remove_voiceovers';
+  content_id: string;
+  language_code: string;
 }
 
 export interface ExplorationChangeRemoveTranslations {

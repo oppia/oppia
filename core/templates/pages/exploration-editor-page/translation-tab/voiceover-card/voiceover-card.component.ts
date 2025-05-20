@@ -118,6 +118,12 @@ export class VoiceoverCardComponent implements OnInit {
       Object.keys(
         this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
       ).length !== 0;
+
+    if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
+      this.voiceoversAreLoaded = true;
+      this.unsupportedLanguageCode = true;
+    }
+
     this.directiveSubscriptions.add(
       this.entityVoiceoversService.onVoiceoverLoad.subscribe(() => {
         this.voiceoversAreLoaded = true;
