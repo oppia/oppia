@@ -2098,41 +2098,24 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.cardDisplay.plusButton
     );
 
-    const isRTL = await this.isPageRTL();
-
     if (allCardElements && allCardElements.length > 1) {
-      const firstCardBox = isRTL
-        ? allCardElements[allCardElements.length - 1]
-        : allCardElements[0];
-      const lastCardBox = isRTL
-        ? allCardElements[0]
-        : allCardElements[allCardElements.length - 1];
-      let isFirstCardInView = await this.isBoxWithinRange(
-        containerElement,
-        firstCardBox
-      );
-      let isLastCardInView = await this.isBoxWithinRange(
-        containerElement,
-        lastCardBox
-      );
+      const getCardsInView = await this.createCardViewChecker(containerElement);
+      let {isFirstCardInView, isLastCardInView} =
+        await getCardsInView(allCardElements);
       if (minusButtonElement === null && plusButtonElement === null) {
         expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
         while (!isLastCardInView) {
           await plusButtonElement?.click();
-          isLastCardInView = await this.isBoxWithinRange(
-            containerElement,
-            lastCardBox
-          );
+          isLastCardInView = (await getCardsInView(allCardElements))
+            .isLastCardInView;
           showMessage('Shifted cards to view more');
         }
         expect(isLastCardInView).toBe(true);
         await minusButtonElement?.click();
         showMessage('Shifted cards to view less');
-        isLastCardInView = await this.isBoxWithinRange(
-          containerElement,
-          lastCardBox
-        );
+        isLastCardInView = (await getCardsInView(allCardElements))
+          .isLastCardInView;
         expect(isLastCardInView).toBe(false);
       }
     } else {
@@ -2172,8 +2155,26 @@ export class LoggedInUser extends BaseUser {
     return childLeft >= parentLeft && childRight <= parentRight;
   }
 
+  private async isPageRTL(): Promise<boolean> {
+    await this.page.waitForSelector(angularRootElementSelector);
+    const pageDirection = await this.page.evaluate(selector => {
+      const oppiaRoot = document.querySelector(selector);
+      if (!oppiaRoot) {
+        throw new Error(`${selector} not found`);
+      }
+
+      const childDiv = oppiaRoot.querySelector('div');
+      if (!childDiv) {
+        throw new Error('Child div not found');
+      }
+
+      return childDiv.getAttribute('dir');
+    }, angularRootElementSelector);
+    return pageDirection === 'rtl';
+  }
+
   private async createCardViewChecker(
-    containerElement: puppeteer.ElementHandle
+    containerElement: puppeteer.ElementHandle | null | undefined
   ): Promise<
     (a: puppeteer.ElementHandle[]) => Promise<Record<string, boolean>>
   > {
@@ -2198,24 +2199,6 @@ export class LoggedInUser extends BaseUser {
       return {isFirstCardInView, isLastCardInView};
     };
     return getCardsInView;
-  }
-
-  private async isPageRTL(): Promise<boolean> {
-    await this.page.waitForSelector(angularRootElementSelector);
-    const pageDirection = await this.page.evaluate(selector => {
-      const oppiaRoot = document.querySelector(selector);
-      if (!oppiaRoot) {
-        throw new Error(`${selector} not found`);
-      }
-
-      const childDiv = oppiaRoot.querySelector('div');
-      if (!childDiv) {
-        throw new Error('Child div not found');
-      }
-
-      return childDiv.getAttribute('dir');
-    }, angularRootElementSelector);
-    return pageDirection === 'rtl';
   }
 }
 
