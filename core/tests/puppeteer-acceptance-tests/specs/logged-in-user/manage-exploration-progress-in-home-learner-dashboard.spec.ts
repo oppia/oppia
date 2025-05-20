@@ -96,8 +96,9 @@ describe('Logged-in User', function () {
         await loggedInUser.continueToNextCard();
       }
     }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
     it(
-      'should display in-progress section after starting explorations (no in progress classroom lessons)',
+      'should display in-progress section after starting explorations (no in-progress classroom lessons)',
       async function () {
         await loggedInUser.navigateToLearnerDashboard();
         await loggedInUser.expectLessonCardsToBePresent(
@@ -109,16 +110,16 @@ describe('Logged-in User', function () {
     );
 
     it(
-      'should display carousel arrows when cards do not fit screen (currently mobile) for LTR languages, shifting all to the end and back',
+      'should hide (desktop) / display (mobile) carousel arrows when cards do not fit for LTR languages, shifting through all cards if displayed',
       async function () {
-        await loggedInUser.navigateToLearnerDashboard();
         await loggedInUser.expectCardDisplayControls('Lessons in progress');
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
+
     // TODO(#18384) - Text was corrected (missing a s) for English key, this might fail if translations are updated.
     it(
-      'should display carousel arrows when cards do not fit screen (currently mobile) for RTL languages, shifting all to the end and back',
+      'should hide (desktop) / display (mobile) carousel arrows when cards do not fit for RTL languages, shifting through all cards if displayed',
       async function () {
         await loggedInUser.changeSiteLanguage('ar');
         await loggedInUser.navigateToLearnerDashboard();
