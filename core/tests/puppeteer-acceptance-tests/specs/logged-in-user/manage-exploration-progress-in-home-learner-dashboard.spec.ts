@@ -32,7 +32,12 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
+  const explorationTitles = [
+    'Exploration 1',
+    'Exploration 2',
+    'Exploration 3',
+    'Exploration 4',
+  ];
   const explorationIds: string[] = [];
 
   beforeAll(async function () {
@@ -62,33 +67,16 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
+
+    for (const id of explorationIds.slice(3)) {
+      await loggedInUser.playExploration(id);
+      await loggedInUser.continueToNextCard();
+    }
   }, 480000);
-  it(
-    'should display saved community lessons after adding to playlist',
-    async function () {
-      await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.addLessonToPlayLater('Exploration 1');
-      await loggedInUser.expectToolTipMessage(
-        "Successfully added to your 'Play Later' list."
-      );
-
-      await loggedInUser.navigateToLearnerDashboard();
-
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Lessons you saved for later',
-        ['Exploration 1']
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
   it(
     'should display in-progress section after starting explorations (no in progress classroom lessons)',
     async function () {
-      for (const id of explorationIds) {
-        await loggedInUser.playExploration(id);
-        await loggedInUser.continueToNextCard();
-      }
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectElementsToBePresent(
         ['Continue where you left off'],
@@ -96,7 +84,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.expectLessonCardsToBePresent(
         'Lessons in progress',
-        explorationTitles
+        explorationTitles.slice(3)
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -105,13 +93,28 @@ describe('Logged-in User', function () {
   it(
     'should display carousel arrows and shift to see all cards',
     async function () {
-      for (const id of explorationIds) {
-        await loggedInUser.playExploration(id);
-        await loggedInUser.continueToNextCard();
-      }
       await loggedInUser.navigateToLearnerDashboard();
 
       await loggedInUser.expectCardDisplayControls('Lessons in progress');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should display saved community lessons after adding to playlist',
+    async function () {
+      await loggedInUser.navigateToCommunityLibraryPage();
+      await loggedInUser.addLessonToPlayLater(explorationTitles[3]);
+      await loggedInUser.expectToolTipMessage(
+        "Successfully added to your 'Play Later' list."
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+
+      await loggedInUser.expectLessonCardsToBePresent(
+        'Lessons you saved for later',
+        explorationTitles.slice(0, 2)
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
