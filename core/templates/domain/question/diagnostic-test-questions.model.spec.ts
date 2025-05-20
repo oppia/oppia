@@ -140,15 +140,6 @@ describe('Diagnostic test questions model', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 2,
       language_code: '',
@@ -237,15 +228,6 @@ describe('Diagnostic test questions model', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 2,
       language_code: '',

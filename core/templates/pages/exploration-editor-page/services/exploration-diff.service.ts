@@ -313,7 +313,9 @@ export class ExplorationDiffService {
           change.cmd !== 'mark_translation_needs_update_for_language' &&
           change.cmd !== 'remove_translations' &&
           change.cmd !== 'edit_translation' &&
-          change.cmd !== 'update_voiceovers'
+          change.cmd !== 'update_voiceovers' &&
+          change.cmd !== 'mark_voiceovers_needs_update' &&
+          change.cmd !== 'remove_voiceovers'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }

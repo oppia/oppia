@@ -394,3 +394,41 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             entity_voiceovers_object.is_both_voiceovers_empty('content_0'))
+
+    def test_should_mark_voiceover_as_needing_update(self) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+        dummy_new_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 4000,
+            'needs_update': False,
+            'duration_secs': 6.0
+        }
+        new_voiceover_object = state_domain.Voiceover.from_dict(
+            dummy_new_voiceover_dict)
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_0')
+
+        entity_voiceovers_object.add_voiceover(
+            content_id='content_0',
+            voiceover_type=feconf.VoiceoverType.MANUAL,
+            voiceovers_mapping=new_voiceover_object)
+
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content')
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertFalse(voiceover.needs_update)
+
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content_0')
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertTrue(voiceover.needs_update)

@@ -250,20 +250,6 @@ describe('Translation tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {
-                en: {
-                  filename: 'myfile2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2,
-                },
-              },
-            },
-          },
         },
       },
       false

@@ -407,6 +407,36 @@ describe('Change List Service when changes are mergable', () => {
     );
   }));
 
+  it('should mark voiceovers as needing update', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.markVoiceoversAsNeedingUpdate('content_id_1', 'en-US');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
+  it('should successfully remove voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.removeVoiceovers('content_id_1', 'en-US');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
   it(
     'should save changes after renaming a state ' +
       "when calling 'renameState'",
