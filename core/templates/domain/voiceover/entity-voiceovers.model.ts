@@ -99,4 +99,17 @@ export class EntityVoiceovers {
       return undefined;
     }
   }
+
+  removeVoiceover(contentId: string): void {
+    if (this.voiceoversMapping[contentId]) {
+      delete this.voiceoversMapping[contentId];
+    }
+  }
+
+  toggleManualVoiceoverNeedsUpdate(contentId: string): void {
+    let voiceover = this.getManualVoiceover(contentId);
+    if (voiceover) {
+      voiceover.needsUpdate = !voiceover.needsUpdate;
+    }
+  }
 }

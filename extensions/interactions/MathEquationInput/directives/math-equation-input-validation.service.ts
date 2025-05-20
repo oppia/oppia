@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import nerdamer from 'nerdamer';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
   BaseInteractionValidationService,
@@ -54,8 +54,7 @@ export class MathEquationInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'The number of custom letters cannot be more than ' +
-          allowedLettersLimit +
-          '.',
+          allowedLettersLimit,
       });
     }
 
@@ -169,7 +168,7 @@ export class MathEquationInputValidationService {
                 ' from Oppia response ' +
                 (i + 1) +
                 ' will never be matched because it is preceded by ' +
-                "an 'IsEquivalentTo' learner answer with a matching input.",
+                "an 'IsEquivalentTo' learner answer with a matching input",
             });
           } else if (
             currentRuleType === 'MatchesExactlyWith' &&
@@ -189,7 +188,7 @@ export class MathEquationInputValidationService {
                 (i + 1) +
                 ' will never be matched because it is preceded by ' +
                 "a 'MatchesExactlyWith' learner answer with " +
-                'a matching input.',
+                'a matching input',
             });
           }
         }

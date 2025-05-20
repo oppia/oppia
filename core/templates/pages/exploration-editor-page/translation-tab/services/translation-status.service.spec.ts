@@ -24,7 +24,6 @@ import {TranslationStatusService} from 'pages/exploration-editor-page/translatio
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
@@ -33,6 +32,8 @@ import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.m
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 class MockNgbModal {
   open() {
@@ -57,11 +58,11 @@ describe('Translation status service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let generateContentIdService: GenerateContentIdService;
   let ess: ExplorationStatesService;
-  let srvs: StateRecordedVoiceoversService;
   let ttams: TranslationTabActiveModeService;
   let tls: TranslationLanguageService;
   let platformFeatureService: PlatformFeatureService;
   let entityVoiceoversService: EntityVoiceoversService;
+  let stateEditorService: StateEditorService;
 
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
@@ -74,7 +75,6 @@ describe('Translation status service', () => {
       providers: [
         TranslationStatusService,
         TranslationLanguageService,
-        StateRecordedVoiceoversService,
         TranslationTabActiveModeService,
         ExplorationStatesService,
         GenerateContentIdService,
@@ -102,7 +102,7 @@ describe('Translation status service', () => {
     ess = TestBed.inject(ExplorationStatesService);
     ttams = TestBed.inject(TranslationTabActiveModeService);
     tls = TestBed.inject(TranslationLanguageService);
-    srvs = TestBed.inject(StateRecordedVoiceoversService);
+    stateEditorService = TestBed.inject(StateEditorService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
@@ -120,21 +120,6 @@ describe('Translation status service', () => {
         content: {
           html: '<p>This is first card.</p>',
           content_id: 'content_0',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_0: {},
-            default_outcome_1: {},
-            feedback_3: {
-              en: {
-                needs_update: false,
-                filename: 'filename1.mp3',
-                file_size_bytes: 43467,
-                duration_secs: 4.3,
-              },
-            },
-            feedback_2: {},
-          },
         },
         interaction: {
           answer_groups: [
@@ -217,13 +202,6 @@ describe('Translation status service', () => {
           html: '<p>This is second card</p>',
           content_id: 'content_5',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_5: {},
-            default_outcome_6: {},
-            feedback_7: {},
-          },
-        },
         interaction: {
           answer_groups: [
             {
@@ -283,18 +261,6 @@ describe('Translation status service', () => {
           html: 'Congratulations, you have finished!',
           content_id: 'content_8',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_8: {
-              en: {
-                needs_update: false,
-                filename: 'content-en-s86jb5zajs.mp3',
-                file_size_bytes: 38870,
-                duration_secs: 38.8,
-              },
-            },
-          },
-        },
         interaction: {
           answer_groups: [],
           solution: null,
@@ -332,6 +298,53 @@ describe('Translation status service', () => {
           },
         },
       });
+
+    let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+    let manualVoiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
+    let manualVoiceover3 = new Voiceover('c.mp3', 1000, false, 10.0);
+    let manualVoiceover4 = new Voiceover('d.mp3', 1000, false, 10.0);
+    let manualVoiceover5 = new Voiceover('e.mp3', 1000, false, 10.0);
+    let manualVoiceover6 = new Voiceover('f.mp3', 1000, false, 10.0);
+    let manualVoiceover7 = new Voiceover('g.mp3', 1000, false, 10.0);
+    let manualVoiceover8 = new Voiceover('h.mp3', 1000, false, 10.0);
+
+    let entityVoiceovers = new EntityVoiceovers(
+      'exp_id',
+      'exploration',
+      5,
+      'en-US',
+      {
+        content_0: {
+          manual: manualVoiceover1,
+        },
+        feedback_2: {
+          manual: manualVoiceover2,
+        },
+        feedback_3: {
+          manual: manualVoiceover3,
+        },
+        default_outcome_1: {
+          manual: manualVoiceover4,
+        },
+        content_5: {
+          manual: manualVoiceover5,
+        },
+        feedback_7: {
+          manual: manualVoiceover6,
+        },
+        default_outcome_6: {
+          manual: manualVoiceover7,
+        },
+        content_8: {
+          manual: manualVoiceover8,
+        },
+      }
+    );
+
+    entityVoiceoversService.init('exp_id', 'exploration', 5);
+    entityVoiceoversService.setLanguageCode('en');
+    entityVoiceoversService.setActiveLanguageAccentCode('en-US');
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
     tss.refresh();
   });
 
@@ -352,11 +365,13 @@ describe('Translation status service', () => {
       var statesNeedingAudioUpdate = tss.getAllStatesNeedUpdatewarning();
       // To check that initially no state contains audio that needs update.
       expect(Object.keys(statesNeedingAudioUpdate).length).toBe(0);
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
-      var value = srvs.displayed;
-      value.toggleNeedsUpdateAttribute('feedback_3', 'en');
-      srvs.saveDisplayedValue();
-      ess.saveRecordedVoiceovers('First', value);
+
+      const languageAccentCode = 'en-US';
+      const contentId = 'content_0';
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
+        languageAccentCode,
+        contentId
+      );
       tss.refresh();
       tss.getAllStateStatusColors();
 
@@ -491,7 +506,7 @@ describe('Translation status service', () => {
     ttams.activateVoiceoverMode();
     var explorationAudioNotAvailableCount =
       tss.getExplorationContentNotAvailableCount();
-    expect(explorationAudioNotAvailableCount).toBe(6);
+    expect(explorationAudioNotAvailableCount).toBe(0);
 
     ess.addState('Fourth', () => {});
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
@@ -500,7 +515,7 @@ describe('Translation status service', () => {
 
     explorationAudioNotAvailableCount =
       tss.getExplorationContentNotAvailableCount();
-    expect(explorationAudioNotAvailableCount).toBe(7);
+    expect(explorationAudioNotAvailableCount).toBe(1);
   });
 
   it(
@@ -509,9 +524,10 @@ describe('Translation status service', () => {
     () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
+      tss.refresh();
       var explorationTranslationNotAvailableCount =
         tss.getExplorationContentNotAvailableCount();
-      expect(explorationTranslationNotAvailableCount).toBe(6);
+      expect(explorationTranslationNotAvailableCount).toBe(7);
 
       ess.addState('Fourth', () => {});
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
@@ -530,33 +546,41 @@ describe('Translation status service', () => {
       'active state components',
     () => {
       ttams.activateVoiceoverMode();
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
+
       var activeStateComponentStatus =
         tss.getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
+      expect(activeStateComponentStatus).toBe(ALL_ASSETS_AVAILABLE_COLOR);
+
+      let entityVoiceovers =
+        entityVoiceoversService.getActiveEntityVoiceovers();
+      entityVoiceovers.removeVoiceover('feedback_2');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+      tss.refresh();
+
       activeStateComponentStatus =
         tss.getActiveStateComponentStatusColor('feedback');
       expect(activeStateComponentStatus).toBe(FEW_ASSETS_AVAILABLE_COLOR);
-      // To test changes after adding an audio translation to "content"
-      // in the first state.
-      srvs.displayed.addVoiceover('content_0', 'en', 'file.mp3', 1000, 1000);
-      srvs.saveDisplayedValue();
-      var value = srvs.displayed;
-      ess.saveRecordedVoiceovers('First', value);
+
+      stateEditorService.setActiveStateName('Second');
       activeStateComponentStatus =
         tss.getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
-      activeStateComponentStatus =
-        tss.getActiveStateComponentStatusColor('content');
-      expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      activeStateComponentStatus =
-        tss.getActiveStateComponentStatusColor('feedback');
-      expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      srvs.init('Third', ess.getRecordedVoiceoversMemento('Third'));
+
+      stateEditorService.setActiveStateName('Third');
+      tss.refresh();
       activeStateComponentStatus =
         tss.getActiveStateComponentStatusColor('content');
       expect(activeStateComponentStatus).toBe(ALL_ASSETS_AVAILABLE_COLOR);
+
+      entityVoiceovers = entityVoiceoversService.getActiveEntityVoiceovers();
+      entityVoiceovers.removeVoiceover('content_8');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+      tss.refresh();
+
+      activeStateComponentStatus =
+        tss.getActiveStateComponentStatusColor('content');
+      expect(activeStateComponentStatus).toBe(NO_ASSETS_AVAILABLE_COLOR);
     }
   );
 
@@ -566,7 +590,7 @@ describe('Translation status service', () => {
     () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
       tss.refresh();
 
       var activeStateComponentStatus =
@@ -609,17 +633,21 @@ describe('Translation status service', () => {
       'update',
     () => {
       ttams.activateVoiceoverMode();
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
       var activeStateComponentNeedsUpdateStatus =
         tss.getActiveStateComponentNeedsUpdateStatus('feedback');
       // To check that initially the state component "feedback" does not
       // contain audio that needs update.
       expect(activeStateComponentNeedsUpdateStatus).toBe(false);
-      var value = srvs.displayed;
-      // To test changes after changing "needs update" status of an audio.
-      value.toggleNeedsUpdateAttribute('feedback_3', 'en');
-      srvs.saveDisplayedValue();
-      ess.saveRecordedVoiceovers('First', value);
+
+      const languageAccentCode = 'en-US';
+      const contentId = 'feedback_2';
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
+        languageAccentCode,
+        contentId
+      );
+      tss.refresh();
+
       activeStateComponentNeedsUpdateStatus =
         tss.getActiveStateComponentNeedsUpdateStatus('feedback');
       // To check that the state component "feedback" contains audio that
@@ -634,7 +662,7 @@ describe('Translation status service', () => {
     () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
 
       var activeStateComponentNeedsUpdateStatus =
         tss.getActiveStateComponentNeedsUpdateStatus('feedback');
@@ -653,33 +681,34 @@ describe('Translation status service', () => {
       'of active state',
     () => {
       ttams.activateVoiceoverMode();
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
       var activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('content_0');
+      expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
+
+      let entityVoiceovers =
+        entityVoiceoversService.getActiveEntityVoiceovers();
+      entityVoiceovers.removeVoiceover('content_0');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+      tss.refresh();
+
+      activeStateContentIdStatusColor =
+        tss.getActiveStateContentIdStatusColor('content_0');
       expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
+
       activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('feedback_2');
-      expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
+      expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
       activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('feedback_3');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      var value = srvs.displayed;
-      // To test changes after adding an audio translation to "content"
-      // in the first state.
-      value.addVoiceover('content_0', 'en', 'file.mp3', 1000, 1000);
-      srvs.saveDisplayedValue();
-      ess.saveRecordedVoiceovers('First', value);
-      activeStateContentIdStatusColor =
-        tss.getActiveStateContentIdStatusColor('content_0');
-      expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
-      srvs.init('Second', ess.getRecordedVoiceoversMemento('Second'));
+
+      stateEditorService.setActiveStateName('Second');
       activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('content_5');
-      expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      activeStateContentIdStatusColor =
-        tss.getActiveStateContentIdStatusColor('feedback_7');
-      expect(activeStateContentIdStatusColor).toBe(NO_ASSETS_AVAILABLE_COLOR);
-      srvs.init('Third', ess.getRecordedVoiceoversMemento('Third'));
+      expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
+
+      stateEditorService.setActiveStateName('Third');
       activeStateContentIdStatusColor =
         tss.getActiveStateContentIdStatusColor('content_8');
       expect(activeStateContentIdStatusColor).toBe(ALL_ASSETS_AVAILABLE_COLOR);
@@ -692,6 +721,15 @@ describe('Translation status service', () => {
     () => {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
+
+      entityTranslationsService.languageCodeToLatestEntityTranslations.hi.updateTranslation(
+        'content_8',
+        TranslatedContent.createFromBackendDict({
+          content_value: '<p>This is a content.</p>',
+          content_format: 'html',
+          needs_update: false,
+        })
+      );
       tss.refresh();
 
       var activeStateContentIdStatusColor =
@@ -711,16 +749,18 @@ describe('Translation status service', () => {
       'state contentId',
     () => {
       ttams.activateVoiceoverMode();
-      srvs.init('First', ess.getRecordedVoiceoversMemento('First'));
+      stateEditorService.setActiveStateName('First');
       var activeStateContentIdNeedsUpdateStatus =
         tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3');
       // To check that initially the state content id "feedback" does not
       // contain audio that needs update.
       expect(activeStateContentIdNeedsUpdateStatus).toBe(false);
 
-      var value = srvs.displayed;
-      value.toggleNeedsUpdateAttribute('feedback_3', 'en');
-      srvs.saveDisplayedValue();
+      entityVoiceoversService.toggleManualVoiceoverByLanguageAccent(
+        'en-US',
+        'feedback_3'
+      );
+      tss.refresh();
       activeStateContentIdNeedsUpdateStatus =
         tss.getActiveStateContentIdNeedsUpdateStatus('feedback_3');
       // To check that the state content id "feedback" contains audio that

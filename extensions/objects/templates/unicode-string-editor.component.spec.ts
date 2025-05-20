@@ -36,7 +36,6 @@ describe('UnicodeStringEditorComponent', () => {
     }).compileComponents();
   }));
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     fixture = TestBed.createComponent(UnicodeStringEditorComponent);
     component = fixture.componentInstance;

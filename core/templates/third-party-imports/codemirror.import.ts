@@ -13,7 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview This file imports the ui.tree library.
+ * @fileoverview Loads scripts needed for codemirror.
  */
 
-require('static/ui-tree-2.22.6/dist/angular-ui-tree.min.js');
+window.CodeMirror = require('codemirror');
+
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/python/python';
+import 'codemirror/mode/yaml/yaml';
+import 'diff_match_patch';
+import 'codemirror/addon/merge/merge';
+import 'codemirror-v5.17.0/addon/merge/merge.css';
+import 'codemirror-v5.17.0/lib/codemirror.css';

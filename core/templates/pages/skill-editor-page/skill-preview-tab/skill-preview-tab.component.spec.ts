@@ -41,7 +41,6 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -157,8 +156,7 @@ describe('Skill Preview Tab Component', () => {
     ),
     [],
     null as unknown as RecordedVoiceovers,
-    '',
-    null as unknown as AudioTranslationLanguageService
+    ''
   );
 
   beforeEach(waitForAsync(() => {
@@ -294,8 +292,7 @@ describe('Skill Preview Tab Component', () => {
       ),
       [],
       null as unknown as RecordedVoiceovers,
-      '',
-      null as unknown as AudioTranslationLanguageService
+      ''
     );
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
@@ -328,8 +325,7 @@ describe('Skill Preview Tab Component', () => {
       ),
       [],
       null as unknown as RecordedVoiceovers,
-      '',
-      null as unknown as AudioTranslationLanguageService
+      ''
     );
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();

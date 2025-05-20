@@ -79,7 +79,9 @@ describe('Logged-out User', function () {
       CARD_NAME.REVISION_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and Revision content.

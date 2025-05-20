@@ -146,6 +146,31 @@ describe('Entity voiceovers service', () => {
     expect(retrievedLanguageAccentCodes).toEqual(['en-US']);
   });
 
+  it('should be able to mark voiceovers as needing update', () => {
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+    expect(
+      entityVoiceovers.voiceoversMapping.content0.manual.needsUpdate
+    ).toBeFalse();
+
+    entityVoiceoversService.markManualVoiceoverAsNeedingUpdate('content0');
+    expect(
+      entityVoiceovers.voiceoversMapping.content0.manual.needsUpdate
+    ).toBeTrue();
+  });
+
+  it('should be able to remove voiceovers for a content ID', () => {
+    entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+    expect(
+      Object.keys(entityVoiceovers.voiceoversMapping).includes('content0')
+    ).toBeTrue();
+
+    entityVoiceoversService.removeAllVoiceoversForContent('content0');
+
+    expect(
+      Object.keys(entityVoiceovers.voiceoversMapping).includes('content0')
+    ).toBeFalse();
+  });
+
   it('should be able to get all content ID to voiceovers mapping', () => {
     let manualVoiceover2: VoiceoverBackendDict = {
       filename: 'b.mp3',

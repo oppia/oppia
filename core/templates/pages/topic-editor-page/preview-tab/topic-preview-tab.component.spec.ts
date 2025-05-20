@@ -30,7 +30,7 @@ describe('Topic Preview Tab Component', () => {
   let componentInstance: TopicPreviewTabComponent;
   let testName = 'test_name';
   let mockUrl = 'mock_url';
-  let topicUrl = 'topicUrl';
+  let topicUrl = 'topic_1';
   let storySummaries = [
     new StorySummary(
       'id',
@@ -75,7 +75,7 @@ describe('Topic Preview Tab Component', () => {
     }
 
     getClassroomUrlFragment() {
-      return 'classroom_url';
+      return 'classroom_1';
     }
 
     getCanonicalStorySummaries() {
@@ -118,6 +118,8 @@ describe('Topic Preview Tab Component', () => {
 
   it('should initialize', () => {
     componentInstance.ngOnInit();
+    expect(componentInstance.classroomUrlFragment).toEqual('classroom_1');
+    expect(componentInstance.topicUrlFragment).toEqual('topic_1');
     expect(componentInstance.topicName).toEqual(testName);
     expect(componentInstance.subtopics).toEqual([]);
     expect(componentInstance.canonicalStorySummaries).toEqual(storySummaries);
