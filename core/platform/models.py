@@ -286,8 +286,8 @@ class _Gae(Platform):
         # based on the environment. Refer to the issue for implementation
         # details.
         from core.platform.speech_synthesis import (
-            azure_speech_synthesis_services)
-        return azure_speech_synthesis_services
+            dev_mode_speech_synthesis_services)
+        return dev_mode_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:

@@ -41,7 +41,6 @@ export class AudioPreloaderService {
   // The following property can be null, when there is no recently
   // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
-  public contentIdsToVoiceovers: {[contentIddd: string]: Voiceover[]} = {};
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,

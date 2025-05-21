@@ -291,6 +291,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return htmlString;
     }
     this.wrapped = true;
+    this.index = 1;
+    this.highlighIdToSentenceText = {};
+    this.previousHighlightedElementId = undefined;
 
     let languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode();

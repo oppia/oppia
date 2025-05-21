@@ -179,32 +179,6 @@ export class AutomaticVoiceoverHighlightService {
           ];
         start = 0.0;
       }
-
-      // If the current token is a punctuation in given language, then it marks
-      // as an end of sentence.
-      // if (this.punctuationsForCurrentLanguage.includes(token)) {
-      //   const highlightId = Object.keys(
-      //     this.highlightIdToSentenceWithoutSpacesMap
-      //   ).find(
-      //     highlightSentenceId =>
-      //       sentence.trim() ===
-      //       this.highlightIdToSentenceWithoutSpacesMap[highlightSentenceId]
-      //   );
-
-      //   this.sentenceHighlightIntervalList.push({
-      //     highlightSentenceId: highlightId,
-      //     startTimeInSecs:
-      //       minOffsetMsecs === Number.MAX_VALUE
-      //         ? 0
-      //         : Math.round(minOffsetMsecs / 1000),
-      //     endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
-      //   });
-
-      //   // Resetting variables for the next sentence.
-      //   sentence = '';
-      //   minOffsetMsecs = Number.MAX_VALUE;
-      //   maxOffsetMsecs = 0;
-      // }
     });
   }
 

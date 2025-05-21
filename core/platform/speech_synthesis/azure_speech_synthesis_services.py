@@ -378,7 +378,7 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = '71e15SqsbL9BjNbRcmK7YVztwe1w0QwslJX7AesMmkXwxs6oWAvPJQQJ99BCACGhslBXJ3w3AAAYACOGzRlz'
+    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY')
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')
