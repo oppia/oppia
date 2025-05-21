@@ -23,11 +23,13 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 from core import feconf
 from core import utils
+from core.constants import constants
+from core.domain import voiceover_services
 from core.platform import models
-
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -50,14 +52,10 @@ SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS = """
 """
 
 # A string template block representing the math content within the SSML.
-MATH_TEMPLATE_SSML_BLOCK = """
-    <say-as interpret-as="math">
-        %s
-    </say-as>
-"""
+MATH_TEMPLATE_SSML_BLOCK = """<say-as interpret-as="math">%s</say-as>"""
 
-# A string template block representing the non math content within the SSML.
-NON_MATH_TEMPLATE_SSML_BLOCK = """
+# A string template block representing the main content within the SSML.
+MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
     <p>
         %s
     </p>
@@ -66,7 +64,7 @@ NON_MATH_TEMPLATE_SSML_BLOCK = """
 # Standard arithmetic operators used to separate text with math expressions in
 # an SSML string.
 COMMONLY_USED_ARITHMETIC_EXPRESSIONS = [
-    '+', ' - ', '*', ' / ', '×', '÷']
+    '+', ' - ', '*', ' / ', '×', '÷', '=']
 
 
 class WordBoundaryCollection:
@@ -141,8 +139,117 @@ def get_azure_voicecode_from_language_accent_code(
     return voice_code
 
 
+def process_factorial_in_text(
+        text: str, math_symbol_pronounciations: Dict[str, str]) -> str:
+    """Process the text to convert factorial expressions into their
+    corresponding words or phrases.
+
+    Args:
+        text: str. The text to be processed for factorial expressions.
+        math_symbol_pronounciations: dict. The dictionary containing the
+            pronunciations of mathematical symbols.
+
+    Returns:
+        str. The processed text with factorial expressions replaced by their
+        corresponding words or phrases.
+    """
+    pronounciation = math_symbol_pronounciations['!'] + ' '
+    return re.sub(r'(\d+)!', pronounciation + r'\1', text)
+
+
+def process_superscript_in_text(
+        text: str, math_symbol_pronounciations: Dict[str, str]) -> str:
+    """Process the text to convert superscript characters into their
+    corresponding words or phrases.
+
+    Args:
+        text: str. The text to be processed for superscript characters.
+        math_symbol_pronounciations: dict. The dictionary containing the
+            pronunciations of mathematical symbols.
+
+    Returns:
+        str. The processed text with superscript characters replaced by their
+        corresponding words or phrases.
+    """
+    superscript_digits = {
+        '⁰': '0',
+        '¹': '1',
+        '²': '2',
+        '³': '3',
+        '⁴': '4',
+        '⁵': '5',
+        '⁶': '6',
+        '⁷': '7',
+        '⁸': '8',
+        '⁹': '9',
+    }
+    superscript_chars = list(superscript_digits.keys())
+    superscript_chars.append('^')
+
+    is_superscript_present = False
+    for char in superscript_chars:
+        if char in text:
+            is_superscript_present = True
+            break
+    if not is_superscript_present:
+        return text
+
+    result = ''
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char in superscript_digits:
+            number = ''
+            while i < len(text) and text[i] in superscript_digits:
+                number += superscript_digits[text[i]]
+                i += 1
+            result += '^%s' % str(number)
+            continue
+        result += char
+        i += 1
+
+    def get_pronounciation(superscript_chars: str) -> str:
+        """Get the pronunciation for the given superscript characters.
+
+        Args:
+            superscript_chars: str. The superscript characters to be
+                pronounced.
+
+        Returns:
+            str. The pronunciation of the superscript characters.
+        """
+        if superscript_chars == '^2':
+            return ' ' + math_symbol_pronounciations['^2']
+        elif superscript_chars == '^3':
+            return ' ' + math_symbol_pronounciations['^3']
+        return (
+            ' ' + math_symbol_pronounciations['^'] +
+            ' ' + superscript_chars[1:])
+
+    result = re.sub(
+        r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result)
+
+    return result
+
+
+def process_algebric_fraction(text: str) -> str:
+    """Transforms algebraic fractions in the text into a format with spaces
+    around slashes. For example, 'x/2' becomes 'x / 2'.
+
+    Args:
+        text: str. The input text containing algebraic fractions.
+
+    Returns:
+        str. The text with algebraic fractions reformatted to include spaces
+        around slashes.
+    """
+    text = re.sub(r'(\d+)/', r'\1 / ', text)
+    text = re.sub(r'/(\d+)', r' / \1', text)
+    return text
+
+
 def convert_plaintext_to_ssml_content(
-        plaintext: str, language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> str:
     """The method transforms the given plaintext into SSML format using the
     SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS.
@@ -162,13 +269,77 @@ def convert_plaintext_to_ssml_content(
     """
     content_list = plaintext.split(feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
-    main_ssml_content = ''
+    language_code = (
+        voiceover_services.get_language_code_from_language_accent_code(
+            language_accent_code))
 
+    math_symbol_pronounciations = (
+        constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            language_code, {}))
+
+    main_ssml_content = ''
     for content in content_list:
-        if is_mathematical_text(content):
-            main_ssml_content += (MATH_TEMPLATE_SSML_BLOCK % content)
-        else:
-            main_ssml_content += (NON_MATH_TEMPLATE_SSML_BLOCK % content)
+        # Updates the content to pronounce `-` correctly in the given language.
+        if ' - ' in content:
+            content = content.replace(
+                '-',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['-'])
+
+        # Update the content to pronounce `*` correctly in the given language.
+        if ' * ' in content:
+            content = content.replace(
+                '*',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['*'])
+
+        # Update the content to pronounce `×` correctly in the given language.
+        if '×' in content:
+            content = content.replace(
+                '×',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['×'])
+
+        # Update the content of algebraic fractions to contain spaces around
+        # the slashes.
+        content = process_algebric_fraction(content)
+
+        # Update the content to pronounce `/` correctly in the given language.
+        if ' / ' in content:
+            content = content.replace(
+                '/',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `÷` correctly in the given language.
+        if '÷' in content:
+            content = content.replace(
+                '÷',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['÷'])
+
+        # Update the content to pronounce `+` correctly in the given language.
+        if ' + ' in content:
+            content = content.replace(
+                '+',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['+'])
+
+        # Update the content to pronounce `=` correctly in the given language.
+        if ' = ' in content:
+            content = content.replace(
+                ' = ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronounciations['='])
+
+        # Update the content to pronounce factorials correctly in the given
+        # language.
+        content = process_factorial_in_text(
+            content, math_symbol_pronounciations)
+
+        # Update the content to pronounce superscripts correctly in the given
+        # language.
+        content = process_superscript_in_text(
+            content, math_symbol_pronounciations)
+
+        # Update the content to pronounce 'dash' for two or more underscores in
+        # the content.
+        content = re.sub(r'_{2,}', ' dash ', content)
+
+        main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,

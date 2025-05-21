@@ -26,7 +26,6 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
@@ -104,7 +103,6 @@ describe('oppiaInteractiveItemSelectionInput', function () {
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
     let recordedVoiceovers = new RecordedVoiceovers({});
-    let audioTranslation = {} as AudioTranslationLanguageService;
     displayedCard = new StateCard(
       'test_name',
       'content',
@@ -112,8 +110,7 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       interaction,
       [],
       recordedVoiceovers,
-      contentId,
-      audioTranslation
+      contentId
     );
   });
 
@@ -166,6 +163,17 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       expect(() => {
         component.getContentId();
       }).toThrowError('Content id is null');
+    });
+
+    it('should return content id correctly', () => {
+      component.choicesValue = [
+        {
+          html: 'choice 1',
+          _contentId: 'content0',
+        },
+      ] as SubtitledHtml[];
+
+      expect(component.getContentId()).toEqual('content0');
     });
 
     it(
