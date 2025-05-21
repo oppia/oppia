@@ -93,12 +93,6 @@ describe('Parameter Metadata Service', () => {
               content_id: 'content',
               html: '{{HtmlValue}}',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -167,12 +161,6 @@ describe('Parameter Metadata Service', () => {
             content: {
               content_id: 'content',
               html: 'content',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
             },
             param_changes: [],
             interaction: {
@@ -243,12 +231,6 @@ describe('Parameter Metadata Service', () => {
               content_id: 'content',
               html: 'content',
             },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
-            },
             param_changes: [],
             interaction: {
               confirmed_unclassified_answers: [],
@@ -317,12 +299,6 @@ describe('Parameter Metadata Service', () => {
             content: {
               content_id: 'content',
               html: 'content',
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-                default_outcome: {},
-              },
             },
             param_changes: [],
             interaction: {

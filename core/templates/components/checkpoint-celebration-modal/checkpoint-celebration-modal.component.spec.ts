@@ -38,7 +38,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 
@@ -88,12 +87,6 @@ const dummyExplorationBackendDict = {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -128,12 +121,6 @@ const dummyExplorationBackendDict = {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -208,7 +195,6 @@ describe('Checkpoint celebration modal component', function () {
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
@@ -225,7 +211,6 @@ describe('Checkpoint celebration modal component', function () {
         PlayerPositionService,
         UrlInterpolationService,
         InteractionObjectFactory,
-        AudioTranslationLanguageService,
         ExplorationPlayerStateService,
         {
           provide: WindowDimensionsService,
@@ -259,9 +244,6 @@ describe('Checkpoint celebration modal component', function () {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
@@ -328,8 +310,7 @@ describe('Checkpoint celebration modal component', function () {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 

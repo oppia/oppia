@@ -25,14 +25,12 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
@@ -43,7 +41,6 @@ describe('Content translation manager service', () => {
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
-  let atls: AudioTranslationLanguageService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
   let imagePreloaderService: ImagePreloaderService;
@@ -56,7 +53,6 @@ describe('Content translation manager service', () => {
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
-    atls = TestBed.inject(AudioTranslationLanguageService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
 
@@ -204,9 +200,7 @@ describe('Content translation manager service', () => {
           null
         ),
         interaction,
-        RecordedVoiceovers.createEmpty(),
-        'content',
-        atls
+        'content'
       )
     );
   });
@@ -408,9 +402,7 @@ describe('Content translation manager service', () => {
           null
         ),
         newInteraction,
-        RecordedVoiceovers.createEmpty(),
-        'content',
-        atls
+        'content'
       )
     );
 

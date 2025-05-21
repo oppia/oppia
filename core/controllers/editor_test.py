@@ -500,11 +500,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_9: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """),
         'State B': (
@@ -541,11 +536,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_10: {}
-    content_5: {}
-    default_outcome_6: {}
 solicit_answer_details: false
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
@@ -582,11 +572,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_2: {}
-    content_0: {}
-    default_outcome_1: {}
 solicit_answer_details: false
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -625,11 +610,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_9: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """)
 
@@ -2111,7 +2091,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 }]
             },
             csrf_token=csrf_token,
-            expected_status_int=500
+            expected_status_int=400
         )
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))

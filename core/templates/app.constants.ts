@@ -151,6 +151,9 @@ export const AppConstants = {
     EXPLANATION: 'worked_example_explanation',
   },
 
+  VOICEOVER_TYPE_AUTO: 'auto',
+  VOICEOVER_TYPE_MANUAL: 'manual',
+
   ACTION_TYPE_EXPLORATION_START: 'ExplorationStart',
   ACTION_TYPE_ANSWER_SUBMIT: 'AnswerSubmit',
   ACTION_TYPE_EXPLORATION_QUIT: 'ExplorationQuit',

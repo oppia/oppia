@@ -32,6 +32,11 @@ UNASSIGN_DAYS_THRESHOLD = 10
 REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 
 class IssueDict(TypedDict, total=False):
     """Dict representation of a GitHub issue."""
@@ -142,7 +147,6 @@ class GitHubService:
             f'{search_url}?q=repo:{self.repo_owner}/'
             f'{self.repo_name}+is:issue+state:open'
         )
-        print(url, 'is the url')
         response = requests.get(url, headers=self.rest_headers, timeout=10)
         if response is None:
             raise AssertionError('Received null res while fetching issues')
@@ -423,7 +427,7 @@ class IssueManager:
 
             if issue.number in issues_with_prs:
                 logging.info(
-                    'Skipping issue #%d: has open PR #%d',
+                    'Skipping issue #%d: has open PR #%s',
                     issue.number, issues_with_prs[issue.number]
                 )
                 continue
