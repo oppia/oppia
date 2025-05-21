@@ -65,6 +65,7 @@ This class must implement the following methods:
   `JobRunResult` objects for any validation errors found in the domain object.
 """
 
+
 class BaseValidationJob(base_jobs.JobBase):
     """Base class for all validation jobs."""
 
