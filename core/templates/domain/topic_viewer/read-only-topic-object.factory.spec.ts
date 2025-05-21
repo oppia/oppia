@@ -42,9 +42,9 @@ describe('Read only topic object Factory', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
       status: 'Published',
-      planned_publication_date_msecs: 100.0,
-      last_modified_msecs: 100.0,
-      first_publication_date_msecs: 200.0,
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
       unpublishing_reason: null,
     };
 
@@ -175,9 +175,9 @@ describe('Read only topic object Factory', () => {
         outline_is_finalized: false,
         thumbnail_bg_color: '#a33f40',
         status: 'Published',
-        planned_publication_date_msecs: 100.0,
-        last_modified_msecs: 100.0,
-        first_publication_date_msecs: 200.0,
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
         unpublishing_reason: null,
       }),
     ]);

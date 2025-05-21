@@ -21,12 +21,9 @@ import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
 import {Voiceover} from 'domain/exploration/voiceover.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {ContextService} from 'services/context.service';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
   providedIn: 'root',
@@ -44,14 +41,12 @@ export class AudioPreloaderService {
   // The following property can be null, when there is no recently
   // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
+  public contentIdsToVoiceovers: {[contentIddd: string]: Voiceover[]} = {};
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private computeGraphService: ComputeGraphService,
-    private contextService: ContextService,
-    private platformFeatureService: PlatformFeatureService,
-    private entityVoiceoversService: EntityVoiceoversService
+    private contextService: ContextService
   ) {}
 
   init(exploration: Exploration): void {
@@ -107,13 +102,6 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode =
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode();
-    // If the language code is not selected then there are no audio
-    // files available, so we directly return empty array.
-    if (languageCode === null) {
-      return [];
-    }
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
@@ -126,35 +114,22 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      if (this.isVoiceoverContributionWithAccentEnabled()) {
-        let contentIds = this.getAllContentIdsFromState(stateName) as string[];
-
-        for (let contentId of contentIds) {
-          let voiceovers = this.contentIdsToVoiceovers[contentId];
-
-          if (voiceovers === undefined) {
-            continue;
-          }
-
-          for (let voiceover of voiceovers) {
-            let filename = voiceover.filename;
-            if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
-              audioFilenamesInBfsOrder.push(voiceover.filename);
-            }
-          }
+      let contentIds = this.getAllContentIdsFromState(stateName) as string[];
+      for (let contentId of contentIds) {
+        let voiceovers = this.contentIdsToVoiceovers[contentId];
+        if (voiceovers === undefined) {
+          continue;
         }
-      } else {
-        let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
-        for (const voiceover of allVoiceovers[stateName]) {
-          audioFilenamesInBfsOrder.push(voiceover.filename);
+
+        for (let voiceover of voiceovers) {
+          let filename = voiceover.filename;
+          if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+            audioFilenamesInBfsOrder.push(voiceover.filename);
+          }
         }
       }
     }
     return audioFilenamesInBfsOrder;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getAllContentIdsFromState(stateName: string): string[] | undefined {

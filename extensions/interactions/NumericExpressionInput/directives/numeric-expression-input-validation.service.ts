@@ -122,7 +122,7 @@ export class NumericExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched ' +
                 "because it is preceded by an 'IsEquivalentTo' " +
-                'answer with a matching input.',
+                'answer with a matching input',
             });
           } else if (
             currentRuleType === 'MatchesExactlyWith' &&
@@ -142,7 +142,7 @@ export class NumericExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched ' +
                 "because it is preceded by a 'MatchesExactlyWith' " +
-                'answer with a matching input.',
+                'answer with a matching input',
             });
           }
         }

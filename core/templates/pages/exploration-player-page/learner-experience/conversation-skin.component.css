@@ -126,7 +126,7 @@ oppia-conversation-skin .supplemental-card-parent-container {
   margin-right: 10px;
 }
 
-oppia-conversation-skin .oppia-button-raised.md-raised {
+oppia-conversation-skin .oppia-button-raised.mat-raised-raised {
   align-items: center;
   background-color: #0d48a1;
   display: flex;

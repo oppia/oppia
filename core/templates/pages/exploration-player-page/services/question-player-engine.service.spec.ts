@@ -36,10 +36,8 @@ import {
   InteractionRulesService,
 } from './answer-classification.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Question player engine service ', () => {
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
@@ -158,15 +156,6 @@ describe('Question player engine service ', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 45,
       next_content_id_index: 5,
@@ -236,15 +225,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'en',
@@ -312,15 +292,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'br',
@@ -388,15 +359,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'ab',
@@ -413,9 +375,6 @@ describe('Question player engine service ', () => {
       imports: [HttpClientTestingModule],
     });
 
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     contextService = TestBed.inject(ContextService);
@@ -923,8 +882,7 @@ describe('Question player engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         answerClassificationResult.outcome.labelledAsCorrect = true;

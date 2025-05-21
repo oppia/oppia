@@ -325,6 +325,21 @@ class EntityVoiceovers:
         self.automated_voiceovers_audio_offsets_msecs[content_id] = (
             sentence_tokens_with_durations)
 
+    def mark_manual_voiceovers_as_needing_update(self, content_id: str) -> None:
+        """Marks the manual voiceover for the given content ID as needing
+        update.
+
+        Args:
+            content_id: str. The ID of the content for which the manual
+                voiceover is being marked.
+        """
+        if content_id not in self.voiceovers_mapping:
+            return
+        manual_voiceover = self.voiceovers_mapping[content_id][
+            feconf.VoiceoverType.MANUAL]
+        if manual_voiceover is not None:
+            manual_voiceover.needs_update = True
+
     @classmethod
     def create_empty(
         cls,

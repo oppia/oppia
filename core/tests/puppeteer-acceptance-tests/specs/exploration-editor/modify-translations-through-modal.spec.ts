@@ -109,7 +109,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.TEXT_QUESTION,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addHintToState(
       'It is closer to zero but not a positive number.'
     );
@@ -128,7 +130,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addSolutionToState(
       'minus',
       'Minus is the opposite of plus.',
@@ -203,7 +207,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.dismissTranslationTabWelcomeModal();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Content',
         'Content translation text'
       );
@@ -236,7 +240,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Interaction',
         'Interaction translation text'
       );
@@ -278,7 +282,7 @@ describe('Exploration Editor', function () {
         await explorationEditor.closeEditorNavigationDropdownOnMobile();
       }
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Hint',
         'Hint translation text'
       );
@@ -314,7 +318,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Solution',
         'Solution explanation translation text'
       );
@@ -353,13 +357,15 @@ describe('Exploration Editor', function () {
       );
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Feedback',
         'Response feedback translation text',
         1
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.editDefaultResponseFeedback('Feedback content.');
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Feedback content.'
+      );
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
         'de',

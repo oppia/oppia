@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Loads scripts needed for ui-codemirror.
+ * @fileoverview Loads scripts needed for codemirror.
  */
 
 window.CodeMirror = require('codemirror');

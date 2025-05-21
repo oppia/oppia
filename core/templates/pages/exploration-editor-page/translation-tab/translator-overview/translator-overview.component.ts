@@ -139,10 +139,6 @@ export class TranslatorOverviewComponent implements OnInit {
     );
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   changeActiveMode(modeName: string): void {
     if (modeName === this.VOICEOVER_MODE) {
       this.translationTabActiveModeService.activateVoiceoverMode();
@@ -190,6 +186,14 @@ export class TranslatorOverviewComponent implements OnInit {
       .getEntityTranslationsAsync(this.languageCode)
       .then(entityTranslations => {
         this.updateTranslationWithChangeList(entityTranslations);
+        this.translationLanguageService.setActiveLanguageCode(
+          this.languageCode
+        );
+        this.translationStatusService.refresh();
+        this.windowRef.nativeWindow.localStorage.setItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE,
+          this.languageCode
+        );
 
         this.entityVoiceoversService.setLanguageCode(this.languageCode);
         this.localStorageService.setLastSelectedLanguageAccentCode('');

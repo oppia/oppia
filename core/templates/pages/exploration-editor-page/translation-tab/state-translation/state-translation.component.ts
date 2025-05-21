@@ -20,7 +20,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {
   TRANSLATION_DATA_FORMAT_HTML,
   TRANSLATION_DATA_FORMAT_UNICODE,
@@ -131,10 +131,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   isVoiceoverContributionEnabled(): boolean {
     return this.platformFeatureService.status.EnableVoiceoverContribution
       .isEnabled;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

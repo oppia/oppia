@@ -6305,9 +6305,6 @@ export default {
       "solution": null
     },
     "param_changes": [],
-    "recorded_voiceovers": {
-      "voiceovers_mapping": {}
-    },
     "solicit_answer_details": false,
     "card_is_checkpoint": false
   },
