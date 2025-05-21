@@ -12,7 +12,12 @@
       </p>
       <p class="oppia-supported-language-pair-heading"
          *ngIf="languageAccentCodeIsPresent">
-        Supported language/accent pairs
+        <span class="language-accent-header">
+          Supported language/accent pairs
+        </span>
+        <span>
+          Supports autogeneration?
+        </span>
       </p>
     </div>
 
@@ -21,8 +26,26 @@
         <mat-list class="oppia-supported-language-list">
           <mat-list-item *ngFor="let languageAccentCodeToDescription of supportedLanguageAccentCodesToDescriptions | keyvalue">
             <div class="oppia-language-accent-list">
-              <span>
+              <span class="language-accent-description">
                 {{languageAccentCodeToDescription.value}}
+              </span>
+              <span class="language-accent-autogeneration-status">
+                <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
+                      matTooltip="This language accent does not support autogeneration functionality."
+                      matTooltipPosition="after">
+                  <span>No</span>
+                  <span>
+                    <mat-icon>info</mat-icon>
+                  </span>
+                </span>
+                <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)">
+                  <mat-select
+                    [ngModel]="isAutogenerationSupported(languageAccentCodeToDescription.key)"
+                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)">
+                    <mat-option value="Yes">Yes</mat-option>
+                    <mat-option value="No">No</mat-option>
+                  </mat-select>
+                </mat-form-field>
               </span>
               <button (click)="removeLanguageAccentCodeSupport(languageAccentCodeToDescription.key)"
                       mat-icon-button
@@ -124,6 +147,15 @@
 </mat-card>
 
 <style>
+  .language-accent-header {
+    margin-right: 23%;
+  }
+  .language-accent-autogeneration-status {
+    width: 20%;
+  }
+  .language-accent-description {
+    width: 30%;
+  }
   .table-container {
     max-height: 500px;
     overflow: auto;
@@ -186,9 +218,6 @@
     margin-left: 25px;
     padding-top: 20px;
     width: -webkit-fill-available;
-  }
-  .oppia-language-accent-list:hover {
-    background-color: #d0cdcd;
   }
   .oppia-first-card-bottom-buttons {
     display: flex;
