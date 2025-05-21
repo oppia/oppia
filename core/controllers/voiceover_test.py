@@ -114,6 +114,7 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+
 class EntityVoiceoversBulkHandlerTests(test_utils.GenericTestBase):
     """Test class to validate entity voiceovers bulk handler."""
 
