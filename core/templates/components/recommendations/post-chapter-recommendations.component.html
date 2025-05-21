@@ -56,8 +56,8 @@
     <div *ngIf="!practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
-          <title>Revision card</title>
-          <a [attr.href]="getRevisionTabUrl()">
+          <title>Study Guide</title>
+          <a [attr.href]="getStudyTabUrl()">
             <rect width="192"
                   height="150"
                   [attr.fill]="'#be563c'">
@@ -73,7 +73,7 @@
         </svg>
       </div>
       <p class="font-italic">
-        {{ 'I18N_END_CHAPTER_REVISION_TAB_TEXT' | translate }}
+        {{ 'I18N_END_CHAPTER_STUDY_GUIDE_TEXT' | translate }}
       </p>
     </div>
   </div>

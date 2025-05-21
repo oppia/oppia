@@ -263,7 +263,7 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/studyguide/<subtopic_url_fragment>' % # pylint: disable=line-too-long
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.SubtopicViewerPageAccessValidationHandler),
 
@@ -355,7 +355,7 @@ URLS = [
 
     get_redirect_route(
         r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/revision' %
+        r'/<topic_url_fragment>/studyguide' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler
     ),
@@ -1258,7 +1258,7 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
-        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/studyguide' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(

@@ -490,7 +490,7 @@ class SubtopicViewerPageAccessValidationHandlerTests(
 
     def test_any_user_can_access_subtopic_viewer_page(self) -> None:
         self.get_html_response(
-            '%s/can_access_subtopic_viewer_page/staging/name/revision/sub-url-frag-one' % # pylint: disable=line-too-long
+            '%s/can_access_subtopic_viewer_page/staging/name/studyguide/sub-url-frag-one' % # pylint: disable=line-too-long
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
 
