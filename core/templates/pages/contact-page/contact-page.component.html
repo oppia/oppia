@@ -17,6 +17,7 @@
           buttonText="{{ 'I18N_CONTACT_PAGE_DONATE_TODAY_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
+
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="Partner" src="assets/images/contact_page/Partner img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_PARTNER_HEADING' | translate"></h2>
@@ -27,6 +28,7 @@
           buttonText="{{ 'I18N_CONTACT_PAGE_BECOME_A_PARTNER_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
+
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="volunteer" src="assets/images/contact_page/Volunteer img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_VOLUNTEER_HEADING' | translate"></h2>
@@ -37,27 +39,38 @@
           buttonText="{{ 'I18N_CONTACT_PAGE_BECOME_A_VOLUNTEER_BUTTON' | translate }}">
         </oppia-primary-button>
       </div>
+
       <div class="oppia-contact-page-content" tabindex="0">
         <img id="other_inquiries" src="assets/images/contact_page/Other inquiries img.svg" alt="">
         <h2 [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_HEADING' | translate"></h2>
         <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_1' | translate"></p>
         <p [innerHTML]="'I18N_CONTACT_PAGE_OTHER_INQUIRIES_PARAGRAPH_2' | translate"></p>
+        <p>
+          <ng-container i18n="@@contactEmailText">
+            For other inquiries, feel free to email us at
+            <a class="oppia-contact-mail" href="mailto:admin@oppia.org">admin@oppia.org</a> or
+            <a class="oppia-contact-mail" href="mailto:press@oppia.org">press@oppia.org</a>.
+          </ng-container>
+        </p>
       </div>
     </div>
-
   </div>
 </div>
+
 <div class="oppia-footer-padding-contact-page-below-banner"></div>
+
 <style>
   oppia-contact-page-content img {
     height: 100px;
     width: 100px;
   }
 
-  /* :ng-deep is used to make the style class work for the class that is given to innerHTML
-     See this for context: stackoverflow.com/questions/44210786/style-not-working-for-innerhtml-in-angular/44215795#44215795 */
-  /* stylelint-disable selector-pseudo-element-no-unknown */
   ::ng-deep .oppia-contact-mail {
+    text-decoration: underline;
+  }
+
+  .oppia-contact-mail:hover {
+    color: #0056b3;
     text-decoration: underline;
   }
 
@@ -118,7 +131,6 @@
   .oppia-contact-page-content p {
     margin: 20px 23px 50px 23px;
     text-align: center;
-
   }
 
   :host {

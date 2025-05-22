@@ -1892,4 +1892,6 @@
     "I18N_WARNING_MODAL_TITLE": "Warning!",
     "I18N_WORKED_EXAMPLE": "Worked Example",
     "I18N_YES": "Yes"
+    "I18N_CONTACT_PAGE_OTHER_INQUIRIES_TEXT": "For other inquiries, feel free to email us at <a class='oppia-contact-mail' href='mailto:admin@oppia.org'>admin@oppia.org</a> or <a class='oppia-contact-mail' href='mailto:press@oppia.org'>press@oppia.org</a>."
+
 }
