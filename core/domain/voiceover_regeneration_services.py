@@ -165,7 +165,6 @@ def synthesize_voiceover_for_html_string(
             feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
         )
     )
-    cached_model = None
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
     is_cached_model_used_for_voiceovers = False
