@@ -261,6 +261,10 @@ class EntityVoiceovers:
             voiceovers_mapping: Voiceover. The voiceover instance to be added to
                 the entity voiceovers object.
         """
+
+        if content_id not in self.voiceovers_mapping:
+            self.add_new_content_id_without_voiceovers(content_id)
+
         self.voiceovers_mapping[content_id][voiceover_type] = voiceovers_mapping
 
     def remove_voiceover(
@@ -300,6 +304,27 @@ class EntityVoiceovers:
                 feconf.VoiceoverType.AUTO] is None
         )
 
+    def add_automated_voiceovers_audio_offsets(
+        self,
+        content_id: str,
+        sentence_tokens_with_durations: List[Dict[str, Union[str, float]]]
+    ) -> None:
+        """Adds the audio offsets for automated voiceovers to the entity
+        voiceover instance.
+
+        Args:
+            content_id: str. The ID of the content for which the audio offsets
+                are being added.
+            sentence_tokens_with_durations: list(dict). A list of dictionaries
+                where each dictionary includes 'token' (a word or punctuation
+                from the content) and 'audio_offset_msecs' (its time offset in
+                milliseconds). This field only applies to automated voiceovers
+                synthesized from Cloud and does not include offsets for manual
+                voiceovers.
+        """
+        self.automated_voiceovers_audio_offsets_msecs[content_id] = (
+            sentence_tokens_with_durations)
+
     def mark_manual_voiceovers_as_needing_update(self, content_id: str) -> None:
         """Marks the manual voiceover for the given content ID as needing
         update.
@@ -323,7 +348,18 @@ class EntityVoiceovers:
         entity_version: int,
         language_accent_code: str
     ) -> EntityVoiceovers:
-        """Creates a new, empty EntityVoiceovers object."""
+        """Creates a new, empty EntityVoiceovers instance.
+
+        Args:
+            entity_id: str. The ID of the corresponding entity.
+            entity_type: str. The type of the corresponding entity.
+            entity_version: int. The version of the corresponding entity.
+            language_accent_code: str. The language-accent code in which
+                the voiceovers are stored.
+
+        Returns:
+            EntityVoiceovers. The new, empty EntityVoiceovers instance.
+        """
         return cls(
             entity_id=entity_id,
             entity_type=entity_type,

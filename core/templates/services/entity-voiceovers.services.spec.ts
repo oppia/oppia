@@ -50,6 +50,7 @@ describe('Entity voiceovers service', () => {
     let contentIdToVoiceoversMapping = {
       content0: {
         manual: manualVoiceover,
+        auto: undefined,
       },
     };
     let entityVoiceoversBackendDict = {
@@ -58,6 +59,7 @@ describe('Entity voiceovers service', () => {
       entity_version: 1,
       language_accent_code: 'en-US',
       voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {},
     };
     entityVoiceovers = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -178,17 +180,37 @@ describe('Entity voiceovers service', () => {
       needs_update: false,
       duration_secs: 10.0,
     };
+    let automaticVoiceover2: VoiceoverBackendDict = {
+      filename: 'c.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
     let contentIdToVoiceoversMapping = {
       content0: {
         manual: manualVoiceover2,
+        auto: automaticVoiceover2,
       },
     };
+
+    let contentIdToVoiceoversAudioOffsetsMsecsBackendDict = {
+      content0: [
+        {token: 'This', audio_offset_msecs: 0.0},
+        {token: 'is', audio_offset_msecs: 100.0},
+        {token: 'from', audio_offset_msecs: 200.0},
+        {token: 'cached', audio_offset_msecs: 300.0},
+        {token: 'model', audio_offset_msecs: 400.0},
+      ],
+    };
+
     let entityVoiceoversBackendDict = {
       entity_id: 'exp_1',
       entity_type: 'exploration',
       entity_version: 1,
       language_accent_code: 'en-IN',
       voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs:
+        contentIdToVoiceoversAudioOffsetsMsecsBackendDict,
     };
     let entityVoiceovers2 = EntityVoiceovers.createFromBackendDict(
       entityVoiceoversBackendDict
@@ -202,9 +224,18 @@ describe('Entity voiceovers service', () => {
 
     let voiceover1 = Voiceover.createFromBackendDict(manualVoiceover);
     let voiceover2 = Voiceover.createFromBackendDict(manualVoiceover2);
+    let voiceover3 = Voiceover.createFromBackendDict(automaticVoiceover2);
 
     expect(retrievedContentIdToEntityVoiceovers).toEqual({
-      content0: [voiceover1, voiceover2],
+      content0: [voiceover1, voiceover2, voiceover3],
     });
+  });
+
+  it('should verify if entity voiceovers are loaded', () => {
+    entityVoiceoversService.entityVoiceoversLoaded = false;
+    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeFalse();
+
+    entityVoiceoversService.entityVoiceoversLoaded = true;
+    expect(entityVoiceoversService.isEntityVoiceoversLoaded()).toBeTrue();
   });
 });
