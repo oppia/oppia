@@ -117,7 +117,9 @@ describe('Exploration Editor', function () {
       '',
       false
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addHintToState(
       'It is closer to zero but not a positive number.'
     );

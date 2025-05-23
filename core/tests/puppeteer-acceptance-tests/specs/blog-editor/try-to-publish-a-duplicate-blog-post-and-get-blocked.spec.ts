@@ -63,6 +63,9 @@ describe('Blog Editor', function () {
 
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.createNewBlogPostWithTitle('Test-Blog');
+      // Navigate to bottom of page, to ensure screenshots are taken from same
+      // positions before comparing them.
+      await blogPostEditor.scrollToBottomOfPage();
       await blogPostEditor.expectScreenshotToMatch(
         'blogEditorPageWithErrorMessageForDuplicateBlogPostTitle',
         __dirname

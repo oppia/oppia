@@ -19,9 +19,9 @@
 import {TestBed} from '@angular/core/testing';
 
 import {
-  AnswerGroupObjectFactory,
+  AnswerGroup,
   AnswerGroupBackendDict,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {
@@ -34,7 +34,7 @@ import {
   SolutionBackendDict,
   SolutionObjectFactory,
 } from 'domain/exploration/SolutionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {
@@ -44,7 +44,6 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
@@ -57,7 +56,6 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
@@ -229,12 +227,46 @@ describe('Interaction object factory', () => {
       id: 'TextInput',
       solution: solutionDict,
     };
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    let testInteraction = iof.createFromBackendDict(interactionDict);
+    let contentIdToHtml = testInteraction.getContentIdToContents();
 
-    let contentIdToHtml = testInteraction.getContentIdToHtml();
     expect(contentIdToHtml).toEqual({
       outcome_1: 'Good answer',
       default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_placeholder_0: 'Enter text',
+    });
+
+    testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        choices: {
+          value: [
+            {
+              content_id: 'ca_choices',
+              html: '<p>first</p>',
+            },
+          ],
+        },
+        allowMultipleItemsInSamePosition: {value: true},
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'DragAndDropSortInput',
+      solution: solutionDict,
+    });
+
+    contentIdToHtml = testInteraction.getContentIdToContents();
+    expect(contentIdToHtml).toEqual({
+      outcome_1: 'Good answer',
+      default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_choices: '<p>first</p>',
     });
 
     let contentId = testInteraction.getContentIdForMatchingHtml('Good answer');
@@ -618,7 +650,7 @@ describe('Interaction object factory', () => {
       tagged_skill_misconception_id: 'skill_id-1',
     };
     expect(testInteraction.answerGroups).toEqual([
-      agof.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -639,7 +671,7 @@ describe('Interaction object factory', () => {
         'TextInput'
       ),
     ]);
-    const newAnswerGroup = agof.createFromBackendDict(
+    const newAnswerGroup = AnswerGroup.createFromBackendDict(
       newAnswerGroupBackendDict,
       'TextInput'
     );

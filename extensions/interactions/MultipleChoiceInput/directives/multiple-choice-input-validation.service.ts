@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
   BaseInteractionValidationService,
@@ -150,7 +150,7 @@ export class MultipleChoiceInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         });
       }
     }

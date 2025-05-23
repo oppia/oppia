@@ -145,24 +145,6 @@ describe('Question Editor Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'filename1.mp3',
-                file_size_bytes: 100000,
-                needs_update: false,
-                duration_secs: 10.0,
-              },
-              hi: {
-                filename: 'filename2.mp3',
-                file_size_bytes: 11000,
-                needs_update: false,
-                duration_secs: 0.11,
-              },
-            },
-          },
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
