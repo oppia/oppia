@@ -74,6 +74,7 @@ describe('Automatic voiceover highlight service', () => {
       automaticVoiceoverHighlightService.highlightIdToSentenceWithoutSpacesMap
     ).toEqual({});
 
+    automaticVoiceoverHighlightService.languageCode = 'en';
     automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap(
       highlightIdToSentenceMap
     );
@@ -131,7 +132,7 @@ describe('Automatic voiceover highlight service', () => {
       highlightId2:
         'The winner would be able to exchange their points for a grand prize to take home!',
     };
-
+    automaticVoiceoverHighlightService.languageCode = 'en';
     automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
       automatedVoiceoversAudioOffsetsMsecs
     );
@@ -139,7 +140,6 @@ describe('Automatic voiceover highlight service', () => {
       highlightIdToSentenceMap
     );
     automaticVoiceoverHighlightService.setActiveContentId('content0');
-    automaticVoiceoverHighlightService.punctuationsForCurrentLanguage = '.!?';
 
     automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
 
@@ -192,5 +192,137 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(6)
     ).toBe('highlightId3');
+  });
+
+  it('should pronounce correctly for superscripts', () => {
+    // Mock AppConstants for math symbol pronunciations.
+    const mathSymbolPronounciations = {
+      '^2': 'squared',
+      '^3': 'cubed',
+      '^': 'to the power of',
+    };
+
+    let content = 'x^2 + y^2 = z^3';
+    let expected = 'x squared + y squared = z cubed';
+    expect(
+      automaticVoiceoverHighlightService.processSuperscriptInText(
+        content,
+        mathSymbolPronounciations
+      )
+    ).toBe(expected);
+
+    content = 'x² + 5 = z⁴';
+    expected = 'x squared + 5 = z to the power of 4';
+    expect(
+      automaticVoiceoverHighlightService.processSuperscriptInText(
+        content,
+        mathSymbolPronounciations
+      )
+    ).toBe(expected);
+
+    content = 'x + 5  = 10';
+    expected = 'x + 5  = 10';
+    expect(
+      automaticVoiceoverHighlightService.processSuperscriptInText(
+        content,
+        mathSymbolPronounciations
+      )
+    ).toBe(expected);
+  });
+
+  it('should transform algebraic fractions correctly', () => {
+    let content = 'Calculate x: x/4 = 2.';
+    let expected = 'Calculate x: x / 4 = 2.';
+    expect(
+      automaticVoiceoverHighlightService.processAlgebraicFraction(content)
+    ).toBe(expected);
+
+    content = 'Calculate x: 4/x = 2.';
+    expected = 'Calculate x: 4 / x = 2.';
+    expect(
+      automaticVoiceoverHighlightService.processAlgebraicFraction(content)
+    ).toBe(expected);
+
+    content = 'y/2 + 3/x = 5.';
+    expected = 'y / 2 + 3 / x = 5.';
+    expect(
+      automaticVoiceoverHighlightService.processAlgebraicFraction(content)
+    ).toBe(expected);
+
+    content = 'No fractions here.';
+    expected = 'No fractions here.';
+    expect(
+      automaticVoiceoverHighlightService.processAlgebraicFraction(content)
+    ).toBe(expected);
+  });
+
+  it('should pronounce correctly for factorials', () => {
+    const mathSymbolPronounciations = {
+      '!': 'factorial of',
+    };
+
+    let content = '5! = 120';
+    let expected = 'factorial of 5 = 120';
+    expect(
+      automaticVoiceoverHighlightService.processFactorialInText(
+        content,
+        mathSymbolPronounciations
+      )
+    ).toBe(expected);
+
+    content = '3! + 4! = 30';
+    expected = 'factorial of 3 + factorial of 4 = 30';
+    expect(
+      automaticVoiceoverHighlightService.processFactorialInText(
+        content,
+        mathSymbolPronounciations
+      )
+    ).toBe(expected);
+  });
+
+  describe('transformMathSentenceContainingAudioSpecficWords', () => {
+    beforeEach(() => {
+      automaticVoiceoverHighlightService.languageCode = 'en';
+    });
+
+    it('should transform math sentence with minus, plus, times, divided by, equals', () => {
+      const sentence = '3 - 2 + 1 * 5 / 2 ÷ 2 = x';
+      const expected =
+        '3 minus 2 plus 1 times 5 divided by 2 divided by 2 equals x';
+      expect(
+        automaticVoiceoverHighlightService.transformMathSentenceContainingAudioSpecficWords(
+          sentence
+        )
+      ).toBe(expected);
+    });
+
+    it('should transform math sentence with multiplication symbols', () => {
+      const sentence = '2 × 3 * 4';
+      const expected = '2 times 3 times 4';
+      expect(
+        automaticVoiceoverHighlightService.transformMathSentenceContainingAudioSpecficWords(
+          sentence
+        )
+      ).toBe(expected);
+    });
+
+    it('should transform math sentence with multiple math symbols and dashes', () => {
+      const sentence = 'a__b = g';
+      const expected = 'a dash b equals g';
+      expect(
+        automaticVoiceoverHighlightService.transformMathSentenceContainingAudioSpecficWords(
+          sentence
+        )
+      ).toBe(expected);
+    });
+
+    it('should not change sentence without math symbols', () => {
+      const sentence = 'This is a simple sentence.';
+      expect(
+        automaticVoiceoverHighlightService.transformMathSentenceContainingAudioSpecficWords(
+          sentence
+        )
+      ).toBe(sentence);
+    });
   });
 });

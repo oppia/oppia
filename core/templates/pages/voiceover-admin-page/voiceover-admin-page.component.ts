@@ -268,21 +268,13 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
     modalRef.result.then(
       () => {
-        if (supportsAutogeneration) {
-          this.languageCodesMapping[languageCode][languageAccentCode] = true;
-        } else {
-          this.languageCodesMapping[languageCode][languageAccentCode] = false;
-        }
+        this.languageCodesMapping[languageCode][languageAccentCode] =
+          supportsAutogeneration;
         this.saveUpdatedLanguageAccentSupport();
       },
       () => {
-        if (supportsAutogeneration) {
-          this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
-            false;
-        } else {
-          this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
-            true;
-        }
+        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+          !supportsAutogeneration;
       }
     );
   }

@@ -33,7 +33,6 @@ interface SentenceHighlightInterval {
 })
 export class AutomaticVoiceoverHighlightService {
   public languageCode!: string;
-  public punctuationsForCurrentLanguage!: string;
   public activeContentId!: string;
 
   public highlightIdToSentenceMap: {[highlightId: string]: string} = {};
@@ -47,11 +46,6 @@ export class AutomaticVoiceoverHighlightService {
   constructor(private localStorageService: LocalStorageService) {
     this.languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode();
-
-    this.punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        this.languageCode
-      ];
   }
 
   setActiveContentId(contentId: string): void {
@@ -84,6 +78,80 @@ export class AutomaticVoiceoverHighlightService {
     }
   }
 
+  processSuperscriptInText(
+    text: string,
+    mathSymbolPronounciations: {[key: string]: string}
+  ): string {
+    const superscriptDigits: {[key: string]: string} = {
+      '⁰': '0',
+      '¹': '1',
+      '²': '2',
+      '³': '3',
+      '⁴': '4',
+      '⁵': '5',
+      '⁶': '6',
+      '⁷': '7',
+      '⁸': '8',
+      '⁹': '9',
+    };
+    const superscriptChars = Object.keys(superscriptDigits).concat('^');
+
+    let isSuperscriptPresent = superscriptChars.some(char =>
+      text.includes(char)
+    );
+    if (!isSuperscriptPresent) {
+      return text;
+    }
+
+    let result = '';
+    let i = 0;
+    while (i < text.length) {
+      const char = text[i];
+      if (superscriptDigits[char]) {
+        let number = '';
+        while (i < text.length && superscriptDigits[text[i]]) {
+          number += superscriptDigits[text[i]];
+          i++;
+        }
+        result += '^' + number;
+        continue;
+      }
+      result += char;
+      i++;
+    }
+
+    const getPronounciation = (superscriptChars: string): string => {
+      if (superscriptChars === '^2') {
+        return ' ' + mathSymbolPronounciations['^2'];
+      } else if (superscriptChars === '^3') {
+        return ' ' + mathSymbolPronounciations['^3'];
+      }
+      return (
+        ' ' + mathSymbolPronounciations['^'] + ' ' + superscriptChars.slice(1)
+      );
+    };
+
+    result = result.replace(/\^(\d+)/g, match => getPronounciation(match));
+
+    return result;
+  }
+
+  processFactorialInText(
+    text: string,
+    mathSymbolPronounciations: {[key: string]: string}
+  ): string {
+    const pronunciation = mathSymbolPronounciations['!'] + ' ';
+    return text.replace(/(\d+)!/g, (_match, p1) => pronunciation + p1);
+  }
+
+  processAlgebraicFraction(text: string): string {
+    // Transforms algebraic fractions in the text into a format with spaces
+    // around slashes. For example, 'x/2' becomes 'x / 2'.
+    text = text.replace(/(\d+)\//g, '$1 / ');
+    text = text.replace(/\/(\d+)/g, ' / $1');
+    return text;
+  }
+
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
     let mathSymbolPronounciations =
       AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS[
@@ -109,6 +177,8 @@ export class AutomaticVoiceoverHighlightService {
       sentence = sentence.replace(/×/g, mathSymbolPronounciations['×']);
     }
 
+    sentence = this.processAlgebraicFraction(sentence);
+
     if (sentence.includes(' / ')) {
       sentence = sentence.replace(/\//g, mathSymbolPronounciations['÷']);
     }
@@ -118,8 +188,15 @@ export class AutomaticVoiceoverHighlightService {
     }
 
     if (sentence.includes(' = ')) {
-      sentence = sentence.replace(/ = /g, mathSymbolPronounciations['=']);
+      sentence = sentence.replace(/=/g, mathSymbolPronounciations['=']);
     }
+
+    sentence = this.processFactorialInText(sentence, mathSymbolPronounciations);
+
+    sentence = this.processSuperscriptInText(
+      sentence,
+      mathSymbolPronounciations
+    );
 
     sentence = sentence.replace(/_{2,}/g, ' dash ');
 
@@ -130,9 +207,8 @@ export class AutomaticVoiceoverHighlightService {
     const audioOffsets =
       this.automatedVoiceoversAudioOffsetsMsecs[this.activeContentId];
 
-    let sentence = '';
-    let minOffsetMsecs = Number.MAX_VALUE;
-    let maxOffsetMsecs = 0;
+    let minOffsetMsecs = 0.0;
+    let maxOffsetMsecs = 0.0;
     this.sentenceHighlightIntervalList = [];
 
     let hightlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
@@ -141,31 +217,27 @@ export class AutomaticVoiceoverHighlightService {
     let currentSentence =
       this.highlightIdToSentenceWithoutSpacesMap[currentHighlightId as string];
 
-    let start, end;
-    start = 0.0;
+    minOffsetMsecs = 0.0;
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       const token = tokenToAudioOffsetMsecs.token;
       const audioOffsetMsecs = tokenToAudioOffsetMsecs.audioOffsetMsecs;
-      if (start === 0.0) {
-        start = audioOffsetMsecs;
-      }
 
-      sentence += token;
-      minOffsetMsecs = Math.min(minOffsetMsecs, audioOffsetMsecs);
-      maxOffsetMsecs = Math.max(maxOffsetMsecs, audioOffsetMsecs);
+      if (minOffsetMsecs === 0.0) {
+        minOffsetMsecs = audioOffsetMsecs;
+      }
 
       currentSentence = currentSentence.startsWith(token)
         ? currentSentence.slice(token.length)
         : currentSentence;
 
       if (currentSentence.length === 0) {
-        end = audioOffsetMsecs;
+        maxOffsetMsecs = audioOffsetMsecs;
 
         this.sentenceHighlightIntervalList.push({
           highlightSentenceId: currentHighlightId,
-          startTimeInSecs: Math.round(start / 1000),
-          endTimeInSecs: Math.round(end / 1000),
+          startTimeInSecs: Math.round(minOffsetMsecs / 1000),
+          endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
         });
 
         currentHighlightId = hightlightIds.shift();
@@ -177,7 +249,7 @@ export class AutomaticVoiceoverHighlightService {
           this.highlightIdToSentenceWithoutSpacesMap[
             currentHighlightId as string
           ];
-        start = 0.0;
+        minOffsetMsecs = 0.0;
       }
     });
   }

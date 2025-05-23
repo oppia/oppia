@@ -134,20 +134,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   representations. For example, it converts \frac{a}{b} to a/b.
   */
   parseAndConvertLatex(latexExpr: string): string {
-    try {
-      const readable = latexExpr
-        .replace(/\\frac{(.+?)}{(.+?)}/g, '$1/$2')
-        .replace(/\\times/g, '×')
-        .replace(/\\div/g, '÷')
-        .replace(/\\cdot/g, '·')
-        .replace(/\\sqrt{(.+?)}/g, '√($1)')
-        .replace(/\\left|\\right/g, '')
-        .replace(/\\[a-zA-Z]+/g, '')
-        .replace(/{|}/g, '');
-      return readable;
-    } catch (error) {
-      return '';
-    }
+    const readable = latexExpr
+      .replace(/\\frac{(.+?)}{(.+?)}/g, '$1/$2')
+      .replace(/\\times/g, '×')
+      .replace(/\\div/g, '÷')
+      .replace(/\\cdot/g, '·')
+      .replace(/\\sqrt{(.+?)}/g, '√($1)')
+      .replace(/\\left|\\right/g, '')
+      .replace(/\\[a-zA-Z]+/g, '')
+      .replace(/{|}/g, '');
+    return readable;
   }
 
   // The method returns the readable text from the node.
@@ -421,53 +417,57 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // The below lines runs on every 200ms to highlight the sentence being
     // played in the audio player.
     setInterval(() => {
-      // Highlight only when the audio is playing.
-      if (this.audioPlayerService.isPlaying()) {
-        let previousHighlightedElement = document.getElementById(
-          this.previousHighlightedElementId
-        );
-
-        let currentElementIdToHighlight =
-          this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
-            this.audioPlayerService.getCurrentTimeInSecs()
-          );
-
-        // If previous highlighted sentence and current sentence are same, then
-        // do not highlight the sentence again.
-        if (
-          previousHighlightedElement?.textContent ===
-          this.highlighIdToSentenceText[currentElementIdToHighlight]
-        ) {
-          return;
-        }
-
-        // Removes the highlight background from the previous sentence.
-        if (previousHighlightedElement) {
-          previousHighlightedElement.style.backgroundColor = '';
-        }
-
-        let currentElementToHighlight = document.getElementById(
-          currentElementIdToHighlight
-        );
-
-        // Highlights the current sentence being played in the audio player.
-        if (currentElementToHighlight) {
-          currentElementToHighlight.style.backgroundColor =
-            this.backgroundColorOfHighlightedSentence;
-
-          this.previousHighlightedElementId = currentElementIdToHighlight;
-        }
-      } else {
-        // Removes the highlight from the previous sentence when the audio is
-        // paused.
-        let previousHighlightedElement = document.getElementById(
-          this.previousHighlightedElementId
-        );
-        if (previousHighlightedElement) {
-          previousHighlightedElement.style.backgroundColor = '';
-        }
-      }
+      this.highlightSentenceDuringVoiceoverPlay();
     }, 200);
+  }
+
+  highlightSentenceDuringVoiceoverPlay(): void {
+    // Highlight only when the audio is playing.
+    if (this.audioPlayerService.isPlaying()) {
+      let previousHighlightedElement = document.getElementById(
+        this.previousHighlightedElementId
+      );
+
+      let currentElementIdToHighlight =
+        this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
+          this.audioPlayerService.getCurrentTimeInSecs()
+        );
+
+      // If previous highlighted sentence and current sentence are same, then
+      // do not highlight the sentence again.
+      if (
+        previousHighlightedElement?.textContent ===
+        this.highlighIdToSentenceText[currentElementIdToHighlight]
+      ) {
+        return;
+      }
+
+      // Removes the highlight background from the previous sentence.
+      if (previousHighlightedElement) {
+        previousHighlightedElement.style.backgroundColor = '';
+      }
+
+      let currentElementToHighlight = document.getElementById(
+        currentElementIdToHighlight
+      );
+
+      // Highlights the current sentence being played in the audio player.
+      if (currentElementToHighlight) {
+        currentElementToHighlight.style.backgroundColor =
+          this.backgroundColorOfHighlightedSentence;
+
+        this.previousHighlightedElementId = currentElementIdToHighlight;
+      }
+    } else {
+      // Removes the highlight from the previous sentence when the audio is
+      // paused.
+      let previousHighlightedElement = document.getElementById(
+        this.previousHighlightedElementId
+      );
+      if (previousHighlightedElement) {
+        previousHighlightedElement.style.backgroundColor = '';
+      }
+    }
   }
 
   getActiveContentId(): string {
@@ -560,6 +560,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.automaticVoiceoverHighlightService.setActiveContentId(
           activeContentId
         );
+        this.automaticVoiceoverHighlightService.languageCode =
+          this.localStorageService.getLastSelectedTranslationLanguageCode();
         this.automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap(
           this.highlighIdToSentenceText
         );
