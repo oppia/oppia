@@ -45,7 +45,7 @@ export class AutomaticVoiceoverHighlightService {
 
   constructor(private localStorageService: LocalStorageService) {
     this.languageCode =
-      this.localStorageService.getLastSelectedTranslationLanguageCode();
+      this.localStorageService.getLastSelectedTranslationLanguageCode() as string;
   }
 
   setActiveContentId(contentId: string): void {
@@ -153,10 +153,23 @@ export class AutomaticVoiceoverHighlightService {
   }
 
   transformMathSentenceContainingAudioSpecficWords(sentence: string): string {
-    let mathSymbolPronounciations =
-      AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS[
-        this.languageCode
-      ];
+    let mathSymbolPronounciations: {[key: string]: string} = {};
+    if (
+      AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.hasOwnProperty(
+        this.languageCode as string
+      )
+    ) {
+      mathSymbolPronounciations =
+        AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS[
+          this
+            .languageCode as keyof typeof AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS
+        ];
+    } else {
+      mathSymbolPronounciations =
+        AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS[
+          AppConstants.DEFAULT_LANGUAGE_CODE as keyof typeof AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS
+        ];
+    }
 
     // This logic is similar to the implementation in
     // core/platform/azure_speech_synthesis/azure_speech_synthesis_services.py.
@@ -235,7 +248,7 @@ export class AutomaticVoiceoverHighlightService {
         maxOffsetMsecs = audioOffsetMsecs;
 
         this.sentenceHighlightIntervalList.push({
-          highlightSentenceId: currentHighlightId,
+          highlightSentenceId: currentHighlightId as string,
           startTimeInSecs: Math.round(minOffsetMsecs / 1000),
           endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
         });

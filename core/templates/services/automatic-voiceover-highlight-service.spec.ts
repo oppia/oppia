@@ -324,5 +324,16 @@ describe('Automatic voiceover highlight service', () => {
         )
       ).toBe(sentence);
     });
+
+    it('should use default language for pronunciation if language code is missing in constants', () => {
+      const sentence = 'x^2 + y^2 = z^3';
+      const expected = 'x squared plus y squared equals z cubed';
+      automaticVoiceoverHighlightService.languageCode = 'fr';
+      expect(
+        automaticVoiceoverHighlightService.transformMathSentenceContainingAudioSpecficWords(
+          sentence
+        )
+      ).toBe(expected);
+    });
   });
 });
