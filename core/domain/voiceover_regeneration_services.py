@@ -86,13 +86,11 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
         text = html.unescape(escaped_text)
         element.string = json.loads(text)
     elif element.name == 'oppia-noninteractive-math':
-        print('oppia-noninteractive-math')
         escaped_math_content = element.get('math_content-with-value')
         math_content = json.loads(html.unescape(escaped_math_content))
         latex_expr = math_content['raw_latex']
         converter = latex2text.LatexNodes2Text()
         element.string = converter.latex_to_text(latex_expr)
-        print(element.string)
 
     element.name = 'p'
     return element
@@ -108,16 +106,12 @@ def parse_html(html_content: str) -> str:
     Returns:
         str. The plain text retrieved from the HTML content.
     """
-    print('html_content')
-    print(html_content)
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
-    print('parsing html...\n\n')
     for custom_tag_element in ALLOWED_CUSTOM_OPPIA_RTE_TAGS:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
     text_content: str = soup.get_text(strip=True, separator='; ')
-    print(text_content)
 
     return text_content
 
@@ -158,8 +152,6 @@ def synthesize_voiceover_for_html_string(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
 
     parsed_text = parse_html(content_html)
-    print('parsed_text')
-    print(parsed_text)
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.
