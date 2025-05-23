@@ -111,7 +111,8 @@ def parse_html(html_content: str) -> str:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
-    text_content: str = soup.get_text(strip=True, separator='; ')
+    text_content: str = soup.get_text(
+        separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True)
 
     return text_content
 

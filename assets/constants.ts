@@ -7804,6 +7804,9 @@ export default {
       "^3": "تكعيب"
     }
   },
+  // Please consult the translation team before adding any entries here.
+  // These punctuation marks are used to identify sentence boundaries during
+  // voiceover playback.
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
