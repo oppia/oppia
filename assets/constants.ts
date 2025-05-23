@@ -7752,12 +7752,6 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
-  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
-    "ar": "؟!",
-    "en": ".!?",
-    "pt": ".!?",
-    "hi": "।!?"
-  },
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
@@ -7809,5 +7803,11 @@ export default {
       "^2": "تربيع",
       "^3": "تكعيب"
     }
+  },
+  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
+    "ar": "؟!",
+    "en": ".!?",
+    "pt": ".!?",
+    "hi": "।!?"
   }
 } as const;
