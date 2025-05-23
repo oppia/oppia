@@ -467,6 +467,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       if (previousHighlightedElement) {
         previousHighlightedElement.style.backgroundColor = '';
       }
+      this.previousHighlightedElementId = undefined;
     }
   }
 

@@ -233,14 +233,16 @@ export class AutomaticVoiceoverHighlightService {
     minOffsetMsecs = 0.0;
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
-      const token = tokenToAudioOffsetMsecs.token;
-      const audioOffsetMsecs = tokenToAudioOffsetMsecs.audioOffsetMsecs;
+      let token = tokenToAudioOffsetMsecs.token;
+      let audioOffsetMsecs = tokenToAudioOffsetMsecs.audioOffsetMsecs;
 
       if (minOffsetMsecs === 0.0) {
         minOffsetMsecs = audioOffsetMsecs;
       }
 
-      currentSentence = currentSentence.startsWith(token)
+      token = token.split(/\s+/).join('').trim();
+
+      currentSentence = currentSentence?.startsWith(token)
         ? currentSentence.slice(token.length)
         : currentSentence;
 
