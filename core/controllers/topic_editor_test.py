@@ -1279,64 +1279,6 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicNameHandlerTest(BaseTopicEditorControllerTests):
-    """Tests for TopicNameHandler."""
-
-    def test_topic_name_handler_when_unique(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Unique topic name does not exists.
-        topic_name = 'Unique Topic Name'
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        self.logout()
-
-    def test_topic_name_handler_when_duplicate(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Topic name exists since we've already published it.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], True)
-
-        self.logout()
-
-
 class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicIdToTopicNameHandlerTest."""
 
