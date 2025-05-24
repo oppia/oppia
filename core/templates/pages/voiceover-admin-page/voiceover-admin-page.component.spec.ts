@@ -357,4 +357,58 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeTrue();
   });
+
+  it('should check whether given language accent supports cloud auto regeneration', () => {
+    component.cloudSupportedLanguageAccentCodes = ['en-US', 'hi-IN'];
+    expect(
+      component.isAutogenerationSupportedByCloudService('en-US')
+    ).toBeTrue();
+    expect(
+      component.isAutogenerationSupportedByCloudService('en-IN')
+    ).toBeFalse();
+  });
+
+  it('should return correct string for autogeneration support', () => {
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': true,
+      'hi-IN': false,
+    };
+    expect(component.isAutogenerationSupported('en-US')).toBe('Yes');
+    expect(component.isAutogenerationSupported('hi-IN')).toBe('No');
+  });
+
+  it('should be able to update cloud supported language accent codes', () => {
+    component.languageCodesMapping = {
+      en: {
+        'en-US': true,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    };
+
+    component.languageAccentCodeToLanguageCode = {
+      'en-US': 'en',
+      'hi-IN': 'hi',
+      'en-IN': 'en',
+    };
+
+    spyOn(component, 'saveUpdatedLanguageAccentSupport').and.returnValue(
+      Promise.resolve()
+    );
+
+    component.updateSupportsAutogenerationField('en-US', 'No');
+    component.updateSupportsAutogenerationField('en-IN', 'Yes');
+
+    expect(component.languageCodesMapping).toEqual({
+      en: {
+        'en-US': false,
+        'en-IN': true,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    });
+  });
 });

@@ -22,6 +22,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRO_CONTENT_VOICEOVER_IN_HI =
@@ -53,6 +54,7 @@ describe('Exploration Editor', function () {
   let curriculumAdmin: CurriculumAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedOutUser: LoggedOutUser;
+  let voiceoverAdmin: VoiceoverAdmin;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -73,11 +75,18 @@ describe('Exploration Editor', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
+    voiceoverAdmin = await UserFactory.createNewUser(
+      'voiceoverAdm',
+      'voiceover_admin@example.com',
+      [ROLES.VOICEOVER_ADMIN]
+    );
+
+    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
+
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
-    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
@@ -137,7 +146,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.dismissTranslationTabWelcomeModal();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Content',
       'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
     );
@@ -147,7 +156,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Interaction',
       'जारी रखना'
     );
@@ -157,7 +166,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.editTranslationOfContent(
-      'hi',
+      'हिन्दी (Hindi)',
       'Content',
       'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
     );
@@ -168,7 +177,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.addVoiceoverToContent(
-      'hi',
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
       'Content',
       INTRO_CONTENT_VOICEOVER_IN_HI
     );
@@ -178,7 +188,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.addVoiceoverToContent(
-      'hi',
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
       'Interaction',
       CONTINUE_INTERACTION_VOICEOVER_IN_HI
     );
@@ -188,7 +199,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.addVoiceoverToContent(
-      'hi',
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
       'Content',
       LAST_CARD_VOICEOVER_IN_HI
     );

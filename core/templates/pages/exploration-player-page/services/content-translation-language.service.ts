@@ -19,11 +19,20 @@
 
 import {Injectable} from '@angular/core';
 
-import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlService} from 'services/contextual/url.service';
 
 import {INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+
+export interface ExplorationLanguageInfo {
+  /**
+   * This inteface is used to keep track of the audio language code (value)
+   * and the audio language description to display (displayed) for the
+   * _languagesInExploration property.
+   */
+  value: string;
+  displayed: string;
+}
 
 @Injectable({
   providedIn: 'root',

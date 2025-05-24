@@ -22,7 +22,12 @@ import os
 from unittest import mock
 
 from core import feconf
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import translation_domain
+from core.domain import translation_services
 from core.domain import voiceover_regeneration_services
 from core.platform import models
 from core.tests import test_utils
@@ -190,6 +195,55 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         self.assertEqual(audio_offset_list, generated_audio_offset_list)
 
+    @mock.patch(
+        'core.domain.fs_services.GcsFileSystem.get',
+        side_effect=Exception('Mocked exception during voiceover retrieval')
+    )
+    def test_regenerate_voiceover_if_there_is_problem_in_cached_voiceover(
+        self,
+        _: mock.Mock,
+    ) -> None:
+        content_html = '<p>This is from cached model</p>'
+        exploration_id = 'exp_id'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        audio_offset_list: List[Dict[str, Union[str, float]]] = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+        voiceover_filename_for_binary = 'english.mp3'
+        voiceover_path = os.path.join(
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename_for_binary)
+        mimetype = 'audio/mpeg'
+
+        with open(voiceover_path, 'rb') as file:
+            binary_audio_data = file.read()
+
+        fs.commit(
+        '%s/%s' % ('audio', filename),
+        binary_audio_data, mimetype=mimetype)
+
+        cached_model = (
+            voiceover_models.CachedAutomaticVoiceoversModel.create_cache_model(
+                language_accent_code, parsed_text, filename, audio_offset_list))
+        cached_model.update_timestamps()
+        cached_model.put()
+
+        generated_audio_offset_list = (
+            voiceover_regeneration_services.
+            synthesize_voiceover_for_html_string(
+                exploration_id, content_html, language_accent_code, filename))
+
+        self.assertEqual(audio_offset_list, generated_audio_offset_list)
+
     def test_update_cache_model_in_case_of_collision(self) -> None:
         content_html_1 = '<p>This is from cached model</p>'
         content_html_2 = '<p>This is a test text</p>'
@@ -295,3 +349,145 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                     filename
                 )
             )
+
+    def test_should_be_able_to_get_new_voiceover_filename(self) -> None:
+        content_id = 'content_0'
+        language_accent_code = 'en-US'
+        filename = 'content_0-en-US-asdjytdyop.mp3'
+
+        new_filename = (
+            voiceover_regeneration_services.generate_new_voiceover_filename(
+                content_id, language_accent_code))
+
+        self.assertNotEqual(filename, new_filename)
+        self.assertTrue(new_filename.startswith('content_0-en-US-'))
+
+    def test_should_get_html_string_from_exploration(self) -> None:
+        editor_email = 'editor1@example.com'
+        editor_username = 'editor1'
+        self.signup(editor_email, editor_username)
+        editor_id = self.get_user_id_from_email(editor_email)
+
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+        exploration = self.save_new_valid_exploration(
+            exploration_id, 'user_id', title='Exploration title')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_CONTENT),
+            'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': content_html
+                }})
+        ]
+        exp_services.update_exploration(
+            editor_id, exploration.id, change_list, 'Updates content')
+
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+
+        retrieved_content_html = (
+            voiceover_regeneration_services.
+            get_content_html_in_requested_language(
+                exploration.id,
+                exploration.version,
+                'Introduction',
+                'content_0',
+                'en-US'
+            )
+        )
+        self.assertEqual(retrieved_content_html, content_html)
+
+    def test_should_get_html_string_from_exploration_with_translation(
+        self
+    ) -> None:
+        entity_type = feconf.TranslatableEntityType.EXPLORATION
+        entity_id = 'exp_id'
+        entity_version = 1
+        language_code = 'hi'
+        content_html = '<p>यह एक परीक्षण पाठ है.</p>'
+
+        translated_content = translation_domain.TranslatedContent(
+            content_html,
+            translation_domain.TranslatableContentFormat.HTML, False)
+
+        translation_services.add_new_translation(
+            entity_type, entity_id, entity_version,
+            language_code, 'content_id_0', translated_content)
+
+        retrieved_content_html = (
+            voiceover_regeneration_services.
+            get_content_html_in_requested_language(
+                entity_id,
+                entity_version,
+                'Introduction',
+                'content_id_0',
+                'hi-IN'
+            )
+        )
+        self.assertEqual(retrieved_content_html, content_html)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Translation for content_id content_id_1 not found in language hi'
+        ):
+            (
+                voiceover_regeneration_services.
+                get_content_html_in_requested_language(
+                    entity_id,
+                    entity_version,
+                    'Introduction',
+                    'content_id_1',
+                    'hi-IN'
+                )
+            )
+
+    def test_should_regenerate_voiceover_for_exp_content(self) -> None:
+        editor_email = 'editor1@example.com'
+        editor_username = 'editor1'
+        self.signup(editor_email, editor_username)
+        editor_id = self.get_user_id_from_email(editor_email)
+
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+        exploration = self.save_new_valid_exploration(
+            exploration_id, 'user_id', title='Exploration title')
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_CONTENT),
+            'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': content_html
+                }})
+        ]
+        exp_services.update_exploration(
+            editor_id, exploration.id, change_list, 'Updates content')
+
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+
+        expected_sentence_tokens_with_durations = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0}
+        ]
+
+        voiceovers, sentence_tokens_with_durations = (
+            voiceover_regeneration_services.
+            regenerate_voiceover_for_exploration_content(
+                exploration_id,
+                exploration.version,
+                'Introduction',
+                'content_0',
+                'en-US',
+            )
+        )
+
+        self.assertTrue(voiceovers.filename.startswith('content_0-en-US-'))
+        self.assertEqual(
+            sentence_tokens_with_durations,
+            expected_sentence_tokens_with_durations)

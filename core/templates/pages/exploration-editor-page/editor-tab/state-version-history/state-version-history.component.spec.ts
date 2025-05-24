@@ -80,12 +80,6 @@ describe('State version history component', () => {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],

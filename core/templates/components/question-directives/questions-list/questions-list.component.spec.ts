@@ -214,9 +214,6 @@ describe('Questions List Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,

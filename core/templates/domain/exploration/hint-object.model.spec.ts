@@ -52,4 +52,11 @@ describe('Hint model', () => {
       })
     );
   });
+
+  it('should get content ID to html dict', () => {
+    var testHint = Hint.createNew('content_id', '<p>Some Hint</p>');
+    expect(testHint.getContentIdToHtml()).toEqual({
+      content_id: '<p>Some Hint</p>',
+    });
+  });
 });
