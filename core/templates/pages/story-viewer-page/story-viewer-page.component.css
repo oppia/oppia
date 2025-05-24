@@ -60,7 +60,7 @@ oppia-story-viewer-page.oppia-login-or-signup-text {
   width: 100%;
 }
 
-.story-viewer-login-container .md-raised {
+.story-viewer-login-container .mat-raised-button {
   font-size: 1.2em;
   min-width: max-content;
   padding: 1em;

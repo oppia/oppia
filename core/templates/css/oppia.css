@@ -78,7 +78,7 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input {
+mat-input-group.long > input {
   height: 45px;
   width: 100%;
 }
@@ -90,7 +90,7 @@ label {
   max-width: 100%;
 }
 
-md-input-group.md-default-theme label {
+.mat-input-group label {
   font-size: 16px;
   font-weight: 200;
   margin-bottom: 0;
@@ -139,7 +139,7 @@ why they need to be overriden.  */
   width: 100%;
 }
 
-.md-button {
+.mat-button {
   font-size: 16px;
   line-height: 22px;
   min-height: 22px;
@@ -147,21 +147,21 @@ why they need to be overriden.  */
   padding: 6px;
 }
 
-.md-button.md-default.theme {
+.mat-button.theme {
   border-radius: 3px;
 }
 
-.md-button-success {
+.mat-button-success {
   color: #009688;
 }
 
-.md-shadow-bottom-z-1, .md-button.md-raised:not([disabled]),
-.md-button.md-fab {
+.mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
+.mat-button.mat-fab {
   box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
 }
 
-.md-button.md-default-theme.md-raised:not([disabled]):hover,
-.md-button.md-raised:not([disabled]):hover {
+.mat-button.mat-default-theme.mat-raised:not([disabled]):hover,
+.mat-button.mat-raised:not([disabled]):hover {
   background-color: rgba(158,158,158,0.3);
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4);
   transform: translate3d(0,-1px,0);
@@ -175,29 +175,22 @@ why they need to be overriden.  */
   outline: 2px solid rgb(255, 255, 255);
 }
 
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled],
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled]:hover,
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button,
-.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
-  font: 16px;
-  margin: 0;
-  min-width: 55px;
-}
-
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   border-radius: 2px;
-  font-size: 16px;
+  font: 16px;
   line-height: 22px;
+  margin: 0;
+  min-width: 55px;
   text-transform: uppercase;
 }
 
@@ -212,20 +205,19 @@ why they need to be overriden.  */
   padding: 0.25rem;
 }
 
-.md-button.oppia-learner-confirm-button,
 .mat-button.oppia-learner-confirm-button,
-.md-button.oppia-learner-got-it-button,
-.md-button.oppia-learner-hint-solution-button {
+.mat-button.oppia-learner-got-it-button,
+.mat-button.oppia-learner-hint-solution-button {
   background: #0d48a1;
   color: #fff;
   padding: 6px 12px;
 }
 
-.md-button.oppia-learner-confirm-button:hover {
+.mat-button.oppia-learner-confirm-button:hover {
   background-color: #115fd4;
 }
 
-.md-button.oppia-learner-reload-image-button {
+.mat-button.oppia-learner-reload-image-button {
   background: #fff;
   border: 2px solid;
   border-color: #0d48a1;
@@ -236,18 +228,18 @@ why they need to be overriden.  */
   padding-top: 12px;
 }
 
-.md-button.md-default-theme.oppia-learner-reload-image-button:focus,
-.md-button.md-default-theme.oppia-learner-reload-image-button:hover {
+.mat-button.oppia-learner-reload-image-button:focus,
+.mat-button.oppia-learner-reload-image-button:hover {
   background-color: rgba(224,242,241,1);
   text-decoration: none;
 }
 
-.md-button.md-default-theme.oppia-learner-confirm-button:focus,
-.md-button.md-default-theme.oppia-learner-confirm-button:hover,
-.md-button.md-default-theme.oppia-learner-got-it-button:focus,
-.md-button.md-default-theme.oppia-learner-got-it-button:hover,
-.md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
-.md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
+.mat-button.oppia-learner-confirm-button:focus,
+.mat-button.oppia-learner-confirm-button:hover,
+.mat-button.oppia-learner-got-it-button:focus,
+.mat-button.oppia-learner-got-it-button:hover,
+.mat-button.oppia-learner-hint-solution-button:focus,
+.mat-button.oppia-learner-hint-solution-button:hover {
   background-color: #115fd4;
   text-decoration: none;
 }
@@ -472,7 +464,7 @@ a:focus {
 }
 
 /* Change all the borders of an input to red when there is validation errors. */
-input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, md-input-group.md-default-theme {
+input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, mat-form-field.ng-invalid .mat-form-field-outline {
   border-color: #f44336;
 }
 
@@ -1189,7 +1181,7 @@ textarea {
   padding-top: 55px;
 }
 
-.oppia-dashboard-aggregated-stats md-card {
+.oppia-dashboard-aggregated-stats mat-card {
   background: #fff;
   margin: 0 7.5px 70px 7.5px;
   padding: 8px;
@@ -1724,7 +1716,7 @@ pre.oppia-pre-wrapped-text {
 .popover-body.container-fluid {
   padding: 10px;
 }
-.popover-content .md-button, .md-button[disabled] {
+.popover-content .mat-button, .mat-button[disabled] {
   font-size: 13px;
 }
 /* The eight rules below should be in sync. */
@@ -2743,11 +2735,11 @@ div#ng-curtain {
   padding-left: 15px;
 }
 
-.oppia-profile-container md-card.md-default-theme {
+.oppia-profile-container mat-card.mat-mdc-card {
   background-color: transparent;
 }
 
-md-card.preview-conversation-skin-inline-interaction {
+mat-card.preview-conversation-skin-inline-interaction {
   background-color: #f6f6f6;
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
@@ -2758,7 +2750,7 @@ md-card.preview-conversation-skin-inline-interaction {
   max-width: 560px;
 }
 
-md-card.preview-conversation-skin-supplemental-card {
+mat-card.preview-conversation-skin-supplemental-card {
   background-color: #f6f6f6;
   margin: -5px 0;
   max-width: 560px;
@@ -2784,7 +2776,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border-bottom: thin solid #eee;
   margin-bottom: 5px;
 }
-.trained-feedback-selection-container md-input-group.md-default-theme label {
+.trained-feedback-selection-container mat-form-field.mat-form-field-label {
   border-bottom: 0;
 }
 

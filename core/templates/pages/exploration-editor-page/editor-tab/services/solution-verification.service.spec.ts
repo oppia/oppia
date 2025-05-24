@@ -79,15 +79,6 @@ describe('Solution Verification Service', () => {
     explorationStatesService.init({
       'First State': {
         content: {content_id: 'content', html: 'First State Content'},
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            hint_1: {},
-            hint_2: {},
-          },
-        },
         interaction: {
           id: 'TextInput',
           answer_groups: [

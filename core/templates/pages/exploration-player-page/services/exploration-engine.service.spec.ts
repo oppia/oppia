@@ -57,13 +57,11 @@ import {ImagePreloaderService} from './image-preloader.service';
 import {LearnerParamsService} from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let contextService: ContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
@@ -90,15 +88,6 @@ describe('Exploration engine service ', () => {
       states: {
         Start: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -171,11 +160,6 @@ describe('Exploration engine service ', () => {
         },
         End: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -200,15 +184,6 @@ describe('Exploration engine service ', () => {
         },
         Mid: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -389,9 +364,6 @@ describe('Exploration engine service ', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     contextService = TestBed.inject(ContextService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
@@ -539,8 +511,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -608,8 +579,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -676,8 +646,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -746,8 +715,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -815,8 +783,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -932,8 +899,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         lastCardInteraction,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -1157,8 +1123,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);

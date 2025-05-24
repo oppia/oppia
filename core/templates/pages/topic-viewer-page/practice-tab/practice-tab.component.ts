@@ -20,12 +20,10 @@ import {Component, Input, OnInit, OnDestroy} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
-
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
-import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {
   I18nLanguageCodeService,
@@ -49,12 +47,12 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicName!: string;
   @Input() subtopicsList!: Subtopic[];
-  @Input() previewMode: boolean = false;
   @Input() displayArea: string = 'topicViewer';
   @Input() topicUrlFragment: string = '';
   @Input() classroomUrlFragment: string = '';
   @Input() subtopicMastery: Record<string, number> = {};
   @Input() topicId!: string;
+  startButtonIsDisabled: boolean = true;
   topicNameTranslationKey!: string;
   translatedTopicName!: string;
   selectedSubtopics: Subtopic[] = [];
@@ -70,7 +68,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private questionBackendApiService: QuestionBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService,
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private translateService: TranslateService,
@@ -101,12 +98,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       false
     );
     this.clientWidth = window.innerWidth;
-    if (this.displayArea === 'topicViewer' && !this.previewMode) {
-      this.topicUrlFragment =
-        this.urlService.getTopicUrlFragmentFromLearnerUrl();
-      this.classroomUrlFragment =
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-    }
     this.topicNameTranslationKey =
       this.i18nLanguageCodeService.getTopicTranslationKey(
         this.topicId,
@@ -146,18 +137,6 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  isStartButtonDisabled(): boolean {
-    if (this.previewMode) {
-      return true;
-    }
-    for (var idx in this.selectedSubtopicIndices) {
-      if (this.selectedSubtopicIndices[idx]) {
-        return !this.questionsAreAvailable;
-      }
-    }
-    return true;
-  }
-
   checkIfQuestionsExist(subtopicIndices: boolean[]): void {
     const skillIds: string[] = [];
     this.questionsStatusCallIsComplete = false;
@@ -172,8 +151,10 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
         .then(questionCount => {
           this.questionsAreAvailable = questionCount > 0;
           this.questionsStatusCallIsComplete = true;
+          this.startButtonIsDisabled = !this.questionsAreAvailable;
         });
     } else {
+      this.startButtonIsDisabled = true;
       this.questionsAreAvailable = false;
       this.questionsStatusCallIsComplete = true;
     }
