@@ -178,7 +178,7 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const emptyProgressMessage = '.e2e-test-empty-progress-message';
 const exploreLessonButton = '.e2e-test-explore-lesson-button';
 const continueButtonSelector = '.e2e-test-continue-button';
-const startLessonButton = '.e2e-test-lesson-resume-redo-button';
+const lessonActionButton = '.e2e-test-lesson-start-resume-redo-button';
 const lessonPercentProgress = '.e2e-test-lesson-progress-percent';
 const incompleteLessonTitle = '.e2e-test-incomplete-community-lessons-section';
 const completedLessonTitle = '.e2e-test-completed-community-lessons-section';
@@ -1898,8 +1898,8 @@ export class LoggedInUser extends BaseUser {
   /*
    * Verifies that the start lesson button text matches the expected value.
    */
-  async expectStartLessonButtonTextToBe(buttonText: string): Promise<void> {
-    const startButtonElement = await this.page.$(startLessonButton);
+  async expectLessonActionButtonTextToBe(buttonText: string): Promise<void> {
+    const startButtonElement = await this.page.$(lessonActionButton);
     const startButtonText = await this.page.evaluate(
       el => el.innerText,
       startButtonElement
@@ -1911,8 +1911,8 @@ export class LoggedInUser extends BaseUser {
   }
 
   // Clicks the start lesson button in Progress Tab under Learner Dashboard and waits for the page to fully load.
-  async startLessonButtons(): Promise<void> {
-    await this.clickOn(startLessonButton);
+  async clickOnLessonActionButton(): Promise<void> {
+    await this.clickOn(lessonActionButton);
     await this.waitForPageToFullyLoad();
   }
 
@@ -1927,13 +1927,13 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(continueButtonSelector);
   }
 
-  // Clicks on the Oppia logo and waits for the homepage to fully load.
+  // Clicks on the Oppia logo and waits for the learner dashboard to fully load.
   async clickOnLogo(): Promise<void> {
     await this.clickOn(oppiaLogoButton);
     await this.waitForPageToFullyLoad();
   }
 
-  // Completes the exploration by clicking continue and returning to the homepage.
+  // Completes the exploration by clicking continue and returning to the learner dashboard.
   async completeExploration(): Promise<void> {
     await this.clickOn(continueButtonSelector);
     await this.waitForPageToFullyLoad();

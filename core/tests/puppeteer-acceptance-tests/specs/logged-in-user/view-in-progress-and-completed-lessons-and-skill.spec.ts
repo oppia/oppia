@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for learner dashboard functionalities, specfically to
+ * @fileoverview Acceptance tests for learner dashboard functionalities, specifically to
  * verify the visibility and correctness of Progress section, Progress percentage, Completed lessons, Skills and skill progress percentages.
  */
 
@@ -131,7 +131,7 @@ describe('Logged-in User', function () {
   it(
     'should mark lesson as completed after finishing it',
     async function () {
-      await loggedInUser.startLessonButtons();
+      await loggedInUser.clickOnLessonActionButton();
       await loggedInUser.completeExploration();
       await loggedInUser.navigateToProgressSectionNewLearner();
       await loggedInUser.expectCompletedLesson('What are the Place Values');
@@ -145,14 +145,14 @@ describe('Logged-in User', function () {
     'should show 100% progress after completing all lessons',
     async function () {
       for (let i = 1; i < placeValueChapters.length; i++) {
-        await loggedInUser.startLessonButtons();
+        await loggedInUser.clickOnLessonActionButton();
         await loggedInUser.completeExploration();
         await loggedInUser.navigateToProgressSectionNewLearner();
         await loggedInUser.expectCompletedLesson(placeValueChapters[i]);
       }
       await loggedInUser.expectProgressPercent('100%');
       await loggedInUser.expectSkillProgressPercent('0%');
-      await loggedInUser.expectStartLessonButtonTextToBe('Redo');
+      await loggedInUser.expectLessonActionButtonTextToBe('Redo');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
