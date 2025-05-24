@@ -91,6 +91,14 @@ export class Solution extends BaseTranslatableObject {
     };
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let solutionContentIdToHtml: {[contentId: string]: string} = {};
+
+    solutionContentIdToHtml[this.explanation.contentId as string] =
+      this.explanation.html;
+    return solutionContentIdToHtml;
+  }
+
   getSummary(
     interactionId: string,
     customizationArgs: InteractionCustomizationArgs

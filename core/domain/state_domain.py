@@ -3616,7 +3616,6 @@ class StateDict(TypedDict):
     content: SubtitledHtmlDict
     param_changes: List[param_domain.ParamChangeDict]
     interaction: InteractionInstanceDict
-    recorded_voiceovers: RecordedVoiceoversDict
     solicit_answer_details: bool
     card_is_checkpoint: bool
     linked_skill_id: Optional[str]
@@ -3632,7 +3631,6 @@ class State(translation_domain.BaseTranslatableObject):
         content: SubtitledHtml,
         param_changes: List[param_domain.ParamChange],
         interaction: InteractionInstance,
-        recorded_voiceovers: RecordedVoiceovers,
         solicit_answer_details: bool,
         card_is_checkpoint: bool,
         linked_skill_id: Optional[str] = None,
@@ -3648,8 +3646,6 @@ class State(translation_domain.BaseTranslatableObject):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
-                the state contents and translations.
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
@@ -3677,7 +3673,6 @@ class State(translation_domain.BaseTranslatableObject):
             interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
-        self.recorded_voiceovers = recorded_voiceovers
         self.linked_skill_id = linked_skill_id
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
@@ -3776,8 +3771,6 @@ class State(translation_domain.BaseTranslatableObject):
                 'Expected card_is_checkpoint to be a boolean, '
                 'received %s' % self.card_is_checkpoint)
 
-        self.recorded_voiceovers.validate(self.get_translatable_content_ids())
-
         if self.linked_skill_id is not None:
             if not isinstance(self.linked_skill_id, str):
                 raise utils.ValidationError(
@@ -3867,55 +3860,14 @@ class State(translation_domain.BaseTranslatableObject):
 
         return utils.yaml_from_dict(state.to_dict(), width=width)
 
-    def _update_content_ids_in_assets(
-        self, old_ids_list: List[str], new_ids_list: List[str]
-    ) -> None:
-        """Adds or deletes content ids in assets i.e, other parts of state
-        object such as recorded_voiceovers.
-
-        Args:
-            old_ids_list: list(str). A list of content ids present earlier
-                within the substructure (like answer groups, hints etc.) of
-                state.
-            new_ids_list: list(str). A list of content ids currently present
-                within the substructure (like answer groups, hints etc.) of
-                state.
-
-        Raises:
-            Exception. The content to be deleted doesn't exist.
-            Exception. The content to be added already exists.
-        """
-        content_ids_to_delete = set(old_ids_list) - set(new_ids_list)
-        content_ids_to_add = set(new_ids_list) - set(old_ids_list)
-        content_ids_for_voiceovers = (
-            self.recorded_voiceovers.get_content_ids_for_voiceovers())
-        for content_id in content_ids_to_delete:
-            if not content_id in content_ids_for_voiceovers:
-                raise Exception(
-                    'The content_id %s does not exist in recorded_voiceovers.'
-                    % content_id)
-
-            self.recorded_voiceovers.delete_content_id_for_voiceover(content_id)
-
-        for content_id in content_ids_to_add:
-            if content_id in content_ids_for_voiceovers:
-                raise Exception(
-                    'The content_id %s already exists in recorded_voiceovers'
-                    % content_id)
-
-            self.recorded_voiceovers.add_content_id_for_voiceover(content_id)
-
     def update_content(self, content: SubtitledHtml) -> None:
         """Update the content of this state.
 
         Args:
             content: SubtitledHtml. Representation of updated content.
         """
-        old_content_id = self.content.content_id
         # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = content
-        self._update_content_ids_in_assets(
-            [old_content_id], [self.content.content_id])
 
     def update_param_changes(
         self, param_changes: List[param_domain.ParamChange]
@@ -3952,9 +3904,6 @@ class State(translation_domain.BaseTranslatableObject):
                                 param_type, objects.BaseTranslatableObject
                         ):
                             old_content_id_list.append(value['contentId'])
-
-            self._update_content_ids_in_assets(
-                old_content_id_list, [])
 
         self.interaction.id = interaction_id
         self.interaction.answer_groups = []
@@ -4014,10 +3963,6 @@ class State(translation_domain.BaseTranslatableObject):
         for ca_name in customization_args:
             customization_args[ca_name].validate_subtitled_html()
 
-        old_content_id_list = list(itertools.chain.from_iterable([
-            self.interaction.customization_args[ca_name].get_content_ids()
-            for ca_name in self.interaction.customization_args]))
-
         self.interaction.customization_args = customization_args
         new_content_id_list = list(itertools.chain.from_iterable([
             self.interaction.customization_args[ca_name].get_content_ids()
@@ -4027,9 +3972,6 @@ class State(translation_domain.BaseTranslatableObject):
             raise Exception(
                 'All customization argument content_ids should be unique. '
                 'Content ids received: %s' % new_content_id_list)
-
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
 
     def update_interaction_answer_groups(
         self, answer_groups_list: List[AnswerGroup]
@@ -4119,8 +4061,6 @@ class State(translation_domain.BaseTranslatableObject):
         new_content_id_list += [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
 
     def update_interaction_default_outcome(
         self, default_outcome: Optional[Outcome]
@@ -4142,9 +4082,6 @@ class State(translation_domain.BaseTranslatableObject):
                 self.interaction.default_outcome.feedback.content_id)
         else:
             self.interaction.default_outcome = None
-
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
 
     def update_interaction_confirmed_unclassified_answers(
         self, confirmed_unclassified_answers: List[AnswerGroup]
@@ -4180,14 +4117,7 @@ class State(translation_domain.BaseTranslatableObject):
             raise Exception(
                 'Expected hints_list to be a list, received %s'
                 % hints_list)
-        old_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
         self.interaction.hints = copy.deepcopy(hints_list)
-
-        new_content_id_list = [
-            hint.hint_content.content_id for hint in self.interaction.hints]
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
 
     def update_interaction_solution(
         self, solution: Optional[Solution]
@@ -4216,20 +4146,6 @@ class State(translation_domain.BaseTranslatableObject):
                 self.interaction.solution.explanation.content_id)
         else:
             self.interaction.solution = None
-
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
-
-    def update_recorded_voiceovers(
-        self, recorded_voiceovers: RecordedVoiceovers
-    ) -> None:
-        """Update the recorded_voiceovers of a state.
-
-        Args:
-            recorded_voiceovers: RecordedVoiceovers. The new RecordedVoiceovers
-                object for the state.
-        """
-        self.recorded_voiceovers = recorded_voiceovers
 
     def update_solicit_answer_details(
         self, solicit_answer_details: bool
@@ -4278,7 +4194,6 @@ class State(translation_domain.BaseTranslatableObject):
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
             'linked_skill_id': self.linked_skill_id,
-            'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
             'card_is_checkpoint': self.card_is_checkpoint,
             'inapplicable_skill_misconception_ids': (
@@ -4311,7 +4226,6 @@ class State(translation_domain.BaseTranslatableObject):
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(
                 state_dict['interaction'], validate=validate),
-            RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
             state_dict['linked_skill_id'],
@@ -4342,18 +4256,12 @@ class State(translation_domain.BaseTranslatableObject):
         """
         content_html = feconf.DEFAULT_STATE_CONTENT_STR
 
-        recorded_voiceovers = RecordedVoiceovers({})
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_state_content)
-        recorded_voiceovers.add_content_id_for_voiceover(
-            content_id_for_default_outcome)
-
         return cls(
             SubtitledHtml(content_id_for_state_content, content_html),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name, content_id_for_default_outcome),
-            recorded_voiceovers, False, is_initial_state)
+            False, is_initial_state)
 
     @classmethod
     def convert_html_fields_in_state(
@@ -4676,7 +4584,9 @@ class State(translation_domain.BaseTranslatableObject):
             state: StateDict = states_dict[state_name]
             new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
             old_to_new_content_id: Dict[str, str] = {}
-            old_voiceovers_mapping = state['recorded_voiceovers'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            old_voiceovers_mapping = state['recorded_voiceovers'][ # type: ignore[misc]
                 'voiceovers_mapping']
 
             for content, content_type, extra_prefix in (
@@ -4703,7 +4613,9 @@ class State(translation_domain.BaseTranslatableObject):
                 new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
                     old_content_id]
 
-            state['recorded_voiceovers']['voiceovers_mapping'] = (
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            state['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
                 new_voiceovers_mapping
             )
 

@@ -46,7 +46,6 @@ import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;
@@ -68,8 +67,7 @@ describe('Progress nav component', () => {
     {} as Interaction,
     [],
     {} as RecordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
   let mockDisplayedCard2 = new StateCard(
     'state',
@@ -78,8 +76,7 @@ describe('Progress nav component', () => {
     {} as Interaction,
     [],
     {} as RecordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
 
   beforeEach(waitForAsync(() => {
