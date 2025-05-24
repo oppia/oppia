@@ -46,7 +46,7 @@
         <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
-        <button (click)="addManualVoiceover()" class="add-manual-voiceover-button">ADD MANUAL VOICEOVER</button>
+        <button (click)="addManualVoiceover()" class="add-manual-voiceover-button e2e-test-voiceover-upload-audio">ADD MANUAL VOICEOVER</button>
       </div>
     </div>
   </div>

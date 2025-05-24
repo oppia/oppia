@@ -58,6 +58,8 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
+const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
+
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
@@ -128,8 +130,14 @@ const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
 const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
-const translationLanguageSelector =
-  'select.e2e-test-translation-language-selector';
+
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
 const translationModeButton = 'button.e2e-test-translation-mode';
 const editTranslationSelector = 'div.e2e-test-edit-translation';
 const stateTranslationEditorSelector =
@@ -210,7 +218,6 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
-const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
@@ -233,6 +240,8 @@ const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
   '.e2e-test-edit-content.oppia-editable-section';
 const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const languageDropdownValueSelector =
+  'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
 const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
@@ -245,11 +254,22 @@ const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 
 enum INTERACTION_TYPES {
+  CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
 }
+
+enum INTERACTION_TABS {
+  PROGRAMMING = 'PROGRAMMING',
+}
+
+export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
+  [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+};
+
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -503,7 +523,19 @@ export class ExplorationEditor extends BaseUser {
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.page.waitForSelector(addInteractionButton, {
+      visible: true,
+    });
+
     await this.clickOn(addInteractionButton);
+
+    // Change tab based on interaction.
+    // Add more conditional tab changes here.
+    if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
+    ) {
+      await this.clickOn(programmingInteractionsButton);
+    }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -760,37 +792,31 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(languageUpdateDropdown);
     await this.clickOn(language);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
    *  Verifies that the selected language matches the expected language.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    await this.page.waitForSelector(languageUpdateDropdown);
-    const languageDropdown = await this.page.$(languageUpdateDropdown);
-    if (!languageDropdown) {
-      throw new Error('Category dropdown not found.');
-    }
-    await languageDropdown.click();
-
-    const selectedLanguage = await this.page.evaluate(() => {
-      const matOption = document.querySelector(
-        '.mat-option.mat-selected'
-      ) as HTMLElement;
-      if (!matOption) {
-        throw new Error('Selected language option not found.');
-      }
-      return matOption.innerText.trim();
+    await this.page.waitForSelector(languageDropdownValueSelector, {
+      visible: true,
     });
+
+    const selectedLanguage = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector) as HTMLElement;
+      return element?.innerText.trim() ?? '';
+    }, languageDropdownValueSelector);
 
     if (selectedLanguage.includes(expectedLanguage)) {
       showMessage(
         `The language ${selectedLanguage} contains the expected language.`
       );
     } else {
-      throw new Error('Language is not correct.');
+      throw new Error(
+        `Expected language: ${expectedLanguage}, but found: "${selectedLanguage}".`
+      );
     }
-    await this.page.keyboard.press('Enter');
   }
 
   async addTags(tagNames: string[]): Promise<void> {
@@ -1222,13 +1248,16 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(
+  async editDefaultResponseFeedbackInExplorationEditorPage(
     defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
@@ -1605,7 +1634,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(previewTabButton);
     }
-    await this.page.waitForNavigation();
   }
 
   /**
@@ -1920,6 +1948,65 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * This function creates simple Programming Exploration.
+   * Starts at new Exploration Editor Page.
+   * Ends at same page, after adding programming interaction and saving the
+   * draft.
+   */
+  async createSimpleProgrammingExploration(): Promise<string | null> {
+    // Check if element to add interaction is visible (pre-check)
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+
+    await this.createMinimalExploration(
+      'This is a test Programming Exploration',
+      INTERACTION_TYPES.CODE_EDITOR
+    );
+
+    const lastInteraction = 'Last Card';
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, lastInteraction);
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    await this.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
+    await this.navigateToCard(lastInteraction);
+    await this.createMinimalExploration(
+      'This is last card',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+
+    await this.saveExplorationDraft();
+    const explorationId = await this.publishExplorationWithMetadata(
+      'Simple Code Editor',
+      'This is goal here',
+      'Algebra'
+    );
+
+    // Check if publish button is disabled (post-check)
+    const publishButton = await this.page.$(saveChangesButton);
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      publishButton
+    );
+
+    if (isDisabled) {
+      showMessage('Publish Button is disabled, as expected');
+    } else {
+      showMessage(
+        'Publish Button is enabled and clickable, expected to be disabled'
+      );
+      throw new Error('Publish Button is enabled and clickable');
+    }
+
+    return explorationId;
+  }
+
+  /**
    * Function for creating an exploration with two cards.
    */
   async createAndPublishExplorationWithCards(
@@ -2060,18 +2147,32 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to edit a translation for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the translation has to be added.
+   * @param {string} language - Language for which the translation has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
-    languageCode: string,
+    language: string,
     contentType: string,
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(translationModeButton);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -2255,17 +2356,20 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to add a voiceover for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async addVoiceoverToContent(
-    languageCode: string,
+    language: string,
+    languageAccent: string,
     contentType: string,
     voiceoverFilePath: string
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.waitForPageToFullyLoad();
+
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -2275,7 +2379,38 @@ export class ExplorationEditor extends BaseUser {
       );
       await this.clickOn(contentType);
     }
-    await this.clickOn(uploadAudioButton);
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();

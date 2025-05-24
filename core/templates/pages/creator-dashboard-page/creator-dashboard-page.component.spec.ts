@@ -489,7 +489,7 @@ describe('Creator Dashboard Page Component', () => {
 
       innerWidthSpy.and.callFake(() => 480);
 
-      angular.element(window).triggerHandler('resize');
+      window.dispatchEvent(new Event('resize'));
 
       expect(component.myExplorationsView).toBe('card');
       expect(component.publishText).toBe(
@@ -498,7 +498,7 @@ describe('Creator Dashboard Page Component', () => {
 
       innerWidthSpy.and.callFake(() => 768);
 
-      angular.element(window).triggerHandler('resize');
+      window.dispatchEvent(new Event('resize'));
 
       expect(component.myExplorationsView).toBe('card');
       expect(component.publishText).toBe(

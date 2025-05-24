@@ -37,6 +37,17 @@ const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
@@ -71,10 +82,6 @@ const solutionInputTextArea =
 const submitQuestionButon = '.e2e-test-save-question-button';
 const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
-const defaultResponseTab = '.e2e-test-default-response-tab';
-const saveOutcomeFeedbackButton = '.e2e-test-save-outcome-feedback';
-const openOutcomeFeedBackEditorSelector =
-  'div.e2e-test-open-outcome-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
 const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
@@ -82,6 +89,8 @@ const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
+
+const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 
 export class QuestionSubmitter extends BaseUser {
   /**
@@ -491,15 +500,42 @@ export class QuestionSubmitter extends BaseUser {
     showMessage('Image interaction has been added successfully.');
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
-   * Function to edit the default response feedback.
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(): Promise<void> {
-    await this.clickOn(defaultResponseTab);
-    await this.clickOn(openOutcomeFeedBackEditorSelector);
-    await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Wrong Answer');
-    await this.clickOn(saveOutcomeFeedbackButton);
+  async editDefaultResponseFeedbackInQuestionEditorPage(
+    defaultResponseFeedback: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.clickOn(defaultFeedbackTab);
+
+    if (defaultResponseFeedback) {
+      await this.clickOn(openOutcomeFeedBackEditor);
+      await this.clickOn(stateContentInputField);
+      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.clickOn(saveOutcomeFeedbackButton);
+    }
+
+    if (directToCard) {
+      await this.clickOn(openOutcomeDestButton);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+    }
   }
 }
 

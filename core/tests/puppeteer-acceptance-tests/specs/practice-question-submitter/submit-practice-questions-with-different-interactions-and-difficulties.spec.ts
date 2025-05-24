@@ -96,7 +96,9 @@ describe('Question Submitter', function () {
       await questionSubmitter.addImageInteraction();
 
       await questionSubmitter.addHintToState('Test Hint 1');
-      await questionSubmitter.editDefaultResponseFeedback();
+      await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+        'Wrong Answer'
+      );
       await questionSubmitter.submitQuestionSuggestion();
 
       await questionSubmitter.expectQuestionSuggestionInContributorDashboard(
@@ -127,7 +129,9 @@ describe('Question Submitter', function () {
         'Option 4',
       ]);
 
-      await questionSubmitter.editDefaultResponseFeedback();
+      await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+        'Wrong Answer'
+      );
       await questionSubmitter.addHintToState('Test Hint 2');
       await questionSubmitter.submitQuestionSuggestion();
 
@@ -154,7 +158,9 @@ describe('Question Submitter', function () {
 
       await questionSubmitter.addTextInputInteraction('Answer');
 
-      await questionSubmitter.editDefaultResponseFeedback();
+      await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+        'Wrong Answer'
+      );
       await questionSubmitter.addHintToState('Test Hint 3');
       await questionSubmitter.addSolutionToState(
         'Answer',

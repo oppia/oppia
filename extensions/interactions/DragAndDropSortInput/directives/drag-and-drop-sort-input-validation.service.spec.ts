@@ -18,15 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -50,7 +44,6 @@ describe('DragAndDropSortInputValidationService', () => {
     hasElementXAtPositionYRule: Rule;
   let customizationArgs: DragAndDropSortInputCustomizationArgs,
     badCustomizationArgs: DragAndDropSortInputCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -58,13 +51,11 @@ describe('DragAndDropSortInputValidationService', () => {
     });
 
     validatorService = TestBed.get(DragAndDropSortInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -77,7 +68,7 @@ describe('DragAndDropSortInputValidationService', () => {
       refresher_exploration_id: null,
     });
 
-    customOutcome = oof.createFromBackendDict({
+    customOutcome = Outcome.createFromBackendDict({
       dest: 'Third State',
       dest_if_really_stuck: null,
       feedback: {
@@ -200,13 +191,13 @@ describe('DragAndDropSortInputValidationService', () => {
     );
 
     answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [equalsListWithAllowedValuesRule],
         goodDefaultOutcome,
         [],
         null
       ),
-      agof.createNew([goodRule1, goodRule2], customOutcome, [], null),
+      AnswerGroup.createNew([goodRule1, goodRule2], customOutcome, [], null),
     ];
   });
 
@@ -237,8 +228,8 @@ describe('DragAndDropSortInputValidationService', () => {
       ),
     ];
     answerGroups = [
-      agof.createNew(rules, customOutcome, [], null),
-      agof.createNew(rules, customOutcome, [], null),
+      AnswerGroup.createNew(rules, customOutcome, [], null),
+      AnswerGroup.createNew(rules, customOutcome, [], null),
     ];
     var warnings = validatorService.getAllWarnings(
       currentState,
@@ -249,11 +240,11 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Multiple items in a single position are not allowed.',
+        message: 'Multiple items in a single position are not allowed',
       },
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Multiple items in a single position are not allowed.',
+        message: 'Multiple items in a single position are not allowed',
       },
     ]);
     customizationArgs.allowMultipleItemsInSamePosition.value = true;
@@ -272,7 +263,7 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Please ensure the list is nonempty.',
+        message: 'Please ensure the list is nonempty',
       },
     ]);
   });
@@ -290,13 +281,13 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Please ensure the items are unique.',
+        message: 'Please ensure the items are unique',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 options do not match ' +
-          'customization argument choices.',
+          'customization argument choices',
       },
     ]);
   });
@@ -386,7 +377,7 @@ describe('DragAndDropSortInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -405,7 +396,7 @@ describe('DragAndDropSortInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 will never be ' +
-          'matched because both the selected elements are same.',
+          'matched because both the selected elements are same',
       },
     ]);
   });
@@ -428,7 +419,7 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 contains choices ' +
             'that do not match any of the choices in the customization ' +
-            'arguments.',
+            'arguments',
         },
       ]);
     }
@@ -452,13 +443,13 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 contains a choice ' +
             'that does not match any of the choices in the customization ' +
-            'arguments.',
+            'arguments',
         },
         {
           type: WARNING_TYPES.ERROR,
           message:
             'Learner answer 1 from Oppia response 1 refers to an ' +
-            'invalid choice position.',
+            'invalid choice position',
         },
       ]);
     }
@@ -483,7 +474,7 @@ describe('DragAndDropSortInputValidationService', () => {
           message:
             'Learner answer 1 from Oppia response 1 will never be ' +
             'matched because there will be at least 2 elements at incorrect ' +
-            'positions if multiple elements cannot occupy the same position.',
+            'positions if multiple elements cannot occupy the same position',
         },
       ]);
       customizationArgs.allowMultipleItemsInSamePosition.value = true;
