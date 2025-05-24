@@ -186,14 +186,6 @@ describe('Exploration Editor', function () {
         'Understanding Negative Numbers'
       );
 
-      // Change the language of the lesson using the dropdown on the first card.
-      // await loggedOutUser.changeLessonLanguage('en');
-
-      // Verify that the lesson is in the selected language.
-      // await loggedOutUser.expectCardContentToMatch(
-      //   'Test Exploration',
-      // );
-
       await loggedOutUser.startVoiceover();
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.verifyVoiceoverIsPlaying(true);
