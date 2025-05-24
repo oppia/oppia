@@ -14,15 +14,16 @@
   font-weight: normal;
   margin: 2px;
 }
-
-md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
+.mat-checkbox.item-selection-input-checkbox.mat-accent .mat-checkbox-background {
   border-color: #0d48a1;
   top: 2px;
 }
-md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
+
+.mat-checkbox.item-selection-input-checkbox.mat-accent.mat-checkbox-checked .mat-checkbox-background {
   background-color: rgba(102, 187, 106, 0.87);
 }
-md-checkbox.item-selection-input-checkbox .md-label {
+
+.mat-checkbox.item-selection-input-checkbox .mat-checkbox-label {
   vertical-align: top;
 }
 
@@ -44,7 +45,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   padding-bottom: 5px;
 }
 
-.item-selection-input-container md-input-group.md-default-theme label {
+.item-selection-input-container .mat-form-field .mat-label {
   border-bottom: 0;
 }
 

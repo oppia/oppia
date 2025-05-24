@@ -963,8 +963,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         question_state_data = test_question_dict['question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
-        question_state_data['recorded_voiceovers'] = (
-            state.recorded_voiceovers.to_dict())
 
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(suggestion.change_cmd.skill_difficulty, float)
@@ -1145,7 +1143,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         new_translation_html_with_image = (
             '<p><oppia-noninteractive-image '
             'alt-with-value="Another description" '
-            'caption-with-value="Another caption" ' 
+            'caption-with-value="Another caption" '
             'filepath-with-value="another_img.svg">'
             '</oppia-noninteractive-image> '
             'Updated translation with image</p>'

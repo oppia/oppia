@@ -78,12 +78,6 @@ describe('ImprovementsService', () => {
         },
         linked_skill_id: null,
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
         card_is_checkpoint: false,
       };
@@ -139,12 +133,6 @@ describe('ImprovementsService', () => {
         },
         linked_skill_id: null,
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
         card_is_checkpoint: false,
       };
@@ -200,12 +188,6 @@ describe('ImprovementsService', () => {
         },
         linked_skill_id: null,
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
         card_is_checkpoint: false,
       };
