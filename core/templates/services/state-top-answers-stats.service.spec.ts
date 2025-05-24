@@ -109,13 +109,6 @@ describe('StateTopAnswersStatsService', () => {
       solution: null,
     },
     classifier_model_id: null,
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-      },
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };

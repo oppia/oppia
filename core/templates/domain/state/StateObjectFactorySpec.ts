@@ -69,9 +69,6 @@ describe('State Object Factory', () => {
     linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {},
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
@@ -94,12 +91,6 @@ describe('State Object Factory', () => {
       content: {
         content_id: 'content_0',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content_0: {},
-          default_outcome_1: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -148,6 +139,17 @@ describe('State Object Factory', () => {
       stateObject
     );
     expect(stateObjectBackend.toBackendDict()).toEqual(stateObject);
+  });
+
+  it('should be able to get content ID to HTML', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+
+    const contentIdToHtml = state.getContentIdToContents();
+    expect(contentIdToHtml).toEqual({
+      content_0: '',
+      default_outcome_1: '',
+      '': 'Type your answer here.',
+    });
   });
 
   it(

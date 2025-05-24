@@ -38,6 +38,14 @@ export class Hint extends BaseTranslatableObject {
     return [this.hintContent];
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let hintContentIdToHtml: {[contentId: string]: string} = {};
+
+    hintContentIdToHtml[this.hintContent.contentId as string] =
+      this.hintContent.html;
+    return hintContentIdToHtml;
+  }
+
   toBackendDict(): HintBackendDict {
     return {
       hint_content: this.hintContent.toBackendDict(),

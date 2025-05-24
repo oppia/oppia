@@ -610,12 +610,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         content_id: 'content',
         html: '{{HtmlValue}}',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       param_changes: [],
       interaction: {
         confirmed_unclassified_answers: [],
@@ -664,12 +658,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
       content: {
         content_id: 'content',
         html: 'content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       param_changes: [],
       interaction: {
@@ -720,12 +708,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         content_id: 'content',
         html: 'content',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       param_changes: [],
       interaction: {
         confirmed_unclassified_answers: [],
@@ -774,12 +756,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
       content: {
         content_id: 'content',
         html: 'content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       param_changes: [],
       interaction: {

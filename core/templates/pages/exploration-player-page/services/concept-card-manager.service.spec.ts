@@ -28,7 +28,6 @@ import {ExplorationEngineService} from './exploration-engine.service';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
 
 describe('ConceptCardManager service', () => {
   let ccms: ConceptCardManagerService;
@@ -38,7 +37,6 @@ describe('ConceptCardManager service', () => {
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
   let interactionObjectFactory: InteractionObjectFactory;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let stateCard: StateCard;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
@@ -64,9 +62,6 @@ describe('ConceptCardManager service', () => {
     spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
   }));
 
   beforeEach(() => {
@@ -127,8 +122,7 @@ describe('ConceptCardManager service', () => {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 
@@ -193,11 +187,6 @@ describe('ConceptCardManager service', () => {
   it('should return if concept card for the state with the new name exists', fakeAsync(() => {
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,
