@@ -114,6 +114,9 @@ describe('Moderator Page Component', () => {
       return {
         then: (successCallback: () => void) => {
           successCallback();
+          return {
+            catch: () => {},
+          };
         },
       };
     }
@@ -213,14 +216,14 @@ describe('Moderator Page Component', () => {
   });
 
   it('should tell if save featured activies button is disabled', () => {
-    componentInstance.displayedFeaturedActivityReferences =
-      componentInstance.lastSavedFeaturedActivityReferences;
+    componentInstance.displayedFeaturedActivityReferences = [
+      {id: '', type: 'emptyID'},
+    ];
     expect(
       componentInstance.isSaveFeaturedActivitiesButtonDisabled()
     ).toBeTrue();
-    componentInstance.displayedFeaturedActivityReferences = [];
-    componentInstance.lastSavedFeaturedActivityReferences = [
-      {id: 'not', type: 'equal'},
+    componentInstance.displayedFeaturedActivityReferences = [
+      {id: 'is', type: 'not'},
     ];
     expect(
       componentInstance.isSaveFeaturedActivitiesButtonDisabled()
@@ -252,6 +255,210 @@ describe('Moderator Page Component', () => {
     componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
     expect(componentInstance.displayedFeaturedActivityReferences).toEqual(
       newValue
+    );
+  });
+
+  it('should display error message for nonexistent exploration', () => {
+    spyOn(alertsService, 'addWarning');
+
+    let newValue: ActivityIdTypeDict[] = [
+      {
+        id: 'dne_exploration',
+        type: 'exploration',
+      },
+    ];
+
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+
+    const mockError = {
+      status: 400,
+      error: {
+        error:
+          'These Exploration IDs do not exist: dne_exploration. Please enter a different ID.',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'These Exploration IDs do not exist: dne_exploration. Please enter a different ID.'
+    );
+  });
+
+  it('should display error message for nonexistent collection', () => {
+    spyOn(alertsService, 'addWarning');
+
+    let newValue: ActivityIdTypeDict[] = [
+      {
+        id: 'dne_collection',
+        type: 'collection',
+      },
+    ];
+
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+
+    const mockError = {
+      status: 400,
+      error: {
+        error:
+          'These Collection IDs do not exist: dne_collection. Please enter a different ID.',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'These Collection IDs do not exist: dne_collection. Please enter a different ID.'
+    );
+  });
+
+  it('should display error message for private exploration', () => {
+    spyOn(alertsService, 'addWarning');
+
+    let newValue: ActivityIdTypeDict[] = [
+      {
+        id: 'priv_exploration',
+        type: 'exploration',
+      },
+    ];
+
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+
+    const mockError = {
+      status: 400,
+      error: {
+        error:
+          'These Exploration IDs are private: priv_exploration. Please enter a different ID.',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'These Exploration IDs are private: priv_exploration. Please enter a different ID.'
+    );
+  });
+
+  it('should display error message for private collection', () => {
+    spyOn(alertsService, 'addWarning');
+
+    let newValue: ActivityIdTypeDict[] = [
+      {
+        id: 'priv_collection',
+        type: 'collection',
+      },
+    ];
+
+    componentInstance.displayedFeaturedActivityReferences = [];
+    componentInstance.updateDisplayedFeaturedActivityReferences(newValue);
+
+    const mockError = {
+      status: 400,
+      error: {
+        error:
+          'These Collection IDs are private: priv_collection. Please enter a different ID.',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'These Collection IDs are private: priv_collection. Please enter a different ID.'
+    );
+  });
+
+  it('should display message for miscellaneous errors', () => {
+    spyOn(alertsService, 'addWarning');
+
+    const mockError = {
+      status: 404,
+      error: {
+        error: '',
+      },
+    };
+
+    spyOn(
+      componentInstance.moderatorPageBackendApiService,
+      'saveFeaturedActivityReferencesAsync'
+    ).and.callFake(() => {
+      return {
+        then: () => {
+          return {
+            catch: (errorCallback: (err: string) => void) => {
+              errorCallback(mockError);
+            },
+          };
+        },
+      };
+    });
+
+    componentInstance.saveFeaturedActivityReferences();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'An unexpected error occurred. Please try again later.'
     );
   });
 });
