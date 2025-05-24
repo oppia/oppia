@@ -1040,44 +1040,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(retrieved_exp_summary.category, 'A new category')
         self.assertEqual(retrieved_exp_summary.contributor_ids, [self.owner_id])
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_apply_change_list(self) -> None:
         self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
             ['TextInput'], category='Algebra')
 
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        change_list_voiceover = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict
-        })]
-        changed_exploration_voiceover = (
-            exp_services.apply_change_list(
-                self.EXP_0_ID, change_list_voiceover))
-        changed_exp_voiceover_obj = (
-            changed_exploration_voiceover.states['State 1'].recorded_voiceovers
-        )
-        self.assertDictEqual(
-            changed_exp_voiceover_obj.to_dict(),
-            recorded_voiceovers_dict)
         change_list_objective = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'objective',
@@ -1127,40 +1094,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIn(self.editor_id, contributer_ids)
         self.assertIn(self.voice_artist_id, contributer_ids)
 
-    def test_is_voiceover_change_list(self) -> None:
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        change_list_voiceover = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict
-        })]
-        self.assertTrue(
-            exp_services.is_voiceover_change_list(change_list_voiceover))
-        not_voiceover_change_list = [exp_domain.ExplorationChange({
-            'cmd': 'edit_exploration_property',
-            'property_name': 'title',
-            'new_value': 'New title'
-        })]
-        self.assertFalse(
-            exp_services.is_voiceover_change_list(not_voiceover_change_list))
-
-    @test_utils.enable_feature_flags(
-            [feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT])
     def test_changes_in_voiceover_list_with_feature_flag_enabled(self) -> None:
         not_voiceover_change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
@@ -1708,40 +1641,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_raise_error_when_adding_voiceover_for_non_curated_exploration(
         self
     ) -> None:
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_0_ID, self.owner_id, ['State 1', 'State 2'],
-            ['TextInput'], category='Algebra')
-
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome': {},
-                'ca_placeholder_0': {}
-            }
-        }
-        change_list_voiceover = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State 1',
-            'new_value': recorded_voiceovers_dict
-        })]
-
-        with self.assertRaisesRegex(
-            Exception,
-            'Voiceover additions are not allowed for this exploration.'
-        ):
-            exp_services.apply_change_list(
-                self.EXP_0_ID, change_list_voiceover)
-
-    def test_raise_error_while_adding_voiceover_with_accent(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             'test_exp_id', title='some title', category='Algebra',
             language_code=constants.DEFAULT_LANGUAGE_CODE
@@ -1784,7 +1683,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             )
 
     def test_exp_summary_model_after_creation(self) -> None:
-        """Test that ExpSummaryModel is correctly initialized after 
+        """Test that ExpSummaryModel is correctly initialized after
         exploration creation.
         """
         exp_id = self.EXP_0_ID
@@ -1826,7 +1725,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(summary.version, initial_version + 2)
 
     def test_exp_summary_model_after_reversion(self) -> None:
-        """Test that ExpSummaryModel reflects the reverted state after 
+        """Test that ExpSummaryModel reflects the reverted state after
         reversion.
         """
         exp_id = self.EXP_0_ID
@@ -1854,7 +1753,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(summary.version, 3)
 
     def test_exp_summary_model_after_publishing(self) -> None:
-        """Test that ExpSummaryModel updates correctly after publishing 
+        """Test that ExpSummaryModel updates correctly after publishing
         an exploration.
         """
         exp_id = self.EXP_0_ID
@@ -1966,175 +1865,6 @@ class ExplorationYamlImportingTests(test_utils.GenericTestBase):
     HINT_AUDIO_FILE: Final = 'answer_hint.mp3'
     SOLUTION_AUDIO_FILE: Final = 'answer_solution.mp3'
 
-    YAML_WITH_AUDIO_TRANSLATIONS: str = (
-        """author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-edits_allowed: true
-init_state_name: Introduction
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 47
-states:
-  Introduction:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: New state
-          dest_if_really_stuck: null
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_3
-              normalizedStrSet:
-              - InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
-        rows:
-          value: 1
-        catchMisspellings:
-          value: false
-      default_outcome:
-        dest: Introduction
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints:
-      - hint_content:
-          content_id: hint_1
-          html: <p>hint one,</p>
-      id: TextInput
-      solution:
-        answer_is_exclusive: false
-        correct_answer: helloworld!
-        explanation:
-          content_id: solution
-          html: <p>hello_world is a string</p>
-    linked_skill_id: null
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_2: {}
-        content:
-          en:
-            duration_secs: 0.0
-            file_size_bytes: 99999
-            filename: %s
-            needs_update: false
-        default_outcome:
-          en:
-            duration_secs: 0.0
-            file_size_bytes: 99999
-            filename: %s
-            needs_update: false
-        feedback_1:
-          en:
-            duration_secs: 0.0
-            file_size_bytes: 99999
-            filename: %s
-            needs_update: false
-        hint_1:
-          en:
-            duration_secs: 0.0
-            file_size_bytes: 99999
-            filename: %s
-            needs_update: false
-        rule_input_3: {}
-        solution:
-          en:
-            duration_secs: 0.0
-            file_size_bytes: 99999
-            filename: %s
-            needs_update: false
-    solicit_answer_details: false
-    card_is_checkpoint: true
-    written_translations:
-      translations_mapping:
-        ca_placeholder_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        hint_1: {}
-        rule_input_3: {}
-        solution: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: New state
-        dest_if_really_stuck: null
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-        default_outcome: {}
-        ca_placeholder_2: {}
-    solicit_answer_details: false
-    card_is_checkpoint: false
-    written_translations:
-      translations_mapping:
-        content: {}
-        default_outcome: {}
-        ca_placeholder_2: {}
-states_schema_version: 42
-tags: []
-title: Title
-""") % (
-    INTRO_AUDIO_FILE, DEFAULT_OUTCOME_AUDIO_FILE, ANSWER_GROUP_AUDIO_FILE,
-    HINT_AUDIO_FILE, SOLUTION_AUDIO_FILE)
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -2166,69 +1896,6 @@ title: Title
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID)
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
-
-    def test_can_load_yaml_with_voiceovers(self) -> None:
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [])
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-
-        state = exp.states[exp.init_state_name]
-        interaction = state.interaction
-        # Ruling out the possibility of None for mypy type checking.
-        assert interaction.solution is not None
-        assert interaction.default_outcome is not None
-        content_id = state.content.content_id
-        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
-        content_voiceovers = voiceovers_mapping[content_id]
-        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_voiceovers = voiceovers_mapping[feedback_id]
-        default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
-        hint_id = interaction.hints[0].hint_content.content_id
-        hint_voiceovers = voiceovers_mapping[hint_id]
-        solution_id = interaction.solution.explanation.content_id
-        solution_voiceovers = voiceovers_mapping[solution_id]
-
-        self.assertEqual(
-            content_voiceovers['en'].filename, self.INTRO_AUDIO_FILE)
-        self.assertEqual(
-            answer_group_voiceovers['en'].filename,
-            self.ANSWER_GROUP_AUDIO_FILE)
-        self.assertEqual(
-            default_outcome_voiceovers['en'].filename,
-            self.DEFAULT_OUTCOME_AUDIO_FILE)
-        self.assertEqual(hint_voiceovers['en'].filename, self.HINT_AUDIO_FILE)
-        self.assertEqual(
-            solution_voiceovers['en'].filename, self.SOLUTION_AUDIO_FILE)
-
-    def test_can_load_yaml_with_stripped_voiceovers(self) -> None:
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [],
-            strip_voiceovers=True)
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-
-        state = exp.states[exp.init_state_name]
-        interaction = state.interaction
-        # Ruling out the possibility of None for mypy type checking.
-        assert interaction.solution is not None
-        assert interaction.default_outcome is not None
-        content_id = state.content.content_id
-        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
-        content_voiceovers = voiceovers_mapping[content_id]
-        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_voiceovers = voiceovers_mapping[feedback_id]
-        default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
-        hint_id = interaction.hints[0].hint_content.content_id
-        hint_voiceovers = voiceovers_mapping[hint_id]
-        solution_id = interaction.solution.explanation.content_id
-        solution_voiceovers = voiceovers_mapping[solution_id]
-
-        self.assertEqual(content_voiceovers, {})
-        self.assertEqual(answer_group_voiceovers, {})
-        self.assertEqual(default_outcome_voiceovers, {})
-        self.assertEqual(hint_voiceovers, {})
-        self.assertEqual(solution_voiceovers, {})
 
     def test_cannot_load_yaml_with_no_schema_version(self) -> None:
         yaml_with_no_schema_version = (
@@ -2655,11 +2322,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -2695,11 +2357,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_5: {}
-        content_3: {}
-        default_outcome_4: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -2761,11 +2418,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   Renamed state:
     card_is_checkpoint: false
@@ -2801,11 +2453,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_5: {}
-        content_3: {}
-        default_outcome_4: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -3208,11 +2855,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_2: {}
-    content_0: {}
-    default_outcome_1: {}
 solicit_answer_details: false
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -3252,11 +2894,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_5: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """)
     }
@@ -3297,11 +2934,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_5: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """)
     }
@@ -7760,46 +7392,6 @@ title: Old Title
             exploration.init_state.interaction.solution.to_dict(),
             solution_2)
 
-    def test_cannot_update_recorded_voiceovers_with_invalid_type(self) -> None:
-        exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
-
-        with self.assertRaisesRegex(
-            Exception, 'Expected recorded_voiceovers to be a dict'):
-            exp_services.update_exploration(
-                self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-                    'state_name': exploration.init_state_name,
-                    'new_value': 'invalid_recorded_voiceovers'
-                })], 'Changed recorded_voiceovers.')
-
-        # Check that the property can be changed when working
-        # on old version.
-        # Add change to upgrade the version.
-        exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'new title'
-            })], 'Changed title.')
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': exploration.init_state_name,
-            'new_value': 'invalid_recorded_voiceovers'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.NEW_EXP_ID, 1, change_list)
-        self.assertTrue(changes_are_mergeable)
-        with self.assertRaisesRegex(
-            Exception, 'Expected recorded_voiceovers to be a dict'):
-            exp_services.update_exploration(
-                self.albert_id, self.NEW_EXP_ID, change_list,
-                'Changed recorded_voiceovers.')
-
     def test_get_exploration_validation_error(self) -> None:
         # Valid exploration version.
         info = exp_services.get_exploration_validation_error(
@@ -8635,7 +8227,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 55,
+            'from_version': 56,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -9008,26 +8600,22 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
             old_model.state_version_history.get(
                 feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
 
-        recorded_voiceovers_dict = {
-            'voiceovers_mapping': {
-                'content_0': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 42.43
-                    }
-                },
-                'default_outcome_1': {}
-            }
+        manual_voiceover_1: state_domain.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 42.43
         }
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': recorded_voiceovers_dict
-        })]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_UPDATE_VOICEOVERS,
+                'language_accent_code': 'en-US',
+                'content_id': 'content_0',
+                'voiceovers': {
+                    'manual': manual_voiceover_1
+                }
+            })
+        ]
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Translation commits')
 

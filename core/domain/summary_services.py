@@ -692,19 +692,19 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
     return results
 
 
-def require_activities_to_be_public(
+def check_activity_id_validity(
     activity_references: List[activity_domain.ActivityReference]
-) -> None:
-    """Raises an exception if any activity reference in the list does not
-    exist, or is not public.
+) -> Tuple[List[str], List[str], List[str], List[str]]:
+    """Returns four lists of each type of invalid Activity ID.
 
     Args:
         activity_references: list(ActivityReference). A list of
             ActivityReference domain objects.
 
-    Raises:
-        Exception. Any activity reference in the list does not
-            exist, or is not public.
+    Returns:
+        Tuple[List[str], List[str], List[str], List[str]]. 
+        The Tuple contains 4 Lists of string type. Each List
+        corresponds to a type of Invalid ID.
     """
     exploration_ids, collection_ids = activity_services.split_by_type(
         activity_references)
@@ -721,16 +721,54 @@ def require_activities_to_be_public(
             collection_ids),
     }]
 
+    # Initialize lists for each type of invalid IDs.
+    non_existent_exploration_ids = []
+    non_existent_collection_ids = []
+    private_exploration_ids = []
+    private_collection_ids = []
+
     for activities_info in activity_summaries_by_type:
-        for index, summary in enumerate(activities_info['summaries']):
-            if summary is None:
-                raise Exception(
-                    'Cannot feature non-existent %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
-            if summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
-                raise Exception(
-                    'Cannot feature private %s with id %s' %
-                    (activities_info['type'], activities_info['ids'][index]))
+
+        # If the activity is an Exploration.
+        if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
+            for index, summary in enumerate(activities_info['summaries']):
+                # If there's no summary for the Exploration ID,
+                # it means it doesn't exist. ID string is added to
+                # non_existent_exploration_ids list.
+                if summary is None:
+                    non_existent_exploration_ids.append(
+                        activities_info['ids'][index]
+                    )
+                # If the Exploration is set to private. ID string is added to
+                # private_exploration_ids list.
+                elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+                    private_exploration_ids.append(
+                        activities_info['ids'][index]
+                    )
+        # If the activity isn't an Exploration, it's a Collection.
+        else:
+            for index, summary in enumerate(activities_info['summaries']):
+                # If there's no summary for the Collection ID,
+                # it means it doesn't exist. ID string is added to
+                # non_existent_collection_ids list.
+                if summary is None:
+                    non_existent_collection_ids.append(
+                        activities_info['ids'][index]
+                    )
+                # If the Collection is set to private. ID string is added to
+                # private_collection_ids list.
+                elif summary.status == rights_domain.ACTIVITY_STATUS_PRIVATE:
+                    private_collection_ids.append(
+                        activities_info['ids'][index]
+                    )
+
+    # Return Tuple of lists containing any invalid IDs.
+    return (
+                non_existent_exploration_ids,
+                non_existent_collection_ids,
+                private_exploration_ids,
+                private_collection_ids
+            )
 
 
 def get_featured_activity_summary_dicts(

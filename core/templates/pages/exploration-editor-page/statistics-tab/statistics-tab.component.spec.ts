@@ -111,15 +111,6 @@ describe('Statistics Tab Component', () => {
       states: {
         Start: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -189,11 +180,6 @@ describe('Statistics Tab Component', () => {
         },
         End: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -218,15 +204,6 @@ describe('Statistics Tab Component', () => {
         },
         Mid: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,

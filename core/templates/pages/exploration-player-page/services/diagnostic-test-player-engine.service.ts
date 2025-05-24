@@ -34,7 +34,6 @@ import {AlertsService} from 'services/alerts.service';
 import {ContextService} from 'services/context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {DiagnosticTestCurrentTopicStatusModel} from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
@@ -60,7 +59,6 @@ export class DiagnosticTestPlayerEngineService {
   constructor(
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contextService: ContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
@@ -459,9 +457,7 @@ export class DiagnosticTestPlayerEngineService {
       questionHtml,
       interactionHtml as string,
       interaction,
-      stateData.recordedVoiceovers,
-      stateData.content.contentId as string,
-      this.audioTranslationLanguageService
+      stateData.content.contentId as string
     );
   }
 
