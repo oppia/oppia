@@ -15,13 +15,16 @@
 """Tests for classes and methods relating to user rights."""
 
 from __future__ import annotations
+import unittest.mock
 
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import rights_domain
+from core.domain import exp_rights_domain
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import user_domain
@@ -136,6 +139,40 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.check_can_manage_voice_artist_in_activity(
                 self.user_a, None))
+
+    def test_get_activity_rights_from_model_returns_correct_rights(
+        self) -> None:
+        exp_services.load_demo('1')
+        rights_model = exp_models.ExplorationRightsModel.get('1')
+
+        rights_obj = rights_manager.get_activity_rights_from_model(
+            rights_model, constants.ACTIVITY_TYPE_EXPLORATION
+        )
+
+        self.assertEqual(rights_obj.id, '1')
+        self.assertIsInstance(rights_obj, exp_rights_domain.ExplorationRights)
+
+    def test_save_activity_rights_for_exploration_executes_correct_branch(self) -> None:
+        exp_id = '1'
+        exp_services.load_demo(exp_id)
+        exploration_rights = rights_manager.get_exploration_rights(exp_id)
+
+        with unittest.mock.patch.object(
+            rights_manager, '_save_exploration_rights'
+        ) as mock_save_exploration_rights:
+            rights_manager._save_activity_rights(
+                self.user_id_moderator,
+                exploration_rights,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                'Test commit',
+                []
+            )
+            mock_save_exploration_rights.assert_called_once_with(
+                self.user_id_moderator,
+                exploration_rights,
+                'Test commit',
+                []
+            )
 
     def test_check_can_modify_core_activity_roles_for_none_activity(
         self
