@@ -7751,5 +7751,58 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "SHORT_COMMIT_HASH": "",
+
+  // Please consult the translation team before adding any entries here.
+  // These words improve the quality of automatic voiceovers.
+  "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
+    "en": {
+      "+": "plus",
+      "-": "minus",
+      "*": "times",
+      "×": "times",
+      "÷": "divided by",
+      "=": "equals",
+      "!": "factorial of",
+      "^": "to the power of",
+      "^2": "squared",
+      "^3": "cubed"
+    },
+    "hi": {
+      "+": "जोड़",
+      "-": "घटा",
+      "*": "गुणा",
+      "×": "गुणा",
+      "÷": "विभाजित",
+      "=": "बराबर",
+      "!": "फैक्टोरियल",
+      "^": "की घात",
+      "^2": "वर्ग",
+      "^3": "घन"
+    },
+    "pt": {
+      "+": "mais",
+      "-": "menos",
+      "*": "vezes",
+      "×": "vezes",
+      "÷": "dividido por",
+      "=": "igual a",
+      "!": "fatorial",
+      "^": "a potência de",
+      "^2": "ao quadrado",
+      "^3": "ao cubo"
+    },
+    "ar": {
+      "+": "زَائِدْ",
+      "-": "نَاقِصْ",
+      "*": "ضَرْبْ",
+      "×": "ضَرْبْ",
+      "÷": "تَقْسِيمْ",
+      "=": "يُسَاوِي",
+      "!": "عاملي",
+      "^": "للقوة",
+      "^2": "تربيع",
+      "^3": "تكعيب"
+    }
+  }
 } as const;

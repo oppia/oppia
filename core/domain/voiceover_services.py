@@ -421,6 +421,19 @@ def create_entity_voiceovers_model(
     return entity_voiceovers_model
 
 
+def save_entity_voiceovers(
+    entity_voiceovers: voiceover_domain.EntityVoiceovers
+) -> None:
+    """Saves the entity voiceovers domain object to the datastore.
+
+    Args:
+        entity_voiceovers: EntityVoiceovers. An instance of the entity
+            voiceovers domain class.
+    """
+    entity_voiceovers_model = create_entity_voiceovers_model(entity_voiceovers)
+    entity_voiceovers_model.put()
+
+
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]]
 ) -> None:
@@ -515,6 +528,19 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read()))
         return autogeneratable_language_accent_list
+
+
+def get_autogeneratable_language_accent_codes() -> List[str]:
+    """The method returns the list of language accent codes that are supported
+    by cloud service for autogeneration.
+
+    Returns:
+        List[str]. A list of language accent codes that are supported by the
+        cloud service for autogeneration.
+    """
+    language_accent_codes = list(
+        get_autogeneratable_language_accent_list().keys())
+    return language_accent_codes
 
 
 def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:

@@ -88,15 +88,27 @@ export class TranslationStatusService implements OnInit {
       return availabilityStatus;
     }
 
-    let voiceover = entityVoiceovers.getManualVoiceover(contentId);
+    let manualVoiceover = entityVoiceovers.getManualVoiceover(contentId);
+    let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(contentId);
 
-    if (voiceover === undefined) {
-      return availabilityStatus;
+    // Manual voiceovers is given higher priority than automatic voiceovers.
+    if (manualVoiceover) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = manualVoiceover.needsUpdate;
+    } else if (
+      automaticVoiceover &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = automaticVoiceover.needsUpdate;
     }
-    availabilityStatus.available = true;
-    availabilityStatus.needsUpdate = voiceover.needsUpdate;
 
     return availabilityStatus;
+  }
+
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
   _getTranslationStatus(contentId: string): AvailabilityStatus {
@@ -236,6 +248,22 @@ export class TranslationStatusService implements OnInit {
           voiceoverContentIds = Object.keys(
             activeEntityVoiceovers.voiceoversMapping
           );
+        }
+
+        // If Automatic voiceover regeneration is not enabled, then we need to
+        // check for only manual voiceovers.
+        if (
+          activeEntityVoiceovers &&
+          !this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+        ) {
+          voiceoverContentIds = [];
+          for (let contentId in activeEntityVoiceovers.voiceoversMapping) {
+            const manualVoiceover =
+              activeEntityVoiceovers.getManualVoiceover(contentId);
+            if (manualVoiceover) {
+              voiceoverContentIds.push(contentId);
+            }
+          }
         }
 
         if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
