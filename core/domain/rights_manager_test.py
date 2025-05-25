@@ -38,8 +38,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([
-    models.Names.EXPLORATION
+(exp_models, collection_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.COLLECTION
 ])
 
 
@@ -1614,6 +1614,17 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b)
+
+    def test_get_collection_rights_where_user_is_owner_returns_correct_collections(self) -> None:
+        self.save_new_default_collection('col1', self.user_id_a)
+        self.save_new_default_collection('col2', self.user_id_b)
+        owned_rights = rights_manager.get_collection_rights_where_user_is_owner(
+            self.user_id_a
+        )
+
+        self.assertEqual(len(owned_rights), 1)
+        self.assertEqual(owned_rights[0].id, 'col1')
+        self.assertTrue(owned_rights[0].is_owner(self.user_id_a))
 
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
