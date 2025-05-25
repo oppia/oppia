@@ -118,7 +118,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -156,7 +156,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by an 'IsEquivalentTo' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
 
@@ -196,7 +196,7 @@ describe('MathEquationInputValidationService', () => {
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
           "matched because it is preceded by a 'MatchesExactlyWith' learner " +
-          'answer with a matching input.',
+          'answer with a matching input',
       },
     ]);
   });
@@ -305,7 +305,7 @@ describe('MathEquationInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The number of custom letters cannot be more than 10.',
+        message: 'The number of custom letters cannot be more than 10',
       },
     ]);
   });

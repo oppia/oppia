@@ -35,6 +35,9 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
@@ -52,6 +55,7 @@ describe('State Translation Editor Component', () => {
   let ngbModal: NgbModal;
   let editabilityService: EditabilityService;
   let entityTranslationsService: EntityTranslationsService;
+  let entityVoiceoversService: EntityVoiceoversService;
   let changeListService: ChangeListService;
   let explorationStatesService: ExplorationStatesService;
   let stateObjectFactory: StateObjectFactory;
@@ -89,6 +93,7 @@ describe('State Translation Editor Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     externalSaveService = TestBed.inject(ExternalSaveService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -167,18 +172,25 @@ describe('State Translation Editor Component', () => {
 
   describe('on clicking save button', () => {
     it('should open model asking whether voiceover needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
+      let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+
+      let entityVoiceovers = new EntityVoiceovers(
+        'exp_id',
+        'exploration',
+        5,
+        'hi-IN',
+        {
+          content_0: {
+            manual: manualVoiceover1,
           },
-        },
-      });
+        }
+      );
+
+      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.setLanguageCode('hi');
+      entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
       spyOn(ngbModal, 'open').and.callThrough();
 
       component.onSaveTranslationButtonClicked();
@@ -212,18 +224,25 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should accept NO on voiceover needs update modal', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
+      let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+
+      let entityVoiceovers = new EntityVoiceovers(
+        'exp_id',
+        'exploration',
+        5,
+        'hi-IN',
+        {
+          content_0: {
+            manual: manualVoiceover1,
           },
-        },
-      });
+        }
+      );
+
+      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.setLanguageCode('hi');
+      entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
       const mockNgbModalRef = new MockNgbModalRef();
       mockNgbModalRef.result = Promise.reject();
       spyOn(ngbModal, 'open').and.returnValue(mockNgbModalRef as NgbModalRef);
