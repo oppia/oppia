@@ -1043,6 +1043,20 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_get_activity_rights_where_user_is_owner_for_exploration(self) -> None:
+        # Setup: Create a user and an exploration owned by that user.
+        self.signup('owner@example.com', 'owneruser')
+        owner_id = self.get_user_id_from_email('owner@example.com')
+        self.save_new_valid_exploration('exp1', owner_id)
+
+        activity_rights_list = rights_manager._get_activity_rights_where_user_is_owner(
+            constants.ACTIVITY_TYPE_EXPLORATION, owner_id
+        )
+
+        self.assertEqual(len(activity_rights_list), 1)
+        self.assertEqual(activity_rights_list[0].id, 'exp1')
+        self.assertTrue(activity_rights_list[0].is_owner(owner_id))
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
