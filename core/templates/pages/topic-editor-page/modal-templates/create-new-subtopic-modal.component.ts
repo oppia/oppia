@@ -77,6 +77,7 @@ export class CreateNewSubtopicModalComponent
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         rows: 100,
       },
     };

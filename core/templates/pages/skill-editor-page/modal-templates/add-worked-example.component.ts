@@ -40,7 +40,9 @@ export class AddWorkedExampleModalComponent
   tmpWorkedExampleQuestionHtml!: string;
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
-    ui_config: {},
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS'
+    },
   };
 
   constructor(

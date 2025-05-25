@@ -65,6 +65,11 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
+    "RTE_COMPONENT_CONFIGS": {
+      "ALL_COMPONENTS": ["tabs", "skillreview", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "collapsible", "link", "video"]
+    },
+
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
     "Partnerships", "Volunteer", "Stories", "Languages", "New features",
