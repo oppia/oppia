@@ -812,31 +812,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to click the Blog button in the About Menu on navbar
-   * and check if it opens the Blog page.
-   */
-  async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.clickButtonToNavigateToNewPage(
-        mobileSidebarAboutMenuBlogButton,
-        'Blog button in the About Menu on mobile sidebar',
-        blogUrl,
-        'Blog'
-      );
-    } else {
-      await this.clickOn(navbarAboutTab);
-      await this.clickButtonToNavigateToNewPage(
-        navbarAboutTabBlogButton,
-        'Blog button in the About Menu on navbar',
-        blogUrl,
-        'Blog'
-      );
-    }
-  }
-
-  /**
    * Function to open the external link by class and text inside it
    */
   async openExternalLinkBySelectorAndText(
