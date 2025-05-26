@@ -917,7 +917,7 @@
 	"I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION": "Guau, ¡completaste todas nuestras lecciones de Temas! Siéntete libre de echar un vistazo a nuestras otras Exploraciones en nuestra <a href=\"/community-library\">Lecciones de la comunidad</a>.",
 	"I18N_LEARNER_DASHBOARD_EVENING_GREETING": "Buenas noches",
 	"I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED": "Jugado últimamente",
-	"I18N_LEARNER_DASHBOARD_GOALS_SECTION": "Cabras",
+	"I18N_LEARNER_DASHBOARD_GOALS_SECTION": "METAS",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON": "Añadir un objetivo",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_HEADING": "Objetivos de <[username]>",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS": "Elija hasta 5 temas de tu interés y luego completa todos los capítulos sobre los temas seleccionados para lograr sus objetivos de aprendizaje.",
