@@ -24,7 +24,6 @@ import {Subscription} from 'rxjs';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
@@ -33,12 +32,10 @@ describe('Player position service', () => {
   let pps: PlayerPositionService;
   let onQuestionChangeSpy: jasmine.Spy;
   let subscriptions: Subscription;
-  let atls: AudioTranslationLanguageService;
 
   beforeEach(() => {
     pts = TestBed.inject(PlayerTranscriptService);
     pps = TestBed.inject(PlayerPositionService);
-    atls = TestBed.inject(AudioTranslationLanguageService);
     onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
     subscriptions = new Subscription();
     subscriptions.add(
@@ -80,8 +77,7 @@ describe('Player position service', () => {
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
         {} as RecordedVoiceovers,
-        '',
-        atls
+        ''
       )
     );
 
@@ -92,8 +88,7 @@ describe('Player position service', () => {
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
         {} as RecordedVoiceovers,
-        '',
-        atls
+        ''
       )
     );
     let callBack = () => {};
