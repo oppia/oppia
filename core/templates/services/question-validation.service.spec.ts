@@ -156,15 +156,6 @@ describe('Question Validation Service', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {},
-          },
-        },
         solicit_answer_details: false,
       },
       language_code: 'en',
@@ -266,7 +257,7 @@ describe('Question Validation Service', () => {
     expect(errorMessage).toBe(
       'Learner answer 1 from Oppia response 2 will never be matched' +
         " because it is preceded by a 'Equals' answer" +
-        ' with a matching input.'
+        ' with a matching input'
     );
 
     originalSpy.and.returnValue(null);
