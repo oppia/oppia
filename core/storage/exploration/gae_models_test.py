@@ -367,8 +367,12 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         exp_rights_model = exp_models.ExplorationRightsModel(**snapshot_dict)
 
         for field in ['translator_ids', 'all_viewer_ids']:
-            self.assertNotIn(field, exp_rights_model._properties) # pylint: disable=protected-access
-            self.assertNotIn(field, exp_rights_model._values) # pylint: disable=protected-access
+            self.assertNotIn(
+                field, exp_rights_model._properties # fmt: skip # pylint: disable=protected-access, line-too-long
+            )
+            self.assertNotIn(
+                field, exp_rights_model._values # fmt: skip # pylint: disable=protected-access, line-too-long
+            )
 
 
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):

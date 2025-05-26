@@ -493,8 +493,10 @@ class BaseModel(datastore_services.Model):
             iterable. Filterable iterable of all entities of this class.
         """
         return (
-            cls.query() if include_deleted else
-            cls.query().filter(cls.deleted == False)) # pylint: disable=singleton-comparison
+            cls.query()
+            if include_deleted
+            else cls.query().filter(cls.deleted == False) # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+        )
 
     @classmethod
     def get_new_id(cls, entity_name: str) -> str:

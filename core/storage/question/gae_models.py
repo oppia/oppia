@@ -667,8 +667,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill id.
         """
         question_skill_link_models = cls.query().filter(
-            cls.skill_id == skill_id,
-            cls.deleted == False) # pylint: disable=singleton-comparison
+            cls.skill_id == skill_id, cls.deleted == False # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+        )
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
