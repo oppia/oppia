@@ -41,9 +41,10 @@
                 <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)">
                   <mat-select
                     [(ngModel)]="languageAccentCodesToSupportsAutogeneration[languageAccentCodeToDescription.key]"
-                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)">
-                    <mat-option [value]="true">Yes</mat-option>
-                    <mat-option [value]="false">No</mat-option>
+                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)"
+                    [ngClass]="'e2e-test-' + languageAccentCodeToDescription.key + '-supports-autogeneration-select'">
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="true">Yes</mat-option>
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="false">No</mat-option>
                   </mat-select>
                 </mat-form-field>
               </span>

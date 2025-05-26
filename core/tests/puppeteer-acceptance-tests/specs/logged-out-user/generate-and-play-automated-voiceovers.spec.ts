@@ -75,7 +75,10 @@ describe('Exploration Editor', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
-    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
+    await voiceoverAdmin.addSupportedLanguageAccentPair(
+      'English (United States)'
+    );
+    await voiceoverAdmin.enableAutogenerationForLanguageAccentPair('en-US');
 
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
