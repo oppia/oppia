@@ -176,7 +176,6 @@ describe('Logged-in User', function () {
         'What are the Place Values'
       );
       await loggedInUser.continueToNextCard();
-      await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
@@ -195,7 +194,6 @@ describe('Logged-in User', function () {
         "Jamie's Adventures in the Arcade",
         'Find the Value of a Number'
       );
-      await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
