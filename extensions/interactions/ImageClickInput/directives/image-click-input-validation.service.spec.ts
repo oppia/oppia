@@ -218,7 +218,7 @@ describe('ImageClickInputValidationService', () => {
       expect(warnings).toEqual([
         {
           type: WARNING_TYPES.ERROR,
-          message: 'Please specify at least one region in the image.',
+          message: 'Please specify at least one region in the image',
         },
       ]);
     }
@@ -254,7 +254,7 @@ describe('ImageClickInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Please add a learner answer to cover what should happen ' +
-          'if none of the given regions are clicked.',
+          'if none of the given regions are clicked',
       },
     ]);
     warnings = validatorService.getAllWarnings(
@@ -268,7 +268,7 @@ describe('ImageClickInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Please add a learner answer to cover what should happen ' +
-          'if none of the given regions are clicked.',
+          'if none of the given regions are clicked',
       },
     ]);
   });

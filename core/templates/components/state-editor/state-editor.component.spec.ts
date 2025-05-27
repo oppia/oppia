@@ -203,12 +203,6 @@ describe('State Editor Component', () => {
     let onStateEditorInitializedEmitter = new EventEmitter();
     let stateData = {
       content: {},
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         id: null,
         answer_groups: [],

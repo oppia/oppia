@@ -232,7 +232,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 upper bound of the range should be ' +
-          'greater than or equal to zero.',
+          'greater than or equal to zero',
       },
     ]);
   });
@@ -250,7 +250,7 @@ describe('NumericInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Learner answer 1 tolerance must be a positive value.',
+        message: 'Learner answer 1 tolerance must be a positive value',
       },
     ]);
   });
@@ -269,7 +269,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 Upper bound of the tolerance ' +
-          'range should be greater than or equal to zero.',
+          'range should be greater than or equal to zero',
       },
     ]);
   });
@@ -287,8 +287,7 @@ describe('NumericInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Learner answer 1 input should be greater than ' +
-          'or equal to zero.',
+          'Learner answer 1 input should be greater than or equal to zero',
       },
     ]);
   });
@@ -306,8 +305,7 @@ describe('NumericInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Learner answer 1 input should be greater than ' +
-          'or equal to zero.',
+          'Learner answer 1 input should be greater than or equal to zero',
       },
     ]);
   });
@@ -325,8 +323,7 @@ describe('NumericInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Learner answer 1 input should be greater than ' +
-          'or equal to zero.',
+          'Learner answer 1 input should be greater than or equal to zero',
       },
     ]);
   });
@@ -349,13 +346,13 @@ describe('NumericInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'In learner answer 1 from Oppia response 1, Please ensure ' +
-            'that the second number is greater than the first number.',
+            'that the second number is greater than the first number',
         },
         {
           type: WARNING_TYPES.ERROR,
           message:
             'In learner answer 2 from Oppia response 1, Please ensure ' +
-            'that the second number is greater than the first number.',
+            'that the second number is greater than the first number',
         },
       ]);
     }
@@ -374,13 +371,13 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 upper bound of the range should be ' +
-          'greater than or equal to zero.',
+          'greater than or equal to zero',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be matched' +
-          ' because it is made redundant by answer 1 from response 1.',
+          ' because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -398,7 +395,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be matched' +
-          ' because it is made redundant by answer 1 from response 1.',
+          ' because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -418,13 +415,13 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 upper bound of the range should be ' +
-          'greater than or equal to zero.',
+          'greater than or equal to zero',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
-          ' because it is made redundant by answer 1 from response 1.',
+          ' because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -443,7 +440,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
     answerGroups[0].rules = [greaterThanNegativeOneRule, equalsZeroRule];
@@ -458,7 +455,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -477,7 +474,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
     answerGroups[0].rules = [
@@ -495,7 +492,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });
@@ -513,7 +510,7 @@ describe('NumericInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 2 from Oppia response 1 will never be ' +
-          'matched because it is made redundant by answer 1 from response 1.',
+          'matched because it is made redundant by answer 1 from response 1',
       },
     ]);
   });

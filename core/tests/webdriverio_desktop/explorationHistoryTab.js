@@ -195,34 +195,18 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       24: {
-        text: 'recorded_voiceovers:',
-        highlighted: false,
-      },
-      25: {
-        text: '  voiceovers_mapping:',
-        highlighted: false,
-      },
-      26: {
-        text: '    content_0: {}',
-        highlighted: false,
-      },
-      27: {
-        text: '    default_outcome_1: {}',
-        highlighted: true,
-      },
-      28: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      29: {
+      25: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      30: {
+      26: {
         text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
-      31: {
+      27: {
         text: '',
         highlighted: false,
       },
@@ -394,38 +378,18 @@ describe('Exploration history', function () {
         highlighted: false,
       },
       42: {
-        text: 'recorded_voiceovers:',
-        highlighted: false,
-      },
-      43: {
-        text: '  voiceovers_mapping:',
-        highlighted: false,
-      },
-      44: {
-        text: '    content_0: {}',
-        highlighted: false,
-      },
-      45: {
-        text: '    default_outcome_1: {}',
-        highlighted: true,
-      },
-      46: {
-        text: '    feedback_2: {}',
-        highlighted: true,
-      },
-      47: {
         text: 'solicit_answer_details: false',
         highlighted: false,
       },
-      48: {
+      43: {
         text: 'card_is_checkpoint: true',
         highlighted: false,
       },
-      49: {
+      44: {
         text: 'inapplicable_skill_misconception_ids: []',
         highlighted: false,
       },
-      50: {
+      45: {
         text: '',
         highlighted: false,
       },
@@ -459,11 +423,6 @@ describe('Exploration history', function () {
       '  id: Continue\n' +
       '  solution: null\n' +
       'param_changes: []\n' +
-      'recorded_voiceovers:\n' +
-      '  voiceovers_mapping:\n' +
-      '    content_3: {}\n' +
-      '    default_outcome_4: {}\n' +
-      '    ca_buttonText_5: {}\n' +
       'solicit_answer_details: false\n' +
       'card_is_checkpoint: false\n' +
       'inapplicable_skill_misconception_ids: []\n' +
@@ -614,7 +573,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 56\n' +
+      'states_schema_version: 57\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +
@@ -630,7 +589,7 @@ describe('Exploration history', function () {
       'tags: []\n' +
       "blurb: ''\n" +
       "author_notes: ''\n" +
-      'states_schema_version: 56\n' +
+      'states_schema_version: 57\n' +
       'init_state_name: Introduction\n' +
       'param_specs: {}\n' +
       'param_changes: []\n' +

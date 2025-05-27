@@ -403,9 +403,13 @@ class Question(translation_domain.BaseTranslatableObject):
         # here 'content_ids_to_audio_translations' is discontinued in the
         # latest recorded_voiceovers. So, while accessing these discontinued
         # fields MyPy throws an error. Thus to avoid the error, we used ignore.
-        question_state_dict['recorded_voiceovers'] = {
-            'voiceovers_mapping': (
-                question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[misc]
+        voiceovers_mapping = question_state_dict.pop(
+            'content_ids_to_audio_translations') # type: ignore[misc]
+
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        question_state_dict['recorded_voiceovers'] = { # type: ignore[misc]
+            'voiceovers_mapping': voiceovers_mapping
         }
         return question_state_dict
 
@@ -475,8 +479,10 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
         # Get the voiceovers_mapping metadata.
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
         voiceovers_mapping = (
-            question_state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping']) # type: ignore[misc]
         language_codes_to_audio_metadata = voiceovers_mapping.values()
         for language_codes in language_codes_to_audio_metadata:
             for audio_metadata in language_codes.values():
@@ -671,9 +677,14 @@ class Question(translation_domain.BaseTranslatableObject):
                     old_answer_groups_feedback_keys) - set(
                         new_answer_groups_feedback_keys)
                 for content_id in content_ids_to_delete:
-                    if content_id in question_state_dict['recorded_voiceovers'][
+                    # Here we use MyPy ignore because the latest schema of state
+                    # dict doesn't contains recorded_voiceovers property.
+                    if content_id in question_state_dict['recorded_voiceovers'][ # type: ignore[misc]
                             'voiceovers_mapping']:
-                        del question_state_dict['recorded_voiceovers'][
+                        # Here we use MyPy ignore because the latest schema of
+                        # state dict doesn't contains recorded_voiceovers
+                        # property.
+                        del question_state_dict['recorded_voiceovers'][ # type: ignore[misc]
                             'voiceovers_mapping'][content_id]
                     if content_id in question_state_dict[
                             # Here we use MyPy ignore because this is a
@@ -974,8 +985,10 @@ class Question(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             question_state_dict['written_translations'][ # type: ignore[misc]
                 'translations_mapping'][new_content_id] = {}
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
             question_state_dict[
-                'recorded_voiceovers'][
+                'recorded_voiceovers'][ # type: ignore[misc]
                     'voiceovers_mapping'][new_content_id] = {}
 
         return question_state_dict
@@ -1082,7 +1095,9 @@ class Question(translation_domain.BaseTranslatableObject):
             # dict doesn't contains written_translations property.
             question_state_dict['written_translations']['translations_mapping'][ # type: ignore[misc]
                 'ca_placeholder_0'] = {}
-            question_state_dict['recorded_voiceovers']['voiceovers_mapping'][
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            question_state_dict['recorded_voiceovers']['voiceovers_mapping'][ # type: ignore[misc]
                 'ca_placeholder_0'] = {}
 
         return question_state_dict
@@ -1224,8 +1239,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict[
                     'written_translations'][ # type: ignore[misc]
                         'translations_mapping'][new_content_id] = {}
+                # Here we use MyPy ignore because the latest schema of state
+                # dict doesn't contains recorded_voiceovers property.
                 question_state_dict[
-                    'recorded_voiceovers'][
+                    'recorded_voiceovers'][ # type: ignore[misc]
                         'voiceovers_mapping'][new_content_id] = {}
 
         return question_state_dict
@@ -1831,6 +1848,26 @@ class Question(translation_domain.BaseTranslatableObject):
 
         question_state_dict['inapplicable_skill_misconception_ids'] = []
 
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v56_dict_to_v57_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from v56 to v57. Version 57 removes the RecordedVoiceovers
+        property from the State.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        # Here we use MyPy ignore because the latest schema of state
+        # dict doesn't contains recorded_voiceovers property.
+        del question_state_dict['recorded_voiceovers'] # type: ignore[misc]
         return question_state_dict
 
     @classmethod

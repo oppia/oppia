@@ -63,7 +63,6 @@ import {ExplorationEditorTabComponent} from './editor-tab/exploration-editor-tab
 import {ExplorationSaveAndPublishButtonsComponent} from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import {ExplorationSavePromptModalComponent} from './modal-templates/exploration-save-prompt-modal.component';
 import {AddAudioTranslationModalComponent} from './translation-tab/modal-templates/add-audio-translation-modal.component';
-import {AudioTranslationBarComponent} from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import {VoiceoverCardComponent} from './translation-tab/voiceover-card/voiceover-card.component';
 import {StateTranslationEditorComponent} from './translation-tab/state-translation-editor/state-translation-editor.component';
 import {StateTranslationComponent} from './translation-tab/state-translation/state-translation.component';
@@ -74,6 +73,7 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
+import {AutomaticVoiceoverRegenerationConfirmModalComponent} from './translation-tab/voiceover-card/modals/automatic-voiceover-regeneration-confirm-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -210,6 +210,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -246,7 +247,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
@@ -265,6 +265,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -301,7 +302,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,

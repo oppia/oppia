@@ -48,14 +48,14 @@ export class ContinueValidationService {
     if (customizationArgs.buttonText.value.unicode.trim().length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be empty.',
+        message: 'The button text should not be empty',
       });
     }
 
     if (customizationArgs.buttonText.value.unicode.length > 20) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'The button text should be at most 20 characters.',
+        message: 'The button text should be at most 20 characters',
       });
     }
     return warningsList;
@@ -74,7 +74,7 @@ export class ContinueValidationService {
         type: AppConstants.WARNING_TYPES.CRITICAL,
         message:
           'Only the default outcome is necessary for a continue' +
-          ' interaction.',
+          ' interaction',
       });
     }
 
@@ -82,7 +82,7 @@ export class ContinueValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
-          'Please specify what Oppia should do after the button is clicked.',
+          'Please specify what Oppia should do after the button is clicked',
       });
     }
 
