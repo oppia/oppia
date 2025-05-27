@@ -45,7 +45,7 @@ class TestIssue(unittest.TestCase):
         data: IssueDict = {
             'number': 123,
             'assignee': {'login': 'testuser'},
-            'events_url': 'https://api.github.com/events'
+            'events_url': 'https://api.github.com/events',
         }
 
         issue = checker.Issue.from_github_data(data)
@@ -58,7 +58,7 @@ class TestIssue(unittest.TestCase):
         data: IssueDict = {
             'number': 123,
             'assignee': None,
-            'events_url': 'https://api.github.com/events'
+            'events_url': 'https://api.github.com/events',
         }
 
         issue = checker.Issue.from_github_data(data)
@@ -113,14 +113,14 @@ class TestGitHubService(unittest.TestCase):
                 {
                     'number': 1,
                     'assignee': {'login': 'user1'},
-                    'events_url': f'{self.base_url}/issues/1/events'
+                    'events_url': f'{self.base_url}/issues/1/events',
                 },
                 {
                     'number': 2,
                     'assignee': None,
-                    'events_url': f'{self.base_url}/issues/2/events'
-                }
-            ]
+                    'events_url': f'{self.base_url}/issues/2/events',
+                },
+            ],
         }
         mock_get.return_value = mock_response
 
@@ -134,9 +134,7 @@ class TestGitHubService(unittest.TestCase):
         search_url = 'https://api.github.com/search/issues'
         url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
-            url,
-            headers=self.service.rest_headers,
-            timeout=10
+            url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -149,15 +147,12 @@ class TestGitHubService(unittest.TestCase):
         with self.assertRaises(AssertionError) as context:
             self.service.get_open_issues()
         self.assertEqual(
-            str(context.exception),
-            'Received null res while fetching issues'
+            str(context.exception), 'Received null res while fetching issues'
         )
         search_url = 'https://api.github.com/search/issues'
         url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
-            url,
-            headers=self.service.rest_headers,
-            timeout=10
+            url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -167,16 +162,11 @@ class TestGitHubService(unittest.TestCase):
 
         with self.assertRaises(Exception) as context:
             self.service.get_open_issues()
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         search_url = 'https://api.github.com/search/issues'
         url = f'{search_url}?q=repo:owner/repo+is:issue+state:open'
         mock_get.assert_called_once_with(
-            url,
-            headers=self.service.rest_headers,
-            timeout=10
+            url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -186,7 +176,7 @@ class TestGitHubService(unittest.TestCase):
         mock_response.status_code = 200
         mock_response.json.return_value = [
             {'login': 'collab1'},
-            {'login': 'collab2'}
+            {'login': 'collab2'},
         ]
         mock_get.return_value = mock_response
 
@@ -196,7 +186,7 @@ class TestGitHubService(unittest.TestCase):
         mock_get.assert_called_once_with(
             f'{self.base_url}/collaborators',
             headers=self.service.rest_headers,
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.get')
@@ -210,12 +200,12 @@ class TestGitHubService(unittest.TestCase):
             self.service.get_repo_collaborators()
         self.assertEqual(
             str(context.exception),
-            'Received null res while fetching collaborators'
+            'Received null res while fetching collaborators',
         )
         mock_get.assert_called_once_with(
             f'{self.base_url}/collaborators',
             headers=self.service.rest_headers,
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.get')
@@ -226,14 +216,11 @@ class TestGitHubService(unittest.TestCase):
         mock_get.side_effect = Exception('Network error')
         with self.assertRaises(Exception) as context:
             self.service.get_repo_collaborators()
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         mock_get.assert_called_once_with(
             f'{self.base_url}/collaborators',
             headers=self.service.rest_headers,
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.get')
@@ -242,18 +229,9 @@ class TestGitHubService(unittest.TestCase):
         mock_response = mock.Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = [
-            {
-                'created_at': '2024-01-01T10:00:00Z',
-                'actor': {'login': 'user1'}
-            },
-            {
-                'created_at': '2024-01-02T10:00:00Z',
-                'actor': {'login': 'user1'}
-            },
-            {
-                'created_at': '2024-01-03T10:00:00Z',
-                'actor': {'login': 'user2'}
-            }
+            {'created_at': '2024-01-01T10:00:00Z', 'actor': {'login': 'user1'}},
+            {'created_at': '2024-01-02T10:00:00Z', 'actor': {'login': 'user1'}},
+            {'created_at': '2024-01-03T10:00:00Z', 'actor': {'login': 'user2'}},
         ]
         mock_get.return_value = mock_response
 
@@ -266,9 +244,7 @@ class TestGitHubService(unittest.TestCase):
         self.assertEqual(latest_date, expected_date)
 
         mock_get.assert_called_once_with(
-            issue.events_url,
-            headers=self.service.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -282,13 +258,10 @@ class TestGitHubService(unittest.TestCase):
         with self.assertRaises(AssertionError) as context:
             self.service.get_issue_events(issue)
         self.assertEqual(
-            str(context.exception),
-            'Received null res while fetching events'
+            str(context.exception), 'Received null res while fetching events'
         )
         mock_get.assert_called_once_with(
-            issue.events_url,
-            headers=self.service.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -299,14 +272,9 @@ class TestGitHubService(unittest.TestCase):
         issue = checker.Issue(1, 'user1', 'events_url')
         with self.assertRaises(Exception) as context:
             self.service.get_issue_events(issue)
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         mock_get.assert_called_once_with(
-            issue.events_url,
-            headers=self.service.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -322,9 +290,7 @@ class TestGitHubService(unittest.TestCase):
 
         self.assertIsNone(latest_date)
         mock_get.assert_called_once_with(
-            issue.events_url,
-            headers=self.service.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.get')
@@ -337,12 +303,12 @@ class TestGitHubService(unittest.TestCase):
         mock_response.json.return_value = [
             {
                 'created_at': '2024-01-01T10:00:00Z',
-                'actor': {'login': 'other_user'}
+                'actor': {'login': 'other_user'},
             },
             {
                 'created_at': '2024-01-02T10:00:00Z',
-                'actor': {'login': 'another_user'}
-            }
+                'actor': {'login': 'another_user'},
+            },
         ]
         mock_get.return_value = mock_response
 
@@ -351,9 +317,7 @@ class TestGitHubService(unittest.TestCase):
 
         self.assertIsNone(latest_date)
         mock_get.assert_called_once_with(
-            issue.events_url,
-            headers=self.service.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.service.rest_headers, timeout=10
         )
 
     @mock.patch('requests.post')
@@ -365,18 +329,15 @@ class TestGitHubService(unittest.TestCase):
             'data': {
                 'repository': {
                     'pullRequests': {
-                        'pageInfo': {
-                            'hasNextPage': False,
-                            'endCursor': None
-                        },
+                        'pageInfo': {'hasNextPage': False, 'endCursor': None},
                         'nodes': [
                             {
                                 'number': 100,
                                 'closingIssuesReferences': {
                                     'nodes': [{'number': 1}]
-                                }
+                                },
                             }
-                        ]
+                        ],
                     }
                 }
             }
@@ -403,16 +364,16 @@ class TestGitHubService(unittest.TestCase):
                     'pullRequests': {
                         'pageInfo': {
                             'hasNextPage': True,
-                            'endCursor': 'cursor1'
+                            'endCursor': 'cursor1',
                         },
                         'nodes': [
                             {
                                 'number': 100,
                                 'closingIssuesReferences': {
                                     'nodes': [{'number': 1}]
-                                }
+                                },
                             }
-                        ]
+                        ],
                     }
                 }
             }
@@ -424,18 +385,15 @@ class TestGitHubService(unittest.TestCase):
             'data': {
                 'repository': {
                     'pullRequests': {
-                        'pageInfo': {
-                            'hasNextPage': False,
-                            'endCursor': None
-                        },
+                        'pageInfo': {'hasNextPage': False, 'endCursor': None},
                         'nodes': [
                             {
                                 'number': 200,
                                 'closingIssuesReferences': {
                                     'nodes': [{'number': 2}]
-                                }
+                                },
                             }
-                        ]
+                        ],
                     }
                 }
             }
@@ -462,8 +420,7 @@ class TestGitHubService(unittest.TestCase):
         with self.assertRaises(AssertionError) as context:
             self.service.get_issues_with_prs()
         self.assertEqual(
-            str(context.exception),
-            'Received null res while fetching PRs'
+            str(context.exception), 'Received null res while fetching PRs'
         )
         mock_post.assert_called_once()
 
@@ -476,10 +433,7 @@ class TestGitHubService(unittest.TestCase):
 
         with self.assertRaises(Exception) as context:
             self.service.get_issues_with_prs()
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         mock_post.assert_called_once()
 
     @mock.patch('requests.delete')
@@ -497,13 +451,12 @@ class TestGitHubService(unittest.TestCase):
             f'{self.base_url}/issues/1/assignees',
             headers=self.service.rest_headers,
             json={'assignees': ['user1']},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.delete')
     def test_unassign_issue_no_assignee(
-        self,
-        mock_delete: mock.MagicMock
+        self, mock_delete: mock.MagicMock
     ) -> None:
         """Test unassigning an issue with no assignee."""
         issue = checker.Issue(1, None, 'events_url')
@@ -528,7 +481,7 @@ class TestGitHubService(unittest.TestCase):
             f'{self.base_url}/issues/1/assignees',
             headers=self.service.rest_headers,
             json={'assignees': ['user1']},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.delete')
@@ -542,20 +495,18 @@ class TestGitHubService(unittest.TestCase):
         with self.assertRaises(AssertionError) as context:
             self.service.unassign_issue(issue)
         self.assertEqual(
-            str(context.exception),
-            'Received null res while unassigning issue'
+            str(context.exception), 'Received null res while unassigning issue'
         )
         mock_delete.assert_called_once_with(
             f'{self.base_url}/issues/1/assignees',
             headers=self.service.rest_headers,
             json={'assignees': ['user1']},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.delete')
     def test_unassign_issue_exception(
-        self,
-        mock_delete: mock.MagicMock
+        self, mock_delete: mock.MagicMock
     ) -> None:
         """Test unassigning an issue with exception."""
         mock_delete.side_effect = Exception('Network error')
@@ -563,21 +514,17 @@ class TestGitHubService(unittest.TestCase):
         issue = checker.Issue(1, 'user1', 'events_url')
         with self.assertRaises(Exception) as context:
             self.service.unassign_issue(issue)
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         mock_delete.assert_called_once_with(
             f'{self.base_url}/issues/1/assignees',
             headers=self.service.rest_headers,
             json={'assignees': ['user1']},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.post')
     def test_add_alert_comment_on_issue_none_response(
-        self,
-        mock_post: mock.MagicMock
+        self, mock_post: mock.MagicMock
     ) -> None:
         """Test handling of None response when adding alert comment."""
         mock_post.return_value = None
@@ -588,13 +535,12 @@ class TestGitHubService(unittest.TestCase):
 
         self.assertEqual(
             str(context.exception),
-            'Received null res while commenting on issue'
+            'Received null res while commenting on issue',
         )
 
     @mock.patch('requests.post')
     def test_add_alert_comment_on_issue(
-        self,
-        mock_post: mock.MagicMock
+        self, mock_post: mock.MagicMock
     ) -> None:
         """Test adding alert comment on an issue."""
         mock_response = mock.Mock()
@@ -620,7 +566,7 @@ class TestGitHubService(unittest.TestCase):
             f'{self.base_url}/issues/1/comments',
             headers=self.service.rest_headers,
             json={'body': expected_comment},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.post')
@@ -633,17 +579,13 @@ class TestGitHubService(unittest.TestCase):
         issue = checker.Issue(1, 'user1', 'events_url')
         with self.assertRaises(Exception) as context:
             self.service.add_alert_comment_on_issue(issue)
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
 
         mock_post.assert_called_once()
 
     @mock.patch('requests.post')
     def test_post_unassignment_comment_none_response(
-        self,
-        mock_post: mock.MagicMock
+        self, mock_post: mock.MagicMock
     ) -> None:
         """Test handling of None response when posting unassignment comment."""
         mock_post.return_value = None
@@ -654,13 +596,11 @@ class TestGitHubService(unittest.TestCase):
 
         self.assertEqual(
             str(context.exception),
-            'Received null res while commenting on issue'
+            'Received null res while commenting on issue',
         )
 
     @mock.patch('requests.post')
-    def test_post_unassignment_comment(
-        self, mock_post: mock.MagicMock
-    ) -> None:
+    def test_post_unassignment_comment(self, mock_post: mock.MagicMock) -> None:
         """Test posting unassignment comment on an issue."""
         mock_response = mock.Mock()
         mock_response.status_code = 201
@@ -679,7 +619,7 @@ class TestGitHubService(unittest.TestCase):
             f'{self.base_url}/issues/1/comments',
             headers=self.service.rest_headers,
             json={'body': expected_comment},
-            timeout=10
+            timeout=10,
         )
 
     @mock.patch('requests.post')
@@ -692,10 +632,7 @@ class TestGitHubService(unittest.TestCase):
         issue = checker.Issue(1, 'user1', 'events_url')
         with self.assertRaises(Exception) as context:
             self.service.post_unassignment_comment(issue)
-        self.assertEqual(
-            str(context.exception),
-            'Network error'
-        )
+        self.assertEqual(str(context.exception), 'Network error')
         mock_post.assert_called_once()
 
 
@@ -728,15 +665,19 @@ class TestIssueManager(unittest.TestCase):
         unassigned_issue = checker.Issue(6, None, 'url6')
 
         self.github_service.get_open_issues.return_value = [
-            active_issue, inactive_warning_issue, inactive_unassign_issue,
-            collaborator_issue, pr_linked_issue, unassigned_issue
+            active_issue,
+            inactive_warning_issue,
+            inactive_unassign_issue,
+            collaborator_issue,
+            pr_linked_issue,
+            unassigned_issue,
         ]
         self.github_service.get_repo_collaborators.return_value = {'collab1'}
         self.github_service.get_issues_with_prs.return_value = {5: {100}}
         self.github_service.get_issue_events.side_effect = [
             active_issue.last_active_date,
             inactive_warning_issue.last_active_date,
-            inactive_unassign_issue.last_active_date
+            inactive_unassign_issue.last_active_date,
         ]
 
         inactive_issues = self.manager.get_inactive_issues()
@@ -748,7 +689,7 @@ class TestIssueManager(unittest.TestCase):
         """Test unassigning multiple issues."""
         issues = [
             checker.Issue(1, 'user1', 'url1'),
-            checker.Issue(2, 'user2', 'url2')
+            checker.Issue(2, 'user2', 'url2'),
         ]
 
         self.github_service.unassign_issue.side_effect = [True, False]
@@ -775,23 +716,26 @@ class TestMainFunction(unittest.TestCase):
 
     def setUp(self) -> None:
         """Set up tests."""
-        self.env_var = mock.patch.dict(os.environ, {
-            'GITHUB_TOKEN': 'fake-token',
-            'DEASSIGN_INACTIVE_CONTRIBUTORS': 'true'
-        })
+        self.env_var = mock.patch.dict(
+            os.environ,
+            {
+                'GITHUB_TOKEN': 'fake-token',
+                'DEASSIGN_INACTIVE_CONTRIBUTORS': 'true',
+            },
+        )
         self.env_var.start()
 
         self.github_service_mock = mock.Mock()
         self.github_service_patch = mock.patch(
             'scripts.inactive_issue_checker.GitHubService',
-            return_value=self.github_service_mock
+            return_value=self.github_service_mock,
         )
         self.github_service_class_mock = self.github_service_patch.start()
 
         self.issue_manager = mock.Mock()
         self.issue_manager_patch = mock.patch(
             'scripts.inactive_issue_checker.IssueManager',
-            return_value=self.issue_manager
+            return_value=self.issue_manager,
         )
         self.issue_manager_class_mock = self.issue_manager_patch.start()
 
@@ -814,7 +758,7 @@ class TestMainFunction(unittest.TestCase):
             'INFO:root:The following issues will be unassigned:',
             'INFO:root:Issue #1 (assignee: user1)',
             'INFO:root:Issue #2 (assignee: user2)',
-            'INFO:root:Inactive issues are sent for deassigning.'
+            'INFO:root:Inactive issues are sent for deassigning.',
         ]
 
         for expected in expected_logs:
@@ -835,7 +779,7 @@ class TestMainFunction(unittest.TestCase):
             'INFO:root:The following issues will be unassigned:',
             'INFO:root:Issue #1 (assignee: user1)',
             'INFO:root:Issue #2 (assignee: user2)',
-            'INFO:root:Unassignment is currently disabled.'
+            'INFO:root:Unassignment is currently disabled.',
         ]
 
         for expected in expected_logs:
@@ -855,19 +799,14 @@ class TestMainFunction(unittest.TestCase):
 
     def test_main_handles_multiple_inactive_issues(self) -> None:
         """Test main function properly handles multiple inactive issues."""
-        issues = [
-            checker.Issue(i, f'user{i}', f'url{i}')
-            for i in range(1, 6)
-        ]
+        issues = [checker.Issue(i, f'user{i}', f'url{i}') for i in range(1, 6)]
         self.issue_manager.get_inactive_issues.return_value = issues
         with self.assertLogs(logging.getLogger(), level='INFO') as log_capture:
             checker.main()
-        expected_logs = [
-            'The following issues will be unassigned:'
-        ]
-        expected_logs.extend([
-            f'Issue #{i} (assignee: user{i})' for i in range(1, 6)
-        ])
+        expected_logs = ['The following issues will be unassigned:']
+        expected_logs.extend(
+            [f'Issue #{i} (assignee: user{i})' for i in range(1, 6)]
+        )
         expected_logs.append('Inactive issues are sent for deassigning.')
 
         for expected in expected_logs:

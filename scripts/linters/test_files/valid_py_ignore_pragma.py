@@ -21,7 +21,8 @@ uses a pragma to ignore this invalid call.
 
 from __future__ import annotations
 
-__author__ = "Something" # disable-bad-pattern-check
+__author__ = "Something"  # disable-bad-pattern-check
+
 
 class FakeClass:
     """This is a fake docstring for invalid syntax purposes."""
@@ -37,4 +38,4 @@ class FakeClass:
             tuple(str, str). The argument passed in but twice
             in a tuple.
         """
-        yield (name, name) # disable-bad-pattern-check
+        yield (name, name)  # disable-bad-pattern-check

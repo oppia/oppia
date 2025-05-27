@@ -36,4 +36,4 @@ class FakeClass:
         Yields:
             tuple(str, str). The argument passed in but twice in a tuple.
         """
-		yield (name, name) # Here we used tab instead of spaces.
+        yield (name, name)  # Here we used tab instead of spaces.

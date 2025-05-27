@@ -48,19 +48,21 @@ class ListDuplicateItemsTest(test_utils.GenericTestBase):
     """Tests for the get_duplicates_from_list_of_strings function."""
 
     def test_get_duplicates_from_list_of_strings_with_duplicat_strings(
-        self
+        self,
     ) -> None:
         strings_list = ['A', 'B', 'B', 'C', 'C', 'C']
         duplicates = linter_utils.get_duplicates_from_list_of_strings(
-            strings_list)
+            strings_list
+        )
         self.assertEqual(sorted(duplicates), ['B', 'C'])
 
     def test_get_duplicates_from_list_of_strings_without_duplicat_strings(
-        self
+        self,
     ) -> None:
         strings_list = ['A', 'B', 'C']
         duplicates = linter_utils.get_duplicates_from_list_of_strings(
-            strings_list)
+            strings_list
+        )
         self.assertEqual(duplicates, [])
 
 
@@ -76,7 +78,8 @@ class TempDirTest(test_utils.GenericTestBase):
     def test_directory_is_placed_in_specified_dir(self) -> None:
         with linter_utils.temp_dir(parent=os.getcwd()) as temp_dir_path:
             parent = os.path.abspath(
-                os.path.join(temp_dir_path, os.path.pardir))
+                os.path.join(temp_dir_path, os.path.pardir)
+            )
             self.assertEqual(parent, os.getcwd())
 
     def test_directory_has_prefix_prepended(self) -> None:
@@ -111,7 +114,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.log,
-            '%s%s%s' % (red_color_message_prefix, message, escape_sequence)
+            '%s%s%s' % (red_color_message_prefix, message, escape_sequence),
         )
 
     def test_print_success_message_in_green_color(self) -> None:
@@ -124,5 +127,5 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self.log,
-            '%s%s%s' % (green_color_message_prefix, message, escape_sequence)
+            '%s%s%s' % (green_color_message_prefix, message, escape_sequence),
         )
