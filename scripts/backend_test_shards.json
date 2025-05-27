@@ -207,6 +207,7 @@
         "core.domain.learner_group_fetchers_test",
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
+        "core.domain.exp_rights_domain_test",
         "core.domain.customization_args_util_test",
         "core.domain.auth_domain_test",
         "core.domain.action_registry_test",
