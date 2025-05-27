@@ -160,7 +160,7 @@
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
         <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
         <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
-             ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
+             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
              width="350"
              height="350"
              loading="lazy"

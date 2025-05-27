@@ -279,19 +279,19 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
-    def import_azure_speech_synthesis_services(cls) -> ModuleType:
-        """Imports and returns azure_speech_synthesis_services module.
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns the speech synthesis services module.
 
         Returns:
-            module. The azure_speech_synthesis_services module.
+            module. The speech synthesis services module based on the current
+            environment.
         """
-        if constants.DEV_MODE:
-            from core.platform.azure_speech_synthesis import (
-                dev_mode_azure_speech_synthesis_services)
-            return dev_mode_azure_speech_synthesis_services
-        from core.platform.azure_speech_synthesis import (
-            azure_speech_synthesis_services)
-        return azure_speech_synthesis_services
+        # TODO(#22301): Modify the following code to invoke the Cloud service
+        # based on the environment. Refer to the issue for implementation
+        # details.
+        from core.platform.speech_synthesis import (
+            dev_mode_speech_synthesis_services)
+        return dev_mode_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
@@ -523,13 +523,13 @@ class Registry:
         return cls._get().import_app_identity_services()
 
     @classmethod
-    def import_azure_speech_synthesis_services(cls) -> ModuleType:
-        """Imports and returns azure_speech_synthesis_services module.
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns speech synthesis services module.
 
         Returns:
-            module. The azure_speech_synthesis_services module.
+            module. The speech synthesis services module.
         """
-        return cls._get().import_azure_speech_synthesis_services()
+        return cls._get().import_speech_synthesis_services()
 
     @classmethod
     def import_email_services(cls) -> ModuleType:

@@ -18,7 +18,7 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
 @Component({
@@ -33,18 +33,13 @@ export class ResponseNumberWithUnitsComponent implements OnInit {
   @Input() answer!: string;
   responses!: string;
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     const answer: NumberWithUnitsAnswer =
       this.htmlEscaperService.escapedJsonToObj(
         this.answer
       ) as NumberWithUnitsAnswer;
-    this.responses = this.numberWithUnitsObjectFactory
-      .fromDict(answer)
-      .toString();
+    this.responses = NumberWithUnits.fromDict(answer).toString();
   }
 }

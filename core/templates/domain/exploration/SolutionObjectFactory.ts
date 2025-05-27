@@ -25,9 +25,8 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {Fraction} from 'domain/objects/fraction.model';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {
   DragAndDropAnswer,
   FractionAnswer,
@@ -92,6 +91,14 @@ export class Solution extends BaseTranslatableObject {
     };
   }
 
+  getContentIdToHtml(): {[contentId: string]: string} {
+    let solutionContentIdToHtml: {[contentId: string]: string} = {};
+
+    solutionContentIdToHtml[this.explanation.contentId as string] =
+      this.explanation.html;
+    return solutionContentIdToHtml;
+  }
+
   getSummary(
     interactionId: string,
     customizationArgs: InteractionCustomizationArgs
@@ -112,9 +119,9 @@ export class Solution extends BaseTranslatableObject {
         this.correctAnswer as FractionAnswer
       ).toString();
     } else if (interactionId === 'NumberWithUnits') {
-      correctAnswer = new NumberWithUnitsObjectFactory(new UnitsObjectFactory())
-        .fromDict(this.correctAnswer as NumberWithUnitsAnswer)
-        .toString();
+      correctAnswer = NumberWithUnits.fromDict(
+        this.correctAnswer as NumberWithUnitsAnswer
+      ).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
       const subtitledHtmlChoices = (
