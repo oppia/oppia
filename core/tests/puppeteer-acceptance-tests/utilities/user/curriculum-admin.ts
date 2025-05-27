@@ -228,6 +228,13 @@ const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 
+const misconceptionsHeaderSelector = '.oppia-misconception-card-header';
+const workedExamplesHeaderSelector =
+  '.oppia-editor-card-section.worked-example-content';
+const prerequisiteSkillsHeaderSelector =
+  '.oppia-editor-card-section.prerequisite-skill-content';
+const rubricHeaderSelector = '.oppia-editor-card-section.edit-rubrics-header';
+
 const mobileSkillNavToggle =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
@@ -467,6 +474,7 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillSelector;
     await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
+
     await this.clickOn(skillsTab);
     await this.page.waitForSelector(skillSelector, {visible: true});
 
@@ -490,6 +498,7 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+    await this.openAllMobileDropdownsOptionsInSkillEditor();
   }
 
   /**
@@ -669,6 +678,13 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
+  }
+
+  private async openAllMobileDropdownsOptionsInSkillEditor(): Promise<void> {
+    await this.clickOn(misconceptionsHeaderSelector);
+    await this.clickOn(workedExamplesHeaderSelector);
+    await this.clickOn(prerequisiteSkillsHeaderSelector);
+    await this.clickOn(rubricHeaderSelector);
   }
 
   /**
