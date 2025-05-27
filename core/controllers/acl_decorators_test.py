@@ -7528,15 +7528,11 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
 
     username = 'user'
     user_email = 'user@example.com'
-    user_a = 'A'
-    user_a_email = 'a@example.com'
     
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
-        self.signup(self.user_a_email, self.user_a)
 
-        
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
             webapp2.Route(
                 '/contributorstatssummarieshandler/<contribution_type>/<contribution_subtype>/<username>',
@@ -7595,13 +7591,10 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
 
     username = 'user'
     user_email = 'user@example.com'
-    user_a = 'A'
-    user_a_email = 'a@example.com'
 
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
-        self.signup(self.user_a_email, self.user_a)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
             webapp2.Route(
@@ -7636,6 +7629,7 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
+
 
 class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
     """Tests for is_from_oppia_android decorator."""
