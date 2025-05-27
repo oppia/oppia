@@ -306,6 +306,7 @@ export class VoiceoverAdmin extends BaseUser {
     const enableAutogenerationOptionSelector =
       '.e2e-test-autogeneration-option-selector';
 
+    await this.page.waitForSelector(enableAutogenerationSelector);
     await this.clickOn(enableAutogenerationSelector);
 
     await this.page.waitForSelector(enableAutogenerationOptionSelector);
