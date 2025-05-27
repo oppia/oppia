@@ -28,6 +28,10 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'exp_id_1'
     EXP_ID_2: Final = 'exp_id_2'
+    EXP_ID_3: Final = 'exp_id_3'
+    COL_ID_1: Final = 'col_id_1'
+    COL_ID_2: Final = 'col_id_2'
+    COL_ID_3: Final = 'col_id_3'
     username = 'albert'
     user_email = 'albert@example.com'
 
@@ -43,13 +47,164 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
-    def test_unpublished_activities_cannot_be_added_to_featured_list(
+        self.save_new_valid_collection(
+            self.COL_ID_1, self.user_id, exploration_id=self.EXP_ID_1)
+
+        rights_manager.publish_collection(self.user, self.COL_ID_1)
+
+        self.save_new_valid_collection(
+            self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1)
+
+    def test_nonexistent_exploration_id_should_fail(
         self
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Posting a list that includes private activities results in an error.
+        # Posting a list that includes a nonexistent exploration
+        # results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_nonexistent_collection_id_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a nonexistent collection
+        # results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_and_nonexistent_exploration_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public exploration
+        # and a nonexistent exploration results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_and_nonexistent_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public collection
+        # and a nonexistent collection results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_nonexistent_exploration_and_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a nonexistent exploration
+        # and a nonexistent collection results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_exploration_and_nonexistent_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public exploration
+        # and a nonexistent collection results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_collection_and_nonexistent_exploration_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a publlic collection
+        # and a nonexistent exploration results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_3,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_private_exploration_id_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a private exploration
+        # results in an error.
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -57,6 +212,35 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_private_collection_id_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a private collection
+        # results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_and_private_exploration_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public exploration
+        # and private exploration results in an error.
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -67,18 +251,114 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
                     'id': self.EXP_ID_2,
                 }],
             }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
 
-        # Posting a list that only contains public activities succeeds.
+    def test_public_and_private_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public exploration
+        # and private exploration results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_private_exploration_and_private_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a private exploration
+        # and private collection results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_exploration_and_private_collection_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public exploration
+        # and private collection results in an error.
+
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
                     'type': 'exploration',
                     'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_collection_and_private_exploration_ids_should_fail(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Posting a list that includes a public collection
+        # and private exploration results in an error.
+
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }],
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_public_exploration_and_public_collection_ids_should_succeed(
+        self
+    ) -> None:
+        self.login(self.MODERATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        # Posting a list that only contains public activities succeeds.
+
+        # Public Exploration & Public Collection.
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'collection',
+                    'id': self.COL_ID_1,
                 }],
             }, csrf_token=csrf_token)
         featured_activity_references = self.get_json(
             '/moderatorhandler/featured')['featured_activity_references']
         self.assertEqual(featured_activity_references[0]['id'], self.EXP_ID_1)
+        self.assertEqual(featured_activity_references[1]['id'], self.COL_ID_1)
         self.logout()
 
 
