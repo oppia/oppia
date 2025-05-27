@@ -396,6 +396,34 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             }
         })
 
+    def test_last_week_stats_missing_average_ratings(self) -> None:
+        self.login(self.OWNER_EMAIL, is_super_admin=True)
+
+        get_last_week_dashboard_stats_swap = self.swap(
+            user_services,
+            'get_last_week_dashboard_stats',
+            lambda _: {
+                'key_2': {
+                    'num_ratings': 2,
+                    "average_ratings": None,
+                    'total_plays': 10
+                }
+            }
+        )
+
+        with get_last_week_dashboard_stats_swap:
+            last_week_stats = self.get_json(
+                feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
+
+        # Check that average_ratings is not included
+        self.assertEqual(last_week_stats, {
+            'key_2': {
+                'num_ratings': 2,
+                "average_ratings": None,
+                'total_plays': 10
+            }
+        })
+
     def test_broken_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 

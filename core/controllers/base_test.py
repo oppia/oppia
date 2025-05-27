@@ -2185,6 +2185,13 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
                 csrf_token=self.csrf_token,
                 source='http://localhost:8181/sample_url/')
 
+    def test_post_request_when_payload_arg_a_is_None(self) -> None:
+        self.payload = {'arg_a': 'None', 'arg_b':'arg_in_payload'} 
+        with self.swap(self, 'testapp', self.testapp):
+            self.post_json(
+                '/mock?arg_a=arg_in_request', self.payload,
+                csrf_token=self.csrf_token)
+
 
 class MockUploadHandlerNormalizedPayloadDict(TypedDict):
     """Type for the MockUploadHandler's normalized_payload

@@ -1378,9 +1378,8 @@ class AdminHandler(
                     })], 'Change category')
 
             story_node_index = 0
-            if story.story_contents is not None:
-                story_node_index = int(
-                    story.story_contents.next_node_id[5:]) - 1
+            story_node_index = int(
+                story.story_contents.next_node_id[5:]) - 1
             if story_node_index > 0:
                 story.update_node_destination_node_ids(
                     '%s%d' % (
