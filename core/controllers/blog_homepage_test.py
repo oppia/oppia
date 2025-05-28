@@ -334,7 +334,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
-        #blog post five is fed into the test to ensure the loop is entered
+        # blog post five is fed into the test to ensure the loop is entered.
         blog_post_five_id = (
             blog_services.create_new_blog_post(blog_editor_id).id)
         change_dict_five = {
@@ -353,9 +353,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
                 blog_post_five.url_fragment
             ))
 
-        # Assert that recommendations are returned and the loop was entered
+        # Assert that recommendations are returned and the loop was entered.
         self.assertEqual(len(json_response['summary_dicts']), 2)
-            
+
     def test_raise_exception_if_blog_post_does_not_exists(self) -> None:
         self.login(self.user_email)
         blog_post = blog_services.get_blog_post_by_id(self.blog_post_one.id)
@@ -412,7 +412,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(blog_post_three_id, change_dict_three)
         blog_services.publish_blog_post(blog_post_three_id)
-        blog_post_three = blog_services.get_blog_post_by_id(blog_post_three_id)
 
         json_response = self.get_json(
             '%s/%s' % (

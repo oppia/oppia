@@ -26,8 +26,8 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import incoming_app_feedback_report
 from core.controllers import contributor_dashboard
+from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -693,7 +693,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_play_exploration/%s' % self.published_exp_id,
                 expected_status_int=401)
-    
+
     def test_moderator_user_can_access_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -3861,7 +3861,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_user_without_review_rights_cannot_accept_question_suggestion(self) -> None:
+    def test_user_without_review_rights_cannot_accept_question_suggestion(
+            self) -> None:
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -5209,13 +5210,13 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
             response = self.mock_testapp.get(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expect_errors=True)
-            self.assertEqual(response.status_int, 401) 
+            self.assertEqual(response.status_int, 401)
 
     def test_user_cannot_access_story_with_empty_topic_id(self) -> None:
         invalid_story_id = story_services.get_new_story_id()
         self.save_new_story(
-            # Empty topic_id
-            invalid_story_id, self.admin_id, '',  
+            # Empty topic_id.
+            invalid_story_id, self.admin_id, '',
             url_fragment='story-no-topic')
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5427,8 +5428,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_user_cannot_access_story_data_with_empty_topic_id(self) -> None:
         story_id_with_no_topic = story_services.get_new_story_id()
         self.save_new_story(
-            # Empty topic_id
-            story_id_with_no_topic, self.admin_id, '',  
+            # Empty topic_id.
+            story_id_with_no_topic, self.admin_id, '',
             url_fragment='story-no-topic')
 
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5436,7 +5437,8 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 '/mock_story_data/staging/topic/%s' % 'story-no-topic',
                 expected_status_int=404)
 
-    def test_story_id_not_in_topic_references_does_not_set_published_flag(self) -> None:
+    def test_story_id_not_in_topic_references_does_not_set_published_flag(
+            self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
         # Create a new story not added to the topic.
@@ -7468,9 +7470,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_reviewers_without_review_rights_cannot_update_translation_suggestion(
-        self
-    ) -> None:
+    def test_user_without_review_rights_cannot_update_translation_suggestion(
+        self) -> None:
         self.login(self.en_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -7480,7 +7481,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             response['error'], 'You are not allowed to update the suggestion.')
         self.logout()
 
-    def test_reviewers_without_review_rights_cannot_update_question_suggestion(
+    def test_user_without_review_rights_cannot_update_question_suggestion(
         self
     ) -> None:
         self.login(self.en_language_reviewer)
@@ -7528,14 +7529,15 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
 
     username = 'user'
     user_email = 'user@example.com'
-    
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
             webapp2.Route(
-                '/contributorstatssummarieshandler/<contribution_type>/<contribution_subtype>/<username>',
+                '/contributorstatssummarieshandler/'
+                '<contribution_type>/<contribution_subtype>/<username>',
                 contributor_dashboard.ContributorStatsSummariesHandler
             )
         ], debug=feconf.DEBUG))
@@ -7558,16 +7560,18 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
             lambda stats: stats
         ), self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/contributorstatssummarieshandler/translation/submission/%s' %
-                self.username)
+                '/contributorstatssummarieshandler/translation/'
+                'submission/%s' % self.username)
         self.assertIn('translation_contribution_stats', response)
-        self.assertEqual(response['translation_contribution_stats'], dummy_stats)
+        self.assertEqual(
+            response['translation_contribution_stats'], dummy_stats)
         self.logout()
-    
+
     def test_guest_user_cannot_fetch_contributor_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/contributorstatssummarieshandler/<contribution_type>/<contribution_subtype>/<username>',
+                '/contributorstatssummarieshandler/<contribution_type>/'
+                '<contribution_subtype>/<username>',
                 expected_status_int=401)
 
         self.assertEqual(
@@ -7578,7 +7582,8 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/contributorstatssummarieshandler/translation/submission/A',
+                '/contributorstatssummarieshandler/'
+                'translation/submission/A',
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -7599,9 +7604,8 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
             webapp2.Route(
                 '/contributorallstatssummarieshandler/<username>',
-                contributor_dashboard.ContributorAllStatsSummariesHandler
-            )
-        ], debug=feconf.DEBUG))
+                contributor_dashboard.ContributorAllStatsSummariesHandler)],
+                debug=feconf.DEBUG))
 
     def test_user_can_fetch_all_contributor_stats(self) -> None: 
         self.login(self.user_email)
@@ -7620,7 +7624,7 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
             response['error'],
             'The user user is not allowed to fetch the stats of other users.')
         self.logout()
-        
+
     def test_guest_user_cannot_fetch_contributor_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(

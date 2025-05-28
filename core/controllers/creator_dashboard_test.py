@@ -405,7 +405,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             lambda _: {
                 'key_2': {
                     'num_ratings': 2,
-                    "average_ratings": None,
+                    'average_ratings': None,
                     'total_plays': 10
                 }
             }
@@ -415,11 +415,11 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             last_week_stats = self.get_json(
                 feconf.CREATOR_DASHBOARD_DATA_URL)['last_week_stats']
 
-        # Check that average_ratings is not included
+        # Check that average_ratings is not included.
         self.assertEqual(last_week_stats, {
             'key_2': {
                 'num_ratings': 2,
-                "average_ratings": None,
+                'average_ratings': None,
                 'total_plays': 10
             }
         })
