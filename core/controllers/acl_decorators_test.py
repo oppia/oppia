@@ -7587,7 +7587,7 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed to fetch the stats of other users.' % self.username)
+            'The user user is not allowed to fetch the stats of other users.')
         self.logout()
 
 
@@ -7607,7 +7607,7 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
                 contributor_dashboard.ContributorAllStatsSummariesHandler)],
                 debug=feconf.DEBUG))
 
-    def test_user_can_fetch_all_contributor_stats(self) -> None: 
+    def test_user_can_fetch_all_contributor_stats(self) -> None:
         self.login(self.user_email)
         response = self.mock_testapp.get(
             f'/contributorallstatssummarieshandler/{self.username}')

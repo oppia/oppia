@@ -235,12 +235,10 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         blog_admin_model.put()
         json_response = self.get_json(
             '%s/%s' % (
-                feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment),
-            )
+                feconf.BLOG_HOMEPAGE_DATA_URL, blog_post_two.url_fragment))
         self.assertEqual(
             'new author name',
-            json_response['blog_post_dict']['displayed_author_name']
-        )
+            json_response['blog_post_dict']['displayed_author_name'])
         self.assertEqual(
             'author account deleted', json_response['author_username'])
         self.assertEqual(
@@ -334,15 +332,15 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
-        # blog post five is fed into the test to ensure the loop is entered.
+        # Blog post five is fed into the test to ensure the loop is entered.
         blog_post_five_id = (
             blog_services.create_new_blog_post(blog_editor_id).id)
-        change_dict_five = {
+        change_dict_five: blog_services.BlogPostChangeDict = {
             'title': 'Unique Title Five',
             'thumbnail_filename': 'unique_thumb.svg',
             'content': '<p>Unique Content</p>',
-            'tags': ['English']  
-        }
+            'tags': ['English']
+            }
         blog_services.update_blog_post(blog_post_five_id, change_dict_five)
         blog_services.publish_blog_post(blog_post_five_id)
         blog_post_five = blog_services.get_blog_post_by_id(blog_post_five_id)
@@ -350,10 +348,8 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.BLOG_HOMEPAGE_DATA_URL,
-                blog_post_five.url_fragment
-            ))
+                blog_post_five.url_fragment))
 
-        # Assert that recommendations are returned and the loop was entered.
         self.assertEqual(len(json_response['summary_dicts']), 2)
 
     def test_raise_exception_if_blog_post_does_not_exists(self) -> None:
