@@ -2,9 +2,9 @@
   <h3>{{headerText}}</h3>
 </div>
 <div class="modal-body">
-  <div *ngIf="supportsAutogeneration">
+  <div *ngIf="supportsAutogeneration && languageCodePresentInConstants">
     <p>
-      This action will cause voiceovers to be regenerated for all existing
+      <strong>⏳ coming soon: </strong>This action will cause voiceovers to be regenerated for all existing
       <strong>{{languageDescription}}</strong>
       translations in each curated exploration.
 
@@ -15,22 +15,6 @@
       </i>
 
       Do you want to continue?
-    </p>
-    <p>
-      Additionally, please ensure that the language code (<strong>{{languageCode}}</strong>) for the corresponding accent is added with appropriate data in the
-      <strong><a [href]="constantsFileLocation">constants file</a></strong> for the following fields:
-    </p>
-    <ul>
-      <li><strong>LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS</strong></li>
-      <li><strong>LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS</strong></li>
-    </ul>
-    <p>
-      These fields are essential for accurately synthesizing voiceovers for math symbols and ensuring correct sentence highlighting
-      during automatic voiceover playback.
-
-      <i>
-        <strong>Note: </strong>If the required data is not already present, please consult with the translation team and add it to the codebase before proceeding with this action.
-      </i>
     </p>
   </div>
   <div *ngIf="!supportsAutogeneration">
@@ -49,10 +33,27 @@
       </i>
     </p>
   </div>
+  <div *ngIf="!languageCodePresentInConstants">
+    <p>
+      The language code (<strong>{{languageCode}}</strong>) is not defined with
+      the necessary data in the <strong><a [href]="constantsFileLocation">constants file</a></strong> for the following fields:
+    </p>
+    <ul>
+      <li><strong>LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS</strong></li>
+      <li><strong>LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS</strong></li>
+    </ul>
+    <p>
+      These fields are essential for accurately synthesizing voiceovers for math symbols and ensuring correct sentence highlighting
+      during automatic voiceover playback.
+    </p>
+    <p>
+      <strong>Note: </strong>Please consult with the development team and add it to the codebase before proceeding with this action.
+    </p>
+  </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success" (click)="update()">
+  <button class="btn btn-success" (click)="update()" [disabled]="!languageCodePresentInConstants">
     <span *ngIf="supportsAutogeneration">Turn on autogeneration</span>
     <span *ngIf="!supportsAutogeneration">Turn off autogeneration</span>
   </button>

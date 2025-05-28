@@ -19,6 +19,7 @@
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-edit-voiceover-regeneration-support-modal',
@@ -33,6 +34,9 @@ export class EditVoiceoverRegenerationSupportModalComponent extends ConfirmOrCan
   constantsFileLocation: string =
     'https://github.com/oppia/oppia/blob/develop/assets/constants.ts';
 
+  languageCodePresentForMathSymbolPronunciations: boolean = false;
+  languageCodePresentInConstants: boolean = false;
+
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
@@ -41,6 +45,16 @@ export class EditVoiceoverRegenerationSupportModalComponent extends ConfirmOrCan
     this.headerText = this.supportsAutogeneration
       ? `Do you want to turn on autogeneration for ${this.languageDescription} voiceovers?`
       : `Do you want to turn off autogeneration for ${this.languageDescription} voiceovers?`;
+
+    // Verify if the language code exists in the constants file for both math
+    // symbol pronunciations and sentence ending highlights.
+    this.languageCodePresentInConstants =
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS.hasOwnProperty(
+        this.languageCode
+      ) &&
+      AppConstants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.hasOwnProperty(
+        this.languageCode
+      );
   }
 
   cancel(): void {
