@@ -48,6 +48,7 @@ import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 import isEqual from 'lodash/isEqual';
 import {ShortAnswerResponse, Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -116,7 +117,8 @@ export class ResponsesService {
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService
   ) {}
 
   private _verifySolution = () => {
@@ -346,7 +348,7 @@ export class ResponsesService {
     }
     return {
       prefix: solution.answerIsExclusive ? 'The only' : 'One',
-      answer: solution.ehfs.getShortAnswerHtml(
+      answer: this.explorationHtmlFormatterService.getShortAnswerHtml(
         solution.correctAnswer,
         interaction.id,
         interaction.customizationArgs

@@ -18,7 +18,6 @@
  */
 
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {Fraction} from 'domain/objects/fraction.model';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -31,7 +30,6 @@ import {
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer,
 } from 'interactions/answer-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {
   InteractionCustomizationArgs,
@@ -58,19 +56,16 @@ export interface ShortAnswerResponse {
 }
 
 export class Solution extends BaseTranslatableObject {
-  ehfs: ExplorationHtmlFormatterService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
-    ehfs: ExplorationHtmlFormatterService,
     answerIsExclusive: boolean,
     correctAnswer: InteractionAnswer,
     explanation: SubtitledHtml
   ) {
     super();
 
-    this.ehfs = ehfs;
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
@@ -171,11 +166,9 @@ export class Solution extends BaseTranslatableObject {
     answerIsExclusive: boolean,
     correctAnswer: InteractionAnswer,
     explanationHtml: string,
-    explanationId: string,
-    ehfs: ExplorationHtmlFormatterService
+    explanationId: string
   ): Solution {
     return new Solution(
-      ehfs,
       answerIsExclusive,
       correctAnswer,
       SubtitledHtml.createDefault(explanationHtml, explanationId)
@@ -183,11 +176,9 @@ export class Solution extends BaseTranslatableObject {
   }
 
   static createFromBackendDict(
-    solutionBackendDict: SolutionBackendDict,
-    ehfs: ExplorationHtmlFormatterService
+    solutionBackendDict: SolutionBackendDict
   ): Solution {
     return new Solution(
-      ehfs,
       solutionBackendDict.answer_is_exclusive,
       solutionBackendDict.correct_answer,
       SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)

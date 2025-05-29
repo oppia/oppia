@@ -69,7 +69,6 @@ describe('Responses Service', () => {
     stateSolutionService = TestBed.get(StateSolutionService);
 
     savedMemento = new Solution(
-      explorationHtmlFormatterService,
       true,
       'This is the correct answer',
       new SubtitledHtml('', 'tesster')
@@ -950,7 +949,6 @@ describe('Responses Service', () => {
       null
     );
     const solution = new Solution(
-      explorationHtmlFormatterService,
       false,
       'This is a correct answer!',
       new SubtitledHtml('This is the explanation', 'solution')
@@ -974,6 +972,13 @@ describe('Responses Service', () => {
       responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
 
     expect(shortAnswerResponse).toEqual(expectedShortAnswerHtml);
+    expect(
+      explorationHtmlFormatterService.getShortAnswerHtml
+    ).toHaveBeenCalledWith(
+      solution.correctAnswer,
+      interaction.id,
+      interaction.customizationArgs
+    );
   });
 
   it("should throw an error if Interaction's id is null", () => {
@@ -992,7 +997,6 @@ describe('Responses Service', () => {
     );
 
     const solution = new Solution(
-      explorationHtmlFormatterService,
       false,
       'This is a correct answer!',
       new SubtitledHtml('This is the explanation', 'solution')

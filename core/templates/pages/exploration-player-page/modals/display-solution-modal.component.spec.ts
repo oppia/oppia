@@ -42,7 +42,6 @@ describe('Display Solution Modal', () => {
   let ngbActiveModal: NgbActiveModal;
   let responsesService: ResponsesService;
   let contentId = 'content_id';
-  let shortAnswerHtml: string = 'html';
   let solutionHtml: string = 'solution_html';
   let shortAnswerResponse: ShortAnswerResponse = {
     prefix: 'The only',

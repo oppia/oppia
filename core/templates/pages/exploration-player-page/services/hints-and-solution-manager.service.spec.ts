@@ -21,13 +21,11 @@ import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
-  let ehfs: ExplorationHtmlFormatterService;
   let firstHint: Hint;
   let secondHint: Hint;
   let thirdHint: Hint;
@@ -47,7 +45,6 @@ describe('HintsAndSolutionManager service', () => {
       mockNewCardAvailableEmitter
     );
     hasms = TestBed.inject(HintsAndSolutionManagerService);
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
 
     firstHint = Hint.createFromBackendDict({
       hint_content: {
@@ -67,17 +64,14 @@ describe('HintsAndSolutionManager service', () => {
         html: 'three',
       },
     });
-    solution = Solution.createFromBackendDict(
-      {
-        answer_is_exclusive: false,
-        correct_answer: 'This is a correct answer!',
-        explanation: {
-          content_id: 'sol-one',
-          html: 'This is the explanation to the answer',
-        },
+    solution = Solution.createFromBackendDict({
+      answer_is_exclusive: false,
+      correct_answer: 'This is a correct answer!',
+      explanation: {
+        content_id: 'sol-one',
+        html: 'This is the explanation to the answer',
       },
-      ehfs
-    );
+    });
   }));
 
   it('should display hints at the right times', fakeAsync(() => {

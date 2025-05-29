@@ -28,12 +28,10 @@ import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
-  let ehfs: ExplorationHtmlFormatterService;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
 
@@ -43,7 +41,6 @@ describe('State card object factory', () => {
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
@@ -240,17 +237,14 @@ describe('State card object factory', () => {
   });
 
   it('should get interaction solution', () => {
-    let expectedResult = Solution.createFromBackendDict(
-      {
-        answer_is_exclusive: true,
-        correct_answer: 'correct answer',
-        explanation: {
-          content_id: 'pqr',
-          html: 'solution explanation',
-        },
+    let expectedResult = Solution.createFromBackendDict({
+      answer_is_exclusive: true,
+      correct_answer: 'correct answer',
+      explanation: {
+        content_id: 'pqr',
+        html: 'solution explanation',
       },
-      ehfs
-    );
+    });
 
     expect(_sampleCard1.getSolution()).toEqual(expectedResult);
   });

@@ -103,7 +103,6 @@ describe('Add Or Update Solution Modal Component', () => {
       ).and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = new Solution(
-        explorationHtmlFormatterService,
         true,
         'solution',
         SubtitledHtml.createDefault('Explanation html', 'cont_1')
@@ -193,8 +192,7 @@ describe('Add Or Update Solution Modal Component', () => {
           true,
           'answer',
           'Explanation html',
-          'cont_1',
-          explorationHtmlFormatterService
+          'cont_1'
         ),
       });
     });

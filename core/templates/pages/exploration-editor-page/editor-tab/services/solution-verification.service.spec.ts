@@ -34,7 +34,6 @@ describe('Solution Verification Service', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateCustomizationArgsService: StateCustomizationArgsService;
-  let ehfs: ExplorationHtmlFormatterService;
   let solutionVerificationService: SolutionVerificationService;
   let stateEditorService: StateEditorService;
   let mockInteractionState: Record<string, unknown>;
@@ -74,7 +73,6 @@ describe('Solution Verification Service', () => {
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     stateEditorService = TestBed.inject(StateEditorService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
 
@@ -146,7 +144,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'abc', 'nothing', ehfs)
+      Solution.createNew(false, 'abc', 'nothing')
     );
 
     expect(
@@ -177,7 +175,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'xyz', 'nothing', ehfs)
+      Solution.createNew(false, 'xyz', 'nothing')
     );
 
     expect(
@@ -230,7 +228,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      Solution.createNew(false, 'abc', 'nothing', ehfs)
+      Solution.createNew(false, 'abc', 'nothing')
     );
 
     expect(

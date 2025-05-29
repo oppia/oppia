@@ -18,39 +18,22 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
-import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Interaction} from './InteractionObjectFactory';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
-    let ehfs: ExplorationHtmlFormatterService, solution: Solution;
+    let solution: Solution;
     beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [
-          CamelCaseToHyphensPipe,
-          CapitalizePipe,
-          ConvertToPlainTextPipe,
-          FormatRtePreviewPipe,
-        ],
-      });
-      ehfs = TestBed.inject(ExplorationHtmlFormatterService);
-      solution = Solution.createFromBackendDict(
-        {
-          answer_is_exclusive: false,
-          correct_answer: 'This is a correct answer!',
-          explanation: {
-            content_id: 'solution',
-            html: 'This is the explanation to the answer',
-          },
+      TestBed.configureTestingModule({});
+      solution = Solution.createFromBackendDict({
+        answer_is_exclusive: false,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer',
         },
-        ehfs
-      );
+      });
     });
 
     it('should get the backend dict from a solution', () => {
@@ -71,8 +54,7 @@ describe('Solution object factory', () => {
         true,
         'This is the correct answer!',
         'This is the explanation to the answer',
-        'solution',
-        ehfs
+        'solution'
       );
       const expectedSolution = {
         answer_is_exclusive: true,
@@ -257,17 +239,14 @@ describe('Solution object factory', () => {
     });
 
     it('should handle when answer exclusivity is true', () => {
-      const solution = Solution.createFromBackendDict(
-        {
-          answer_is_exclusive: true,
-          correct_answer: 'This is a correct answer!',
-          explanation: {
-            content_id: 'solution',
-            html: 'This is the explanation to the answer',
-          },
+      const solution = Solution.createFromBackendDict({
+        answer_is_exclusive: true,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer',
         },
-        ehfs
-      );
+      });
 
       expect(solution.answerIsExclusive).toBe(true);
       expect(solution.getSummary('TestInput', {})).toEqual(

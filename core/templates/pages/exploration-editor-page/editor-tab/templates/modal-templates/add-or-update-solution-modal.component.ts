@@ -144,8 +144,7 @@ export class AddOrUpdateSolutionModalComponent
           this.data.answerIsExclusive,
           this.data.correctAnswer,
           this.data.explanationHtml,
-          this.data.explanationContentId,
-          this.explorationHtmlFormatterService
+          this.data.explanationContentId
         ),
       });
     } else {

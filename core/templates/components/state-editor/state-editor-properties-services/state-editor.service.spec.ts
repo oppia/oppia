@@ -29,7 +29,6 @@ import {
   InteractionObjectFactory,
 } from 'domain/exploration/InteractionObjectFactory';
 import {Solution} from 'domain/exploration/solution.model';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
@@ -41,7 +40,6 @@ describe('Editor state service', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let solutionValidityService: SolutionValidityService;
   let mockInteraction: Interaction;
-  let ehfs: ExplorationHtmlFormatterService;
   let stateEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
   let stateEditorDirectiveInitializedSpy: jasmine.Spy<jasmine.Func>;
   let interactionEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
@@ -59,7 +57,6 @@ describe('Editor state service', () => {
     });
 
     ecs = TestBed.inject(StateEditorService);
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
@@ -516,30 +513,24 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction solution', () => {
-    let newSolution = Solution.createFromBackendDict(
-      {
-        answer_is_exclusive: true,
-        correct_answer: 'test_answer_new',
-        explanation: {
-          content_id: '2',
-          html: 'test_explanation1_new',
-        },
+    let newSolution = Solution.createFromBackendDict({
+      answer_is_exclusive: true,
+      correct_answer: 'test_answer_new',
+      explanation: {
+        content_id: '2',
+        html: 'test_explanation1_new',
       },
-      ehfs
-    );
+    });
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.solution).toEqual(
-      Solution.createFromBackendDict(
-        {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
+      Solution.createFromBackendDict({
+        answer_is_exclusive: true,
+        correct_answer: 'test_answer',
+        explanation: {
+          content_id: '2',
+          html: 'test_explanation1',
         },
-        ehfs
-      )
+      })
     );
     ecs.setInteractionSolution(newSolution);
     expect(ecs.interaction.solution).toEqual(newSolution);

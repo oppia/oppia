@@ -22,9 +22,9 @@ import {SolutionEditor} from './solution-editor.component';
 import {EditabilityService} from 'services/editability.service';
 import {Solution} from 'domain/exploration/solution.model';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 class MockStateCustomizationArgsService {
   savedMemento = 'data3';
@@ -56,7 +56,6 @@ describe('Solution editor component', () => {
   let component: SolutionEditor;
   let fixture: ComponentFixture<SolutionEditor>;
   let editabilityService: EditabilityService;
-  let ehfs: ExplorationHtmlFormatterService;
   let stateSolutionService: StateSolutionService;
 
   beforeEach(waitForAsync(() => {
@@ -92,7 +91,6 @@ describe('Solution editor component', () => {
     fixture = TestBed.createComponent(SolutionEditor);
     component = fixture.componentInstance;
 
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     editabilityService = TestBed.inject(EditabilityService);
     stateSolutionService = TestBed.inject(StateSolutionService);
 
@@ -100,8 +98,7 @@ describe('Solution editor component', () => {
       true,
       'correct_answer',
       '<p> Hint Index 0 </p>',
-      '0',
-      ehfs
+      '0'
     );
     fixture.detectChanges();
   });
@@ -127,7 +124,7 @@ describe('Solution editor component', () => {
   });
 
   it('should save new solution', () => {
-    let solution = Solution.createNew(true, 'answer', 'Html', 'XyzID', ehfs);
+    let solution = Solution.createNew(true, 'answer', 'Html', 'XyzID');
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.updateNewSolution(solution);

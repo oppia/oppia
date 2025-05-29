@@ -80,7 +80,6 @@ import {CurrentInteractionService} from '../services/current-interaction.service
 import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
 import {ExplorationRecommendationsService} from '../services/exploration-recommendations.service';
-import {ExplorationHtmlFormatterService} from '../../../services/exploration-html-formatter.service';
 import {FatigueDetectionService} from '../services/fatigue-detection.service';
 import {HintsAndSolutionManagerService} from '../services/hints-and-solution-manager.service';
 import {ImagePreloaderService} from '../services/image-preloader.service';
@@ -165,7 +164,6 @@ describe('Conversation skin component', () => {
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
-  let ehfs: ExplorationHtmlFormatterService;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
   let displayedCard = new StateCard(
@@ -456,7 +454,6 @@ describe('Conversation skin component', () => {
       imports: [HttpClientTestingModule],
       declarations: [ConversationSkinComponent, MockTranslatePipe],
       providers: [
-        ExplorationHtmlFormatterService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -529,7 +526,6 @@ describe('Conversation skin component', () => {
     );
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -1210,8 +1206,7 @@ describe('Conversation skin component', () => {
         true,
         'answer',
         'Html',
-        'XyzID',
-        ehfs
+        'XyzID'
       );
       componentInstance.numberOfIncorrectSubmissions = 3;
       componentInstance.triggerIfLearnerStuckAction();
@@ -1277,8 +1272,7 @@ describe('Conversation skin component', () => {
         true,
         'answer',
         'Html',
-        'XyzID',
-        ehfs
+        'XyzID'
       );
       componentInstance.numberOfIncorrectSubmissions = 3;
       componentInstance.triggerIfLearnerStuckActionDirectly();

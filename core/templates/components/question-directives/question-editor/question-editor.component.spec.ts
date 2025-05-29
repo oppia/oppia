@@ -354,7 +354,7 @@ describe('Question Editor Component', () => {
     // because of the need to test validations. This error is thrown because
     // the value of 'htmlFormatter' is null.
     // @ts-ignore
-    let solution = new Solution(null, null, null, null);
+    let solution = new Solution(null, null, null);
     component.saveSolution(solution);
 
     expect(stateEditorService.setInteractionSolution).toHaveBeenCalledWith(

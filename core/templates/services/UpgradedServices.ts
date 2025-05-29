@@ -618,7 +618,8 @@ export class UpgradedServices {
       upgradedServices['StateCustomizationArgsService'],
       upgradedServices['StateEditorService'],
       upgradedServices['StateInteractionIdService'],
-      upgradedServices['StateSolutionService']
+      upgradedServices['StateSolutionService'],
+      upgradedServices['ExplorationHtmlFormatterService']
     );
     upgradedServices['QuestionValidationService'] =
       new QuestionValidationService(
@@ -1112,9 +1113,8 @@ export class UpgradedServices {
       );
 
     // Topological level: 7.
-    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['ExplorationHtmlFormatterService']
-    );
+    upgradedServices['InteractionObjectFactory'] =
+      new InteractionObjectFactory();
 
     // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =

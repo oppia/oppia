@@ -42,7 +42,6 @@ import {EditabilityService} from 'services/editability.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ExplorationWarningsService} from '../services/exploration-warnings.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {RouterService} from '../services/router.service';
 import {StateEditorRefreshService} from '../services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
@@ -91,7 +90,6 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let ehfs: ExplorationHtmlFormatterService;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
@@ -213,7 +211,6 @@ describe('Exploration editor tab component', () => {
 
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -842,30 +839,24 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      Solution.createFromBackendDict(
-        {
-          correct_answer: 'This is the correct answer',
-          answer_is_exclusive: false,
-          explanation: {
-            html: 'Solution explanation',
-            content_id: 'content_4',
-          },
-        },
-        ehfs
-      )
-    );
-
-    let displayedValue = Solution.createFromBackendDict(
-      {
-        correct_answer: 'This is the second correct answer',
-        answer_is_exclusive: true,
+      Solution.createFromBackendDict({
+        correct_answer: 'This is the correct answer',
+        answer_is_exclusive: false,
         explanation: {
-          html: 'Solution complete explanation',
+          html: 'Solution explanation',
           content_id: 'content_4',
         },
-      },
-      ehfs
+      })
     );
+
+    let displayedValue = Solution.createFromBackendDict({
+      correct_answer: 'This is the second correct answer',
+      answer_is_exclusive: true,
+      explanation: {
+        html: 'Solution complete explanation',
+        content_id: 'content_4',
+      },
+    });
     component.saveSolution(displayedValue);
 
     expect(stateEditorService.interaction.solution).toEqual(displayedValue);
