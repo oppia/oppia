@@ -326,7 +326,7 @@ describe('Audio Bar Component', () => {
       expect(loadAndPlaySpy).toHaveBeenCalled();
     });
 
-    it('should be able update diplayable language accent code for manual voiceover', () => {
+    it('should be able to update displayable language accent code for manual voiceover', () => {
       let manualVoiceoverBackendDict: VoiceoverBackendDict = {
         filename: 'a.mp3',
         file_size_bytes: 200000,
@@ -373,7 +373,7 @@ describe('Audio Bar Component', () => {
       expect(component.voiceoverToBePlayed.filename).toEqual('a.mp3');
     });
 
-    it('should be able update diplayable language accent code for auto voiceover', () => {
+    it('should be able to update displayable language accent code for auto voiceover', () => {
       let autoVoiceoverBackendDict: VoiceoverBackendDict = {
         filename: 'b.mp3',
         file_size_bytes: 200000,

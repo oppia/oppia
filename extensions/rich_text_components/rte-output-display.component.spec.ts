@@ -496,56 +496,60 @@ describe('RTE display component', () => {
     );
   }));
 
-  it('should highlight the current element are same during voiceover playback', fakeAsync(() => {
-    let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
-    audioPlayingSpy.and.returnValue(true);
+  it(
+    'should highlight the current element and remove highlighting from ' +
+      'previous element during voiceover playback',
+    fakeAsync(() => {
+      let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
+      audioPlayingSpy.and.returnValue(true);
 
-    component.highlighIdToSentenceText = {
-      highlightBlock2: 'New element',
-    };
+      component.highlighIdToSentenceText = {
+        highlightBlock2: 'New element',
+      };
 
-    let document = TestBed.inject(DOCUMENT);
+      let document = TestBed.inject(DOCUMENT);
 
-    let previousElement = document.createElement('p');
-    // eslint-disable-next-line oppia/no-inner-html
-    previousElement.innerHTML = 'Hello world';
-    previousElement.style.backgroundColor =
-      component.backgroundColorOfHighlightedSentence;
+      let previousElement = document.createElement('p');
+      // eslint-disable-next-line oppia/no-inner-html
+      previousElement.innerHTML = 'Hello world';
+      previousElement.style.backgroundColor =
+        component.backgroundColorOfHighlightedSentence;
 
-    let currentElement = document.createElement('p');
-    // eslint-disable-next-line oppia/no-inner-html
-    currentElement.innerHTML = 'New element';
-    currentElement.style.backgroundColor = '';
+      let currentElement = document.createElement('p');
+      // eslint-disable-next-line oppia/no-inner-html
+      currentElement.innerHTML = 'New element';
+      currentElement.style.backgroundColor = '';
 
-    component.previousHighlightedElementId = 'highlightBlock1';
+      component.previousHighlightedElementId = 'highlightBlock1';
 
-    spyOn(
-      automaticVoiceoverHighlightService,
-      'getCurrentSentenceIdToHighlight'
-    ).and.returnValue('highlightBlock2');
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getCurrentSentenceIdToHighlight'
+      ).and.returnValue('highlightBlock2');
 
-    spyOn(document, 'getElementById').and.callFake((id: string) => {
-      if (id === 'highlightBlock1') {
-        return previousElement;
-      } else if (id === 'highlightBlock2') {
-        return currentElement;
-      }
-      return null;
-    });
+      spyOn(document, 'getElementById').and.callFake((id: string) => {
+        if (id === 'highlightBlock1') {
+          return previousElement;
+        } else if (id === 'highlightBlock2') {
+          return currentElement;
+        }
+        return null;
+      });
 
-    component.highlightSentenceDuringVoiceoverPlay();
+      component.highlightSentenceDuringVoiceoverPlay();
 
-    expect(
-      (document.getElementById('highlightBlock1') as HTMLElement).style
-        .backgroundColor
-    ).toBe('');
+      expect(
+        (document.getElementById('highlightBlock1') as HTMLElement).style
+          .backgroundColor
+      ).toBe('');
 
-    expect(
-      (document.getElementById('highlightBlock2') as HTMLElement).style
-        .backgroundColor
-    ).toBe('rgb(243, 209, 64)');
-    expect(component.previousHighlightedElementId).toBe('highlightBlock2');
-  }));
+      expect(
+        (document.getElementById('highlightBlock2') as HTMLElement).style
+          .backgroundColor
+      ).toBe('rgb(243, 209, 64)');
+      expect(component.previousHighlightedElementId).toBe('highlightBlock2');
+    })
+  );
 
   it('should remove highlight when audio is not playing', fakeAsync(() => {
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
