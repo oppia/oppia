@@ -2191,11 +2191,9 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
 
         with testapp_swap, payload_swap:
             self.post_json(
-                '/mock?arg_a=arg_in_request',
-                None,
+                '/mock?arg_a=arg_in_request', None,
                 csrf_token=self.csrf_token,
-                expected_status_int=400
-            )
+                expected_status_int=400)
 
 
 class MockUploadHandlerNormalizedPayloadDict(TypedDict):
