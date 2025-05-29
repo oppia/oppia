@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+
 from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_services
@@ -580,4 +581,55 @@ class TopicPageDataHandlerTests(
             'classroom_name': None
         }
         self.assertDictContainsSubset(expected_dict, json_response)
+        self.logout()
+
+
+class TopicNameHandlerTest(test_utils.GenericTestBase):
+    """Tests for TopicNameHandler."""
+
+    def setUp(self) -> None:
+        """Completes the sign-up process for the various users."""
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.topic_id = 'topic'
+        self.topic_name = 'Topic Name'
+        self.topic_url_fragment = 'topic-name'
+        self.description = 'Topic Description'
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id,
+            self.topic_name,
+            self.topic_url_fragment,
+            description=self.description,
+            page_title_frag=self.topic_name
+        )
+        topic_services.save_new_topic(self.admin_id, topic)
+
+    def test_get_with_existing_topic_name(self) -> None:
+        """Test that the handler returns True when topic name exists."""
+        self.login(self.NEW_USER_EMAIL)
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+        self.assertEqual(response['topic_name_exists'], True)
+        self.logout()
+
+    def test_get_with_nonexistent_topic_name(self) -> None:
+        """Test that the handler returns False when topic name doesn't exist."""
+        self.login(self.NEW_USER_EMAIL)
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, 'nonexistent_topic'))
+        self.assertEqual(response['topic_name_exists'], False)
+        self.logout()
+
+    def test_get_with_guest_user(self) -> None:
+        """Test that guest users can check topic name existence."""
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+        self.assertEqual(response['topic_name_exists'], True)
         self.logout()

@@ -98,7 +98,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Programming language name must be a string.',
+        message: 'Programming language name must be a string',
       },
     ]);
   });
@@ -118,7 +118,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       },
     ]);
   });
@@ -138,7 +138,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The pre-code text must be a string.',
+        message: 'The pre-code text must be a string',
       },
     ]);
   });
@@ -158,7 +158,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The post-code text must be a string.',
+        message: 'The post-code text must be a string',
       },
     ]);
   });

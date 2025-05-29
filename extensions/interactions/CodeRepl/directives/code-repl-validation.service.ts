@@ -49,7 +49,7 @@ export class CodeReplValidationService {
     if (!(typeof language === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Programming language name must be a string.',
+        message: 'Programming language name must be a string',
       });
     }
 
@@ -57,7 +57,7 @@ export class CodeReplValidationService {
     if (!(typeof placeholder === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       });
     }
 
@@ -65,7 +65,7 @@ export class CodeReplValidationService {
     if (!(typeof preCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The pre-code text must be a string.',
+        message: 'The pre-code text must be a string',
       });
     }
 
@@ -73,7 +73,7 @@ export class CodeReplValidationService {
     if (!(typeof postCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The post-code text must be a string.',
+        message: 'The post-code text must be a string',
       });
     }
     return warningsList;
