@@ -54,6 +54,10 @@ const languageAccentDropdownSelector =
   '.e2e-test-language-accent-dropdown-selector';
 const enableAutogenerationConfirmationButtonSelector =
   '.e2e-test-autogeneration-confirmation';
+const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
+  `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
+const enableAutogenerationOptionSelector =
+  '.e2e-test-autogeneration-option-selector';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -302,10 +306,8 @@ export class VoiceoverAdmin extends BaseUser {
   async enableAutogenerationForLanguageAccentPair(
     languageAccentCode: string
   ): Promise<void> {
-    const enableAutogenerationSelector = `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
-    const enableAutogenerationOptionSelector =
-      '.e2e-test-autogeneration-option-selector';
-
+    const enableAutogenerationSelector =
+      enableAutogenerationSelectorTemplate(languageAccentCode);
     await this.page.waitForSelector(enableAutogenerationSelector);
     await this.clickOn(enableAutogenerationSelector);
 

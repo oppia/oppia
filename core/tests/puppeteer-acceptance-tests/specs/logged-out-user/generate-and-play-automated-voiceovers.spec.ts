@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for regenrating and playing voiceovers in an exploration.
+ * @fileoverview Acceptance Test for regenerating and playing voiceovers in an exploration.
  */
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
@@ -139,10 +139,7 @@ describe('Exploration Editor', function () {
       'Algebra I'
     );
 
-    // Setting up translations for the exploration.
-    await explorationEditor.page.bringToFront();
-
-    // Adding voiceovers to the exploration.
+    // Generating voiceovers to the exploration.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.reloadPage();
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
@@ -155,7 +152,6 @@ describe('Exploration Editor', function () {
     );
 
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.regenerateVoiceoverToContent(
@@ -165,7 +161,6 @@ describe('Exploration Editor', function () {
     );
 
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.regenerateVoiceoverToContent(
