@@ -47,6 +47,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 import isEqual from 'lodash/isEqual';
+import {ShortAnswerResponse, Solution} from 'domain/exploration/solution.model';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -334,6 +335,23 @@ export class ResponsesService {
 
   getActiveAnswerGroupIndex(): number {
     return this._activeAnswerGroupIndex;
+  }
+
+  getOppiaShortAnswerResponseHtml(
+    interaction: Interaction,
+    solution: Solution
+  ): ShortAnswerResponse {
+    if (interaction.id === null) {
+      throw new Error('Interaction id is possibly null.');
+    }
+    return {
+      prefix: solution.answerIsExclusive ? 'The only' : 'One',
+      answer: solution.ehfs.getShortAnswerHtml(
+        solution.correctAnswer,
+        interaction.id,
+        interaction.customizationArgs
+      ),
+    };
   }
 
   onInteractionIdChanged(

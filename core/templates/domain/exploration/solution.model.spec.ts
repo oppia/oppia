@@ -256,55 +256,6 @@ describe('Solution object factory', () => {
       );
     });
 
-    it('should get oppia short answer', () => {
-      const interaction = new Interaction(
-        [],
-        [],
-        {
-          choices: {
-            value: [new SubtitledHtml('This is a choice', 'id1')],
-          },
-        },
-        null,
-        [],
-        '0',
-        null
-      );
-      const expectedShortAnswerHtml = {
-        prefix: 'One',
-        answer:
-          '<oppia-short-response-0 answer="&amp;quot;' +
-          'This is a correct answer!&amp;quot;" choices="' +
-          '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
-          '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
-          '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
-      };
-
-      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
-        expectedShortAnswerHtml
-      );
-    });
-
-    it("should throw an error if Interaction's id is null", () => {
-      const interaction = new Interaction(
-        [],
-        [],
-        {
-          choices: {
-            value: [new SubtitledHtml('This is a choice', '')],
-          },
-        },
-        null,
-        [],
-        null,
-        null
-      );
-
-      expect(() => {
-        solution.getOppiaShortAnswerResponseHtml(interaction);
-      }).toThrowError('Interaction id is possibly null.');
-    });
-
     it('should handle when answer exclusivity is true', () => {
       const solution = Solution.createFromBackendDict(
         {

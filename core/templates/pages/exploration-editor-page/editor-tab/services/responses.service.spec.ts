@@ -935,6 +935,74 @@ describe('Responses Service', () => {
     );
   });
 
+  it('should get oppia short answer', () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', 'id1')],
+        },
+      },
+      null,
+      [],
+      '0',
+      null
+    );
+    const solution = new Solution(
+      explorationHtmlFormatterService,
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+    const expectedShortAnswerHtml = {
+      prefix: 'One',
+      answer:
+        '<oppia-short-response-0 answer="&amp;quot;' +
+        'This is a correct answer!&amp;quot;" choices="' +
+        '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
+        '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
+        '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
+    };
+
+    spyOn(
+      explorationHtmlFormatterService,
+      'getShortAnswerHtml'
+    ).and.returnValue(expectedShortAnswerHtml.answer);
+
+    const shortAnswerResponse =
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+
+    expect(shortAnswerResponse).toEqual(expectedShortAnswerHtml);
+  });
+
+  it("should throw an error if Interaction's id is null", () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')],
+        },
+      },
+      null,
+      [],
+      null,
+      null
+    );
+
+    const solution = new Solution(
+      explorationHtmlFormatterService,
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+
+    expect(() => {
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+    }).toThrowError('Interaction id is possibly null.');
+  });
+
   it('should fetch EventEmitters', () => {
     let answerGroupsChangedEventEmitter = new EventEmitter();
     let initializeAnswerGroupsEventEmitter = new EventEmitter();

@@ -163,22 +163,6 @@ export class Solution extends BaseTranslatableObject {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(
-    interaction: Interaction
-  ): ShortAnswerResponse {
-    if (interaction.id === null) {
-      throw new Error('Interaction id is possibly null.');
-    }
-    return {
-      prefix: this.answerIsExclusive ? 'The only' : 'One',
-      answer: this.ehfs.getShortAnswerHtml(
-        this.correctAnswer,
-        interaction.id,
-        interaction.customizationArgs
-      ),
-    };
-  }
-
   getOppiaSolutionExplanationResponseHtml(): string {
     return this.explanation.html;
   }
