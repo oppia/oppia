@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2025 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,9 +37,11 @@ def update_redis_host(redis_host: str) -> None:
         redis_models.REDIS_CLIENT_ID, strict = False)
     if retrieved_redisclient is not None:
         retrieved_redisclient.redishost = redis_host
+        retrieved_redisclient.update_timestamps()
         retrieved_redisclient.put()
     else:
         redisclient = redis_models.RedisClientModel(
             id=redis_models.REDIS_CLIENT_ID, redishost = redis_host
         )
+        redisclient.update_timestamps()
         redisclient.put()
