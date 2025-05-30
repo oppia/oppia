@@ -2173,6 +2173,8 @@ class GenericTestBase(AppEngineTestBase):
     EDITOR_USERNAME: Final = 'editor'
     QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
     QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
+    QUESTION_COORDINATOR_EMAIL: Final = 'questionSpecialist@app.com'
+    QUESTION_COORDINATOR_USERNAME: Final = 'questionSpecialist'
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
     QUESTION_REVIEWER_USERNAME: Final = 'question'
     TOPIC_MANAGER_EMAIL: Final = 'topicmanager@example.com'
@@ -2680,6 +2682,36 @@ version: 1
                     'username': username,
                     'action': 'assign',
                     'topic_id': topic_id
+                }, csrf_token=self.get_new_csrf_token())
+
+    def set_question_admins(
+            self, question_admin_usernames: List[str]
+    ) -> None:
+        """Sets role of given users as QUESTION_ADMIN.
+
+        Args:
+            question_admin_usernames: list(str). List of usernames.
+        """
+        with self.super_admin_context():
+            for username in question_admin_usernames:
+                self.put_json('/questionadminrolehandler', {
+                    'username': username,
+                    'action': 'assign'
+                }, csrf_token=self.get_new_csrf_token())
+
+    def set_question_coordinators(
+            self, question_coordinator_usernames: List[str]
+    ) -> None:
+        """Sets role of given users as QUESTION_COORDINATOR.
+
+        Args:
+            question_coordinator_usernames: list(str). List of usernames.
+        """
+        with self.super_admin_context():
+            for username in question_coordinator_usernames:
+                self.put_json('/questioncoordinatorrolehandler', {
+                    'username': username,
+                    'action': 'assign'
                 }, csrf_token=self.get_new_csrf_token())
 
     def set_translation_coordinators(

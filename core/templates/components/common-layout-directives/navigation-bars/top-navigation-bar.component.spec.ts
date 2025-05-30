@@ -631,6 +631,8 @@ describe('TopNavigationBarComponent', () => {
 
     expect(component.isModerator).toBe(false);
     expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isQuestionCoordinator).toBe(false);
     expect(component.isTopicManager).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(false);
@@ -642,6 +644,8 @@ describe('TopNavigationBarComponent', () => {
 
     expect(component.isModerator).toBe(true);
     expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isQuestionCoordinator).toBe(false);
     expect(component.isTopicManager).toBe(false);
     expect(component.isSuperAdmin).toBe(false);
     expect(component.userIsLoggedIn).toBe(true);
@@ -653,11 +657,85 @@ describe('TopNavigationBarComponent', () => {
     );
   }));
 
+  it('should set isQuestionAdmin to true when user is a question admin', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE', 'QUESTION_ADMIN'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isQuestionCoordinator).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isModerator).toBe(true);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(true);
+    expect(component.isQuestionCoordinator).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
+  it('should set isQuestionCoordinator to true when user is a question coordinator', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE', 'QUESTION_COORDINATOR'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+
+    expect(component.isModerator).toBe(false);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isQuestionCoordinator).toBe(false);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.isModerator).toBe(true);
+    expect(component.isCurriculumAdmin).toBe(false);
+    expect(component.isQuestionAdmin).toBe(false);
+    expect(component.isQuestionCoordinator).toBe(true);
+    expect(component.isTopicManager).toBe(false);
+    expect(component.isSuperAdmin).toBe(false);
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
+
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     let userInfo = {
       isModerator: () => false,
       isCurriculumAdmin: () => false,
+      isQuestionAdmin: () => false,
+      isQuestionCoordinator: () => false,
       isTopicManager: () => false,
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,

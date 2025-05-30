@@ -44,7 +44,12 @@ export class TopicsAndSkillsDashboardAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin() || userInfo.isTopicManager()) {
+    if (
+      userInfo.isCurriculumAdmin() ||
+      userInfo.isTopicManager() ||
+      userInfo.isQuestionAdmin() ||
+      userInfo.isQuestionCoordinator()
+    ) {
       return true;
     }
 

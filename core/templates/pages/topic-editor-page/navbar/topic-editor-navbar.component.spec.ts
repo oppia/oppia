@@ -164,7 +164,7 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
-      new TopicRights(false, false, false)
+      new TopicRights(false, false, false, false)
     );
   });
 

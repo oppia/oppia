@@ -91,6 +91,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   learnDropdownOffset: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
+  isQuestionAdmin: boolean = false;
+  isQuestionCoordinator: boolean = false;
   isTopicManager: boolean = false;
   pageIsIframed: boolean = false;
   isSuperAdmin: boolean = false;
@@ -264,6 +266,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+      this.isQuestionAdmin = userInfo.isQuestionAdmin();
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
       this.isBlogAdmin = userInfo.isBlogAdmin();
