@@ -40,7 +40,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class ElasticSearchClient:
-    """Cretes an Elastic Search Client."""
+    """Creates an Elastic Search Client."""
 
     def __init__(self) -> None:
         self._client: Optional[elasticsearch.Elasticsearch] = None
