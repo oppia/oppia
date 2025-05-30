@@ -201,7 +201,7 @@ describe('Contributor dashboard page', () => {
   }));
 
   describe('when user is logged in', () => {
-    it('should set specific properties after $onInit is called', fakeAsync(() => {
+    it('should set specific properties after ngOnInit is called', fakeAsync(() => {
       spyOn(userService, 'getUserContributionRightsDataAsync').and.returnValue(
         Promise.resolve(userContributionRights)
       );
@@ -247,7 +247,7 @@ describe('Contributor dashboard page', () => {
     });
 
     it(
-      'should initialize $scope properties after controller is initialized' +
+      'should initialize component properties after component is initialized' +
         ' and get data from backend',
       () => {
         spyOn(

@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for fetching the admin data;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -33,6 +32,7 @@ import {
   SkillSummary,
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
+import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface UserRolesBackendResponse {
@@ -86,6 +86,7 @@ export interface AdminPageDataBackendDict {
   topic_summaries: CreatorTopicSummaryBackendDict[];
   platform_params_dicts: PlatformParameterBackendDict[];
   skill_list: SkillSummaryBackendDict[];
+  story_list: StoryBackendDict[];
 }
 
 export interface AdminPageData {
@@ -99,6 +100,7 @@ export interface AdminPageData {
   topicSummaries: CreatorTopicSummary[];
   platformParameters: PlatformParameter[];
   skillList: SkillSummary[];
+  storyList: Story[];
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
@@ -137,6 +139,9 @@ export class AdminBackendApiService {
               ),
               skillList: response.skill_list.map(dict =>
                 SkillSummary.createFromBackendDict(dict)
+              ),
+              storyList: response.story_list.map(dict =>
+                Story.createFromBackendDict(dict)
               ),
             });
           },
@@ -682,6 +687,28 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateDummyStoriesAsync(
+    topicId: string,
+    numberOfStories: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_stories',
+      topic_id: topicId,
+      num_dummy_stories_to_generate: numberOfStories,
+    });
+  }
+
+  async generateDummyChaptersAsync(
+    storyId: string,
+    numberOfChapters: number
+  ): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_dummy_chapters',
+      story_id: storyId,
+      num_dummy_chapters_to_generate: numberOfChapters,
+    });
+  }
+
   async retrieveExplorationInteractionIdsAsync(
     expId: string
   ): Promise<ExplorationInteractionIdsBackendResponse> {
@@ -707,10 +734,3 @@ export class AdminBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AdminBackendApiService',
-    downgradeInjectable(AdminBackendApiService)
-  );

@@ -21,6 +21,8 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
+import fs from 'fs';
+import path from 'path';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -28,6 +30,7 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
@@ -54,6 +57,8 @@ const addRoleDropdown = 'mat-select.e2e-test-role-select';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+
+const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -125,8 +130,14 @@ const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
 const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
-const translationLanguageSelector =
-  'select.e2e-test-translation-language-selector';
+
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
 const translationModeButton = 'button.e2e-test-translation-mode';
 const editTranslationSelector = 'div.e2e-test-edit-translation';
 const stateTranslationEditorSelector =
@@ -207,7 +218,6 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
-const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
@@ -218,8 +228,52 @@ const stayAnonymousCheckbox = '.e2e-test-stay-anonymous-checkbox';
 const responseTextareaSelector = '.e2e-test-feedback-response-textarea';
 const sendButtonSelector = '.e2e-test-oppia-feedback-response-send-btn';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const historyTabButton = '.e2e-test-history-tab';
+const historyListContent = '.e2e-test-history-list-item';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const totalPlaysSelector = '.e2e-test-oppia-total-plays';
+const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
+const avarageRatingSelector = '.e2e-test-oppia-average-rating';
+const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
 
+const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
+const stateContentEditorSelector =
+  '.e2e-test-edit-content.oppia-editable-section';
+const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
+const languageDropdownValueSelector =
+  'mat-select.e2e-test-exploration-language-select .mat-select-value';
+
+const historyTableIndex = '.history-table-index';
+const historyListOptions = '.e2e-test-history-list-options';
+const downloadExplorationButton =
+  'a.dropdown-item.e2e-test-download-exploration';
+const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
+const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
+const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
+const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
+
+const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+
+enum INTERACTION_TYPES {
+  CODE_EDITOR = 'Code Editor',
+  CONTINUE_BUTTON = 'Continue Button',
+  END_EXPLORATION = 'End Exploration',
+}
+
+enum INTERACTION_TABS {
+  PROGRAMMING = 'PROGRAMMING',
+}
+
+export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
+  [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+};
+
+const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-unpublished_exploration-v';
+const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
+  'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to creator dashboard page.
@@ -276,13 +330,19 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
     showMessage('Settings tab is opened successfully.');
   }
 
+  /**
+   * Function to open control dropdown so that delete exploration button is visible
+   * in mobile view.
+   */
+  async openExplorationControlDropdown(): Promise<void> {
+    await this.clickOn(explorationControlsSettingsDropdown);
+  }
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -366,6 +426,10 @@ export class ExplorationEditor extends BaseUser {
 
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileFeedbackTabButton);
@@ -395,18 +459,31 @@ export class ExplorationEditor extends BaseUser {
    * Function to dismiss exploration editor welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
+    showMessage('Tutorial pop-up closed successfully.');
+  }
+
+  /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
     try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      await this.page.waitForSelector(dropdownToggleIcon, {
         visible: true,
         timeout: 5000,
       });
-      await this.clickOn(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
-      showMessage('Tutorial pop-up closed successfully.');
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -446,7 +523,19 @@ export class ExplorationEditor extends BaseUser {
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.page.waitForSelector(addInteractionButton, {
+      visible: true,
+    });
+
     await this.clickOn(addInteractionButton);
+
+    // Change tab based on interaction.
+    // Add more conditional tab changes here.
+    if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
+    ) {
+      await this.clickOn(programmingInteractionsButton);
+    }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
@@ -703,37 +792,31 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(languageUpdateDropdown);
     await this.clickOn(language);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
    *  Verifies that the selected language matches the expected language.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    await this.page.waitForSelector(languageUpdateDropdown);
-    const languageDropdown = await this.page.$(languageUpdateDropdown);
-    if (!languageDropdown) {
-      throw new Error('Category dropdown not found.');
-    }
-    await languageDropdown.click();
-
-    const selectedLanguage = await this.page.evaluate(() => {
-      const matOption = document.querySelector(
-        '.mat-option.mat-selected'
-      ) as HTMLElement;
-      if (!matOption) {
-        throw new Error('Selected language option not found.');
-      }
-      return matOption.innerText.trim();
+    await this.page.waitForSelector(languageDropdownValueSelector, {
+      visible: true,
     });
+
+    const selectedLanguage = await this.page.evaluate(selector => {
+      const element = document.querySelector(selector) as HTMLElement;
+      return element?.innerText.trim() ?? '';
+    }, languageDropdownValueSelector);
 
     if (selectedLanguage.includes(expectedLanguage)) {
       showMessage(
         `The language ${selectedLanguage} contains the expected language.`
       );
     } else {
-      throw new Error('Language is not correct.');
+      throw new Error(
+        `Expected language: ${expectedLanguage}, but found: "${selectedLanguage}".`
+      );
     }
-    await this.page.keyboard.press('Enter');
   }
 
   async addTags(tagNames: string[]): Promise<void> {
@@ -815,6 +898,25 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw error('Automatic Text-to-Speech is disabled.');
     }
+  }
+
+  /**
+   * Assigns a role of manager to any guest user.
+   */
+  async assignUserToManagerRole(username: string): Promise<void> {
+    await this.clickOn(editRoleButton);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
+    const [managerOption] = await this.page.$x(
+      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    );
+    await managerOption.click();
+    await this.page.waitForSelector(tagFilterDropdownSelector, {
+      hidden: true,
+    });
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as manager role.`);
   }
 
   /**
@@ -908,6 +1010,11 @@ export class ExplorationEditor extends BaseUser {
       if (!element) {
         await this.clickOn(mobileOptionsButton);
       }
+
+      await this.page.waitForSelector(
+        `${mobileSaveChangesButton}:not([disabled])`,
+        {visible: true}
+      );
       await this.clickOn(mobileSaveChangesButton);
     } else {
       await this.clickOn(saveChangesButton);
@@ -994,6 +1101,13 @@ export class ExplorationEditor extends BaseUser {
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.type(addStateInput, cardName);
+    await this.clickOn(saveOutcomeDestButton);
+  }
+
+  async directLearnersToAlreadyExistingCard(cardName: string): Promise<void> {
+    await this.clickOn(openOutcomeDestButton);
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, cardName);
     await this.clickOn(saveOutcomeDestButton);
   }
 
@@ -1101,7 +1215,6 @@ export class ExplorationEditor extends BaseUser {
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
-
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
@@ -1126,17 +1239,26 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.waitForNetworkIdle();
     }
   }
 
+  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
    * Function to add feedback for default responses of a state interaction.
    * @param {string} defaultResponseFeedback - The feedback for the default responses.
    * @param {string} [directToCard] - The card to direct to (optional).
    * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(
-    defaultResponseFeedback?: string,
+  async editDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string,
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
@@ -1512,7 +1634,132 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(previewTabButton);
     }
-    await this.page.waitForNavigation();
+  }
+
+  /**
+   * Function to navigate to the history tab.
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileHistoryTabButton);
+    } else {
+      await this.clickOn(historyTabButton);
+    }
+  }
+
+  /**
+   * Gets the list of existing files for the given version.
+   * @param {number} version - The expected version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @returns {string[]} - List of matching file names.
+   */
+  async getExistingVersionFiles(
+    version: number,
+    isPublished: boolean
+  ): Promise<string[]> {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+
+    const files = fs.readdirSync(downloadPath);
+    return files.filter(file =>
+      file.match(new RegExp(`^${filePrefix}${version}( \\(\\d+\\))?\\.zip$`))
+    );
+  }
+
+  /**
+   * Generates the expected filename based on the existing count.
+   * @param {number} version - The version number.
+   * @param {boolean} isPublished - Whether the exploration is published.
+   * @param {number} fileCount - The number of existing files.
+   * @returns {string} - The expected filename.
+   */
+  getExpectedFileName(
+    version: number,
+    isPublished: boolean,
+    fileCount: number
+  ): string {
+    const filePrefix = isPublished
+      ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
+      : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+    return fileCount === 0
+      ? `${filePrefix}${version}.zip`
+      : `${filePrefix}${version} (${fileCount}).zip`;
+  }
+
+  /**
+   * Function to download a specific version of Exploration.
+   * @param {number} explorationVersion - The version of the exploration to download.
+   * @param {boolean} isExplorationPublished - Whether the Exploration is published.
+   */
+  async downloadExploration(
+    explorationVersion: number,
+    isExplorationPublished: boolean
+  ): Promise<void> {
+    const historyItems = await this.page.$$(historyListContent);
+    for (const historyItem of historyItems) {
+      const versionNumberElement = await historyItem.$(historyTableIndex);
+      const versionText = await this.page.evaluate(
+        element => element.textContent,
+        versionNumberElement
+      );
+
+      // Check whether the current exploration version matches the given explorationVersion.
+      if (parseInt(versionText, 10) === explorationVersion) {
+        // Count existing files with same name before downloading.
+        const existingFiles = await this.getExistingVersionFiles(
+          explorationVersion,
+          isExplorationPublished
+        );
+        const nextNumber = existingFiles.length;
+        const expectedFileName = this.getExpectedFileName(
+          explorationVersion,
+          isExplorationPublished,
+          nextNumber
+        );
+
+        const dropdownButton = await historyItem.$(historyListOptions);
+        await this.page.evaluate(el => el.click(), dropdownButton);
+        await this.page.waitForTimeout(1000);
+        const downloadButton = await historyItem.$(downloadExplorationButton);
+        await this.page.evaluate(el => el.click(), downloadButton);
+        await this.page.waitForTimeout(5000);
+        const downloadedFile =
+          await this.waitForExplorationDownload(expectedFileName);
+        if (downloadedFile) {
+          showMessage(`${downloadedFile} file is successfully downloaded`);
+          return;
+        } else {
+          throw new Error(
+            `Download failed for Exploration version: ${explorationVersion}`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Waits for a downloaded file to appear and cleans up only the new one.
+   * @param {string} expectedFileName - The expected file name.
+   * @returns {Promise<string | null>} - The verified file name or null if not found.
+   */
+  async waitForExplorationDownload(
+    expectedFileName: string
+  ): Promise<string | null> {
+    // Wait for network to be idle after triggering the download.
+    await this.page.waitForNetworkIdle();
+    const files = fs.readdirSync(downloadPath);
+    const downloadedFile =
+      files.find(file => file === expectedFileName) || null;
+    if (
+      downloadedFile &&
+      fs.existsSync(path.join(downloadPath, downloadedFile))
+    ) {
+      fs.unlinkSync(path.join(downloadPath, downloadedFile));
+    }
+    return downloadedFile;
   }
 
   /**
@@ -1676,14 +1923,18 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
+   * @param {boolean} flag - Determines whether to dismiss the welcome modal.
    */
   async createAndPublishAMinimalExplorationWithTitle(
     title: string,
-    category: string = 'Algebra'
+    category: string = 'Algebra',
+    flag: boolean = true
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
-    await this.dismissWelcomeModal();
+    if (flag) {
+      await this.dismissWelcomeModal();
+    }
     await this.createMinimalExploration(
       'Exploration intro text',
       'End Exploration'
@@ -1692,6 +1943,95 @@ export class ExplorationEditor extends BaseUser {
     return await this.publishExplorationWithMetadata(
       title,
       'This is Goal here.',
+      category
+    );
+  }
+
+  /**
+   * This function creates simple Programming Exploration.
+   * Starts at new Exploration Editor Page.
+   * Ends at same page, after adding programming interaction and saving the
+   * draft.
+   */
+  async createSimpleProgrammingExploration(): Promise<string | null> {
+    // Check if element to add interaction is visible (pre-check)
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+
+    await this.createMinimalExploration(
+      'This is a test Programming Exploration',
+      INTERACTION_TYPES.CODE_EDITOR
+    );
+
+    const lastInteraction = 'Last Card';
+    await this.waitForElementToBeClickable(destinationCardSelector);
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, lastInteraction);
+    await this.clickOn(addNewResponseButton);
+    await this.clickOn(correctAnswerInTheGroupSelector);
+
+    await this.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
+    await this.navigateToCard(lastInteraction);
+    await this.createMinimalExploration(
+      'This is last card',
+      INTERACTION_TYPES.END_EXPLORATION
+    );
+
+    await this.saveExplorationDraft();
+    const explorationId = await this.publishExplorationWithMetadata(
+      'Simple Code Editor',
+      'This is goal here',
+      'Algebra'
+    );
+
+    // Check if publish button is disabled (post-check)
+    const publishButton = await this.page.$(saveChangesButton);
+    const isDisabled = await this.page.evaluate(
+      el => el.disabled,
+      publishButton
+    );
+
+    if (isDisabled) {
+      showMessage('Publish Button is disabled, as expected');
+    } else {
+      showMessage(
+        'Publish Button is enabled and clickable, expected to be disabled'
+      );
+      throw new Error('Publish Button is enabled and clickable');
+    }
+
+    return explorationId;
+  }
+
+  /**
+   * Function for creating an exploration with two cards.
+   */
+  async createAndPublishExplorationWithCards(
+    explorationTitle: string,
+    category: string = 'Mathematics'
+  ): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.dismissWelcomeModal();
+
+    await this.updateCardContent('Content 0');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 1');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 1');
+    await this.updateCardContent('Content 1');
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.navigateToCard('Introduction');
+    await this.saveExplorationDraft();
+
+    return await this.publishExplorationWithMetadata(
+      explorationTitle,
+      `This is ${explorationTitle}\`s goals.`,
       category
     );
   }
@@ -1807,18 +2147,32 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to edit a translation for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the translation has to be added.
+   * @param {string} language - Language for which the translation has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
-    languageCode: string,
+    language: string,
     contentType: string,
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(translationModeButton);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -2002,17 +2356,20 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to add a voiceover for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async addVoiceoverToContent(
-    languageCode: string,
+    language: string,
+    languageAccent: string,
     contentType: string,
     voiceoverFilePath: string
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.waitForPageToFullyLoad();
+
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -2022,10 +2379,180 @@ export class ExplorationEditor extends BaseUser {
       );
       await this.clickOn(contentType);
     }
-    await this.clickOn(uploadAudioButton);
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to create and save a new untitled exploration containing only the EndExploration interaction.
+   */
+  async createAndSaveAMinimalExploration(): Promise<void> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorPage();
+    await this.createMinimalExploration(
+      'Exploration intro text',
+      'End Exploration'
+    );
+    await this.saveExplorationDraft();
+  }
+
+  /**
+   * Function to verify the average rating and the number of users who submitted ratings.
+   * @param {number} expectedRating - The expected average rating.
+   * @param {number} expectedUsers - The expected count of users who submitted ratings.
+   */
+  async expectAverageRatingAndUsersToBe(
+    expectedRating: number,
+    expectedUsers: number
+  ): Promise<void> {
+    await this.page.waitForSelector(avarageRatingSelector, {
+      visible: true,
+    });
+    const avarageRating = await this.page.$eval(
+      avarageRatingSelector,
+      element => parseFloat((element as HTMLElement).innerText.trim())
+    );
+    if (avarageRating !== expectedRating) {
+      throw new Error(
+        `Expected average rating to be ${expectedRating}, but found ${avarageRating}.`
+      );
+    }
+    const totalUsersText = await this.page.$eval(
+      usersCountInRatingSelector,
+      el => (el as HTMLElement).innerText.trim() || ''
+    );
+    // Extract number from text (e.g., "by 3 users" → 3).
+    const totalUsersMatch = totalUsersText.match(/\d+/);
+    const totalUsers = totalUsersMatch ? parseInt(totalUsersMatch[0], 10) : 0;
+    if (totalUsers !== expectedUsers) {
+      throw new Error(
+        `Expected ${expectedUsers} users to have submitted ratings, but found only ${totalUsers} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected number of open feedback entries.
+   * @param {number} number - The expected count of open feedback entries.
+   */
+  async expectOpenFeedbacksToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(numberOfOpenFeedbacksSelector, {
+      visible: true,
+    });
+    const numberOfOpenFeedbacks = await this.page.$eval(
+      numberOfOpenFeedbacksSelector,
+      el => parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfOpenFeedbacks !== number) {
+      throw new Error(
+        `Expected open feedback count to be ${number}, but found ${numberOfOpenFeedbacks}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of plays."
+   * @param {number} number - The expected total play count.
+   */
+  async expectTotalPlaysToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(totalPlaysSelector, {
+      visible: true,
+    });
+    const numberOfTotalPlays = await this.page.$eval(totalPlaysSelector, el =>
+      parseInt((el as HTMLElement).innerText.trim(), 10)
+    );
+    if (numberOfTotalPlays !== number) {
+      throw new Error(
+        `Expected total plays count to be ${number}, but found ${numberOfTotalPlays}.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the expected total number of explorations.
+   * @param {number} number - The expected count of total explorations.
+   */
+  async expectNumberOfExplorationsToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+    const count = titlesOnPage.length;
+
+    if (count !== number) {
+      throw new Error(
+        `Expected ${number} explorations, but found ${count} instead.`
+      );
+    }
+  }
+
+  /**
+   * Function to check the presence and expected number of occurrences of an exploration.
+   * @param {string} explorationName - The name of the exploration.
+   * @param {number} numberOfOccurrence - The expected occurrence count of the exploration.
+   */
+  async expectExplorationNameToAppearNTimes(
+    explorationName: string,
+    numberOfOccurrence: number = 1
+  ): Promise<void> {
+    await this.page.waitForSelector(explorationSummaryTileTitleSelector, {
+      visible: true,
+    });
+
+    // Extract all exploration titles.
+    const titlesOnPage = await this.page.$$eval(
+      explorationSummaryTileTitleSelector,
+      elements => elements.map(el => el.textContent?.trim() || '')
+    );
+
+    // Count occurrences of the target exploration.
+    const count = titlesOnPage.filter(
+      title => title === explorationName
+    ).length;
+
+    if (numberOfOccurrence === 1 && count !== numberOfOccurrence) {
+      throw new Error(`Exploration "${explorationName}" not found.`);
+    } else if (count !== numberOfOccurrence) {
+      throw new Error(
+        `Exploration "${explorationName}" found ${count} times, but expected ${numberOfOccurrence} times.`
+      );
+    }
   }
 
   /**
@@ -2129,6 +2656,92 @@ export class ExplorationEditor extends BaseUser {
   async replyToSuggestion(reply: string): Promise<void> {
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Verifies that the Edit Roles button is hidden, indicating the user
+   * doesn't have permission to modify user roles.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectEditRolesButtonToBeHidden(): Promise<void> {
+    const element = await this.page.$(editRolesButtonSelector);
+    expect(element).toBe(null);
+  }
+
+  /**
+   * Verifies that the state content editor is hidden, indicating the user
+   * doesn't have permission to edit exploration content.
+   * @returns A promise that resolves when the assertion completes.
+   */
+  async expectStateContentEditorToBeHidden(): Promise<void> {
+    const element = await this.page.$(stateContentEditorSelector);
+    expect(element).toBe(null);
+  }
+
+  /**
+   * Navigates back to the feedback tab.
+   */
+  async goBackToTheFeedbackTab(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Changes the status of the current feedback thread.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async changeFeedbackStatus(statusValue: string): Promise<void> {
+    if (statusValue === 'ignored' || statusValue === 'not_actionable') {
+      await this.type(responseTextareaSelector, statusValue);
+    }
+    await this.select(feedbackStatusMenu, statusValue);
+    await this.clickOn(sendButtonSelector);
+  }
+
+  /**
+   * Checks if the current feedback status matches the expected value.
+   * @param {string} statusValue - The expected status value of the feedback.
+   */
+  async expectFeedbackStatusToBe(statusValue: string): Promise<void> {
+    const currentStatus = await this.page.$eval(
+      feedbackStatusMenu,
+      el => (el as HTMLSelectElement).value
+    );
+    if (currentStatus !== statusValue) {
+      throw new Error(
+        `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
+      );
+    }
+  }
+
+  /**
+   * Presses the back button in the feedback thread tab.
+   */
+  async pressFeedbackThreadBackButton(): Promise<void> {
+    await this.clickOn(feedbackTabBackButtonSelector);
+  }
+
+  /**
+   * Verifies that a feedback thread at the specified index has the expected status.
+   * @param {number} threadIndex - The 1-indexed position of the feedback thread.
+   * @param {string} expectedStatus - The status text expected for the feedback thread.
+   */
+  async expectFeedbackStatusInList(
+    threadIndex: number,
+    expectedStatus: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackTabRowSelector, {
+      visible: true,
+    });
+    let feedbackStatuses = await this.page.$$(feedbackStatusSelector);
+    const statusText = await this.page.evaluate(
+      el => el.textContent?.trim(),
+      feedbackStatuses[threadIndex - 1]
+    );
+    if (statusText !== expectedStatus) {
+      throw new Error(
+        `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
+      );
+    }
   }
 }
 

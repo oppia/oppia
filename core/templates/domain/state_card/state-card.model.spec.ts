@@ -18,16 +18,13 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {
   InteractionBackendDict,
   InteractionObjectFactory,
 } from 'domain/exploration/InteractionObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {Voiceover} from 'domain/exploration/voiceover.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
@@ -36,7 +33,6 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let solutionObjectFactory: SolutionObjectFactory;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
 
@@ -47,9 +43,6 @@ describe('State card object factory', () => {
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
@@ -103,26 +96,7 @@ describe('State card object factory', () => {
       '<p>Content</p>',
       '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
-      RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content: {
-            en: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100000,
-              needs_update: false,
-              duration_secs: 10.0,
-            },
-            hi: {
-              filename: 'filename2.mp3',
-              file_size_bytes: 11000,
-              needs_update: false,
-              duration_secs: 0.11,
-            },
-          },
-        },
-      }),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     _sampleCard2 = StateCard.createNewCard(
       'State 2',
@@ -133,13 +107,7 @@ describe('State card object factory', () => {
       // because of the need to test validations.
       // @ts-ignore
       null,
-      // This throws "Type null is not assignable to type
-      // 'Interaction'." We need to suppress this error
-      // because of the need to test validations.
-      // @ts-ignore
-      null,
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 
@@ -155,36 +123,6 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getInputResponsePairs()).toEqual([]);
     expect(_sampleCard1.getLastInputResponsePair()).toBeNull();
     expect(_sampleCard1.getLastOppiaResponse()).toBeNull();
-    expect(
-      _sampleCard1.getRecordedVoiceovers().getBindableVoiceovers('content')
-    ).toEqual({
-      en: Voiceover.createFromBackendDict({
-        filename: 'filename1.mp3',
-        file_size_bytes: 100000,
-        needs_update: false,
-        duration_secs: 10.0,
-      }),
-      hi: Voiceover.createFromBackendDict({
-        filename: 'filename2.mp3',
-        file_size_bytes: 11000,
-        needs_update: false,
-        duration_secs: 0.11,
-      }),
-    });
-    expect(_sampleCard1.getVoiceovers()).toEqual({
-      en: Voiceover.createFromBackendDict({
-        filename: 'filename1.mp3',
-        file_size_bytes: 100000,
-        needs_update: false,
-        duration_secs: 10.0,
-      }),
-      hi: Voiceover.createFromBackendDict({
-        filename: 'filename2.mp3',
-        file_size_bytes: 11000,
-        needs_update: false,
-        duration_secs: 0.11,
-      }),
-    });
 
     expect(_sampleCard1.getInteractionId()).toEqual('TextInput');
     expect(_sampleCard2.getInteractionId()).toBeNull();
@@ -266,15 +204,6 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getLastAnswer()).toEqual('learner input');
   });
 
-  it('should get voiceovers when calling', () => {
-    const expectedResults = {
-      en: new Voiceover('filename1.mp3', 100000, false, 10),
-      hi: new Voiceover('filename2.mp3', 11000, false, 0.11),
-    };
-    expect(_sampleCard1.getVoiceovers()).toEqual(expectedResults);
-    expect(_sampleCard2.getVoiceovers()).toEqual({});
-  });
-
   it('should get current interaction id when calling', () => {
     expect(_sampleCard1.getInteractionId()).toEqual('TextInput');
   });
@@ -294,16 +223,6 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual(
       expectedResults
     );
-  });
-
-  it('should check whether content audio translation is available', () => {
-    spyOn(
-      audioTranslationLanguageService,
-      'isAutogeneratedAudioAllowed'
-    ).and.returnValue(false);
-
-    expect(_sampleCard1.isContentAudioTranslationAvailable()).toBeTrue();
-    expect(_sampleCard2.isContentAudioTranslationAvailable()).toBeFalse();
   });
 
   it('should get all the hints from interaction', () => {
@@ -425,5 +344,35 @@ describe('State card object factory', () => {
 
     simulateInteraction(-1);
     expect(_sampleCard1.showNoResponseError()).toBeFalse();
+  });
+  it('should update answer validity using updateAnswerIsValid', () => {
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+
+    _sampleCard1.updateAnswerIsValid(true);
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeTrue();
+
+    _sampleCard1.updateAnswerIsValid(false);
+    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+  });
+
+  it('should show invalid response error when answer is invalid and submit clicked', () => {
+    _sampleCard1.updateAnswerIsValid(false);
+    _sampleCard1.getInteraction().submitClicked = true;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeTrue();
+  });
+
+  it('should not show invalid response error when answer is valid', () => {
+    _sampleCard1.updateAnswerIsValid(true);
+    _sampleCard1.getInteraction().submitClicked = true;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
+  });
+
+  it('should not show invalid response error when submit not clicked', () => {
+    _sampleCard1.updateAnswerIsValid(false);
+    _sampleCard1.getInteraction().submitClicked = false;
+
+    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
   });
 });

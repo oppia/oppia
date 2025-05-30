@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -44,7 +44,6 @@ import {
   StateObjectsBackendDict,
   States,
   StatesObjectFactory,
-  VoiceoverObjectsDict,
 } from 'domain/exploration/StatesObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -200,16 +199,8 @@ export class Exploration extends BaseTranslatableObject {
     return this.getState(stateName).content.html;
   }
 
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
-    return this.states.getAllVoiceovers(languageCode);
-  }
-
   getLanguageCode(): string {
     return this.languageCode;
-  }
-
-  getAllVoiceoverLanguageCodes(): string[] {
-    return this.states.getAllVoiceoverLanguageCodes();
   }
 }
 
@@ -268,10 +259,3 @@ export class ExplorationObjectFactory {
     return this.createFromBackendDict(explorationBackendDict);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationObjectFactory',
-    downgradeInjectable(ExplorationObjectFactory)
-  );

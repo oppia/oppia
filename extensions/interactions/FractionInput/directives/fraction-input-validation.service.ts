@@ -17,17 +17,17 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {FractionAnswer} from 'interactions/answer-defs';
 import {Fraction} from 'domain/objects/fraction.model';
-import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {BaseInteractionValidationService} from 'interactions/base-interaction-validation.service';
 import {AppConstants} from 'app.constants';
 import {Warning} from 'services/alerts.service';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
+import isEqual from 'lodash/isEqual';
 
 interface FractionWarning {
   type: string;
@@ -47,7 +47,7 @@ interface Range {
   providedIn: 'root',
 })
 export class FractionInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: BaseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
@@ -58,7 +58,7 @@ export class FractionInputValidationService {
         ' from Oppia response ' +
         (i + 1) +
         ' is invalid: input should be an ' +
-        'integer.',
+        'integer',
     };
   }
 
@@ -169,7 +169,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -178,7 +178,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -219,16 +219,85 @@ export class FractionInputValidationService {
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
-          case 'IsEquivalentTo': // fall-through.
+          case 'IsEquivalentTo':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form',
+                });
+              }
+            }
+          // Intentional fall through.
           case 'IsEquivalentToAndInSimplestForm':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
           case 'IsGreaterThan':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, f, Infinity, false, false);
             break;
           case 'IsLessThan':
+            if (shouldBeInSimplestForm) {
+              var fractionDict = rule.inputs.f as FractionAnswer;
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                warningsList.push({
+                  type: AppConstants.WARNING_TYPES.ERROR,
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
+                    (i + 1) +
+                    ' will never be matched because it is not ' +
+                    'in simplest form',
+                });
+              }
+            }
             var f = toFloat.call(this, rule.inputs.f as FractionAnswer);
             setLowerAndUpperBounds(range, -Infinity, f, false, false);
             break;
@@ -267,7 +336,7 @@ export class FractionInputValidationService {
                   ' from Oppia response ' +
                   (i + 1) +
                   ' is invalid: denominator ' +
-                  'should be greater than zero.',
+                  'should be greater than zero',
               });
             }
             matchedDenominator.denominator = rule.inputs.x as number;
@@ -333,8 +402,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (ranges[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (ranges[k].answerGroupIndex + 1) +
-                  '.',
+                  (ranges[k].answerGroupIndex + 1),
               });
             }
           }
@@ -360,8 +428,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (matchedDenominators[k].answerGroupIndex + 1) +
-                  '.',
+                  (matchedDenominators[k].answerGroupIndex + 1),
               });
             }
           }
@@ -379,10 +446,3 @@ export class FractionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FractionInputValidationService',
-    downgradeInjectable(FractionInputValidationService)
-  );

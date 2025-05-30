@@ -17,7 +17,6 @@
  * necessary to have a fully-qualified URL.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -168,7 +167,7 @@ export class UrlInterpolationService {
         'Every parameter passed into interpolateUrl must have string values, ' +
           'but received: {' +
           nonStringParams
-            .map(([key, val]) => key + ': ' + angular.toJson(val))
+            .map(([key, val]) => key + ': ' + JSON.stringify(val))
             .join(', ') +
           '}'
       );
@@ -254,10 +253,3 @@ export class UrlInterpolationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'UrlInterpolationService',
-    downgradeInjectable(UrlInterpolationService)
-  );

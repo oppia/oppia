@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ImageClickAnswer} from 'interactions/answer-defs';
 import {ImageClickRuleInputs} from 'interactions/rule-input-defs';
@@ -30,10 +29,3 @@ export class ImageClickInputRulesService {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ImageClickInputRulesService',
-    downgradeInjectable(ImageClickInputRulesService)
-  );

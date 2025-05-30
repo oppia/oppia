@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
@@ -381,7 +380,3 @@ export class ImagePreloaderService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ImagePreloaderService', downgradeInjectable(ImagePreloaderService));

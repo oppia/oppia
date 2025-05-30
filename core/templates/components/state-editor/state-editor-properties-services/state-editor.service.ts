@@ -20,10 +20,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
@@ -34,7 +33,7 @@ import {
   MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {State} from 'domain/state/StateObjectFactory';
@@ -367,7 +366,3 @@ export class StateEditorService {
     return this._onChangeLinkedSkillIdEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StateEditorService', downgradeInjectable(StateEditorService));

@@ -21,7 +21,6 @@ import binascii
 import collections
 import datetime
 import hashlib
-import imghdr
 import io
 import itertools
 import json
@@ -40,6 +39,7 @@ from core.constants import constants
 
 from PIL import Image
 import certifi
+import filetype
 import yaml
 
 from typing import ( # isort:skip
@@ -426,14 +426,16 @@ def convert_image_binary_to_data_url(
         Exception. The given binary string does not represent a PNG image.
         Exception. The given binary string does not represent a WEBP image.
     """
-    if imghdr.what(None, h=content) == file_type:
-        return '%s%s' % (
-            DATA_URL_FORMAT_PREFIX % file_type,
-            urllib.parse.quote(base64.b64encode(content))
-        )
-    else:
+    file_details = filetype.guess(content)
+    if file_details is None or file_details.extension != file_type:
         raise Exception(
-            'The given string does not represent a %s image.' % file_type)
+            'The given binary string does not represent a %s image.' 
+            % file_type)
+
+    return '%s%s' % (
+        DATA_URL_FORMAT_PREFIX % file_type,
+        urllib.parse.quote(base64.b64encode(content))
+    )
 
 
 def is_base64_encoded(content: str) -> bool:
@@ -593,6 +595,24 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     return datetime_obj.timestamp() * 1000.0
+
+
+def convert_millisecs_time_to_datetime_object(
+        date_time_msecs: float) -> datetime.datetime:
+    """Returns the datetime object from the given date time in milliseconds.
+
+    Args:
+        date_time_msecs: float. Date time represented in milliseconds.
+
+    Returns:
+        datetime. An object of type datetime.datetime corresponding to
+        the given milliseconds.
+    """
+    return (
+        datetime.datetime.fromtimestamp(
+            date_time_msecs / 1000.0, tz=datetime.timezone.utc
+        )
+    )
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -1439,3 +1459,14 @@ def unescape_html(escaped_html_data: str) -> str:
             replace_tuple[0], replace_tuple[1])
 
     return unescaped_html_data
+
+
+def get_image_filename_regex_pattern() -> str:
+    """Returns regex pattern for valid image filenames based on
+    accepted extensions.
+    """
+    extensions = []
+    for _, exts in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.items():
+        extensions.extend(exts)
+    extension_pattern = '|'.join(extensions)
+    return r'^[a-zA-Z0-9\-_]+\.(%s)$' % extension_pattern

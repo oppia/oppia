@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 // This throws "Object is possibly undefined." The type undefined
 // comes here from ngx joyride dependency. We need to suppress this
@@ -30,7 +29,6 @@ import {JoyrideService} from 'ngx-joyride';
 import {Subscription} from 'rxjs';
 import {WelcomeTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {ContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
 import {LoaderService} from 'services/loader.service';
@@ -73,7 +71,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
     private stateEditorService: StateEditorService,
-    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
@@ -84,13 +81,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.stateTutorialFirstTimeService.initTranslation(
       this.contextService.getExplorationId()
     );
-    let stateName = this.stateEditorService.getActiveStateName();
-    if (stateName) {
-      this.stateRecordedVoiceoversService.init(
-        stateName,
-        this.explorationStatesService.getRecordedVoiceoversMemento(stateName)
-      );
-    }
     this.showTranslationTabSubDirectives = true;
     this.translationTabActiveModeService.activateVoiceoverMode();
     this.loaderService.hideLoadingScreen();
@@ -195,10 +185,3 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTranslationTab',
-  downgradeComponent({
-    component: TranslationTabComponent,
-  }) as angular.IDirectiveFactory
-);

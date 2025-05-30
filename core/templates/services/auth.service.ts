@@ -19,7 +19,6 @@
 import {Injectable, Optional} from '@angular/core';
 import {FirebaseOptions} from '@angular/fire';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import {md5} from 'hash-wasm';
@@ -200,7 +199,3 @@ export class AuthService {
     await this.authBackendApiService.endSessionAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AuthService', downgradeInjectable(AuthService));

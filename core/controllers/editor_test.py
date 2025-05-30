@@ -135,28 +135,6 @@ class EditorTests(BaseEditorControllerTests):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
 
-    def test_editor_page(self) -> None:
-        """Test access to editor pages for the sample exploration."""
-
-        # Check that non-editors can access, but not edit, the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_cannot_edit('0')
-
-        # Log in as an editor.
-        self.login(self.EDITOR_EMAIL)
-
-        # Check that it is now possible to access and edit the editor page.
-        response = self.get_html_response('/create/0')
-        self.assertIn(
-            b'<exploration-editor-page></exploration-editor-page>',
-            response.body)
-        self.assert_can_edit('0')
-
-        self.logout()
-
     def test_that_default_exploration_cannot_be_published(self) -> None:
         """Test that publishing a default exploration raises an error
         due to failing strict validation.
@@ -379,6 +357,110 @@ class EditorTests(BaseEditorControllerTests):
             'This exploration cannot be edited. Please contact the admin.')
         self.logout()
 
+    def test_public_exploration_requires_commit_message(self) -> None:
+        """Test that public explorations require a commit message
+        when updated.
+        """
+        self.login(self.OWNER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, end_state_name='End State')
+
+        rights_manager.publish_exploration(self.owner, exp_id)
+
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'old_value': 'A title',
+            'new_value': 'Updated Title'
+        }]
+
+        # Test with commit_message set to None.
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'commit_message': None,
+                'change_list': change_list
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Exploration is public so expected a commit message but received '
+            'none.'
+        )
+
+        # Test without commit_message field.
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'change_list': change_list
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'],
+            'Exploration is public so expected a commit message but received '
+            'none.'
+        )
+
+        # Test with a valid commit_message.
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'commit_message': 'Updated the title',
+                'change_list': change_list
+            },
+            csrf_token=csrf_token
+        )
+        updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(updated_exploration.title, 'Updated Title')
+
+        self.logout()
+
+    def test_private_exploration_does_not_require_commit_message(
+        self
+    ) -> None:
+        """Test that private explorations do not require a commit message
+        when updated.
+        """
+        self.login(self.OWNER_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, end_state_name='End State')
+
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'old_value': 'A title',
+            'new_value': 'Updated Title'
+        }]
+
+        # Test updating a private exploration without a commit message.
+        self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id),
+            {
+                'version': 1,
+                'change_list': change_list
+            },
+            csrf_token=csrf_token
+        )
+        updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        self.assertEqual(updated_exploration.title, 'Updated Title')
+
+        self.logout()
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
@@ -418,11 +500,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_9: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """),
         'State B': (
@@ -459,11 +536,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_10: {}
-    content_5: {}
-    default_outcome_6: {}
 solicit_answer_details: false
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
@@ -500,11 +572,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_2: {}
-    content_0: {}
-    default_outcome_1: {}
 solicit_answer_details: false
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -543,11 +610,6 @@ interaction:
   solution: null
 linked_skill_id: null
 param_changes: []
-recorded_voiceovers:
-  voiceovers_mapping:
-    ca_placeholder_9: {}
-    content_3: {}
-    default_outcome_4: {}
 solicit_answer_details: false
 """)
 
@@ -1341,12 +1403,6 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 },
             })], 'Change objective and init state content')
 
-    def test_get_with_disabled_exploration_id_raises_error(self) -> None:
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
-            expected_status_int=404)
-
     def test_check_revert_valid(self) -> None:
         """Test if an old exploration version is valid."""
         reader_dict = self.get_json(
@@ -2035,7 +2091,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 }]
             },
             csrf_token=csrf_token,
-            expected_status_int=500
+            expected_status_int=400
         )
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
@@ -3760,6 +3816,120 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         # Check that the file is uploaded successfully.
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, exp_id)
         filepath = '%s/%s' % (filename_prefix, filename)
+        self.assertTrue(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_regex_pattern_matches_accepted_extensions(self) -> None:
+        """Test that regex pattern updates with
+        changes to accepted extensions.
+        """
+        with self.swap(
+            feconf, 'ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS',
+            {'test': ['abc', 'xyz']}
+        ):
+            pattern = utils.get_image_filename_regex_pattern()
+            self.assertEqual(pattern, r'^[a-zA-Z0-9\-_]+\.(abc|xyz)$')
+
+    def test_rejects_invalid_filenames(self) -> None:
+        """Test that invalid filenames are rejected during image upload."""
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        invalid_filenames = [
+            'file!@#$name.png',
+            'file你好.png',
+            'file..name.png',
+            'malicious.php.svg',
+            'test_file.jpeg1',
+            'image.PNG123',
+            'file.jpg9',
+            'invalid.exe',
+            'invalid.svg.exe',
+            'svg.exe',
+            '.svg',
+        ]
+
+        filename_prefix = 'image'
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        for filename in invalid_filenames:
+            response = self.post_json(
+                publish_url, {
+                    'image': 'img',
+                    'filename': filename,
+                    'filename_prefix': filename_prefix
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=[('image', 'unused_filename', raw_image)]
+            )
+
+            self.assertIn(
+                'Schema validation for \'filename\' failed',
+                response['error']
+            )
+
+            fs = fs_services.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exp_id
+            )
+            filepath = '%s/%s' % (filename_prefix, filename)
+            self.assertFalse(fs.isfile(filepath))
+
+        self.logout()
+
+    def test_filename_regex_matches_accepted_extensions(self) -> None:
+        """Test that filename regex pattern matches all
+        accepted image extensions.
+        """
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.editor_id)
+
+        filename_prefix = 'image'
+        publish_url = '%s/%s/%s' % (
+            feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id)
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        response = self.post_json(
+            publish_url, {
+                'image': 'img',
+                'filename': 'valid_image.png',
+                'filename_prefix': filename_prefix
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200,
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
+
+        self.assertEqual(response['filename'], 'valid_image.png')
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exp_id
+        )
+        filepath = '%s/%s' % (filename_prefix, 'valid_image.png')
         self.assertTrue(fs.isfile(filepath))
 
         self.logout()

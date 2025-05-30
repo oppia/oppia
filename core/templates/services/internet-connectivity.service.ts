@@ -19,7 +19,6 @@
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
 import {Subscription, timer, throwError} from 'rxjs';
 import {delay, retryWhen, switchMap, tap} from 'rxjs/operators';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ServerConnectionBackendApiService} from './server-connection-backend-api.service';
 
@@ -123,10 +122,3 @@ export class InternetConnectivityService {
     return this._connectionStateChangeEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InternetConnectivityService',
-    downgradeInjectable(InternetConnectivityService)
-  );

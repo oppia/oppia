@@ -60,6 +60,7 @@ const saveResponseButton = 'button.e2e-test-add-new-response';
 const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
 const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
 const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
@@ -69,11 +70,13 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
 const topicNameField = 'input.e2e-test-new-topic-name-field';
-const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
+const topicUrlFragmentField =
+  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
 const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
 const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
 const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
@@ -95,7 +98,7 @@ const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
 const subtopicUrlFragmentField =
-  'input.e2e-test-new-subtopic-url-fragment-field';
+  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const subtopicNameSelector = '.e2e-test-subtopic-name';
@@ -191,8 +194,9 @@ const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyUrlFragmentField =
+  '.e2e-test-create-new-story-url-fragment-field .e2e-test-url-fragment-field';
 const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
 const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const storyPhotoBoxButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
@@ -217,6 +221,13 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const rteSelector = '.e2e-test-rte';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -330,6 +341,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(equalsRuleButtonText);
     await this.type(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
+    await this.clickOn(openAnswerGroupFeedBackEditor);
+    await this.type(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -375,6 +388,9 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     await this.type(topicNameField, name);
+    await this.page.waitForSelector(topicUrlFragmentField, {
+      visible: true,
+    });
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
     await this.type(
@@ -499,6 +515,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
@@ -522,7 +542,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addSubtopicButton);
     await this.type(subtopicTitleField, title);
-    await this.type(subtopicUrlFragmentField, urlFragment);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
 
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -613,6 +636,57 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft(topicName);
+  }
+
+  /**
+   * Updates a rubric.
+   * @param {string} difficulty - The difficulty level to update.
+   * @param {string} explanation - The explanation to update.
+   */
+  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    let difficultyValue: string;
+    switch (difficulty) {
+      case 'Easy':
+        difficultyValue = '0';
+        break;
+      case 'Medium':
+        difficultyValue = '1';
+        break;
+      case 'Hard':
+        difficultyValue = '2';
+        break;
+      default:
+        throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+    await this.waitForElementToBeClickable(selectRubricDifficultySelector);
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.type(rteSelector, explanation);
+    await this.clickOn(saveRubricExplanationButton);
+  }
+
+  /**
+   * Publishes an updated skill.
+   * @param {string} updateMessage - The update message.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(saveOrPublishSkillSelector, {
+      visible: true,
+    });
+    await this.clickOn(saveOrPublishSkillSelector);
+
+    await this.page.waitForSelector(commitMessageInputSelector, {
+      visible: true,
+    });
+    await this.type(commitMessageInputSelector, updateMessage);
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(closeSaveModalButtonSelector);
+    showMessage('Skill updated successful');
   }
 
   /**
@@ -841,6 +915,23 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Function to close editor navigation dropdown. Can be done by clicking
+   * on the dropdown toggle.
+   */
+  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dropdownToggleIcon, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOn(dropdownToggleIcon);
+      showMessage('Editor navigation closed successfully.');
+    } catch (error) {
+      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+    }
+  }
+
+  /**
    * Function to open control dropdown so that delete exploration button is visible
    * in mobile view.
    */
@@ -865,7 +956,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
     await this.type(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
@@ -916,7 +1010,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
     await this.type(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`

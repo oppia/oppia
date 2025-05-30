@@ -19,7 +19,7 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   Question,
   QuestionBackendDict,
@@ -36,17 +36,14 @@ import {
   InteractionRulesService,
 } from './answer-classification.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Question player engine service ', () => {
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
@@ -159,15 +156,6 @@ describe('Question player engine service ', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 45,
       next_content_id_index: 5,
@@ -237,15 +225,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'en',
@@ -313,15 +292,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'br',
@@ -389,15 +359,6 @@ describe('Question player engine service ', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 45,
         language_code: 'ab',
@@ -414,9 +375,6 @@ describe('Question player engine service ', () => {
       imports: [HttpClientTestingModule],
     });
 
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     contextService = TestBed.inject(ContextService);
@@ -425,7 +383,6 @@ describe('Question player engine service ', () => {
     );
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     textInputService = TestBed.get(TextInputRulesService);
 
@@ -481,7 +438,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -595,7 +552,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -704,7 +661,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -741,7 +698,7 @@ describe('Question player engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -771,7 +728,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', null, null, []),
+          Outcome.createNew('default', null, null, []),
           1,
           0,
           'default_outcome'
@@ -820,7 +777,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -871,7 +828,7 @@ describe('Question player engine service ', () => {
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -914,7 +871,7 @@ describe('Question player engine service ', () => {
         let initErrorCb = jasmine.createSpy('fail');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createNew('default', '', '', []),
+          Outcome.createNew('default', '', '', []),
           1,
           0,
           'default_outcome'
@@ -925,8 +882,7 @@ describe('Question player engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         answerClassificationResult.outcome.labelledAsCorrect = true;

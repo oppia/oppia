@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {OperatorFunction, Subject, Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {BaseEvent} from './app-events';
@@ -83,10 +82,6 @@ export class EventBusService {
     this._subject$.next(event);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('EventBusService', downgradeInjectable(EventBusService));
 
 /**
  * This class is a wrapper around the EventBusService. This is not supposed to

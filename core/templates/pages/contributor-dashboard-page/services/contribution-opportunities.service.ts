@@ -18,7 +18,6 @@
  */
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ContributionOpportunitiesBackendApiService} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
@@ -202,10 +201,3 @@ export class ContributionOpportunitiesService {
     return this._unpinnedOpportunitiesChanged;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributionOpportunitiesService',
-    downgradeInjectable(ContributionOpportunitiesService)
-  );

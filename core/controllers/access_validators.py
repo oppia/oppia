@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -25,10 +24,10 @@ from core.controllers import editor
 from core.controllers import reader
 from core.domain import blog_services
 from core.domain import classroom_config_services
-from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
+from core.domain import topic_fetchers
 from core.domain import user_services
 
 from typing import Dict, Optional, TypedDict
@@ -229,6 +228,51 @@ class ManageOwnAccountValidationHandler(
         pass
 
 
+class PracticeSessionAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to practice seesion page.
+    """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'selected_subtopic_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+
+        assert self.normalized_request is not None
+        subtopics = self.normalized_request.get(
+            'selected_subtopic_ids')
+
+        if not isinstance(subtopics, list) or not all(
+                isinstance(s, int) for s in subtopics):
+            raise self.InvalidInputException('Invalid subtopic IDs')
+
+        topic_url_fragment = self.request.route_kwargs.get(
+            'topic_url_fragment')
+        topic = topic_fetchers.get_topic_by_url_fragment(
+            topic_url_fragment)
+
+        subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
+
+        for subtopic_id in subtopics:
+            if subtopic_id not in subtopics_ids:
+                raise self.NotFoundException
+
+
 class ProfileExistsValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -276,11 +320,7 @@ class DiagnosticTestPlayerAccessValidationHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        if not feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
-            user_id=self.user_id
-        ):
-            raise self.NotFoundException
+        pass
 
 
 class ReleaseCoordinatorAccessValidationHandler(
@@ -672,6 +712,69 @@ class CollectionEditorAccessValidationPage(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+
+class ExplorationEditorAccessValidationHandlerPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+    ):
+    """The editor page for a single exploration."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, unused_exploration_id: str) -> None:
+        """Renders an exploration editor page.
+
+        Args:
+            unused_exploration_id: str. The unused exploration ID.
+        """
+        pass
+
+
+class TopicEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """The editor page for a single topic."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_view_any_topic_editor
+    def get(self, topic_id: str) -> None:
+        """Displays the topic editor page.
+
+        Args:
+            topic_id: str. The ID of the topic.
+
+        Raises:
+            NotFoundException. If the topic with the given ID doesn't exist.
+        """
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.NotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
 
 
 class StoryEditorAccessValidationHandlerPage(

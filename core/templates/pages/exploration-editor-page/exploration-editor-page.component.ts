@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {WelcomeModalComponent} from './modal-templates/welcome-modal.component';
 import {HelpModalComponent} from './modal-templates/help-modal.component';
@@ -79,6 +78,10 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -185,7 +188,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private versionHistoryService: VersionHistoryService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private insertScriptService: InsertScriptService
   ) {}
 
   setDocumentTitle(): void {
@@ -250,11 +254,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       );
       this.contextService.setExplorationVersion(explorationData.version);
 
+      const languageCode =
+        this.entityVoiceoversService.languageCode ||
+        explorationData.language_code;
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
         explorationData.version,
-        explorationData.language_code
+        languageCode
       );
 
       this.explorationTitleService.init(explorationData.title);
@@ -451,6 +458,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
       this.explorationEditorPageHasInitialized = true;
     });
+  }
+
+  isVoiceoverTabEnabled(): boolean {
+    if (this.contextService.isExplorationLinkedToStory()) {
+      return true;
+    }
+    return this.platformFeatureService.status
+      .ShowVoiceoverTabForNonCuratedExplorations.isEnabled;
   }
 
   populateEntityTranslationsWithDraftChanges(
@@ -684,6 +699,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.internetConnectivityService.startCheckingConnection();
 
+    this.insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
+
     this.directiveSubscriptions.add(
       this.explorationPropertyService.onExplorationPropertyChanged.subscribe(
         () => {
@@ -784,7 +801,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.areExplorationWarningsVisible = false;
 
     // The initExplorationPage function is written separately since it
-    // is also called in $scope.$on when some external events are
+    // is also called in directiveSubscriptions when some external events are
     // triggered.
     this.initExplorationPage();
     this.improvementsTabIsEnabled = false;
@@ -806,10 +823,3 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'explorationEditorPage',
-  downgradeComponent({
-    component: ExplorationEditorPageComponent,
-  }) as angular.IDirectiveFactory
-);

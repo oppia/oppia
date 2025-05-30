@@ -17,7 +17,6 @@
  * topic data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -248,10 +247,3 @@ export class ReadOnlyTopicObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReadOnlyTopicObjectFactory',
-    downgradeInjectable(ReadOnlyTopicObjectFactory)
-  );

@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
@@ -91,10 +90,3 @@ export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaEditorNavbarBreadcrumb',
-  downgradeComponent({
-    component: EditorNavbarBreadcrumbComponent,
-  }) as angular.IDirectiveFactory
-);

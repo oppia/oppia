@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -34,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class EndExplorationValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -52,21 +51,21 @@ export class EndExplorationValidationService {
     if (!Array.isArray(recommendedExplorationIds)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.',
+        message: 'Set of recommended exploration IDs must be list',
       });
     }
     for (var i = 0; i < recommendedExplorationIds.length; i++) {
       if (!(typeof recommendedExplorationIds[i] === 'string')) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Recommended exploration ID must be a string.',
+          message: 'Recommended exploration ID must be a string',
         });
         break;
       }
       if (recommendedExplorationIds[i].trim().length === 0) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Recommended exploration ID must be non-empty.',
+          message: 'Recommended exploration ID must be non-empty',
         });
         break;
       }
@@ -92,7 +91,7 @@ export class EndExplorationValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.',
+          'have any Oppia responses',
       });
     }
     if (defaultOutcome) {
@@ -100,17 +99,10 @@ export class EndExplorationValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have a default outcome.',
+          'have a default outcome',
       });
     }
 
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EndExplorationValidationService',
-    downgradeInjectable(EndExplorationValidationService)
-  );

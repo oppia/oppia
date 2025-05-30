@@ -26,7 +26,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 import {VALIDATION_STATUS_INVALID} from 'utility/forms';
 
@@ -115,9 +114,3 @@ export class SanitizedUrlEditorComponent implements AfterViewInit {
     });
   }
 }
-angular.module('oppia').directive(
-  'sanitizedUrlEditor',
-  downgradeComponent({
-    component: SanitizedUrlEditorComponent,
-  }) as angular.IDirectiveFactory
-);

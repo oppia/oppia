@@ -16,7 +16,7 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-import {Component} from '@angular/core';
+import {Component, Renderer2} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import {CreatorDashboardConstants} from './creator-dashboard-page.constants';
@@ -24,7 +24,6 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LoaderService} from 'services/loader.service';
 import {UserService} from 'services/user.service';
-import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
@@ -91,7 +90,7 @@ export class CreatorDashboardPageComponent {
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService,
     private userService: UserService,
-    private alertsService: AlertsService,
+    private renderer: Renderer2,
     private windowDimensionsService: WindowDimensionsService,
     private dateTimeFormatService: DateTimeFormatService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
@@ -226,15 +225,6 @@ export class CreatorDashboardPageComponent {
     let dashboardDataPromise =
       this.creatorDashboardBackendApiService.fetchDashboardDataAsync();
     dashboardDataPromise.then((response: CreatorDashboardData) => {
-      // The following condition is required for Karma testing. The
-      // Angular HttpClient returns an Observable which when converted
-      // to a promise does not have the 'data' key but the AngularJS
-      // mocks of services using HttpClient use $http which return
-      // promise and the content is contained in the 'data' key.
-      // Therefore the following condition checks for presence of
-      // 'response.data' which would be the case in AngularJS testing
-      // but assigns 'response' if the former is not present which is
-      // the case with HttpClient.
       let responseData = response;
       this.currentSortType =
         CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
@@ -280,7 +270,8 @@ export class CreatorDashboardPageComponent {
       );
     this.canReviewActiveThread = false;
     this.updatesGivenScreenWidth();
-    angular.element(this.windowRef.nativeWindow).on('resize', () => {
+
+    this.renderer.listen('window', 'resize', () => {
       this.updatesGivenScreenWidth();
     });
   }
@@ -293,7 +284,7 @@ export class CreatorDashboardPageComponent {
     // This function is used as a custom function to
     // sort heading in the list view. Directly assigning
     // keyvalue : 0 gives error "TypeError: The comparison function
-    // must be either a function or undefined" .
+    // must be either a function or undefined".
     return 0;
   }
 }

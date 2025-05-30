@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
 import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
 import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -48,6 +47,7 @@ export class SkillSelectorComponent implements OnInit {
   @Input() categorizedSkills!: CategorizedSkills;
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() allowSkillsFromOtherTopics!: boolean;
+  @Input() skillIdsToExclude: Set<string> = new Set();
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
@@ -200,9 +200,11 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
-    let skills: string[] = this.untriagedSkillSummaries.map(val => {
-      return val.description;
-    });
+    let skills: string[] = this.untriagedSkillSummaries
+      .filter(val => !this.skillIdsToExclude.has(val.id))
+      .map(val => {
+        return val.description;
+      });
     let filteredSkills = this.filterForMatchingSubstringPipe.transform(
       skills,
       searchText
@@ -225,10 +227,3 @@ export class SkillSelectorComponent implements OnInit {
     this.updateSkillsListOnTopicFilterChange();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillSelector',
-    downgradeComponent({component: SkillSelectorComponent})
-  );

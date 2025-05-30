@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 type TranslatableHtmlContentIdEditorChoices = {val: string}[];
 
@@ -61,9 +60,3 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 }
-angular.module('oppia').directive(
-  'translatableHtmlContentIdEditor',
-  downgradeComponent({
-    component: TranslatableHtmlContentIdEditorComponent,
-  }) as angular.IDirectiveFactory
-);

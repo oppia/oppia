@@ -86,7 +86,9 @@ describe('Logged-out User', function () {
       CARD_NAME.FRACTION_CONVERSION,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
     await explorationEditor.addHintToState(
       'Remember that negative numbers are less than 0.'
     );
@@ -111,7 +113,7 @@ describe('Logged-out User', function () {
       true
     );
 
-    await explorationEditor.editDefaultResponseFeedback(
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Incorrect, try again!',
       undefined,
       CARD_NAME.REVISION_CARD
@@ -127,8 +129,8 @@ describe('Logged-out User', function () {
     await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
     await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.editDefaultResponseFeedback(
-      undefined,
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToAlreadyExistingCard(
       CARD_NAME.FINAL_CARD
     );
 

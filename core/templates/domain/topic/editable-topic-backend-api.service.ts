@@ -18,7 +18,6 @@
 
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -140,11 +139,6 @@ export class EditableTopicBackendApiService {
       .then(
         response => {
           if (successCallback) {
-            // The response is passed as a dict with 2 fields and not as 2
-            // parameters, because the successCallback is called as the resolve
-            // callback function in $q in fetchTopic(), and according to its
-            // documentation (https://docs.angularjs.org/api/ng/service/$q),
-            // resolve or reject can have only a single parameter.
             successCallback({
               topicDict: response.topic_dict,
               groupedSkillSummaries: response.grouped_skill_summary_dicts,
@@ -448,10 +442,3 @@ export class EditableTopicBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableTopicBackendApiService',
-    downgradeInjectable(EditableTopicBackendApiService)
-  );

@@ -17,10 +17,9 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
 @Component({
@@ -40,10 +39,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   errorMessageI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
-  constructor(
-    private eventBusService: EventBusService,
-    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
-  ) {
+  constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
@@ -51,9 +47,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     if (this.value === null || this.value === undefined) {
       return;
     } else {
-      const defaultNumberWithUnits = this.numberWithUnitsObjectFactory.fromDict(
-        this.value
-      );
+      const defaultNumberWithUnits = NumberWithUnits.fromDict(this.value);
       this.numberWithUnitsString = defaultNumberWithUnits.toString();
       this.valueChanged.emit(this.value);
     }
@@ -61,8 +55,7 @@ export class NumberWithUnitsEditorComponent implements OnInit {
 
   updateValue(newValue: string): void {
     try {
-      let numberWithUnits =
-        this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
+      let numberWithUnits = NumberWithUnits.fromRawInputString(newValue);
       this.value = numberWithUnits;
       this.valueChanged.emit(this.value);
       this.eventBusGroup.emit(
@@ -89,10 +82,3 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'numberWithUnitsEditor',
-  downgradeComponent({
-    component: NumberWithUnitsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -62,6 +62,7 @@ describe('InteractiveRatioExpressionInput', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (): boolean => false,
+    updateAnswerIsValid: (isValid: boolean) => {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -125,12 +126,76 @@ describe('InteractiveRatioExpressionInput', () => {
       component.answer = '2:3';
       component.isValid = false;
       spyOn(currentInteractionService, 'onSubmit');
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
       component.submitAnswer();
       expect(component.errorMessageI18nKey).toEqual(
         'I18N_INTERACTIONS_TERMS_LIMIT'
       );
       expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
       expect(component.isAnswerValid()).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+    });
+
+    it('should raise error if there is more terms than expected', function () {
+      component.ngOnInit();
+      component.answer = '2:3:4:5';
+      component.expectedNumberOfTerms = 3;
+      component.isValid = false;
+      spyOn(currentInteractionService, 'onSubmit');
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toEqual(
+        'I18N_INTERACTIONS_TERMS_LIMIT'
+      );
+
+      expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+      expect(component.isAnswerValid()).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+    });
+
+    it('should raise an error if there are fewer terms than expected.', function () {
+      component.ngOnInit();
+      component.answer = '2:3';
+      component.expectedNumberOfTerms = 3;
+      component.isValid = false;
+      spyOn(currentInteractionService, 'onSubmit');
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toEqual(
+        'I18N_INTERACTIONS_TERMS_LIMIT'
+      );
+
+      expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+      expect(component.isAnswerValid()).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
+    });
+
+    it('should raise error if there is invalid input', function () {
+      component.ngOnInit();
+      component.answer = '*:3:4';
+      component.expectedNumberOfTerms = 3;
+      component.isValid = false;
+      spyOn(currentInteractionService, 'onSubmit');
+      spyOn(currentInteractionService, 'updateAnswerIsValid');
+      component.submitAnswer();
+
+      expect(component.errorMessageI18nKey).toEqual(
+        'I18N_INTERACTIONS_RATIO_INVALID_CHARS'
+      );
+
+      expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+      expect(component.isAnswerValid()).toBe(false);
+      expect(
+        currentInteractionService.updateAnswerIsValid
+      ).toHaveBeenCalledWith(false);
     });
 
     it('should submit the answer if valid', function () {

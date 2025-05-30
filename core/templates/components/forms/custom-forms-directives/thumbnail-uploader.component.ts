@@ -19,7 +19,6 @@
 import {EventEmitter, OnInit, Output} from '@angular/core';
 import {OnChanges, SimpleChanges} from '@angular/core';
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
@@ -276,10 +275,3 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaThumbnailUploader',
-    downgradeComponent({component: ThumbnailUploaderComponent})
-  );

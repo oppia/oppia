@@ -42,8 +42,6 @@ describe('State name service', () => {
     sns.init();
     expect(sns.setStateNameSavedMemento).toHaveBeenCalled();
     expect(sns.getStateNameSavedMemento()).toBeNull();
-    expect(sns.setStateNameEditorVisibility).toHaveBeenCalled();
-    expect(sns.isStateNameEditorShown()).toBe(false);
   });
 
   it('should return the correct value for the getter functions', () => {

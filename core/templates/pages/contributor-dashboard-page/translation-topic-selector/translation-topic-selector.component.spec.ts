@@ -31,11 +31,16 @@ describe('Translation language selector', () => {
   let component: TranslationTopicSelectorComponent;
   let fixture: ComponentFixture<TranslationTopicSelectorComponent>;
 
-  let topicNames = ['All', 'Topic 1'];
+  const topicsPerClassroomBackendDict = [
+    {classroom: 'Class 1', topics: ['Topic 1', 'Topic 2']},
+    {classroom: 'Class 2', topics: ['Topic 3']},
+    {classroom: '', topics: ['All', 'Topic 4']},
+  ];
 
   let contributionOpportunitiesBackendApiServiceStub: Partial<ContributionOpportunitiesBackendApiService> =
     {
-      fetchTranslatableTopicNamesAsync: async () => Promise.resolve(topicNames),
+      fetchTranslatableTopicNamesPerClassroomAsync: async () =>
+        Promise.resolve(topicsPerClassroomBackendDict),
     };
 
   let clickDropdown: () => void;
@@ -81,6 +86,30 @@ describe('Translation language selector', () => {
     );
 
     expect(dropdown.firstChild.textContent.trim()).toBe('All');
+  });
+
+  it('should correctly display topics organized by classroom', async () => {
+    await fixture.whenStable();
+    expect(component.topicsPerClassroomMap).toBeTruthy();
+
+    clickDropdown();
+    expect(component.dropdownShown).toBe(true);
+
+    const classroomLabels = fixture.debugElement.nativeElement.querySelectorAll(
+      '.oppia-translation-topic-selector-dropdown-label'
+    );
+
+    // Only Class 1 and Class 2 should have labels.
+    expect(classroomLabels.length).toBe(2);
+    expect(classroomLabels[0].textContent).toBe('Class 1');
+    expect(classroomLabels[1].textContent).toBe('Class 2');
+
+    const allOptions = fixture.debugElement.nativeElement.querySelectorAll(
+      '.oppia-translation-topic-selector-dropdown-option'
+    );
+
+    // Total topics across all classrooms.
+    expect(allOptions.length).toBe(5);
   });
 
   it('should correctly show and hide the dropdown', () => {

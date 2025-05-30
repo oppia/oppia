@@ -30,7 +30,7 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
 import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
@@ -45,7 +45,6 @@ describe('Diagnostic test engine service', () => {
   let question4: Question;
   let stateObject: StateObjectFactory;
   let textInputService: InteractionRulesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let answerClassificationService: AnswerClassificationService;
   let alertsService: AlertsService;
   let questionObjectFactory: QuestionObjectFactory;
@@ -62,7 +61,6 @@ describe('Diagnostic test engine service', () => {
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     stateObject = TestBed.inject(StateObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
@@ -149,15 +147,6 @@ describe('Diagnostic test engine service', () => {
         },
         linked_skill_id: null,
         card_is_checkpoint: true,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            1: {},
-            ca_placeholder_0: {},
-            feedback_id: {},
-            solution: {},
-            hint_1: {},
-          },
-        },
       },
       question_state_data_schema_version: 2,
       language_code: '',
@@ -376,7 +365,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -461,7 +450,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      Outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -650,7 +639,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -715,7 +704,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      Outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -793,7 +782,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -901,7 +890,7 @@ describe('Diagnostic test engine service', () => {
 
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createNew('default', '', '', []),
+        Outcome.createNew('default', '', '', []),
         1,
         0,
         'default_outcome'
@@ -961,7 +950,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      Outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'
@@ -1260,7 +1249,7 @@ describe('Diagnostic test engine service', () => {
 
     let answer = 'answer';
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory.createNew('default', '', '', []),
+      Outcome.createNew('default', '', '', []),
       1,
       0,
       'default_outcome'

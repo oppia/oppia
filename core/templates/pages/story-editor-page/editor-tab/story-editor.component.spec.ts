@@ -39,6 +39,7 @@ import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-mod
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -83,6 +84,7 @@ describe('Story Editor Component having three story nodes', () => {
         StoryEditorComponent,
         NewChapterTitleModalComponent,
         DeleteChapterModalComponent,
+        UrlFragmentEditorComponent,
       ],
       providers: [
         WindowDimensionsService,
@@ -136,9 +138,9 @@ describe('Story Editor Component having three story nodes', () => {
             exploration_id: null,
             outline_is_finalized: false,
             status: 'Published',
-            planned_publication_date_msecs: 30.0,
-            last_modified_msecs: 20.0,
-            first_publication_date_msecs: 10.0,
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
             unpublishing_reason: 'Bad Content',
           },
           {
@@ -152,9 +154,9 @@ describe('Story Editor Component having three story nodes', () => {
             exploration_id: 'exp_1',
             outline_is_finalized: true,
             status: 'Ready To Publish',
-            planned_publication_date_msecs: 30.0,
-            last_modified_msecs: 20.0,
-            first_publication_date_msecs: 10.0,
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
             unpublishing_reason: null,
           },
           {
@@ -168,9 +170,9 @@ describe('Story Editor Component having three story nodes', () => {
             exploration_id: 'exp_3',
             outline_is_finalized: true,
             status: 'Draft',
-            planned_publication_date_msecs: 30.0,
-            last_modified_msecs: 20.0,
-            first_publication_date_msecs: 10.0,
+            planned_publication_date_msecs: 30,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
             unpublishing_reason: null,
           },
         ],
@@ -235,9 +237,9 @@ describe('Story Editor Component having three story nodes', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
       status: 'Published',
-      planned_publication_date_msecs: 100.0,
-      last_modified_msecs: 100.0,
-      first_publication_date_msecs: 200.0,
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
       unpublishing_reason: null,
     });
     expect(component.isDragAndDropDisabled(node)).toBeTrue();
@@ -263,9 +265,9 @@ describe('Story Editor Component having three story nodes', () => {
         outline_is_finalized: false,
         thumbnail_bg_color: '#a33f40',
         status: 'Published',
-        planned_publication_date_msecs: 100.0,
-        last_modified_msecs: 100.0,
-        first_publication_date_msecs: 200.0,
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
         unpublishing_reason: null,
       }),
       StoryNode.createFromBackendDict({
@@ -281,9 +283,9 @@ describe('Story Editor Component having three story nodes', () => {
         outline_is_finalized: false,
         thumbnail_bg_color: '#a33f40',
         status: 'Ready To Publish',
-        planned_publication_date_msecs: 100.0,
-        last_modified_msecs: 100.0,
-        first_publication_date_msecs: 200.0,
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
         unpublishing_reason: null,
       }),
       StoryNode.createFromBackendDict({
@@ -299,9 +301,9 @@ describe('Story Editor Component having three story nodes', () => {
         outline_is_finalized: false,
         thumbnail_bg_color: '#a33f40',
         status: 'Draft',
-        planned_publication_date_msecs: 100.0,
-        last_modified_msecs: 100.0,
-        first_publication_date_msecs: 200.0,
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
         unpublishing_reason: null,
       }),
     ];
@@ -778,5 +780,15 @@ describe('Story Editor Component having three story nodes', () => {
     expect(selectChapterSpy).toHaveBeenCalled();
     expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
     expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('should update editableUrlFragment and call updateStoryUrlFragment', () => {
+    spyOn(component, 'updateStoryUrlFragment');
+    const newUrlFragment = 'new-story-url';
+    component.onStoryEditorUrlFragmentChange(newUrlFragment);
+    expect(component.editableUrlFragment).toBe(newUrlFragment);
+    expect(component.updateStoryUrlFragment).toHaveBeenCalledWith(
+      newUrlFragment
+    );
   });
 });

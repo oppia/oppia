@@ -32,7 +32,6 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',
@@ -348,10 +347,3 @@ export class TopicEditorNavbarComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicEditorNavbar',
-  downgradeComponent({
-    component: TopicEditorNavbarComponent,
-  }) as angular.IDirectiveFactory
-);

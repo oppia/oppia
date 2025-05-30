@@ -27,7 +27,7 @@ import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChangeObjectFactory,
@@ -57,13 +57,11 @@ import {ImagePreloaderService} from './image-preloader.service';
 import {LearnerParamsService} from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let contextService: ContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
@@ -80,7 +78,6 @@ describe('Exploration engine service ', () => {
   let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let translateService: TranslateService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
@@ -91,15 +88,6 @@ describe('Exploration engine service ', () => {
       states: {
         Start: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -172,11 +160,6 @@ describe('Exploration engine service ', () => {
         },
         End: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -201,15 +184,6 @@ describe('Exploration engine service ', () => {
         },
         Mid: {
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              ca_placeholder_0: {},
-              feedback_1: {},
-              rule_input_2: {},
-              content: {},
-              default_outcome: {},
-            },
-          },
           solicit_answer_details: false,
           interaction: {
             solution: null,
@@ -390,9 +364,6 @@ describe('Exploration engine service ', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     contextService = TestBed.inject(ContextService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
@@ -417,7 +388,6 @@ describe('Exploration engine service ', () => {
     paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
   });
 
   beforeEach(() => {
@@ -518,7 +488,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          Outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -541,8 +511,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -587,7 +556,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          Outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -610,8 +579,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -655,7 +623,7 @@ describe('Exploration engine service ', () => {
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
         let answerClassificationResult = new AnswerClassificationResult(
-          outcomeObjectFactory.createFromBackendDict({
+          Outcome.createFromBackendDict({
             dest: 'Mid',
             dest_if_really_stuck: 'Mid',
             feedback: {
@@ -678,8 +646,7 @@ describe('Exploration engine service ', () => {
           'Interaction text',
           null,
           null,
-          'content_id',
-          audioTranslationLanguageService
+          'content_id'
         );
 
         spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
@@ -725,7 +692,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        Outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {
@@ -748,8 +715,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -794,7 +760,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        Outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {
@@ -817,8 +783,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -874,7 +839,7 @@ describe('Exploration engine service ', () => {
         missing_prerequisite_skill_id: null,
       };
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict(defaultOutcomeDict),
+        Outcome.createFromBackendDict(defaultOutcomeDict),
         1,
         0,
         'default_outcome'
@@ -934,8 +899,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         lastCardInteraction,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -1136,7 +1100,7 @@ describe('Exploration engine service ', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory.createFromBackendDict({
+        Outcome.createFromBackendDict({
           dest: 'Mid',
           dest_if_really_stuck: 'Mid',
           feedback: {
@@ -1159,8 +1123,7 @@ describe('Exploration engine service ', () => {
         'Interaction text',
         null,
         null,
-        'content_id',
-        audioTranslationLanguageService
+        'content_id'
       );
 
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);

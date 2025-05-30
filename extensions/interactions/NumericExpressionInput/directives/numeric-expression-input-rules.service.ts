@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
@@ -77,10 +76,3 @@ export class NumericExpressionInputRulesService {
     return nerdamer(answer).eq(nerdamer(inputs.x).toString());
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumericExpressionInputRulesService',
-    downgradeInjectable(NumericExpressionInputRulesService)
-  );

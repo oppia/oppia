@@ -42,7 +42,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
@@ -179,10 +178,3 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveMath',
-  downgradeComponent({
-    component: NoninteractiveMath,
-  }) as angular.IDirectiveFactory
-);

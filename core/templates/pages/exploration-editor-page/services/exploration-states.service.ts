@@ -18,7 +18,6 @@
  * keeps no mementos.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -49,9 +48,8 @@ import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/
 import {State} from 'domain/state/StateObjectFactory';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
@@ -72,6 +70,7 @@ import {
 } from 'domain/objects/BaseTranslatableObject.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -119,7 +118,8 @@ export class ExplorationStatesService {
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
-    private entityTranslationsService: EntityTranslationsService
+    private entityTranslationsService: EntityTranslationsService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   // Properties that have a different backend representation from the
@@ -132,9 +132,6 @@ export class ExplorationStatesService {
     },
     content: (content: SubtitledHtml): SubtitledHtmlBackendDict => {
       return content.toBackendDict();
-    },
-    recorded_voiceovers: (recordedVoiceovers: RecordedVoiceovers) => {
-      return recordedVoiceovers.toBackendDict();
     },
     default_outcome: (defaultOutcome: Outcome | null) => {
       if (defaultOutcome) {
@@ -183,7 +180,6 @@ export class ExplorationStatesService {
       'confirmedUnclassifiedAnswers',
     ],
     content: ['content'],
-    recorded_voiceovers: ['recordedVoiceovers'],
     linked_skill_id: ['linkedSkillId'],
     default_outcome: ['interaction', 'defaultOutcome'],
     param_changes: ['paramChanges'],
@@ -293,25 +289,22 @@ export class ExplorationStatesService {
 
   markTranslationAndVoiceoverNeedsUpdate(contentId: string): void {
     this.changeListService.markTranslationsAsNeedingUpdate(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
-      recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
+    this.entityVoiceoversService.markManualVoiceoverAsNeedingUpdate(contentId);
+    this.changeListService.markVoiceoversAsNeedingUpdate(
+      contentId,
+      this.entityVoiceoversService.languageCode
+    );
   }
 
   removeTranslationAndVoiceover(contentId: string): void {
     this.changeListService.removeTranslations(contentId);
-    let stateName = this.stateEditorService.getActiveStateName();
-    let state = this.getState(stateName);
-    let recordedVoiceovers = state.recordedVoiceovers;
-    if (recordedVoiceovers.hasVoiceovers(contentId)) {
-      recordedVoiceovers.voiceoversMapping[contentId] = {};
-      this.saveRecordedVoiceovers(stateName, recordedVoiceovers);
-    }
     this.entityTranslationsService.removeAllTranslationsForContent(contentId);
+
+    this.changeListService.removeVoiceovers(
+      contentId,
+      this.entityVoiceoversService.languageCode
+    );
+    this.entityVoiceoversService.removeAllVoiceoversForContent(contentId);
   }
 
   private _getElementsInFirstSetButNotInSecond(
@@ -365,10 +358,6 @@ export class ExplorationStatesService {
     stateName: string,
     backendName: 'solution'
   ): SubtitledHtml;
-  getStatePropertyMemento(
-    stateName: string,
-    backendName: 'recorded_voiceovers'
-  ): RecordedVoiceovers;
   getStatePropertyMemento(
     stateName: string,
     backendName: 'solicit_answer_details'
@@ -456,11 +445,6 @@ export class ExplorationStatesService {
   ): void;
   saveStateProperty(
     stateName: string,
-    backendName: 'recorded_voiceovers',
-    newValue: RecordedVoiceovers
-  ): void;
-  saveStateProperty(
-    stateName: string,
     backendName: 'solicit_answer_details',
     newValue: boolean
   ): void;
@@ -512,24 +496,6 @@ export class ExplorationStatesService {
         this._verifyChangesInitialContents(backendName, newValue);
       }
 
-      if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
-        let oldContentIds = this._extractContentIds(backendName, oldValue);
-        let newContentIds = this._extractContentIds(backendName, newValue);
-        let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-          oldContentIds,
-          newContentIds
-        );
-        let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-          newContentIds,
-          oldContentIds
-        );
-        contentIdsToDelete.forEach(contentId => {
-          newStateData.recordedVoiceovers.deleteContentId(contentId);
-        });
-        contentIdsToAdd.forEach(contentId => {
-          newStateData.recordedVoiceovers.addContentId(contentId);
-        });
-      }
       let propertyRef = newStateData;
       for (let i = 0; i < accessorList.length - 1; i++) {
         propertyRef = propertyRef[accessorList[i]];
@@ -611,6 +577,13 @@ export class ExplorationStatesService {
     this._setState(stateName, stateData, true);
   }
 
+  getAllContentIdsByStateName(stateName: string): string[] {
+    let allContentIds = (
+      this._states.getState(stateName) as State
+    ).getAllContentIds();
+    return allContentIds.filter(contentId => contentId !== undefined);
+  }
+
   getCheckpointCount(): number {
     let count: number = 0;
     if (this._states) {
@@ -621,6 +594,10 @@ export class ExplorationStatesService {
       });
     }
     return count;
+  }
+
+  isNewStateNameDuplicate(newStateName: string): boolean {
+    return this._states.hasState(newStateName);
   }
 
   isNewStateNameValid(newStateName: string, showWarnings: boolean): boolean {
@@ -758,21 +735,6 @@ export class ExplorationStatesService {
 
   saveSolution(stateName: string, newSolution: SubtitledHtml): void {
     this.saveStateProperty(stateName, 'solution', newSolution);
-  }
-
-  getRecordedVoiceoversMemento(stateName: string): RecordedVoiceovers {
-    return this.getStatePropertyMemento(stateName, 'recorded_voiceovers');
-  }
-
-  saveRecordedVoiceovers(
-    stateName: string,
-    newRecordedVoiceovers: RecordedVoiceovers
-  ): void {
-    this.saveStateProperty(
-      stateName,
-      'recorded_voiceovers',
-      newRecordedVoiceovers
-    );
   }
 
   getSolicitAnswerDetailsMemento(stateName: string): boolean {
@@ -959,10 +921,3 @@ export class ExplorationStatesService {
     return this._refreshGraphEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationStatesService',
-    downgradeInjectable(ExplorationStatesService)
-  );

@@ -71,12 +71,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: '',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             id: 'Continue',
             default_outcome: {
@@ -115,12 +109,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -145,14 +133,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: 'Multiple Choice',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -255,14 +235,6 @@ describe('Extracting Image file names in the state service', () => {
               '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
               'quot;s4Content.png&amp;quot;">' +
               '</oppia-noninteractive-image></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -381,17 +353,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              feedback_3: {},
-              feedback_4: {},
-              feedback_5: {},
-            },
           },
           interaction: {
             id: 'ImageClickInput',
@@ -601,16 +562,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: '<p>Text Input Content</p>',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              hint_1: {},
-              solution: {},
-            },
-          },
           interaction: {
             id: 'TextInput',
             default_outcome: {
@@ -757,14 +708,6 @@ describe('Extracting Image file names in the state service', () => {
               'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
               'oppia-noninteractive-image&amp;gt;&amp;quot;}]">' +
               '</oppia-noninteractive-tabs></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',

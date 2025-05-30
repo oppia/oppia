@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for user exploration permissions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -62,10 +61,3 @@ export class ExplorationPermissionsBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationPermissionsBackendApiService',
-    downgradeInjectable(ExplorationPermissionsBackendApiService)
-  );

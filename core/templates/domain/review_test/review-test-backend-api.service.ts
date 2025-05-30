@@ -17,7 +17,6 @@
  * backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -72,10 +71,3 @@ export class ReviewTestBackendApiService {
     return this._fetchReviewTestDataAsync(storyUrlFragment);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReviewTestBackendApiService',
-    downgradeInjectable(ReviewTestBackendApiService)
-  );

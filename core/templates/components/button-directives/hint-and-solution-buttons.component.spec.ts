@@ -34,7 +34,6 @@ import {
 } from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
@@ -58,7 +57,6 @@ describe('HintAndSolutionButtonsComponent', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let newCard: StateCard;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   const defaultInteractionBackendDict = {
     id: 'TextInput',
@@ -144,9 +142,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       ExplorationPlayerStateService
     );
     statsReportingService = TestBed.inject(StatsReportingService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
@@ -174,8 +169,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         defaultInteractionBackendDict
       ),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 
@@ -192,8 +186,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       'Interaction html',
       interaction,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(component, 'resetLocalHintsArray');
 
@@ -213,8 +206,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       'Interaction html',
       interaction,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(component, 'resetLocalHintsArray');
 
@@ -256,8 +248,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         '<interaction></interaction>',
         {} as Interaction,
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
@@ -366,8 +357,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           solution: null,
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
 
       expect(component.isHintButtonVisible(0)).toBe(false);

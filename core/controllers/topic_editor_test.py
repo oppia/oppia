@@ -163,8 +163,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': None,
-            'first_publication_date_msecs': 1672684200000.0,
-            'last_modified_msecs': 1672684200000.0,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -182,9 +182,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1672770600000.0,
+            'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -202,9 +202,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690655400000.0,
+            'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
@@ -534,54 +534,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
-
-    def test_get_can_not_access_topic_page_with_nonexistent_topic_id(
-        self
-    ) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX,
-                topic_fetchers.get_new_topic_id()), expected_status_int=404)
-
-        self.logout()
-
-    def test_cannot_access_topic_editor_page_with_invalid_topic_id(
-        self
-    ) -> None:
-        # Check that the editor page can not be accessed with an
-        # an invalid topic id.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, 'invalid_id'),
-            expected_status_int=404)
-        self.logout()
-
-    def test_access_topic_editor_page(self) -> None:
-        """Test access to editor pages for the sample topic."""
-
-        # Check that non-admin and topic_manager cannot access the editor
-        # page.
-        self.login(self.NEW_USER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-            expected_status_int=401)
-        self.logout()
-
-        # Check that admins can access the editor page.
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
-
-        # Check that any topic manager can access the editor page.
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        self.logout()
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -1323,64 +1275,6 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
                 feconf.TOPIC_URL_FRAGMENT_HANDLER,
                 topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], True)
-
-        self.logout()
-
-
-class TopicNameHandlerTest(BaseTopicEditorControllerTests):
-    """Tests for TopicNameHandler."""
-
-    def test_topic_name_handler_when_unique(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Unique topic name does not exists.
-        topic_name = 'Unique Topic Name'
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        self.logout()
-
-    def test_topic_name_handler_when_duplicate(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Topic name exists since we've already published it.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], True)
 
         self.logout()
 

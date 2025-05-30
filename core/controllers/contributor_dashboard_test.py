@@ -1785,6 +1785,207 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
         )
 
 
+class TranslatableTopicNamesPerClassroomHandlerTest(
+    test_utils.GenericTestBase):
+    """Test for the TranslatableTopicNamesByClassroomHandlerTest."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+    def test_no_topic_name_should_be_returned_when_no_topic_exists(
+        self) -> None:
+        response = self.get_json('/gettranslatabletopicnamesperclassroom')
+        self.assertEqual(
+            response,
+            {'topic_names_per_classroom': []}
+        )
+
+    def test_no_topic_name_should_be_returned_when_topic_is_not_published(
+        self) -> None:
+        # Create a topic.
+        subtopic = topic_domain.Subtopic(
+            1, 'Title', ['skill_id_3'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'dummy-subtopic-three')
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='topic 1',
+            abbreviated_name='abbrev-one',
+            url_fragment='topic-a',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2
+        )
+
+        # Create a classroom.
+        classroom_id_1 = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id_1,
+            name='Class 1',
+            topic_id_to_prerequisite_topic_ids={
+                topic_id_1: []
+            }
+        )
+
+        response = self.get_json('/gettranslatabletopicnamesperclassroom')
+        self.assertEqual(
+            response,
+            {'topic_names_per_classroom': []}
+        )
+
+    def test_topic_name_should_be_returned_when_topic_is_published(
+        self) -> None:
+        # Create a topic.
+        subtopic = topic_domain.Subtopic(
+            1, 'Title', ['skill_id_3'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'dummy-subtopic-three')
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='topic 1',
+            abbreviated_name='abbrev-one',
+            url_fragment='topic-a',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2
+        )
+
+        # Create a classroom.
+        classroom_id_1 = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id_1,
+            name='Class 1',
+            topic_id_to_prerequisite_topic_ids={
+                topic_id_1: []
+            }
+        )
+
+        # Publish the topic.
+        topic_services.publish_topic(topic_id_1, self.admin_id)
+
+        response = self.get_json('/gettranslatabletopicnamesperclassroom')
+        self.assertEqual(
+            response,
+            {'topic_names_per_classroom': [
+                {
+                    'classroom': 'Class 1',
+                    'topics': ['topic 1']
+                }
+            ]}
+        )
+
+    def test_topic_without_classroom_should_also_be_returned(
+        self) -> None:
+        # Create topics.
+        subtopic = topic_domain.Subtopic(
+            1, 'Title', ['skill_id_3'], 'image.svg',
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+            'dummy-subtopic-three')
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='topic 1',
+            abbreviated_name='abbrev-one',
+            url_fragment='topic-a',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2
+        )
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            self.admin_id,
+            name='topic 2',
+            abbreviated_name='abbrev-two',
+            url_fragment='topic-b',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2
+        )
+        topic_id_3 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_3,
+            self.admin_id,
+            name='topic 3',
+            abbreviated_name='abbrev-three',
+            url_fragment='topic-c',
+            description='description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2
+        )
+
+        # Create classrooms.
+        classroom_id_1 = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id_1,
+            name='Class 1',
+            topic_id_to_prerequisite_topic_ids={
+                topic_id_1: []
+            }
+        )
+        classroom_id_2 = classroom_config_services.get_new_classroom_id()
+        self.save_new_valid_classroom(
+            classroom_id=classroom_id_2,
+            name='Class 2',
+            topic_id_to_prerequisite_topic_ids={
+                topic_id_2: []
+            }
+        )
+
+        # Publish the topics.
+        topic_services.publish_topic(topic_id_1, self.admin_id)
+        topic_services.publish_topic(topic_id_2, self.admin_id)
+        topic_services.publish_topic(topic_id_3, self.admin_id)
+
+        response = self.get_json('/gettranslatabletopicnamesperclassroom')
+        expected_response = {
+            'topic_names_per_classroom': [
+                {
+                    'classroom': '',
+                    'topics': ['topic 3']
+                },
+                {
+                    'classroom': 'Class 1',
+                    'topics': ['topic']
+                },
+                {
+                    'classroom': 'Class 2', 
+                    'topics': ['topic 2']
+                }
+            ]
+        }
+        self.assertItemsEqual(response, expected_response)
+
+
 class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
     """Test for the TranslationPreferenceHandler."""
 

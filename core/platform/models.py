@@ -279,6 +279,21 @@ class _Gae(Platform):
         return gae_app_identity_services
 
     @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns the speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module based on the current
+            environment.
+        """
+        # TODO(#22301): Modify the following code to invoke the Cloud service
+        # based on the environment. Refer to the issue for implementation
+        # details.
+        from core.platform.speech_synthesis import (
+            dev_mode_speech_synthesis_services)
+        return dev_mode_speech_synthesis_services
+
+    @classmethod
     def import_email_services(cls) -> ModuleType:
         """Imports and returns the email services module specified in feconf.py.
         If in DEV_MODE, uses the dev mode version of email services.
@@ -506,6 +521,15 @@ class Registry:
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
+
+    @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module.
+        """
+        return cls._get().import_speech_synthesis_services()
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
