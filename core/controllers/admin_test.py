@@ -619,6 +619,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.community_owned)
         # TODO(release-scripts#137): Update once project ID is verified on
         # all servers.
+        print("hello world")
+        print(observed_log_messages)
         self.assertEqual(
             observed_log_messages,
             [
