@@ -48,7 +48,7 @@ class RedisServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_redis_host_updates_existing_model(self) -> None:
         initial_model = redis_client_models.RedisClientModel(
-            redis_client_models.REDIS_CLIENT_ID
+            id=redis_client_models.REDIS_CLIENT_ID
         )
         initial_model.redishost = 'initial.redis.host'
         initial_model.update_timestamps()
