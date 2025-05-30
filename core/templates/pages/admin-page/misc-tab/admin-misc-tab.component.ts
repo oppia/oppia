@@ -61,6 +61,7 @@ export class AdminMiscTabComponent implements OnInit {
   expIdToGetInteractionIdsFor!: string;
   explorationInteractionIds: string[] = [];
   voiceoverAutogenerationIsEnabled!: boolean;
+  redisHost!: string;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -396,22 +397,15 @@ export class AdminMiscTabComponent implements OnInit {
       );
   }
 
-  updateRedisModel(): void {
-    this.setStatusMessage.emit('Updating blog post data...');
-    this.adminBackendApiService
-      .updateBlogPostDataAsync(
-        this.blogPostId,
-        this.authorUsername,
-        this.publishedOn
-      )
-      .then(
-        () => {
-          this.setStatusMessage.emit('Successfully updated blog post data');
-        },
-        errorResponse => {
-          this.setStatusMessage.emit('Server error: ' + errorResponse);
-        }
-      );
+  updateRedisHost(): void {
+    this.adminBackendApiService.updateRedisHostAsync(this.redisHost).then(
+      () => {
+        this.setStatusMessage.emit('Redishost updated successfully.');
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
   }
 
   resetForm(): void {

@@ -46,6 +46,7 @@ from core.domain import platform_parameter_services as parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
+from core.domain import redis_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import search_services
@@ -267,7 +268,8 @@ class AdminHandler(
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
-                        'rollback_exploration_to_safe_state'
+                        'rollback_exploration_to_safe_state',
+                        'update_redis_host'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -496,6 +498,8 @@ class AdminHandler(
                 the action is generate_dummy_chapters.
             Exception. The num_dummy_chapters_to_generate must be 
                 provided when the action is generate_dummy_chapters.
+            Exception. The redis_host must be provided when the action
+                is update_redis_host.
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
@@ -664,6 +668,14 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
+            elif action == 'update_redis_host':
+                redis_host = self.normalized_payload.get('redis_host')
+                if redis_host is None:
+                    raise Exception(
+                        'The \'redis_host\' must be provided when the action'
+                        ' is update_redis_host.'
+                    )
+                redis_services.update_redis_host(redis_host)
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the

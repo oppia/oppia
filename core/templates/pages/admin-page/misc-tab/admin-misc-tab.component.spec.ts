@@ -909,4 +909,41 @@ describe('Admin misc tab component ', () => {
       );
     }));
   });
+
+  describe('when clicking on update redis host button ', () => {
+    it('should update redis host successfully', fakeAsync(() => {
+      component.redisHost = 'redisHost';
+      let updateRedisHostSpy = spyOn(
+        adminBackendApiService,
+        'updateRedisHostAsync'
+      ).and.returnValue(Promise.resolve());
+
+      component.updateRedisHost();
+      tick();
+
+      expect(updateRedisHostSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Redishost updated successfully.'
+      );
+    }));
+
+    it(
+      'should not update redishost in case of backend ' + 'error',
+      fakeAsync(() => {
+        component.redisHost = 'redisHost';
+        let updateRedisHostSpy = spyOn(
+          adminBackendApiService,
+          'updateRedisHostAsync'
+        ).and.rejectWith('Internal Server Error.');
+
+        component.updateBlogPostData();
+        tick();
+
+        expect(updateRedisHostSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
+  });
 });

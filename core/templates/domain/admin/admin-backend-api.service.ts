@@ -733,4 +733,16 @@ export class AdminBackendApiService {
         );
     });
   }
+
+  async updateRedisHostAsync(redisHost: string): Promise<void> {
+    let action = 'update_redis_host';
+    let payload = {
+      redis_host: redisHost,
+    };
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
+  }
 }
