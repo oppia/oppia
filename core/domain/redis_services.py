@@ -36,13 +36,13 @@ def update_redis_host(redis_host: str) -> None:
     """
     retrieved_redisclient = redis_client_models.RedisClientModel.get(
         redis_client_models.REDIS_CLIENT_ID, strict=False)
-    if retrieved_redisclient is not None:
-        retrieved_redisclient.redishost = redis_host
-        retrieved_redisclient.update_timestamps()
-        retrieved_redisclient.put()
-    else:
-        redisclient = redis_client_models.RedisClientModel(
-            id=redis_client_models.REDIS_CLIENT_ID, redishost=redis_host
+    redisclient = (
+        retrieved_redisclient
+        if retrieved_redisclient is not None
+        else redis_client_models.RedisClientModel(
+            id=redis_client_models.REDIS_CLIENT_ID
         )
-        redisclient.update_timestamps()
-        redisclient.put()
+    )
+    redisclient.redishost = redis_host
+    redisclient.update_timestamps()
+    redisclient.put()
