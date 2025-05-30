@@ -58,5 +58,5 @@ class RedisClientModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'redishost': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

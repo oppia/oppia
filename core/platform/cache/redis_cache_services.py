@@ -23,7 +23,7 @@ from core.domain import caching_domain
 from core.platform import models
 
 import redis
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -48,7 +48,8 @@ class RedisClient:
 
     def _initialize_client(self) -> None:
         """Initializes the client by fetching redis model if the client is not
-        initialized."""
+        initialized.
+        """
 
         if self._is_client_initialized:
             return
