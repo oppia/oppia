@@ -43,10 +43,13 @@ class RedisClient:
         self._is_client_initialized = False
         self._redis_model: Optional[
             redis_client_models.RedisClientModel] = None
-        self._oppia_redis_client: Optional[redis.StrictRedis] = None
-        self._cloud_ndb_redis_client: Optional[redis.StrictRedis] = None
+        self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
+        self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
 
     def _initialize_client(self) -> None:
+        """Initializes the client by fetching redis model if the client is not
+        initialized."""
+
         if self._is_client_initialized:
             return
 
@@ -71,11 +74,23 @@ class RedisClient:
             )
         self._is_client_initialized = True
 
-    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis]:
+    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
+        """Initializes redis model and obtains oppia redis client.
+
+        Returns:
+            redis.StrictRedis[str] or None. The oppia redis client if redishost
+            is setup, else None.
+        """
         self._initialize_client()
         return self._oppia_redis_client
 
-    def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis]:
+    def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis[str]]:
+        """Initializes redis model and obtains cloud ndb redis client.
+
+        Returns:
+            redis.StrictRedis[str] or None. The cloud ndb redis client if
+            redishost is setup, else None.
+        """
         self._initialize_client()
         return self._cloud_ndb_redis_client
 

@@ -2016,8 +2016,8 @@ describe('Admin backend api service', () => {
       let redisHost = 'redishost';
       abas.updateRedisHostAsync(redisHost).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/update');
-      expect(req.request.method).toEqual('PUT');
+      let req = httpTestingController.expectOne('/adminhandler');
+      expect(req.request.method).toEqual('POST');
 
       req.flush({status: 200, statusText: 'Success.'});
       flushMicrotasks();
@@ -2031,7 +2031,7 @@ describe('Admin backend api service', () => {
       abas.updateRedisHostAsync(redisHost).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminhandler');
-      expect(req.request.method).toEqual('PUT');
+      expect(req.request.method).toEqual('POST');
 
       req.flush(
         {error: 'Redishost could not be updated'},

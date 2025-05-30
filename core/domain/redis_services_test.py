@@ -22,8 +22,6 @@ from core.domain import redis_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
-
 MYPY = False
 if MYPY:
     from mypy_imports import redis_client_models
@@ -45,6 +43,7 @@ class RedisServicesUnitTests(test_utils.GenericTestBase):
 
         fetched_model = redis_client_models.RedisClientModel.get(
             redis_client_models.REDIS_CLIENT_ID, strict=False)
+        assert fetched_model is not None
         self.assertEqual(fetched_model.redishost, new_host)
 
     def test_update_redis_host_updates_existing_model(self) -> None:
@@ -60,4 +59,5 @@ class RedisServicesUnitTests(test_utils.GenericTestBase):
 
         fetched_model = redis_client_models.RedisClientModel.get(
             redis_client_models.REDIS_CLIENT_ID, strict=False)
+        assert fetched_model is not None
         self.assertEqual(fetched_model.redishost, new_host)

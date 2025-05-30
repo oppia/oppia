@@ -508,6 +508,7 @@
 /core/controllers/tasks*.py @oppia/lace-backend-reviewers
 /core/domain/email*.py @oppia/lace-backend-reviewers
 /core/domain/image_service*.py @oppia/lace-backend-reviewers
+/core/domain/redis_services*.py @oppia/dev-workflow-reviewers
 /core/platform/ @oppia/lace-backend-reviewers
 /core/templates/oppia-platform-stats.ts @oppia/lace-frontend-reviewers
 /core/templates/app.constants.ts @oppia/lace-frontend-reviewers

@@ -33,7 +33,7 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        redis_services.update_redis_host("localhost")
+        redis_services.update_redis_host('localhost')
 
     def test_memory_stats_returns_dict(self) -> None:
         memory_stats = redis_cache_services.get_memory_cache_stats()

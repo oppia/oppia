@@ -19,8 +19,6 @@ from __future__ import annotations
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
