@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
+from core.constants import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
@@ -289,3 +290,177 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(
             word_boundary_collection.audio_offset_list,
             expected_word_boundary_collection)
+
+    def test_is_mathematical_text(self) -> None:
+        math_text = 'Convert 5 + 3 to words.'
+        self.assertTrue(
+            azure_speech_synthesis_services.is_mathematical_text(math_text))
+
+        non_math_text = 'This is a test text.'
+        self.assertFalse(
+            azure_speech_synthesis_services.is_mathematical_text(non_math_text))
+
+    def _get_ssml_content(
+        self, main_content: str, language_accent_code: str
+    ) -> str:
+        """Returns the SSML content for the given main content and language
+        accent code.
+
+        Args:
+            main_content: str. The main content for which SSML content is to be
+                generated.
+            language_accent_code: str. The language accent code for which SSML
+                content is to be generated.
+
+        Returns:
+            str. The SSML content for the given main content and language accent
+            code.
+        """
+        voice_code = (
+            azure_speech_synthesis_services.
+            get_azure_voicecode_from_language_accent_code(language_accent_code))
+        main_ssml_content = (
+            azure_speech_synthesis_services.MAIN_CONTENT_SSML_TEMPLATE_BLOCK %
+            main_content)
+        return (
+            azure_speech_synthesis_services.SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS
+        ) % (language_accent_code, voice_code, main_ssml_content)
+
+    def test_should_convert_plaintext_to_ssml_content_correctly(self) -> None:
+        language_accent_code = 'en-US'
+        plaintext = 'This is a test text.'
+        expected_main_content = 'This is a test text.'
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 5 * 3.'
+        expected_main_content = (
+            'Find the value of 5 <say-as interpret-as="math">times</say-as> 3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 5 × 3.'
+        expected_main_content = (
+            'Find the value of 5 <say-as interpret-as="math">times</say-as> 3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 5 - 3.'
+        expected_main_content = (
+            'Find the value of 5 <say-as interpret-as="math">minus</say-as> 3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 5 + 3.'
+        expected_main_content = (
+            'Find the value of 5 <say-as interpret-as="math">plus</say-as> 3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 15 / 5.'
+        expected_main_content = (
+            'Find the value of 15 <say-as interpret-as="math">divided by'
+            '</say-as> 5.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = 'Find the value of 15x ÷ 5 = 3.'
+        expected_main_content = (
+            'Find the value of 15x <say-as interpret-as="math">divided by'
+            '</say-as> 5<say-as interpret-as="math">equals</say-as>3.')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+        plaintext = '15 ÷ 5 is ______.'
+        expected_main_content = (
+            '15 <say-as interpret-as="math">divided by</say-as> 5 is  dash .')
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code))
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code))
+
+    def test_should_transform_algebric_fraction(self) -> None:
+        content = 'Calculate x: x/4 = 2.'
+        expected_transformed_content = 'Calculate x: x / 4 = 2.'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_algebric_fraction(content),
+            expected_transformed_content)
+
+        content = 'Calculate x: 4/x = 2.'
+        expected_transformed_content = 'Calculate x: 4 / x = 2.'
+        self.assertEqual(
+            azure_speech_synthesis_services.process_algebric_fraction(content),
+            expected_transformed_content)
+
+    def test_should_pronounce_correctly_for_superscripts(self) -> None:
+        math_symbol_pronounciations = (
+            constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+            'en', {}))
+
+        content = 'x^2 + y^2 = z^3'
+        expected_content_to_be_pronounced = 'x squared + y squared = z cubed'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )
+
+        content = 'x² + 5 = z⁴'
+        expected_content_to_be_pronounced = (
+            'x squared + 5 = z to the power of 4')
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )
+
+        # Should not update if the text doesn't contain any superscript.
+        content = 'x + 5  = 10'
+        expected_content_to_be_pronounced = 'x + 5  = 10'
+
+        self.assertEqual(
+            azure_speech_synthesis_services.process_superscript_in_text(
+                content, math_symbol_pronounciations),
+            expected_content_to_be_pronounced
+        )

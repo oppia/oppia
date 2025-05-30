@@ -207,7 +207,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.dismissTranslationTabWelcomeModal();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Content',
         'Content translation text'
       );
@@ -240,7 +240,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Interaction',
         'Interaction translation text'
       );
@@ -282,7 +282,7 @@ describe('Exploration Editor', function () {
         await explorationEditor.closeEditorNavigationDropdownOnMobile();
       }
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Hint',
         'Hint translation text'
       );
@@ -318,7 +318,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Solution',
         'Solution explanation translation text'
       );
@@ -357,7 +357,7 @@ describe('Exploration Editor', function () {
       );
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Feedback',
         'Response feedback translation text',
         1

@@ -65,8 +65,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/google-analytics.initializer.ts',
     'core/templates/pages/exploration-editor-page/services/'
         'exploration-states.service.ts',
-    'core/templates/pages/exploration-editor-page/translation-tab/'
-        'services/voiceover-recording.service.ts',
     'core/templates/pages/exploration-player-page/services/'
         'learner-answer-info.service.ts',
     'extensions/interactions/MusicNotesInput/directives/'

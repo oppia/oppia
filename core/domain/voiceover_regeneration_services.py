@@ -23,15 +23,23 @@ from __future__ import annotations
 import html
 import io
 import json
+import logging
+import uuid
 
 from core import feconf
+from core import utils
+from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import state_domain
+from core.domain import translation_fetchers
+from core.domain import voiceover_services
+
 from core.platform import models
 
 import bs4
 from mutagen import mp3
 from pylatexenc import latex2text
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -151,8 +159,7 @@ def synthesize_voiceover_for_html_string(
         voiceover_models.CachedAutomaticVoiceoversModel.
         generate_hash_from_text(parsed_text)
     )
-
-    cached_model = (
+    cached_model: Optional[voiceover_models.CachedAutomaticVoiceoversModel] = (
         voiceover_models.CachedAutomaticVoiceoversModel.
         get_cached_automatic_voiceover_model(
             content_hash_code,
@@ -167,18 +174,25 @@ def synthesize_voiceover_for_html_string(
 
     if cached_model is not None:
         error_details = None
-        if cached_model.plaintext == parsed_text:
-            audio_offset_list = (
-                cached_model.audio_offset_list)
-            filename = cached_model.voiceover_filename
-            binary_audio_data = fs.get('%s/%s' % ('audio', filename))
-            is_cached_model_used_for_voiceovers = True
+        try:
+            if cached_model.plaintext == parsed_text:
+                audio_offset_list = (
+                    cached_model.audio_offset_list)
+                filename = cached_model.voiceover_filename
+                binary_audio_data = fs.get('%s/%s' % ('audio', filename))
+                is_cached_model_used_for_voiceovers = True
+        except Exception as e:
+            cached_model = None
+            logging.warning('Failed to retrieve voiceover from cache: %s' % e)
 
+    # Generate automatic voiceover only if retrieving the voiceover from the
+    # cache fails; otherwise, utilize the cached voiceovers.
     if not is_cached_model_used_for_voiceovers:
         try:
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    parsed_text, language_accent_code))
+                    parsed_text, language_accent_code)
+            )
         except Exception as e:
             error_details = str(e)
 
@@ -200,7 +214,8 @@ def synthesize_voiceover_for_html_string(
         '%s/%s' % ('audio', voiceover_filename),
         binary_audio_data, mimetype=mimetype)
 
-    # Case of Collison.
+    # In case the content is not available in the cache, store the generated
+    # voiceovers in the cache.
     if cached_model is not None:
         if cached_model.plaintext != parsed_text:
             if len(parsed_text) < len(cached_model.plaintext):
@@ -224,3 +239,153 @@ def synthesize_voiceover_for_html_string(
         new_cached_model.put()
 
     return audio_offset_list
+
+
+def generate_new_voiceover_filename(
+        content_id: str, language_accent_code: str) -> str:
+    """Generates a unique filename for a new voiceover. The filename is composed
+    of the content ID, language accent code, and a random 10-character string.
+
+    Args:
+        content_id: str. The content ID for which the voiceover is generated.
+        language_accent_code: str. The language accent code for the voiceover.
+
+    Returns:
+        str. The generated filename for the voiceover.
+    """
+    random_string_for_filename = utils.convert_to_hash(uuid.uuid4().hex, 10)
+    return '%s-%s-%s.mp3' % (
+        content_id,
+        language_accent_code,
+        random_string_for_filename
+    )
+
+
+def get_content_html_in_requested_language(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    content_id: str,
+    language_accent_code: str
+) -> str:
+    """Fetches the content HTML in the requested language using the translation
+    service.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        content_id: str. The content ID.
+        language_accent_code: str. The language accent code.
+
+    Returns:
+        str. The content HTML in the requested language.
+
+    Raises:
+        Exception. The translation for the content ID is not found in the
+            requested language.
+    """
+    language_code = (
+        voiceover_services.
+        get_language_code_from_language_accent_code(language_accent_code))
+    assert isinstance(language_code, str)
+
+    if language_code == 'en':
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        content_html = exploration.get_content_html(state_name, content_id)
+        assert isinstance(content_html, str)
+        return content_html
+    else:
+        entity_translations = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType(feconf.ENTITY_TYPE_EXPLORATION),
+            exploration_id,
+            exploration_version,
+            language_code
+        )
+        try:
+            translated_content_html = entity_translations.translations[
+                content_id].content_value
+            assert isinstance(translated_content_html, str)
+        except Exception as e:
+            raise Exception(
+                'Translation for content_id %s not found in language %s' % (
+                    content_id, language_code)) from e
+        return translated_content_html
+
+
+def regenerate_voiceover_for_exploration_content(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    content_id: str,
+    language_accent_code: str
+) -> Tuple[state_domain.Voiceover, List[Dict[str, Union[str, float]]]]:
+    """Regenerates the voiceover for the given exploration content in the
+    requested language accent code.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        content_id: str. The content ID.
+        language_accent_code: str. The language accent code for the voiceover.
+
+    Returns:
+        tuple(Voiceover, list(dict(str, str|float))). A tuple containing the
+        voiceover object and a list of dictionaries. The voiceover object
+        contains the voiceover filename, audio size in bytes, duration in
+        seconds, and whether the voiceover is needs update. The list of
+        dictionaries contains the audio offset for each token in the content.
+        Each dictionary contains two keys.
+        - 'token': str. The token representing a word or punctuation in the
+        content.
+        - 'audio_offset_msecs': float. The time offset in milliseconds in the
+        audio for the token.
+        Note: This field only contains the audio offset for automated
+        voiceovers that are synthesized from using cloud service.
+    """
+    content_html = get_content_html_in_requested_language(
+        exploration_id,
+        exploration_version,
+        state_name,
+        content_id,
+        language_accent_code
+    )
+    voiceover_filename = generate_new_voiceover_filename(
+        content_id, language_accent_code)
+
+    sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
+        exploration_id, content_html, language_accent_code, voiceover_filename)
+
+    fs = fs_services.GcsFileSystem(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+
+    binary_audio_data = fs.get('%s/%s' % ('audio', voiceover_filename))
+
+    tempbuffer = io.BytesIO()
+    tempbuffer.write(binary_audio_data)
+    tempbuffer.seek(0)
+    audio = mp3.MP3(tempbuffer)
+
+    duration_secs = audio.info.length
+    audio_size_bytes = tempbuffer.getbuffer().nbytes
+
+    voiceover = state_domain.Voiceover(
+        voiceover_filename, audio_size_bytes, False, duration_secs)
+
+    entity_voiceovers = (
+        voiceover_services.get_voiceovers_for_given_language_accent_code(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_accent_code
+        )
+    )
+    entity_voiceovers.add_voiceover(
+        content_id, feconf.VoiceoverType.AUTO, voiceover)
+    entity_voiceovers.add_automated_voiceovers_audio_offsets(
+        content_id, sentence_tokens_with_durations)
+    entity_voiceovers.validate()
+    voiceover_services.save_entity_voiceovers(entity_voiceovers)
+
+    return voiceover, sentence_tokens_with_durations
