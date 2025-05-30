@@ -60,18 +60,22 @@ class RedisClient:
                 )
             )
 
-        if self._redis_model is not None:
-            self._oppia_redis_client = redis.StrictRedis(
-                host=self._redis_model.redishost,
-                port=feconf.REDISPORT,
-                db=feconf.OPPIA_REDIS_DB_INDEX,
-                decode_responses=True
-            )
-            self._cloud_ndb_redis_client = redis.StrictRedis(
-                host=self._redis_model.redishost,
-                port=feconf.REDISPORT,
-                db=feconf.CLOUD_NDB_REDIS_DB_INDEX
-            )
+        redishost = (
+            self._redis_model.redishost
+            if self._redis_model is not None
+            else feconf.REDISHOST
+        )
+        self._oppia_redis_client = redis.StrictRedis(
+            host=redishost,
+            port=feconf.REDISPORT,
+            db=feconf.OPPIA_REDIS_DB_INDEX,
+            decode_responses=True
+        )
+        self._cloud_ndb_redis_client = redis.StrictRedis(
+            host=redishost,
+            port=feconf.REDISPORT,
+            db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+        )
         self._is_client_initialized = True
 
     def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
