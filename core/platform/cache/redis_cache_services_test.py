@@ -22,7 +22,6 @@ import os
 
 from core import feconf
 from core import utils
-from core.domain import redis_services
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 from scripts import common
@@ -30,10 +29,6 @@ from scripts import common
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        redis_services.update_redis_host('localhost')
 
     def test_memory_stats_returns_dict(self) -> None:
         memory_stats = redis_cache_services.get_memory_cache_stats()
