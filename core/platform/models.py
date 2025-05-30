@@ -161,8 +161,7 @@ class _Gae(Platform):
                     gae_models as recommendations_models)
                 returned_models.append(recommendations_models)
             elif name == Names.REDIS_CLIENT:
-                from core.storage.redis import (
-                    gae_models as redis_client_models)
+                from core.storage.redis import gae_models as redis_client_models
                 returned_models.append(redis_client_models)
             elif name == Names.SKILL:
                 from core.storage.skill import gae_models as skill_models

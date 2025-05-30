@@ -936,7 +936,7 @@ describe('Admin misc tab component ', () => {
           'updateRedisHostAsync'
         ).and.rejectWith('Internal Server Error.');
 
-        component.updateBlogPostData();
+        component.updateRedisHost();
         tick();
 
         expect(updateRedisHostSpy).toHaveBeenCalled();

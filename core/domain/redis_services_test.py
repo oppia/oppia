@@ -26,32 +26,31 @@ from typing import Final
 
 MYPY = False
 if MYPY:
-    from mypy_imports import redis_models
+    from mypy_imports import redis_client_models
 
-(redis_models,) = models.Registry.import_models([models.Names.REDIS_CLIENT])
+(redis_client_models,) = models.Registry.import_models([
+    models.Names.REDIS_CLIENT])
 
 
 class RedisServicesUnitTests(test_utils.GenericTestBase):
     """Tests for the Redis services module."""
 
     def test_update_redis_host_creates_new_model(self) -> None:
-        """Tests that update_redis_host creates a new model if one doesn't exist."""
-        initial_model = redis_models.RedisClientModel.get(
-            redis_models.REDIS_CLIENT_ID, strict=False)
+        initial_model = redis_client_models.RedisClientModel.get(
+            redis_client_models.REDIS_CLIENT_ID, strict=False)
         self.assertIsNone(initial_model)
 
         new_host = 'new.redis.host'
         redis_services.update_redis_host(new_host)
 
-        fetched_model = redis_models.RedisClientModel.get(
-            redis_models.REDIS_CLIENT_ID, strict=False)
+        fetched_model = redis_client_models.RedisClientModel.get(
+            redis_client_models.REDIS_CLIENT_ID, strict=False)
         self.assertEqual(fetched_model.redishost, new_host)
 
     def test_update_redis_host_updates_existing_model(self) -> None:
-        """Tests that update_redis_host updates an existing model."""
         initial_host = 'initial.redis.host'
-        initial_model = redis_models.RedisClientModel(
-            redis_models.REDIS_CLIENT_ID, redishost=initial_host
+        initial_model = redis_client_models.RedisClientModel(
+            redis_client_models.REDIS_CLIENT_ID, redishost=initial_host
         )
         initial_model.update_timestamps()
         initial_model.put()
@@ -59,6 +58,6 @@ class RedisServicesUnitTests(test_utils.GenericTestBase):
         new_host = 'updated.redis.host'
         redis_services.update_redis_host(new_host)
 
-        fetched_model = redis_models.RedisClientModel.get(
-            redis_models.REDIS_CLIENT_ID, strict=False)
+        fetched_model = redis_client_models.RedisClientModel.get(
+            redis_client_models.REDIS_CLIENT_ID, strict=False)
         self.assertEqual(fetched_model.redishost, new_host)

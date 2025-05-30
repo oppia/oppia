@@ -22,9 +22,10 @@ from core.platform import models
 
 MYPY = False
 if MYPY:
-    from mypy_imports import redis_models
+    from mypy_imports import redis_client_models
 
-(redis_models,) = models.Registry.import_models([models.Names.REDIS_CLIENT])
+(redis_client_models,) = models.Registry.import_models([
+    models.Names.REDIS_CLIENT])
 
 
 def update_redis_host(redis_host: str) -> None:
@@ -33,15 +34,15 @@ def update_redis_host(redis_host: str) -> None:
     Args:
         redis_host: str. The Redis host to save.
     """
-    retrieved_redisclient = redis_models.RedisClientModel.get(
-        redis_models.REDIS_CLIENT_ID, strict = False)
+    retrieved_redisclient = redis_client_models.RedisClientModel.get(
+        redis_client_models.REDIS_CLIENT_ID, strict = False)
     if retrieved_redisclient is not None:
         retrieved_redisclient.redishost = redis_host
         retrieved_redisclient.update_timestamps()
         retrieved_redisclient.put()
     else:
-        redisclient = redis_models.RedisClientModel(
-            id=redis_models.REDIS_CLIENT_ID, redishost = redis_host
+        redisclient = redis_client_models.RedisClientModel(
+            id=redis_client_models.REDIS_CLIENT_ID, redishost = redis_host
         )
         redisclient.update_timestamps()
         redisclient.put()

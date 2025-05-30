@@ -24,9 +24,9 @@ from typing import Final
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
-    from mypy_imports import redis_models
+    from mypy_imports import redis_client_models
 
-(base_models, redis_models) = models.Registry.import_models([
+(base_models, redis_client_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.REDIS_CLIENT
 ])
 
@@ -36,12 +36,13 @@ class RedisClientModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            redis_models.RedisClientModel.get_deletion_policy(),
+            redis_client_models.RedisClientModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            redis_models.RedisClientModel.get_model_association_to_user(),
+            redis_client_models.RedisClientModel.
+                get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_export_policy(self) -> None:
@@ -52,5 +53,5 @@ class RedisClientModelUnitTests(test_utils.GenericTestBase):
             'redishost': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
-            redis_models.RedisClientModel.get_export_policy(),
+            redis_client_models.RedisClientModel.get_export_policy(),
             expected_export_policy_dict)
