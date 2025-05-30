@@ -6260,7 +6260,7 @@ export default {
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
   // This represents the maximum number of characters in the URL fragment for
   // subtopic in the revision page URL. E.g.
-  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // in /learn/math/fractions/studyguide/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
   // This is same as base_models.ID_Length.
@@ -6666,7 +6666,7 @@ export default {
       ]
     },
     "SUBTOPIC_VIEWER": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
