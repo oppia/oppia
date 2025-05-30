@@ -27,7 +27,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import redis_models
 
 (base_models, redis_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.REDIS
+    models.Names.BASE_MODEL, models.Names.REDIS_CLIENT
 ])
 
 
