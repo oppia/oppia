@@ -24,30 +24,24 @@ from typing import Final
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
-    from mypy_imports import recommendations_models
+    from mypy_imports import redis_models
 
-(base_models, recommendations_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.RECOMMENDATIONS
+(base_models, redis_models) = models.Registry.import_models([
+    models.Names.BASE_MODEL, models.Names.REDIS
 ])
 
 
-class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
-    """Tests the ExplorationRecommendationsModel class."""
-
-    RECOMMENDATION_1_ID: Final = 'rec_1_id'
-    RECOMMENDATION_2_ID: Final = 'rec_2_id'
-    RECOMMENDATION_3_ID: Final = 'rec_3_id'
+class RedisClientModelUnitTests(test_utils.GenericTestBase):
+    """Tests the RedisClientModel class."""
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel
-            .get_deletion_policy(),
+            redis_models.RedisClientModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel.
-                get_model_association_to_user(),
+            redis_models.RedisClientModel.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_export_policy(self) -> None:
@@ -55,36 +49,8 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'recommended_exploration_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'redishost': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel
-            .get_export_policy(),
-            expected_export_policy_dict)
-
-
-class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
-    """Tests the TopicSimilaritiesModel class."""
-
-    def test_get_deletion_policy(self) -> None:
-        self.assertEqual(
-            recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
-
-    def test_get_model_association_to_user(self) -> None:
-        self.assertEqual(
-            recommendations_models.TopicSimilaritiesModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
-
-    def test_get_export_policy(self) -> None:
-        expected_export_policy_dict = {
-            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        }
-        self.assertEqual(
-            recommendations_models.TopicSimilaritiesModel.get_export_policy(),
+            redis_models.RedisClientModel.get_export_policy(),
             expected_export_policy_dict)
