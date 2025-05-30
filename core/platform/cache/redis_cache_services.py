@@ -43,8 +43,8 @@ class RedisClient:
         self._is_client_initialized = False
         self._redis_model: Optional[
             redis_client_models.RedisClientModel] = None
-        self._oppia_redis_client: Optional[redis.Redis[Any]] = None
-        self._cloud_ndb_redis_client: Optional[redis.Redis[Any]] = None
+        self._oppia_redis_client: Optional[redis.StrictRedis] = None
+        self._cloud_ndb_redis_client: Optional[redis.StrictRedis] = None
 
     def _initialize_client(self) -> None:
         if self._is_client_initialized:
@@ -71,11 +71,11 @@ class RedisClient:
             )
         self._is_client_initialized = True
 
-    def get_oppia_redis_client(self) -> Optional[redis.Redis[Any]]:
+    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis]:
         self._initialize_client()
         return self._oppia_redis_client
 
-    def get_cloud_ndb_redis_client(self) -> Optional[redis.Redis[Any]]:
+    def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis]:
         self._initialize_client()
         return self._cloud_ndb_redis_client
 
