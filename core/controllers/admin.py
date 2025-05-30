@@ -388,6 +388,12 @@ class AdminHandler(
                 },
                 'default_value': None
             },
+            'redis_host': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': None
+            },
             'default_value': {
                 'schema': {
                     'type': 'object_dict',

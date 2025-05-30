@@ -31,6 +31,10 @@ def update_redis_host(redis_host: str) -> None:
     Args:
         redis_host: str. The Redis host to save.
     """
-    client = redis_models.RedisClientModel.get_singleton()
-    client.redishost = redis_host
-    client.put()
+    redisclient = redis_models.RedisClientModel.get(
+        redis_models.REDIS_CLIENT_ID, strict = False)
+    if redisclient is None:
+        redisclient = create_default_topic_similarities()
+
+    redisclient.redishost = redis_host
+    redisclient.put()
