@@ -22,7 +22,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import redis_models
 
-(redis_models,) = models.Registry.import_models([models.Names.REDIS_CACHE])
+(redis_models,) = models.Registry.import_models([models.Names.REDIS_CLIENT])
 
 
 def update_redis_host(redis_host: str) -> None:
