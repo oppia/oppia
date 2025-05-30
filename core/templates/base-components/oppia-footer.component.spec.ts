@@ -38,6 +38,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
+import {FormsModule} from '@angular/forms';
 
 class MockWindowRef {
   nativeWindow = {
@@ -69,7 +70,7 @@ describe('OppiaFooterComponent', () => {
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, FormsModule],
       declarations: [OppiaFooterComponent, MockTranslatePipe],
       providers: [
         {
@@ -140,6 +141,37 @@ describe('OppiaFooterComponent', () => {
     expect(component.disableNewsletterSubscription()).toBeTrue();
   });
 
+  it('should return whether the email address is present or not in the set of subscribed emails', () => {
+    expect(component.isAlreadySubscribed('validEmail@example.com')).toBeFalse();
+
+    component.emailsSubscribed.add('validEmail@example.com');
+    expect(component.isAlreadySubscribed('validEmail@example.com')).toBeTrue();
+  });
+
+  it('should clear newsletter warning when email address input changes', fakeAsync(() => {
+    component.emailAddress = 'validEmail@example.com';
+    component.name = 'validName';
+    component.emailsSubscribed.add(component.emailAddress);
+    fixture.detectChanges();
+
+    expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeFalse();
+
+    component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeTrue();
+
+    const input: HTMLInputElement =
+      fixture.nativeElement.querySelector('input');
+    input.value = 'anotherEmail@example.com';
+    input.dispatchEvent(new Event('input'));
+    tick();
+    fixture.detectChanges();
+
+    expect(component.emailDuplicated).toBeFalse();
+  }));
+
   it('should add user to mailing list and return status', fakeAsync(() => {
     spyOn(alertsService, 'addInfoMessage');
     tick();
@@ -151,6 +183,7 @@ describe('OppiaFooterComponent', () => {
     ).and.returnValue(Promise.resolve(true));
 
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeFalse();
 
     component.subscribeToMailingList();
 
@@ -158,14 +191,14 @@ describe('OppiaFooterComponent', () => {
 
     flushMicrotasks();
 
-    tick(500);
-
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith('Done!', 1000);
     expect(ngbModal.open).toHaveBeenCalledWith(
       ThanksForSubscribingModalComponent,
       {backdrop: 'static', size: 'xl'}
     );
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.isAlreadySubscribed(component.emailAddress)).toBeTrue();
+    expect(component.emailDuplicated).toBeFalse();
   }));
 
   it('should fail to add user to mailing list and return status', fakeAsync(() => {
@@ -179,6 +212,7 @@ describe('OppiaFooterComponent', () => {
     ).and.returnValue(Promise.resolve(false));
 
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeFalse();
 
     component.subscribeToMailingList();
 
@@ -186,13 +220,13 @@ describe('OppiaFooterComponent', () => {
 
     flushMicrotasks();
 
-    tick(500);
-
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
       10000
     );
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.isAlreadySubscribed(component.emailAddress)).toBeTrue();
+    expect(component.emailDuplicated).toBeFalse();
   }));
 
   it('should reject request to the mailing list correctly', fakeAsync(() => {
@@ -206,6 +240,7 @@ describe('OppiaFooterComponent', () => {
     ).and.returnValue(Promise.reject(false));
 
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeFalse();
 
     component.subscribeToMailingList();
 
@@ -213,13 +248,40 @@ describe('OppiaFooterComponent', () => {
 
     flushMicrotasks();
 
-    tick(500);
-
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
       10000
     );
     expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.isAlreadySubscribed(component.emailAddress)).toBeTrue();
+    expect(component.emailDuplicated).toBeFalse();
+  }));
+
+  it('should show newsletter warning if user tries to subscribe to newsletter with already used email address', fakeAsync(() => {
+    component.emailAddress = 'validEmail@example.com';
+    component.name = 'validName';
+    spyOn(
+      mailingListBackendApiService,
+      'subscribeUserToMailingList'
+    ).and.returnValue(Promise.resolve(true));
+
+    expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeFalse();
+
+    component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeTrue();
+
+    flushMicrotasks();
+
+    expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.isAlreadySubscribed(component.emailAddress)).toBeTrue();
+    expect(component.emailDuplicated).toBeFalse();
+
+    component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeFalse();
+    expect(component.emailDuplicated).toBeTrue();
   }));
 
   it('should register About footer link click event', () => {

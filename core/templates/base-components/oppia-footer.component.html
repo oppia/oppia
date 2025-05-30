@@ -14,6 +14,7 @@
                  class="e2e-test-newsletter-input"
                  [(ngModel)]="emailAddress"
                  [ngModelOptions]="{standalone: true}"
+                 (ngModelChange)="clearNewsletterWarning()"
                  required="true"
                  aria-labelledby="email">
           <button class="oppia-footer-newsletter-button e2e-test-newsletter-subscribe-btn"
@@ -21,6 +22,9 @@
                   (click)="subscribeToMailingList()">
             <span>{{ 'I18N_SUBSCRIBE_BUTTON_TEXT' | translate }}</span>
           </button>
+        </div>
+        <div class="oppia-footer-newsletter-warning" *ngIf="emailDuplicated">
+          <p>{{ 'I18N_FOOTER_NEWSLETTER_WARNING' | translate }}</p>
         </div>
       </div>
     </div>

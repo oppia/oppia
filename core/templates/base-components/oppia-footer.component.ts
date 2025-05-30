@@ -50,6 +50,8 @@ export class OppiaFooterComponent {
   versionInformationIsShown: boolean = this.router.url === '/about';
 
   subscriptionProcessing: boolean = false;
+  emailDuplicated: boolean = false;
+  emailsSubscribed: Set<string> = new Set();
 
   constructor(
     private alertsService: AlertsService,
@@ -77,18 +79,29 @@ export class OppiaFooterComponent {
     return this.subscriptionProcessing;
   }
 
+  isAlreadySubscribed(email: string | null): boolean {
+    return this.emailsSubscribed.has(email ?? '');
+  }
+
+  clearNewsletterWarning(): void {
+    this.emailDuplicated = false;
+  }
+
   subscribeToMailingList(): void {
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
-    this.subscriptionProcessing = true;
-    this.mailingListBackendApiService
-      .subscribeUserToMailingList(
-        String(this.emailAddress),
-        userName,
-        AppConstants.MAILING_LIST_WEB_TAG
-      )
-      .then(status => {
-        setTimeout(() => {
+    if (this.isAlreadySubscribed(this.emailAddress)) {
+      this.emailDuplicated = true;
+    } else {
+      this.subscriptionProcessing = true;
+      this.emailsSubscribed.add(this.emailAddress);
+      this.mailingListBackendApiService
+        .subscribeUserToMailingList(
+          String(this.emailAddress),
+          userName,
+          AppConstants.MAILING_LIST_WEB_TAG
+        )
+        .then(status => {
           if (status) {
             this.alertsService.addInfoMessage('Done!', 1000);
             this.ngbModal.open(ThanksForSubscribingModalComponent, {
@@ -102,17 +115,15 @@ export class OppiaFooterComponent {
             );
           }
           this.subscriptionProcessing = false;
-        }, 500);
-      })
-      .catch(errorResponse => {
-        setTimeout(() => {
+        })
+        .catch(errorResponse => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
           this.subscriptionProcessing = false;
-        }, 500);
-      });
+        });
+    }
   }
 
   navigateToAboutPage(): void {
