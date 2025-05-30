@@ -26,8 +26,6 @@ from __future__ import annotations
 from core.platform.app_identity import (
     gae_app_identity_services as app_identity_services)
 from core.platform.auth import firebase_auth_services as platform_auth_services
-from core.platform.azure_speech_synthesis import (
-    dev_mode_azure_speech_synthesis_services as speech_synthesis_services)
 from core.platform.bulk_email import (
     dev_mode_bulk_email_services as bulk_email_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
@@ -36,6 +34,8 @@ from core.platform.datastore import (
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.secrets import cloud_secrets_services as secrets_services
+from core.platform.speech_synthesis import (
+    dev_mode_speech_synthesis_services as speech_synthesis_services)
 from core.platform.storage import dev_mode_storage_services as storage_services
 from core.platform.taskqueue import (
     dev_mode_taskqueue_services as platform_taskqueue_services)

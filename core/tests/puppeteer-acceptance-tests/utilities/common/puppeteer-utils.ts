@@ -82,7 +82,7 @@ export class BaseUser {
    */
   async openBrowser(): Promise<Page> {
     const args: string[] = [
-      '--start-fullscreen',
+      '--window-size=1920,1080',
       '--use-fake-ui-for-media-stream',
     ];
 
@@ -139,8 +139,9 @@ export class BaseUser {
 
         // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
+          const uniqueString = Math.random().toString(36).substring(2, 8);
           const outputFileName =
-            `${specName}-${new Date().toISOString()}.mp4`.replace(
+            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
@@ -156,8 +157,8 @@ export class BaseUser {
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
             videoFrame: {
-              width: 1920,
-              height: 1080,
+              width: 1280,
+              height: 720,
             },
             aspectRatio: '16:9',
             videoCrf: 18,
@@ -190,6 +191,21 @@ export class BaseUser {
             await this.screenRecorder.stop();
           });
         }
+
+        // Set up Download Folder.
+        const downloadDir = testConstants.TEST_DOWNLOAD_DIR;
+
+        // Ensure the folder exists.
+        if (!fs.existsSync(downloadDir)) {
+          fs.mkdirSync(downloadDir, {recursive: true});
+        }
+
+        // Enable download behavior using Chrome DevTools Protocol (CDP).
+        const client = await this.page.target().createCDPSession();
+        await client.send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: downloadDir,
+        });
 
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -733,7 +749,7 @@ export class BaseUser {
       } else {
         dirName = '/dev-mobile-screenshots';
       }
-      failureTrigger += 0.042;
+      failureTrigger += 0.048;
       if (await currentPage.$(backgroundBanner)) {
         failureTrigger += 0.0352;
       } else if (await currentPage.$(libraryBanner)) {
@@ -864,6 +880,16 @@ export class BaseUser {
     await newPage.bringToFront();
     this.page = newPage;
     return newPage;
+  }
+
+  /**
+   * Scrolls to the bottom of the page.
+   */
+  async scrollToBottomOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
   }
 }
 

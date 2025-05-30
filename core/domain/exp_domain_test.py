@@ -23,6 +23,7 @@ import json
 import os
 from unittest import mock
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -2271,8 +2272,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_drag_and_drop_interaction(self) -> None:
         """Tests DragAndDrop interaction."""
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_2')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.set_interaction_for_state(
             self.state, 'DragAndDropSortInput', content_id_generator)
@@ -2546,16 +2545,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_text_interaction(self) -> None:
         """Tests Text interaction."""
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'feedback_0')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'rule_input_27')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_0')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_1')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_2')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.set_interaction_for_state(
             self.state, 'TextInput', content_id_generator)
@@ -4810,10 +4799,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -4841,10 +4826,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -6993,7 +6974,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7040,13 +7021,6 @@ states:
     linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7116,18 +7090,13 @@ states:
     linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: Title
 """)
@@ -7266,7 +7235,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7329,14 +7298,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7357,11 +7318,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -7515,7 +7473,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7588,14 +7546,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7616,11 +7566,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -7735,7 +7682,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7767,11 +7714,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7792,11 +7734,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: Title
 version: 0
@@ -7931,7 +7870,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7977,11 +7916,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8002,11 +7936,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -8189,7 +8120,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8261,16 +8192,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8294,11 +8215,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -8437,7 +8355,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8474,16 +8392,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8507,11 +8415,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -8624,7 +8529,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8656,11 +8561,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8684,11 +8584,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9019,7 +8916,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9125,14 +9022,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        hint_5: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9153,11 +9042,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9438,7 +9324,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9552,15 +9438,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9581,11 +9458,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -9735,7 +9609,7 @@ next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9793,12 +9667,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_3: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9819,11 +9687,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_4: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10026,7 +9891,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10096,20 +9961,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10130,11 +9981,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10332,7 +10180,7 @@ next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10427,17 +10275,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_5: {}
-        ca_choices_6: {}
-        ca_choices_7: {}
-        ca_choices_8: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        solution_4: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10458,11 +10295,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_9: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10684,7 +10518,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10749,14 +10583,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10777,11 +10603,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -10946,7 +10769,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11006,15 +10829,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11035,11 +10849,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11176,7 +10987,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11231,13 +11042,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11258,11 +11062,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_5: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11515,7 +11316,7 @@ next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11596,16 +11397,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        ca_choices_7: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11626,11 +11417,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_8: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -11799,7 +11587,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11877,15 +11665,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11906,11 +11685,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12086,7 +11862,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12152,14 +11928,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -12180,11 +11948,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12488,7 +12253,7 @@ next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12626,22 +12391,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_13: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_10: {}
-        feedback_2: {}
-        feedback_4: {}
-        feedback_6: {}
-        feedback_8: {}
-        rule_input_11: {}
-        rule_input_12: {}
-        rule_input_3: {}
-        rule_input_5: {}
-        rule_input_7: {}
-        rule_input_9: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -12662,11 +12411,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_14: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12801,7 +12547,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 61
+schema_version: 62
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12857,13 +12603,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_4: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        rule_input_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -12884,11 +12623,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_5: {}
     solicit_answer_details: false
-states_schema_version: 56
+states_schema_version: 57
 tags: []
 title: ''
 version: 0
@@ -12930,12 +12666,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'content': {
                     'content_id': content_id_for_content,
                     'html': content_str,
-                },
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                        content_id_for_content: {},
-                        content_id_for_default_outcome: {}
-                    }
                 },
                 'solicit_answer_details': False,
                 'card_is_checkpoint': is_init_state,
@@ -17140,357 +16870,9 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 4, change_list_5)
         self.assertEqual(changes_are_mergeable_3, False)
 
-    def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(
-        self
-    ) -> None:
-        # Adding content, feedbacks, solutions so that
-        # voiceovers can be added later on.
-        change_list = [exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': None,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT),
-                'html': '<p>First State Content.</p>'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'widget_customization_args',
-            'old_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': '',
-                        'content_id': 'cust_arg_1'
-                    }
-                },
-                'rows': {
-                    'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
-                }
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'placeholder': {
-                    'value': {
-                        'unicode_str': 'Placeholder',
-                        'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.CUSTOMIZATION_ARG,
-                            extra_prefix='placeholder')
-                    }
-                },
-                'rows': {
-                    'value': 1
-                },
-                'catchMisspellings': {
-                    'value': False
-                }
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'default_outcome',
-            'old_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': 'feedback_5',
-                    'html': ''
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            },
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'labelled_as_correct': False,
-                'missing_prerequisite_skill_id': None,
-                'refresher_exploration_id': None,
-                'feedback': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.DEFAULT_OUTCOME),
-                    'html': '<p>Feedback 1.</p>'
-                },
-                'param_changes': [
-
-                ],
-                'dest_if_really_stuck': None,
-                'dest': 'End'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'hints',
-            'old_value': ['old_value'],
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': [
-                {
-                    'hint_content': {
-                        'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.HINT),
-                        'html': '<p>Hint 1.</p>'
-                    }
-                }
-            ]
-        }), exp_domain.ExplorationChange({
-            'property_name': 'solution',
-            'old_value': None,
-            'state_name': 'Introduction',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'answer_is_exclusive': False,
-                'explanation': {
-                    'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.SOLUTION),
-                    'html': '<p>Explanation.</p>'
-                },
-                'correct_answer': 'Solution'
-            }
-        }), exp_domain.ExplorationChange({
-            'property_name': 'content',
-            'old_value': {
-                'content_id': 'content_6',
-                'html': ''
-            },
-            'state_name': 'End',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.CONTENT),
-                'html': '<p>Second State Content.</p>'
-            }
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            self.append_next_content_id_index_change(change_list),
-            'Added various contents.')
-
-        # Adding change to the field which is neither
-        # affected by nor affects voiceovers.
-        change_list_2 = [exp_domain.ExplorationChange({
-            'cmd': 'edit_state_property',
-            'state_name': 'Introduction',
-            'property_name': 'card_is_checkpoint',
-            'new_value': True
-        })]
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            self.append_next_content_id_index_change(change_list_2),
-            'Added single unrelated change.')
-
-        # Adding some voiceovers to the first state.
-        change_list_3 = [exp_domain.ExplorationChange({
-            'property_name': 'recorded_voiceovers',
-            'old_value': {
-                'voiceovers_mapping': {
-                    'hint_1': {},
-                    'default_outcome': {},
-                    'solution': {},
-                    'ca_placeholder_0': {},
-                    'content': {}
-                }
-            },
-            'state_name': 'Introduction',
-            'new_value': {
-                'voiceovers_mapping': {
-                    'hint_1': {},
-                    'default_outcome': {},
-                    'solution': {},
-                    'ca_placeholder_0': {},
-                    'content': {
-                        'en': {
-                            'needs_update': False,
-                            'filename': 'content-en-xrss3z3nso.mp3',
-                            'file_size_bytes': 114938,
-                            'duration_secs': 7.183625
-                        }
-                    }
-                }
-            },
-            'cmd': 'edit_state_property'
-        }), exp_domain.ExplorationChange({
-            'property_name': 'recorded_voiceovers',
-            'old_value': {
-                'voiceovers_mapping': {
-                    'hint_1': {},
-                    'default_outcome': {},
-                    'solution': {},
-                    'ca_placeholder_0': {},
-                    'content': {
-                        'en': {
-                            'needs_update': False,
-                            'filename': 'content-en-xrss3z3nso.mp3',
-                            'file_size_bytes': 114938,
-                            'duration_secs': 7.183625
-                        }
-                    }
-                }
-            },
-            'state_name': 'Introduction',
-            'new_value': {
-                'voiceovers_mapping': {
-                    'hint_8': {},
-                    'default_outcome_7': {},
-                    'solution_9': {},
-                    'ca_placeholder_6': {
-                        'en': {
-                            'needs_update': False,
-                            'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
-                            'file_size_bytes': 175542,
-                            'duration_secs': 10.971375
-                        }
-                    },
-                    'content_5': {
-                        'en': {
-                            'needs_update': False,
-                            'filename': 'content-en-xrss3z3nso.mp3',
-                            'file_size_bytes': 114938,
-                            'duration_secs': 7.183625
-                        }
-                    }
-                }
-            },
-            'cmd': 'edit_state_property'
-        })]
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 2, change_list_3)
-        self.assertEqual(changes_are_mergeable, True)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            self.append_next_content_id_index_change(change_list_3),
-            'Added some voiceovers.')
-
-        # Adding voiceovers again to the same first state
-        # to check if they can be applied. They will not
-        # be mergeable as the changes are in the same property
-        # i.e. recorded_voiceovers.
-        change_list_4 = [exp_domain.ExplorationChange({
-            'property_name': 'recorded_voiceovers',
-            'cmd': 'edit_state_property',
-            'old_value': {
-                'voiceovers_mapping': {
-                    'default_outcome': {},
-                    'solution': {},
-                    'content': {},
-                    'ca_placeholder_0': {},
-                    'hint_1': {}
-                }
-            },
-            'new_value': {
-                'voiceovers_mapping': {
-                    'default_outcome': {},
-                    'solution': {},
-                    'content': {},
-                    'ca_placeholder_0': {},
-                    'hint_1': {
-                        'en': {
-                            'needs_update': False,
-                            'duration_secs': 30.0669375,
-                            'filename': 'hint_1-en-ajclkw0cnz.mp3',
-                            'file_size_bytes': 481071
-                        }
-                    }
-                }
-            },
-            'state_name': 'Introduction'
-        })]
-
-        changes_are_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_4)
-        self.assertEqual(changes_are_mergeable, False)
-
-        # Adding voiceovers to the second state to check
-        # if they can be applied. They can be mergead as
-        # the changes are in the different states.
-        change_list_5 = [exp_domain.ExplorationChange({
-            'old_value': {
-                'voiceovers_mapping': {
-                    'content': {}
-                }
-            },
-            'property_name': 'recorded_voiceovers',
-            'cmd': 'edit_state_property',
-            'new_value': {
-                'voiceovers_mapping': {
-                    'content': {
-                        'en': {
-                            'duration_secs': 10.3183125,
-                            'filename': 'content-en-ar9zhd7edl.mp3',
-                            'file_size_bytes': 165093,
-                            'needs_update': False
-                        }
-                    }
-                }
-            },
-            'state_name': 'End'
-        })]
-
-        changes_are_mergeable_1 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 3, change_list_5)
-        self.assertEqual(changes_are_mergeable_1, True)
-
-        # Changes to the content of first state to check
-        # that the changes in the contents of first state
-        # doesn't affects the changes to the voiceovers in
-        # second state.
-        change_list_6 = [exp_domain.ExplorationChange({
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'html': '<p>First State Content.</p>'
-            },
-            'new_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'html': '<p>Changed First State Content.</p>'
-            },
-            'property_name': 'content',
-            'cmd': 'edit_state_property'
-        })]
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            self.append_next_content_id_index_change(change_list_6),
-            'Changing Content in First State.')
-        changes_are_mergeable_3 = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 4, change_list_5)
-        self.assertEqual(changes_are_mergeable_3, True)
-
-        # Changes to the content of second state to check that
-        # the changes to the voiceovers can not be made in
-        # same state if the property which can be recorded is
-        # changed.
-        change_list_6 = [exp_domain.ExplorationChange({
-            'state_name': 'End',
-            'old_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'html': '<p>Second State Content.</p>'
-            },
-            'new_value': {
-                'content_id': self.content_id_generator.generate(
-                            translation_domain.ContentType.FEEDBACK),
-                'html': '<p>Changed Second State Content.</p>'
-            },
-            'property_name': 'content',
-            'cmd': 'edit_state_property'
-        })]
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID,
-            self.append_next_content_id_index_change(change_list_6),
-            'Changing Content in Second State.')
-
-        changes_are_not_mergeable = exp_services.are_changes_mergeable(
-            self.EXP_0_ID, 4, change_list_4)
-        self.assertEqual(changes_are_not_mergeable, False)
-
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_changes_are_not_mergeable_when_voiceovers_changes_conflict(
         self
     ) -> None:

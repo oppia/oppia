@@ -8,12 +8,12 @@
     </div>
     <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers">
       <i>
-        Content is not available for voiceover in the selected language.
+        There is no content available for voiceover in the selected language.
       </i>
     </div>
   </div>
 
-  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode && contentAvailableForVoiceovers">
+  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode">
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
@@ -57,7 +57,7 @@
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()"
-                class="add-manual-voiceover-button"
+                class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
                 [disabled]="!contentAvailableForVoiceovers">
           ADD MANUAL VOICEOVER
         </button>
@@ -83,7 +83,7 @@
                 mat-icon-button
                 mat-button
                 *ngIf="!isAutomaticVoiceoverGenerating"
-                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled">
+                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
           <mat-icon matTooltip="Regenerate voiceover">sync</mat-icon>
         </button>
         <div *ngIf="isAutomaticVoiceoverGenerating">
@@ -107,7 +107,7 @@
         <button (click)="generateVoiceover()"
                 class="add-automatic-voiceover-button"
                 *ngIf="!isAutomaticVoiceoverGenerating"
-                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled">
+                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
           GENERATE AUTOMATIC VOICEOVER
         </button>
         <div *ngIf="isAutomaticVoiceoverGenerating">

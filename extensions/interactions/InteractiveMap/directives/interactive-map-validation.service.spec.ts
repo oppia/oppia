@@ -18,15 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
@@ -39,7 +33,6 @@ describe('InteractiveMapValidationService', () => {
   let currentState: string;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customizationArguments: InteractiveMapCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,10 +41,8 @@ describe('InteractiveMapValidationService', () => {
 
     validatorService = TestBed.get(InteractiveMapValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -76,7 +67,7 @@ describe('InteractiveMapValidationService', () => {
       },
     };
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {

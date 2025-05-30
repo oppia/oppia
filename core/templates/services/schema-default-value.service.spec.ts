@@ -24,7 +24,7 @@ import {
   SchemaDefaultValueService,
 } from 'services/schema-default-value.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('Schema Default Value Service', () => {
   let sdvs: SchemaDefaultValueService;

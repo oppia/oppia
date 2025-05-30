@@ -907,7 +907,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
 
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
-    """Tests for requiring that activity references are public."""
+    """Tests for checking id validity of activities 
+    that don't exist or are private."""
 
     EXP_ID_0: Final = 'exp_id_0'
     EXP_ID_1: Final = 'exp_id_1'
@@ -919,19 +920,44 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-    def test_requiring_nonexistent_activities_be_public_raises_exception(
+    def test_checking_activity_id_validity_on_nonexistent_activities(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'non-existent exploration'):
-            summary_services.require_activities_to_be_public([
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
-        with self.assertRaisesRegex(Exception, 'non-existent collection'):
-            summary_services.require_activities_to_be_public([
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
+        non_existent_exploration_id = 'non-existent exploration'
+        non_existent_collection_id = 'non-existent collection'
 
-    def test_requiring_private_activities_to_be_public_raises_exception(
+        non_existent_activity_ids = [
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                non_existent_exploration_id
+            ),
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_COLLECTION,
+                non_existent_collection_id
+            )
+        ]
+
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            non_existent_activity_ids
+        )
+
+        self.assertIn(
+            non_existent_exploration_id,
+            non_existent_exploration_ids
+        )
+        self.assertIn(
+            non_existent_collection_id,
+            non_existent_collection_ids
+        )
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
+
+    def test_checking_activity_id_validity_on_private_activities(
         self
     ) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -939,16 +965,28 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        with self.assertRaisesRegex(Exception, 'private exploration'):
-            summary_services.require_activities_to_be_public([
+        private_activity_ids = [
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
-        with self.assertRaisesRegex(Exception, 'private collection'):
-            summary_services.require_activities_to_be_public([
+                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)
+        ]
 
-    def test_requiring_public_activities_to_be_public_succeeds(self) -> None:
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            private_activity_ids
+        )
+
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertIn(self.EXP_ID_0, private_exploration_ids)
+        self.assertIn(self.COL_ID_2, private_collection_ids)
+
+    def test_checking_activity_id_validity_on_valid_activities(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
@@ -956,12 +994,26 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
-        # There are no validation errors.
-        summary_services.require_activities_to_be_public([
+        valid_activity_ids = [
             activity_domain.ActivityReference(
                 constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)
+        ]
+
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            valid_activity_ids
+        )
+
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
 
 
 class CollectionNodeMetadataDictsTest(

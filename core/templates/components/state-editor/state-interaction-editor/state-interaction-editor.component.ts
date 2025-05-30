@@ -51,8 +51,8 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {State} from 'domain/state/StateObjectFactory';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 

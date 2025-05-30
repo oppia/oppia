@@ -505,7 +505,7 @@ URLS = [
         story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_NAME_HANDLER,
-        topic_editor.TopicNameHandler),
+        topic_viewer.TopicNameHandler),
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),

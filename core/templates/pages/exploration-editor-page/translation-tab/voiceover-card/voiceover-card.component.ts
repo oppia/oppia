@@ -51,6 +51,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {AppConstants} from 'app.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -111,7 +112,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private explorationStatesService: ExplorationStatesService
   ) {}
 
   ngOnInit(): void {
@@ -147,6 +149,15 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         }
       )
     );
+    this.voiceoversAreLoaded =
+      Object.keys(
+        this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
+      ).length !== 0;
+
+    if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
+      this.voiceoversAreLoaded = true;
+      this.unsupportedLanguageCode = true;
+    }
 
     this.directiveSubscriptions.add(
       this.entityVoiceoversService.onVoiceoverLoad.subscribe(() => {
@@ -618,7 +629,17 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   isContentAvaiableForVoiceover(): boolean {
     if (this.languageCode === 'en') {
-      return true;
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      let state = this.explorationStatesService.getState(
+        activeStateName as string
+      );
+      let contentIdToHtml = state.getContentIdToContents();
+
+      if (contentIdToHtml[this.activeContentId]) {
+        return true;
+      }
+
+      return false;
     }
 
     return Boolean(

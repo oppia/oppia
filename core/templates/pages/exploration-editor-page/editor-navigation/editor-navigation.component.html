@@ -9,7 +9,7 @@
         </a>
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
         <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'uib-dropdown': countWarnings()}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
               <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
@@ -56,7 +56,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-history-button" [ngClass]="{'active': getActiveTabName() === 'history'}">
             <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
                class="oppia-exploration-editor-tabs-dropdown-element">
@@ -312,5 +312,7 @@
   .publish-button {
     background-color: #419889;
     color: #fff;
+    position: relative;
+    z-index: 1041;
   }
 </style>
