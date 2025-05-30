@@ -50,7 +50,6 @@ class RedisClient:
         """Initializes the client by fetching redis model if the client is not
         initialized.
         """
-
         if self._is_client_initialized:
             return
 
