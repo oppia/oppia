@@ -66,6 +66,8 @@ This class must implement the following methods:
 """
 
 
+# TODO(oppia-web-developer-docs#464): Create wiki page for pointers on writing
+# validation jobs.
 class BaseValidationJob(base_jobs.JobBase):
     """Base class for all validation jobs."""
 
