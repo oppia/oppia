@@ -238,6 +238,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     exp_id: Optional[str]
     blog_post_title: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
+    redis_host: Optional[str]
 
 
 class AdminHandler(

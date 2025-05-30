@@ -23,7 +23,7 @@ from core.domain import caching_domain
 from core.platform import models
 
 import redis
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -43,8 +43,8 @@ class RedisClient:
         self._is_client_initialized = False
         self._redis_model: Optional[
             redis_client_models.RedisClientModel] = None
-        self._oppia_redis_client: Optional[redis.StrictRedis] = None
-        self._cloud_ndb_redis_client: Optional[redis.StrictRedis] = None
+        self._oppia_redis_client: Optional[redis.Redis[Any]] = None
+        self._cloud_ndb_redis_client: Optional[redis.Redis[Any]] = None
 
     def _initialize_client(self) -> None:
         if self._is_client_initialized:
@@ -57,7 +57,7 @@ class RedisClient:
                 )
             )
 
-        if self._redis_model:
+        if self._redis_model is not None:
             self._oppia_redis_client = redis.StrictRedis(
                 host=self._redis_model.redishost,
                 port=feconf.REDISPORT,
@@ -71,11 +71,11 @@ class RedisClient:
             )
         self._is_client_initialized = True
 
-    def get_oppia_redis_client(self) -> redis.StrictRedis:
+    def get_oppia_redis_client(self) -> Optional[redis.Redis[Any]]:
         self._initialize_client()
         return self._oppia_redis_client
 
-    def get_cloud_ndb_redis_client(self) -> redis.StrictRedis:
+    def get_cloud_ndb_redis_client(self) -> Optional[redis.Redis[Any]]:
         self._initialize_client()
         return self._cloud_ndb_redis_client
 

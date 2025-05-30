@@ -31,7 +31,7 @@ from scripts import common
 class RedisCacheServicesUnitTests(test_utils.TestBase):
     """Tests for redis_cache_services."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         redis_services.update_redis_host("localhost")
 
