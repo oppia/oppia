@@ -126,12 +126,6 @@ describe('State Name Editor component', () => {
             content_id: 'content',
             html: 'First State Content',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -163,12 +157,6 @@ describe('State Name Editor component', () => {
             content_id: 'content',
             html: 'Second State Content',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -199,12 +187,6 @@ describe('State Name Editor component', () => {
           content: {
             content_id: 'content',
             html: 'This is some content.',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
           },
           interaction: {
             confirmed_unclassified_answers: [],

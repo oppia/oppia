@@ -156,15 +156,6 @@ describe('Question Validation Service', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {},
-          },
-        },
         solicit_answer_details: false,
       },
       language_code: 'en',

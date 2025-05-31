@@ -71,9 +71,6 @@ describe('State Interaction Stats Service', () => {
         content_id: 'content',
         html: 'content',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
       interaction: {
         answer_groups: [
           {
