@@ -5531,10 +5531,10 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         subtopic_data_url = (
             '/mock_subtopic_data/<classroom_url_fragment>/'
             '<topic_url_fragment>/<subtopic_url_fragment>')
-        studyguide_url_fragment = 'studyguide/<subtopic_url_fragment>'
         subtopic_page_url = (
-            '/mock_subtopic_page/<classroom_url_fragment>/<topic_url_fragment>/%s'
-            % studyguide_url_fragment)
+            '/mock_subtopic_page/<classroom_url_fragment>/'
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
