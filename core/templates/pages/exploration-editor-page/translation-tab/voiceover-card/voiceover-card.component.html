@@ -1,27 +1,36 @@
 <mat-card>
   <h3>Voiceovers</h3>
-  <div *ngIf="pageIsLoaded">
+  <div *ngIf="voiceoversAreLoaded">
     <div *ngIf="unsupportedLanguageCode">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
         Please contact a server admin for more details.
       </i>
     </div>
+    <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers">
+      <i>
+        There is no content available for voiceover in the selected language.
+      </i>
+    </div>
   </div>
 
-  <div *ngIf="pageIsLoaded && voiceoversAreLoaded && !unsupportedLanguageCode">
+  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode">
     <div class="manual-voiceovers">
+      <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
-        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename)">
-          <mat-icon *ngIf="!audioPlayerService.isPlaying()" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="audioPlayerService.isPlaying()" matTooltip="Pause">pause_arrow</mat-icon>
+        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
+          <mat-icon *ngIf="!isManualVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isManualVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
         </button>
+
         <mat-progress-bar mode="determinate"
-                          [value]="voiceoverProgress"
+                          [value]="manualVoiceoverProgress"
                           class="voiceover-progress">
         </mat-progress-bar>
+
         <span class="voiceover-timer">
-          {{currentVoiceoverDuration | formatTime}} / {{manualVoiceoverDuration | formatTime}}
+          {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
+
         <button (click)="deleteManualVoiceover()"
                 mat-icon-button
                 mat-button>
@@ -42,11 +51,73 @@
           </mat-icon>
         </button>
       </div>
+
       <div *ngIf="manualVoiceover">
         <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
-        <button (click)="addManualVoiceover()" class="add-manual-voiceover-button e2e-test-voiceover-upload-audio">ADD MANUAL VOICEOVER</button>
+        <button (click)="addManualVoiceover()"
+                class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
+                [disabled]="!contentAvailableForVoiceovers">
+          ADD MANUAL VOICEOVER
+        </button>
+      </div>
+    </div>
+
+    <div class="automatic-voiceovers"
+         *ngIf="isVoiceoverAutogenerationSupportedForSelectedAccent && isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
+      <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
+      <div class="voiceovers-component" *ngIf="automaticVoiceover">
+        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
+          <mat-icon *ngIf="!isAutomaticVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isAutomaticVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
+        </button>
+        <mat-progress-bar mode="determinate"
+                          [value]="automaticVoiceoverProgress"
+                          class="voiceover-progress">
+        </mat-progress-bar>
+        <span class="voiceover-timer">
+          {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
+        </span>
+        <button (click)="generateVoiceover()"
+                mat-icon-button
+                mat-button
+                *ngIf="!isAutomaticVoiceoverGenerating"
+                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
+          <mat-icon matTooltip="Regenerate voiceover">sync</mat-icon>
+        </button>
+        <div *ngIf="isAutomaticVoiceoverGenerating">
+          <mat-icon class="rotating">rotate_right</mat-icon>
+        </div>
+        <button mat-icon-button
+                mat-button
+                [ngClass]="automaticVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
+          <mat-icon matTooltip="Audio needs update"
+                    *ngIf="automaticVoiceover.needsUpdate"
+                    class="warning-icon">
+            warning
+          </mat-icon>
+          <mat-icon matTooltip="Audio is up-to-date"
+                    *ngIf="!automaticVoiceover.needsUpdate">
+            check_circle
+          </mat-icon>
+        </button>
+      </div>
+      <div class="add-new-manual-voiceovers" *ngIf="!automaticVoiceover">
+        <button (click)="generateVoiceover()"
+                class="add-automatic-voiceover-button"
+                *ngIf="!isAutomaticVoiceoverGenerating"
+                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
+          GENERATE AUTOMATIC VOICEOVER
+        </button>
+        <div *ngIf="isAutomaticVoiceoverGenerating">
+          <span>Generating voiceover</span>
+          <mat-icon class="rotating">rotate_right</mat-icon>
+        </div>
+      </div>
+      <div class="automatic-voiceover-enable-instruction"
+           *ngIf="!isGenerateAutomaticVoiceoverOptionEnabled">
+        Save all the draft changes to activate the Generate Automatic Voiceovers button.
       </div>
     </div>
   </div>
@@ -58,6 +129,25 @@
 </mat-card>
 
 <style>
+  .voiceover-type-heading {
+    font-weight: bold;
+    margin: 2%;
+  }
+  .rotating {
+    animation: rotate 2s linear infinite;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .automatic-voiceover-enable-instruction {
+    color: #f00;
+  }
   .warning-icon {
     margin-bottom: 4px;
   }
@@ -98,5 +188,17 @@
     color: #009688;
     height: 40px;
     width: 100%;
+  }
+  .add-manual-voiceover-button:disabled {
+    color: #a1c5c3;
+  }
+  .add-automatic-voiceover-button {
+    border-style: dashed;
+    color: #009688;
+    height: 40px;
+    width: 100%;
+  }
+  .add-automatic-voiceover-button:disabled {
+    color: #a1c5c3;
   }
 </style>

@@ -1040,6 +1040,8 @@ CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
 VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover/<exploration_id>')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

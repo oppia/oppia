@@ -52,6 +52,7 @@ import {
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -99,7 +100,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -196,9 +198,18 @@ export class TranslatorOverviewComponent implements OnInit {
         this.entityVoiceoversService.setLanguageCode(this.languageCode);
         this.localStorageService.setLastSelectedLanguageAccentCode('');
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.updateLanguageAccentCodesDropdownOptions();
+
+          this.translationLanguageService.setActiveLanguageCode(
+            this.languageCode
+          );
+          this.translationStatusService.refresh();
+          this.windowRef.nativeWindow.localStorage.setItem(
+            this.LAST_SELECTED_TRANSLATION_LANGUAGE,
+            this.languageCode
+          );
           this.routerService.onCenterGraph.emit();
           this.loaderService.hideLoadingScreen();
-          this.updateLanguageAccentCodesDropdownOptions();
         });
       });
   }
@@ -301,21 +312,28 @@ export class TranslatorOverviewComponent implements OnInit {
         this.inVoiceoverMode = false;
         this.refreshDirectiveScope();
       });
+
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
 
     this.voiceoverBackendApiService
       .fetchVoiceoverAdminDataAsync()
-      .then(voiceoverLanguages => {
-        this.languageAccentMasterList =
-          voiceoverLanguages.languageAccentMasterList;
-        this.languageCodesMapping = voiceoverLanguages.languageCodesMapping;
-        this.updateLanguageAccentCodesDropdownOptions();
+      .then(response => {
+        this.voiceoverLanguageManagementService.init(
+          response.languageAccentMasterList,
+          response.autoGeneratableLanguageAccentCodes,
+          response.languageCodesMapping
+        );
+
+        this.languageAccentMasterList = response.languageAccentMasterList;
+        this.languageCodesMapping = response.languageCodesMapping;
+
         this.voiceoverPlayerService.languageAccentMasterList =
           this.languageAccentMasterList;
         this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
           this.languageCode,
           this.entityVoiceoversService.getLanguageAccentCodes()
         );
+
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
           this.updateLanguageAccentCodesDropdownOptions();
         });
@@ -358,14 +376,12 @@ export class TranslatorOverviewComponent implements OnInit {
 
     if (
       lastSelectedLanguageAccentCode !== 'undefined' &&
-      lastSelectedLanguageAccentCode !== ''
+      lastSelectedLanguageAccentCode !== '' &&
+      lastSelectedLanguageAccentCode !== 'null'
     ) {
       this.selectedLanguageAccentCode = lastSelectedLanguageAccentCode;
     } else {
       this.selectedLanguageAccentCode = firstLanguageAccentCode;
-      this.localStorageService.setLastSelectedLanguageAccentCode(
-        firstLanguageAccentCode
-      );
     }
     this.updateLanguageAccentCode(this.selectedLanguageAccentCode);
   }

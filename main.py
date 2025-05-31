@@ -505,7 +505,7 @@ URLS = [
         story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_NAME_HANDLER,
-        topic_editor.TopicNameHandler),
+        topic_viewer.TopicNameHandler),
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
@@ -566,6 +566,10 @@ URLS = [
         r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+        voiceover.RegenerateAutomaticVoiceoverHandler
     ),
 
     get_redirect_route(
