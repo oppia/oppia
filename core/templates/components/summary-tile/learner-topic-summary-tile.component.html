@@ -13,7 +13,10 @@
         </span>
         <div class="oppia-topic-lessons">
           {{ totalPublishedNodeCount }}
-          <span translate="I8N_COUNT_OF_LESSONS" translate-values="{lessonCountValue:<[totalPublishedNodeCount]>}" translate-interpolation="messageformat"></span>
+          <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
+          lessonCountValue: totalPublishedNodeCount,
+          messageFormat: true
+        }"></span>
         </div>
       </div>
     </a>
@@ -28,7 +31,10 @@
       </p>
       <p class="oppia-class-card-text">
         {{ totalPublishedNodeCount }}
-        <span translate="I8N_COUNT_OF_LESSONS" translate-values="{lessonCountValue:<[totalPublishedNodeCount]>}" translate-interpolation="messageformat"></span>
+        <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
+          lessonCountValue: totalPublishedNodeCount,
+          messageFormat: true
+        }"></span>
       </p>
     </div>
   </a>
