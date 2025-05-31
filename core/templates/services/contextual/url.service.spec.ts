@@ -197,7 +197,8 @@ describe('Url Service', () => {
   it('should correctly retrieve subtopic url fragment from url', () => {
     mockLocation.pathname = '/learn/math/fractions/studyguide/xyz';
     expect(urlService.getSubtopicUrlFragmentFromLearnerUrl()).toBe('xyz');
-    mockLocation.pathname = '/learn/math/topic-name/studyguide/negative-numbers';
+    mockLocation.pathname =
+      '/learn/math/topic-name/studyguide/negative-numbers';
     expect(urlService.getSubtopicUrlFragmentFromLearnerUrl()).toBe(
       'negative-numbers'
     );

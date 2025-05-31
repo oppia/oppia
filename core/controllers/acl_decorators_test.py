@@ -5603,7 +5603,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/studyguide/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/'+
+                'studyguide/sub-one-frag',
                 expected_status_int=200)
 
     def test_fall_back_to_studyguide_page_if_subtopic_url_frag_is_invalid(
@@ -5627,7 +5628,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             subtopic_page_services, 'get_subtopic_page_by_id', None)
         with testapp_swap, subtopic_swap:
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/studyguide/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/'+
+                'studyguide/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic-frag/studyguide',
@@ -5639,7 +5641,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/invalid-topic/studyguide/sub-one-frag',
+                '/mock_subtopic_page/math/invalid-topic/'+
+                'studyguide/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
@@ -5660,7 +5663,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/studyguide/Sub-One-Frag',
+                '/mock_subtopic_page/staging/topic-frag/'+
+                'studyguide/Sub-One-Frag',
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic-frag/studyguide'
