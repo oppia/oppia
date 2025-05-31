@@ -6259,7 +6259,7 @@ export default {
   // 'story URL fragment'.
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
   // This represents the maximum number of characters in the URL fragment for
-  // subtopic in the revision page URL. E.g.
+  // subtopic in the studyguide page URL. E.g.
   // in /learn/math/fractions/studyguide/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,

@@ -21,12 +21,7 @@
         {{ topicNameTranslationKey | translate }}
       </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}
-      <span *ngIf="topicSummary.getTotalPublishedNodeCount() === 1">
-        <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }}</span>
-      </span>
-      <span *ngIf="topicSummary.getTotalPublishedNodeCount() !== 1">
-        <span>{{ 'I18N_TOPIC_VIEWER_LESSONS' | translate }}</span>
-      </span>
+      <span translate="I8N_COUNT_OF_LESSONS" translate-values="{lessonCountValue:<[topicSummary.getTotalPublishedNodeCount()]>}" translate-interpolation="messageformat"></span>
     </div>
   </a>
 </div>
