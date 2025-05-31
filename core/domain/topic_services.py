@@ -1411,26 +1411,6 @@ def check_can_edit_question(
     )
 
 
-def check_can_delete_question(
-        user: user_domain.UserActionsInfo,
-        topic_rights: Optional[topic_domain.TopicRights]
-) -> bool:
-    """Checks whether the user can delete the questions.
-
-    Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-        topic_rights: TopicRights or None. Rights object for the given topic.
-
-    Returns:
-        bool. Whether the given user can delete the question.
-    """
-    return topic_rights is not None and (
-        role_services.ACTION_DELETE_ANY_QUESTION in user.actions or (
-        role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC in user.actions
-        and check_can_edit_topic(user, topic_rights)))
-
-
 def deassign_user_from_all_topics(
     committer: user_domain.UserActionsInfo, user_id: str
 ) -> None:
