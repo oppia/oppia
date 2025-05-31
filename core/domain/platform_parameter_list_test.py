@@ -38,8 +38,8 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'es_cloud_id',
                             'es_username',
                             'high_bounce_rate_task_minimum_exploration_starts',
-                            'high_bounce_rate_task_state_bounce_rate_creation_threshold',  # pylint: disable=line-too-long
-                            'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold',# pylint: disable=line-too-long
+                            'high_bounce_rate_task_state_bounce_rate_creation_threshold',   # pylint: disable=line-too-long
+                            'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold', # pylint: disable=line-too-long
                             'mailchimp_audience_id',
                             'mailchimp_username',
                             'mailgun_domain_name',

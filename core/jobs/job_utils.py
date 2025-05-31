@@ -67,7 +67,8 @@ def clone_model(
     # Pylint doesn't like that we call __get__() directly, but we have to in
     # order to specify its arguments model and cls.
     props = {
-        k: v.__get__(model, cls) for k, v in cls._properties.items() # fmt: skip # pylint: disable=protected-access,unnecessary-dunder-call, line-too-long
+        k: v.__get__(model, cls) # pylint: disable=unnecessary-dunder-call
+        for k, v in cls._properties.items() # pylint: disable=protected-access
     }
     props.update(new_values)
     with datastore_services.get_ndb_context():
@@ -100,7 +101,7 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     # separate workers and some parts of the jobs are probably not available
     # to all the workers.
     models.Registry.get_all_storage_model_classes()
-    return datastore_services.Model._lookup_model( # fmt: skip # pylint: disable=protected-access, line-too-long
+    return datastore_services.Model._lookup_model( # pylint: disable=protected-access
         kind
     )
 
@@ -128,7 +129,7 @@ def get_model_kind(
     if isinstance(model, datastore_services.Model) or (
             isinstance(model, type) and
             issubclass(model, datastore_services.Model)):
-        return model._get_kind()  # fmt: skip # pylint: disable=protected-access, line-too-long
+        return model._get_kind() # pylint: disable=protected-access
     else:
         raise TypeError('%r is not a model type or instance' % model)
 
@@ -193,7 +194,7 @@ def get_beam_entity_from_ndb_model(
     # a functionality that we need and writing it ourselves would be
     # too complicated.
     with datastore_services.get_ndb_context():
-        model_to_put = ndb_model._entity_to_ds_entity( # fmt: skip # pylint: disable=protected-access, line-too-long
+        model_to_put = ndb_model._entity_to_ds_entity( # pylint: disable=protected-access
             model
     )
     return beam_datastore_types.Entity.from_client_entity(model_to_put)
@@ -230,7 +231,7 @@ def get_ndb_key_from_beam_key(
     Returns:
         datastore_services.Key. The NDB key.
     """
-    return datastore_services.Key._from_ds_key( # fmt: skip # pylint: disable=protected-access, line-too-long
+    return datastore_services.Key._from_ds_key( # pylint: disable=protected-access
         beam_key.to_client_key()
     )
 
@@ -318,7 +319,11 @@ def _get_beam_filters_from_ndb_node(
             beam_filters.extend(_get_beam_filters_from_ndb_node(n))
     elif isinstance(node, ndb_query.FilterNode):
         beam_filters.append(
-            (node._name, node._opsymbol, node._value) # pylint: disable=protected-access
+            (
+                node._name, # pylint: disable=protected-access
+                node._opsymbol, # pylint: disable=protected-access
+                node._value # pylint: disable=protected-access
+            )
     )
     else:
         raise TypeError(

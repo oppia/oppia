@@ -435,7 +435,8 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                 lambda result: result.is_ok())
             | 'Fetch the models to be put' >> beam.FlatMap(
                 lambda result: result.unwrap())
-            | 'Add ID as a key' >> beam.WithKeys( # fmt: skip # pylint: disable=no-value-for-parameter, line-too-long
+            | 'Add ID as a key'
+            >> beam.WithKeys( # pylint: disable=no-value-for-parameter
                 lambda model: model.id
             )
             | 'Allow only one item per key' >> (

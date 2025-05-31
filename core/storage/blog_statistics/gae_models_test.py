@@ -114,7 +114,8 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
         def mock_convert_to_hash(
-                input_string: str, max_length: int # fmt: skip # pylint: disable=unused-argument, line-too-long
+                input_string: str, # pylint: disable=unused-argument
+                max_length: int, # pylint: disable=unused-argument
         ) -> str:
             return rand_hash
         with self.swap(
@@ -226,7 +227,8 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         rand_hash = '123456789123'
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         def mock_convert_to_hash(
-            input_string: str, max_length: int # fmt: skip # pylint: disable=unused-argument, line-too-long
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int, # pylint: disable=unused-argument
         ) -> str:
             return rand_hash
         with self.swap(
@@ -357,7 +359,9 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
         def mock_convert_to_hash(
-            input_string: str, max_length: int) -> str: # fmt: skip # pylint: disable=unused-argument, line-too-long
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int, # pylint: disable=unused-argument
+        ) -> str:
             return rand_hash
         with self.swap(
             utils,

@@ -387,7 +387,8 @@ class BlogPostRightsModel(base_models.BaseModel):
         """
         query = cls.query(
             cls.editor_ids == user_id,
-            cls.blog_post_is_published == True # fmt: skip # pylint: disable=singleton-comparison,line-too-long
+            cls.blog_post_is_published # pylint: disable=singleton-comparison
+            == True
         ).order(-cls.last_updated)
         return list(
             query.fetch(
@@ -417,7 +418,8 @@ class BlogPostRightsModel(base_models.BaseModel):
         """
         query = cls.query(
             cls.editor_ids == user_id,
-            cls.blog_post_is_published == False # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+            cls.blog_post_is_published # pylint: disable=singleton-comparison
+            == False
         ).order(-cls.last_updated)
         return list(
             query.fetch(limit) if limit is not None else query.fetch()

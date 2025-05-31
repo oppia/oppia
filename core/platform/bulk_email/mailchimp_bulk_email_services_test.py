@@ -187,7 +187,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email = 'test@example.com'
         subscriber_hash = '55502f40dc8b7c769880b10874abc9d0'
         self.assertEqual(
-            mailchimp_bulk_email_services._get_subscriber_hash( # fmt: skip # pylint: disable=protected-access, line-too-long
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
                 sample_email
             ),
             subscriber_hash,
@@ -200,7 +200,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email_2 = 5
         with self.assertRaisesRegex(
             Exception, 'Invalid type for email. Expected string, received 5'):
-            mailchimp_bulk_email_services._get_subscriber_hash( # fmt: skip # pylint: disable=protected-access
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
                 sample_email_2 # type: ignore[arg-type]
             )
 

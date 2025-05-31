@@ -2922,7 +2922,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         reviewer_keys = cls.query(
-            cls.can_review_questions == True # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+            cls.can_review_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -2935,7 +2936,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         contributor_keys = cls.query(
-            cls.can_submit_questions == True # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+            cls.can_submit_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [contributor_key.id() for contributor_key in contributor_keys]
 

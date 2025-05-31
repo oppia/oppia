@@ -144,7 +144,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 'max_age must be a datetime.timedelta instance or None.')
 
         query = cls.query(
-            cls.post_commit_is_private == False # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+            cls.post_commit_is_private # pylint: disable=singleton-comparison
+            == False
         )
         if max_age:
             query = query.filter(

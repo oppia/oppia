@@ -368,10 +368,12 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
         for field in ['translator_ids', 'all_viewer_ids']:
             self.assertNotIn(
-                field, exp_rights_model._properties # fmt: skip # pylint: disable=protected-access, line-too-long
+                field,
+                exp_rights_model._properties # pylint: disable=protected-access
             )
             self.assertNotIn(
-                field, exp_rights_model._values # fmt: skip # pylint: disable=protected-access, line-too-long
+                field,
+                exp_rights_model._values # pylint: disable=protected-access
             )
 
 

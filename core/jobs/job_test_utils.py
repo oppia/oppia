@@ -146,7 +146,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         """
         property_values = {
             p._name: p._default # pylint: disable=protected-access
-            for p in model_class._properties.values() # fmt: skip # pylint: disable=protected-access, line-too-long
+            for p in model_class._properties.values() # pylint: disable=protected-access
             if p._required # pylint: disable=protected-access
         }
         property_values['created_on'] = self.YEAR_AGO

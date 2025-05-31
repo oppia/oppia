@@ -495,7 +495,9 @@ class BaseModel(datastore_services.Model):
         return (
             cls.query()
             if include_deleted
-            else cls.query().filter(cls.deleted == False) # fmt: skip # pylint: disable=singleton-comparison, line-too-long
+            else cls.query().filter(
+                cls.deleted == False # pylint: disable=singleton-comparison
+            )
         )
 
     @classmethod

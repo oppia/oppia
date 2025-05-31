@@ -80,10 +80,12 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict = collection_model.convert_to_valid_dict(snapshot_dict)
         collection_model = collection_models.CollectionModel(**snapshot_dict)
         self.assertNotIn(
-            'nodes', collection_model._properties # fmt: skip # pylint: disable=protected-access, line-too-long
+            'nodes', 
+            collection_model._properties # pylint: disable=protected-access
         )
         self.assertNotIn(
-            'nodes', collection_model._values # fmt: skip # pylint: disable=protected-access, line-too-long
+            'nodes', 
+            collection_model._values # pylint: disable=protected-access
         )
 
 
