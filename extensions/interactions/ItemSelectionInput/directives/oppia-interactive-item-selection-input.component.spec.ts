@@ -521,4 +521,22 @@ describe('oppiaInteractiveItemSelectionInput', function () {
       }
     );
   });
+
+  it('should call submitAnswer when Enter key is pressed', () => {
+    component.userSelections = {
+      'choice 1': true,
+    };
+    component.choices = ['choice 1', 'choice 2'];
+    component.choicesValue = [
+      SubtitledHtml.createDefault('choice 1', 'content_id_1'),
+    ];
+    spyOn(component, 'submitAnswer').and.callThrough();
+    spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.handleEnterKey(event);
+
+    expect(component.submitAnswer).toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
+  });
 });
