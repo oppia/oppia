@@ -204,7 +204,7 @@ class BlogPostModel(base_models.BaseModel):
             datastore_services.all_of(
                 cls.url_fragment == url_fragment,
                 cls.deleted == False # pylint: disable=singleton-comparison
-        )
+            )
         ).get()
 
     @classmethod

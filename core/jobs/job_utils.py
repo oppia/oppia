@@ -324,7 +324,7 @@ def _get_beam_filters_from_ndb_node(
                 node._opsymbol, # pylint: disable=protected-access
                 node._value # pylint: disable=protected-access
             )
-    )
+        )
     else:
         raise TypeError(
             '`!=`, `IN`, and `OR` are forbidden filters. To emulate their '

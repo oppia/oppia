@@ -127,8 +127,8 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 exp_id = snapshot_model.get_unversioned_instance_id()
                 model_class = exp_models.ExplorationModel
                 reconstituted_model = (
-                model_class( # pylint: disable=protected-access
-                    id=exp_id
+                    model_class( # pylint: disable=protected-access
+                        id=exp_id
                     )._reconstitute(snapshot_dict)
                 )
                 reconstituted_model.created_on = snapshot_model.created_on
@@ -940,7 +940,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 model_class = exp_models.ExplorationModel
                 reconstituted_model = (
                     model_class( # pylint: disable=protected-access
-                    id=exp_id
+                        id=exp_id
                     )._reconstitute(snapshot_dict)
                 )
                 reconstituted_model.created_on = snapshot_model.created_on

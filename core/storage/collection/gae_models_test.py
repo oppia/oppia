@@ -353,10 +353,12 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_rights_model = collection_models.CollectionRightsModel(
             **snapshot_dict)
         self.assertNotIn(
-            'translator_ids', collection_rights_model._properties # fmt: skip # pylint: disable=protected-access, line-too-long
+            'translator_ids', 
+            collection_rights_model._properties # pylint: disable=protected-access
         )
         self.assertNotIn(
-            'translator_ids', collection_rights_model._values # fmt: skip # pylint: disable=protected-access, line-too-long
+            'translator_ids', 
+            collection_rights_model._values # pylint: disable=protected-access
         )
 
 
