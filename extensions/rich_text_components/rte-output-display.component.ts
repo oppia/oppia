@@ -563,7 +563,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         );
         this.automaticVoiceoverHighlightService.languageCode =
           this.localStorageService.getLastSelectedTranslationLanguageCode();
-        this.automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap(
+        this.automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
           this.highlighIdToSentenceText
         );
         this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
