@@ -1966,10 +1966,6 @@ export class LoggedInUser extends BaseUser {
     if (topicCardElement) {
       await topicCardElement.click();
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-      await this.expectToBeOnPage(
-        `learn/math/${topic.toLowerCase().replace(/\s+/g, '-')}`
-      );
-      showMessage(`Navigated to ${topic} from learner dashboard.`);
     } else {
       throw new Error(`${topic} is not a valid topic`);
     }

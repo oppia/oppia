@@ -132,6 +132,8 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTopicPageByCard('Place Values');
+      await loggedInUser.expectToBeOnPage('learn/math/place-values');
+      showMessage('Navigated to Place Values topic from learner dashboard.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
