@@ -296,7 +296,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Cannot get activity rights for unknown activity'
         ):
-            rights_manager._get_activity_rights( # pylint: disable=protected-access, line-too-long
+            rights_manager._get_activity_rights( # pylint: disable=protected-access
                 'invalid_type', 
                 self.user_id_a
             )

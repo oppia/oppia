@@ -370,13 +370,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_find_prerequisite_skill_id_index(self) -> None:
         # Disabling pylint protected access because this is a test.
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access, line-too-long
-                'skill_id_2'),
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_2'
+            ),
             0
         )
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access, line-too-long
-                'skill_id_3'),
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_3'
+            ),
             None
         )
 

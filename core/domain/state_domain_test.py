@@ -2136,10 +2136,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         def mock_get_html_field_types_to_rule_specs(
             unused_cls: Type[ # pylint: disable=unused-argument
                 state_domain.State
-                ],
+            ],
             state_schema_version: Optional[ # pylint: disable=unused-argument
                 int
-                ] = None
+            ] = None
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
