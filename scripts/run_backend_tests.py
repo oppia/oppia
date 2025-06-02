@@ -654,7 +654,9 @@ def check_coverage(
 
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
-         'core/jobs/batch_jobs/contributor_admin_stats_jobs.py']
+         '--omit="%s*","third_party/*","/usr/share/*"'
+         % common.OPPIA_TOOLS_DIR, '--show-missing',
+         '--skip-covered']
     if include:
         cmd.append('--include=%s' % ','.join(include))
 
@@ -681,12 +683,6 @@ def check_coverage(
         coverage = (
             float(coverage_result.group('total')) if coverage_result else 0.0
         )
-
-    generate_html_cmd = [
-        'coverage', 'html', 'core/jobs/batch_jobs/contributor_admin_stats_jobs.py']
-    subprocess.run(
-        generate_html_cmd, capture_output=True, encoding='utf-8', env=env,
-        check=False)
 
     return process.stdout, coverage
 
