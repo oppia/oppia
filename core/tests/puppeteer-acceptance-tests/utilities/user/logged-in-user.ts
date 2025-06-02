@@ -2023,9 +2023,9 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies lesson card navigates to correct lesson.
+   * Navigates to lesson using lesson card.
    * @param {string} criteria - Subsection title value to match.
-   * @param {string} lessonTitle - Lesson card titles expected.
+   * @param {string} lessonTitle - Lesson card title expected.
    * @param {string} lessonId - Lesson card id expected.
    * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
@@ -2052,17 +2052,28 @@ export class LoggedInUser extends BaseUser {
       );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
-        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-        expect(`/explore/${lessonId}`.toLowerCase()).toBe(
-          new URL(this.page.url()).pathname.toLowerCase()
-        );
-        showMessage(`Navigated to ${lessonTitle} from learner dashboard.`);
       }
     } else {
       throw new Error(
         `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
       );
     }
+  }
+
+  /**
+   * Verifies user is on correct lesson page.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} lessonId - Lesson card id expected.
+   */
+  async expectToBeOnLessonPage(
+    lessonTitle: string,
+    lessonId: string
+  ): Promise<void> {
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    expect(`/explore/${lessonId}`.toLowerCase()).toBe(
+      new URL(this.page.url()).pathname.toLowerCase()
+    );
+    showMessage(`Navigated to ${lessonTitle}`);
   }
 }
 

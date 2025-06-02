@@ -167,6 +167,11 @@ describe('Logged-in User', function () {
         'Chapter 1: What are the Place Values',
         chapterIds[0]
       );
+
+      await loggedInUser.expectToBeOnLessonPage(
+        'Chapter 1: What are the Place Values',
+        chapterIds[0]
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
