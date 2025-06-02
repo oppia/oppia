@@ -31,6 +31,7 @@ import {ContextService} from 'services/context.service';
 export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
   private filenamesOfAudioToBeDownloaded: string[] = [];
+  public contentIdsToVoiceovers: {[contentId: string]: Voiceover[]} = {};
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -40,7 +41,6 @@ export class AudioPreloaderService {
   // The following property can be null, when there is no recently
   // requested audio filename.
   private mostRecentlyRequestedAudioFilename: string | null = null;
-  public contentIdsToVoiceovers: {[contentIddd: string]: Voiceover[]} = {};
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
