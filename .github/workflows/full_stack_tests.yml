@@ -114,7 +114,7 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=0
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance test logs
         if: ${{ failure() }}
@@ -144,7 +144,7 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload desktop acceptance retry test logs
         if: ${{ failure() }}
@@ -171,7 +171,7 @@ jobs:
           set -o pipefail;
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
-          --prod_env --mobile --server_log_level=info
+          --prod_env --mobile
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
@@ -194,7 +194,7 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build
-          --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
+          --suite=${{ matrix.suite.name }} --prod_env --mobile
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
