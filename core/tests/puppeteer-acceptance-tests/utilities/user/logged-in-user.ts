@@ -191,6 +191,8 @@ const goalsTabSectionInLearnerDashboard = 'e2e-test-current-goals-section';
 // Preferences page selectors.
 const deleteAccountPage = '.acceptance-test-delete-account';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
+const subjectInterestTagsInPreferencesPage =
+  '.acceptance-test-subject-interest-chip';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -690,7 +692,6 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  // TODO: NOPP
   /**
   /**
    * Adds a lesson to the 'Play Later' list from community library page.
@@ -734,6 +735,11 @@ export class LoggedInUser extends BaseUser {
         );
         await addToPlayLaterButtons[lessonIndex].click();
       }
+
+      // TODO: Verify if post check is proper.
+      await this.expectToolTipMessage(
+        "Successfully added to your 'Play Later' list."
+      );
 
       showMessage(`Lesson "${lessonTitle}" added to 'Play Later' list.`);
     } catch (error) {
@@ -794,6 +800,12 @@ export class LoggedInUser extends BaseUser {
         searchResultsElements[lessonIndex]
       );
       await searchResultsElements[lessonIndex].click();
+
+      if (!this.page.url().includes('/explore/')) {
+        throw new Error(
+          `Failed to navigate to the lesson page for "${lessonName}".`
+        );
+      }
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
@@ -803,6 +815,7 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  // TODO: NOPP
   /**
    * Removes a lesson from the 'Play Later' list in the learner dashboard.
    * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
@@ -899,9 +912,16 @@ export class LoggedInUser extends BaseUser {
    * @param {string} picturePath - The path of the picture to upload.
    */
   async updateProfilePicture(picturePath: string): Promise<void> {
+    await this.page.waitForSelector(editProfilePictureButton, {
+      visible: true,
+    });
     await this.clickOn(editProfilePictureButton);
     await this.uploadFile(picturePath);
     await this.clickOn(addProfilePictureButton);
+
+    await this.page.waitForSelector(addProfilePictureButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -909,8 +929,19 @@ export class LoggedInUser extends BaseUser {
    * @param {string} bio - The new bio to set for the user.
    */
   async updateBio(bio: string): Promise<void> {
+    await this.page.waitForSelector(bioTextareaSelector, {
+      visible: true,
+    });
     await this.clickOn(bioTextareaSelector);
     await this.type(bioTextareaSelector, bio);
+
+    const updatedValue = await this.page.$eval(
+      bioTextareaSelector,
+      el => (el as HTMLTextAreaElement).value
+    );
+    if (updatedValue !== bio) {
+      throw new Error('Bio update failed');
+    }
   }
 
   /**
@@ -935,6 +966,14 @@ export class LoggedInUser extends BaseUser {
     const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
 
     await this.clickOn(dashboardSelector);
+
+    const isChecked = await this.page.$eval(
+      dashboardSelector,
+      el => (el as HTMLInputElement).checked
+    );
+    if (!isChecked) {
+      throw new Error(`Failed to select ${dashboard} radio button`);
+    }
   }
 
   /**
@@ -946,7 +985,17 @@ export class LoggedInUser extends BaseUser {
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
     }
+
+    // Post-check: ensure all interests are present as tags
+    for (const interest of interests) {
+      const tagSelector = `${subjectInterestTagsInPreferencesPage} >> text="${interest}"`;
+      const tag = await this.page.$(tagSelector);
+      if (!tag) {
+        throw new Error(`Subject interest "${interest}" not added`);
+      }
+    }
   }
+
   /**
    * Updates the user's subject interests in the preferences page
    * when the input field loses focus.
@@ -956,9 +1005,21 @@ export class LoggedInUser extends BaseUser {
   async updateSubjectInterestsWhenBlurringField(
     interests: string[]
   ): Promise<void> {
+    await this.page.waitForSelector(subjectInterestsInputSelector, {
+      visible: true,
+    });
     for (const interest of interests) {
       await this.type(subjectInterestsInputSelector, interest);
       await this.page.click(matFormTextSelector);
+    }
+
+    // Post-check: ensure all interests are present as tags
+    for (const interest of interests) {
+      const tagSelector = `${subjectInterestTagsInPreferencesPage} >> text="${interest}"`;
+      const tag = await this.page.$(tagSelector);
+      if (!tag) {
+        throw new Error(`Subject interest "${interest}" not added`);
+      }
     }
   }
 

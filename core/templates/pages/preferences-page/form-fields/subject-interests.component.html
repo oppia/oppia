@@ -4,6 +4,7 @@
   </mat-label>
   <mat-chip-list #chipList role="textbox">
     <mat-chip *ngFor="let subjectInterest of subjectInterests"
+              class="acceptance-test-subject-interest-chip"
               [selectable]="selectable"
               [removable]="removable"
               tabindex="-1"
