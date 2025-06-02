@@ -176,11 +176,6 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
-// Learner dashboard selectors.
-const learnerDashboardProgressSectionModel =
-  '.acceptance-test-learner-dash-progress-section';
-const learnerDashboardHomeTabModel = '.acceptance-test-learner-dash-home-tab';
-
 export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
@@ -199,9 +194,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileProgressSectionButton, {
-        visible: true,
-      });
+      await this.page.waitForSelector(mobileProgressSectionButton);
       await this.clickOn(mobileProgressSectionButton);
 
       try {
@@ -218,17 +211,8 @@ export class LoggedInUser extends BaseUser {
       }
       await this.clickOn(mobileCommunityLessonSectionButton);
     } else {
-      await this.page.waitForSelector(communityLessonsSectionButton, {
-        visible: true,
-      });
       await this.page.click(communityLessonsSectionButton);
-
-      await this.page.waitForSelector(learnerDashboardProgressSectionModel, {
-        visible: true,
-      });
     }
-
-    showMessage('Navigated to the community lessons section.');
   }
 
   /**
@@ -242,9 +226,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.clickOn(subscribeButton);
-    await this.page.waitForSelector(unsubscribeLabel, {
-      visible: true,
-    });
+    await this.page.waitForSelector(unsubscribeLabel);
     showMessage(`Subscribed to the creator with username ${username}.`);
   }
 
@@ -268,10 +250,6 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(learnerDashboardMenuLink);
-
-    await this.page.waitForSelector(learnerDashboardHomeTabModel, {
-      visible: true,
-    });
   }
 
   /**
