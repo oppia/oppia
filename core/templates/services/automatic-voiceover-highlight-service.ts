@@ -59,7 +59,7 @@ export class AutomaticVoiceoverHighlightService {
       automatedVoiceoversAudioOffsetsMsecs;
   }
 
-  setHighlightIdToSenetnceMap(highlightIdToSentenceMap: {
+  setHighlightIdToSenetenceMap(highlightIdToSentenceMap: {
     [highlightId: string]: string;
   }): void {
     this.highlightIdToSentenceMap = highlightIdToSentenceMap;

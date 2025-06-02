@@ -324,7 +324,7 @@ describe('RTE display component', () => {
       component,
       'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
     );
-    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSenetnceMap');
+    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSenetenceMap');
     spyOn(automaticVoiceoverHighlightService, 'setActiveContentId');
 
     let changes: SimpleChanges = {
@@ -348,7 +348,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
     ).not.toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
@@ -361,7 +361,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSenetnceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
     ).toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
