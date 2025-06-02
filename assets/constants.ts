@@ -7752,7 +7752,6 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
-
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
@@ -7804,5 +7803,14 @@ export default {
       "^2": "تربيع",
       "^3": "تكعيب"
     }
+  },
+  // Please consult the translation team before adding any entries here.
+  // These punctuation marks are used to identify sentence boundaries during
+  // voiceover playback.
+  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
+    "ar": "؟!",
+    "en": ".!?",
+    "pt": ".!?",
+    "hi": "।!?"
   }
 } as const;
