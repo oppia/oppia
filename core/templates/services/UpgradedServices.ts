@@ -211,7 +211,6 @@ import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFact
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamTypeObjectFactory} from 'domain/exploration/ParamTypeObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   PencilCodeEditorValidationService,
