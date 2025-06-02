@@ -176,6 +176,15 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+// Learner dashboard selectors.
+const communityLessonsSectionInLearnerDashboard =
+  '.acceptance-test-community-lessons-section';
+const homeTabSectionInLearnerDashboard =
+  '.acceptance-test-learner-dash-home-tab';
+const progressTabSectionInLearnerDashboard =
+  '.acceptance-test-learner-dash-progress-tab';
+const goalsTabSectionInLearnerDashboard = 'e2e-test-current-goals-section';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
@@ -211,7 +220,17 @@ export class LoggedInUser extends BaseUser {
       }
       await this.clickOn(mobileCommunityLessonSectionButton);
     } else {
+      await this.page.waitForSelector(progressSectionSelector, {
+        visible: true,
+      });
       await this.page.click(communityLessonsSectionButton);
+
+      await this.page.waitForSelector(
+        communityLessonsSectionInLearnerDashboard,
+        {
+          visible: true,
+        }
+      );
     }
   }
 
@@ -250,6 +269,11 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(learnerDashboardMenuLink);
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
@@ -283,6 +307,9 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
@@ -316,6 +343,9 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
@@ -348,6 +378,9 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(goalsTabSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
