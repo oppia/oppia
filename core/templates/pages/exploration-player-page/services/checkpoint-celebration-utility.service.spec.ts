@@ -70,12 +70,6 @@ describe('Checkpoint celebration utility service', () => {
           content_id: 'content',
           html: '',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],
@@ -110,12 +104,6 @@ describe('Checkpoint celebration utility service', () => {
         content: {
           content_id: 'content',
           html: '',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
         },
         interaction: {
           answer_groups: [],
