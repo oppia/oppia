@@ -176,6 +176,9 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
+// Auth Pages
+const loginPage = '.e2e-test-login-page';
+
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.acceptance-test-community-lessons-section';
@@ -184,6 +187,10 @@ const homeTabSectionInLearnerDashboard =
 const progressTabSectionInLearnerDashboard =
   '.acceptance-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = 'e2e-test-current-goals-section';
+
+// Preferences page selectors.
+const deleteAccountPage = '.acceptance-test-delete-account';
+const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -501,6 +508,10 @@ export class LoggedInUser extends BaseUser {
    */
   async deleteAccount(): Promise<void> {
     await this.clickAndWaitForNavigation(deleteAccountButton);
+
+    await this.page.waitForSelector(deleteAccountPage, {
+      visible: true,
+    });
   }
 
   /**
@@ -511,6 +522,10 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(accountDeletionButtonInDeleteAccountPage);
     await this.type(confirmUsernameField, username);
     await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
+
+    await this.page.waitForSelector(deleteMyAcccountButton, {
+      visible: false,
+    });
   }
 
   /**
@@ -524,8 +539,13 @@ export class LoggedInUser extends BaseUser {
       this.userHasAcceptedCookies = true;
     }
     await this.clickOn('Sign in');
+
+    await this.page.waitForSelector(loginPage, {
+      visible: true,
+    });
   }
 
+  // TODO: NOPP
   /**
    * Clicks on the link to the Oppia Wiki, which opens in a new tab.
    */
@@ -541,6 +561,10 @@ export class LoggedInUser extends BaseUser {
    * @param {string} username - The username to enter.
    */
   async signInWithUsername(username: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(signUpUsernameField, {
+      visible: true,
+    });
     await this.clearAllTextFrom(signUpUsernameField);
     await this.type(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
@@ -557,6 +581,10 @@ export class LoggedInUser extends BaseUser {
       await this.page.waitForSelector(registerNewUserButton);
       await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    } else {
+      throw new Error(
+        'Invalid username. Please enter a valid username and try again.'
+      );
     }
   }
 
@@ -564,6 +592,9 @@ export class LoggedInUser extends BaseUser {
    * Function to sign in the user with the given email to the Oppia website only when the email is valid.
    */
   async enterEmail(email: string): Promise<void> {
+    await this.page.waitForSelector(signUpEmailField, {
+      visible: true,
+    });
     await this.clearAllTextFrom(signUpEmailField);
     await this.type(signUpEmailField, email);
 
@@ -574,6 +605,12 @@ export class LoggedInUser extends BaseUser {
     if (!invalidEmailErrorContainerElement) {
       await this.clickOn('Sign In');
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+
+      // Post Check: Check if the login page is closed. We can't check if user
+      // is redirected to the home page it is dependent to "redirects" in URL.
+      await this.page.waitForSelector(signUpEmailField, {
+        hidden: true,
+      });
     }
   }
 
@@ -619,6 +656,9 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedSuggestion - The expected suggestion.
    */
   async expectAdminEmailSuggestion(expectedSuggestion: string): Promise<void> {
+    await this.page.waitForSelector(signUpEmailField, {
+      visible: true,
+    });
     await this.clickOn(signUpEmailField);
     await this.page.waitForSelector(optionText);
     const suggestion = await this.page.$eval(optionText, el => el.textContent);
@@ -638,7 +678,7 @@ export class LoggedInUser extends BaseUser {
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    const url = await this.page.url();
+    const url = this.page.url();
 
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
@@ -650,6 +690,7 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  // TODO: NOPP
   /**
   /**
    * Adds a lesson to the 'Play Later' list from community library page.
@@ -658,7 +699,7 @@ export class LoggedInUser extends BaseUser {
   async addLessonToPlayLater(lessonTitle: string): Promise<void> {
     try {
       await this.waitForPageToFullyLoad();
-      const isMobileViewport = await this.isViewportAtMobileWidth();
+      const isMobileViewport = this.isViewportAtMobileWidth();
       const lessonCardTitleSelector = isMobileViewport
         ? mobileLessonCardTitleSelector
         : desktopLessonCardTitleSelector;
