@@ -16,16 +16,13 @@
  * @fileoverview Description of this file.
  */
 
-import {
-  ParamTypeObjectFactory,
-  ParamType,
-} from 'domain/exploration/ParamTypeObjectFactory';
+import {ParamType} from 'domain/exploration/param-type.model';
 
 describe('ParamType objects', () => {
-  let paramType: ParamTypeObjectFactory;
+  let paramType: ParamType;
 
   beforeEach(() => {
-    paramType = new ParamTypeObjectFactory();
+    paramType = new ParamType();
   });
 
   it('should have its registry frozen', () => {
@@ -33,18 +30,18 @@ describe('ParamType objects', () => {
   });
 
   it('should use UnicodeString as default type', () => {
-    expect(paramType.getDefaultType()).toBe(paramType.registry.UnicodeString);
+    expect(ParamType.getDefaultType()).toBe(paramType.registry.UnicodeString);
   });
 
   it('should return correct values for existing types', () => {
     Object.entries(paramType.registry).forEach(([backendName, value]) => {
-      expect(paramType.getTypeFromBackendName(backendName)).toEqual(value);
+      expect(ParamType.getTypeFromBackendName(backendName)).toEqual(value);
     });
   });
 
   it('should throw for non-existant types', () => {
     expect(() => {
-      paramType.getTypeFromBackendName('MissingType');
+      ParamType.getTypeFromBackendName('MissingType');
     }).toThrowError(/not a registered parameter type/);
   });
 

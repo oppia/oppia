@@ -452,7 +452,6 @@ export class UpgradedServices {
       new NumericInputRulesService();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
-    upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -605,9 +604,6 @@ export class UpgradedServices {
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']
       );
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
-      upgradedServices['ParamTypeObjectFactory']
-    );
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']
