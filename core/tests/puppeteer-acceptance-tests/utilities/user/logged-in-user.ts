@@ -1994,8 +1994,6 @@ export class LoggedInUser extends BaseUser {
         targetHref = buttonHref;
         await buttonElement.click();
         await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-        await this.expectToBeOnPage(`learn/${classroom}`);
-        showMessage('Navigated to math classroom from learner dashboard.');
         break;
       }
     }

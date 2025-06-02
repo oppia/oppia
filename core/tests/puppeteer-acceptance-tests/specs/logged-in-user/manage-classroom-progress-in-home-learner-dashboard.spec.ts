@@ -25,6 +25,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -120,6 +121,8 @@ describe('Logged-in User', function () {
     'should navigate directly to math classroom',
     async function () {
       await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
+      await loggedInUser.expectToBeOnPage('learn/math');
+      showMessage('Navigated to math classroom from learner dashboard.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
