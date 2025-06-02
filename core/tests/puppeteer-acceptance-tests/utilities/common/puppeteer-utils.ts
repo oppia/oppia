@@ -513,6 +513,12 @@ export class BaseUser {
    */
   async goto(url: string): Promise<void> {
     await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
+
+    if (this.page.url() !== url) {
+      throw new Error(
+        `Failed to navigate to ${url}. Current URL is ${this.page.url()}.`
+      );
+    }
   }
 
   /**
