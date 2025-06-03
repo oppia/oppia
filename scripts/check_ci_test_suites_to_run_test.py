@@ -281,8 +281,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             encoding='utf-8'
         ) as f:
             f.write(
-                'blog-admin-page.module.ts\n'
-                'blog-dashboard-page.module.ts'
+                'blog-admin-page.module.ts\nblog-dashboard-page.module.ts'
             )
         os.mkdir(
             os.path.join(
@@ -481,8 +480,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     b''
                 )
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 
@@ -516,8 +515,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     b'fatal: not a valid git branch\n'
                 )
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 

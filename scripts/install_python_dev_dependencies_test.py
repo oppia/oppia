@@ -34,7 +34,7 @@ from typing import Dict, Generator, List, Optional
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     @contextlib.contextmanager
-    def sys_real_prefix_context(
+    def sys_real_prefix_context( # pylint: disable=used-before-assignment
         self, new_value: str,
     ) -> Generator[None, None, None]:
         """Create a context manager to temporarily set sys.real_prefix.
@@ -56,7 +56,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 # Pylint doesn't recognize that if we reach this part of the
                 # code, then had_attribute is True, which means that we did set
                 # `original` above.
-                setattr(sys, 'real_prefix', original)  # pylint: disable=used-before-assignment
+                setattr(sys, 'real_prefix', original)
             else:
                 delattr(sys, 'real_prefix')
 

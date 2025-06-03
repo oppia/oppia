@@ -47,11 +47,12 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             def __init__(self, lcov_items_list: Optional[str]):
                 self.lcov_items_list = lcov_items_list
 
-            def read(self) -> Optional[str]:  # pylint: disable=missing-docstring
+            def read( # pylint: disable=missing-docstring
+                self) -> Optional[str]:
                 return self.lcov_items_list
 
-        def mock_open_file(
-            file_name: str, option: Dict[str, str]  # pylint: disable=unused-argument
+        def mock_open_file( # pylint: disable=unused-argument
+            file_name: str, option: Dict[str, str]
         ) -> MockFile:  # pylint: disable=unused-argument
             self.check_function_calls['open_file_is_called'] = True
             return MockFile(self.lcov_items_list)
@@ -107,10 +108,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self) -> None:
         self.lcov_items_list = (
-            'SF:\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
+            'SF:\nLF:10\nLH:5\nend_of_record\n'
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -122,10 +120,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
     def test_get_stanzas_from_lcov_file_total_lines_exception(self) -> None:
         self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:\n'
-            'LH:5\n'
-            'end_of_record\n'
+            'SF:/opensource/oppia/file.ts\nLF:\nLH:5\nend_of_record\n'
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -137,10 +132,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
 
     def test_get_stanzas_from_lcov_file_covered_lines_exception(self) -> None:
         self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:\n'
-            'end_of_record\n'
+            'SF:/opensource/oppia/file.ts\nLF:10\nLH:\nend_of_record\n'
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -173,7 +165,8 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         check_function_calls = {'sys_exit_is_called': False}
         expected_check_function_calls = {'sys_exit_is_called': False}
 
-        def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
+        def mock_sys_exit( # pylint: disable=unused-argument
+            error_message: str) -> None:
             check_function_calls['sys_exit_is_called'] = True
 
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
@@ -314,7 +307,8 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         check_function_calls = {'sys_exit_is_called': False}
         expected_check_function_calls = {'sys_exit_is_called': False}
 
-        def mock_sys_exit(error_message: str) -> None:  # pylint: disable=unused-argument
+        def mock_sys_exit( # pylint: disable=unused-argument
+            error_message: str) -> None:
             check_function_calls['sys_exit_is_called'] = True
 
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)

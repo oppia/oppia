@@ -295,8 +295,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
                 'the Oppia codebase.',
-                '"DEV_MODE": false,\n'
-                '"EMULATOR_MODE": true\n')
+                '"DEV_MODE": false,\nEMULATOR_MODE": true\n')
 
         with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
@@ -316,8 +315,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
                 ' * @fileoverview Initializes constants for '
                 'the Oppia codebase.',
-                '"DEV_MODE": true,\n'
-                '"EMULATOR_MODE": false\n')
+                '"DEV_MODE": true,\nEMULATOR_MODE": false\n')
 
         with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
