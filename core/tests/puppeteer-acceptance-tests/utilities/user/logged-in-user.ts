@@ -2026,13 +2026,11 @@ export class LoggedInUser extends BaseUser {
    * Navigates to lesson using lesson card.
    * @param {string} criteria - Subsection title value to match.
    * @param {string} lessonTitle - Lesson card title expected.
-   * @param {string} lessonId - Lesson card id expected.
    * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
   async navigateToLessonByCard(
     criteria: string,
     lessonTitle: string,
-    lessonId: string,
     section: string = 'N/A'
   ): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
@@ -2052,6 +2050,7 @@ export class LoggedInUser extends BaseUser {
       );
       if (lessonCardButtonElement) {
         await lessonCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
       }
     } else {
       throw new Error(
@@ -2069,7 +2068,6 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     lessonId: string
   ): Promise<void> {
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     expect(`/explore/${lessonId}`.toLowerCase()).toBe(
       new URL(this.page.url()).pathname.toLowerCase()
     );

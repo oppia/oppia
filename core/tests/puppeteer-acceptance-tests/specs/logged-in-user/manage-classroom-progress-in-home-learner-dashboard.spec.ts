@@ -164,8 +164,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
-        'Chapter 1: What are the Place Values',
-        chapterIds[0]
+        'Chapter 1: What are the Place Values'
       );
 
       await loggedInUser.expectToBeOnLessonPage(
