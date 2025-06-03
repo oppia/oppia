@@ -255,7 +255,7 @@ class StudyGuideSection:
 
     @classmethod
     def from_dict(
-        cls, sections_dict: StudyGuideSectionDict
+        cls, section_dict: StudyGuideSectionDict
     ) -> StudyGuideSection:
         """Creates a study guide sections object from a dictionary.
 
@@ -266,10 +266,10 @@ class StudyGuideSection:
         Returns:
             StudyGuideSection. The corresponding object.
         """
-        heading = state_domain.SubtitledUnicode().from_dict(
-            sections_dict['heading'])
+        heading = state_domain.SubtitledUnicode.from_dict(
+            section_dict['heading'])
         content = state_domain.SubtitledHtml.from_dict(
-            sections_dict['content']
+            section_dict['content']
         )
         heading.validate()
         content.validate()
@@ -329,11 +329,14 @@ class StudyGuide:
         Returns:
             dict. A dict, mapping all fields of StudyGuide instance.
         """
+        sections_dicts = []
+        for section in self.sections:
+            sections_dicts.append(section.to_dict()) 
         return {
             'id': self.id,
             'next_content_id_index': self.next_content_id_index,
             'topic_id': self.topic_id,
-            'sections': self.sections.to_dict(),
+            'sections': sections_dicts,
             'sections_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
             'version': self.version
@@ -348,11 +351,11 @@ class StudyGuide:
         """
         concatenated_html_parts = []
         
-        sections_list = self.sections.to_dict()
-        for section in sections_list:
-            heading_html = f"<p><strong>{section['heading']}</strong></p>"
+        for section in self.sections:
+            section_dict = section.to_dict()
+            heading_html = f"<p><strong>{section_dict['heading']['unicode_str']}</strong></p>"
             concatenated_html_parts.append(heading_html)
-            concatenated_html_parts.append(section['content'])
+            concatenated_html_parts.append(section_dict['content']['html'])
         
         concatenated_html = '\n\n'.join(concatenated_html_parts)
         
@@ -406,17 +409,20 @@ class StudyGuide:
         """
         content_id_generator = translation_domain.ContentIdGenerator()
         study_guide_page_id = cls.get_study_guide_page_id(topic_id, study_guide_id)
-        return cls(
-            study_guide_page_id, topic_id,
-            [StudyGuideSection.create_study_guide_section(
+        sections = []
+        section = StudyGuideSection.create_study_guide_section(
                 content_id_generator.generate(
                     translation_domain.ContentType.SECTION,
-                    'heading')),
+                    'heading'),
                     heading_plaintext,
                 content_id_generator.generate(
                     translation_domain.ContentType.SECTION,
                     'content'),
-                    content_html],
+                    content_html)
+        sections.append(section)
+        return cls(
+            study_guide_page_id, topic_id,
+            sections,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
             constants.DEFAULT_LANGUAGE_CODE, 1)
@@ -599,7 +605,8 @@ class StudyGuide:
             raise utils.ValidationError(
                 'Expected version number to be an int, received %s' %
                 self.version)
-        self.sections.validate()
+        for section in self.sections:
+            section.validate()
 
         if not isinstance(self.sections_schema_version, int):
             raise utils.ValidationError(

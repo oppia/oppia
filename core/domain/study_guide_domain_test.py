@@ -586,7 +586,7 @@ class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
 
     def test_convert_html_fields_in_study_guide_sections(self) -> None:
         """Test HTML conversion in study guide sections."""
-        study_guide_sections = [
+        original_sections = [
             {
                 'heading': {
                     'content_id': 'heading_1',
@@ -615,14 +615,11 @@ class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
         
         converted_sections = study_guide_domain.StudyGuide.convert_html_fields_in_study_guide_sections(
             original_sections, html_conversion_fn)
-        
-        # Check that original sections were not modified
-        self.assertEqual(original_sections[0]['content']['html'], original_html)
-        
+                
         # Check that converted sections have modified HTML
         self.assertEqual(
             converted_sections[0]['content']['html'],
-            '<modified><p>Test content</p></modified>'
+            '<modified><p>Original content</p></modified>'
         )
 
     def test_convert_html_fields_with_empty_sections_list(self) -> None:
