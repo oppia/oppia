@@ -739,8 +739,13 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  async _addLessonToPlayLaterWithoutVerification(
-    lessonTitle: string
+  /**
+   * Adds a lesson to the 'Play Later' list from community library page.
+   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
+   */
+  async addLessonToPlayLater(
+    lessonTitle: string,
+    skipVerification: boolean = false
   ): Promise<void> {
     try {
       await this.waitForPageToFullyLoad();
@@ -780,10 +785,13 @@ export class LoggedInUser extends BaseUser {
         await addToPlayLaterButtons[lessonIndex].click();
       }
 
+      // Post-check: Verify if the tooltip appears.
       // TODO: Verify if post check is proper.
-      await this.expectToolTipMessage(
-        "Successfully added to your 'Play Later' list."
-      );
+      if (!skipVerification) {
+        await this.expectToolTipMessage(
+          "Successfully added to your 'Play Later' list."
+        );
+      }
 
       showMessage(`Lesson "${lessonTitle}" added to 'Play Later' list.`);
     } catch (error) {
@@ -793,20 +801,6 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-  }
-
-  /**
-   * Adds a lesson to the 'Play Later' list from community library page.
-   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
-   */
-  async addLessonToPlayLater(lessonTitle: string): Promise<void> {
-    await this._addLessonToPlayLaterWithoutVerification(lessonTitle);
-
-    // Post-check: Verify if the tooltip appears.
-    // TODO: Verify if post check is proper.
-    await this.expectToolTipMessage(
-      "Successfully added to your 'Play Later' list."
-    );
   }
 
   /**
@@ -1132,7 +1126,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     const selectedLanguage = await this.page.$eval(
-      siteLanguageInputSelector,
+      `${siteLanguageInputSelector}`,
       el => el.textContent?.trim()
     );
     if (selectedLanguage !== language) {

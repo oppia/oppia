@@ -160,10 +160,7 @@ describe('Logged-out User', function () {
       );
       progressUrl = await loggedOutUser.copyProgressUrl();
 
-      await loggedOutUser.startExplorationUsingProgressUrl(
-        progressUrl,
-        (verifyURL = true)
-      );
+      await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
       await loggedOutUser.expectProgressRemainder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
