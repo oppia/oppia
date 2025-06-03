@@ -141,9 +141,6 @@ class SubtopicViewerPageRevisionRedirectHandler(
     @acl_decorators.can_access_subtopic_viewer_page
     def get(self, *args: str) -> None:
         """Handles GET requests and redirects to studyguide URL."""
-        print("Route kwargs:", self.request.route_kwargs)
-        print("Args:", args)
-        print("Normalized request keys:", list(self.normalized_request.keys()))
         classroom_url_fragment = self.request.route_kwargs.get('classroom_url_fragment')
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         subtopic_url_fragment = self.request.route_kwargs.get('subtopic_url_fragment')
@@ -222,9 +219,6 @@ class TopicViewerPageRevisionRedirectHandler(
     @acl_decorators.can_access_topic_viewer_page
     def get(self, *args: str) -> None:
         """Handles GET requests and redirects to studyguide URL."""
-        print("Route kwargs:", self.request.route_kwargs)
-        print("Args:", args)
-        print("Normalized request keys:", list(self.normalized_request.keys()))
         classroom_url_fragment = self.request.route_kwargs.get('classroom_url_fragment')
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         new_url = '/learn/%s/%s/studyguide' % (
