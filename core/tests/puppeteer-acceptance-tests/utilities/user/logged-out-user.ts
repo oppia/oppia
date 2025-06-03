@@ -544,7 +544,7 @@ export class LoggedOutUser extends BaseUser {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPageUrl);
+    await this.goto(classroomsPageUrl, verifyURL);
   }
 
   /**

@@ -564,12 +564,15 @@ export class LoggedInUser extends BaseUser {
    * @param {string} username - The username of the account.
    */
   async confirmAccountDeletion(username: string): Promise<void> {
+    await this.page.waitForSelector(accountDeletionButtonInDeleteAccountPage, {
+      visible: true,
+    });
     await this.clickOn(accountDeletionButtonInDeleteAccountPage);
     await this.type(confirmUsernameField, username);
     await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
 
     await this.page.waitForSelector(deleteMyAcccountButton, {
-      visible: false,
+      hidden: true,
     });
   }
 
@@ -590,7 +593,6 @@ export class LoggedInUser extends BaseUser {
     });
   }
 
-  // TODO: NOPP
   /**
    * Clicks on the link to the Oppia Wiki, which opens in a new tab.
    */
@@ -855,7 +857,7 @@ export class LoggedInUser extends BaseUser {
 
       if (!this.page.url().includes('/explore/')) {
         throw new Error(
-          `Failed to navigate to the lesson page for "${lessonName}".`
+          `Failed to navigate to the lesson page for "${lessonName}". Expected URL to include '/explore/', but got: ${this.page.url()}`
         );
       }
     } catch (error) {
@@ -867,7 +869,6 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  // TODO: NOPP
   /**
    * Removes a lesson from the 'Play Later' list in the learner dashboard.
    * @param {string} lessonName - The name of the lesson to remove from the 'Play Later' list.
@@ -906,6 +907,10 @@ export class LoggedInUser extends BaseUser {
 
       // Confirm removal.
       await this.clickOn(confirmRemovalFromPlayLaterButton);
+
+      await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
+        hidden: true,
+      });
 
       showMessage(`Lesson "${lessonName}" removed from 'Play Later' list.`);
     } catch (error) {
@@ -1038,6 +1043,8 @@ export class LoggedInUser extends BaseUser {
       await this.page.keyboard.press('Enter');
     }
 
+    // TODO: Ensure works properly
+
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
       const foundTexts = await this.page.$$eval(
@@ -1049,7 +1056,7 @@ export class LoggedInUser extends BaseUser {
 
       if (!found) {
         throw new Error(
-          `Subject interest "<span class="math-inline">\{interest\}" not added\. Actual chip texts found\: \[</span>{foundTexts.join(', ')}]`
+          `Subject interest ${interests} not added. Actual chip texts found: ${foundTexts.join(', ')}`
         );
       }
     }
@@ -1072,6 +1079,7 @@ export class LoggedInUser extends BaseUser {
       await this.page.click(matFormTextSelector);
     }
 
+    // TODO: Ensure works properly
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
       const foundTexts = await this.page.$$eval(
@@ -1083,7 +1091,7 @@ export class LoggedInUser extends BaseUser {
 
       if (!found) {
         throw new Error(
-          `Subject interest "<span class="math-inline">\{interest\}" not added\. Actual chip texts found\: \[</span>{foundTexts.join(', ')}]`
+          `Subject interest ${interests} not added. Actual chip texts found: ${foundTexts.join(', ')}`
         );
       }
     }
@@ -1112,6 +1120,22 @@ export class LoggedInUser extends BaseUser {
     }
 
     // TODO: Add post check to verify the language is set correctly.
+    const languageSelector = await this.page.$(
+      '.e2e-test-site-language-selector'
+    );
+    if (!languageSelector) {
+      throw new Error('Language selector not found');
+    }
+    const selectedLanguage = await languageSelector.$eval(
+      '.mat-select-value-text',
+      el => el.textContent?.trim()
+    );
+    if (selectedLanguage !== language) {
+      throw new Error(
+        `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
+      );
+    }
+    console.log('Selected language:', selectedLanguage);
   }
 
   /**
@@ -1147,6 +1171,7 @@ export class LoggedInUser extends BaseUser {
     await this.type(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
+    // TODO: Fix
     const selectedAudioLanguage = await this.page.$eval(
       audioLanguageInputSelector,
       el => el.textContent?.trim()
@@ -1638,7 +1663,10 @@ export class LoggedInUser extends BaseUser {
         return;
       }
     }
-    // TODO: NOPP
+
+    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector, {
+      hidden: true,
+    });
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 
