@@ -988,9 +988,14 @@ export class LoggedInUser extends BaseUser {
 
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
-      const tagSelector = `${subjectInterestTagsInPreferencesPage} >> text="${interest}"`;
-      const tag = await this.page.$(tagSelector);
-      if (!tag) {
+      const found = await this.page.$$eval(
+        '.acceptance-test-subject-interest-chip',
+        (elements, interestText) =>
+          elements.some(el => el.textContent?.trim() === interestText),
+        interest
+      );
+
+      if (!found) {
         throw new Error(`Subject interest "${interest}" not added`);
       }
     }
@@ -1015,9 +1020,14 @@ export class LoggedInUser extends BaseUser {
 
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
-      const tagSelector = `${subjectInterestTagsInPreferencesPage} >> text="${interest}"`;
-      const tag = await this.page.$(tagSelector);
-      if (!tag) {
+      const found = await this.page.$$eval(
+        '.acceptance-test-subject-interest-chip',
+        (elements, interestText) =>
+          elements.some(el => el.textContent?.trim() === interestText),
+        interest
+      );
+
+      if (!found) {
         throw new Error(`Subject interest "${interest}" not added`);
       }
     }
