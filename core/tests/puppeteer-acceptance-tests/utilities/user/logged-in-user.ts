@@ -190,11 +190,32 @@ const progressTabSectionInLearnerDashboard =
   '.acceptance-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
 
+// Creator dashboard selectors.
+const creatorDashboardContainerSelector =
+  '.acceptance-test-creator-dashboard-container';
+const settingsTabMainContent = '.acceptance-test-settings-card';
+
+// Contributor dashboard selectors.
+const contributorDashboardContainerSelector =
+  '.acceptance-test-oppia-contributor-home';
+
 // Preferences page selectors.
+const preferencesContainerSelector = '.acceptance-test-preferences-container';
 const deleteAccountPage = '.acceptance-test-delete-account';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
 const subjectInterestTagsInPreferencesPage =
   '.acceptance-test-subject-interest-chip';
+
+// Profile Page
+const profileContainerSelector = '.acceptance-test-profile-container';
+
+// Exploration player selectors
+const explorationSuccessfullyFlaggedMessage =
+  '.acceptance-test-exploration-flagged-success-message';
+
+// Feedback updates page
+const feedbackUpdatesMainContentContainer =
+  '.acceptance-test-feedback-updates-main-content-container';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1095,6 +1116,8 @@ export class LoggedInUser extends BaseUser {
         break;
       }
     }
+
+    // TODO: Add post check to verify the language is set correctly.
   }
 
   /**
@@ -1102,8 +1125,21 @@ export class LoggedInUser extends BaseUser {
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredSiteLanguage(language: string): Promise<void> {
+    await this.page.waitForSelector(siteLanguageInputSelector, {
+      visible: true,
+    });
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
+
+    const selectedLanguage = await this.page.$eval(
+      siteLanguageInputSelector,
+      el => el.textContent?.trim()
+    );
+    if (selectedLanguage !== language) {
+      throw new Error(
+        `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
+      );
+    }
   }
 
   /**
@@ -1111,8 +1147,21 @@ export class LoggedInUser extends BaseUser {
    * @param {string} language - The new language to set for the user.
    */
   async updatePreferredAudioLanguage(language: string): Promise<void> {
+    await this.page.waitForSelector(audioLanguageInputSelector, {
+      visible: true,
+    });
     await this.type(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
+
+    const selectedAudioLanguage = await this.page.$eval(
+      audioLanguageInputSelector,
+      el => el.textContent?.trim()
+    );
+    if (selectedAudioLanguage !== language) {
+      throw new Error(
+        `Language not set. Expected: ${language}, Found: ${selectedAudioLanguage}`
+      );
+    }
   }
 
   /**
@@ -1134,6 +1183,19 @@ export class LoggedInUser extends BaseUser {
           if (label === preference) {
             await this.waitForElementToBeClickable(checkbox);
             await checkbox.click();
+            // Check if the checkbox is checked after clicking.
+            const isChecked = await checkbox.evaluate(el => {
+              const input = el.querySelector(
+                'input[type="checkbox"]'
+              ) as HTMLInputElement | null;
+              return input?.checked;
+            });
+            if (!isChecked) {
+              throw new Error(
+                `Checkbox for "${preference}" was not checked after click.`
+              );
+            }
+
             found = true;
             break;
           }
@@ -1166,6 +1228,9 @@ export class LoggedInUser extends BaseUser {
 
       await this.clickAndWaitForNavigation(goToProfilePageButton);
       await this.waitForPageToFullyLoad();
+      if (!this.page.url().includes('/profile')) {
+        throw new Error('Failed to navigate to Profile tab');
+      }
     } catch (error) {
       const newError = new Error(
         `Failed to navigate to Profile tab from Preferences page: ${error}`
@@ -1178,10 +1243,23 @@ export class LoggedInUser extends BaseUser {
   /**
    * Saves the changes made in the preferences page.
    */
-  async saveChanges(): Promise<void> {
+  async saveChangesInPreferencesPage(): Promise<void> {
     await this.waitForNetworkIdle({idleTime: 1000});
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(saveChangesButtonSelector, {
+      visible: true,
+    });
     await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+    const isDisabled = await this.page.$eval(
+      `button${saveChangesButtonSelector}`,
+      btn => (btn as HTMLButtonElement).disabled
+    );
+    if (!isDisabled) {
+      throw new Error(
+        'Save Changes button is not disabled after saving changes'
+      );
+    }
+    showMessage('Changes saved successfully in preferences page.');
   }
 
   /**
@@ -1333,6 +1411,9 @@ export class LoggedInUser extends BaseUser {
    * @param {string} issueDescription - The description of the issue.
    */
   async reportExploration(issueDescription: string): Promise<void> {
+    await this.page.waitForSelector(reportExplorationButtonSelector, {
+      visible: true,
+    });
     await this.clickOn(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
     const issueTypeElement = await this.page.$(issueTypeSelector);
@@ -1343,6 +1424,10 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(submitReportButtonSelector);
 
     await this.clickOn('Close');
+
+    await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1358,6 +1443,8 @@ export class LoggedInUser extends BaseUser {
     } else {
       throw new Error(`Thread not found: ${threadNumber}`);
     }
+
+    await this.page.waitForSelector(feedbackUpdatesMainContentContainer);
   }
 
   /**
@@ -1557,6 +1644,7 @@ export class LoggedInUser extends BaseUser {
         return;
       }
     }
+    // TODO: NOPP
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 
@@ -1626,6 +1714,10 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(creatorDashboardMenuLink);
+
+    await this.page.waitForSelector(creatorDashboardContainerSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1641,6 +1733,10 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(contributorDashboardMenuLink);
+
+    await this.page.waitForSelector(contributorDashboardContainerSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1656,6 +1752,10 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(preferencesMenuLink);
+
+    await this.page.waitForSelector(preferencesContainerSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1671,15 +1771,32 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(profileMenuLink);
+
+    await this.page.waitForSelector(profileContainerSelector, {
+      visible: true,
+    });
   }
 
   /**
    * Deletes the previous written title and updates the new title.
    */
   async updateTitleTo(title: string): Promise<void> {
+    await this.page.waitForSelector(addTitleBar, {
+      visible: true,
+    });
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
+
+    const currentTitle = await this.page.$eval(
+      addTitleBar,
+      el => (el as HTMLInputElement).value
+    );
+    if (currentTitle !== title) {
+      throw new Error(
+        `Title update failed. Expected: ${title}, Found: ${currentTitle}`
+      );
+    }
 
     showMessage(`Title has been updated to ${title}`);
   }
@@ -1712,6 +1829,8 @@ export class LoggedInUser extends BaseUser {
     } else {
       await this.clickOn(settingsTab);
     }
+
+    await this.page.waitForSelector(settingsTabMainContent, {visible: true});
     showMessage('Settings tab is opened successfully.');
   }
 
@@ -1740,10 +1859,16 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration editor.
+   * Function to navigate to exploration editor from creator dashboard.
    */
-  async navigateToExplorationEditorPage(): Promise<void> {
+  async navigateToExplorationEditorPageFromCreatorDashboard(): Promise<void> {
     await this.clickAndWaitForNavigation(createExplorationButton);
+
+    if (!this.page.url().includes('/create/')) {
+      throw new Error(
+        'Navigation to exploration editor from creator dashboard failed.'
+      );
+    }
   }
 
   /**
@@ -1787,6 +1912,9 @@ export class LoggedInUser extends BaseUser {
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
+    await this.page.waitForSelector(addInteractionButton, {
+      visible: true,
+    });
     await this.clickOn(addInteractionButton);
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
@@ -1886,6 +2014,9 @@ export class LoggedInUser extends BaseUser {
         await this.clickOn(mobileChangesDropdown);
         await this.clickOn(mobilePublishButton);
       } else {
+        await this.page.waitForSelector(publishExplorationButton, {
+          visible: true,
+        });
         await this.clickOn(publishExplorationButton);
       }
     };
@@ -1903,6 +2034,10 @@ export class LoggedInUser extends BaseUser {
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.clickOn(closePublishedPopUpButton);
+
+      await this.page.waitForSelector(closePublishedPopUpButton, {
+        hidden: true,
+      });
       return explorationId;
     };
 
@@ -1935,7 +2070,7 @@ export class LoggedInUser extends BaseUser {
     category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
-    await this.navigateToExplorationEditorPage();
+    await this.navigateToExplorationEditorPageFromCreatorDashboard();
     await this.dismissWelcomeModal();
     await this.createMinimalExploration(
       'Exploration intro text',
@@ -1975,6 +2110,12 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
+
+    if (!this.page.url().includes('/create/')) {
+      throw new Error(
+        'Navigation to exploration editor from creator dashboard failed.'
+      );
+    }
   }
 
   /**
@@ -1989,6 +2130,10 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(anonymousCheckboxSelector);
     }
     await this.clickOn(submitButtonSelector);
+
+    await this.page.waitForSelector(feedbackTextareaSelector, {
+      hidden: true,
+    });
   }
 }
 

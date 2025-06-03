@@ -61,7 +61,7 @@ describe('Logged-in User', function () {
         'Receive news and updates about the site',
       ]);
 
-      await loggedInUser1.saveChanges();
+      await loggedInUser1.saveChangesInPreferencesPage();
 
       // Navigate to Profile page and verify changes.
       await loggedInUser1.navigateToProfilePageFromPreferencePage();
