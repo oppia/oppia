@@ -291,7 +291,7 @@ class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
             self.CURRICULUM_ADMIN_EMAIL)
 
     def test_redirect_to_studyguide_url_for_authenticated_user(self) -> None:
-        """Test that revision URLs redirect to studyguide URLs for authenticated users."""
+        """Test that revision URLs redirect to study guide URLs for authenticated users."""
         # Set up curriculum admin and create dummy classroom
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -506,7 +506,7 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
     def test_get_redirects_to_studyguide_url(self) -> None:
-        """Test that GET request redirects to the correct studyguide URL."""
+        """Test that GET request redirects to the correct study guide URL."""
         response = self.get_html_response(
             '/learn/staging/name/revision/sub-url-frag-one',
             expected_status_int=301)
