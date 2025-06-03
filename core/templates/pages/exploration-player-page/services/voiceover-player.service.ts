@@ -52,12 +52,24 @@ export class VoiceoverPlayerService {
         this.entityVoiceoversService.getActiveEntityVoiceovers();
       let voiceoverTypeToVoiceovers =
         activeEntityVoiceover.voiceoversMapping[contentId];
-      this.activeVoiceover = voiceoverTypeToVoiceovers.manual;
+
+      let manualVoiceover = voiceoverTypeToVoiceovers.manual;
+      let automaticVoiceover = voiceoverTypeToVoiceovers.auto;
+
+      if (manualVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = manualVoiceover;
+      } else if (automaticVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = automaticVoiceover;
+      }
     } catch (e: unknown) {
       this.activeVoiceover = undefined;
     }
 
     this._activeVoiceoverChangedEventEmitter.emit();
+  }
+
+  getActiveContentId(): string {
+    return this.activeContentId;
   }
 
   setActiveComponentName(componentName: string): void {

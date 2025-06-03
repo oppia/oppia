@@ -37,6 +37,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -56,7 +57,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private windowRef: WindowRef,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private audioPreloaderService: AudioPreloaderService
+    private audioPreloaderService: AudioPreloaderService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -118,6 +120,11 @@ export class ContentLanguageSelectorComponent implements OnInit {
         newLanguageCode,
         this.entityVoiceoversService.getLanguageAccentCodes()
       );
+      this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+        this.entityVoiceoversService.getActiveEntityVoiceovers()
+          ?.automatedVoiceoversAudioOffsetsMsecs || {}
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
     });
 
     if (this.shouldPromptForRefresh()) {

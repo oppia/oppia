@@ -18,6 +18,7 @@
 
 import {
   Component,
+  ChangeDetectorRef,
   ElementRef,
   OnInit,
   ViewChild,
@@ -98,6 +99,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   constructor(
     private audioPlayerService: AudioPlayerService,
     private contextService: ContextService,
+    private changeDetectorRef: ChangeDetectorRef,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private ngbModal: NgbModal,
@@ -149,10 +151,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         }
       )
     );
-    this.voiceoversAreLoaded =
-      Object.keys(
-        this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
-      ).length !== 0;
 
     if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
       this.voiceoversAreLoaded = true;
@@ -212,6 +210,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
+    this.isVoiceoverAutogenerationSupportedForSelectedAccent =
+      this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
+        this.languageAccentCode
+      );
+    this.changeDetectorRef.detectChanges();
   }
 
   isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
@@ -485,6 +488,18 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.audioPlayerService.play();
       });
     }
+  }
+
+  isExplorationLinkedToStory(): boolean {
+    return this.contextService.isExplorationLinkedToStory();
+  }
+
+  shouldShowAutoVoiceoverRegenerationSection(): boolean {
+    return (
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.isExplorationLinkedToStory()
+    );
   }
 
   deleteManualVoiceover(): void {
