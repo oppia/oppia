@@ -263,6 +263,10 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>',
+        access_validators.SubtopicViewerPageRevisionRedirectHandler),
+
+    get_redirect_route(
         r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/studyguide/<subtopic_url_fragment>' % # pylint: disable=line-too-long
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.SubtopicViewerPageAccessValidationHandler),
@@ -351,6 +355,11 @@ URLS = [
         r'/<topic_url_fragment>/story' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+        access_validators.TopicViewerPageRevisionRedirectHandler
     ),
 
     get_redirect_route(
