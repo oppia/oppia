@@ -16,9 +16,13 @@
 
 from __future__ import annotations
 
+import unittest.mock
+
+from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
+from core.domain import exp_rights_domain
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import rights_domain
@@ -35,8 +39,8 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
 
-(exp_models,) = models.Registry.import_models([
-    models.Names.EXPLORATION
+(exp_models, collection_models) = models.Registry.import_models([
+    models.Names.EXPLORATION, models.Names.COLLECTION
 ])
 
 
@@ -136,6 +140,41 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.check_can_manage_voice_artist_in_activity(
                 self.user_a, None))
+
+    def test_get_activity_rights_from_model_returns_correct_rights(
+        self) -> None:
+        exp_services.load_demo('1')
+        rights_model = exp_models.ExplorationRightsModel.get('1')
+
+        rights_obj = rights_manager.get_activity_rights_from_model(
+            rights_model, constants.ACTIVITY_TYPE_EXPLORATION
+        )
+
+        self.assertEqual(rights_obj.id, '1')
+        self.assertIsInstance(rights_obj, exp_rights_domain.ExplorationRights)
+
+    def test_save_activity_rights_for_exploration_executes_correct_branch(
+        self) -> None:
+        exp_id = '1'
+        exp_services.load_demo(exp_id)
+        exploration_rights = rights_manager.get_exploration_rights(exp_id)
+
+        with unittest.mock.patch(
+            'core.domain.rights_manager._save_exploration_rights'
+        ) as mock_save_exploration_rights:
+            rights_manager._save_activity_rights(  # pylint: disable=protected-access
+                self.user_id_moderator,
+                exploration_rights,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                'Test commit',
+                []
+            )
+            mock_save_exploration_rights.assert_called_once_with(
+                self.user_id_moderator,
+                exploration_rights,
+                'Test commit',
+                []
+            )
 
     def test_check_can_modify_core_activity_roles_for_none_activity(
         self
@@ -1006,6 +1045,22 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             )
         )
 
+    def test_get_activity_rights_where_user_is_owner_for_exploration(
+        self) -> None:
+        # Setup: Create a user and an exploration owned by that user.
+        self.signup('owner@example.com', 'owneruser')
+        owner_id = self.get_user_id_from_email('owner@example.com')
+        self.save_new_valid_exploration('exp1', owner_id)
+
+        activity_rights_list = (
+            rights_manager._get_activity_rights_where_user_is_owner(  # pylint: disable=protected-access
+            constants.ACTIVITY_TYPE_EXPLORATION, owner_id
+        ))
+
+        self.assertEqual(len(activity_rights_list), 1)
+        self.assertEqual(activity_rights_list[0].id, 'exp1')
+        self.assertTrue(activity_rights_list[0].is_owner(owner_id))
+
 
 class CollectionRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on collections work as expected."""
@@ -1577,6 +1632,18 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_collection(
                 self.user_a, self.COLLECTION_ID, self.user_id_b)
+
+    def test_get_collection_rights_where_user_is_owner(
+        self) -> None:
+        self.save_new_default_collection('col1', self.user_id_a)
+        self.save_new_default_collection('col2', self.user_id_b)
+        owned_rights = rights_manager.get_collection_rights_where_user_is_owner(
+            self.user_id_a
+        )
+
+        self.assertEqual(len(owned_rights), 1)
+        self.assertEqual(owned_rights[0].id, 'col1')
+        self.assertTrue(owned_rights[0].is_owner(self.user_id_a))
 
 
 class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):

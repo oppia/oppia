@@ -65,7 +65,7 @@
     </div>
 
     <div class="automatic-voiceovers"
-         *ngIf="isVoiceoverAutogenerationSupportedForSelectedAccent && isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
+         *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
       <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
       <div class="voiceovers-component" *ngIf="automaticVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
