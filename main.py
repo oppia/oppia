@@ -263,7 +263,7 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
-        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>',
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>', # pylint: disable=line-too-long
         access_validators.SubtopicViewerPageRevisionRedirectHandler),
 
     get_redirect_route(

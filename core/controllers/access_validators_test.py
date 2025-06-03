@@ -291,8 +291,7 @@ class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
             self.CURRICULUM_ADMIN_EMAIL)
 
     def test_redirect_to_studyguide_url_for_authenticated_user(self) -> None:
-        """Test that revision URLs redirect to study guide URLs for authenticated users."""
-        # Set up curriculum admin and create dummy classroom
+        # Set up curriculum admin and create dummy classroom.
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -302,15 +301,15 @@ class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         self.logout()
 
-        # Login as regular user and test redirect
+        # Login as regular user and test redirect.
         self.login(self.NEW_USER_EMAIL)
-        
+
         response = self.get_html_response(
             '/learn/math/fraction/revision',
             expected_status_int=301)
-        
-        expected_redirect_url = 'http://localhost/learn/math/fraction/studyguide'
-        self.assertEqual(response.headers['Location'], expected_redirect_url)
+
+        redirect_url = 'http://localhost/learn/math/fraction/studyguide'
+        self.assertEqual(response.headers['Location'], redirect_url)
 
 
 class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
@@ -510,7 +509,7 @@ class SubtopicViewerPageRevisionRedirectHandlerTests(
         response = self.get_html_response(
             '/learn/staging/name/revision/sub-url-frag-one',
             expected_status_int=301)
-        
+
         self.assertEqual(
             response.headers['Location'],
             'http://localhost/learn/staging/name/studyguide/sub-url-frag-one')
