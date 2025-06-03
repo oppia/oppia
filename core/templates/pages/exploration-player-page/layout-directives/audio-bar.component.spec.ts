@@ -326,7 +326,7 @@ describe('Audio Bar Component', () => {
       expect(loadAndPlaySpy).toHaveBeenCalled();
     });
 
-    it('should be able update diplayable language accent code', () => {
+    it('should be able to update displayable language accent code for manual voiceover', () => {
       let manualVoiceoverBackendDict: VoiceoverBackendDict = {
         filename: 'a.mp3',
         file_size_bytes: 200000,
@@ -336,6 +336,7 @@ describe('Audio Bar Component', () => {
       let contentIdToVoiceoversMappingBackendDict = {
         content0: {
           manual: manualVoiceoverBackendDict,
+          auto: undefined,
         },
       };
       let entityId = 'exploration_1';
@@ -370,6 +371,53 @@ describe('Audio Bar Component', () => {
       component.updateDisplayableLanguageAccentDescription();
 
       expect(component.voiceoverToBePlayed.filename).toEqual('a.mp3');
+    });
+
+    it('should be able to update displayable language accent code for auto voiceover', () => {
+      let autoVoiceoverBackendDict: VoiceoverBackendDict = {
+        filename: 'b.mp3',
+        file_size_bytes: 200000,
+        needs_update: false,
+        duration_secs: 10.0,
+      };
+      let contentIdToVoiceoversMappingBackendDict = {
+        content0: {
+          manual: undefined,
+          auto: autoVoiceoverBackendDict,
+        },
+      };
+      let entityId = 'exploration_1';
+      let entityType = 'exploration';
+      let entityVersion = 1;
+      let languageAccentCode = 'en-US';
+      let entityVoiceoversBackendDict = {
+        entity_id: entityId,
+        entity_type: entityType,
+        entity_version: entityVersion,
+        language_accent_code: languageAccentCode,
+        voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+      };
+      let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+        entityVoiceoversBackendDict
+      );
+      let languageAccentDecriptions = ['en-US', 'en-IN'];
+
+      spyOn(
+        voiceoverPlayerService,
+        'getLanguageAccentDescriptions'
+      ).and.returnValue(languageAccentDecriptions);
+      spyOn(
+        entityVoiceoversService,
+        'getActiveEntityVoiceovers'
+      ).and.returnValue(entityVoiceovers);
+      spyOn(playerPositionService, 'getCurrentStateName');
+      spyOn(audioPreloaderService, 'restartAudioPreloader');
+      voiceoverPlayerService.activeContentId = 'content0';
+
+      component.voiceoverToBePlayed = undefined;
+      component.updateDisplayableLanguageAccentDescription();
+
+      expect(component.voiceoverToBePlayed.filename).toEqual('b.mp3');
     });
 
     it('should pause uploaded voiceover when pause button is clicked', () => {

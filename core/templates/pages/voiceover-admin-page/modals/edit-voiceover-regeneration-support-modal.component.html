@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h3>{{headerText}}</h3>
+</div>
+<div class="modal-body">
+  <div *ngIf="supportsAutogeneration && languageCodePresentInConstants">
+    <p>
+      <strong>⏳ coming soon: </strong>This action will cause voiceovers to be regenerated for all existing
+      <strong>{{languageDescription}}</strong>
+      translations in each curated exploration.
+
+      <i>
+        <strong>Note: </strong>If there are 100 explorations, each with 10,000 characters in its
+        <strong>{{languageDescription}}</strong> translation, the estimated cost for regenerating all voiceovers is approximately
+        <strong>$16 USD.</strong>
+      </i>
+
+      Do you want to continue?
+    </p>
+  </div>
+  <div *ngIf="!supportsAutogeneration">
+    <p>
+      <mat-icon>warning</mat-icon>
+      If you change your mind and turn on autogeneration again to "Yes" in near
+      future, all voiceovers for this language accent code in all the curated
+      explorations will be regenerated from scratch, as translations may have
+      changed. This will incur additional costs as per the given “Note” below.
+    </p>
+    <p>
+      <i>
+        <strong>Note: </strong>If there are 100 explorations, each with 10,000 characters in its
+        <strong>{{languageDescription}}</strong> translation, the estimated cost for regenerating all voiceovers is approximately
+        <strong>$16 USD.</strong>
+      </i>
+    </p>
+  </div>
+  <div *ngIf="!languageCodePresentInConstants">
+    <p>
+      The language code (<strong>{{languageCode}}</strong>) is not defined with
+      the necessary data in the <strong><a [href]="constantsFileLocation">constants file</a></strong> for the following fields:
+    </p>
+    <ul>
+      <li><strong>LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS</strong></li>
+      <li><strong>LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS</strong></li>
+    </ul>
+    <p>
+      These fields are essential for accurately synthesizing voiceovers for math symbols and ensuring correct sentence highlighting
+      during automatic voiceover playback.
+    </p>
+    <p>
+      <strong>Note: </strong>Please consult with the development team and add it to the codebase before proceeding with this action.
+    </p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success" (click)="update()" [disabled]="!languageCodePresentInConstants">
+    <span *ngIf="supportsAutogeneration">Turn on autogeneration</span>
+    <span *ngIf="!supportsAutogeneration">Turn off autogeneration</span>
+  </button>
+</div>
