@@ -38,7 +38,8 @@ STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT: Final = 'sections_content'
 CMD_CREATE_NEW: Final = 'create_new'
 # This takes additional 'heading_plaintext' and 'content_html' parameters.
 CMD_ADD_NEW_SECTION: Final = 'add_new_section'
-# This takes additional 'heading_content_id' and 'content_content_id' parameters.
+# This takes additional 'heading_content_id' and 'content_content_id'
+# parameters.
 CMD_DELETE_SECTION: Final = 'delete_section'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -206,8 +207,8 @@ class StudyGuideSection:
         """Constructs a StudyGuideSection domain object.
 
         Args:
-            heading: SubtitledUnicode. The heading of the section being displayed
-                on the page.
+            heading: SubtitledUnicode. The heading of the section being
+                displayed on the page.
             content: SubtitledHtml. The content of the section being displayed
                 on the page.
         """
@@ -260,8 +261,8 @@ class StudyGuideSection:
         """Creates a study guide sections object from a dictionary.
 
         Args:
-            sections_dict: dict. The dict representation of
-                StudyGuideSection object.
+        section_dict: dict. The dict representation of
+            StudyGuideSection object.
 
         Returns:
             StudyGuideSection. The corresponding object.
@@ -289,6 +290,7 @@ class StudyGuideDict(TypedDict):
     language_code: str
     version: int
 
+
 class StudyGuideAndroidDict(TypedDict):
     """Dictionary representing the Android StudyGuide object."""
 
@@ -296,6 +298,7 @@ class StudyGuideAndroidDict(TypedDict):
     topic_id: str
     page_contents: state_domain.SubtitledHtmlDict
     page_contents_schema_version: int
+    language_code: str
     version: int
 
 
@@ -321,6 +324,8 @@ class StudyGuide:
                 and content pairs of the to be shown to the user.
             sections_schema_version: int. The schema version for the sections
                 object.
+            next_content_id_index: int. The content id for the next created
+                section.
             language_code: str. The ISO 639-1 code for the language this
                 study guide is written in.
             version: int. The current version of the study guide.
@@ -341,7 +346,7 @@ class StudyGuide:
         """
         sections_dicts = []
         for section in self.sections:
-            sections_dicts.append(section.to_dict()) 
+            sections_dicts.append(section.to_dict())
         return {
             'id': self.id,
             'next_content_id_index': self.next_content_id_index,
@@ -360,15 +365,19 @@ class StudyGuide:
             for Android with a single 'subtitled_html' field.
         """
         concatenated_html_parts = []
-        
+
         for section in self.sections:
             section_dict = section.to_dict()
-            heading_html = f"<p><strong>{section_dict['heading']['unicode_str']}</strong></p>"
+            heading_html = (
+                f'<p><strong>'+
+                f'{section_dict['heading']['unicode_str']}'+
+                f'</strong></p>'
+            )
             concatenated_html_parts.append(heading_html)
             concatenated_html_parts.append(section_dict['content']['html'])
-        
+
         concatenated_html = '\n\n'.join(concatenated_html_parts)
-        
+
         return {
             'id': self.id,
             'topic_id': self.topic_id,
@@ -388,7 +397,8 @@ class StudyGuide:
         """Returns the study guide page id from the topic_id and study_guide_id.
 
         Args:
-            topic_id: str. The id of the topic that the study guide is a part of.
+            topic_id: str. The id of the topic that the study guide
+                is a part of.
             study_guide_id: int. The id of the study guide.
 
         Returns:
@@ -418,7 +428,10 @@ class StudyGuide:
             sections field.
         """
         content_id_generator = translation_domain.ContentIdGenerator()
-        study_guide_page_id = cls.get_study_guide_page_id(topic_id, study_guide_id)
+        study_guide_page_id = cls.get_study_guide_page_id(
+            topic_id,
+            study_guide_id
+        )
         sections = []
         section = StudyGuideSection.create_study_guide_section(
                 content_id_generator.generate(
@@ -507,10 +520,15 @@ class StudyGuide:
         """The new value for the heading data field.
 
         Args:
-            new_sections_heading: SubtitledUnicode. The new heading for a section of the
-                study guide.
-            old_sections_heading: SubtitledUnicode. The content id of the old heading for
-                a section of the study guide to be updated.
+        new_section_heading: SubtitledUnicode. The new heading for a
+            section of the study guide.
+        old_section_heading_content_id: str. The content id of the
+            old heading for a section of the study guide to be
+            updated.
+
+        Raises:
+        Exception. The provided old_section_heading_content_id
+            does not exist.
         """
         for section in self.sections:
             if old_section_heading_content_id == section.heading.content_id:
@@ -525,26 +543,31 @@ class StudyGuide:
 
     def update_section_content(
         self,
-        new_section_heading: state_domain.SubtitledUnicode,
-        old_section_heading_content_id: str
+        new_section_content: state_domain.SubtitledHtml,
+        old_section_content_content_id: str
     ) -> None:
-        """The new value for the heading data field.
+        """The new value for the content data field.
 
         Args:
-            new_sections_heading: SubtitledUnicode. The new heading for a section of the
-                study guide.
-            old_sections_heading: SubtitledUnicode. The content id of the old heading for
-                a section of the study guide to be updated.
+            new_section_content: SubtitledHtml. The new content
+                for a section of the study guide.
+            old_section_content_content_id: str. The content id
+                of the old content for a section of the study
+                guide to be updated.
+
+        Raises:
+        Exception. The provided old_section_content_content_id
+            does not exist.
         """
         for section in self.sections:
-            if old_section_heading_content_id == section.heading.content_id:
-                section.heading = new_section_heading
+            if old_section_content_content_id == section.content.content_id:
+                section.content = new_section_content
                 return
 
             raise Exception(
-                'Invalid heading content_id: %s; '
+                'Invalid content content_id: %s; '
                 'it is not in the list of sections for '
-                'this study guide' % (old_section_heading_content_id)
+                'this study guide' % (old_section_content_content_id)
             )
 
     def add_section(
@@ -582,17 +605,21 @@ class StudyGuide:
         """Deletes a section from the study guide.
 
         Args:
-            heading_content_id: str. The content id of the heading of the section
-                to be deleted.
-            content_content_id: str. The content id of the content of the section
-                to be deleted.
+        heading_content_id: str. The content id of the heading of the
+            section to be deleted.
+        content_content_id: str. The content id of the content of the
+            section to be deleted.
+
+        Raises:
+        Exception: The provided heading_content_id or
+            content_content_id does not exist.
         """
         for i, section in enumerate(self.sections):
             if (section.heading.content_id == heading_content_id and 
                 section.content.content_id == content_content_id):
                 del self.sections[i]
                 return
-    
+
         raise Exception(
             'Invalid section content_ids: heading=%s, content=%s; '
             'no matching section found in this study guide' % (

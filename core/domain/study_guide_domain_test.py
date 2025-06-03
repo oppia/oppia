@@ -189,17 +189,17 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         """Test updating a section heading."""
         first_section = self.study_guide.sections[0]
         old_content_id = first_section.heading.content_id
-        new_heading = state_domain.SubtitledUnicode('new_content_id', 'Updated Heading')
+        new_heading = state_domain.SubtitledUnicode('section_heading_2', 'Updated Heading')
         
         self.study_guide.update_section_heading(new_heading, old_content_id)
         
         updated_section = self.study_guide.sections[0]
-        self.assertEqual(updated_section.heading.content_id, 'new_content_id')
+        self.assertEqual(updated_section.heading.content_id, 'section_heading_2')
         self.assertEqual(updated_section.heading.unicode_str, 'Updated Heading')
 
     def test_update_section_heading_with_invalid_content_id(self) -> None:
         """Test updating section heading with invalid content ID raises exception."""
-        new_heading = state_domain.SubtitledUnicode('new_content_id', 'Updated Heading')
+        new_heading = state_domain.SubtitledUnicode('section_heading_2', 'Updated Heading')
         
         with self.assertRaisesRegex(
             Exception,
@@ -301,14 +301,14 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
                 'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
                 'study_guide_id': 1,
                 'property_name': 'invalid',
-                'old_value': {'content_id': 'old', 'unicode_str': 'old'},
-                'new_value': {'content_id': 'new', 'unicode_str': 'new'},
+                'old_value': {'content_id': 'section_heading_0', 'unicode_str': 'old'},
+                'new_value': {'content_id': 'section_heading_2', 'unicode_str': 'new'},
             })
 
     def test_create_new_study_guide_change(self) -> None:
         """Test creation of CreateNewStudyGuideCmd."""
         change_dict = {
-            'cmd': study_guide_domain.CMD_CREATE_NEW,
+            'cmd': 'create_new',
             'topic_id': 'topic_id',
             'study_guide_id': 1
         }
@@ -336,27 +336,27 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_section_change(self) -> None:
         """Test creation of DeleteSectionCmd."""
         change_dict = {
-            'cmd': study_guide_domain.CMD_DELETE_SECTION,
-            'heading_content_id': 'heading_id',
-            'content_content_id': 'content_id',
+            'cmd': 'delete_section',
+            'heading_content_id': 'section_heading_0',
+            'content_content_id': 'section_content_1',
             'study_guide_id': 1
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
         
         self.assertEqual(change_object.cmd, study_guide_domain.CMD_DELETE_SECTION)
-        self.assertEqual(change_object.heading_content_id, 'heading_id')
-        self.assertEqual(change_object.content_content_id, 'content_id')
+        self.assertEqual(change_object.heading_content_id, 'section_heading_0')
+        self.assertEqual(change_object.content_content_id, 'section_content_1')
         self.assertEqual(change_object.study_guide_id, 1)
 
     def test_update_study_guide_property_sections_heading_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsHeadingCmd."""
-        old_value = {'content_id': 'old_id', 'unicode_str': 'Old Heading'}
-        new_value = {'content_id': 'new_id', 'unicode_str': 'New Heading'}
+        old_value = {'content_id': 'section_heading_0', 'unicode_str': 'Old Heading'}
+        new_value = {'content_id': 'section_heading_2', 'unicode_str': 'New Heading'}
         
         change_dict = {
-            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'cmd': 'update_study_guide_property',
             'study_guide_id': 1,
-            'property_name': study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS_HEADING,
+            'property_name': 'sections_heading',
             'old_value': old_value,
             'new_value': new_value
         }
@@ -370,13 +370,13 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_study_guide_property_sections_content_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsContentCmd."""
-        old_value = {'content_id': 'old_id', 'html': '<p>Old content</p>'}
-        new_value = {'content_id': 'new_id', 'html': '<p>New content</p>'}
+        old_value = {'content_id': 'section_content_1', 'html': '<p>Old content</p>'}
+        new_value = {'content_id': 'section_content_3', 'html': '<p>New content</p>'}
         
         change_dict = {
-            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'cmd': 'update_study_guide_property',
             'study_guide_id': 1,
-            'property_name': study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT,
+            'property_name': 'sections_content',
             'old_value': old_value,
             'new_value': new_value
         }
@@ -391,7 +391,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
     def test_migrate_study_guide_sections_schema_change(self) -> None:
         """Test creation of migration command."""
         change_dict = {
-            'cmd': study_guide_domain.CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION,
+            'cmd': 'migrate_study_guide_sections_schema_to_latest_version',
             'from_version': 1,
             'to_version': 2
         }
@@ -407,7 +407,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         """Test StudyGuideChange to_dict method."""
         change_dict = {
-            'cmd': study_guide_domain.CMD_CREATE_NEW,
+            'cmd': 'create_new',
             'topic_id': 'topic_id',
             'study_guide_id': 1
         }
@@ -484,11 +484,11 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
             'sections': [
                 {
                     'heading': {
-                        'content_id': 'heading_1',
+                        'content_id': 'section_heading_0',
                         'unicode_str': 'Test Heading'
                     },
                     'content': {
-                        'content_id': 'content_1',
+                        'content_id': 'section_content_1',
                         'html': '<p>Test content</p>'
                     }
                 }
@@ -498,7 +498,6 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
         # Mock the conversion function that would be called
         def mock_conversion_fn(section_dict):
             """Simulates a conversion that adds a new field"""
-
             converted_section = section_dict.copy()
             converted_section['new_field'] = 'added_in_v2'
             return converted_section
