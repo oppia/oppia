@@ -20,11 +20,11 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 interface TypeDefinitionObject {
-  validate: (arg0: unknown) => boolean;
+  validate: (arg0: Object) => boolean;
 
   // The default value is typed as Object because its type could be anything.
   // It depends on the arguments passed to the constructor.
-  default_value: unknown;
+  default_value: Object;
 }
 
 interface RegistryType {
@@ -33,15 +33,15 @@ interface RegistryType {
 
 export class ParamType {
   _name: string;
-  valueIsValid: (arg0: unknown) => boolean;
-  defaultValue: unknown;
+  valueIsValid: (arg0: Object) => boolean;
+  defaultValue: Object;
 
   // Type registration.
   /** @type {Object.<String, ParamType>} */
   static registry: RegistryType = (() => {
     const registry: RegistryType = {
       UnicodeString: new ParamType({
-        validate: (value: unknown) => {
+        validate: (value: Object) => {
           return typeof value === 'string' || value instanceof String;
         },
         default_value: '',
@@ -87,7 +87,7 @@ export class ParamType {
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
-  createDefaultValue(): unknown {
+  createDefaultValue(): Object {
     return cloneDeep(this.defaultValue);
   }
 
