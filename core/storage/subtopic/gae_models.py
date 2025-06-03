@@ -210,19 +210,19 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         datastore_services.StringProperty(indexed=True, required=True))
 
     @classmethod
-    def get_instance_id(cls, study_guide_id: str, version: int) -> str:
+    def get_instance_id(cls, study_guide_page_id: str, version: int) -> str:
         """This function returns the generated id for the get_commit function
         in the parent class.
 
         Args:
-            study_guide_page_id: str. The id of the study guide being edited.
-            version: int. The version number of the study guide after the
-                commit.
+        study_guide_page_id: str. The id of the study guide being edited.
+        version: int. The version number of the study guide after the
+            commit.
 
         Returns:
-            str. The commit id with the study guide id and version number.
+        str. The commit id with the study guide id and version number.
         """
-        return 'studyguide-%s-%s' % (study_guide_id, version)
+        return 'studyguide-%s-%s' % (study_guide_page_id, version)
 
     @staticmethod
     def get_model_association_to_user(

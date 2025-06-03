@@ -369,8 +369,8 @@ class StudyGuide:
         for section in self.sections:
             section_dict = section.to_dict()
             heading_html = (
-                f'<p><strong>'+
-                f'{section_dict['heading']['unicode_str']}'+
+                f'<p><strong>' +
+                f'{section_dict["heading"]["unicode_str"]}' +
                 f'</strong></p>'
             )
             concatenated_html_parts.append(heading_html)
@@ -576,7 +576,7 @@ class StudyGuide:
             content_html: str
     ) -> None:
         """Adds a section to the study guide.
-        
+
         Args:
             heading_plaintext: str. The heading of the new section.
             content_html: str. The content of the new section.
@@ -625,7 +625,6 @@ class StudyGuide:
             'no matching section found in this study guide' % (
                 heading_content_id, content_content_id)
         )
-
 
     def validate(self) -> None:
         """Validates various properties of the StudyGuide object.

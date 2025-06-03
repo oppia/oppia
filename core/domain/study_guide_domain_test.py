@@ -14,18 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for study guide domain objects."""
+"""Tests for study guide domain objects."""
 
-from typing import Dict, List
+from __future__ import annotations
 
-from core.domain import study_guide_domain
-from core.domain import state_domain
-from core.domain import translation_domain
-from core.tests import test_utils
-from core import utils
 from core import feconf
+from core import utils
 from core.constants import constants
-
+from core.domain import state_domain
+from core.domain import study_guide_domain
+from core.tests import test_utils
 
 class StudyGuideSectionDomainUnitTests(test_utils.GenericTestBase):
     """Tests for StudyGuideSection domain objects."""
@@ -46,8 +44,16 @@ class StudyGuideSectionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_study_guide_section(self) -> None:
         """Test creation of a study guide section."""
-        section = study_guide_domain.StudyGuideSection.create_study_guide_section(
-            'section_heading_2', 'Sample Heading', 'section_content_3', '<p>Sample content</p>')
+        section = (
+            study_guide_domain
+            .StudyGuideSection
+            .create_study_guide_section(
+                'section_heading_2',
+                'Sample Heading',
+                'section_content_3',
+                '<p>Sample content</p>'
+            )
+        )
         
         self.assertEqual(section.heading.content_id, 'section_heading_2')
         self.assertEqual(section.heading.unicode_str, 'Sample Heading')
@@ -74,7 +80,7 @@ class StudyGuideSectionDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>Test content</p>'
             }
         }
-        
+
         section = study_guide_domain.StudyGuideSection.from_dict(section_dict)
         self.assertEqual(section.heading.content_id, 'section_heading_2')
         self.assertEqual(section.heading.unicode_str, 'Test Heading')
@@ -91,60 +97,82 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.study_guide = study_guide_domain.StudyGuide.create_study_guide(
-            self.study_guide_id, self.topic_id, 'Test Heading', '<p>Test content</p>')
+            self.study_guide_id,
+            self.topic_id,
+            'Test Heading',
+            '<p>Test content</p>'
+        )
 
     def test_create_study_guide(self) -> None:
         """Test creation of a default study guide."""
         study_guide = study_guide_domain.StudyGuide.create_study_guide(
             2, 'topic_123', 'Sample Heading', '<p>Sample content</p>')
-        
+
         self.assertEqual(study_guide.id, 'topic_123-2')
         self.assertEqual(study_guide.topic_id, 'topic_123')
         self.assertEqual(len(study_guide.sections), 1)
-        self.assertEqual(study_guide.sections[0].heading.unicode_str, 'Sample Heading')
-        self.assertEqual(study_guide.sections[0].content.html, '<p>Sample content</p>')
-        self.assertEqual(study_guide.language_code, constants.DEFAULT_LANGUAGE_CODE)
+        self.assertEqual(
+            study_guide.sections[0].heading.unicode_str,
+            'Sample Heading'
+        )
+        self.assertEqual(
+            study_guide.sections[0].content.html,
+            '<p>Sample content</p>'
+        )
+        self.assertEqual(
+            study_guide.language_code,
+            constants.DEFAULT_LANGUAGE_CODE
+        )
         self.assertEqual(study_guide.version, 1)
 
     def test_get_study_guide_page_id(self) -> None:
         """Test generation of study guide page ID."""
-        page_id = study_guide_domain.StudyGuide.get_study_guide_page_id('abc', 5)
+        page_id = study_guide_domain.StudyGuide.get_study_guide_page_id(
+            'abc',
+            5
+        )
         self.assertEqual(page_id, 'abc-5')
 
     def test_get_study_guide_id_from_study_guide_page_id(self) -> None:
         """Test extraction of study guide ID from page ID."""
-        study_guide_id = self.study_guide.get_study_guide_id_from_study_guide_page_id()
+        study_guide_id = (
+            self.study_guide
+            .get_study_guide_id_from_study_guide_page_id()
+        )
         self.assertEqual(study_guide_id, self.study_guide_id)
 
     def test_to_dict(self) -> None:
         """Test conversion of study guide to dictionary."""
         study_guide_dict = self.study_guide.to_dict()
-        
+
         expected_keys = {
             'id', 'next_content_id_index', 'topic_id', 'sections',
             'sections_schema_version', 'language_code', 'version'
         }
         self.assertEqual(set(study_guide_dict.keys()), expected_keys)
-        self.assertEqual(study_guide_dict['id'], f'{self.topic_id}-{self.study_guide_id}')
+        self.assertEqual(
+            study_guide_dict['id'],
+            f'{self.topic_id}-{self.study_guide_id}'
+        )
         self.assertEqual(study_guide_dict['topic_id'], self.topic_id)
 
     def test_to_subtopic_page_dict_for_android(self) -> None:
         """Test conversion to Android-compatible format."""
-        # Add another section to test concatenation
+        # Add another section to test concatenation.
         self.study_guide.add_section('Second Heading', '<p>Second content</p>')
-        
+
         android_dict = self.study_guide.to_subtopic_page_dict_for_android()
-        
+
         expected_keys = {
             'id', 'topic_id', 'page_contents', 'page_contents_schema_version',
             'language_code', 'version'
         }
         self.assertEqual(set(android_dict.keys()), expected_keys)
-        
-        # Check that HTML is concatenated properly
+
+        # Check that HTML is concatenated properly.
         page_contents = android_dict['page_contents']
         self.assertIn('subtitled_html', page_contents)
-        
+
         html_content = page_contents['subtitled_html']['html']
         self.assertIn('<p><strong>Test Heading</strong></p>', html_content)
         self.assertIn('<p>Test content</p>', html_content)
@@ -155,7 +183,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         """Test adding a new section to the study guide."""
         initial_count = len(self.study_guide.sections)
         self.study_guide.add_section('New Heading', '<p>New content</p>')
-        
+
         self.assertEqual(len(self.study_guide.sections), initial_count + 1)
         new_section = self.study_guide.sections[-1]
         self.assertEqual(new_section.heading.unicode_str, 'New Heading')
@@ -165,42 +193,63 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         """Test deleting a section from the study guide."""
         # Add a second section first
         self.study_guide.add_section('Second Heading', '<p>Second content</p>')
-        
-        # Get the content IDs of the first section
+
+        # Get the content IDs of the first section.
         first_section = self.study_guide.sections[0]
         heading_content_id = first_section.heading.content_id
         content_content_id = first_section.content.content_id
-        
+
         initial_count = len(self.study_guide.sections)
         self.study_guide.delete_section(heading_content_id, content_content_id)
-        
+
         self.assertEqual(len(self.study_guide.sections), initial_count - 1)
-        # The remaining section should be the second one
-        self.assertEqual(self.study_guide.sections[0].heading.unicode_str, 'Second Heading')
+        # The remaining section should be the second one.
+        self.assertEqual(
+            self.study_guide.sections[0].heading.unicode_str,
+            'Second Heading'
+        )
 
     def test_delete_section_with_invalid_content_ids(self) -> None:
         """Test deleting a section with invalid content IDs raises exception."""
         with self.assertRaisesRegex(
             Exception,
-            'Invalid section content_ids: heading=invalid_heading, content=invalid_content'):
-            self.study_guide.delete_section('invalid_heading', 'invalid_content')
+            'Invalid section content_ids: heading=invalid_heading, ' \
+            'content=invalid_content'
+        ):
+            self.study_guide.delete_section(
+                'invalid_heading',
+                'invalid_content'
+            )
 
     def test_update_section_heading(self) -> None:
         """Test updating a section heading."""
         first_section = self.study_guide.sections[0]
         old_content_id = first_section.heading.content_id
-        new_heading = state_domain.SubtitledUnicode('section_heading_2', 'Updated Heading')
-        
+        new_heading = state_domain.SubtitledUnicode(
+            'section_heading_2',
+            'Updated Heading'
+        )
+
         self.study_guide.update_section_heading(new_heading, old_content_id)
-        
+
         updated_section = self.study_guide.sections[0]
-        self.assertEqual(updated_section.heading.content_id, 'section_heading_2')
-        self.assertEqual(updated_section.heading.unicode_str, 'Updated Heading')
+        self.assertEqual(
+            updated_section.heading.content_id,
+            'section_heading_2'
+        )
+        self.assertEqual(
+            updated_section.heading.unicode_str,
+            'Updated Heading'
+        )
 
     def test_update_section_heading_with_invalid_content_id(self) -> None:
-        """Test updating section heading with invalid content ID raises exception."""
-        new_heading = state_domain.SubtitledUnicode('section_heading_2', 'Updated Heading')
-        
+        """Test updating section heading with invalid
+            content ID raises exception."""
+        new_heading = state_domain.SubtitledUnicode(
+            'section_heading_2',
+            'Updated Heading'
+        )
+
         with self.assertRaisesRegex(
             Exception,
             'Invalid heading content_id: invalid_id'):
@@ -301,8 +350,14 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
                 'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
                 'study_guide_id': 1,
                 'property_name': 'invalid',
-                'old_value': {'content_id': 'section_heading_0', 'unicode_str': 'old'},
-                'new_value': {'content_id': 'section_heading_2', 'unicode_str': 'new'},
+                'old_value': {
+                    'content_id': 'section_heading_0',
+                    'unicode_str': 'old'
+                },
+                'new_value': {
+                    'content_id': 'section_heading_2',
+                    'unicode_str': 'new'
+                },
             })
 
     def test_create_new_study_guide_change(self) -> None:
@@ -313,7 +368,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'study_guide_id': 1
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
+
         self.assertEqual(change_object.cmd, study_guide_domain.CMD_CREATE_NEW)
         self.assertEqual(change_object.topic_id, 'topic_id')
         self.assertEqual(change_object.study_guide_id, 1)
@@ -327,8 +382,11 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'study_guide_id': 1
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
-        self.assertEqual(change_object.cmd, study_guide_domain.CMD_ADD_NEW_SECTION)
+
+        self.assertEqual(
+            change_object.cmd,
+            study_guide_domain.CMD_ADD_NEW_SECTION
+        )
         self.assertEqual(change_object.heading_plaintext, 'New Heading')
         self.assertEqual(change_object.content_html, '<p>New content</p>')
         self.assertEqual(change_object.study_guide_id, 1)
@@ -342,17 +400,26 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'study_guide_id': 1
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
-        self.assertEqual(change_object.cmd, study_guide_domain.CMD_DELETE_SECTION)
+
+        self.assertEqual(
+            change_object.cmd,
+            study_guide_domain.CMD_DELETE_SECTION
+        )
         self.assertEqual(change_object.heading_content_id, 'section_heading_0')
         self.assertEqual(change_object.content_content_id, 'section_content_1')
         self.assertEqual(change_object.study_guide_id, 1)
 
     def test_update_study_guide_property_sections_heading_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsHeadingCmd."""
-        old_value = {'content_id': 'section_heading_0', 'unicode_str': 'Old Heading'}
-        new_value = {'content_id': 'section_heading_2', 'unicode_str': 'New Heading'}
-        
+        old_value = {
+            'content_id': 'section_heading_0',
+            'unicode_str': 'Old Heading'
+        }
+        new_value = {
+            'content_id': 'section_heading_2',
+            'unicode_str': 'New Heading'
+        }
+
         change_dict = {
             'cmd': 'update_study_guide_property',
             'study_guide_id': 1,
@@ -361,8 +428,11 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'new_value': new_value
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
-        self.assertEqual(change_object.cmd, study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY)
+
+        self.assertEqual(
+            change_object.cmd,
+            study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
+        )
         self.assertEqual(change_object.study_guide_id, 1)
         self.assertEqual(change_object.property_name, 'sections_heading')
         self.assertEqual(change_object.old_value, old_value)
@@ -370,9 +440,15 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_study_guide_property_sections_content_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsContentCmd."""
-        old_value = {'content_id': 'section_content_1', 'html': '<p>Old content</p>'}
-        new_value = {'content_id': 'section_content_3', 'html': '<p>New content</p>'}
-        
+        old_value = {
+            'content_id': 'section_content_1',
+            'html': '<p>Old content</p>'
+        }
+        new_value = {
+            'content_id': 'section_content_3',
+            'html': '<p>New content</p>'
+        }
+
         change_dict = {
             'cmd': 'update_study_guide_property',
             'study_guide_id': 1,
@@ -381,8 +457,11 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'new_value': new_value
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
-        self.assertEqual(change_object.cmd, study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY)
+
+        self.assertEqual(
+            change_object.cmd,
+            study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
+        )
         self.assertEqual(change_object.study_guide_id, 1)
         self.assertEqual(change_object.property_name, 'sections_content')
         self.assertEqual(change_object.old_value, old_value)
@@ -396,10 +475,13 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'to_version': 2
         }
         change_object = study_guide_domain.StudyGuideChange(change_dict)
-        
+
         self.assertEqual(
             change_object.cmd,
-            study_guide_domain.CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION
+            (
+                study_guide_domain
+                .CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION
+            )
         )
         self.assertEqual(change_object.from_version, 1)
         self.assertEqual(change_object.to_version, 2)
@@ -435,7 +517,7 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
     def test_to_dict(self) -> None:
         """Test StudyGuideSummary to_dict method."""
         study_guide_summary_dict = self.study_guide_summary.to_dict()
-        
+
         expected_dict = {
             'study_guide_id': self.STUDY_GUIDE_ID,
             'study_guide_title': self.STUDY_GUIDE_TITLE,
@@ -447,7 +529,7 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
             'parent_topic_url_fragment': 'topic-url',
             'classroom_url_fragment': 'classroom-url'
         }
-        
+
         self.assertEqual(study_guide_summary_dict, expected_dict)
 
     def test_to_dict_with_none_values(self) -> None:
@@ -456,9 +538,9 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
             self.STUDY_GUIDE_ID, self.STUDY_GUIDE_TITLE, self.PARENT_TOPIC_ID,
             self.PARENT_TOPIC_NAME, None, None, None, None, None
         )
-        
+
         study_guide_summary_dict = study_guide_summary.to_dict()
-        
+
         expected_dict = {
             'study_guide_id': self.STUDY_GUIDE_ID,
             'study_guide_title': self.STUDY_GUIDE_TITLE,
@@ -470,7 +552,7 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
             'parent_topic_url_fragment': None,
             'classroom_url_fragment': None
         }
-        
+
         self.assertEqual(study_guide_summary_dict, expected_dict)
 
 
@@ -479,7 +561,10 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
 
     def test_update_sections_from_model(self) -> None:
         """Test updating sections from model with version conversion."""
-        versioned_sections: study_guide_domain.VersionedStudyGuideSectionsDict = {
+        versioned_sections: (
+            study_guide_domain
+            .VersionedStudyGuideSectionsDict
+        ) = {
             'schema_version': 1,
             'sections': [
                 {
@@ -494,43 +579,60 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
                 }
             ]
         }
-        
-        # Mock the conversion function that would be called
+
+        # Mock the conversion function that would be called.
         def mock_conversion_fn(section_dict):
             """Simulates a conversion that adds a new field"""
             converted_section = section_dict.copy()
             converted_section['new_field'] = 'added_in_v2'
             return converted_section
-        
-        # Mock the conversion method on the StudyGuide class
+
+        # Mock the conversion method on the StudyGuide class.
         original_method = getattr(study_guide_domain.StudyGuide, 
                                 '_convert_section_v1_dict_to_v2_dict', None)
-        study_guide_domain.StudyGuide._convert_section_v1_dict_to_v2_dict = staticmethod(mock_conversion_fn)
-        
+        (
+            study_guide_domain
+            .StudyGuide
+            ._convert_section_v1_dict_to_v2_dict
+        ) = staticmethod(mock_conversion_fn)
+
         try:
             initial_version = 1
             study_guide_domain.StudyGuide.update_sections_from_model(
                 versioned_sections, initial_version)
-            
-            # Check that schema version was incremented
+
+            # Check that schema version was incremented.
             self.assertEqual(versioned_sections['schema_version'], 2)
-            
-            # Check that conversion function was applied to each section
+
+            # Check that conversion function was applied to each section.
             self.assertEqual(len(versioned_sections['sections']), 1)
             self.assertIn('new_field', versioned_sections['sections'][0])
-            self.assertEqual(versioned_sections['sections'][0]['new_field'], 'added_in_v2')
-            
+            self.assertEqual(
+                versioned_sections['sections'][0]['new_field'],
+                'added_in_v2'
+            )
+
         finally:
-            # Restore original method if it existed
+            # Restore original method if it existed.
             if original_method:
-                study_guide_domain.StudyGuide._convert_section_v1_dict_to_v2_dict = original_method
+                (
+                    study_guide_domain
+                    .StudyGuide
+                    ._convert_section_v1_dict_to_v2_dict
+                ) = original_method
             else:
-                # Remove the mock method
-                delattr(study_guide_domain.StudyGuide, '_convert_section_v1_dict_to_v2_dict')
+                # Remove the mock method.
+                delattr(
+                    study_guide_domain.StudyGuide,
+                    '_convert_section_v1_dict_to_v2_dict'
+                )
 
     def test_update_sections_from_model_with_multiple_sections(self) -> None:
         """Test updating multiple sections from model."""
-        versioned_sections: study_guide_domain.VersionedStudyGuideSectionsDict = {
+        versioned_sections: (
+            study_guide_domain
+            .VersionedStudyGuideSectionsDict
+        ) = {
             'schema_version': 2,
             'sections': [
                 {
@@ -555,30 +657,37 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
                 }
             ]
         }
-        
-        # Mock conversion function
+
+        # Mock conversion function.
         def mock_conversion_fn(section_dict):
             converted_section = section_dict.copy()
             converted_section['converted'] = True
             return converted_section
-        
-        study_guide_domain.StudyGuide._convert_section_v2_dict_to_v3_dict = staticmethod(mock_conversion_fn)
-        
+
+        (
+            study_guide_domain
+            .StudyGuide
+            ._convert_section_v2_dict_to_v3_dict
+        ) = staticmethod(mock_conversion_fn)
+
         try:
             initial_version = 2
             study_guide_domain.StudyGuide.update_sections_from_model(
                 versioned_sections, initial_version)
-            
-            # Check schema version increment
+
+            # Check schema version increment.
             self.assertEqual(versioned_sections['schema_version'], 3)
-            
-            # Check all sections were converted
+
+            # Check all sections were converted.
             self.assertEqual(len(versioned_sections['sections']), 2)
             for section in versioned_sections['sections']:
                 self.assertTrue(section['converted'])
-                
+
         finally:
-            delattr(study_guide_domain.StudyGuide, '_convert_section_v2_dict_to_v3_dict')
+            delattr(
+                study_guide_domain.StudyGuide,
+                '_convert_section_v2_dict_to_v3_dict'
+            )
 
 
 class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
@@ -608,15 +717,18 @@ class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
                 }
             }
         ]
-        
-        # Define a conversion function that wraps content in <strong> tags
+
+        # Define a conversion function that wraps content in <strong> tags.
         def html_conversion_fn(html_string: str) -> str:
             return f'<modified>{html_string}</modified>'
-        
-        converted_sections = study_guide_domain.StudyGuide.convert_html_fields_in_study_guide_sections(
-            original_sections, html_conversion_fn)
-                
-        # Check that converted sections have modified HTML
+
+        converted_sections = (
+            study_guide_domain
+            .StudyGuide
+            .convert_html_fields_in_study_guide_sections
+        )(original_sections, html_conversion_fn)
+      
+        # Check that converted sections have modified HTML.
         self.assertEqual(
             converted_sections[0]['content']['html'],
             '<modified><p>Original content</p></modified>'
@@ -625,13 +737,16 @@ class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
     def test_convert_html_fields_with_empty_sections_list(self) -> None:
         """Test HTML conversion with empty sections list."""
         empty_sections = []
-        
+
         def dummy_conversion_fn(html_string: str) -> str:
             return html_string.upper()
-        
-        converted_sections = study_guide_domain.StudyGuide.convert_html_fields_in_study_guide_sections(
-            empty_sections, dummy_conversion_fn)
-        
+
+        converted_sections = (
+            study_guide_domain
+            .StudyGuide
+            .convert_html_fields_in_study_guide_sections
+        )(empty_sections, dummy_conversion_fn)
+
         self.assertEqual(len(converted_sections), 0)
         self.assertEqual(converted_sections, [])
 
@@ -645,17 +760,23 @@ class StudyGuideConvertHtmlFieldsTests(test_utils.GenericTestBase):
                 },
                 'content': {
                     'content_id': 'content_1',
-                    'html': '<div><p>Paragraph <strong>bold</strong> and <em>italic</em></p><ul><li>Item 1</li><li>Item 2</li></ul></div>'
+                    'html': '<div><p>Paragraph <strong>bold</strong> and <em>italic</em></p><ul><li>Item 1</li><li>Item 2</li></ul></div>' # pylint: disable=line-too-long
                 }
             }
         ]
-        
+
         def strip_tags_conversion(html_string: str) -> str:
-            # Simple function to demonstrate conversion - adds a wrapper div
+            # Simple function to demonstrate conversion - adds a wrapper div.
             return f'<div class="converted">{html_string}</div>'
-        
-        converted_sections = study_guide_domain.StudyGuide.convert_html_fields_in_study_guide_sections(
-            sections_with_complex_html, strip_tags_conversion)
-        
-        expected_html = '<div class="converted"><div><p>Paragraph <strong>bold</strong> and <em>italic</em></p><ul><li>Item 1</li><li>Item 2</li></ul></div></div>'
-        self.assertEqual(converted_sections[0]['content']['html'], expected_html)
+
+        converted_sections = (
+            study_guide_domain
+            .StudyGuide
+            .convert_html_fields_in_study_guide_sections
+        )(sections_with_complex_html, strip_tags_conversion)
+
+        expected_html = '<div class="converted"><div><p>Paragraph <strong>bold</strong> and <em>italic</em></p><ul><li>Item 1</li><li>Item 2</li></ul></div></div>' # pylint: disable=line-too-long
+        self.assertEqual(
+            converted_sections[0]['content']['html'],
+            expected_html
+        )
