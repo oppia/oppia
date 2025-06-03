@@ -202,11 +202,11 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     StudyGuideModel occurs.
 
     The id for this model is of the form
-    'studyguide-[study_guide_id]-[version]'.
+    'studyguide-[study_guide_page_id]-[version]'.
     """
 
     # The id of the study guide being edited.
-    study_guide_id = (
+    study_guide_page_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
     @classmethod
@@ -215,7 +215,7 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         in the parent class.
 
         Args:
-            study_guide_id: str. The id of the study guide being edited.
+            study_guide_page_id: str. The id of the study guide being edited.
             version: int. The version number of the study guide after the
                 commit.
 
@@ -239,7 +239,7 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         commit logs don't contain relevant data corresponding to those users.
         """
         return dict(super(cls, cls).get_export_policy(), **{
-            'study_guide_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'study_guide_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 
@@ -251,7 +251,7 @@ class StudyGuideModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
-    COMMIT_LOG_ENTRY_CLASS = StudyGuideCommitLogEntryModel()
+    COMMIT_LOG_ENTRY_CLASS = StudyGuideCommitLogEntryModel
     ALLOW_REVERT = False
 
     # The topic id that this study guide is a part of.
@@ -323,7 +323,7 @@ class StudyGuideModel(base_models.VersionedModel):
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
-        study_guide_commit_log_entry.subtopic_page_id = self.id
+        study_guide_commit_log_entry.study_guide_page_id = self.id
         # The order is important here, as the 'versioned_model' needs to be
         # after 'snapshot_content_model' otherwise it leads to problems with
         # putting the models into the datastore.

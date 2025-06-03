@@ -497,7 +497,8 @@ class StudyGuideUpdateSectionsFromModelTests(test_utils.GenericTestBase):
         
         # Mock the conversion function that would be called
         def mock_conversion_fn(section_dict):
-            # Simulate a conversion that adds a new field
+            """Simulates a conversion that adds a new field"""
+
             converted_section = section_dict.copy()
             converted_section['new_field'] = 'added_in_v2'
             return converted_section

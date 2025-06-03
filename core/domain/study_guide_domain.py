@@ -242,7 +242,7 @@ class StudyGuideSection:
                 content_content_id,
                 content_html))
 
-    def to_dict(self) -> StudyGuideSection:
+    def to_dict(self) -> StudyGuideSectionDict:
         """Returns a dict representing this StudyGuideSection domain object.
 
         Returns:
@@ -285,7 +285,17 @@ class StudyGuideDict(TypedDict):
     topic_id: str
     sections: List[StudyGuideSectionDict]
     sections_schema_version: int
+    next_content_id_index: int
     language_code: str
+    version: int
+
+class StudyGuideAndroidDict(TypedDict):
+    """Dictionary representing the Android StudyGuide object."""
+
+    id: str
+    topic_id: str
+    page_contents: state_domain.SubtitledHtmlDict
+    page_contents_schema_version: int
     version: int
 
 
@@ -341,8 +351,8 @@ class StudyGuide:
             'language_code': self.language_code,
             'version': self.version
         }
-    
-    def to_subtopic_page_dict_for_android(self) -> dict:
+
+    def to_subtopic_page_dict_for_android(self) -> StudyGuideAndroidDict:
         """Returns a dict formatted for Android compatibility.
 
         Returns:
