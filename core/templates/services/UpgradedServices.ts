@@ -604,6 +604,7 @@ export class UpgradedServices {
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']
       );
+    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']

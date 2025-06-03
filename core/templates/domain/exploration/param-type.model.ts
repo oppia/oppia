@@ -20,67 +20,96 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 interface TypeDefinitionObject {
-  validate: (value: unknown) => boolean;
+  validate: (arg0: unknown) => boolean;
+
+  // The default value is typed as Object because its type could be anything.
+  // It depends on the arguments passed to the constructor.
   default_value: unknown;
 }
 
+interface RegistryType {
+  [key: string]: ParamType;
+}
+
 export class ParamType {
-  private _name: string;
-  valueIsValid: (value: unknown) => boolean;
+  _name: string;
+  valueIsValid: (arg0: unknown) => boolean;
   defaultValue: unknown;
 
-  // Static registry for all available types.
-  private static registry: Record<string, ParamType> = (() => {
-    const unicodeString = new ParamType({
-      validate: (value: unknown): boolean =>
-        typeof value === 'string' || value instanceof String,
-      default_value: '',
-    });
-
-    unicodeString._name = 'UnicodeString';
-
-    // Freeze type to prevent mutation
-    Object.freeze(unicodeString);
-
-    const registry: Record<string, ParamType> = {
-      UnicodeString: unicodeString,
+  // Type registration.
+  /** @type {Object.<String, ParamType>} */
+  static registry: RegistryType = (() => {
+    const registry: RegistryType = {
+      UnicodeString: new ParamType({
+        validate: (value: unknown) => {
+          return typeof value === 'string' || value instanceof String;
+        },
+        default_value: '',
+      }),
     };
 
-    // Freeze registry itself
-    Object.freeze(registry);
+    Object.keys(registry).forEach((paramTypeName: string) => {
+      const paramType = registry[paramTypeName];
+      paramType._name = paramTypeName;
+      Object.freeze(paramType);
+    });
 
+    Object.freeze(registry);
     return registry;
   })();
 
+  /**
+   * @private @constructor
+   * Defines a specific type that a parameter can take.
+   *
+   * IMPORTANT: All new types must be created in this file and registered in the
+   * {@link ParamType.registry}. See {@link ParamType.registry.UnicodeString}
+   * for an example.
+   *
+   * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
+   *    is valid.
+   * @param {Object} defaultValue - simple value any parameter of this type can
+   * take.
+   */
   constructor(typeDefinitionObject: TypeDefinitionObject) {
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
-        'The default value is invalid according to the validation function.'
+        'The default value is invalid according to validation function'
       );
     }
 
+    /** @member {String} */
     this._name = '';
+    /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
+    /** @member {Object} */
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
+  /** @returns {Object} - A valid default value for this particular type. */
   createDefaultValue(): unknown {
     return cloneDeep(this.defaultValue);
   }
 
+  /** @returns {String} - The display-name of this type. */
   getName(): string {
     return this._name;
   }
 
+  /** @returns {ParamType} - Implementation-defined default parameter type. */
   static getDefaultType(): ParamType {
     return this.registry.UnicodeString;
   }
 
+  /**
+   * @param {String} backendName - the name of the type to fetch.
+   * @returns {ParamType} - The associated type, if any.
+   * @throws {Error} - When the given type name isn't registered.
+   */
   static getTypeFromBackendName(backendName: string): ParamType {
-    const type = this.registry[backendName];
-    if (!type) {
-      throw new Error(`${backendName} is not a registered parameter type.`);
+    if (!this.registry.hasOwnProperty(backendName)) {
+      throw new Error(backendName + ' is not a registered parameter type.');
     }
-    return type;
+    return this.registry[backendName];
   }
 }
