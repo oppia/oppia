@@ -322,7 +322,7 @@ CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
 
 # The current version of sections dict in the study guide schema.
-CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION = 2
+CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
