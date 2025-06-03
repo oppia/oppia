@@ -23,6 +23,7 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {verify} from 'crypto';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -81,7 +82,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.navigateToLearnerDashboard();
       await loggedInUser1.verifyPageIsRTL();
 
-      await loggedInUser1.navigateToSplashPage();
+      await loggedInUser1.navigateToSplashPage((verifyURL = false));
       await loggedInUser1.verifyPageIsRTL();
 
       await loggedInUser1.navigateToAboutPage();

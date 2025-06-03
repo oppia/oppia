@@ -36,6 +36,8 @@ const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
 const siteAdminPageUrl = testConstants.URLs.AdminPage;
 const CreatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const splashPageUrl = testConstants.URLs.splash;
+const classroomsPageUrl = testConstants.URLs.ClassroomsPage;
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -186,7 +188,7 @@ const homeTabSectionInLearnerDashboard =
   '.acceptance-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.acceptance-test-learner-dash-progress-tab';
-const goalsTabSectionInLearnerDashboard = 'e2e-test-current-goals-section';
+const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
 
 // Preferences page selectors.
 const deleteAccountPage = '.acceptance-test-delete-account';
@@ -198,12 +200,32 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
    */
-  async navigateToProfilePage(username: string): Promise<void> {
+  async navigateToProfilePage(
+    username: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
     if (this.page.url() === profilePageUrl) {
       return;
     }
-    await this.goto(profilePageUrl);
+    await this.goto(profilePageUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the splash page.
+   */
+  async navigateToSplashPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(splashPageUrl, verifyURL);
+  }
+
+  /**
+   * Function to navigate to the classrooms page.
+   */
+  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
+    if (this.page.url() === classroomsPageUrl) {
+      await this.page.reload();
+    }
+    await this.goto(classroomsPageUrl, verifyURL);
   }
 
   /**
@@ -562,7 +584,10 @@ export class LoggedInUser extends BaseUser {
    * Enters the provided username into the sign up username field and sign in if the username is correct.
    * @param {string} username - The username to enter.
    */
-  async signInWithUsername(username: string): Promise<void> {
+  async signInWithUsername(
+    username: string,
+    verifyLogin: boolean = true
+  ): Promise<void> {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(signUpUsernameField, {
       visible: true,
@@ -583,7 +608,8 @@ export class LoggedInUser extends BaseUser {
       await this.page.waitForSelector(registerNewUserButton);
       await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    } else {
+    } else if (verifyLogin) {
+      // If the username is invalid, we throw an error.
       throw new Error(
         'Invalid username. Please enter a valid username and try again.'
       );
@@ -692,12 +718,9 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
-  /**
-  /**
-   * Adds a lesson to the 'Play Later' list from community library page.
-   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
-   */
-  async addLessonToPlayLater(lessonTitle: string): Promise<void> {
+  async _addLessonToPlayLaterWithoutVerification(
+    lessonTitle: string
+  ): Promise<void> {
     try {
       await this.waitForPageToFullyLoad();
       const isMobileViewport = this.isViewportAtMobileWidth();
@@ -749,6 +772,20 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Adds a lesson to the 'Play Later' list from community library page.
+   * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
+   */
+  async addLessonToPlayLater(lessonTitle: string): Promise<void> {
+    await this._addLessonToPlayLaterWithoutVerification(lessonTitle);
+
+    // Post-check: Verify if the tooltip appears.
+    // TODO: Verify if post check is proper.
+    await this.expectToolTipMessage(
+      "Successfully added to your 'Play Later' list."
+    );
   }
 
   /**
@@ -988,15 +1025,17 @@ export class LoggedInUser extends BaseUser {
 
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
-      const found = await this.page.$$eval(
-        '.acceptance-test-subject-interest-chip',
-        (elements, interestText) =>
-          elements.some(el => el.textContent?.trim() === interestText),
-        interest
+      const foundTexts = await this.page.$$eval(
+        subjectInterestTagsInPreferencesPage,
+        elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
       );
 
+      const found = foundTexts.some(text => text === interest);
+
       if (!found) {
-        throw new Error(`Subject interest "${interest}" not added`);
+        throw new Error(
+          `Subject interest "<span class="math-inline">\{interest\}" not added\. Actual chip texts found\: \[</span>{foundTexts.join(', ')}]`
+        );
       }
     }
   }
@@ -1020,15 +1059,17 @@ export class LoggedInUser extends BaseUser {
 
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
-      const found = await this.page.$$eval(
-        '.acceptance-test-subject-interest-chip',
-        (elements, interestText) =>
-          elements.some(el => el.textContent?.trim() === interestText),
-        interest
+      const foundTexts = await this.page.$$eval(
+        subjectInterestTagsInPreferencesPage,
+        elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
       );
 
+      const found = foundTexts.some(text => text === interest);
+
       if (!found) {
-        throw new Error(`Subject interest "${interest}" not added`);
+        throw new Error(
+          `Subject interest "<span class="math-inline">\{interest\}" not added\. Actual chip texts found\: \[</span>{foundTexts.join(', ')}]`
+        );
       }
     }
   }

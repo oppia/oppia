@@ -21,6 +21,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {verify} from 'crypto';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const PROGRESS_URL_VALIDITY_INFO =
@@ -160,7 +161,10 @@ describe('Logged-out User', function () {
       );
       progressUrl = await loggedOutUser.copyProgressUrl();
 
-      await loggedOutUser.startExplorationUsingProgressUrl(progressUrl);
+      await loggedOutUser.startExplorationUsingProgressUrl(
+        progressUrl,
+        (verifyURL = true)
+      );
       await loggedOutUser.expectProgressRemainder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
