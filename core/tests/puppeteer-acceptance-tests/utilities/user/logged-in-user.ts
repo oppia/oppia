@@ -1136,43 +1136,19 @@ export class LoggedInUser extends BaseUser {
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
-    // const selectedLanguage = await this.page.$eval(
-    //   '.e2e-test-site-language-selector',
-    //   el => el?.textContent?.trim()
-    // );
-    await this.page.waitForSelector('.e2e-test-site-language-selector');
-    const selectedLanguageElement = await this.page.$(
-      '.e2e-test-site-language-selector'
-    );
-    const atr = await this.page.$eval(
-      '.e2e-test-site-language-selector',
-      el => {
-        const attrs = {};
-        for (let attr of el.attributes) {
-          attrs[attr.name] = attr.value;
-        }
-        return attrs;
-      }
-    );
-    console.log('Attributes:', atr);
-
     // TODO
+    await this.page.waitForSelector(
+      '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line'
+    );
 
-    // const selectedLanguage = selectedLanguageElement.qu
+    // Get the selected language text
+    const selectedLanguage = await this.page.$eval(
+      '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line',
+      el => el?.textContent?.trim()
+    );
 
-    // const selectedLanguage = await this.page.$eval(siteLanguageInputSelector, el => (el as HTMLInputElement).value)
-    // const selectedLanguage = await languageSelector?.evaluate(el => (el as HTMLInputElement).value);
-    // showMessage(selectedLanguage || 'No language selected');
-
-    // const selectedLanguage = await this.page.$eval(
-    //   `${siteLanguageInputSelector}`,
-    //   el => el.textContent?.trim()
-    // );
-    // if (selectedLanguage !== language) {
-    //   throw new Error(
-    //     `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
-    //   );
-    // }
+    // Assert the language is English
+    expect(selectedLanguage).toBe(language);
   }
 
   /**
@@ -1187,15 +1163,14 @@ export class LoggedInUser extends BaseUser {
     await this.page.keyboard.press('Enter');
 
     // TODO: Fix
-    const selectedAudioLanguage = await this.page.$eval(
-      audioLanguageInputSelector,
-      el => el.textContent?.trim()
+    await this.page.waitForSelector(
+      '.e2e-test-audio-language-selector .mat-select-min-line',
+      {visible: true}
     );
-    if (selectedAudioLanguage !== language) {
-      throw new Error(
-        `Language not set. Expected: ${language}, Found: ${selectedAudioLanguage}`
-      );
-    }
+    const selectedLanguage = await this.page.$eval(
+      '.e2e-test-audio-language-selector .mat-select-min-line',
+      el => el?.innerHTML?.trim()
+    );
   }
 
   /**
