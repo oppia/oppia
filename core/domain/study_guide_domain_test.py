@@ -226,6 +226,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_section_heading(self) -> None:
         """Test updating a section heading."""
+        self.study_guide.add_section('Second Heading', '<p>Second content</p>')
         old_section = self.study_guide.sections[1]
         old_content_id = old_section.heading.content_id
         new_heading = 'Updated Heading'
