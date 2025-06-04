@@ -453,68 +453,6 @@ class StudyGuide:
             content_id_generator.next_content_id_index,
             constants.DEFAULT_LANGUAGE_CODE, 1)
 
-    @classmethod
-    def update_sections_from_model(
-        cls,
-        versioned_sections: VersionedStudyGuideSectionsDict,
-        current_version: int
-    ) -> None:
-        """Converts the sections in the sections list contained
-        in the given versioned_sections dict from current_version to
-        current_version + 1. Note that the versioned_sections being
-        passed in is modified in-place.
-
-        Args:
-            versioned_sections: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
-                    sections dict.
-                - sections: List. The list comprising of the study guide
-                    section dicts.
-            current_version: int. The current schema version of sections.
-        """
-        versioned_sections['schema_version'] = current_version + 1
-
-        for i, section in enumerate(versioned_sections['sections']):
-            conversion_fn = getattr(
-                cls, '_convert_section_v%s_dict_to_v%s_dict' % (
-                    current_version, current_version + 1))
-            versioned_sections['sections'][i] = conversion_fn(section)
-
-    @classmethod
-    def convert_html_fields_in_study_guide_sections(
-        cls,
-        study_guide_section_dicts: List[StudyGuideSectionDict],
-        conversion_fn: Callable[[str], str]
-    ) -> List[StudyGuideSectionDict]:
-        """Applies a conversion function on all the html strings in study
-        guide sections to migrate them to a desired state.
-
-        Args:
-            study_guide_section_dicts: List. The list containing dicts of
-                study guide sections.
-            conversion_fn: function. The conversion function to be applied on
-                the study_guide_section_dicts.
-
-        Returns:
-            dict. The converted subtopic_page_contents_dict.
-        """
-        new_study_guide_section_dicts = []
-        for section in study_guide_section_dicts:
-            modified_section = section.copy()
-            modified_section['content']['html'] = (
-                conversion_fn(
-                    modified_section['content']['html']))
-            new_study_guide_section_dicts.append(modified_section)
-        return new_study_guide_section_dicts
-
-    def get_study_guide_id_from_study_guide_page_id(self) -> int:
-        """Returns the id from the study guide page id of the object.
-
-        Returns:
-            int. The study_guide_id of the object.
-        """
-        return int(self.id[len(self.topic_id) + 1:])
-
     def update_section_heading(
         self,
         new_section_heading: str,
